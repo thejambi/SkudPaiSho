@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<title>Skud Pai Sho</title>
+
+	<!-- Images used in Skud Pai Sho are originally from the Lotus Gambit rules community at http://lotusgambit.pbworks.com/w/page/45592429/Home -->
+
+	<link href="style/main.css" rel="stylesheet" type="text/css">
+
+	<!-- <link href="favicon.ico" rel="shortcut icon"> -->
+	<link href="meta/apple-touch-icon.png" rel="apple-touch-icon">
+	<link href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+	<!-- iPhone 5+ -->
+	<link href="meta/apple-touch-startup-image-640x920.png" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+	<!-- iPhone, retina -->
+	<meta content="yes" name="apple-mobile-web-app-capable">
+	<meta content="black" name="apple-mobile-web-app-status-bar-style">
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+
+	<script src="js/GameData.js"></script>
+	<script src="js/Actuator.js"></script>
+	<script src="js/Tile.js"></script>
+	<script src="js/TileManager.js"></script>
+	<script src="js/BoardPoint.js"></script>
+	<script src="js/Harmony.js"></script>
+	<script src="js/Board.js"></script>
+	<script src="js/GameNotation.js"></script>
+	<script src="js/GameManager.js"></script>
+	<script src="js/PaiShoMain.js"></script>
+</head>
+
+<body>
+	<div class="leftContainer">
+		<!-- -->
+
+
+		<div class="heading">
+			<h1 align="center" class="title">Skud Pai Sho</h1>
+		</div>
+
+
+		<div class="game-container gone" id="the-game-container">
+			<div class="notationText" id="notationText">
+
+			</div>
+			<div class="notationInput gone">
+				<input type="text" id="notationInput" />
+				<input type="button" onclick="inputNow()" value="Enter" />
+			</div>
+
+			<div class="gone">
+                        <input type="button" onclick="playPrevMove()" value="Prev Move" />
+      			<input type="button" onclick="playNextMove()" value="Next Move" />
+      			<br /><br />
+      			<input type="button" onclick="playAllMoves()" value="Play ALL Moves" />
+			</div>
+		</div>
+<br />
+
+<div class="svgContainer">
+  <div class="bg-svg">
+    <div class="pointContainer">
+      <!--  -->
+    </div>
+  </div>
+</div>
+<div class="tilePileContainer">
+      <div class="bonusContainer hidden">
+            Harmony Bonus! Select a tile to play or <span class="skipBonus" onclick="skipHarmonyBonus()">skip</span>.
+      </div>
+      <div class="beginGameMessage hidden">
+            <!--  -->
+      </div>
+    	<div class="hostTilesContainer">
+    		<div class="HR3"></div>
+    		<div class="HR4"></div>
+    		<div class="HR5"></div>
+    		<div class="HW3"></div>
+    		<div class="HW4"></div>
+    		<div class="HW5"></div>
+    		<br class="clear" />
+    		<div class="HR"></div>
+    		<div class="HW"></div>
+    		<div class="HK"></div>
+    		<div class="HB"></div>
+    		<div class="HL"></div>
+    		<div class="HO"></div>
+    	</div>
+    	<div class="guestTilesContainer">
+    		<div class="GR3"></div>
+    		<div class="GR4"></div>
+    		<div class="GR5"></div>
+    		<div class="GW3"></div>
+    		<div class="GW4"></div>
+    		<div class="GW5"></div>
+    		<br class="clear" />
+    		<div class="GR"></div>
+    		<div class="GW"></div>
+    		<div class="GK"></div>
+    		<div class="GB"></div>
+    		<div class="GL"></div>
+    		<div class="GO"></div>
+    	</div>
+    </div>
+
+
+
+	</div>
+</body>
+</html>

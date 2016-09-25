@@ -1,0 +1,457 @@
+div {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #faf8ef;
+  color: #776e65;
+  font-family: "San Francisco", "Helvetica Neue", Arial, sans-serif;
+  font-size: 18px;
+  
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+}
+
+body {
+  margin: 20px 0 0 0; }
+
+#footer {
+	clear: both;
+	padding-top: 1px;
+	margin-top: 10px;
+	font-size: small;
+	text-align: center;
+}
+
+.heading:after {
+  content: "";
+  display: block;
+  clear: both; }
+
+h1.title {
+  font-size: 30px;
+  font-weight: bold;
+  margin: 0;
+  display: block;
+    text-align: center;
+}
+
+
+p {
+  margin-top: 0;
+  margin-bottom: 10px;
+  line-height: 1.65; }
+
+a {
+  color: #776e65;
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer; }
+
+strong.important {
+  text-transform: uppercase; }
+
+hr {
+  border: none;
+  border-bottom: 1px solid #d8d4d0;
+  margin-top: 20px;
+  margin-bottom: 30px; }
+
+
+/* --------------------------------------- */
+
+.svgContainer {
+  width: 576px;
+  /*border: 1px dotted gray;*/
+  /*padding-left: 1px;*/
+
+  display: inline;
+  float: left;
+}
+.bg-svg {
+  width: 100%;
+  height: 100%;
+  background-image: url(board.svg);
+  background-size: cover;
+  height: 0;
+  padding: 0; /* reset */
+  padding-bottom: 100%;
+  border: none;
+}
+figure > div {
+  margin: 1em auto;
+}
+
+.theSVG {
+  display: none;
+}
+
+.pointContainer {
+  padding: 16px;
+}
+.tilePileContainer {
+  display: inline;
+  float: left;
+  width: 192px;
+  margin-left: 12px;
+  /*margin-top: 16px;*/
+}
+
+.point {
+  border-radius: 16px;
+  width: 32px;
+  height: 32px;
+  display: inline;
+  float: left;
+}
+.activePoint:hover {
+/*  -moz-box-shadow: 0px 0px 32px #054;
+  -webkit-box-shadow: 0px 0px 32px #054;*/
+  box-shadow: 0px 0px 32px #054;
+}
+
+.hasTile {
+  box-shadow: 0px 0px 4px #555;
+}
+
+.point img {
+  width: 100%;
+}
+
+.drained {
+  opacity: 0.6;
+}
+
+.possibleMove {
+  box-shadow: 0px 0px 32px #421;
+  /*border: 1px solid #741;*/
+}
+
+.possibleMove img {
+  opacity: 0.8;
+}
+
+.selectedFromPile {
+  box-shadow: 0px 0px 32px #054;
+}
+
+.tilePileContainer div {
+  display: inline;
+  float: left;
+  margin-top: 20px;
+}
+
+.tilePileContainer div div {
+  display: inline;
+  float: left;
+  width: 32px;
+  margin-top: 8px;
+}
+
+.clear {
+  clear: both;
+}
+
+.skipBonus {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.gone {
+  display: none;
+}
+
+
+
+
+
+/* ----------- iPhone 4 and 4S ----------- */
+
+/* Portrait and Landscape */
+@media only screen
+and (min-device-width: 320px)
+and (max-device-width: 480px)
+and (-webkit-min-device-pixel-ratio: 2) {
+    
+}
+
+/* Portrait */
+@media only screen
+and (min-device-width: 320px)
+and (max-device-width: 480px)
+and (-webkit-min-device-pixel-ratio: 2)
+and (orientation: portrait) {
+}
+
+/* Landscape */
+@media only screen
+and (min-device-width: 320px)
+and (max-device-width: 480px)
+and (-webkit-min-device-pixel-ratio: 2)
+and (orientation: landscape) {
+    body {
+        margin: 0 0 0 0; }
+    
+    h1.title {
+        display: none;
+    }
+    
+    .container {
+        width: 400px; }
+    
+    .game-container {
+        float: left;
+        display: inline;
+    }
+    
+    .restartButton {
+        float: right;
+        display: inline;
+        margin: 136px 0 0 12px;
+    }
+
+}
+
+/* ----------- iPhone 5 and 5S ----------- */
+
+/* Portrait and Landscape */
+@media only screen
+and (min-device-width: 320px)
+and (max-device-width: 568px)
+and (-webkit-min-device-pixel-ratio: 2) {
+    
+}
+
+/* Portrait */
+@media only screen
+and (min-device-width: 320px)
+and (max-device-width: 568px)
+and (-webkit-min-device-pixel-ratio: 2)
+and (orientation: portrait) {
+    
+}
+
+/* Landscape */
+@media only screen
+and (min-device-width: 320px)
+and (max-device-width: 568px)
+and (-webkit-min-device-pixel-ratio: 2)
+and (orientation: landscape) {
+    
+    body {
+        margin: 0 0 0 0; }
+    
+    h1.title {
+        display: none;
+    }
+    
+    .container {
+        width: 400px; }
+    
+    .game-container {
+        float: left;
+        display: inline;
+    }
+    
+    .restartButton {
+        float: right;
+        display: inline;
+        margin: 136px 0 0 12px;
+    }
+}
+
+/* ----------- iPhone 6 ----------- */
+
+/* Portrait and Landscape */
+@media only screen
+and (min-device-width: 375px)
+and (max-device-width: 667px)
+and (-webkit-min-device-pixel-ratio: 2) {
+    
+}
+
+/* Portrait */
+@media only screen
+and (min-device-width: 375px)
+and (max-device-width: 667px)
+and (-webkit-min-device-pixel-ratio: 2)
+and (orientation: portrait) {
+    
+}
+
+/* Landscape */
+@media only screen
+and (min-device-width: 375px)
+and (max-device-width: 667px)
+and (-webkit-min-device-pixel-ratio: 2)
+and (orientation: landscape) {
+    body {
+        margin: 0 0 0 0; }
+    
+    h1.title {
+        display: none;
+    }
+    
+    .container {
+        width: 400px; }
+    
+    .game-container {
+        float: left;
+        display: inline;
+    }
+    
+    .restartButton {
+        float: right;
+        display: inline;
+        margin: 136px 0 0 12px;
+    }
+
+}
+
+/* ----------- iPhone 6+ ----------- */
+
+/* Portrait and Landscape */
+@media only screen
+and (min-device-width: 414px)
+and (max-device-width: 736px)
+and (-webkit-min-device-pixel-ratio: 3) {
+    
+}
+
+/* Portrait */
+@media only screen
+and (min-device-width: 414px)
+and (max-device-width: 736px)
+and (-webkit-min-device-pixel-ratio: 3)
+and (orientation: portrait) {
+    
+}
+
+/* Landscape */
+@media only screen
+and (min-device-width: 414px)
+and (max-device-width: 736px)
+and (-webkit-min-device-pixel-ratio: 3)
+and (orientation: landscape) {
+    body {
+        margin: 0 0 0 0; }
+    
+    h1.title {
+        display: none;
+    }
+    
+    .container {
+        width: 400px; }
+    
+    .game-container {
+        float: left;
+        display: inline;
+    }
+    
+    .restartButton {
+        float: right;
+        display: inline;
+        margin: 136px 0 0 12px;
+    }
+
+}
+
+
+
+
+
+/* ----------- iPad mini ----------- */
+
+/* Portrait and Landscape */
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (-webkit-min-device-pixel-ratio: 1) {
+    body {
+        zoom: 1.5;
+    }
+}
+
+/* Portrait */
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (orientation: portrait)
+and (-webkit-min-device-pixel-ratio: 1) {
+    
+}
+
+/* Landscape */
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (orientation: landscape)
+and (-webkit-min-device-pixel-ratio: 1) {
+    
+}
+
+/* ----------- iPad 1 and 2 ----------- */
+/* Portrait and Landscape */
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (-webkit-min-device-pixel-ratio: 1) {
+    body {
+        zoom: 1.5;
+    }
+}
+
+/* Portrait */
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (orientation: portrait)
+and (-webkit-min-device-pixel-ratio: 1) {
+    
+}
+
+/* Landscape */
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (orientation: landscape)
+and (-webkit-min-device-pixel-ratio: 1) {
+    
+}
+
+/* ----------- iPad 3 and 4 ----------- */
+/* Portrait and Landscape */
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (-webkit-min-device-pixel-ratio: 2) {
+    body {
+        zoom: 1.5;
+    }
+}
+
+/* Portrait */
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (orientation: portrait)
+and (-webkit-min-device-pixel-ratio: 2) {
+    
+}
+
+/* Landscape */
+@media only screen
+and (min-device-width: 768px)
+and (max-device-width: 1024px)
+and (orientation: landscape)
+and (-webkit-min-device-pixel-ratio: 2) {
+    
+}
