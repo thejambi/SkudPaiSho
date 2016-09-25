@@ -22,7 +22,7 @@ GameManager.prototype.actuate = function () {
 	this.actuator.actuate(this.board, this.tileManager);
 };
 
-GameManager.prototype.runNotationMove = function(move) {
+GameManager.prototype.runNotationMove = function(move, withActuate) {
 	debug("Running Move: " + move.fullMoveText);
 
 	var errorFound = false;
@@ -40,6 +40,10 @@ GameManager.prototype.runNotationMove = function(move) {
 		allAccentCodes.forEach(function(tileCode) {
 			self.tileManager.grabTile(move.player, tileCode);
 		});
+		self.tileManager.unselectTiles(move.player);
+	} else if (move.moveNum === 1) {
+		this.tileManager.unselectTiles(GUEST);
+		this.tileManager.unselectTiles(HOST);
 	}
 
 	if (move.moveType === PLANTING) {
@@ -70,7 +74,9 @@ GameManager.prototype.runNotationMove = function(move) {
 		}
 	}
 
-	this.actuate();
+	if (withActuate) {
+		this.actuate();
+	}
 
 	return bonusAllowed;
 };
@@ -91,8 +97,14 @@ GameManager.prototype.hidePossibleMovePoints = function() {
 	this.actuate();
 };
 
-GameManager.prototype.revealOpenGates = function() {
-	this.board.setOpenGatePossibleMoves();
+GameManager.prototype.revealOpenGates = function(moveNum) {
+	debug("Move num: " + moveNum);
+	if (moveNum === 2) {
+		// guest selecting first tile
+		this.board.setGuestGateOpen();
+	} else {
+		this.board.setOpenGatePossibleMoves();
+	}
 	this.actuate();
 };
 

@@ -902,7 +902,7 @@ Board.prototype.analyzeHarmonies = function() {
 		}
 	}
 
-	// this.harmonyManager.printHarmonies();
+	this.harmonyManager.printHarmonies();
 
 	if (this.harmonyManager.harmonyRingExists()) {
 		debug("!!! WE HAVE A WINNER !!!");
@@ -911,6 +911,10 @@ Board.prototype.analyzeHarmonies = function() {
 
 Board.prototype.getTileHarmonies = function(tile, rowAndCol) {
 	var tileHarmonies = [];
+
+	if (this.cells[rowAndCol.row][rowAndCol.col].isType(GATE)) {
+		return tileHarmonies;
+	}
 
 	if (!this.rowBlockedByRock(rowAndCol.row)) {
 		var leftHarmony = this.getHarmonyLeft(tile, rowAndCol);
@@ -1128,6 +1132,14 @@ Board.prototype.setOpenGatePossibleMoves = function() {
 				this.cells[row][col].addType(POSSIBLE_MOVE);
 			}
 		}
+	}
+};
+
+Board.prototype.setGuestGateOpen = function() {
+	var row = 16;
+	var col = 8;
+	if (this.cells[row][col].isOpenGate()) {
+		this.cells[row][col].addType(POSSIBLE_MOVE);
 	}
 };
 

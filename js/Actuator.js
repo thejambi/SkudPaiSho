@@ -81,6 +81,7 @@ Actuator.prototype.addTile = function (tile, mainContainer) {
 	theDiv.appendChild(theImg);
 
 	theDiv.setAttribute("name", tile.getImageName());
+	theDiv.setAttribute("id", tile.id);
 	theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
 
 	container.appendChild(theDiv);

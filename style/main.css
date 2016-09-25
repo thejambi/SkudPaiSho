@@ -157,7 +157,10 @@ figure > div {
 }
 
 .skipBonus {
-  text-decoration: underline;
+  /*text-decoration: underline;*/
+  border: 1px solid #776e65;
+  border-radius: 4px;
+  padding: 2px;
   font-weight: bold;
 }
 

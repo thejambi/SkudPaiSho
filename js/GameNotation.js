@@ -175,6 +175,14 @@ function NotationBuilder() {
 	this.status = BRAND_NEW;
 }
 
+NotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
+	var builder = new NotationBuilder();
+	builder.moveType = PLANTING;
+	builder.plantedFlowerType = tileCode;
+	builder.endPoint = new NotationPoint("0,8");
+	return builder;
+};
+
 // --------------------------------------- //
 
 
@@ -216,7 +224,13 @@ GameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 
 	if (lastMove) {
 		moveNum = lastMove.moveNum;
-		if (lastMove.player === HOST) {
+		// At game beginning:
+		if (lastMove.moveNum === 0 && lastMove.player === HOST) {
+			player = GUEST;
+		} else if (lastMove.moveNum === 0 && lastMove.player === GUEST) {
+			moveNum++;
+			player = GUEST;
+		} else if (lastMove.player === HOST) {	// Usual
 			moveNum++;
 		} else {
 			player = HOST;
@@ -282,5 +296,7 @@ GameNotation.prototype.getNotationHtml = function() {
 
 	return notationHtml;
 };
+
+
 
 

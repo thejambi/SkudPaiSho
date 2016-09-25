@@ -8,6 +8,18 @@ function TileManager() {
 TileManager.prototype.loadTileSet = function(ownerCode) {
 	var tiles = [];
 
+	// 2 of each accent tile
+	for (var i = 0; i < 2; i++) {
+		tiles.push(new Tile('R', ownerCode));
+		tiles.push(new Tile('W', ownerCode));
+		tiles.push(new Tile('K', ownerCode));
+		tiles.push(new Tile('B', ownerCode));
+	}
+
+	tiles.forEach(function(tile) {
+		tile.selectedFromPile = true;
+	});
+
 	// 3 of each basic flower
 	for (var i = 0; i < 3; i++) {
 		tiles.push(new Tile("R3", ownerCode));
@@ -16,14 +28,6 @@ TileManager.prototype.loadTileSet = function(ownerCode) {
 		tiles.push(new Tile("W3", ownerCode));
 		tiles.push(new Tile("W4", ownerCode));
 		tiles.push(new Tile("W5", ownerCode));
-	}
-
-	// 2 of each accent tile 	JUST 1 FOR NOW
-	for (var i = 0; i < 2; i++) {
-		tiles.push(new Tile('R', ownerCode));
-		tiles.push(new Tile('W', ownerCode));
-		tiles.push(new Tile('K', ownerCode));
-		tiles.push(new Tile('B', ownerCode));
 	}
 
 	// 1 of each special flower
@@ -55,13 +59,21 @@ TileManager.prototype.grabTile = function(player, tileCode) {
 	return tile;
 };
 
-TileManager.prototype.peekTile = function(player, tileCode) {
+TileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
 	}
 
 	var tile;
+	if (tileId) {
+		for (var i = 0; i < tilePile.length; i++) {
+			if (tilePile[i].id === tileId) {
+				return tilePile[i];
+			}
+		}
+	}
+
 	for (var i = 0; i < tilePile.length; i++) {
 		if (tilePile[i].code === tileCode) {
 			tile = tilePile[i];
@@ -84,6 +96,17 @@ TileManager.prototype.removeSelectedTileFlags = function() {
 		tile.selectedFromPile = false;
 	});
 };
+
+TileManager.prototype.unselectTiles = function(player) {
+	var tilePile = this.hostTiles;
+	if (player === GUEST) {
+		tilePile = this.guestTiles;
+	}
+
+	tilePile.forEach(function(tile) {
+		tile.selectedFromPile = false;
+	});
+}
 
 // TileManager.prototype.putTileBack = function(tile) {
 // 	var player = tile.ownerName;
