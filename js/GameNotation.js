@@ -297,6 +297,11 @@ GameNotation.prototype.getNotationHtml = function() {
 	return notationHtml;
 };
 
+GameNotation.prototype.notationTextForUrl = function() {
+	var str = this.notationText;
+	return str;
+};
+
 
 
 

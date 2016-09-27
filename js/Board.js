@@ -7,6 +7,8 @@ function Board() {
 	this.harmonyManager = new HarmonyManager();
 
 	this.rockRowAndCols = [];
+	this.playedWhiteLotusTiles = [];
+	this.winners = [];
 }
 
 Board.prototype.brandNew = function () {
@@ -361,6 +363,9 @@ Board.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
 		this.analyzeHarmonies();
 	} else {
 		this.putTileOnPoint(tile, notationPoint);
+		if (tile.specialFlowerType === WHITE_LOTUS) {
+			this.playedWhiteLotusTiles.push(tile);
+		}
 	}
 };
 
@@ -730,6 +735,88 @@ Board.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
 	}
 };
 
+Board.prototype.whiteLotusProtected = function(lotusTile) {
+	// Protected if: player also has Blooming Orchid 
+	var isProtected = false;
+	this.cells.forEach(function(row) {
+		row.forEach(function(boardPoint) {
+			if (boardPoint.hasTile() && boardPoint.tile.specialFlowerType === ORCHID 
+				&& boardPoint.tile.ownerName === lotusTile.ownerName 
+				&& !boardPoint.isType(GATE)) {
+				isProtected = true;
+			}
+		});
+	});
+	return isProtected;
+};
+
+Board.prototype.orchidCanCapture = function(orchidTile) {
+	// Note: This method does not check if other tile is protected from capture.
+	var orchidCanCapture = false;
+	this.cells.forEach(function(row) {
+		row.forEach(function(boardPoint) {
+			if (boardPoint.hasTile() && boardPoint.tile.specialFlowerType === WHITE_LOTUS 
+				&& boardPoint.tile.ownerName === orchidTile.ownerName 
+				&& !boardPoint.isType(GATE)) {
+				orchidCanCapture = true;
+			}
+		});
+	});
+	return orchidCanCapture;
+};
+
+Board.prototype.orchidVulnerable = function(orchidTile) {
+	var orchidVulnerable = false;
+	this.playedWhiteLotusTiles.forEach(function(lotus) {
+		if (lotus.ownerName === orchidTile.ownerName) {
+			orchidVulnerable = true;
+		}
+	});
+	if (orchidVulnerable) {
+		return true;
+	}
+};
+
+Board.prototype.canCapture = function(boardPointStart, boardPointEnd) {
+	var tile = boardPointStart.tile;
+	var otherTile = boardPointEnd.tile;
+
+	if (tile.ownerName === otherTile.ownerName) {
+		return false;	// Cannot capture own tile
+	}
+
+	// Check otherTile White Lotus protected from capture
+	if (otherTile.specialFlowerType === WHITE_LOTUS) {
+		if (this.whiteLotusProtected(otherTile)) {
+			return false;	// Cannot capture otherTile any way at all
+		} else if (tile.type === BASIC_FLOWER) {
+			return true;	// If Lotus not protected, basic flower captures. Orchid handled in Orchid checks
+		}
+	}
+
+	// Clashing Basic Flowers check
+	if (tile.clashesWith(otherTile)) {
+		return true;
+	}
+
+	// Orchid checks
+	// Can otherTile Orchid be captured?
+	// If vulnerable, it can be captured by basic flower
+	if (otherTile.specialFlowerType === ORCHID && tile.type === BASIC_FLOWER) {
+		if (this.orchidVulnerable(otherTile)) {
+			return true;
+		}
+	}
+
+	// Can Orchid capture?
+	// If so, Orchid can capture basic or special flower
+	if (tile.specialFlowerType === ORCHID && otherTile.type !== ACCENT_TILE) {
+		if (this.orchidCanCapture(tile)) {
+			return true;
+		}
+	}
+};
+
 Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
 	// start point must have a tile
 	if (!boardPointStart.hasTile()) {
@@ -752,16 +839,11 @@ Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPoin
 		// debug("You can't move into a Gate, jerk.");
 		return false;
 	}
-
-	// var canCaptureOrEmpty = !boardPointEnd.hasTile();
-	// if (boardPointEnd.hasTile()) {
-	// 	if (boardPointStart.tile.canCapture(boardPointEnd.tile)) {
-	// 		canCaptureOrEmpty = true;
-	// 	}
-	// }
+	
 	var canCapture = false;
 	if (boardPointEnd.hasTile()) {
-		canCapture = boardPointStart.tile.canCapture(boardPointEnd.tile);
+		// canCapture = boardPointStart.tile.canCapture(boardPointEnd.tile);
+		canCapture = this.canCapture(boardPointStart, boardPointEnd);
 	}
 
 	// If endpoint has a tile there that can't be captured, that is wrong.
@@ -898,15 +980,27 @@ Board.prototype.analyzeHarmonies = function() {
 				var tileHarmonies = this.getTileHarmonies(boardPoint.tile, new RowAndColumn(row, col));
 				// Add harmonies
 				this.harmonyManager.addHarmonies(tileHarmonies);
+
+				boardPoint.tile.inHarmony = tileHarmonies.length > 0;
 			}
 		}
 	}
 
 	this.harmonyManager.printHarmonies();
 
-	if (this.harmonyManager.harmonyRingExists()) {
-		debug("!!! WE HAVE A WINNER !!!");
+	this.winners = [];
+	var self = this;
+	var harmonyRingOwners = this.harmonyManager.harmonyRingExists();
+	if (harmonyRingOwners.length > 0) {
+		harmonyRingOwners.forEach(function(player) {
+			if (!self.winners.includes(player)) {
+				self.winners.push(player);
+			}
+		});
 	}
+	// if (this.harmonyManager.harmonyRingExists()) {
+	// 	debug("!!! WE HAVE A WINNER !!!");
+	// }
 };
 
 Board.prototype.getTileHarmonies = function(tile, rowAndCol) {

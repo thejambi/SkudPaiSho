@@ -11,20 +11,17 @@ html, body {
   color: #776e65;
   font-family: "San Francisco", "Helvetica Neue", Arial, sans-serif;
   font-size: 18px;
-  
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
 }
 
 body {
   margin: 20px 0 0 0; }
 
-#footer {
+.footer {
 	clear: both;
-	padding-top: 1px;
+	padding-top: 10px;
 	margin-top: 10px;
-	font-size: small;
-	text-align: center;
+  margin-bottom: 20px;
+	text-align: left;
 }
 
 .heading:after {
@@ -139,6 +136,13 @@ figure > div {
   box-shadow: 0px 0px 32px #054;
 }
 
+.GUESTharmony {
+  box-shadow: 0px 0px 8px 4px #ff8100;
+}
+.HOSTharmony {
+  box-shadow: 0px 0px 8px 4px #ff8100;
+}
+
 .tilePileContainer div {
   display: inline;
   float: left;
@@ -157,11 +161,12 @@ figure > div {
 }
 
 .skipBonus {
-  /*text-decoration: underline;*/
-  border: 1px solid #776e65;
-  border-radius: 4px;
-  padding: 2px;
+  text-decoration: underline;
+  /*border: 1px solid #776e65;*/
+  /*border-radius: 4px;*/
+  padding: 1px;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .hidden {
@@ -172,6 +177,13 @@ figure > div {
   display: none;
 }
 
+input[type=submit] {
+  /*background: #24333d;
+  color: #FFF;*/
+  font: inherit;
+  padding: 7px 20px;
+  width: auto;
+}
 
 
 

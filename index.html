@@ -20,6 +20,11 @@
 	<meta content="True" name="HandheldFriendly">
 	<meta content="320" name="MobileOptimized">
 
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> -->
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="js/jquery.form.js"></script>
+    <script type="text/javascript" src="js/contact.js"></script>
 	<script src="js/GameData.js"></script>
 	<script src="js/Actuator.js"></script>
 	<script src="js/Tile.js"></script>
@@ -29,6 +34,7 @@
 	<script src="js/Board.js"></script>
 	<script src="js/GameNotation.js"></script>
 	<script src="js/GameManager.js"></script>
+    <script src="js/LocalStorage.js"></script>
 	<script src="js/PaiShoMain.js"></script>
 </head>
 
@@ -43,7 +49,7 @@
 
 
 		<div class="game-container gone" id="the-game-container">
-			<div class="notationText" id="notationText">
+			<div class="notationText gone" id="notationText">
 
 			</div>
 			<div class="notationInput gone">
@@ -68,6 +74,11 @@
   </div>
 </div>
 <div class="tilePileContainer">
+      <form class='gone' id='contactform' action='processForm.php' method='post'>
+            <input class='gone' type='text' id='fromEmail' name='fromEmail' value='' />
+            <input class='gone' type='text' id='toEmail' name='toEmail' value='' />
+            <input class='gone' type='text' id='message' name='message' value=''></input>
+            <input type='submit' value='Submit move!' id='send' /></form><div id='response'></div>
       <div class="gameMessage">
             <!--  -->
             Current Turn: Guest
@@ -107,5 +118,9 @@
 
 
 	</div>
+    <div class="footer">
+      If you <span class='skipBonus' onclick='promptEmail()'>enter your email address</span>, you can be notified automatically when your friend plays a move. Your email address is never used for any other reason, and you can edit it at any time. Click <span class='skipBonus' onclick='promptEmail()'>here</span> to edit email.
+    </div>
+    <div class="rules"><a href="https://skudpaisho.wordpress.com/">Skud Pai Sho Rules</a></div>
 </body>
 </html>

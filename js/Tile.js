@@ -108,16 +108,19 @@ Tile.prototype.clashesWith = function(otherTile) {
 		&& this.basicValue === otherTile.basicValue);
 };
 
-Tile.prototype.canCapture = function(otherTile) {
-	// either clash or special ability of Orchid
-	if (this.clashesWith(otherTile)) {
-		return true;
-	}
+// Tile.prototype.canCapture = function(otherTile) {
+// 	// either clash or special ability of Orchid
+// 	if (this.clashesWith(otherTile)) {
+// 		return true;
+// 	}
 
-	// TODO set up the Orchid ability checks
+// 	// TODO set up the Orchid ability checks
+// 	if (this.specialFlowerType === ORCHID) {
+// 		// Can capture if my Lotus
+// 	}
 
-	return false;
-};
+// 	return false;
+// };
 
 Tile.prototype.getMoveDistance = function() {
 	if (this.type === BASIC_FLOWER) {

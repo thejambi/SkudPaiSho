@@ -112,8 +112,10 @@ Actuator.prototype.addBoardPoint = function (boardPoint) {
 
 		theImg.src = "images/" + boardPoint.tile.getImageName() + ".png";
 		
-		if (boardPoint.tile.drained || boardPoint.tile.trapped) {
-			theImg.classList.add("drained");
+		if (boardPoint.tile.inHarmony) {
+			theDiv.classList.add(boardPoint.tile.ownerName + "harmony");
+		} else if (boardPoint.tile.drained || boardPoint.tile.trapped) {
+			theDiv.classList.add("drained");
 		}
 		
 		theDiv.appendChild(theImg);

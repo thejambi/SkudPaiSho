@@ -187,15 +187,17 @@ HarmonyManager.prototype.harmonyRingExists = function() {
 		}
 	}
 
-	var verifiedHarmonyRings = [];
+	var verifiedHarmonyRingOwners = [];
 	rings.forEach(function(ring) {
 		debug(ring);
-		if (self.verifyHarmonyRing(ring)) {
-			verifiedHarmonyRings.push(ring);
+		var playerName = self.verifyHarmonyRing(ring);
+		if (playerName) {
+			verifiedHarmonyRingOwners.push(playerName);
 		}
 	});
 
-	return verifiedHarmonyRings.length > 0;
+	// return verifiedHarmonyRings.length > 0;
+	return verifiedHarmonyRingOwners;
 };
 
 // I think this works.
@@ -207,6 +209,7 @@ HarmonyManager.prototype.verifyHarmonyRing = function(ring) {
 	var shapePoints = [];
 
 	var h = ring.pop();	// LOL
+	var playerName = h.tile1.ownerName;
 	shapePoints.push(new NotationPoint(h.tile1Pos.notationPointString).toArr());
 	shapePoints.push(new NotationPoint(h.tile2Pos.notationPointString).toArr());
 
@@ -251,7 +254,7 @@ HarmonyManager.prototype.verifyHarmonyRing = function(ring) {
 
 	if (this.isPointInsideShape(new NotationPoint("0,0"), shapePoints)) {
 		// debug("OH MY GOODNESS !@#@%#%$&&$(*&^%#%#$^%#@%#");
-		return true;
+		return playerName;
 	} else {
 		// debug("for shame");
 		return false;
