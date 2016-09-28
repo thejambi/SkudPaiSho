@@ -378,7 +378,7 @@ Board.prototype.putTileOnPoint = function(tile, notationPoint) {
 
 Board.prototype.canPlaceRock = function(boardPoint) {
 	if (boardPoint.hasTile()) {
-		debug("Rock cannot be played on top of another tile");
+		// debug("Rock cannot be played on top of another tile");
 		return false;
 	}
 	if (boardPoint.isType(GATE)) {
@@ -403,7 +403,7 @@ Board.prototype.placeRock = function(tile, notationPoint) {
 
 Board.prototype.canPlaceWheel = function(boardPoint) {
 	if (boardPoint.hasTile()) {
-		debug("Wheel cannot be played on top of another tile");
+		// debug("Wheel cannot be played on top of another tile");
 		return false;
 	}
 
@@ -440,11 +440,6 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 Board.prototype.placeWheel = function(tile, notationPoint) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
-
-	// if (boardPoint.hasTile()) {
-	// 	debug("Wheel cannot be played on top of another tile");
-	// 	return false;
-	// }
 
 	// // get surrounding RowAndColumn values
 	var rowCols = this.getSurroundingRowAndCols(rowAndCol);
@@ -820,72 +815,89 @@ Board.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
 	// start point must have a tile
 	if (!boardPointStart.hasTile()) {
-		// debug("No tile to move!");
 		return false;
 	}
 
 	// Tile must belong to player
 	if (boardPointStart.tile.ownerName !== player) {
-		// debug("You can't move a tile that isn't yours!!!");
 		return false;
 	}
 
+	// Cannot move drained or trapped tile
 	if (boardPointStart.tile.drained || boardPointStart.tile.trapped) {
 		return false;
 	}
 
 	// If endpoint is a Gate, that's wrong.
 	if (boardPointEnd.isType(GATE)) {
-		// debug("You can't move into a Gate, jerk.");
 		return false;
 	}
 	
 	var canCapture = false;
 	if (boardPointEnd.hasTile()) {
-		// canCapture = boardPointStart.tile.canCapture(boardPointEnd.tile);
 		canCapture = this.canCapture(boardPointStart, boardPointEnd);
 	}
 
 	// If endpoint has a tile there that can't be captured, that is wrong.
 	if (boardPointEnd.hasTile() && !canCapture) {
-		// debug("Can't move there, point already occupied and you can't capture");
 		return false;
 	}
 
 	if (!boardPointEnd.canHoldTile(boardPointStart.tile) && !canCapture) {
-		// debug("I found reasons you can't move tehre, OK????");
-		return false;
-	}
-
-	// Cannot move into Disharmony
-	// (Passing BoardPoint object, but it has the same row and col values as RowAndCol???)
-	if (this.hasDisharmony(boardPointStart.tile, boardPointEnd) && !canCapture) {
-		// debug("DISHARMONY found, cannot move.");
 		return false;
 	}
 
 	// If endpoint is too far away, that is wrong.
-	// get num Moves
 	var numMoves = boardPointStart.tile.getMoveDistance();
-	// (8,0)-(6,-3) : 8-6 + 0-(-3) = 5
 	if (Math.abs(boardPointStart.row - boardPointEnd.row) + Math.abs(boardPointStart.col - boardPointEnd.col) > numMoves) {
-		// debug("Tile cannot move that far! NOOOOOO");
+		// end point is too far away, can't move that far
 		return false;
 	} else {
-		// We know it's not impossible. But there may be tiles in the way...
+		// Move may be possible. But there may be tiles in the way...
 		if (!this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves)) {
 			debug("Tiles are in the way, so you can't reach that spot.");
 			return false;
 		}
 	}
 
+	// What if moving the tile there creates a Disharmony on the board? That can't happen!
+	if (this.moveCreatesDisharmony(boardPointStart, boardPointEnd)) {
+		return false;
+	}
+
 	// I guess we made it through
 	return true;
 };
 
-Board.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {
-  // Oh boy. Check all possible paths!
+Board.prototype.moveCreatesDisharmony = function(boardPointStart, boardPointEnd) {
+	// Grab tile in end point and put the start tile there
+	var endTile = boardPointEnd.removeTile();
+	boardPointEnd.putTile(boardPointStart.removeTile());
 
+	var clashFound = false;
+
+	// Now, analyze board for disharmonies
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var boardPoint = this.cells[row][col];
+			if (boardPoint.hasTile()) {
+				// Check for Disharmonies!
+				if (this.hasDisharmony(boardPoint)) {
+					clashFound = true;
+					break;
+				}
+			}
+		}
+	}
+
+	// Put tiles back the way they were
+	boardPointStart.putTile(boardPointEnd.removeTile());
+	boardPointEnd.putTile(endTile);
+
+	return clashFound;
+};
+
+Board.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {
   // Recursion!
   return this.pathFound(boardPointStart, boardPointEnd, numMoves);
 };
@@ -998,9 +1010,6 @@ Board.prototype.analyzeHarmonies = function() {
 			}
 		});
 	}
-	// if (this.harmonyManager.harmonyRingExists()) {
-	// 	debug("!!! WE HAVE A WINNER !!!");
-	// }
 };
 
 Board.prototype.getTileHarmonies = function(tile, rowAndCol) {
@@ -1109,22 +1118,27 @@ Board.prototype.hasNewHarmony = function(player, tile, startRowCol, endRowCol) {
 	return this.harmonyManager.hasNewHarmony(player, oldHarmonies);
 };
 
-Board.prototype.hasDisharmony = function(tile, endRowCol) {
+Board.prototype.hasDisharmony = function(boardPoint) {
+	if (boardPoint.isType(GATE)) {
+		return false;	// Gate never has disharmony
+	}
+
+	var tile = boardPoint.tile;
 	var clashFound = false;
 
-	if (this.hasDisharmonyLeft(tile, endRowCol)) {
+	if (this.hasDisharmonyLeft(tile, boardPoint)) {
 		clashFound = true;
 	}
 
-	if (this.hasDisharmonyRight(tile, endRowCol)) {
+	if (this.hasDisharmonyRight(tile, boardPoint)) {
 		clashFound = true;
 	}
 
-	if (this.hasDisharmonyUp(tile, endRowCol)) {
+	if (this.hasDisharmonyUp(tile, boardPoint)) {
 		clashFound = true;
 	}
 
-	if (this.hasDisharmonyDown(tile, endRowCol)) {
+	if (this.hasDisharmonyDown(tile, boardPoint)) {
 		clashFound = true;
 	}
 

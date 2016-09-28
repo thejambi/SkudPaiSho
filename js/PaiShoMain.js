@@ -83,12 +83,12 @@ window.requestAnimationFrame(function () {
 function promptEmail() {
 	var ans = prompt("Please enter your email address:");
 
-	if (getCurrentPlayer() === HOST && !QueryString.host) {
+	if (getCurrentPlayer() === HOST) {
 		if (ans) {
 			hostEmail = ans;
 			localStorage.setItem(localEmailKey, hostEmail);
 		}
-	} else if (getCurrentPlayer() === GUEST && !QueryString.guest) {
+	} else if (getCurrentPlayer() === GUEST) {
 		if (ans) {
 			guestEmail = ans;
 			localStorage.setItem(localEmailKey, guestEmail);
@@ -207,11 +207,10 @@ function finalizeMove() {
 }
 
 function showSubmitMoveForm(url) {
-	// From current player
-	var fromEmail = getCurrentPlayerEmail();
-
-	// To other player
-	var toEmail = getOpponentPlayerEmail();
+	// Move has completed, so need to send to "current player"
+	// TODO change this to getLocalUserEmail and always send from that.
+	var toEmail = getCurrentPlayerEmail();
+	var fromEmail = getOpponentPlayerEmail();
 
 	var bodyMessage = getEmailBody(url);
 
@@ -243,7 +242,7 @@ function linkShortenCallback(shortUrl) {
 }
 
 function haveBothEmails() {
-	return hostEmail && guestEmail;
+	return hostEmail && guestEmail && localStorage.getItem(localEmailKey);
 }
 
 function getCurrentPlayerEmail() {
