@@ -6,6 +6,9 @@ var QueryString = function () {
   var query_string = {};
   var query = window.location.search.substring(1);
   var vars = query.split("&");
+  if (query.includes("&amp;")) {
+  	vars = query.split("&amp;");
+  }
   for (var i=0;i<vars.length;i++) {
   	var pair = vars[i].split("=");
         // If first entry with this name
@@ -31,6 +34,7 @@ var theGame;
 var gameNotation;
 var notationBuilder;
 var beginPhaseData;
+var defaultHelpMessageText;
 
 var localStorage;
 
@@ -61,6 +65,10 @@ window.requestAnimationFrame(function () {
 	hostEmail = QueryString.host;
 	guestEmail = QueryString.guest;
 
+	if (QueryString.replay === "true") {
+		document.getElementById("replayControls").classList.remove("gone");
+	}
+
 	refreshNotationDisplay();
 
 	notationBuilder = new NotationBuilder();
@@ -78,6 +86,8 @@ window.requestAnimationFrame(function () {
 	}
 
 	updateFooter();
+
+	defaultHelpMessageText = document.querySelector(".helpText").innerHTML;
 });
 
 function promptEmail() {
@@ -118,9 +128,17 @@ function refreshNotationDisplay() {
 
 var currentMoveIndex = 0;
 
+function rewindAllMoves() {
+	theGame = new GameManager();
+	notationBuilder = new NotationBuilder();
+	currentMoveIndex = 0;
+	refreshMessage();
+}
+
 function playNextMove(withActuate) {
 	if (currentMoveIndex >= gameNotation.moves.length) {
 		// no more moves to run
+		refreshMessage();
 		return false;
 	} else {
 		theGame.runNotationMove(gameNotation.moves[currentMoveIndex], withActuate);
@@ -139,8 +157,10 @@ function playPrevMove() {
 	currentMoveIndex = 0;
 
 	while (currentMoveIndex < moveToPlayTo) {
-		playNextMove();
+		playNextMove(true);
 	}
+
+	refreshMessage();
 }
 
 function playAllMoves() {
@@ -165,7 +185,7 @@ function getAdditionalMessage() {
 		if (theGame.board.winners.length > 1) {
 			// There are two winners???
 		} else {
-			msg += "<strong>" + theGame.board.winners[0] + " has created a Harmony Ring and won the game!</strong>";
+			msg += "<br /><strong>" + theGame.board.winners[0] + " has created a Harmony Ring and won the game!</strong>";
 		}
 	}
 	return msg;
@@ -199,10 +219,14 @@ function finalizeMove() {
 	}
 	linkUrl += "game=" + gameNotation.notationTextForUrl();
 
-	if (!url.startsWith("file")) {
+	if (theGame.board.winners.length > 0) {
+		linkUrl += "&replay=true";
+	}
+
+	if (!url.startsWith("file") && !haveBothEmails()) {
 		getShortUrl(linkUrl, linkShortenCallback);
 	} else {
-		linkShortenCallback(encodeURI(linkUrl).replace(/\(/g, "%28").replace(/\)/g, "%29"));
+		linkShortenCallback(linkUrl.replace(/\(/g, "%28").replace(/\)/g, "%29"));
 	}
 }
 
@@ -221,7 +245,7 @@ function showSubmitMoveForm(url) {
 }
 
 function linkShortenCallback(shortUrl) {
-	var messageText = "Copy this <a href=\"" + shortUrl + "\">link</a> and send to the " + getCurrentPlayer();
+	var messageText = "Copy this <a href=\"" + shortUrl + "\">link</a> and send to the " + getCurrentPlayer() + ".";
 
 	if (haveBothEmails()) {
 		// messageText = "Click <span class='skipBonus' onclick=sendMail('" + shortUrl + "')>here</span> to email your move to the " + getCurrentPlayer() + ". Or, share this <a href=\"" + shortUrl + "\">link</a> with them.";
@@ -234,7 +258,7 @@ function linkShortenCallback(shortUrl) {
 		if (theGame.board.winners.length > 1) {
 			// There are two winners???
 		} else {
-			messageText += "<strong>" + theGame.board.winners[0] + " has created a Harmony Ring and won the game!</strong>";
+			messageText += "<br /><strong>" + theGame.board.winners[0] + " has created a Harmony Ring and won the game!</strong>";
 		}
 	}
 
@@ -318,7 +342,7 @@ function unplayedTileClicked(tileDiv) {
 		return;
 	}
 
-	var divName = tileDiv.getAttribute("name");	// Like: RW5 or HL
+	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 	var playerCode = divName.charAt(0);
 	var tileCode = divName.substring(1);
@@ -374,12 +398,13 @@ function unplayedTileClicked(tileDiv) {
 		}
 		theGame.actuate();
 	} else if (notationBuilder.status === BRAND_NEW) {
-		tile.selectedFromPile = true;
 		// new Planting turn, can be basic flower
 		if (tile.type !== BASIC_FLOWER) {
 			debug("Can only Plant a Basic Flower tile. That's not one of them.");
 			return false;
 		}
+
+		tile.selectedFromPile = true;
 
 		notationBuilder.moveType = PLANTING;
 		notationBuilder.plantedFlowerType = tileCode;
@@ -399,7 +424,12 @@ function unplayedTileClicked(tileDiv) {
 		}
 	} else {
 		theGame.hidePossibleMovePoints();
-		notationBuilder = new NotationBuilder();
+		if (notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT) {
+			notationBuilder.status = READY_FOR_BONUS;
+			showHarmonyBonusMessage();
+		} else {
+			notationBuilder = new NotationBuilder();
+		}
 	}
 }
 
@@ -521,15 +551,191 @@ function getShortUrl(url, callback) {
 	$.getJSON(
 		url,
 		{},
-		function(response)
-		{
+		function(response) {
 			if(callback)
 				callback(response.data.url);
-		}
-		);
+		});
 }
 
+function clearMessage() {
+	document.querySelector(".helpText").innerHTML = defaultHelpMessageText;
+}
 
+function showTileMessage(tileDiv) {
+	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
+	var tileId = parseInt(tileDiv.getAttribute("id"));
+
+	var tile = new Tile(divName.substring(1), divName.charAt(0));
+
+	var message = [];
+
+	var ownerName = HOST;
+	if (divName.startsWith('G')) {
+		ownerName = GUEST;
+	}
+	
+	var tileCode = divName.substring(1);
+
+	var heading = Tile.getTileName(tileCode);
+
+	if (tileCode.length > 1) {
+		var colorCode = tileCode.charAt(0);
+		var tileNum = parseInt(tileCode.charAt(1));
+
+		var harmTileNum = tileNum - 1;
+		var harmTileColor = colorCode;
+		if (harmTileNum < 3) {
+			harmTileNum = 5;
+			if (colorCode === 'R') {
+				harmTileColor = 'W';
+			} else {
+				harmTileColor = 'R';
+			}
+		}
+
+		var harmTile1 = Tile.getTileName(harmTileColor + harmTileNum);
+
+		harmTileNum = tileNum + 1;
+		harmTileColor = colorCode;
+		if (harmTileNum > 5) {
+			harmTileNum = 3;
+			if (colorCode === 'R') {
+				harmTileColor = 'W';
+			} else {
+				harmTileColor = 'R';
+			}
+		}
+
+		var harmTile2 = Tile.getTileName(harmTileColor + harmTileNum);
+
+		harmTileNum = tileNum;
+		if (colorCode === 'R') {
+			harmTileColor = 'W';
+		} else {
+			harmTileColor = 'R';
+		}
+		var clashTile = Tile.getTileName(harmTileColor + harmTileNum);
+
+		message.push("Basic Flower Tile");
+		message.push("Can move up to " + tileNum + " spaces");
+		message.push("Forms Harmony with " + harmTile1 + " and " + harmTile2);
+		message.push("Clashes with " + clashTile);
+	} else {
+		if (tileCode === 'R') {
+			heading = "Accent Tile: Rock";
+			message.push("The Rock cancels Harmonies on horizontal and vertical lines it lies on.");
+		} else if (tileCode === 'W') {
+			heading = "Accent Tile: Wheel";
+			message.push("The Wheel rotates all surrounding tiles one space clockwise.");
+		} else if (tileCode === 'K') {
+			heading = "Accent Tile: Knotweed";
+			message.push("The Knotweed disables surrounding Basic Flower Tiles so they are unable to move or form Harmony.");
+		} else if (tileCode === 'B') {
+			heading = "Accent Tile: Boat";
+			message.push("The Boat moves an opponent’s Basic Flower Tile one space or removes opponent’s Knotweed tile.");
+		} else if (tileCode === 'L') {
+			heading = "Special Flower: White Lotus";
+			message.push("Can move up to 2 spaces");
+			message.push("Forms Harmony with all Basic Flower Tiles");
+			message.push("Can be captured by any Basic Flower Tile unless you have a Blooming Orchid");
+		} else if (tileCode === 'O') {
+			heading = "Special Flower: Orchid";
+			message.push("Can move up to 6 spaces");
+			message.push("Traps opponent's surrounding Basic Flower Tiles so they cannot move");
+			message.push("Can capture Flower Tiles if you have a Blooming White Lotus");
+			message.push("Can be captured by any Basic Flower Tile if your White Lotus has been played");
+		}
+	}
+
+	if (message.length > 1) {
+		document.querySelector(".helpText").innerHTML = toHeading(heading) + toBullets(message);
+	} else {
+		document.querySelector(".helpText").innerHTML = toHeading(heading) + toMessage(message);
+	}
+}
+
+function showPointMessage(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	var boardPoint = theGame.board.cells[rowCol.row][rowCol.col];
+
+	var message = [];
+	if (boardPoint.isType(NEUTRAL)) {
+		message.push(getNeutralPointMessage());
+	} else if (boardPoint.isType(RED) && boardPoint.isType(WHITE)) {
+		message.push(getRedWhitePointMessage());
+	} else if (boardPoint.isType(RED)) {
+		message.push(getRedPointMessage());
+	} else if (boardPoint.isType(WHITE)) {
+		message.push(getWhitePointMessage());
+	} else if (boardPoint.isType(GATE)) {
+		message.push(getGatePointMessage());
+	}
+
+	document.querySelector(".helpText").innerHTML = toMessage(message);
+}
+
+function toHeading(str) {
+	return "<h4>" + str + "</h4>";
+}
+
+function toMessage(paragraphs) {
+	var message = "";
+
+	paragraphs.forEach(function(str) {
+		message += "<p>" + str + "</p>";
+	});
+
+	return message;
+}
+
+function toBullets(paragraphs) {
+	var message = "<ul>";
+
+	paragraphs.forEach(function(str) {
+		message += "<li>" + str + "</li>";
+	});
+
+	message += "</ul>";
+
+	return message;
+}
+
+function getNeutralPointMessage() {
+	var msg = "<h4>Neutral Point</h4>";
+	msg += "<ul>";
+	msg += "<li>This point is Neutral, so any tile can land here.</li>";
+	msg += "<li>If a tile that is on a point touches a Neutral area of the board, that point is considered Neutral.</li>";
+	msg += "</ul>";
+	return msg;
+}
+
+function getRedPointMessage() {
+	var msg = "<h4>Red Point</h4>";
+	msg += "<p>This point is Red, so Basic White Flower Tiles are not allowed to land here.</p>";
+	return msg;
+}
+
+function getWhitePointMessage() {
+	var msg = "<h4>White Point</h4>";
+	msg += "<p>This point is White, so Basic Red Flower Tiles are not allowed to land here.</p>";
+	return msg;
+}
+
+function getRedWhitePointMessage() {
+	var msg = "<h4>Red/White Point</h4>";
+	msg += "<p>This point is both Red and White, so any tile is allowed to land here.</p>";
+	return msg;
+}
+
+function getGatePointMessage() {
+	var msg = "<h4>Gate</h4>";
+	msg += '<p>This point is a Gate. When Flower Tiles are played, they are <em>Planted</em> in an open Gate.</p>';
+	msg += '<p>Tiles in a Gate are considered <em>Growing</em>, and when they have moved out of the Gate, they are considered <em>Blooming</em>.</p>';
+	return msg;
+}
 
 
 

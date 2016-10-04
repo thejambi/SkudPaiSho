@@ -385,7 +385,7 @@ Board.prototype.canPlaceRock = function(boardPoint) {
 		return false;
 	}
 	return true;
-}
+};
 
 Board.prototype.placeRock = function(tile, notationPoint) {
 	var rowAndCol = notationPoint.rowAndColumn;
@@ -413,7 +413,6 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 
 	// get surrounding RowAndColumn values
 	var rowCols = this.getSurroundingRowAndCols(boardPoint);
-	// debug(rowCols);
 
 	// Validate.. Wheel must not be next to a Gate or non-playable
 	if (rowCols.length < 8) {
@@ -427,12 +426,19 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 			// debug("Wheel cannot be played next to a GATE");
 			return false;
 		} else if (bp.hasTile() && bp.tile.drained) {
-			// debug("wheel no played next to drained tile");
+			// debug("wheel cannot be played next to drained tile");
 			return false;
 		}
-	}
 
-	// TODO: A Wheel cannot move a flower into opposite-colored garden
+		// If a tile would be affected, verify the target
+		if (bp.hasTile()) {
+			var targetRowCol = this.getClockwiseRowCol(boardPoint, rowCols[i]);
+			var targetBp = this.cells[targetRowCol.row][targetRowCol.col];
+			if (!targetBp.canHoldTile(bp.tile, true)) {
+				return false;
+			}
+		}
+	}
 
 	return true;
 };
@@ -441,23 +447,9 @@ Board.prototype.placeWheel = function(tile, notationPoint) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
-	// // get surrounding RowAndColumn values
+	// get surrounding RowAndColumn values
 	var rowCols = this.getSurroundingRowAndCols(rowAndCol);
-	// // debug(rowCols);
 
-	// // Validate.. Wheel must not be next to a Gate or non-playable
-	// if (rowCols.length < 8) {
-	// 	// Not full, means there was non-playable
-	// 	debug("Wheel cannot be played next to a NON-POINT");
-	// 	return false;
-	// }
-	// for (var i = 0; i < rowCols.length; i++) {
-	// 	var bp = this.cells[rowCols[i].row][rowCols[i].col];
-	// 	if (bp.isType(GATE)) {
-	// 		debug("Wheel cannot be played next to a GATE");
-	// 		return false;
-	// 	}
-	// }
 	if (!this.canPlaceWheel(boardPoint)) {
 		return false;
 	}
@@ -481,7 +473,8 @@ Board.prototype.placeWheel = function(tile, notationPoint) {
 		var bp = self.cells[result[1].row][result[1].col];
 		bp.putTile(result[0]);
 	});
-	debug("Wheel placed");
+	
+	this.refreshRockRowAndCols();
 };
 
 Board.prototype.canPlaceKnotweed = function(boardPoint) {
@@ -512,21 +505,8 @@ Board.prototype.placeKnotweed = function(tile, notationPoint) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
-	// if (boardPoint.hasTile()) {
-	// 	debug("Knotweed cannot be played on top of another tile");
-	// 	return false;
-	// }
-
 	var rowCols = this.getSurroundingRowAndCols(rowAndCol);
 
-	// // Validate: Must not be played next to Gate
-	// for (var i = 0; i < rowCols.length; i++) {
-	// 	var bp = this.cells[rowCols[i].row][rowCols[i].col];
-	// 	if (bp.isType(GATE)) {
-	// 		debug("Knotweed cannot be played next to a GATE");
-	// 		return false;
-	// 	}
-	// }
 	if (!this.canPlaceKnotweed(boardPoint)) {
 		return false;
 	}
@@ -544,6 +524,10 @@ Board.prototype.placeKnotweed = function(tile, notationPoint) {
 Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 	if (!boardPoint.hasTile()) {
 		// debug("Boat always played on top of another tile");
+		return false;
+	}
+
+	if (boardPoint.isType(GATE)) {
 		return false;
 	}
 
@@ -570,25 +554,11 @@ Board.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
-	// if (!boardPoint.hasTile()) {
-	// 	debug("Boat always played on top of another tile");
-	// 	return false;
-	// }
-
-	// if (boardPoint.tile.ownerName === tile.ownerName) {
-	// 	debug("Cannot play BOAT on own tile");
-	// 	return false;
-	// }
-
 	if (!this.canPlaceBoat(boardPoint, tile)) {
 		return false;
 	}
 
 	if (boardPoint.tile.type === ACCENT_TILE) {
-		// if (boardPoint.tile.accentType !== KNOTWEED) {
-		// 	debug("Not played on Knotweed tile");
-		// 	return false;
-		// }
 		// Validated as Knotweed
 
 		boardPoint.putTile(tile);
@@ -642,6 +612,19 @@ Board.prototype.getSurroundingRowAndCols = function(rowAndCol) {
 		}
 	}
 	return rowAndCols;
+};
+
+Board.prototype.refreshRockRowAndCols = function() {
+	this.rockRowAndCols = [];
+	var self = this;
+
+	this.cells.forEach(function(row) {
+		row.forEach(function(boardPoint) {
+			if (boardPoint.hasTile() && boardPoint.tile.accentType === ROCK) {
+				self.rockRowAndCols.push(boardPoint);
+			}
+		});
+	});
 };
 
 Board.prototype.pointIsOpenGate = function(notationPoint) {
@@ -907,6 +890,10 @@ Board.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
     return false; // start or end point not given
   }
 
+  if (boardPointStart.isType(NON_PLAYABLE) || boardPointEnd.isType(NON_PLAYABLE)) {
+  	return false;	// Paths must be through playable points
+  }
+
   if (boardPointStart.row === boardPointEnd.row && boardPointStart.col === boardPointEnd.col) {
     return true; // Yay! start point equals end point
   }
@@ -998,7 +985,7 @@ Board.prototype.analyzeHarmonies = function() {
 		}
 	}
 
-	this.harmonyManager.printHarmonies();
+	// this.harmonyManager.printHarmonies();
 
 	this.winners = [];
 	var self = this;

@@ -209,7 +209,7 @@ HarmonyManager.prototype.verifyHarmonyRing = function(ring) {
 	var shapePoints = [];
 
 	var h = ring.pop();	// LOL
-	var playerName = h.tile1.ownerName;
+	var playerName = h.ownerName;
 	shapePoints.push(new NotationPoint(h.tile1Pos.notationPointString).toArr());
 	shapePoints.push(new NotationPoint(h.tile2Pos.notationPointString).toArr());
 

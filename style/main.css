@@ -13,9 +13,6 @@ html, body {
   font-size: 18px;
 }
 
-body {
-  margin: 20px 0 0 0; }
-
 .footer {
 	clear: both;
 	padding-top: 10px;
@@ -38,10 +35,11 @@ h1.title {
 }
 
 
-p {
+p, li {
   margin-top: 0;
   margin-bottom: 10px;
-  line-height: 1.65; }
+  line-height: 1.65;
+}
 
 a {
   color: #776e65;
@@ -61,8 +59,14 @@ hr {
 
 /* --------------------------------------- */
 
+#replayControls {
+  margin-top: 12px;
+  margin-left: 12px;
+}
+
 .svgContainer {
-  width: 576px;
+  /*width: 576px;*/
+  width: 612px;
   /*border: 1px dotted gray;*/
   /*padding-left: 1px;*/
 
@@ -88,27 +92,33 @@ figure > div {
 }
 
 .pointContainer {
-  padding: 16px;
+  /*padding: 16px;*/
+  padding: 17px;
 }
 .tilePileContainer {
   display: inline;
   float: left;
-  width: 192px;
+  /*width: 192px;*/
+  width: 204px;
   margin-left: 12px;
   /*margin-top: 16px;*/
 }
 
 .point {
-  border-radius: 16px;
+  /*border-radius: 16px;
   width: 32px;
-  height: 32px;
+  height: 32px;*/
+  border-radius: 17px;
+  width: 34px;
+  height: 34px;
   display: inline;
   float: left;
 }
 .activePoint:hover {
 /*  -moz-box-shadow: 0px 0px 32px #054;
   -webkit-box-shadow: 0px 0px 32px #054;*/
-  box-shadow: 0px 0px 32px #054;
+  /*box-shadow: 0px 0px 32px #054;*/
+  box-shadow: 0px 0px 34px #054;
 }
 
 .hasTile {
@@ -124,8 +134,8 @@ figure > div {
 }
 
 .possibleMove {
-  box-shadow: 0px 0px 32px #421;
-  /*border: 1px solid #741;*/
+  /*box-shadow: 0px 0px 32px #421;*/
+  box-shadow: 0px 0px 34px #421;
 }
 
 .possibleMove img {
@@ -133,26 +143,30 @@ figure > div {
 }
 
 .selectedFromPile {
-  box-shadow: 0px 0px 32px #054;
+  /*box-shadow: 0px 0px 32px #054;*/
+  /*box-shadow: 0px 0px 34px #054;*/
+  box-shadow: 0px 0px 8px 4px #c6c;
 }
 
 .GUESTharmony {
-  box-shadow: 0px 0px 8px 4px #ff8100;
+  /*box-shadow: 0px 0px 8px 4px #ff8100;*/
+  box-shadow: 0px 0px 8px 4px #6cc;
 }
 .HOSTharmony {
-  box-shadow: 0px 0px 8px 4px #ff8100;
+  /*box-shadow: 0px 0px 8px 4px #ff8100;*/
+  box-shadow: 0px 0px 8px 4px #6CC;
 }
 
 .tilePileContainer div {
   display: inline;
   float: left;
-  margin-top: 20px;
+  margin-top: 12px;
 }
 
 .tilePileContainer div div {
   display: inline;
   float: left;
-  width: 32px;
+  width: 34px;
   margin-top: 8px;
 }
 
@@ -183,6 +197,19 @@ input[type=submit] {
   font: inherit;
   padding: 7px 20px;
   width: auto;
+}
+
+.helpContainer {
+  margin: 0px 0px 0px 32px;
+  width: 230px;
+  display: inline;
+  float: left;
+  font-size: 85%;
+}
+
+.license {
+  margin-top: 20px;
+  font-size: smaller;
 }
 
 

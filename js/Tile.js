@@ -83,7 +83,19 @@ Tile.prototype.formsHarmonyWith = function(otherTile) {
 		return false;
 	}
 
-	if (otherTile.ownerName !== this.ownerName || this.drained || otherTile.drained) {
+	if (this.drained || otherTile.drained) {
+		// debug("Drained tiles cannot form Harmony.");
+		return false;
+	}
+
+	// Check White Lotus (Lotus can belong to either player)
+	if ((this.code === 'L' && otherTile.type === BASIC_FLOWER) 
+		|| (otherTile.code === 'L' && this.type == BASIC_FLOWER)) {
+		return true;
+	}
+
+	// For normal Harmonies, tiles must belong to same player
+	if (otherTile.ownerName !== this.ownerName) {
 		// debug("Tiles drained or have different owners - NO Harmony");
 		return false;
 	}
@@ -108,20 +120,6 @@ Tile.prototype.clashesWith = function(otherTile) {
 		&& this.basicValue === otherTile.basicValue);
 };
 
-// Tile.prototype.canCapture = function(otherTile) {
-// 	// either clash or special ability of Orchid
-// 	if (this.clashesWith(otherTile)) {
-// 		return true;
-// 	}
-
-// 	// TODO set up the Orchid ability checks
-// 	if (this.specialFlowerType === ORCHID) {
-// 		// Can capture if my Lotus
-// 	}
-
-// 	return false;
-// };
-
 Tile.prototype.getMoveDistance = function() {
 	if (this.type === BASIC_FLOWER) {
 		return parseInt(this.basicValue);
@@ -142,6 +140,84 @@ Tile.prototype.drain = function() {
 Tile.prototype.restore = function() {
 	this.drained = false;
 };
+
+
+Tile.getTileName = function(tileCode) {
+	var name = "";
+	
+	if (tileCode.length > 1) {
+		var colorCode = tileCode.charAt(0);
+		var tileNum = tileCode.charAt(1);
+
+		if (colorCode === 'R') {
+			if (tileNum === '3') {
+				name = "Rose";
+			} else if (tileNum === '4') {
+				name = "Chrysanthemum";
+			} else if (tileNum === '5') {
+				name = "Rhododendron";
+			}
+			name += " (Red " + tileNum + ")";
+		} else if (colorCode === 'W') {
+			if (tileNum === '3') {
+				name = "Jasmine";
+			} else if (tileNum === '4') {
+				name = "Lily";
+			} else if (tileNum === '5') {
+				name = "White Jade";
+			}
+			name += " (White " + tileNum + ")";
+		}
+	} else {
+		if (tileCode === 'R') {
+			name = "Rock";
+		} else if (tileCode === 'W') {
+			name = "Wheel";
+		} else if (tileCode === 'K') {
+			name = "Knotweed";
+		} else if (tileCode === 'B') {
+			name = "Boat";
+		} else if (tileCode === 'O') {
+			name = "Orchid";
+		} else if (tileCode === 'L') {
+			name = "White Lotus";
+		}
+	}
+
+	return name;
+};
+
+// Tile.getTileHeading = function(tileCode) {
+// 	var heading = Tile.getTileName(tileCode);
+
+// 	if (tileCode.length ===  1) {
+// 		return heading;
+// 	}
+
+// 	// For Basic Flower Tile, add simple name (like "Red 3")
+
+// 	heading += " (";
+// 	if ()
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

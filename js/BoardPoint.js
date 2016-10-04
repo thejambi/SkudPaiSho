@@ -110,14 +110,14 @@ BoardPoint.prototype.restoreTile = function() {
 	}
 };
 
-BoardPoint.prototype.canHoldTile = function(tile) {
+BoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	// Validate this point's ability to hold given tile
 
 	if (this.isType(NON_PLAYABLE)) {
 		return false;
 	}
 
-	if (this.hasTile()) {
+	if (!ignoreTileCheck && this.hasTile()) {
 		// This function does not take into account capturing abilities
 		return false;
 	}
@@ -134,6 +134,8 @@ BoardPoint.prototype.canHoldTile = function(tile) {
 
 		return true;
 	} else if (tile.type === SPECIAL_FLOWER) {
+		return true;
+	} else if (tile.type === ACCENT_TILE) {
 		return true;
 	}
 

@@ -90,7 +90,7 @@ TileManager.prototype.peekTile = function(player, tileCode, tileId) {
 
 TileManager.prototype.removeSelectedTileFlags = function() {
 	this.hostTiles.forEach(function(tile) {
-		tile.selectedFromPile = false;;
+		tile.selectedFromPile = false;
 	});
 	this.guestTiles.forEach(function(tile) {
 		tile.selectedFromPile = false;

@@ -83,10 +83,8 @@ GameManager.prototype.runNotationMove = function(move, withActuate) {
 
 GameManager.prototype.revealPossibleMovePoints = function(boardPoint) {
 	if (!boardPoint.hasTile()) {
-		debug("Can't move non-existent tile, man");
 		return;
 	}
-	debug(boardPoint);
 	this.board.setPossibleMovePoints(boardPoint);
 	this.actuate();
 };
