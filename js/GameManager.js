@@ -1,24 +1,31 @@
 // Game Manager
 
-function GameManager() {
+function GameManager(ignoreActuate, isCopy) {
+	this.isCopy = isCopy;
+
 	this.actuator = new Actuator();
 
 	this.tileManager = new TileManager();
 
-	this.setup();
+	this.setup(ignoreActuate);
 }
 
 // Set up the game
-GameManager.prototype.setup = function () {
+GameManager.prototype.setup = function (ignoreActuate) {
 
 	this.board = new Board();
 
 	// Update the actuator
-	this.actuate();
+	if (!ignoreActuate) {
+		this.actuate();
+	}
 };
 
 // Sends the updated board to the actuator
 GameManager.prototype.actuate = function () {
+	if (this.isCopy) {
+		return;
+	}
 	this.actuator.actuate(this.board, this.tileManager);
 };
 
@@ -81,29 +88,36 @@ GameManager.prototype.runNotationMove = function(move, withActuate) {
 	return bonusAllowed;
 };
 
-GameManager.prototype.revealPossibleMovePoints = function(boardPoint) {
+GameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
 	this.board.setPossibleMovePoints(boardPoint);
-	this.actuate();
+	
+	if (!ignoreActuate) {
+		this.actuate();
+	}
 };
 
-GameManager.prototype.hidePossibleMovePoints = function() {
+GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	this.board.removePossibleMovePoints();
 	this.tileManager.removeSelectedTileFlags();
-	this.actuate();
+	if (!ignoreActuate) {
+		this.actuate();
+	}
 };
 
-GameManager.prototype.revealOpenGates = function(moveNum) {
-	debug("Move num: " + moveNum);
+GameManager.prototype.revealOpenGates = function(player, moveNum, ignoreActuate) {
 	if (moveNum === 2) {
 		// guest selecting first tile
 		this.board.setGuestGateOpen();
 	} else {
-		this.board.setOpenGatePossibleMoves();
+		this.board.setOpenGatePossibleMoves(player);
 	}
-	this.actuate();
+	
+	if (!ignoreActuate) {
+		this.actuate();
+	}
 };
 
 GameManager.prototype.revealPossiblePlacementPoints = function(tile) {
@@ -116,4 +130,9 @@ GameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
 	this.actuate();
 };
 
-
+GameManager.prototype.getCopy = function() {
+	var copyGame = new GameManager(true, true);
+	copyGame.board = this.board.getCopy();
+	copyGame.tileManager = this.tileManager.getCopy();
+	return copyGame;
+};

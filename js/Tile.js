@@ -141,6 +141,14 @@ Tile.prototype.restore = function() {
 	this.drained = false;
 };
 
+Tile.prototype.getName = function() {
+	return Tile.getTileName(this.code);
+};
+
+Tile.prototype.getCopy = function() {
+	return new Tile(this.code, this.ownerCode);
+};
+
 
 Tile.getTileName = function(tileCode) {
 	var name = "";
@@ -185,6 +193,16 @@ Tile.getTileName = function(tileCode) {
 	}
 
 	return name;
+};
+
+Tile.getClashTileCode = function(tileCode) {
+	if (tileCode.length === 2) {
+		if (tileCode.startsWith("R")) {
+			return "W" + tileCode.charAt(1);
+		} else if (tileCode.startsWith("W")) {
+			return "R" + tileCode.charAt(1);
+		}
+	}
 };
 
 // Tile.getTileHeading = function(tileCode) {

@@ -1,13 +1,10 @@
 // Harmony
 
 function Harmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
-
 	this.tile1 = tile1;
 	this.tile1Pos = tile1RowAndColumn;
 	this.tile2 = tile2;
 	this.tile2Pos = tile2RowAndColumn;
-
-	// Get the player it belongs to
 
 	if (this.tile1.type === BASIC_FLOWER) {
 		this.ownerCode = this.tile1.ownerCode;
@@ -22,11 +19,8 @@ function Harmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 
 Harmony.prototype.equals = function(otherHarmony) {
 	if (this.ownerName === otherHarmony.ownerName && this.ownerCode === otherHarmony.ownerCode) {
-		// debug("Same owner!");
 		if (this.tile1 === otherHarmony.tile1 || this.tile1 === otherHarmony.tile2) {
-			// debug("Other contains tile1!");
 			if (this.tile2 === otherHarmony.tile1 || this.tile2 === otherHarmony.tile2) {
-				// debug("Other contains tile2!");
 				return true;
 			}
 		}
@@ -75,6 +69,35 @@ Harmony.prototype.getString = function() {
 	return this.ownerName + " (" + this.tile1Pos.notationPointString + ")-(" + this.tile2Pos.notationPointString + ")";
 };
 
+Harmony.prototype.getDirectionForTile = function(tile) {
+	if (!this.containsTile(tile)) {
+		return;
+	}
+
+	var thisPos = this.tile1Pos;	// Assume it's tile1
+	var otherPos = this.tile2Pos;
+	if (this.tile2.id === tile.id) {
+		thisPos = this.tile2Pos;	// It's tile2!
+		otherPos = this.tile1Pos;
+	}
+
+	if (thisPos.row === otherPos.row) {
+		// Same row means East or West
+		if (thisPos.col < otherPos.col) {
+			return "East";
+		} else {
+			return "West";
+		}
+	} else if (thisPos.col === otherPos.col) {
+		// Same col means North or South
+		if (thisPos.row > otherPos.row) {
+			return "North";
+		} else {
+			return "South";
+		}
+	}
+};
+
 
 // --------------------------------------------- // 
 
@@ -89,6 +112,16 @@ HarmonyManager.prototype.printHarmonies = function() {
 	for (var i = 0; i < this.harmonies.length; i++) {
 		debug(this.harmonies[i].getString());
 	}
+};
+
+HarmonyManager.prototype.getHarmoniesWithThisTile = function(tile) {
+	var results = [];
+	this.harmonies.forEach(function(harmony) {
+		if (harmony.containsTile(tile)) {
+			results.push(harmony);
+		}
+	});
+	return results;
 };
 
 HarmonyManager.prototype.addHarmony = function(harmony) {
@@ -252,18 +285,17 @@ HarmonyManager.prototype.verifyHarmonyRing = function(ring) {
 	// }
 
 
-	if (this.isPointInsideShape(new NotationPoint("0,0"), shapePoints)) {
-		// debug("OH MY GOODNESS !@#@%#%$&&$(*&^%#%#$^%#@%#");
+	if (this.isCenterInsideShape(shapePoints)) {
+		// debug("WINNER");
 		return playerName;
 	} else {
-		// debug("for shame");
 		return false;
 	}
 };
 
 
 /** Don't touch this magic... 
-Based off of https://github.com/substack/point-in-polygon under MIT License:
+Polygon shape checking based off of https://github.com/substack/point-in-polygon under MIT License:
 
 The MIT License (MIT)
 
@@ -296,6 +328,11 @@ HarmonyManager.prototype.isPointInsideShape = function(notationPoint, shapePoint
 		var xi = shapePoints[i][0], yi = shapePoints[i][1];
 		var xj = shapePoints[j][0], yj = shapePoints[j][1];
 
+		// If on the line, doesn't count...
+		if ((xi === x && xj === x && xi * xj )) {
+			return false;
+		}
+
 		var intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
 		if (intersect) {
 			inside = !inside;
@@ -304,6 +341,41 @@ HarmonyManager.prototype.isPointInsideShape = function(notationPoint, shapePoint
 
 	return inside;
 };
+
+HarmonyManager.prototype.isPointInsideShape_alternate = function(notationPoint, poly) {
+	var pt = [notationPoint.x, notationPoint.y];
+    for(var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
+        ((poly[i][1] <= pt[1] && pt[1] < poly[j][1]) || (poly[j][1] <= pt[1] && pt[1] < poly[i][1]))
+        && (pt[0] < (poly[j][0] - poly[i][0]) * (pt[1] - poly[i][1]) / (poly[j][1] - poly[i][1]) + poly[i][0])
+        && (c = !c);
+    return c;
+};
+
+/* Working function */
+HarmonyManager.prototype.isCenterInsideShape = function(shapePoints) {
+	var x = 0;
+	var y = 0;
+	var inside = false;
+	for (var i = 0, j = shapePoints.length - 1; i < shapePoints.length; j = i++) {
+		var xi = shapePoints[i][0], yi = shapePoints[i][1];
+		var xj = shapePoints[j][0], yj = shapePoints[j][1];
+
+		// If on the line, doesn't count...
+		if ((xi === 0 && xj === 0 && yi * yj < 0)
+			|| (yi === 0 && yj === 0 && xi * xj < 0)) {
+			debug("Crosses center, cannot count");
+			return false;
+		}
+
+		var intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+		if (intersect) {
+			inside = !inside;
+		}
+	}
+
+	return inside;
+};
+
 
 
 

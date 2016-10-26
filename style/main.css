@@ -10,7 +10,7 @@ html, body {
   background: #faf8ef;
   color: #776e65;
   font-family: "San Francisco", "Helvetica Neue", Arial, sans-serif;
-  font-size: 18px;
+  font-size: 15px;
 }
 
 .footer {
@@ -19,6 +19,7 @@ html, body {
 	margin-top: 10px;
   margin-bottom: 20px;
 	text-align: left;
+  max-width: 612px;
 }
 
 .heading:after {
@@ -35,10 +36,19 @@ h1.title {
 }
 
 
-p, li {
-  margin-top: 0;
-  margin-bottom: 10px;
+p {
+  margin-bottom: 6px;
   line-height: 1.65;
+}
+
+li {
+  margin-top: 0;
+  margin-bottom: 2px;
+  line-height: 1.65;
+}
+
+ul {
+  margin-top: 0;
 }
 
 a {
@@ -59,14 +69,27 @@ hr {
 
 /* --------------------------------------- */
 
+#send {
+  font-size: x-large;
+  margin-top: 4px;
+}
+
 #replayControls {
   margin-top: 12px;
-  margin-left: 12px;
+}
+
+.replayButton {
+  width: 36px;
+  height: 36px;
+  border: 1px solid black;
+  border-radius: 3px;
+  background-color: #ccc;
 }
 
 .svgContainer {
   /*width: 576px;*/
   width: 612px;
+  margin-top: 8px;
   /*border: 1px dotted gray;*/
   /*padding-left: 1px;*/
 
@@ -94,14 +117,20 @@ figure > div {
 .pointContainer {
   /*padding: 16px;*/
   padding: 17px;
+  height: 612px;
+  width: 612px;
 }
 .tilePileContainer {
   display: inline;
   float: left;
-  /*width: 192px;*/
-  width: 204px;
+  /*width: 236px;*/
+  width: 222px;
   margin-left: 12px;
-  /*margin-top: 16px;*/
+}
+
+.gameMessage {
+  width: 90%;
+  margin-top: 6px;
 }
 
 .point {
@@ -145,20 +174,40 @@ figure > div {
 .selectedFromPile {
   /*box-shadow: 0px 0px 32px #054;*/
   /*box-shadow: 0px 0px 34px #054;*/
-  box-shadow: 0px 0px 8px 4px #c6c;
+  box-shadow: 0px 0px 4px 4px #c6c;
 }
 
 .GUESTharmony {
-  /*box-shadow: 0px 0px 8px 4px #ff8100;*/
-  box-shadow: 0px 0px 8px 4px #6cc;
+  box-shadow: 0px 0px 8px 4px #87f;
 }
 .HOSTharmony {
   /*box-shadow: 0px 0px 8px 4px #ff8100;*/
   box-shadow: 0px 0px 8px 4px #6CC;
 }
 
-.tilePileContainer div {
-  display: inline;
+
+.betweenHarmony {
+  margin: 16px;
+  width: 2px;
+  height: 2px;
+}
+.bhHost {
+  box-shadow: 0px 0px 7px 3px #6cc;
+  background-color: #6cc;
+}
+.bhGuest {
+  box-shadow: 0px 0px 7px 3px #87f;
+  background-color: #87f;
+}
+.bhHost.bhGuest {
+  box-shadow: 0px 0px 7px 3px #77A2E6;
+  background-color: #77A2E6;
+}
+
+
+
+.hostTilesContainer, .guestTilesContainer {
+  display: inline-block;
   float: left;
   margin-top: 12px;
 }
@@ -174,7 +223,7 @@ figure > div {
   clear: both;
 }
 
-.skipBonus {
+.skipBonus, .clickableText {
   text-decoration: underline;
   /*border: 1px solid #776e65;*/
   /*border-radius: 4px;*/
@@ -200,11 +249,11 @@ input[type=submit] {
 }
 
 .helpContainer {
-  margin: 0px 0px 0px 32px;
+  margin: 0;
   width: 230px;
   display: inline;
   float: left;
-  font-size: 85%;
+  /*font-size: 85%;*/
 }
 
 .license {
@@ -212,288 +261,185 @@ input[type=submit] {
   font-size: smaller;
 }
 
-
-
-
-/* ----------- iPhone 4 and 4S ----------- */
-
-/* Portrait and Landscape */
-@media only screen
-and (min-device-width: 320px)
-and (max-device-width: 480px)
-and (-webkit-min-device-pixel-ratio: 2) {
-    
+.header {
+  width: 100%;
+  height: 32px;
+  margin: 0;
+  background-color: #444;
+  color: #faf8ef;
+  font-size: 14px;
 }
 
-/* Portrait */
-@media only screen
-and (min-device-width: 320px)
-and (max-device-width: 480px)
-and (-webkit-min-device-pixel-ratio: 2)
-and (orientation: portrait) {
+.header h1 {
+  margin: 0;
+  font-size: 26px;
 }
 
-/* Landscape */
-@media only screen
-and (min-device-width: 320px)
-and (max-device-width: 480px)
-and (-webkit-min-device-pixel-ratio: 2)
-and (orientation: landscape) {
-    body {
-        margin: 0 0 0 0; }
-    
-    h1.title {
-        display: none;
-    }
-    
-    .container {
-        width: 400px; }
-    
-    .game-container {
-        float: left;
-        display: inline;
-    }
-    
-    .restartButton {
-        float: right;
-        display: inline;
-        margin: 136px 0 0 12px;
-    }
-
+.headerLeft {
+  float: left;
 }
 
-/* ----------- iPhone 5 and 5S ----------- */
-
-/* Portrait and Landscape */
-@media only screen
-and (min-device-width: 320px)
-and (max-device-width: 568px)
-and (-webkit-min-device-pixel-ratio: 2) {
-    
-}
-
-/* Portrait */
-@media only screen
-and (min-device-width: 320px)
-and (max-device-width: 568px)
-and (-webkit-min-device-pixel-ratio: 2)
-and (orientation: portrait) {
-    
-}
-
-/* Landscape */
-@media only screen
-and (min-device-width: 320px)
-and (max-device-width: 568px)
-and (-webkit-min-device-pixel-ratio: 2)
-and (orientation: landscape) {
-    
-    body {
-        margin: 0 0 0 0; }
-    
-    h1.title {
-        display: none;
-    }
-    
-    .container {
-        width: 400px; }
-    
-    .game-container {
-        float: left;
-        display: inline;
-    }
-    
-    .restartButton {
-        float: right;
-        display: inline;
-        margin: 136px 0 0 12px;
-    }
-}
-
-/* ----------- iPhone 6 ----------- */
-
-/* Portrait and Landscape */
-@media only screen
-and (min-device-width: 375px)
-and (max-device-width: 667px)
-and (-webkit-min-device-pixel-ratio: 2) {
-    
-}
-
-/* Portrait */
-@media only screen
-and (min-device-width: 375px)
-and (max-device-width: 667px)
-and (-webkit-min-device-pixel-ratio: 2)
-and (orientation: portrait) {
-    
-}
-
-/* Landscape */
-@media only screen
-and (min-device-width: 375px)
-and (max-device-width: 667px)
-and (-webkit-min-device-pixel-ratio: 2)
-and (orientation: landscape) {
-    body {
-        margin: 0 0 0 0; }
-    
-    h1.title {
-        display: none;
-    }
-    
-    .container {
-        width: 400px; }
-    
-    .game-container {
-        float: left;
-        display: inline;
-    }
-    
-    .restartButton {
-        float: right;
-        display: inline;
-        margin: 136px 0 0 12px;
-    }
-
-}
-
-/* ----------- iPhone 6+ ----------- */
-
-/* Portrait and Landscape */
-@media only screen
-and (min-device-width: 414px)
-and (max-device-width: 736px)
-and (-webkit-min-device-pixel-ratio: 3) {
-    
-}
-
-/* Portrait */
-@media only screen
-and (min-device-width: 414px)
-and (max-device-width: 736px)
-and (-webkit-min-device-pixel-ratio: 3)
-and (orientation: portrait) {
-    
-}
-
-/* Landscape */
-@media only screen
-and (min-device-width: 414px)
-and (max-device-width: 736px)
-and (-webkit-min-device-pixel-ratio: 3)
-and (orientation: landscape) {
-    body {
-        margin: 0 0 0 0; }
-    
-    h1.title {
-        display: none;
-    }
-    
-    .container {
-        width: 400px; }
-    
-    .game-container {
-        float: left;
-        display: inline;
-    }
-    
-    .restartButton {
-        float: right;
-        display: inline;
-        margin: 136px 0 0 12px;
-    }
-
+.headerRight {
+  float: right;
+  margin-top: 10px;
+  color: #faf8ef;
+  text-decoration: none;
 }
 
 
 
+/* -------------------------- */
 
+@media only screen and (max-width: 1090px) {
+  /* Show message under board */
+  .tilePileContainer {
+    width: 204px;
+  }
 
-/* ----------- iPad mini ----------- */
+  .helpContainer {
+    clear: both;
+    width: 612px;
+    margin-bottom: 20px;
+  }
 
-/* Portrait and Landscape */
-@media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (-webkit-min-device-pixel-ratio: 1) {
-    body {
-        zoom: 1.5;
+  .helpContainer h4 {
+    text-align: center;
+  }
+
+  .footer {
+    border-top: 1px solid #776e65;
+  }
+}
+
+@media only screen and (max-width: 828px) {
+  /* Show tiles under board */
+  .tilePileContainer {
+    clear: both;
+    width: 612px;
+  }
+
+  .hostTilesContainer, .guestTilesContainer {
+    margin-left: 9.3vw;
+  }
+
+  .tilePileContainer div {
+    margin-top: 4px;
+  }
+
+  .tilePileContainer div div {
+    margin-top: 4px;
+  }
+
+  #send {
+    font-size: large;
+    margin-top: 0;
+  }
+}
+
+@media only screen and (max-width: 612px) {
+    .svgContainer {
+      width: 100vw;
+    }
+
+    .pointContainer {
+      width: 100vw;
+      height: 100vw;
+    }
+
+    .pointContainer {
+      padding: 2.77777vw;
+    }
+
+    .tilePileContainer {
+      width: 95%;
+    }
+
+    .tilePileContainer div div {
+      width: 5.5555vw;
+    }
+
+    .point {
+      width: 5.5555vw;
+      height: 5.611vw;
+    }
+
+    .helpContainer {
+      width: 100%;
+    }
+
+  .possibleMove {
+    /*box-shadow: 0px 0px 32px #421;*/
+    box-shadow: 0px 0px 5.6vw #421;
+  }
+
+  .betweenHarmony {
+    /*margin: 0;*/
+    margin: 2.614vw;
+    width: 0.3268vw;
+    height: 0.3268vw;
+    /*width: 5.5555vw;
+      height: 5.611vw;*/
+  }
+  .bhHost {
+    box-shadow: 0px 0px 7px 3px #6cc;
+    background-color: #6cc;
+  }
+  .bhGuest {
+    box-shadow: 0px 0px 7px 3px #87f;
+    background-color: #87f;
+  }
+  .bhHost.bhGuest {
+    box-shadow: 0px 0px 7px 3px #77A2E6;
+    background-color: #77A2E6;
+  }
+
+}
+
+@media only screen and (max-width: 306px) {
+    .svgContainer {
+      width: 306px;
+    }
+
+    .pointContainer {
+      width: 306px;
+      height: 306px;
+    }
+
+    .pointContainer {
+      padding: 8.5px;
+    }
+    
+    .tilePileContainer div {
+      margin-top: 2px;
+    }
+
+    .tilePileContainer div div {
+      width: 17px;
+      margin-top: 2px;
+    }
+
+    .point {
+      width: 17px;
+      height: 17px;
+    }
+
+    .betweenHarmony {
+      margin: 8px;
+      width: 1px;
+      height: 1px;
+    }
+    .bhHost {
+      box-shadow: 0px 0px 7px 3px #6cc;
+      background-color: #6cc;
+    }
+    .bhGuest {
+      box-shadow: 0px 0px 7px 3px #87f;
+      background-color: #87f;
+    }
+    .bhHost.bhGuest {
+      box-shadow: 0px 0px 7px 3px #77A2E6;
+      background-color: #77A2E6;
     }
 }
 
-/* Portrait */
-@media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (orientation: portrait)
-and (-webkit-min-device-pixel-ratio: 1) {
-    
-}
 
-/* Landscape */
-@media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (orientation: landscape)
-and (-webkit-min-device-pixel-ratio: 1) {
-    
-}
-
-/* ----------- iPad 1 and 2 ----------- */
-/* Portrait and Landscape */
-@media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (-webkit-min-device-pixel-ratio: 1) {
-    body {
-        zoom: 1.5;
-    }
-}
-
-/* Portrait */
-@media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (orientation: portrait)
-and (-webkit-min-device-pixel-ratio: 1) {
-    
-}
-
-/* Landscape */
-@media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (orientation: landscape)
-and (-webkit-min-device-pixel-ratio: 1) {
-    
-}
-
-/* ----------- iPad 3 and 4 ----------- */
-/* Portrait and Landscape */
-@media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (-webkit-min-device-pixel-ratio: 2) {
-    body {
-        zoom: 1.5;
-    }
-}
-
-/* Portrait */
-@media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (orientation: portrait)
-and (-webkit-min-device-pixel-ratio: 2) {
-    
-}
-
-/* Landscape */
-@media only screen
-and (min-device-width: 768px)
-and (max-device-width: 1024px)
-and (orientation: landscape)
-and (-webkit-min-device-pixel-ratio: 2) {
-    
-}

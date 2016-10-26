@@ -96,11 +96,10 @@ Actuator.prototype.addTile = function(tile, mainContainer) {
 	theDiv.setAttribute("name", tile.getImageName());
 	theDiv.setAttribute("id", tile.id);
 
-	theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
 	if (this.mobile) {
-		theDiv.setAttribute("ontouchstart", "showTileMessage(this);");
-		theDiv.setAttribute("ontouchend", "clearMessage();");
+		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
 	} else {
+		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
 		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
 		theDiv.setAttribute("onmouseout", "clearMessage();");
 	}
@@ -119,14 +118,21 @@ Actuator.prototype.addBoardPoint = function(boardPoint) {
 		theDiv.classList.add("activePoint");
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
+		} else if (boardPoint.betweenHarmony) {
+			theDiv.classList.add("betweenHarmony");
+			if (boardPoint.betweenHarmonyHost) {
+				theDiv.classList.add("bhHost");
+			}
+			if (boardPoint.betweenHarmonyGuest) {
+				theDiv.classList.add("bhGuest");
+			}
 		}
 		theDiv.setAttribute("name", new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
 		
-		theDiv.setAttribute("onclick", "pointClicked(this);");
 		if (this.mobile) {
-			theDiv.setAttribute("ontouchstart", "showPointMessage(this);");
-			theDiv.setAttribute("ontouchend", "clearMessage();");
+			theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
 		} else {
+			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
 			theDiv.setAttribute("onmouseout", "clearMessage();");
 		}

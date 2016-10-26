@@ -360,13 +360,15 @@ Board.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
 		} else if (tile.accentType === BOAT) {
 			this.placeBoat(tile, notationPoint, extraBoatPoint);
 		}
-		this.analyzeHarmonies();
 	} else {
 		this.putTileOnPoint(tile, notationPoint);
 		if (tile.specialFlowerType === WHITE_LOTUS) {
 			this.playedWhiteLotusTiles.push(tile);
 		}
 	}
+	// Things to do after a tile is placed
+	this.flagAllTrappedTiles();
+	this.analyzeHarmonies();
 };
 
 Board.prototype.putTileOnPoint = function(tile, notationPoint) {
@@ -425,8 +427,8 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 		if (bp.isType(GATE)) {
 			// debug("Wheel cannot be played next to a GATE");
 			return false;
-		} else if (bp.hasTile() && bp.tile.drained) {
-			// debug("wheel cannot be played next to drained tile");
+		} else if (bp.hasTile() && (bp.tile.drained || bp.tile.accentType === KNOTWEED)) {
+			// debug("wheel cannot be played next to drained tile or Knotweed");
 			return false;
 		}
 
@@ -531,18 +533,16 @@ Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 		return false;
 	}
 
-	if (boardPoint.tile.ownerName === tile.ownerName) {
-		// debug("Cannot play BOAT on own tile");
-		return false;
-	}
+	// if (boardPoint.tile.ownerName === tile.ownerName) {
+	// 	// debug("Cannot play BOAT on own tile");
+	// 	return false;
+	// }	// Updating to allow Boat to be played on any Flower Tile
 
 	if (boardPoint.tile.type === ACCENT_TILE) {
 		if (boardPoint.tile.accentType !== KNOTWEED) {
 			// debug("Not played on Knotweed tile");
 			return false;
 		}
-	} else if (boardPoint.tile.type !== BASIC_FLOWER) {
-		return false;
 	}
 
 	return true;
@@ -561,7 +561,13 @@ Board.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint) {
 	if (boardPoint.tile.type === ACCENT_TILE) {
 		// Validated as Knotweed
 
-		boardPoint.putTile(tile);
+		// Options for Boat behavior. Uncomment ONE
+
+		// This line replaces the Knotweed with the Boat
+		//boardPoint.putTile(tile);
+
+		// This line follows the actual current rule: Both removed from board
+		boardPoint.removeTile();
 
 		var rowCols = this.getSurroundingRowAndCols(rowAndCol);
 		// "Restore" surrounding tiles
@@ -714,6 +720,11 @@ Board.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
 };
 
 Board.prototype.whiteLotusProtected = function(lotusTile) {
+	// Testing Lotus never protected:
+	return false;
+
+	// ----------- //
+
 	// Protected if: player also has Blooming Orchid 
 	var isProtected = false;
 	this.cells.forEach(function(row) {
@@ -826,7 +837,7 @@ Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPoin
 		return false;
 	}
 
-	if (!boardPointEnd.canHoldTile(boardPointStart.tile) && !canCapture) {
+	if (!boardPointEnd.canHoldTile(boardPointStart.tile, canCapture)) {
 		return false;
 	}
 
@@ -965,6 +976,59 @@ Board.prototype.columnBlockedByRock = function(colNum) {
 	return blocked;
 };
 
+Board.prototype.markSpacesBetweenHarmonies = function() {
+	// Unmark all
+	this.cells.forEach(function(row) {
+		row.forEach(function(boardPoint) {
+			boardPoint.betweenHarmony = false;
+			boardPoint.betweenHarmonyHost = false;
+			boardPoint.betweenHarmonyGuest = false;
+		});
+	});
+
+	// Go through harmonies, mark the spaces between them
+	var self = this;
+	this.harmonyManager.harmonies.forEach(function(harmony) {
+		// harmony.tile1Pos.row (for example)
+		// Harmony will be in same row or same col
+		if (harmony.tile1Pos.row === harmony.tile2Pos.row) {
+			// Get smaller of the two
+			var row = harmony.tile1Pos.row;
+			var firstCol = harmony.tile1Pos.col;
+			var lastCol = harmony.tile2Pos.col;
+			if (harmony.tile2Pos.col < harmony.tile1Pos.col) {
+				firstCol = harmony.tile2Pos.col;
+				lastCol = harmony.tile1Pos.col;
+			}
+			for (var col = firstCol + 1; col < lastCol; col++) {
+				self.cells[row][col].betweenHarmony = true;
+				if (harmony.ownerName === GUEST) {
+					self.cells[row][col].betweenHarmonyGuest = true;
+				} else if (harmony.ownerName === HOST) {
+					self.cells[row][col].betweenHarmonyHost = true;
+				}
+			}
+		} else if (harmony.tile2Pos.col === harmony.tile2Pos.col) {
+			// Get smaller of the two
+			var col = harmony.tile1Pos.col;
+			var firstRow = harmony.tile1Pos.row;
+			var lastRow = harmony.tile2Pos.row;
+			if (harmony.tile2Pos.row < harmony.tile1Pos.row) {
+				firstRow = harmony.tile2Pos.row;
+				lastRow = harmony.tile1Pos.row;
+			}
+			for (var row = firstRow + 1; row < lastRow; row++) {
+				self.cells[row][col].betweenHarmony = true;
+				if (harmony.ownerName === GUEST) {
+					self.cells[row][col].betweenHarmonyGuest = true;
+				} else if (harmony.ownerName === HOST) {
+					self.cells[row][col].betweenHarmonyHost = true;
+				}
+			}
+		}
+	});
+};
+
 Board.prototype.analyzeHarmonies = function() {
 	// We're going to find all harmonies on the board
 
@@ -984,6 +1048,8 @@ Board.prototype.analyzeHarmonies = function() {
 			}
 		}
 	}
+
+	this.markSpacesBetweenHarmonies();
 
 	// this.harmonyManager.printHarmonies();
 
@@ -1219,11 +1285,12 @@ Board.prototype.removePossibleMovePoints = function() {
 	});
 };
 
-Board.prototype.setOpenGatePossibleMoves = function() {
+Board.prototype.setOpenGatePossibleMoves = function(player) {
 	// Apply "open gate" type to applicable boardPoints
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
-			if (this.cells[row][col].isOpenGate()) {
+			var bp = this.cells[row][col];
+			if (bp.isOpenGate() && !bp.betweenPlayerHarmony(player)) {
 				this.cells[row][col].addType(POSSIBLE_MOVE);
 			}
 		}
@@ -1279,6 +1346,37 @@ Board.prototype.revealBoatBonusPoints = function(boardPoint) {
 	}
 };
 
+Board.prototype.getCopy = function() {
+	var copyBoard = new Board();
+
+	/*
+	this.cells = this.brandNew();
+
+	this.harmonyManager = new HarmonyManager();	// just analyzeharmonies
+
+	this.rockRowAndCols = [];	// call refreshRockRowAndCo...
+	this.playedWhiteLotusTiles = [];
+	this.winners = [];	// call analyzeHarmon...
+	*/
+
+	// cells
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			copyBoard.cells[row][col] = this.cells[row][col].getCopy();
+		}
+	}
+
+	// playedWhiteLotusTiles
+	for (var i = 0; i < this.playedWhiteLotusTiles.length; i++) {
+		copyBoard.playedWhiteLotusTiles.push(this.playedWhiteLotusTiles[i].getCopy());
+	}
+
+	// Everything else...
+	copyBoard.refreshRockRowAndCols();
+	copyBoard.analyzeHarmonies();
+	
+	return copyBoard;
+};
 
 
 

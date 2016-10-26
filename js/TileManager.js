@@ -118,3 +118,10 @@ TileManager.prototype.unselectTiles = function(player) {
 // 	tilePile.push(tile);
 // };
 
+TileManager.prototype.getCopy = function() {
+	var copy = new TileManager();
+
+	// copy this.hostTiles and this.guestTiles
+	
+	return copy;
+};

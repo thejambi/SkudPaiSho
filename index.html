@@ -9,6 +9,7 @@
 
 	<link href="style/main.css" rel="stylesheet" type="text/css">
 
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- <link href="favicon.ico" rel="shortcut icon"> -->
 	<link href="meta/apple-touch-icon.png" rel="apple-touch-icon">
 	<link href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
@@ -25,6 +26,7 @@
     <script type="text/javascript" src="js/jquery.validate.min.js"></script>
     <script type="text/javascript" src="js/jquery.form.js"></script>
     <script type="text/javascript" src="js/contact.js"></script>
+    <script src="js/lz-string.min.js"></script>
     <script src="js/GameData.js"></script>
     <script src="js/Actuator.js"></script>
     <script src="js/Tile.js"></script>
@@ -35,11 +37,24 @@
     <script src="js/GameNotation.js"></script>
     <script src="js/GameManager.js"></script>
     <script src="js/LocalStorage.js"></script>
+    
+    <!-- AI -->
+    <!-- <script src="js/ai/SkudAIv1.js"></script> -->
+
+    <!-- Main -->
     <script src="js/PaiShoMain.js"></script>
+    <!-- <script src="js/Recurse.js"></script> -->
 </head>
 
 <body>
-  <script> touchAvailable = false; </script>
+  <div class="header">
+    <div class="headerLeft"><h1>Skud Pai Sho</h1></div>
+    <!-- <div class="headerRight">&nbsp;|&nbsp;</div> -->
+    <a href="http://skudpaisho.com" target="_blank" class="headerRight clickableText">New Game</a>
+    <div class="headerRight">&nbsp;|&nbsp;</div>
+    <a href="https://skudpaisho.wordpress.com/skud-quick-reference/" target="_blank" class="headerRight clickableText">Rules</a>
+  </div>
+
 	<div class="leftContainer">
 
 		<!-- <div class="game-container gone" id="the-game-container"> -->
@@ -52,14 +67,7 @@
 				<input type="button" onclick="inputNow()" value="Enter" />
 			</div>
 
-			<div id="replayControls" class="gone">
-                <input type="button" onclick="rewindAllMoves()" value="|<" />
-                <input type="button" onclick="playPrevMove()" value="<" />
-                <input type="button" onclick="playNextMove(true)" value=">" />
-                <input type="button" onclick="playAllMoves()" value=">|" />
-            </div>
-        </div>
-        <br />
+    </div>
 
         <div class="svgContainer">
           <div class="bg-svg">
@@ -69,6 +77,13 @@
       </div>
   </div>
   <div class="tilePileContainer">
+    <div id="replayControls" class="gone">
+      <input class='replayButton' type="button" onclick="rewindAllMoves()" value="|<" />
+      <input class='replayButton' type="button" onclick="playPrevMove()" value="<-" />
+      <input class='replayButton playPauseButton' type="button" onclick="playPause()" value=">" />
+      <input class='replayButton' type="button" onclick="playNextMove(true); pauseRun();" value="->" />
+      <input class='replayButton' type="button" onclick="playAllMoves()" value=">|" />
+  </div>
       <form class='gone' id='contactform' action='processForm.php' method='post'>
         <input class='gone' type='text' id='fromEmail' name='fromEmail' value='' />
         <input class='gone' type='text' id='toEmail' name='toEmail' value='' />
@@ -112,9 +127,9 @@
   <div class="helpContainer" id="help">
     <div class="helpText">
       <h4>Skud Pai Sho</h4>
-      <p>Pai Sho is a fun and relaxingly strategic game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies between your tiles that surrounds the center of the board.</p>
+      <p>Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p>
       <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p>
-      <p>Select tiles or points on the board to learn more or <a href="https://skudpaisho.wordpress.com/" target="_blank">view the full rules</a>.</p>
+      <p>Select tiles or points on the board to learn more or <a href="https://skudpaisho.wordpress.com/skud-quick-reference/" target="_blank">view the rules</a>.</p>
     </div>
   </div>
 
@@ -123,10 +138,10 @@
 
 </div>
 <div class="footer">
-  If you <span class='skipBonus' onclick='promptEmail()'>enter your email address</span>, you can be notified automatically when your friend plays a move. Your email address is never used for any other reason, and you can edit it at any time. Click <span class='skipBonus' onclick='promptEmail()'>here</span> to edit email.
+  If you <span class='skipBonus' onclick='promptEmail()'>enter your email address</span>, you can be notified automatically when your opponent plays a move. Your email address is never used for any other reason, and you can edit it at any time. Click <span class='skipBonus' onclick='promptEmail()'>here</span> to edit email.
 </div>
-<div class="rules"><a href="https://skudpaisho.wordpress.com/" target="_blank">Skud Pai Sho Rules</a></div>
-<div class="license"><a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/us/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/3.0/us/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/us/">Creative Commons Attribution-NonCommercial 3.0 United States License</a>.</div>
+<!-- <div class="rules"><a href="https://skudpaisho.wordpress.com/" target="_blank">Skud Pai Sho Rules</a></div> -->
+<div class="license"><a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/us/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/3.0/us/88x31.png" /></a>&nbsp;This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/us/">Creative Commons Attribution-NonCommercial 3.0 United States License</a>.</div>
 
 
 <script>

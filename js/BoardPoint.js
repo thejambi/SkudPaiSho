@@ -142,6 +142,36 @@ BoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	return false;
 };
 
+BoardPoint.prototype.betweenPlayerHarmony = function(player) {
+	if (player === GUEST) {
+		return this.betweenHarmonyGuest;
+	} else if (player === HOST) {
+		return this.betweenHarmonyHost;
+	}
+	return false;
+};
+
+BoardPoint.prototype.getCopy = function() {
+	var copy = new BoardPoint();
+
+	// this.types
+	for (var i = 0; i < this.types.length; i++) {
+		copy.types.push(this.types[i]);
+	}
+
+	// this.row
+	copy.row = this.row;
+	// this.col
+	copy.col = this.col;
+
+	// tile
+	if (this.hasTile()) {
+		copy.tile = this.tile.getCopy();
+	}
+
+	return copy;
+};
+
 
 
 // Point makers

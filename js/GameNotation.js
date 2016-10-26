@@ -152,6 +152,10 @@ NotationMove.prototype.isValidNotation = function() {
 	return this.valid;
 };
 
+NotationMove.prototype.equals = function(otherMove) {
+	return this.fullMoveText === otherMove.fullMoveText;
+};
+
 
 
 // --------------------------------------- //
@@ -178,9 +182,26 @@ function NotationBuilder() {
 NotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
 	var builder = new NotationBuilder();
 	builder.moveType = PLANTING;
-	builder.plantedFlowerType = tileCode;
+	builder.plantedFlowerType = Tile.getClashTileCode(tileCode);
 	builder.endPoint = new NotationPoint("0,8");
 	return builder;
+};
+
+NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
+	var notationLine = moveNum + player.charAt(0) + ".";
+	if (this.moveType === ARRANGING) {
+		notationLine += "(" + this.startPoint.pointText + ")-(" + this.endPoint.pointText + ")";
+		if (this.bonusTileCode && this.bonusEndPoint) {
+			notationLine += "+" + this.bonusTileCode + "(" + this.bonusEndPoint.pointText + ")";
+			if (this.boatBonusPoint) {
+				notationLine += "-(" + this.boatBonusPoint.pointText + ")";
+			}
+		}
+	} else if (this.moveType === PLANTING) {
+		notationLine += this.plantedFlowerType + "(" + this.endPoint.pointText + ")";
+	}
+	
+	return new NotationMove(notationLine);
 };
 
 // --------------------------------------- //
@@ -194,13 +215,11 @@ function GameNotation() {
 
 GameNotation.prototype.setNotationText = function(text) {
 	this.notationText = text;
-	this.moves = [];
 	this.loadMoves();
 };
 
 GameNotation.prototype.addNotationLine = function(text) {
 	this.notationText += ";" + text.trim();
-	this.moves = [];
 	this.loadMoves();
 };
 
@@ -210,8 +229,33 @@ GameNotation.prototype.addMove = function(move) {
 	} else {
 		this.notationText = move.fullMoveText;
 	}
-	this.moves = [];
 	this.loadMoves();
+};
+
+GameNotation.prototype.removeLastMove = function() {
+	this.notationText = this.notationText.substring(0, this.notationText.lastIndexOf(";"));
+	this.loadMoves();
+};
+
+GameNotation.prototype.getPlayerMoveNum = function() {
+	var moveNum = 0;
+	var lastMove = this.moves[this.moves.length-1];
+
+	if (lastMove) {
+		moveNum = lastMove.moveNum;
+		// At game beginning:
+		if (lastMove.moveNum === 0 && lastMove.player === HOST) {
+			player = GUEST;
+		} else if (lastMove.moveNum === 0 && lastMove.player === GUEST) {
+			moveNum++;
+			player = GUEST;
+		} else if (lastMove.player === HOST) {	// Usual
+			moveNum++;
+		} else {
+			player = HOST;
+		}
+	}
+	return moveNum;
 };
 
 GameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
@@ -237,23 +281,11 @@ GameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 		}
 	}
 
-	var notationLine = moveNum + player.charAt(0) + ".";
-	if (builder.moveType === ARRANGING) {
-		notationLine += "(" + builder.startPoint.pointText + ")-(" + builder.endPoint.pointText + ")";
-		if (builder.bonusTileCode && builder.bonusEndPoint) {
-			notationLine += "+" + builder.bonusTileCode + "(" + builder.bonusEndPoint.pointText + ")";
-			if (builder.boatBonusPoint) {
-				notationLine += "-(" + builder.boatBonusPoint.pointText + ")";
-			}
-		}
-	} else if (builder.moveType === PLANTING) {
-		notationLine += builder.plantedFlowerType + "(" + builder.endPoint.pointText + ")";
-	}
-	
-	return new NotationMove(notationLine);
+	return builder.getNotationMove(moveNum, player);
 };
 
 GameNotation.prototype.loadMoves = function() {
+	this.moves = [];
 	var lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
@@ -265,7 +297,7 @@ GameNotation.prototype.loadMoves = function() {
 
 	var self = this;
 	var lastPlayer = HOST;
-	lines.forEach(function (line) {
+	lines.forEach(function(line) {
 		var move = new NotationMove(line);
 		if (move.moveNum === 0 && move.isValidNotation()) {
 			self.moves.push(move);
@@ -273,7 +305,7 @@ GameNotation.prototype.loadMoves = function() {
 			self.moves.push(move);
 			lastPlayer = move.player;
 		} else {
-			debug("the player check is broken?")
+			debug("the player check is broken?");
 		}
 	});
 };
