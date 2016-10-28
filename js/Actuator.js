@@ -156,13 +156,13 @@ Actuator.prototype.addBoardPoint = function(boardPoint) {
 		theDiv.appendChild(theImg);
 	}
 
-	if (boardPoint.col === 0) {
-		var theBr = document.createElement("br");
+	this.boardContainer.appendChild(theDiv);
+
+	if (boardPoint.betweenHarmony && boardPoint.col === 16) {
+		var theBr = document.createElement("div");
 		theBr.classList.add("clear");
 		this.boardContainer.appendChild(theBr);
 	}
-	
-	this.boardContainer.appendChild(theDiv);
 };
 
 Actuator.prototype.printBoard = function(board) {
