@@ -63,6 +63,8 @@ var HOST_SELECT_ACCENTS = "HOST_SELECT_ACCENTS";
 
 var localPlayerRole = HOST;
 
+var vagabond = false;
+
 // var aiList = [new SkudAIv1()];
 var aiList = [];
 var activeAi;
@@ -698,8 +700,8 @@ function pointClicked(htmlPoint) {
 			theGame.hidePossibleMovePoints();
 			notationBuilder.bonusEndPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
-			// If we're placing a boat, and boardPoint is opponent's basic flower...
-			if (notationBuilder.bonusTileCode.endsWith("B") && boardPoint.tile.type == BASIC_FLOWER) {
+			// If we're placing a boat, and boardPoint is a flower...
+			if (notationBuilder.bonusTileCode.endsWith("B") && boardPoint.tile.type !== ACCENT_TILE) {
 				// Boat played on basic flower, need to pick flower endpoint
 				notationBuilder.status = WAITING_FOR_BOAT_BONUS_POINT;
 				theGame.revealBoatBonusPoints(boardPoint);
@@ -835,12 +837,12 @@ function showTileMessage(tileDiv) {
 			message.push("The Knotweed disables surrounding Basic Flower Tiles so they are unable to move or form Harmony.");
 		} else if (tileCode === 'B') {
 			heading = "Accent Tile: Boat";
-			message.push("The Boat moves an opponent’s Basic Flower Tile one space or removes opponent’s Knotweed tile.");
+			message.push("The Boat moves a Flower Tile one space or removes a Knotweed tile.");
 		} else if (tileCode === 'L') {
 			heading = "Special Flower: White Lotus";
 			message.push("Can move up to 2 spaces");
 			message.push("Forms Harmony with all Basic Flower Tiles");
-			message.push("Can be captured by any Basic Flower Tile unless you have a Blooming Orchid");
+			message.push("Can be captured by any Flower Tile");
 		} else if (tileCode === 'O') {
 			heading = "Special Flower: Orchid";
 			message.push("Can move up to 6 spaces");

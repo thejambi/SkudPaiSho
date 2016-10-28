@@ -575,7 +575,7 @@ Board.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint) {
 			var bp = this.cells[rowCols[i].row][rowCols[i].col];
 			bp.restoreTile();
 		}
-	} else if (boardPoint.tile.type === BASIC_FLOWER) {
+	} else {
 		// Can't move a tile to where it can't normally go
 		var bpRowCol = extraBoatPoint.rowAndColumn;
 		var destBoardPoint = this.cells[bpRowCol.row][bpRowCol.col];

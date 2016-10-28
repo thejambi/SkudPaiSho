@@ -114,6 +114,8 @@ Actuator.prototype.addBoardPoint = function(boardPoint) {
 
 	theDiv.classList.add("point");
 
+	theDiv.setAttribute("name", new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
+
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
@@ -127,7 +129,6 @@ Actuator.prototype.addBoardPoint = function(boardPoint) {
 				theDiv.classList.add("bhGuest");
 			}
 		}
-		theDiv.setAttribute("name", new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
 		
 		if (this.mobile) {
 			theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
@@ -155,6 +156,12 @@ Actuator.prototype.addBoardPoint = function(boardPoint) {
 		theDiv.appendChild(theImg);
 	}
 
+	if (boardPoint.col === 0) {
+		var theBr = document.createElement("br");
+		theBr.classList.add("clear");
+		this.boardContainer.appendChild(theBr);
+	}
+	
 	this.boardContainer.appendChild(theDiv);
 };
 
