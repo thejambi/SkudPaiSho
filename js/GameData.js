@@ -1,3 +1,4 @@
+var newKnotweedRules = true;  // They're good. Always on!
 
 var debugOn = true;
 

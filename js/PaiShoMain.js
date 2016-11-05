@@ -6,7 +6,7 @@ var QueryString = function () {
   var query_string = {};
   var query = window.location.search.substring(1);
 
-  if (query.length > 0 && !query.includes("game=")) {
+  if (query.length > 0 && !(query.includes("game=") || query.includes("vagabond"))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
   	query = LZString.decompressFromEncodedURIComponent(query);
@@ -75,6 +75,15 @@ window.requestAnimationFrame(function () {
 	url = window.location.href.split('?')[0];
 
 	theGame = new GameManager();
+
+	if (QueryString.vagabond) {
+		debug("VAGABOND");
+		vagabond = true;
+	}
+
+	if (QueryString.nkr) {
+		newKnotweedRules = true;
+	}
 
 	gameNotation = new GameNotation();
 	gameNotation.setNotationText(QueryString.game);
@@ -324,7 +333,11 @@ function finalizeMove(ignoreNoEmail) {
 
 	linkUrl += "&replay=true";
 
-	// debug("Compressing: " + linkUrl);
+	// if (newKnotweedRules) {
+	// 	linkUrl += "&nkr=y";
+	// }	// No longer needed
+
+	debug(url + "?" + linkUrl);
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
 	linkUrl = url + "?" + linkUrl;
@@ -348,7 +361,6 @@ function finalizeMove(ignoreNoEmail) {
 
 function showSubmitMoveForm(url) {
 	// Move has completed, so need to send to "current player"
-	// TODO change this to getLocalUserEmail and always send from that.
 	var toEmail = getCurrentPlayerEmail();
 	var fromEmail = getUserEmail();
 
@@ -447,7 +459,13 @@ function getOpponentPlayerEmail() {
 }
 
 function getEmailBody(url) {
-	return "I just made a move in Skud Pai Sho! Click here to open our game: " + url;
+	// if (getUserEmail().includes("skudpaisho")) {
+		return "I just made a move #" + gameNotation.getLastMoveNumber() + " in Skud Pai Sho! Click here to open our game: " + url
+		+ "[BR][BR]---- Full Details: ----[BR]Move: " + gameNotation.getLastMoveText() 
+		+ "[BR][BR]Game Notation: [BR]" + gameNotation.getNotationForEmail();
+	// } else {
+		// return "I just made a move in Skud Pai Sho! Click here to open our game: " + url;
+	// }
 }
 
 function getCurrentPlayer() {
@@ -654,7 +672,11 @@ function pointClicked(htmlPoint) {
 				return;
 			}
 
-			if (boardPoint.tile.drained || boardPoint.tile.trapped) {
+			if (boardPoint.tile.trapped) {
+				return;
+			}
+
+			if (!newKnotweedRules && boardPoint.tile.trapped) {
 				return;
 			}
 
@@ -834,7 +856,11 @@ function showTileMessage(tileDiv) {
 			message.push("The Wheel rotates all surrounding tiles one space clockwise.");
 		} else if (tileCode === 'K') {
 			heading = "Accent Tile: Knotweed";
-			message.push("The Knotweed disables surrounding Basic Flower Tiles so they are unable to move or form Harmony.");
+			if (newKnotweedRules) {
+				message.push("The Knotweed drains surrounding Flower Tiles so they are unable to form Harmony.");
+			} else {
+				message.push("The Knotweed drains surrounding Basic Flower Tiles so they are unable to move or form Harmony.");
+			}
 		} else if (tileCode === 'B') {
 			heading = "Accent Tile: Boat";
 			message.push("The Boat moves a Flower Tile one space or removes a Knotweed tile.");
@@ -889,7 +915,8 @@ function showPointMessage(htmlPoint) {
 		// Drained? Trapped? Anything else?
 		if (boardPoint.tile.drained) {
 			message.push("Currently <em>drained</em> by a Knotweed.");
-		} else if (boardPoint.tile.trapped) {
+		}
+		if (boardPoint.tile.trapped) {
 			message.push("Currently <em>trapped</em> by an Orchid.")
 		}
 	} else {
@@ -985,16 +1012,11 @@ function getLink() {
 	}
 
 	var linkUrl = "";
-	// if (hostEmail) {
-	// 	linkUrl += "host=" + hostEmail + "&";
-	// }
-	// if (guestEmail) {
-	// 	linkUrl += "guest=" + guestEmail + "&";
-	// }
 	linkUrl += "game=" + notation.notationTextForUrl();
-
 	linkUrl += "&replay=true";
-
+	// if (newKnotweedRules) {
+	// 	linkUrl += "&nkr=y";
+	// }	// No longer needed
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
 	linkUrl = url + "?" + linkUrl;
@@ -1007,6 +1029,7 @@ function getLink() {
 	}
 
 	console.log(linkUrl);
+	return linkUrl;
 }
 
 function setAiIndex(i) {
@@ -1056,7 +1079,10 @@ function playAiTurn() {
 	finalizeMove();
 }
 
-
+function sandboxFromMove() {
+	var link = getLink();
+	window.open(link);
+}
 
 
 

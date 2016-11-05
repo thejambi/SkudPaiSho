@@ -367,7 +367,7 @@ Board.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
 		}
 	}
 	// Things to do after a tile is placed
-	this.flagAllTrappedTiles();
+	this.flagAllTrappedAndDrainedTiles();
 	this.analyzeHarmonies();
 };
 
@@ -427,7 +427,7 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 		if (bp.isType(GATE)) {
 			// debug("Wheel cannot be played next to a GATE");
 			return false;
-		} else if (bp.hasTile() && (bp.tile.drained || bp.tile.accentType === KNOTWEED)) {
+		} else if (!newKnotweedRules && bp.hasTile() && (bp.tile.drained || bp.tile.accentType === KNOTWEED)) {
 			// debug("wheel cannot be played next to drained tile or Knotweed");
 			return false;
 		}
@@ -442,17 +442,25 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 		}
 	}
 
+	// Does it create Disharmony?
+	var newBoard = this.getCopy();
+	var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
+	newBoard.placeWheel(new Tile('W', 'G'), notationPoint, true);
+	if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
+		return false;
+	}
+
 	return true;
 };
 
-Board.prototype.placeWheel = function(tile, notationPoint) {
+Board.prototype.placeWheel = function(tile, notationPoint, ignoreCheck) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
 	// get surrounding RowAndColumn values
 	var rowCols = this.getSurroundingRowAndCols(rowAndCol);
 
-	if (!this.canPlaceWheel(boardPoint)) {
+	if (!ignoreCheck && !this.canPlaceWheel(boardPoint)) {
 		return false;
 	}
 
@@ -466,8 +474,6 @@ Board.prototype.placeWheel = function(tile, notationPoint) {
 		var targetRowCol = this.getClockwiseRowCol(rowAndCol, rowCols[i]);
 		results.push([tile,targetRowCol]);
 	}
-
-	debug(rowAndCol.notationPointString);
 
 	// go through and place tiles in target points
 	var self = this;
@@ -533,28 +539,31 @@ Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 		return false;
 	}
 
-	// if (boardPoint.tile.ownerName === tile.ownerName) {
-	// 	// debug("Cannot play BOAT on own tile");
-	// 	return false;
-	// }	// Updating to allow Boat to be played on any Flower Tile
-
 	if (boardPoint.tile.type === ACCENT_TILE) {
 		if (boardPoint.tile.accentType !== KNOTWEED) {
 			// debug("Not played on Knotweed tile");
 			return false;
+		} else {
+			// Ensure no Disharmony
+			var newBoard = this.getCopy();
+			var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
+			newBoard.placeBoat(new Tile('B', 'G'), notationPoint, boardPoint, true);
+			if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
+				return false;
+			}
 		}
 	}
 
 	return true;
 };
 
-Board.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint) {
+Board.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint, ignoreCheck) {
 	// debug("extra boat point:");
 	// debug(extraBoatPoint);
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
-	if (!this.canPlaceBoat(boardPoint, tile)) {
+	if (!ignoreCheck && !this.canPlaceBoat(boardPoint, tile)) {
 		return false;
 	}
 
@@ -671,19 +680,22 @@ Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd
 	}
 
 	// Check for tile "trapped" by opponent Orchid
-	this.flagAllTrappedTiles();
+	this.flagAllTrappedAndDrainedTiles();
 
 	// Check for harmonies
 	return this.hasNewHarmony(player, tile, startRowCol, endRowCol);
 };
 
-Board.prototype.flagAllTrappedTiles = function() {
+Board.prototype.flagAllTrappedAndDrainedTiles = function() {
 	// First, untrap
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
 			if (bp.hasTile()) {
 				bp.tile.trapped = false;
+				if (newKnotweedRules) {
+					bp.tile.drained = false;
+				}
 			}
 		}
 	}
@@ -692,6 +704,31 @@ Board.prototype.flagAllTrappedTiles = function() {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
 			this.trapTilesSurroundingPointIfNeeded(bp);
+			if (newKnotweedRules) {
+				this.drainTilesSurroundingPointIfNeeded(bp);
+			}
+		}
+	}
+};
+
+Board.prototype.drainTilesSurroundingPointIfNeeded = function(boardPoint) {
+	if (!newKnotweedRules) {
+		return;
+	}
+	if (!boardPoint.hasTile()) {
+		return;
+	}
+	if (boardPoint.tile.accentType !== KNOTWEED) {
+		return;
+	}
+
+	// get surrounding RowAndColumn values
+	var rowCols = this.getSurroundingRowAndCols(boardPoint);
+
+	for (var i = 0; i < rowCols.length; i++) {
+		var bp = this.cells[rowCols[i].row][rowCols[i].col];
+		if (bp.hasTile()) {
+			bp.tile.drained = true;
 		}
 	}
 };
@@ -818,7 +855,11 @@ Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPoin
 	}
 
 	// Cannot move drained or trapped tile
-	if (boardPointStart.tile.drained || boardPointStart.tile.trapped) {
+	if (boardPointStart.tile.trapped) {
+		return false;
+	}
+
+	if (!newKnotweedRules && boardPointStart.tile.drained) {
 		return false;
 	}
 
@@ -1332,8 +1373,22 @@ Board.prototype.revealBoatBonusPoints = function(boardPoint) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
-	// Apply "possible move point" type to applicable boardPoints
+	
 	var player = boardPoint.tile.ownerName;
+
+	if (newKnotweedRules) {
+		// New rules: All surrounding points
+		var rowCols = this.getSurroundingRowAndCols(boardPoint);
+
+		for (var i = 0; i < rowCols.length; i++) {
+			var boardPointEnd = this.cells[rowCols[i].row][rowCols[i].col];
+			if (this.canMoveTileToPoint(player, boardPoint, boardPointEnd)) {
+				boardPointEnd.addType(POSSIBLE_MOVE);
+			}
+		}
+		return;
+	}
+	// Apply "possible move point" type to applicable boardPoints
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var boardPointEnd = this.cells[row][col];
@@ -1348,16 +1403,6 @@ Board.prototype.revealBoatBonusPoints = function(boardPoint) {
 
 Board.prototype.getCopy = function() {
 	var copyBoard = new Board();
-
-	/*
-	this.cells = this.brandNew();
-
-	this.harmonyManager = new HarmonyManager();	// just analyzeharmonies
-
-	this.rockRowAndCols = [];	// call refreshRockRowAndCo...
-	this.playedWhiteLotusTiles = [];
-	this.winners = [];	// call analyzeHarmon...
-	*/
 
 	// cells
 	for (var row = 0; row < this.cells.length; row++) {

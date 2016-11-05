@@ -329,11 +329,36 @@ GameNotation.prototype.getNotationHtml = function() {
 	return notationHtml;
 };
 
+GameNotation.prototype.getNotationForEmail = function() {
+	var lines = [];
+	if (this.notationText) {
+		if (this.notationText.includes(';')) {
+			lines = this.notationText.split(";");
+		} else {
+			lines = [this.notationText];
+		}
+	}
+
+	var notationHtml = "";
+
+	lines.forEach(function (line) {
+		notationHtml += line + "[BR]";
+	});
+
+	return notationHtml;
+};
+
 GameNotation.prototype.notationTextForUrl = function() {
 	var str = this.notationText;
 	return str;
 };
 
+GameNotation.prototype.getLastMoveText = function() {
+	return this.moves[this.moves.length - 1].fullMoveText;
+};
 
+GameNotation.prototype.getLastMoveNumber = function() {
+	return this.moves[this.moves.length - 1].moveNum;
+};
 
 
