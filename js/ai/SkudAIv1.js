@@ -163,6 +163,8 @@ SkudAIv1.prototype.calculateScore = function(origGame, copyGame, depth) {
 
 	if (after < before) {
 		score += 15;
+	} else if (after > before) {
+		score -= 15;
 	}
 
 	// Check tiles in red/white gardens, increase is good
