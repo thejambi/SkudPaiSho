@@ -122,6 +122,16 @@ TileManager.prototype.getCopy = function() {
 	var copy = new TileManager();
 
 	// copy this.hostTiles and this.guestTiles
+	copy.hostTiles = this.copyArr(this.hostTiles);
+	copy.guestTiles = this.copyArr(this.guestTiles);
 	
 	return copy;
+};
+
+TileManager.prototype.copyArr = function(arr) {
+	var copyArr = [];
+	for (var i = 0; i < arr.length; i++) {
+		copyArr.push(arr[i].getCopy());
+	}
+	return copyArr;
 };

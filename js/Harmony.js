@@ -156,6 +156,16 @@ HarmonyManager.prototype.clearList = function() {
 	this.harmonies = [];
 };
 
+HarmonyManager.prototype.numHarmoniesForPlayer = function(player) {
+	var count = 0;
+	for (var i = 0; i < this.harmonies.length; i++) {
+		if (this.harmonies[i].ownerName === player) {
+			count++;
+		}
+	}
+	return count;
+};
+
 HarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies) {
 	// There's a new harmony if a player's tile has a harmony with a tile it didn't before
 	

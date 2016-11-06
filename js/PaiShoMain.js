@@ -65,8 +65,8 @@ var localPlayerRole = HOST;
 
 var vagabond = false;
 
-// var aiList = [new SkudAIv1()];
-var aiList = [];
+var aiList = [new SkudAIv1()];
+// var aiList = [];
 var activeAi;
 
 window.requestAnimationFrame(function () {
@@ -337,7 +337,7 @@ function finalizeMove(ignoreNoEmail) {
 	// 	linkUrl += "&nkr=y";
 	// }	// No longer needed
 
-	debug(url + "?" + linkUrl);
+	// debug(url + "?" + linkUrl);
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
 	linkUrl = url + "?" + linkUrl;
@@ -393,7 +393,10 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		messageText += "Or, copy and share this <a href=\"" + shortUrl + "\">link</a> with your opponent.";
 		showSubmitMoveForm(shortUrl);
 	} else if (activeAi && getCurrentPlayer() === activeAi.player) {
-		messageText += "<span class='skipBonus' onclick='playAiTurn();'>Submit move to AI</span>";
+		//messageText += "<span class='skipBonus' onclick='playAiTurn();'>Submit move to AI</span>";
+		messageText += "<em>THINKING...</em>";
+	} else if (activeAi) {
+		messageText += "Your turn";
 	} else {
 		messageText += "Copy this <a href=\"" + shortUrl + "\">link</a> and send to the " + getCurrentPlayer() + ".";
 	}
@@ -1067,16 +1070,33 @@ function playAiTurn() {
 		var hostMoveBuilder = notationBuilder.getFirstMoveForHost(gameNotation.moves[gameNotation.moves.length - 1].plantedFlowerType);
 		gameNotation.addMove(gameNotation.getNotationMoveFromBuilder(hostMoveBuilder));
 		finalizeMove();
-		return;
+	} else if (playerMoveNum < 3) {
+		var move = activeAi.getMove(theGame.getCopy(), playerMoveNum);
+		if (!move) {
+			debug("No move given...");
+			return;
+		}
+		gameNotation.addMove(move);
+		finalizeMove();
+	} else {
+		setTimeout(function(){
+			var move = activeAi.getMove(theGame.getCopy(), playerMoveNum);
+			if (!move) {
+				debug("No move given...");
+				return;
+			}
+			gameNotation.addMove(move);
+			finalizeMove();
+		}, 10);
 	}
 
-	var move = activeAi.getMove(theGame.getCopy(), playerMoveNum);
+	/*var move = activeAi.getMove(theGame.getCopy(), playerMoveNum);
 	if (!move) {
 		debug("No move given...");
 		return;
 	}
 	gameNotation.addMove(move);
-	finalizeMove();
+	finalizeMove();*/
 }
 
 function sandboxFromMove() {
