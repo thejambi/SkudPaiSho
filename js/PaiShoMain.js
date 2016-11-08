@@ -66,8 +66,10 @@ var localPlayerRole = HOST;
 var vagabond = false;
 
 var aiList = [new SkudAIv1()];
+// var aiList = [new SkudAIv1(), new SkudAIv1()];
 // var aiList = [];
 var activeAi;
+var activeAi2;
 
 window.requestAnimationFrame(function () {
 	localStorage = new LocalStorage().storage;
@@ -392,7 +394,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		// messageText = "Click <span class='skipBonus' onclick=sendMail('" + shortUrl + "')>here</span> to email your move to the " + getCurrentPlayer() + ". Or, share this <a href=\"" + shortUrl + "\">link</a> with them.";
 		messageText += "Or, copy and share this <a href=\"" + shortUrl + "\">link</a> with your opponent.";
 		showSubmitMoveForm(shortUrl);
-	} else if (activeAi && getCurrentPlayer() === activeAi.player) {
+	} else if ((activeAi && getCurrentPlayer() === activeAi.player) || (activeAi2 && getCurrentPlayer() === activeAi2.player)) {
 		//messageText += "<span class='skipBonus' onclick='playAiTurn();'>Submit move to AI</span>";
 		messageText += "<em>THINKING...</em>";
 	} else if (activeAi) {
@@ -420,7 +422,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 	document.querySelector(".gameMessage").innerHTML = messageText;
 
 	// QUICK!
-	if (activeAi && getCurrentPlayer() === activeAi.player) {
+	if ((activeAi && getCurrentPlayer() === activeAi.player) || (activeAi2 && getCurrentPlayer() === activeAi2.player)) {
 		// setTimeout(function() { playAiTurn(); }, 100);	// Didn't work?
 		playAiTurn();
 	}
@@ -1040,8 +1042,13 @@ function setAiIndex(i) {
 	if (QueryString.replay === "true") {
 		document.getElementById("replayControls").classList.remove("gone");
 	}
-	activeAi = aiList[i];
-	activeAi.setPlayer(getCurrentPlayer());
+	if (activeAi) {
+		activeAi2 = aiList[i];
+		activeAi2.setPlayer(getCurrentPlayer());
+	} else {
+		activeAi = aiList[i];
+		activeAi.setPlayer(getCurrentPlayer());
+	}
 	playAiTurn();
 	if (gameNotation.getPlayerMoveNum() === 1) {
 		playAiTurn();
@@ -1061,6 +1068,12 @@ function playAiTurn() {
 	if (theGame.board.winners.length > 0) {
 		return;
 	}
+	var theAi = activeAi;
+	if (activeAi2) {
+		if (activeAi2.player === getCurrentPlayer()) {
+			theAi = activeAi2;
+		}
+	}
 
 	var playerMoveNum = gameNotation.getPlayerMoveNum();
 
@@ -1071,7 +1084,7 @@ function playAiTurn() {
 		gameNotation.addMove(gameNotation.getNotationMoveFromBuilder(hostMoveBuilder));
 		finalizeMove();
 	} else if (playerMoveNum < 3) {
-		var move = activeAi.getMove(theGame.getCopy(), playerMoveNum);
+		var move = theAi.getMove(theGame.getCopy(), playerMoveNum);
 		if (!move) {
 			debug("No move given...");
 			return;
@@ -1080,7 +1093,7 @@ function playAiTurn() {
 		finalizeMove();
 	} else {
 		setTimeout(function(){
-			var move = activeAi.getMove(theGame.getCopy(), playerMoveNum);
+			var move = theAi.getMove(theGame.getCopy(), playerMoveNum);
 			if (!move) {
 				debug("No move given...");
 				return;

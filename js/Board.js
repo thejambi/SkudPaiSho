@@ -1429,7 +1429,7 @@ Board.prototype.numTilesInGardensForPlayer = function(player) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
 			if (bp.types.length === 1 && bp.hasTile()) {
-				if (bp.isType(bp.basicColorName)) {
+				if (bp.isType(bp.tile.basicColorName)) {
 					count++;
 				}
 			}
@@ -1453,29 +1453,53 @@ Board.prototype.numTilesOnBoardForPlayer = function(player) {
 
 Board.prototype.getSurroundness = function(player) {
 	var up = 0;
+	var hasUp = 0;
 	var down = 0;
+	var hasDown = 0;
 	var left = 0;
+	var hasLeft = 0;
 	var right = 0;
+	var hasRight = 0;
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
 			if (bp.hasTile() && bp.tile.ownerName === player) {
-				if (bp.row > 8 && down === 0) {
-					down = 1;
+				if (bp.row > 8) {
+					down++;
+					hasDown = 1;
 				}
-				if (bp.row < 8 && up === 0) {
-					up = 1;
+				if (bp.row < 8) {
+					up++;
+					hasUp = 1;
 				}
-				if (bp.col < 8 && left === 0) {
-					left = 1;
+				if (bp.col < 8) {
+					left++;
+					hasLeft = 1;
 				}
-				if (bp.col > 8 && right === 0) {
-					right = 1;
+				if (bp.col > 8) {
+					right++;
+					hasRight = 1;
 				}
 			}
 		}
 	}
-	return up + down + left + right;
+	// Get lowest...
+	var lowest = up;
+	if (down < lowest) {
+		lowest = down;
+	}
+	if (left < lowest) {
+		lowest = left;
+	}
+	if (right < lowest) {
+		lowest = right;
+	}
+
+	if (lowest === 0) {
+		return hasUp + hasDown + hasLeft + hasRight;
+	} else {
+		return lowest * 4;
+	}
 };
 
 

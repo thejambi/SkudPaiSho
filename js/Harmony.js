@@ -98,6 +98,30 @@ Harmony.prototype.getDirectionForTile = function(tile) {
 	}
 };
 
+Harmony.prototype.crossesCenter = function() {
+	var rowHigh = this.tile1Pos.row;
+	var rowLow = this.tile2Pos.row;
+	if (this.tile1Pos.row < this.tile2Pos.row) {
+		rowHigh = this.tile2Pos.row;
+		rowLow = this.tile1Pos.row;
+	}
+
+	if (rowHigh !== rowLow) {
+		return rowHigh > 8 && rowLow < 8;
+	}
+
+	var colHigh = this.tile1Pos.col;
+	var colLow = this.tile2Pos.col;
+	if (this.tile1Pos.col < this.tile2Pos.col) {
+		colHigh = this.tile2Pos.col;
+		colLow = this.tile1Pos.col;
+	}
+
+	if (colHigh !== colLow) {
+		return colHigh > 8 && colLow < 8;
+	}
+};
+
 
 // --------------------------------------------- // 
 
@@ -166,6 +190,52 @@ HarmonyManager.prototype.numHarmoniesForPlayer = function(player) {
 	return count;
 };
 
+HarmonyManager.prototype.getNumCrossingCenterForPlayer = function(player) {
+	var count = 0;
+	for (var i = 0; i < this.harmonies.length; i++) {
+		if (this.harmonies[i].ownerName === player) {
+			if (this.harmonies[i].crossesCenter()) {
+				count++;
+			}
+		}
+	}
+	return count;
+};
+
+HarmonyManager.prototype.ringLengthForPlayer = function(player) {
+	var rings = this.getHarmonyChains();
+	var longest = 0;
+
+	for (var i = 0; i < rings.length; i++) {
+		var ring = rings[i];
+		var h = ring.pop();	// LOL
+		var playerName = h.ownerName;
+		if (playerName === player) {
+			// // verify very nice ring - crosses center lines
+			// var crossesUp = false;
+			// var crossesDown = false;
+			// var crossesLeft = false;
+			// var crossesRight = false;
+
+			// for (var j = 0; j < ring.length; j++) {
+			// 	var h = ring[j];
+			// 	crossesUp = h.crossesUp();
+			// 	crossesDown = h.crossesDown();
+			// 	crossesLeft = h.crossesLeft();
+			// 	crossesRight = h.crossesRight();
+			// }
+
+			// var veryNice = crossesUp && crossesDown && crossesLeft && crossesRight;
+			var veryNice = true;
+			if (veryNice && ring.length > longest) {
+				longest = ring.length;
+			}
+		}
+	}
+
+	return longest;
+};
+
 HarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies) {
 	// There's a new harmony if a player's tile has a harmony with a tile it didn't before
 	
@@ -195,9 +265,7 @@ HarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies) {
 	return newHarmonies.length > 0;
 };
 
-HarmonyManager.prototype.harmonyRingExists = function() {
-	// Chain of harmonies around the center of the board
-
+HarmonyManager.prototype.getHarmonyChains = function() {
 	var self = this;
 
 	var rings = [];
@@ -229,6 +297,45 @@ HarmonyManager.prototype.harmonyRingExists = function() {
 			}
 		}
 	}
+
+	return rings;
+};
+
+HarmonyManager.prototype.harmonyRingExists = function() {
+	// Chain of harmonies around the center of the board
+
+	var self = this;
+
+	// var rings = [];
+	var rings = this.getHarmonyChains();
+
+	// for (var i = 0; i < this.harmonies.length; i++) {
+	// 	var hx = this.harmonies[i];
+
+	// 	var chain = [];
+	// 	chain.push(hx);
+
+	// 	var startTile = hx.tile2;
+	// 	var startTilePos = hx.tile2Pos;
+	// 	var targetTile = hx.tile1;
+	// 	var targetTilePos = hx.tile1Pos;
+
+	// 	var ringFound = this.lookForRing(startTile, targetTile, chain);
+		
+	// 	if (ringFound[0]) {
+	// 		var ringExists = false;
+			
+	// 		rings.forEach(function(ring) {
+	// 			if (self.ringsMatch(ring, ringFound[1])) {
+	// 				ringExists = true;
+	// 			}
+	// 		});
+
+	// 		if (!ringExists) {
+	// 			rings.push(ringFound[1]);
+	// 		}
+	// 	}
+	// }
 
 	var verifiedHarmonyRingOwners = [];
 	rings.forEach(function(ring) {
