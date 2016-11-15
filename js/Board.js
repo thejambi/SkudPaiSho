@@ -703,7 +703,9 @@ Board.prototype.flagAllTrappedAndDrainedTiles = function() {
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
-			this.trapTilesSurroundingPointIfNeeded(bp);
+			if (!bp.isType(GATE)) {
+				this.trapTilesSurroundingPointIfNeeded(bp);
+			}
 			if (newKnotweedRules) {
 				this.drainTilesSurroundingPointIfNeeded(bp);
 			}
@@ -748,7 +750,7 @@ Board.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
 
 	for (var i = 0; i < rowCols.length; i++) {
 		var bp = this.cells[rowCols[i].row][rowCols[i].col];
-		if (bp.hasTile()) {
+		if (bp.hasTile() && !bp.isType(GATE)) {
 			if (bp.tile.ownerName !== orchidOwner && bp.tile.type === BASIC_FLOWER) {
 				bp.tile.trapped = true;
 			}
