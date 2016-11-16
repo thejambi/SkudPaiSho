@@ -344,6 +344,10 @@ function finalizeMove(ignoreNoEmail) {
 	// 	linkUrl += "&nkr=y";
 	// }	// No longer needed
 
+	if (simpleCanonRules) {
+		linkUrl += "&canon=y";
+	}
+
 	// debug(url + "?" + linkUrl);
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
@@ -1027,6 +1031,9 @@ function getLink() {
 	// if (newKnotweedRules) {
 	// 	linkUrl += "&nkr=y";
 	// }	// No longer needed
+	if (simpleCanonRules) {
+		linkUrl += "&canon=y";
+	}
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
 	linkUrl = url + "?" + linkUrl;
