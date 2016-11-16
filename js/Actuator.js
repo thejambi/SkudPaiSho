@@ -42,7 +42,7 @@ Actuator.prototype.htmlify = function(board, tileManager) {
 		});
 	});
 
-	var fullTileSet = new TileManager();
+	var fullTileSet = new TileManager(true);
 
 	// Go through tile piles and clear containers
 	fullTileSet.hostTiles.forEach(function(tile) {

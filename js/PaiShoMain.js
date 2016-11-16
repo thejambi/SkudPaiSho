@@ -6,7 +6,7 @@ var QueryString = function () {
   var query_string = {};
   var query = window.location.search.substring(1);
 
-  if (query.length > 0 && !(query.includes("game=") || query.includes("vagabond"))) {
+  if (query.length > 0 && !(query.includes("game=") || query.includes("canon"))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
   	query = LZString.decompressFromEncodedURIComponent(query);
@@ -85,6 +85,11 @@ window.requestAnimationFrame(function () {
 
 	if (QueryString.nkr) {
 		newKnotweedRules = true;
+	}
+
+	if (QueryString.canon) {
+		simpleCanonRules = true;
+		debug("Simple Canon rules");
 	}
 
 	gameNotation = new GameNotation();
@@ -595,7 +600,7 @@ function unplayedTileClicked(tileDiv) {
 		if (getCurrentPlayer() === HOST) {
 			hostAccentTiles.push(tileCode);
 
-			if (hostAccentTiles.length === 4) {
+			if (hostAccentTiles.length === 4 || (simpleCanonRules && hostAccentTiles.length === 2)) {
 				var move = new NotationMove("0H." + hostAccentTiles.join());
 				gameNotation.addMove(move);
 				finalizeMove();
@@ -603,7 +608,7 @@ function unplayedTileClicked(tileDiv) {
 		} else {
 			guestAccentTiles.push(tileCode);
 			
-			if (guestAccentTiles.length === 4) {
+			if (guestAccentTiles.length === 4 || (simpleCanonRules && guestAccentTiles.length === 2)) {
 				var move = new NotationMove("0G." + guestAccentTiles.join());
 				gameNotation.addMove(move);
 				// No finalize move because it is still Guest's turn

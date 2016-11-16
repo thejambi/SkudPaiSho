@@ -183,6 +183,11 @@ NotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
 	var builder = new NotationBuilder();
 	builder.moveType = PLANTING;
 	builder.plantedFlowerType = Tile.getClashTileCode(tileCode);
+
+	if (simpleCanonRules) {
+		builder.plantedFlowerType = tileCode;
+	}
+
 	builder.endPoint = new NotationPoint("0,8");
 	return builder;
 };

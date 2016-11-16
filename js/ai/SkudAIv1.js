@@ -264,7 +264,12 @@ SkudAIv1.prototype.addAccentSelectionMoves = function(moves, game) {
 	// For now, get four random accent tiles
 	var chosenAccents = [];
 
-	for (var i = 0; i < 4; i++) {
+	var length = 4;
+	if (simpleCanonRules) {
+		length = 2;
+	}
+
+	for (var i = 0; i < length; i++) {
 		var chosenIndex = Math.floor(Math.random() * availableAccents.length);
 		var randomAccentTile = availableAccents.splice(chosenIndex, 1)[0];
 		chosenAccents.push(randomAccentTile.code);

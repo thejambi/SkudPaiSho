@@ -1,11 +1,24 @@
 // Tile Manager
 
-function TileManager() {
+function TileManager(forActuating) {
+	if (forActuating) {
+		this.hostTiles = this.loadOneOfEach('H');
+		this.guestTiles = this.loadOneOfEach('G');
+		return;
+	}
 	this.hostTiles = this.loadTileSet('H');
 	this.guestTiles = this.loadTileSet('G');
 }
 
 TileManager.prototype.loadTileSet = function(ownerCode) {
+	if (simpleCanonRules) {
+		return this.loadSimpleCanonSet(ownerCode);
+	} else {
+		return this.loadSkudSet(ownerCode);
+	}
+};
+
+TileManager.prototype.loadSkudSet = function(ownerCode) {
 	var tiles = [];
 
 	// 2 of each accent tile
@@ -31,6 +44,52 @@ TileManager.prototype.loadTileSet = function(ownerCode) {
 	}
 
 	// 1 of each special flower
+	tiles.push(new Tile('L', ownerCode));
+	tiles.push(new Tile('O', ownerCode));
+
+	return tiles;
+};
+
+TileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
+	var tiles = [];
+
+	// Accent tiles
+	for (var i = 0; i < 2; i++) {
+		tiles.push(new Tile('W', ownerCode));
+	}
+
+	tiles.forEach(function(tile) {
+		tile.selectedFromPile = true;
+	});
+
+	// Basic flowers
+	for (var i = 0; i < 6; i++) {
+		tiles.push(new Tile("R3", ownerCode));
+		tiles.push(new Tile("W5", ownerCode));
+	}
+
+	// Special flowers
+	tiles.push(new Tile('L', ownerCode));
+	tiles.push(new Tile('O', ownerCode));
+
+	return tiles;
+};
+
+TileManager.prototype.loadOneOfEach = function(ownerCode) {
+	var tiles = [];
+
+	tiles.push(new Tile('R', ownerCode));
+	tiles.push(new Tile('W', ownerCode));
+	tiles.push(new Tile('K', ownerCode));
+	tiles.push(new Tile('B', ownerCode));
+
+	tiles.push(new Tile("R3", ownerCode));
+	tiles.push(new Tile("R4", ownerCode));
+	tiles.push(new Tile("R5", ownerCode));
+	tiles.push(new Tile("W3", ownerCode));
+	tiles.push(new Tile("W4", ownerCode));
+	tiles.push(new Tile("W5", ownerCode));
+
 	tiles.push(new Tile('L', ownerCode));
 	tiles.push(new Tile('O', ownerCode));
 
