@@ -495,14 +495,17 @@ Board.prototype.canPlaceKnotweed = function(boardPoint) {
 		return false;
 	}
 
-	var rowCols = this.getSurroundingRowAndCols(boardPoint);
+	if (!newKnotweedRules) {
+		// Knotweed can be placed next to Gate in new knotweed rules
+		var rowCols = this.getSurroundingRowAndCols(boardPoint);
 
-	// Validate: Must not be played next to Gate
-	for (var i = 0; i < rowCols.length; i++) {
-		var bp = this.cells[rowCols[i].row][rowCols[i].col];
-		if (bp.isType(GATE)) {
-			// debug("Knotweed cannot be played next to a GATE");
-			return false;
+		// Validate: Must not be played next to Gate
+		for (var i = 0; i < rowCols.length; i++) {
+			var bp = this.cells[rowCols[i].row][rowCols[i].col];
+			if (bp.isType(GATE)) {
+				// debug("Knotweed cannot be played next to a GATE");
+				return false;
+			}
 		}
 	}
 
@@ -1336,6 +1339,10 @@ Board.prototype.setOpenGatePossibleMoves = function(player) {
 			if (bp.isOpenGate() && !bp.betweenPlayerHarmony(player)) {
 				this.cells[row][col].addType(POSSIBLE_MOVE);
 			}
+			// Update: Use below for removing betweenPlayerHarmony check rule
+			// if (bp.isOpenGate()) {
+			// 	this.cells[row][col].addType(POSSIBLE_MOVE);
+			// }
 		}
 	}
 };
