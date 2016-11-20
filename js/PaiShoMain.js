@@ -473,13 +473,9 @@ function getOpponentPlayerEmail() {
 }
 
 function getEmailBody(url) {
-	// if (getUserEmail().includes("skudpaisho")) {
-		return "I just made a move #" + gameNotation.getLastMoveNumber() + " in Skud Pai Sho! Click here to open our game: " + url
+	return "I just made move #" + gameNotation.getLastMoveNumber() + " in Skud Pai Sho! Click here to open our game: " + url
 		+ "[BR][BR]---- Full Details: ----[BR]Move: " + gameNotation.getLastMoveText() 
 		+ "[BR][BR]Game Notation: [BR]" + gameNotation.getNotationForEmail();
-	// } else {
-		// return "I just made a move in Skud Pai Sho! Click here to open our game: " + url;
-	// }
 }
 
 function getCurrentPlayer() {
