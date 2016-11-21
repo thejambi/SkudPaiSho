@@ -76,6 +76,10 @@ window.requestAnimationFrame(function () {
 
 	url = window.location.href.split('?')[0];
 
+	if (url.includes("calebhugo.com")) {
+		url = "http://skudpaisho.com";
+	}
+
 	theGame = new GameManager();
 
 	if (QueryString.vagabond) {
@@ -351,7 +355,12 @@ function finalizeMove(ignoreNoEmail) {
 	// debug(url + "?" + linkUrl);
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
-	linkUrl = url + "?" + linkUrl;
+	// if opponent is me, use calebhugo.com url
+	if (getCurrentPlayerEmail() === "skudpaisho@gmail.com") {
+		linkUrl = "http://skudpaisho.calebhugo.com" + "?" + linkUrl;
+	} else {
+		linkUrl = url + "?" + linkUrl;
+	}
 
 	if (theGame.board.winners.length > 0) {
 		// Call short url because game is over
