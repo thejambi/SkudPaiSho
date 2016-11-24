@@ -77,7 +77,7 @@ window.requestAnimationFrame(function () {
 	url = window.location.href.split('?')[0];
 
 	if (url.includes("calebhugo.com")) {
-		url = "http://skudpaisho.com";
+		url = "http://skudpaisho.com/";
 	}
 
 	theGame = new GameManager();
@@ -357,7 +357,7 @@ function finalizeMove(ignoreNoEmail) {
 
 	// if opponent is me, use calebhugo.com url
 	if (getCurrentPlayerEmail() === "skudpaisho@gmail.com") {
-		linkUrl = "http://skudpaisho.calebhugo.com" + "?" + linkUrl;
+		linkUrl = "http://skudpaisho.calebhugo.com/" + "?" + linkUrl;
 	} else {
 		linkUrl = url + "?" + linkUrl;
 	}
