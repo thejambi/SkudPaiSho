@@ -71,6 +71,7 @@ var aiList = [new SkudAIv1()];
 var activeAi;
 var activeAi2;
 var sandboxUrl;
+var metadata = new Object();
 
 window.requestAnimationFrame(function () {
 	localStorage = new LocalStorage().storage;
@@ -97,6 +98,11 @@ window.requestAnimationFrame(function () {
 		simpleCanonRules = true;
 		debug("Simple Canon rules");
 	}
+
+	// Load metadata
+	metadata.startDate = QueryString.sDate;
+	metadata.endDate = QueryString.eDate;
+	// --- //
 
 	gameNotation = new GameNotation();
 	gameNotation.setNotationText(QueryString.game);
@@ -355,6 +361,11 @@ function finalizeMove(ignoreNoEmail) {
 		linkUrl += "&canon=y";
 	}
 
+	if (!metadata.startDate) {
+		metadata.startDate = getDateString();
+		linkUrl += "&sDate=" + metadata.startDate;
+	}
+
 	// debug(url + "?" + linkUrl);
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
@@ -369,6 +380,12 @@ function finalizeMove(ignoreNoEmail) {
 		// Call short url because game is over
 		if (!url.startsWith("file")) {
 			getShortUrl(linkUrl);
+		}
+
+		// Add end date
+		if (!metadata.endDate) {
+			metadata.endDate = getDateString();
+			linkUrl += "&eDate" + metadata.endDate;
 		}
 	}
 
@@ -1143,7 +1160,11 @@ function sandboxFromMove() {
 	window.open(link);
 }
 
-
+function getDateString() {
+	let date = new Date();
+	date = date.toISOString().slice(0,10);
+	return date;
+}
 
 
 
