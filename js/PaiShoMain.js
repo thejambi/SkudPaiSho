@@ -70,11 +70,13 @@ var aiList = [new SkudAIv1()];
 // var aiList = [];
 var activeAi;
 var activeAi2;
+var sandboxUrl;
 
 window.requestAnimationFrame(function () {
 	localStorage = new LocalStorage().storage;
 
 	url = window.location.href.split('?')[0];
+	sandboxUrl = url;
 
 	if (url.includes("calebhugo.com")) {
 		url = "http://skudpaisho.com/";
@@ -102,7 +104,8 @@ window.requestAnimationFrame(function () {
 	hostEmail = QueryString.host;
 	guestEmail = QueryString.guest;
 
-	if (QueryString.replay === "true") {
+	//if (QueryString.replay === "true") {
+	if (gameNotation.moves.length > 1) {
 		document.getElementById("replayControls").classList.remove("gone");
 	}
 
@@ -342,7 +345,7 @@ function finalizeMove(ignoreNoEmail) {
 	}
 	linkUrl += "game=" + gameNotation.notationTextForUrl();
 
-	linkUrl += "&replay=true";
+	// linkUrl += "&replay=true";	// No longer needed
 
 	// if (newKnotweedRules) {
 	// 	linkUrl += "&nkr=y";
@@ -356,7 +359,7 @@ function finalizeMove(ignoreNoEmail) {
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
 	// if opponent is me, use calebhugo.com url
-	if (getCurrentPlayerEmail() === "skudpaisho@gmail.com") {
+	if (getCurrentPlayerEmail() === "skudpaisho@gmail.com" && !url.startsWith("file")) {
 		linkUrl = "http://skudpaisho.calebhugo.com/" + "?" + linkUrl;
 	} else {
 		linkUrl = url + "?" + linkUrl;
@@ -1024,15 +1027,21 @@ function getGatePointMessage() {
 }
 
 
-function getLink() {
+function getLink(forSandbox) {
 	var notation = new GameNotation();
 	for (var i = 0; i < currentMoveIndex; i++) {
 		notation.addMove(gameNotation.moves[i]);
 	}
 
 	var linkUrl = "";
+
+	if (forSandbox && getUserEmail()) {
+		linkUrl += "host=" + getUserEmail() + "&";
+		linkUrl += "guest=" + getUserEmail() + "&";
+	}
+
 	linkUrl += "game=" + notation.notationTextForUrl();
-	linkUrl += "&replay=true";
+	// linkUrl += "&replay=true";
 	// if (newKnotweedRules) {
 	// 	linkUrl += "&nkr=y";
 	// }	// No longer needed
@@ -1041,11 +1050,11 @@ function getLink() {
 	}
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
-	linkUrl = url + "?" + linkUrl;
+	linkUrl = sandboxUrl + "?" + linkUrl;
 
 	if (theGame.board.winners.length > 0) {
 		// Call short url because game is over
-		if (!url.startsWith("file")) {
+		if (!sandboxUrl.startsWith("file")) {
 			getShortUrl(linkUrl);
 		}
 	}
@@ -1130,7 +1139,7 @@ function playAiTurn() {
 }
 
 function sandboxFromMove() {
-	var link = getLink();
+	var link = getLink(true);
 	window.open(link);
 }
 
