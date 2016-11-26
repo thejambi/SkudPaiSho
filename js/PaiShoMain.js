@@ -385,7 +385,7 @@ function finalizeMove(ignoreNoEmail) {
 		// Add end date
 		if (!metadata.endDate) {
 			metadata.endDate = getDateString();
-			linkUrl += "&eDate" + metadata.endDate;
+			linkUrl += "&eDate=" + metadata.endDate;
 		}
 	}
 
