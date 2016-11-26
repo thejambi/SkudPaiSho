@@ -1069,6 +1069,19 @@ function getLink(forSandbox) {
 	if (simpleCanonRules) {
 		linkUrl += "&canon=y";
 	}
+
+	// Add start date
+	if (metadata.startDate) {
+		linkUrl += "&sDate=" + metadata.startDate;
+	}
+
+	if (theGame.board.winners.length > 0) {
+		// Add end date
+		if (metadata.endDate) {
+			linkUrl += "&eDate=" + metadata.endDate;
+		}
+	}
+
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
 	linkUrl = sandboxUrl + "?" + linkUrl;
