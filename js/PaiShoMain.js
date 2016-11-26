@@ -361,10 +361,11 @@ function finalizeMove(ignoreNoEmail) {
 		linkUrl += "&canon=y";
 	}
 
+	// Add start date
 	if (!metadata.startDate) {
 		metadata.startDate = getDateString();
-		linkUrl += "&sDate=" + metadata.startDate;
 	}
+	linkUrl += "&sDate=" + metadata.startDate;
 
 	// debug(url + "?" + linkUrl);
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
@@ -380,9 +381,9 @@ function finalizeMove(ignoreNoEmail) {
 		// Add end date
 		if (!metadata.endDate) {
 			metadata.endDate = getDateString();
-			linkUrl += "&eDate=" + metadata.endDate;
 		}
-		
+		linkUrl += "&eDate=" + metadata.endDate;
+
 		// Call short url because game is over
 		if (!url.startsWith("file")) {
 			getShortUrl(linkUrl);
