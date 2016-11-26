@@ -367,7 +367,16 @@ function finalizeMove(ignoreNoEmail) {
 	}
 	linkUrl += "&sDate=" + metadata.startDate;
 
+	if (theGame.board.winners.length > 0) {
+		// Add end date
+		if (!metadata.endDate) {
+			metadata.endDate = getDateString();
+		}
+		linkUrl += "&eDate=" + metadata.endDate;
+	}
+
 	// debug(url + "?" + linkUrl);
+	// Compress, then build full URL
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
 	// if opponent is me, use calebhugo.com url
@@ -378,12 +387,6 @@ function finalizeMove(ignoreNoEmail) {
 	}
 
 	if (theGame.board.winners.length > 0) {
-		// Add end date
-		if (!metadata.endDate) {
-			metadata.endDate = getDateString();
-		}
-		linkUrl += "&eDate=" + metadata.endDate;
-
 		// Call short url because game is over
 		if (!url.startsWith("file")) {
 			getShortUrl(linkUrl);
