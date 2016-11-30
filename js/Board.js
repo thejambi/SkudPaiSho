@@ -416,12 +416,8 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 	// get surrounding RowAndColumn values
 	var rowCols = this.getSurroundingRowAndCols(boardPoint);
 
-	// Validate.. Wheel must not be next to a Gate or non-playable
-	if (rowCols.length < 8) {
-		// Not full, means there was non-playable
-		// debug("Wheel cannot be played next to a NON-POINT");
-		return false;
-	}
+	// Validate.. Wheel must not be next to a Gate, create Clash, or move tile off board
+
 	for (var i = 0; i < rowCols.length; i++) {
 		var bp = this.cells[rowCols[i].row][rowCols[i].col];
 		if (bp.isType(GATE)) {
@@ -435,9 +431,13 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 		// If a tile would be affected, verify the target
 		if (bp.hasTile()) {
 			var targetRowCol = this.getClockwiseRowCol(boardPoint, rowCols[i]);
-			var targetBp = this.cells[targetRowCol.row][targetRowCol.col];
-			if (!targetBp.canHoldTile(bp.tile, true)) {
-				return false;
+			if (this.isValidRowCol(targetRowCol)) {
+				var targetBp = this.cells[targetRowCol.row][targetRowCol.col];
+				if (!targetBp.canHoldTile(bp.tile, true)) {
+					return false;
+				}
+			} else {
+				return false;	// Would move tile off board, no good
 			}
 		}
 	}
@@ -451,6 +451,10 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 	}
 
 	return true;
+};
+
+Board.prototype.isValidRowCol = function(rowCol) {
+	return rowCol.row >= 0 && rowCol.col >= 0 && rowCol.row <= 16 && rowCol.col <= 16;
 };
 
 Board.prototype.placeWheel = function(tile, notationPoint, ignoreCheck) {
@@ -472,7 +476,9 @@ Board.prototype.placeWheel = function(tile, notationPoint, ignoreCheck) {
 		// Save tile and target rowAndCol
 		var tile = this.cells[rowCols[i].row][rowCols[i].col].removeTile();
 		var targetRowCol = this.getClockwiseRowCol(rowAndCol, rowCols[i]);
-		results.push([tile,targetRowCol]);
+		if (this.isValidRowCol(targetRowCol)) {
+			results.push([tile,targetRowCol]);
+		}
 	}
 
 	// go through and place tiles in target points
@@ -1148,7 +1154,8 @@ Board.prototype.getTileHarmonies = function(tile, rowAndCol) {
 Board.prototype.getHarmonyLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
-	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
+	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile() 
+		&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
 		colToCheck--;
 	}
 
@@ -1164,7 +1171,8 @@ Board.prototype.getHarmonyLeft = function(tile, endRowCol) {
 Board.prototype.getHarmonyRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
 
-	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
+	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile() 
+		&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
 		colToCheck++;
 	}
 
@@ -1180,7 +1188,8 @@ Board.prototype.getHarmonyRight = function(tile, endRowCol) {
 Board.prototype.getHarmonyUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
-	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
+	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
+		&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
 		rowToCheck--;
 	}
 
@@ -1196,7 +1205,8 @@ Board.prototype.getHarmonyUp = function(tile, endRowCol) {
 Board.prototype.getHarmonyDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
-	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
+	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
+		&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
 		rowToCheck++;
 	}
 
@@ -1247,7 +1257,8 @@ Board.prototype.hasDisharmony = function(boardPoint) {
 Board.prototype.hasDisharmonyLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
-	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
+	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile() 
+		&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
 		colToCheck--;
 	}
 
@@ -1263,7 +1274,8 @@ Board.prototype.hasDisharmonyLeft = function(tile, endRowCol) {
 Board.prototype.hasDisharmonyRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
 
-	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
+	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile() 
+		&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
 		colToCheck++;
 	}
 
@@ -1279,7 +1291,8 @@ Board.prototype.hasDisharmonyRight = function(tile, endRowCol) {
 Board.prototype.hasDisharmonyUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
-	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
+	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
+		&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
 		rowToCheck--;
 	}
 
@@ -1295,7 +1308,8 @@ Board.prototype.hasDisharmonyUp = function(tile, endRowCol) {
 Board.prototype.hasDisharmonyDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
-	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
+	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
+		&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
 		rowToCheck++;
 	}
 
