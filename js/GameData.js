@@ -1,5 +1,6 @@
 var newKnotweedRules = true;  // They're good. Always on!
 var simpleCanonRules = false;
+var newSpecialFlowerRules = false;
 
 var debugOn = true;
 

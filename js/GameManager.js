@@ -120,6 +120,16 @@ GameManager.prototype.revealOpenGates = function(player, moveNum, ignoreActuate)
 	}
 };
 
+GameManager.prototype.revealSpecialFlowerPlacementPoints = function(player) {
+	if (!newSpecialFlowerRules) {
+		this.revealOpenGates(player);
+		return;
+	}
+
+	this.board.revealSpecialFlowerPlacementPoints(player);
+	this.actuate();
+};
+
 GameManager.prototype.revealPossiblePlacementPoints = function(tile) {
 	this.board.revealPossiblePlacementPoints(tile);
 	this.actuate();

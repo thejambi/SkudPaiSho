@@ -6,7 +6,7 @@ var QueryString = function () {
   var query_string = {};
   var query = window.location.search.substring(1);
 
-  if (query.length > 0 && !(query.includes("game=") || query.includes("canon"))) {
+  if (query.length > 0 && !(query.includes("game=") || query.includes("canon=") || query.includes("newSpecialFlowerRules="))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
   	query = LZString.decompressFromEncodedURIComponent(query);
@@ -97,6 +97,10 @@ window.requestAnimationFrame(function () {
 	if (QueryString.canon) {
 		simpleCanonRules = true;
 		debug("Simple Canon rules");
+	}
+
+	if (QueryString.newSpecialFlowerRules) {
+		newSpecialFlowerRules = true;
 	}
 
 	// Load metadata
@@ -353,9 +357,9 @@ function finalizeMove(ignoreNoEmail) {
 
 	// linkUrl += "&replay=true";	// No longer needed
 
-	// if (newKnotweedRules) {
-	// 	linkUrl += "&nkr=y";
-	// }	// No longer needed
+	if (newSpecialFlowerRules) {
+		linkUrl += "&newSpecialFlowerRules=y";
+	}
 
 	if (simpleCanonRules) {
 		linkUrl += "&canon=y";
@@ -670,10 +674,12 @@ function unplayedTileClicked(tileDiv) {
 		notationBuilder.bonusTileCode = tileCode;
 		notationBuilder.status = WAITING_FOR_BONUS_ENDPOINT;
 
-		if (tile.type !== ACCENT_TILE) {
+		if (tile.type === BASIC_FLOWER) {
 			theGame.revealOpenGates(getCurrentPlayer());
-		} else {
+		} else if (tile.type === ACCENT_TILE) {
 			theGame.revealPossiblePlacementPoints(tile);
+		} else if (tile.type === SPECIAL_FLOWER) {
+			theGame.revealSpecialFlowerPlacementPoints(getCurrentPlayer());
 		}
 	} else {
 		theGame.hidePossibleMovePoints();

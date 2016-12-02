@@ -1361,6 +1361,47 @@ Board.prototype.setOpenGatePossibleMoves = function(player) {
 	}
 };
 
+Board.prototype.revealSpecialFlowerPlacementPoints = function(player) {
+	// Check each Gate for tile belonging to player, then check gate edge points
+	var bpCheckList = [];
+	
+	var row = 0;
+	var col = 8;
+	var bp = this.cells[row][col];
+	if (bp.hasTile() && bp.tile.ownerName === player) {
+		bpCheckList.push(this.cells[row][col - 1]);
+		bpCheckList.push(this.cells[row][col + 1]);
+	}
+
+	row = 16;
+	var bp = this.cells[row][col];
+	if (bp.hasTile() && bp.tile.ownerName === player) {
+		bpCheckList.push(this.cells[row][col - 1]);
+		bpCheckList.push(this.cells[row][col + 1]);
+	}
+
+	row = 8;
+	col = 0;
+	var bp = this.cells[row][col];
+	if (bp.hasTile() && bp.tile.ownerName === player) {
+		bpCheckList.push(this.cells[row - 1][col]);
+		bpCheckList.push(this.cells[row + 1][col]);
+	}
+
+	col = 16;
+	var bp = this.cells[row][col];
+	if (bp.hasTile() && bp.tile.ownerName === player) {
+		bpCheckList.push(this.cells[row - 1][col]);
+		bpCheckList.push(this.cells[row + 1][col]);
+	}
+
+	bpCheckList.forEach(function(bp) {
+		if (!bp.hasTile()) {
+			bp.addType(POSSIBLE_MOVE);
+		}
+	});
+};
+
 Board.prototype.setGuestGateOpen = function() {
 	var row = 16;
 	var col = 8;
