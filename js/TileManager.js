@@ -177,6 +177,55 @@ TileManager.prototype.unselectTiles = function(player) {
 // 	tilePile.push(tile);
 // };
 
+TileManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
+	// Check Host
+	var hostHasBasic = false;
+	for (var i = 0; i < this.hostTiles.length; i++) {
+		if (this.hostTiles[i].type === BASIC_FLOWER) {
+			hostHasBasic = true;
+			break;
+		}
+	}
+
+	var guestHasBasic = false;
+	for (var i = 0; i < this.guestTiles.length; i++) {
+		if (this.guestTiles[i].type === BASIC_FLOWER) {
+			guestHasBasic = true;
+			break;
+		}
+	}
+
+	if (!hostHasBasic && guestHasBasic) {
+		return HOST;
+	} else if (!guestHasBasic && hostHasBasic) {
+		return GUEST;
+	} else if (!guestHasBasic && !hostHasBasic) {
+		return "BOTH PLAYERS";
+	}
+};
+
+TileManager.prototype.getPlayerWithMoreAccentTiles = function() {
+	var hostCount = 0;
+	for (var i = 0; i < this.hostTiles.length; i++) {
+		if (this.hostTiles[i].type === ACCENT_TILE) {
+			hostCount++;
+		}
+	}
+
+	var guestCount = 0;
+	for (var i = 0; i < this.guestTiles.length; i++) {
+		if (this.guestTiles[i].type === ACCENT_TILE) {
+			guestCount++;
+		}
+	}
+
+	if (hostCount > guestCount) {
+		return HOST;
+	} else if (guestCount > hostCount) {
+		return GUEST;
+	}
+};
+
 TileManager.prototype.getCopy = function() {
 	var copy = new TileManager();
 

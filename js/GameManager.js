@@ -8,6 +8,7 @@ function GameManager(ignoreActuate, isCopy) {
 	this.tileManager = new TileManager();
 
 	this.setup(ignoreActuate);
+	this.endGameWinners = [];
 }
 
 // Set up the game
@@ -85,6 +86,32 @@ GameManager.prototype.runNotationMove = function(move, withActuate) {
 		this.actuate();
 	}
 
+	this.endGameWinners = [];
+	if (this.board.winners.length === 0) {
+		// If no harmony ring winners, check for player out of basic flower tiles
+		var playerOutOfTiles = this.aPlayerIsOutOfBasicFlowerTiles();
+		if (playerOutOfTiles) {
+			debug("PLAYER OUT OF TILES: " + playerOutOfTiles);
+			// If a player has more accent tiles, they win
+			var playerMoreAccentTiles = this.tileManager.getPlayerWithMoreAccentTiles();
+			if (playerMoreAccentTiles) {
+				debug("Player has more Accent Tiles: " + playerMoreAccentTiles)
+				this.endGameWinners.push(playerMoreAccentTiles);
+			} else {
+				// Calculate player with most Harmonies
+				var playerWithmostHarmonies = this.board.harmonyManager.getPlayerWithMostHarmonies();
+				if (playerWithmostHarmonies) {
+					this.endGameWinners.push(playerWithmostHarmonies);
+					debug("Most Harmonies winner: " + playerWithmostHarmonies);
+				} else {
+					this.endGameWinners.push(HOST);
+					this.endGameWinners.push(GUEST);
+					debug("Most Harmonies is a tie!");
+				}
+			}
+		}
+	}
+
 	return bonusAllowed;
 };
 
@@ -138,6 +165,34 @@ GameManager.prototype.revealPossiblePlacementPoints = function(tile) {
 GameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
 	this.board.revealBoatBonusPoints(boardPoint);
 	this.actuate();
+};
+
+GameManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
+	return this.tileManager.aPlayerIsOutOfBasicFlowerTiles();
+};
+
+GameManager.prototype.getWinner = function() {
+	if (this.board.winners.length === 1) {
+		return this.board.winners[0];
+	} else if (this.board.winners.length > 1) {
+		return "BOTH players";
+	} else if (this.endGameWinners.length === 1) {
+		return this.endGameWinners[0];
+	} else if (this.endGameWinners.length > 1) {
+		return "BOTH players";
+	}
+};
+
+GameManager.prototype.getWinReason = function() {
+	if (this.board.winners.length === 1) {
+		return " created a Harmony Ring and won the game!";
+	} else if (this.endGameWinners.length === 1) {
+		if (this.tileManager.getPlayerWithMoreAccentTiles()) {
+			return " won the game with more Accent Tiles left.";
+		} else {
+			return " won the game with the most Harmonies.";
+		}
+	}
 };
 
 GameManager.prototype.getCopy = function() {

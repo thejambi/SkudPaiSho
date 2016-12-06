@@ -190,6 +190,17 @@ HarmonyManager.prototype.numHarmoniesForPlayer = function(player) {
 	return count;
 };
 
+HarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
+	var hostCount = this.numHarmoniesForPlayer(HOST);
+	var guestCount = this.numHarmoniesForPlayer(GUEST);
+
+	if (guestCount > hostCount) {
+		return GUEST;
+	} else if (hostCount > guestCount) {
+		return HOST;
+	}
+};
+
 HarmonyManager.prototype.getNumCrossingCenterForPlayer = function(player) {
 	var count = 0;
 	for (var i = 0; i < this.harmonies.length; i++) {
@@ -234,6 +245,17 @@ HarmonyManager.prototype.ringLengthForPlayer = function(player) {
 	}
 
 	return longest;
+};
+
+HarmonyManager.prototype.getPlayerWithLongestChain = function() {
+	var hostLength = this.ringLengthForPlayer(HOST);
+	var guestLength = this.ringLengthForPlayer(GUEST);
+
+	if (guestLength > hostLength) {
+		return GUEST;
+	} else if (hostLength > guestLength) {
+		return HOST;
+	}
 };
 
 HarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies) {

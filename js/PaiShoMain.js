@@ -274,6 +274,7 @@ function playAllMoves() {
 }
 
 var interval = 0;
+var replayIntervalLength = 800;
 
 function playPause() {
 	if (gameNotation.moves.length === 0) {
@@ -287,7 +288,7 @@ function playPause() {
 				if (!playNextMove(true)) {
 					pauseRun();
 				}
-			}, 800);//800);
+			}, replayIntervalLength);//800);
 } else {
 			// All done.. restart!
 			rewindAllMoves();
@@ -314,14 +315,16 @@ function getAdditionalMessage() {
 		msg += "Plant a Basic Flower Tile.";
 	}
 
-	if (theGame.board.winners.length > 0) {
+	//if (theGame.board.winners.length > 0) {
+	if (theGame.getWinner()) {
 		// There is a winner!
-		if (theGame.board.winners.length > 1) {
-			// More than one winner?
-			msg += "<br /><strong>Both players have created Harmony Rings! It's a tie!</strong>";
-		} else {
-			msg += "<br /><strong>" + theGame.board.winners[0] + " has created a Harmony Ring and won the game!</strong>";
-		}
+		// if (theGame.board.winners.length > 1) {
+		// 	// More than one winner?
+		// 	msg += "<br /><strong>Both players have created Harmony Rings! It's a tie!</strong>";
+		// } else {
+		// 	msg += "<br /><strong>" + theGame.board.winners[0] + " has created a Harmony Ring and won the game!</strong>";
+		// }
+		msg += "<br /><strong>" + theGame.getWinner() + theGame.getWinReason() + "</strong>";
 	}
 	return msg;
 }
@@ -371,7 +374,8 @@ function finalizeMove(ignoreNoEmail) {
 	}
 	linkUrl += "&sDate=" + metadata.startDate;
 
-	if (theGame.board.winners.length > 0) {
+	//if (theGame.board.winners.length > 0) {
+	if (theGame.getWinner()) {
 		// Add end date
 		if (!metadata.endDate) {
 			metadata.endDate = getDateString();
@@ -390,7 +394,8 @@ function finalizeMove(ignoreNoEmail) {
 		linkUrl = url + "?" + linkUrl;
 	}
 
-	if (theGame.board.winners.length > 0) {
+	// if (theGame.board.winners.length > 0) {
+	if (theGame.getWinner()) {
 		// Call short url because game is over
 		if (!url.startsWith("file")) {
 			getShortUrl(linkUrl);
@@ -453,14 +458,16 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		messageText = getNoUserEmailMessage();
 	}
 
-	if (theGame.board.winners.length > 0) {
+	//if (theGame.board.winners.length > 0) {
+	if (theGame.getWinner()) {
 		// There is a winner!
-		if (theGame.board.winners.length > 1) {
-			// There are two winners???
-			messageText += "<br /><strong>Both players have created Harmony Rings! It's a tie!</strong>";
-		} else {
-			messageText += "<br /><strong>" + theGame.board.winners[0] + " has created a Harmony Ring and won the game!</strong>";
-		}
+		// if (theGame.board.winners.length > 1) {
+		// 	// There are two winners???
+		// 	messageText += "<br /><strong>Both players have created Harmony Rings! It's a tie!</strong>";
+		// } else {
+		// 	messageText += "<br /><strong>" + theGame.board.winners[0] + " has created a Harmony Ring and won the game!</strong>";
+		// }
+		messageText += "<br /><strong>" + theGame.getWinner() + theGame.getWinReason() + "</strong>";
 	} else {
 		messageText += getResetMoveText();
 	}
@@ -586,7 +593,7 @@ function myTurn() {
 }
 
 function unplayedTileClicked(tileDiv) {
-	if (theGame.board.winners.length > 0 && notationBuilder.status !== READY_FOR_BONUS) {
+	if (theGame.getWinner() && notationBuilder.status !== READY_FOR_BONUS) {
 		return;
 	}
 	if (!myTurn()) {
@@ -693,7 +700,7 @@ function unplayedTileClicked(tileDiv) {
 }
 
 function pointClicked(htmlPoint) {
-	if (theGame.board.winners.length > 0 && notationBuilder.status !== WAITING_FOR_BONUS_ENDPOINT) {
+	if (theGame.getWinner() && notationBuilder.status !== WAITING_FOR_BONUS_ENDPOINT) {
 		return;
 	}
 	if (!myTurn()) {
@@ -1081,7 +1088,8 @@ function getLink(forSandbox) {
 		linkUrl += "&sDate=" + metadata.startDate;
 	}
 
-	if (theGame.board.winners.length > 0) {
+	//if (theGame.board.winners.length > 0) {
+	if (theGame.getWinner()) {
 		// Add end date
 		if (metadata.endDate) {
 			linkUrl += "&eDate=" + metadata.endDate;
@@ -1092,7 +1100,8 @@ function getLink(forSandbox) {
 
 	linkUrl = sandboxUrl + "?" + linkUrl;
 
-	if (theGame.board.winners.length > 0) {
+	//if (theGame.board.winners.length > 0) {
+	if (theGame.getWinner()) {
 		// Call short url because game is over
 		if (!sandboxUrl.startsWith("file")) {
 			getShortUrl(linkUrl);
@@ -1131,7 +1140,7 @@ function setAiIndex(i) {
 }
 
 function playAiTurn() {
-	if (theGame.board.winners.length > 0) {
+	if (theGame.getWinner()) {
 		return;
 	}
 	var theAi = activeAi;
