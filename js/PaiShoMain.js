@@ -690,7 +690,7 @@ function unplayedTileClicked(tileDiv) {
 		notationBuilder.bonusTileCode = tileCode;
 		notationBuilder.status = WAITING_FOR_BONUS_ENDPOINT;
 
-		if (tile.type === BASIC_FLOWER) {
+		if (tile.type === BASIC_FLOWER && theGame.playerCanBonusPlant(getCurrentPlayer())) {
 			theGame.revealOpenGates(getCurrentPlayer());
 		} else if (tile.type === ACCENT_TILE) {
 			theGame.revealPossiblePlacementPoints(tile);

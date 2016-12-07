@@ -147,6 +147,15 @@ GameManager.prototype.revealOpenGates = function(player, moveNum, ignoreActuate)
 	}
 };
 
+GameManager.prototype.playerCanBonusPlant = function(player) {
+	if (!newGatesRule) {
+		return true;
+	}
+
+	// New Gate Rules: Player cannot plant on Bonus if already controlling two Gates
+	return this.board.playerControlsLessThanTwoGates(player);
+};
+
 GameManager.prototype.revealSpecialFlowerPlacementPoints = function(player) {
 	if (!newSpecialFlowerRules) {
 		this.revealOpenGates(player);
