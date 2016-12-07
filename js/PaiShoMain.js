@@ -6,7 +6,7 @@ var QueryString = function () {
   var query_string = {};
   var query = window.location.search.substring(1);
 
-  if (query.length > 0 && !(query.includes("game=") || query.includes("canon=") || query.includes("newSpecialFlowerRules="))) {
+  if (query.length > 0 && !(query.includes("game=") || query.includes("canon=") || query.includes("newSpecialFlowerRules=") || query.includes("newGatesRule="))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
   	query = LZString.decompressFromEncodedURIComponent(query);
@@ -101,6 +101,11 @@ window.requestAnimationFrame(function () {
 
 	if (QueryString.newSpecialFlowerRules) {
 		newSpecialFlowerRules = true;
+	}
+
+	if (QueryString.newGatesRule) {
+		newGatesRule = true;
+		debug("-- New Gates Rule in effect --");
 	}
 
 	// Load metadata
@@ -362,6 +367,10 @@ function finalizeMove(ignoreNoEmail) {
 
 	if (newSpecialFlowerRules) {
 		linkUrl += "&newSpecialFlowerRules=y";
+	}
+
+	if (newGatesRule) {
+		linkUrl += "&newGatesRule=y";
 	}
 
 	if (simpleCanonRules) {

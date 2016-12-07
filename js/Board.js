@@ -1347,16 +1347,27 @@ Board.prototype.removePossibleMovePoints = function() {
 
 Board.prototype.setOpenGatePossibleMoves = function(player) {
 	// Apply "open gate" type to applicable boardPoints
+	var openGateCount = 0;
+	var lastGatePoint;
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
-			if (bp.isOpenGate() && !bp.betweenPlayerHarmony(player)) {
+			if (bp.isOpenGate()) {
 				this.cells[row][col].addType(POSSIBLE_MOVE);
+				openGateCount++;
+				lastGatePoint = this.cells[row][col];
 			}
 			// Update: Use below for removing betweenPlayerHarmony check rule
 			// if (bp.isOpenGate()) {
 			// 	this.cells[row][col].addType(POSSIBLE_MOVE);
 			// }
+		}
+	}
+
+	if (newGatesRule) {
+		if (openGateCount === 1) {
+			// If only 1 open Gate, rejected!
+			lastGatePoint.removeType(POSSIBLE_MOVE);
 		}
 	}
 };
