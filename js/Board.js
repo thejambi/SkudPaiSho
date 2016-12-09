@@ -915,6 +915,37 @@ Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPoin
 	return true;
 };
 
+Board.prototype.canTransportTileToPoint = function(boardPointStart, boardPointEnd) {
+	// Transport Tile: used in Boat special ability
+
+	// start point must have a tile
+	if (!boardPointStart.hasTile()) {
+		return false;
+	}
+
+	// If endpoint is a Gate, that's wrong.
+	if (boardPointEnd.isType(GATE)) {
+		return false;
+	}
+
+	// If endpoint has a tile, that is wrong.
+	if (boardPointEnd.hasTile()) {
+		return false;
+	}
+
+	if (!boardPointEnd.canHoldTile(boardPointStart.tile)) {
+		return false;
+	}
+
+	// What if moving the tile there creates a Disharmony on the board? That can't happen!
+	if (this.moveCreatesDisharmony(boardPointStart, boardPointEnd)) {
+		return false;
+	}
+
+	// I guess we made it through
+	return true;
+};
+
 Board.prototype.moveCreatesDisharmony = function(boardPointStart, boardPointEnd) {
 	// Grab tile in end point and put the start tile there
 	var endTile = boardPointEnd.removeTile();
@@ -1456,12 +1487,14 @@ Board.prototype.revealBoatBonusPoints = function(boardPoint) {
 
 		for (var i = 0; i < rowCols.length; i++) {
 			var boardPointEnd = this.cells[rowCols[i].row][rowCols[i].col];
-			if (this.canMoveTileToPoint(player, boardPoint, boardPointEnd)) {
+			// if (this.canMoveTileToPoint(player, boardPoint, boardPointEnd)) {
+			if (this.canTransportTileToPoint(boardPoint, boardPointEnd)) {
 				boardPointEnd.addType(POSSIBLE_MOVE);
 			}
 		}
 		return;
 	}
+	// The rest is old and outdated...
 	// Apply "possible move point" type to applicable boardPoints
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
