@@ -102,15 +102,16 @@ window.requestAnimationFrame(function () {
 	if (QueryString.newSpecialFlowerRules === 'n') {
 		newSpecialFlowerRules = false;
 		debug("-- Old Special Flower Rules in effect --");
-	} else {
-		newSpecialFlowerRules = true;	// On by default - Need to review this rule
+	} else if (QueryString.newSpecialFlowerRules) {
+		newSpecialFlowerRules = true;
 		debug("-- New Special Flower Rules in effect --");
 	}
 
 	if (QueryString.newGatesRule === 'n') {
 		newGatesRule = false;
-	} else {
-		newGatesRule = true;	// On by default - it's good!
+		debug("-- New Gates Rule is disabled --");
+	} else if (QueryString.newGatesRule) {
+		newGatesRule = true;
 		debug("-- New Gates Rule in effect --");
 	}
 
