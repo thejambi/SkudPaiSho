@@ -99,8 +99,12 @@ window.requestAnimationFrame(function () {
 		debug("Simple Canon rules");
 	}
 
-	if (QueryString.newSpecialFlowerRules) {
+	if (QueryString.newSpecialFlowerRules === 'n') {
+		newSpecialFlowerRules = false;
+		debug("-- Old Special Flower Rules in effect --");
+	} else {
 		newSpecialFlowerRules = true;
+		debug("-- New Special Flower Rules in effect --");
 	}
 
 	if (QueryString.newGatesRule) {
@@ -367,6 +371,8 @@ function finalizeMove(ignoreNoEmail) {
 
 	if (newSpecialFlowerRules) {
 		linkUrl += "&newSpecialFlowerRules=y";
+	} else {
+		linkUrl += "&newSpecialFlowerRules=n";
 	}
 
 	if (newGatesRule) {
@@ -1088,6 +1094,16 @@ function getLink(forSandbox) {
 	// if (newKnotweedRules) {
 	// 	linkUrl += "&nkr=y";
 	// }	// No longer needed
+	if (newSpecialFlowerRules) {
+		linkUrl += "&newSpecialFlowerRules=y";
+	} else {
+		linkUrl += "&newSpecialFlowerRules=n";
+	}
+
+	if (newGatesRule) {
+		linkUrl += "&newGatesRule=y";
+	}
+
 	if (simpleCanonRules) {
 		linkUrl += "&canon=y";
 	}
