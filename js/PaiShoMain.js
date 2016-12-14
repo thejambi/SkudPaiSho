@@ -103,12 +103,14 @@ window.requestAnimationFrame(function () {
 		newSpecialFlowerRules = false;
 		debug("-- Old Special Flower Rules in effect --");
 	} else {
-		newSpecialFlowerRules = true;
+		newSpecialFlowerRules = true;	// On by default - Need to review this rule
 		debug("-- New Special Flower Rules in effect --");
 	}
 
-	if (QueryString.newGatesRule) {
-		newGatesRule = true;
+	if (QueryString.newGatesRule === 'n') {
+		newGatesRule = false;
+	} else {
+		newGatesRule = true;	// On by default - it's good!
 		debug("-- New Gates Rule in effect --");
 	}
 
@@ -377,6 +379,8 @@ function finalizeMove(ignoreNoEmail) {
 
 	if (newGatesRule) {
 		linkUrl += "&newGatesRule=y";
+	} else {
+		linkUrl += "&newGatesRule=n";
 	}
 
 	if (simpleCanonRules) {
@@ -1102,6 +1106,8 @@ function getLink(forSandbox) {
 
 	if (newGatesRule) {
 		linkUrl += "&newGatesRule=y";
+	} else {
+		linkUrl += "&newGatesRule=n";
 	}
 
 	if (simpleCanonRules) {
