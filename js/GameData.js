@@ -2,6 +2,7 @@ var newKnotweedRules = true;  // They're good. Always on!
 var simpleCanonRules = false;
 var newSpecialFlowerRules = false;
 var newGatesRule = true;  // Great! Always on!
+var newWheelRule = true;  // Wheel can be played next to Gate as long as it's ok. Always on.
 
 var debugOn = true;
 

@@ -420,12 +420,16 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 
 	for (var i = 0; i < rowCols.length; i++) {
 		var bp = this.cells[rowCols[i].row][rowCols[i].col];
-		if (bp.isType(GATE)) {
+		if (bp.isType(GATE) && !newWheelRule) {
 			// debug("Wheel cannot be played next to a GATE");
 			return false;
 		} else if (!newKnotweedRules && bp.hasTile() && (bp.tile.drained || bp.tile.accentType === KNOTWEED)) {
 			// debug("wheel cannot be played next to drained tile or Knotweed");
 			return false;
+		} else if (newWheelRule) {
+			if (bp.isType(GATE) && bp.hasTile()) {
+				return false;	// Can't play Wheel next to Gate if Blooming tile
+			}
 		}
 
 		// If a tile would be affected, verify the target
@@ -435,6 +439,9 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 				var targetBp = this.cells[targetRowCol.row][targetRowCol.col];
 				if (!targetBp.canHoldTile(bp.tile, true)) {
 					return false;
+				}
+				if (targetBp.isType(GATE)) {
+					return false;	// Can't move tile onto a Gate
 				}
 			} else {
 				return false;	// Would move tile off board, no good
