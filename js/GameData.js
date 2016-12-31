@@ -1,8 +1,13 @@
 var newKnotweedRules = true;  // They're good. Always on!
 var simpleCanonRules = false;
-var newSpecialFlowerRules = false;
-var newGatesRule = true;  // Great! Always on!
+var newSpecialFlowerRules = false;  // Special Flowers planted next to Growing Flower
+var newGatesRule = true;  // Great! Always on! (New Gate Rules: Player cannot plant on Bonus if already controlling two Gates)
 var newWheelRule = true;  // Wheel can be played next to Gate as long as it's ok. Always on.
+var newOrchidClashRule = false; // Orchid clashes with all opponent Flowers... I don't think it's a good idea.
+var newOrchidVulnerableRule = false;  // Testing new Orchid vulnerable rules
+var newOrchidCaptureRule = false;  // Testing new Orchid capture rules
+var simpleSpecialFlowerRule = false;  // Simplest special flower rule
+var specialFlowerBonusRule = false;
 
 var debugOn = true;
 

@@ -6,7 +6,7 @@ var QueryString = function () {
   var query_string = {};
   var query = window.location.search.substring(1);
 
-  if (query.length > 0 && !(query.includes("game=") || query.includes("canon=") || query.includes("newSpecialFlowerRules=") || query.includes("newGatesRule="))) {
+  if (query.length > 0 && !(query.includes("game=") || query.includes("canon=") || query.includes("newSpecialFlowerRules=") || query.includes("newGatesRule=") || query.includes("newOrchidVulnerableRule=") || query.includes("newOrchidClashRule=") || query.includes("newOrchidCaptureRule=") || query.includes("simpleSpecialFlowerRule="))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
   	query = LZString.decompressFromEncodedURIComponent(query);
@@ -113,6 +113,26 @@ window.requestAnimationFrame(function () {
 	} else if (QueryString.newGatesRule) {
 		newGatesRule = true;
 		debug("-- New Gates Rule in effect --");
+	}
+
+	if (QueryString.newOrchidVulnerableRule === 'y') {
+		newOrchidVulnerableRule = true;
+		debug("-- New Orchid Vulnerable rule in effect --");
+	}
+
+	if (QueryString.newOrchidClashRule === 'y') {
+		newOrchidClashRule = true;
+		debug("-- New Orchid Clash rule in effect --");
+	}
+
+	if (QueryString.newOrchidCaptureRule === 'y') {
+		newOrchidCaptureRule = true;
+		debug("-- New Orchid Capture rule in effect --");
+	}
+
+	if (QueryString.simpleSpecialFlowerRule === 'y') {
+		simpleSpecialFlowerRule = true;
+		debug("-- Simplest Special Flower Rule in effect --");
 	}
 
 	// Load metadata
@@ -387,6 +407,31 @@ function finalizeMove(ignoreNoEmail) {
 	if (simpleCanonRules) {
 		linkUrl += "&canon=y";
 	}
+
+	if (newOrchidVulnerableRule) {
+		linkUrl += "&newOrchidVulnerableRule=y";
+	} //else {
+	// 	linkUrl += "&newOrchidVulnerableRule=n";
+	// }
+
+	if (newOrchidCaptureRule) {
+		linkUrl += "&newOrchidCaptureRule=y";
+	} //else {
+	// 	linkUrl += "&newOrchidCaptureRule=n";
+	// }
+
+	if (newOrchidClashRule) {
+		linkUrl += "&newOrchidClashRule=y";
+	} //else {
+	// 	linkUrl += "&newOrchidClashRule=n";
+	// }
+
+	if (simpleSpecialFlowerRule) {
+		linkUrl += "&simpleSpecialFlowerRule=y";
+	} //else {
+	// 	linkUrl += "&simpleSpecialFlowerRule=n";
+	// }
+
 
 	// Add start date
 	if (!metadata.startDate) {
@@ -696,6 +741,13 @@ function unplayedTileClicked(tileDiv) {
 
 		theGame.revealOpenGates(getCurrentPlayer(), gameNotation.moves.length);
 	} else if (notationBuilder.status === READY_FOR_BONUS) {
+		if (simpleSpecialFlowerRule && tile.type === SPECIAL_FLOWER) {
+			// Other special tile still needs to be in that player's tile pile
+			if (!theGame.playerHasNotPlayedEitherSpecialTile(tile.ownerName)) {
+				return false;
+			}
+		}
+
 		tile.selectedFromPile = true;
 		// Bonus Plant! Can be any tile
 		notationBuilder.bonusTileCode = tileCode;
@@ -1114,6 +1166,32 @@ function getLink(forSandbox) {
 	if (simpleCanonRules) {
 		linkUrl += "&canon=y";
 	}
+
+	if (newOrchidVulnerableRule) {
+		linkUrl += "&newOrchidVulnerableRule=y";
+	} //else {
+	// 	linkUrl += "&newOrchidVulnerableRule=n";
+	// }
+
+	if (newOrchidCaptureRule) {
+		linkUrl += "&newOrchidCaptureRule=y";
+	} //else {
+	// 	linkUrl += "&newOrchidCaptureRule=n";
+	// }
+
+	if (newOrchidClashRule) {
+		linkUrl += "&newOrchidClashRule=y";
+	} //else {
+	// 	linkUrl += "&newOrchidClashRule=n";
+	// }
+
+	if (simpleSpecialFlowerRule) {
+		linkUrl += "&simpleSpecialFlowerRule=y";
+	} //else {
+	// 	linkUrl += "&simpleSpecialFlowerRule=n";
+	// }
+
+	
 
 	// Add start date
 	if (metadata.startDate) {

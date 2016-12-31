@@ -775,6 +775,10 @@ Board.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
 };
 
 Board.prototype.whiteLotusProtected = function(lotusTile) {
+	if (simpleSpecialFlowerRule) {
+		return true;	// Simplest? Cannot be captured.
+	}
+
 	// Testing Lotus never protected:
 	return false;
 
@@ -795,6 +799,10 @@ Board.prototype.whiteLotusProtected = function(lotusTile) {
 };
 
 Board.prototype.orchidCanCapture = function(orchidTile) {
+	if (simpleSpecialFlowerRule) {
+		return true;	// Simplest? Always can capture.
+	}
+
 	// Note: This method does not check if other tile is protected from capture.
 	var orchidCanCapture = false;
 	this.cells.forEach(function(row) {
@@ -810,6 +818,26 @@ Board.prototype.orchidCanCapture = function(orchidTile) {
 };
 
 Board.prototype.orchidVulnerable = function(orchidTile) {
+	if (newOrchidVulnerableRule) {
+		var orchidVulnerable = false;
+		// Orchid vulnerable if opponent White Lotus is on board
+		this.cells.forEach(function(row) {
+			row.forEach(function(boardPoint) {
+				if (boardPoint.hasTile() && boardPoint.tile.specialFlowerType === WHITE_LOTUS 
+					&& boardPoint.tile.ownerName !== orchidTile.ownerName) {
+					orchidCanVulnerable = true;
+				}
+			});
+		});
+		return orchidVulnerable;
+	}
+
+	if (simpleSpecialFlowerRule) {
+		return true;	// Simplest? Always vulnerable.
+	}
+
+	/* ======= Original Rules: ======= */
+
 	var orchidVulnerable = false;
 	this.playedWhiteLotusTiles.forEach(function(lotus) {
 		if (lotus.ownerName === orchidTile.ownerName) {
@@ -908,7 +936,7 @@ Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPoin
 	} else {
 		// Move may be possible. But there may be tiles in the way...
 		if (!this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves)) {
-			debug("Tiles are in the way, so you can't reach that spot.");
+			// debug("Tiles are in the way, so you can't reach that spot.");
 			return false;
 		}
 	}

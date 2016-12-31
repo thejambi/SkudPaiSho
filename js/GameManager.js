@@ -180,6 +180,10 @@ GameManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
 	return this.tileManager.aPlayerIsOutOfBasicFlowerTiles();
 };
 
+GameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playerName) {
+	return this.tileManager.playerHasBothSpecialTilesRemaining(playerName);
+};
+
 GameManager.prototype.getWinner = function() {
 	if (this.board.winners.length === 1) {
 		return this.board.winners[0];

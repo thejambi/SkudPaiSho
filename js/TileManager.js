@@ -226,6 +226,23 @@ TileManager.prototype.getPlayerWithMoreAccentTiles = function() {
 	}
 };
 
+TileManager.prototype.playerHasBothSpecialTilesRemaining = function(player) {
+	var tilePile = this.hostTiles;
+	if (player === GUEST) {
+		tilePile = this.guestTiles;
+	}
+
+	var specialTileCount = 0;
+
+	tilePile.forEach(function(tile) {
+		if (tile.type === SPECIAL_FLOWER) {
+			specialTileCount++;
+		}
+	});
+
+	return specialTileCount > 1;
+};
+
 TileManager.prototype.getCopy = function() {
 	var copy = new TileManager();
 

@@ -115,6 +115,14 @@ Tile.prototype.formsHarmonyWith = function(otherTile) {
 };
 
 Tile.prototype.clashesWith = function(otherTile) {
+	if (newOrchidClashRule) {
+		if (this.ownerName !== otherTile.ownerName) {
+			if (this.specialFlowerType === ORCHID || otherTile.specialFlowerType === ORCHID) {
+				return true;
+			}
+		}
+	}
+
 	return (this.type === BASIC_FLOWER && otherTile.type === BASIC_FLOWER 
 		&& this.basicColorCode !== otherTile.basicColorCode 
 		&& this.basicValue === otherTile.basicValue);
