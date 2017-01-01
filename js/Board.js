@@ -432,6 +432,12 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 			}
 		}
 
+		if (rocksUnwheelable) {
+			if (bp.hasTile() && bp.tile.accentType === ROCK) {
+				return false; 	// Can't play Wheel next to Rock
+			}
+		}
+
 		// If a tile would be affected, verify the target
 		if (bp.hasTile()) {
 			var targetRowCol = this.getClockwiseRowCol(boardPoint, rowCols[i]);
@@ -1075,6 +1081,10 @@ Board.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
 };
 
 Board.prototype.rowBlockedByRock = function(rowNum) {
+	if (rocksUnwheelable) {
+		return false;	// Rocks Unwheelable: Rocks cannot be moved by Wheel but don't disable entire row/col of Harmonies.
+	}
+
 	var blocked = false;
 	this.rockRowAndCols.forEach(function(rowAndCol) {
 		if (rowAndCol.row === rowNum) {
@@ -1085,6 +1095,10 @@ Board.prototype.rowBlockedByRock = function(rowNum) {
 };
 
 Board.prototype.columnBlockedByRock = function(colNum) {
+	if (rocksUnwheelable) {
+		return false;	// Rocks Unwheelable: Rocks cannot be moved by Wheel but don't disable entire row/col of Harmonies.
+	}
+	
 	var blocked = false;
 	this.rockRowAndCols.forEach(function(rowAndCol) {
 		if (rowAndCol.col === colNum) {

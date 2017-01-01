@@ -6,7 +6,7 @@ var QueryString = function () {
   var query_string = {};
   var query = window.location.search.substring(1);
 
-  if (query.length > 0 && !(query.includes("game=") || query.includes("canon=") || query.includes("newSpecialFlowerRules=") || query.includes("newGatesRule=") || query.includes("newOrchidVulnerableRule=") || query.includes("newOrchidClashRule=") || query.includes("newOrchidCaptureRule=") || query.includes("simpleSpecialFlowerRule="))) {
+  if (query.length > 0 && !(query.includes("game=") || query.includes("canon=") || query.includes("newSpecialFlowerRules=") || query.includes("newGatesRule=") || query.includes("newOrchidVulnerableRule=") || query.includes("newOrchidClashRule=") || query.includes("newOrchidCaptureRule=") || query.includes("simpleSpecialFlowerRule=") || query.includes("rocksUnwheelable=") || query.includes("specialFlowerBonusRule="))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
   	query = LZString.decompressFromEncodedURIComponent(query);
@@ -133,6 +133,16 @@ window.requestAnimationFrame(function () {
 	if (QueryString.simpleSpecialFlowerRule === 'y') {
 		simpleSpecialFlowerRule = true;
 		debug("-- Simplest Special Flower Rule in effect --");
+	}
+
+	if (QueryString.rocksUnwheelable === 'y') {
+		rocksUnwheelable = true;
+		debug("-- Rocks Unwheelable rule in effect --");
+	}
+
+	if (QueryString.specialFlowerBonusRule === 'y') {
+		specialFlowerBonusRule = true;
+		debug("-- Special Flower Bonus Rule rule in effect --");
 	}
 
 	// Load metadata
@@ -430,6 +440,18 @@ function finalizeMove(ignoreNoEmail) {
 		linkUrl += "&simpleSpecialFlowerRule=y";
 	} //else {
 	// 	linkUrl += "&simpleSpecialFlowerRule=n";
+	// }
+
+	if (rocksUnwheelable) {
+		linkUrl += "&rocksUnwheelable=y";
+	} //else {
+	// 	linkUrl += "&rocksUnwheelable=n";
+	// }
+
+	if (specialFlowerBonusRule) {
+		linkUrl += "&specialFlowerBonusRule=y";
+	} //else {
+	// 	linkUrl += "&specialFlowerBonusRule=n";
 	// }
 
 
@@ -876,6 +898,10 @@ function pointClicked(htmlPoint) {
 			theGame.hidePossibleMovePoints();
 			notationBuilder.status = READY_FOR_BONUS;
 		}
+	} else if (notationBuilder.status === READY_FOR_BONUS) {
+		if (specialFlowerBonusRule) {
+			//
+		}
 	}
 }
 
@@ -1189,6 +1215,18 @@ function getLink(forSandbox) {
 		linkUrl += "&simpleSpecialFlowerRule=y";
 	} //else {
 	// 	linkUrl += "&simpleSpecialFlowerRule=n";
+	// }
+
+	if (rocksUnwheelable) {
+		linkUrl += "&rocksUnwheelable=y";
+	} //else {
+	// 	linkUrl += "&rocksUnwheelable=n";
+	// }
+
+	if (specialFlowerBonusRule) {
+		linkUrl += "&specialFlowerBonusRule=y";
+	} //else {
+	// 	linkUrl += "&specialFlowerBonusRule=n";
 	// }
 
 	

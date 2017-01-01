@@ -7,7 +7,8 @@ var newOrchidClashRule = false; // Orchid clashes with all opponent Flowers... I
 var newOrchidVulnerableRule = false;  // Testing new Orchid vulnerable rules
 var newOrchidCaptureRule = false;  // Testing new Orchid capture rules
 var simpleSpecialFlowerRule = false;  // Simplest special flower rule
-var specialFlowerBonusRule = false;
+var specialFlowerBonusRule = false; // Special Flowers can be moved on Harmony Bonus - not implemented
+var rocksUnwheelable = false; // Rocks Unwheelable: Rocks cannot be moved by Wheel but don't disable entire row/col of Harmonies.
 
 var debugOn = true;
 
