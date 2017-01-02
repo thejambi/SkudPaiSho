@@ -773,7 +773,7 @@ Board.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
 	for (var i = 0; i < rowCols.length; i++) {
 		var bp = this.cells[rowCols[i].row][rowCols[i].col];
 		if (bp.hasTile() && !bp.isType(GATE)) {
-			if (bp.tile.ownerName !== orchidOwner && bp.tile.type === BASIC_FLOWER) {
+			if (bp.tile.ownerName !== orchidOwner && bp.tile.type !== ACCENT_TILE) {
 				bp.tile.trapped = true;
 			}
 		}
