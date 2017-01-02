@@ -781,6 +781,10 @@ Board.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
 };
 
 Board.prototype.whiteLotusProtected = function(lotusTile) {
+	if (lotusNoCapture) {
+		return true;
+	}
+
 	if (simpleSpecialFlowerRule) {
 		return true;	// Simplest? Cannot be captured.
 	}
@@ -831,7 +835,7 @@ Board.prototype.orchidVulnerable = function(orchidTile) {
 			row.forEach(function(boardPoint) {
 				if (boardPoint.hasTile() && boardPoint.tile.specialFlowerType === WHITE_LOTUS 
 					&& boardPoint.tile.ownerName !== orchidTile.ownerName) {
-					orchidCanVulnerable = true;
+					orchidVulnerable = true;
 				}
 			});
 		});
@@ -840,6 +844,20 @@ Board.prototype.orchidVulnerable = function(orchidTile) {
 
 	if (simpleSpecialFlowerRule) {
 		return true;	// Simplest? Always vulnerable.
+	}
+
+	if (lotusNoCapture) {
+		// Changing Orchid vulnerable when player has a Blooming Lotus
+		var orchidVulnerable = false;
+		this.cells.forEach(function(row) {
+			row.forEach(function(boardPoint) {
+				if (!boardPoint.isType(GATE) && boardPoint.hasTile() && boardPoint.tile.specialFlowerType === WHITE_LOTUS 
+					&& boardPoint.tile.ownerName === orchidTile.ownerName) {
+					orchidVulnerable = true;
+				}
+			});
+		});
+		return orchidVulnerable;
 	}
 
 	/* ======= Original Rules: ======= */
@@ -863,6 +881,14 @@ Board.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 		return false;	// Cannot capture own tile
 	}
 
+	// Is tile Orchid that can capture?
+	// If so, Orchid can capture basic or special flower
+	if (tile.specialFlowerType === ORCHID && otherTile.type !== ACCENT_TILE) {
+		if (this.orchidCanCapture(tile)) {
+			return true;
+		}
+	}
+
 	// Check otherTile White Lotus protected from capture
 	if (otherTile.specialFlowerType === WHITE_LOTUS) {
 		if (this.whiteLotusProtected(otherTile)) {
@@ -882,14 +908,6 @@ Board.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 	// If vulnerable, it can be captured by basic flower
 	if (otherTile.specialFlowerType === ORCHID && tile.type === BASIC_FLOWER) {
 		if (this.orchidVulnerable(otherTile)) {
-			return true;
-		}
-	}
-
-	// Can Orchid capture?
-	// If so, Orchid can capture basic or special flower
-	if (tile.specialFlowerType === ORCHID && otherTile.type !== ACCENT_TILE) {
-		if (this.orchidCanCapture(tile)) {
 			return true;
 		}
 	}
