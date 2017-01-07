@@ -1007,7 +1007,11 @@ function showTileMessage(tileDiv) {
 			message.push("The Rock cancels Harmonies on horizontal and vertical lines it lies on.");
 		} else if (tileCode === 'W') {
 			heading = "Accent Tile: Wheel";
-			message.push("The Wheel rotates all surrounding tiles one space clockwise (as long as it does not move tiles off the board or onto or off of a Gate).");
+			if (rocksUnwheelable) {
+				message.push("The Wheel rotates all surrounding tiles one space clockwise but cannot affect a Rock (cannot move tiles off the board or onto or off of a Gate).");
+			} else {
+				message.push("The Wheel rotates all surrounding tiles one space clockwise (cannot move tiles off the board or onto or off of a Gate).");
+			}
 		} else if (tileCode === 'K') {
 			heading = "Accent Tile: Knotweed";
 			if (newKnotweedRules) {
@@ -1017,7 +1021,11 @@ function showTileMessage(tileDiv) {
 			}
 		} else if (tileCode === 'B') {
 			heading = "Accent Tile: Boat";
-			message.push("The Boat moves a Flower Tile to a surrounding space or removes a Knotweed tile.");
+			if (rocksUnwheelable) {
+				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Knotweed or Rock tile.");
+			} else {
+				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Knotweed tile.");
+			}
 		} else if (tileCode === 'L') {
 			heading = "Special Flower: White Lotus";
 			message.push("Can move up to 2 spaces");
@@ -1028,7 +1036,7 @@ function showTileMessage(tileDiv) {
 		} else if (tileCode === 'O') {
 			heading = "Special Flower: Orchid";
 			message.push("Can move up to 6 spaces");
-			message.push("Traps opponent's surrounding Basic Flower Tiles so they cannot move");
+			message.push("Traps opponent's surrounding Flower Tiles so they cannot move");
 			message.push("Can capture Flower Tiles if you have a Blooming White Lotus");
 			if (lotusNoCapture) {
 				message.push("Can be captured by any Basic Flower Tile if you have a Blooming White Lotus");

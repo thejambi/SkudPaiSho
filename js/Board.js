@@ -563,8 +563,12 @@ Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 
 	if (boardPoint.tile.type === ACCENT_TILE) {
 		if (boardPoint.tile.accentType !== KNOTWEED) {
-			// debug("Not played on Knotweed tile");
-			return false;
+			if (rocksUnwheelable && boardPoint.tile.accentType !== ROCK) {
+					return false;
+			} else {
+				// debug("Not played on Knotweed tile");
+				return false;
+			}
 		} else {
 			// Ensure no Disharmony
 			var newBoard = this.getCopy();
@@ -605,6 +609,10 @@ Board.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint, ignore
 		for (var i = 0; i < rowCols.length; i++) {
 			var bp = this.cells[rowCols[i].row][rowCols[i].col];
 			bp.restoreTile();
+		}
+		
+		if (rocksUnwheelable) {
+			this.refreshRockRowAndCols();
 		}
 	} else {
 		// Can't move a tile to where it can't normally go
@@ -1099,9 +1107,9 @@ Board.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
 };
 
 Board.prototype.rowBlockedByRock = function(rowNum) {
-	if (rocksUnwheelable) {
-		return false;	// Rocks Unwheelable: Rocks cannot be moved by Wheel but don't disable entire row/col of Harmonies.
-	}
+	// if (rocksUnwheelable) {
+	// 	return false;	// Rocks Unwheelable: Rocks cannot be moved by Wheel but don't disable entire row/col of Harmonies.
+	// }	// Changing Rocks Unwheelable to: Rocks cannot be moved by Wheel but can be removed by Boat.
 
 	var blocked = false;
 	this.rockRowAndCols.forEach(function(rowAndCol) {
@@ -1113,9 +1121,9 @@ Board.prototype.rowBlockedByRock = function(rowNum) {
 };
 
 Board.prototype.columnBlockedByRock = function(colNum) {
-	if (rocksUnwheelable) {
-		return false;	// Rocks Unwheelable: Rocks cannot be moved by Wheel but don't disable entire row/col of Harmonies.
-	}
+	// if (rocksUnwheelable) {
+	// 	return false;	// Rocks Unwheelable: Rocks cannot be moved by Wheel but don't disable entire row/col of Harmonies.
+	// }	// Changing Rocks Unwheelable to: Rocks cannot be moved by Wheel but can be removed by Boat.
 	
 	var blocked = false;
 	this.rockRowAndCols.forEach(function(rowAndCol) {

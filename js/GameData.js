@@ -8,7 +8,7 @@ var newOrchidVulnerableRule = false;  // Testing new Orchid vulnerable rules
 var newOrchidCaptureRule = false;  // Testing new Orchid capture rules
 var simpleSpecialFlowerRule = false;  // Simplest special flower rule
 var specialFlowerBonusRule = false; // Special Flowers can be moved on Harmony Bonus - not implemented
-var rocksUnwheelable = false; // Rocks Unwheelable: Rocks cannot be moved by Wheel but don't disable entire row/col of Harmonies.
+var rocksUnwheelable = false; // Rocks Unwheelable: Rocks cannot be moved by Wheel but can be removed by Boat. OLD: Rocks cannot be moved by Wheel but don't disable entire row/col of Harmonies.
 var lotusNoCapture = true; // Lotus not able to be captured. Always on.
 
 var debugOn = true;
