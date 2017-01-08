@@ -565,7 +565,7 @@ Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 		if (boardPoint.tile.accentType !== KNOTWEED) {
 			if (rocksUnwheelable && boardPoint.tile.accentType !== ROCK) {
 					return false;
-			} else {
+			} else if (!rocksUnwheelable) {
 				// debug("Not played on Knotweed tile");
 				return false;
 			}
