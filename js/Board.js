@@ -1107,9 +1107,9 @@ Board.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
 };
 
 Board.prototype.rowBlockedByRock = function(rowNum) {
-	// if (rocksUnwheelable) {
-	// 	return false;	// Rocks Unwheelable: Rocks cannot be moved by Wheel but don't disable entire row/col of Harmonies.
-	// }	// Changing Rocks Unwheelable to: Rocks cannot be moved by Wheel but can be removed by Boat.
+	if (simpleRocks) {
+		return false;	// simpleRocks: Rocks don't disable Harmonies.
+	}
 
 	var blocked = false;
 	this.rockRowAndCols.forEach(function(rowAndCol) {
@@ -1121,9 +1121,9 @@ Board.prototype.rowBlockedByRock = function(rowNum) {
 };
 
 Board.prototype.columnBlockedByRock = function(colNum) {
-	// if (rocksUnwheelable) {
-	// 	return false;	// Rocks Unwheelable: Rocks cannot be moved by Wheel but don't disable entire row/col of Harmonies.
-	// }	// Changing Rocks Unwheelable to: Rocks cannot be moved by Wheel but can be removed by Boat.
+	if (simpleRocks) {
+		return false;	// simpleRocks: Rocks don't disable Harmonies.
+	}
 	
 	var blocked = false;
 	this.rockRowAndCols.forEach(function(rowAndCol) {

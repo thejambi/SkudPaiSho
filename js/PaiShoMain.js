@@ -140,6 +140,11 @@ window.requestAnimationFrame(function () {
 		debug("-- Rocks Unwheelable rule in effect --");
 	}
 
+	if (QueryString.simpleRocks === 'y') {
+		simpleRocks = true;
+		debug("-- Simple Rocks rule in effect --");
+	}
+
 	if (QueryString.specialFlowerBonusRule === 'y') {
 		specialFlowerBonusRule = true;
 		debug("-- Special Flower Bonus Rule rule in effect --");
@@ -447,6 +452,10 @@ function finalizeMove(ignoreNoEmail) {
 	} //else {
 	// 	linkUrl += "&rocksUnwheelable=n";
 	// }
+
+	if (simpleRocks) {
+		linkUrl += "&simpleRocks=y";
+	}
 
 	if (specialFlowerBonusRule) {
 		linkUrl += "&specialFlowerBonusRule=y";
@@ -1004,11 +1013,19 @@ function showTileMessage(tileDiv) {
 	} else {
 		if (tileCode === 'R') {
 			heading = "Accent Tile: Rock";
-			message.push("The Rock cancels Harmonies on horizontal and vertical lines it lies on.");
+			if (rocksUnwheelable) {
+				if (simpleRocks) {
+					message.push("The Rock blocks Harmonies and cannot be moved by a Wheel.");
+				} else {
+					message.push("The Rock cancels Harmonies on horizontal and vertical lines it lies on. A Rock cannot be moved by a Wheel.");
+				}
+			} else {
+				message.push("The Rock cancels Harmonies on horizontal and vertical lines it lies on.");
+			}
 		} else if (tileCode === 'W') {
 			heading = "Accent Tile: Wheel";
 			if (rocksUnwheelable) {
-				message.push("The Wheel rotates all surrounding tiles one space clockwise but cannot affect a Rock (cannot move tiles off the board or onto or off of a Gate).");
+				message.push("The Wheel rotates all surrounding tiles one space clockwise but cannot move a Rock (cannot move tiles off the board or onto or off of a Gate).");
 			} else {
 				message.push("The Wheel rotates all surrounding tiles one space clockwise (cannot move tiles off the board or onto or off of a Gate).");
 			}
@@ -1022,7 +1039,7 @@ function showTileMessage(tileDiv) {
 		} else if (tileCode === 'B') {
 			heading = "Accent Tile: Boat";
 			if (rocksUnwheelable) {
-				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Knotweed or Rock tile.");
+				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Rock or Knotweed tile.");
 			} else {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Knotweed tile.");
 			}
@@ -1236,6 +1253,10 @@ function getLink(forSandbox) {
 	} //else {
 	// 	linkUrl += "&rocksUnwheelable=n";
 	// }
+
+	if (simpleRocks) {
+		linkUrl += "&simpleRocks=y";
+	}
 
 	if (specialFlowerBonusRule) {
 		linkUrl += "&specialFlowerBonusRule=y";
