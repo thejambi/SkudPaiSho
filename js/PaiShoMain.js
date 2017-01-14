@@ -354,12 +354,20 @@ function pauseRun() {
 
 function getAdditionalMessage() {
 	var msg = "<br />";
+
+	// Is it the player's turn?
+	if (myTurn()) {
+		msg = " (You)" + msg;
+	}
+
 	if (gameNotation.moves.length === 0) {
 		msg += "Select 4 Accent Tiles to play with.";
 	} else if (gameNotation.moves.length === 1) {
 		msg += "Select 4 Accent Tiles to play with, then Plant a Basic Flower Tile.";
 	} else if (gameNotation.moves.length === 2) {
 		msg += "Plant a Basic Flower Tile.";
+	} else if (gameNotation.moves.length === 4) {
+		msg += "Now, make the first move of the game.";
 	}
 
 	//if (theGame.board.winners.length > 0) {
