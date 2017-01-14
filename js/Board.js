@@ -432,7 +432,7 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 			}
 		}
 
-		if (rocksUnwheelable) {
+		if (rocksUnwheelable || simplest) {
 			if (bp.hasTile() && bp.tile.accentType === ROCK) {
 				return false; 	// Can't play Wheel next to Rock
 			}
@@ -562,7 +562,7 @@ Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 	}
 
 	if (boardPoint.tile.type === ACCENT_TILE) {
-		if (boardPoint.tile.accentType !== KNOTWEED) {
+		if (boardPoint.tile.accentType !== KNOTWEED && !simplest) {
 			if (rocksUnwheelable && boardPoint.tile.accentType !== ROCK) {
 					return false;
 			} else if (!rocksUnwheelable) {
@@ -789,7 +789,7 @@ Board.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
 };
 
 Board.prototype.whiteLotusProtected = function(lotusTile) {
-	if (lotusNoCapture) {
+	if (lotusNoCapture || simplest) {
 		return true;
 	}
 
@@ -817,8 +817,8 @@ Board.prototype.whiteLotusProtected = function(lotusTile) {
 };
 
 Board.prototype.orchidCanCapture = function(orchidTile) {
-	if (simpleSpecialFlowerRule) {
-		return true;	// Simplest? Always can capture.
+	if (simpleSpecialFlowerRule || simplest) {
+		return false;	// Simplest? Never can capture.
 	}
 
 	// Note: This method does not check if other tile is protected from capture.
@@ -854,7 +854,7 @@ Board.prototype.orchidVulnerable = function(orchidTile) {
 		return true;	// Simplest? Always vulnerable.
 	}
 
-	if (lotusNoCapture) {
+	if (lotusNoCapture || simplest) {
 		// Changing Orchid vulnerable when player has a Blooming Lotus
 		var orchidVulnerable = false;
 		this.cells.forEach(function(row) {
@@ -1107,7 +1107,7 @@ Board.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
 };
 
 Board.prototype.rowBlockedByRock = function(rowNum) {
-	if (simpleRocks) {
+	if (simpleRocks || simplest) {
 		return false;	// simpleRocks: Rocks don't disable Harmonies.
 	}
 
@@ -1121,7 +1121,7 @@ Board.prototype.rowBlockedByRock = function(rowNum) {
 };
 
 Board.prototype.columnBlockedByRock = function(colNum) {
-	if (simpleRocks) {
+	if (simpleRocks || simplest) {
 		return false;	// simpleRocks: Rocks don't disable Harmonies.
 	}
 	

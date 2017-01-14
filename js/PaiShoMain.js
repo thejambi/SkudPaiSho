@@ -6,7 +6,7 @@ var QueryString = function () {
   var query_string = {};
   var query = window.location.search.substring(1);
 
-  if (query.length > 0 && !(query.includes("game=") || query.includes("canon=") || query.includes("newSpecialFlowerRules=") || query.includes("newGatesRule=") || query.includes("newOrchidVulnerableRule=") || query.includes("newOrchidClashRule=") || query.includes("newOrchidCaptureRule=") || query.includes("simpleSpecialFlowerRule=") || query.includes("rocksUnwheelable=") || query.includes("specialFlowerBonusRule="))) {
+  if (query.length > 0 && !(query.includes("game=") || query.includes("canon=") || query.includes("simplest=") || query.includes("rocksUnwheelable="))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
   	query = LZString.decompressFromEncodedURIComponent(query);
@@ -148,6 +148,11 @@ window.requestAnimationFrame(function () {
 	if (QueryString.specialFlowerBonusRule === 'y') {
 		specialFlowerBonusRule = true;
 		debug("-- Special Flower Bonus Rule rule in effect --");
+	}
+
+	if (QueryString.simplest === 'y') {
+		simplest = true;
+		debug("-- 'Simplest' rules in effect --");
 	}
 
 	// Load metadata
@@ -463,6 +468,10 @@ function finalizeMove(ignoreNoEmail) {
 
 	if (simpleRocks) {
 		linkUrl += "&simpleRocks=y";
+	}
+
+	if (simplest) {
+		linkUrl += "&simplest=y";
 	}
 
 	if (specialFlowerBonusRule) {
@@ -811,7 +820,8 @@ function unplayedTileClicked(tileDiv) {
 }
 
 function pointClicked(htmlPoint) {
-	if (theGame.getWinner() && notationBuilder.status !== WAITING_FOR_BONUS_ENDPOINT) {
+	if (theGame.getWinner() && notationBuilder.status !== WAITING_FOR_BONUS_ENDPOINT 
+			&& notationBuilder.status !== WAITING_FOR_BOAT_BONUS_POINT) {
 		return;
 	}
 	if (!myTurn()) {
@@ -976,6 +986,8 @@ function showTileMessage(tileDiv) {
 
 	var heading = Tile.getTileName(tileCode);
 
+	message.push(tile.ownerName + "'s tile");
+
 	if (tileCode.length > 1) {
 		var colorCode = tileCode.charAt(0);
 		var tileNum = parseInt(tileCode.charAt(1));
@@ -1021,7 +1033,9 @@ function showTileMessage(tileDiv) {
 	} else {
 		if (tileCode === 'R') {
 			heading = "Accent Tile: Rock";
-			if (rocksUnwheelable) {
+			if (simplest) {
+				message.push("The Rock disrupts Harmonies and cannot be moved by a Wheel.");
+			} else if (rocksUnwheelable) {
 				if (simpleRocks) {
 					message.push("The Rock blocks Harmonies and cannot be moved by a Wheel.");
 				} else {
@@ -1032,7 +1046,7 @@ function showTileMessage(tileDiv) {
 			}
 		} else if (tileCode === 'W') {
 			heading = "Accent Tile: Wheel";
-			if (rocksUnwheelable) {
+			if (rocksUnwheelable || simplest) {
 				message.push("The Wheel rotates all surrounding tiles one space clockwise but cannot move a Rock (cannot move tiles off the board or onto or off of a Gate).");
 			} else {
 				message.push("The Wheel rotates all surrounding tiles one space clockwise (cannot move tiles off the board or onto or off of a Gate).");
@@ -1046,7 +1060,9 @@ function showTileMessage(tileDiv) {
 			}
 		} else if (tileCode === 'B') {
 			heading = "Accent Tile: Boat";
-			if (rocksUnwheelable) {
+			if (simplest) {
+				message.push("The Boat moves a Flower Tile to a surrounding space or removes an Accent tile.");
+			} else if (rocksUnwheelable) {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Rock or Knotweed tile.");
 			} else {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Knotweed tile.");
@@ -1055,16 +1071,18 @@ function showTileMessage(tileDiv) {
 			heading = "Special Flower: White Lotus";
 			message.push("Can move up to 2 spaces");
 			message.push("Forms Harmony with all Basic Flower Tiles");
-			if (!lotusNoCapture) {
+			if (!lotusNoCapture && !simplest) {
 				message.push("Can be captured by any Flower Tile");
 			}
 		} else if (tileCode === 'O') {
 			heading = "Special Flower: Orchid";
 			message.push("Can move up to 6 spaces");
 			message.push("Traps opponent's surrounding Flower Tiles so they cannot move");
-			message.push("Can capture Flower Tiles if you have a Blooming White Lotus");
-			if (lotusNoCapture) {
-				message.push("Can be captured by any Basic Flower Tile if you have a Blooming White Lotus");
+			if (!lotusNoCapture && !simplest) {
+				message.push("Can capture Flower Tiles if you have a Blooming White Lotus");
+			}
+			if (lotusNoCapture || simplest) {
+				message.push("Can be captured by any Flower Tile if you have a Blooming White Lotus");
 			} else {
 				message.push("Can be captured by any Basic Flower Tile if your White Lotus has been played");
 			}
@@ -1264,6 +1282,10 @@ function getLink(forSandbox) {
 
 	if (simpleRocks) {
 		linkUrl += "&simpleRocks=y";
+	}
+
+	if (simplest) {
+		linkUrl += "&simplest=y";
 	}
 
 	if (specialFlowerBonusRule) {
