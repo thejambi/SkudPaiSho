@@ -1060,7 +1060,7 @@ function showTileMessage(tileDiv) {
 			}
 		} else if (tileCode === 'B') {
 			heading = "Accent Tile: Boat";
-			if (simplest) {
+			if (simplest || rocksUnwheelable) {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes an Accent tile.");
 			} else if (rocksUnwheelable) {
 				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Rock or Knotweed tile.");

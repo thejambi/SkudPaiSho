@@ -562,7 +562,7 @@ Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 	}
 
 	if (boardPoint.tile.type === ACCENT_TILE) {
-		if (boardPoint.tile.accentType !== KNOTWEED && !simplest) {
+		if (boardPoint.tile.accentType !== KNOTWEED && !simplest && !rocksUnwheelable) {
 			if (rocksUnwheelable && boardPoint.tile.accentType !== ROCK) {
 					return false;
 			} else if (!rocksUnwheelable) {
