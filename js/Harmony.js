@@ -372,10 +372,45 @@ HarmonyManager.prototype.harmonyRingExists = function() {
 	return verifiedHarmonyRingOwners;
 };
 
+HarmonyManager.prototype.ringContains345 = function(ring) {
+	// 
+	var has3 = false;
+	var has4 = false;
+	var has5 = false;
+	for (var i = 0; i < ring.length; i++) {
+		var h = ring[i];
+		if (h.tile1.basicValue === '3') {
+			has3 = true;
+		}
+		if (h.tile1.basicValue === '4') {
+			has4 = true;
+		}
+		if (h.tile1.basicValue === '5') {
+			has5 = true;
+		}
+		if (h.tile2.basicValue === '3') {
+			has3 = true;
+		}
+		if (h.tile2.basicValue === '4') {
+			has4 = true;
+		}
+		if (h.tile2.basicValue === '5') {
+			has5 = true;
+		}
+	}
+
+	return has3 && has4 && has5;
+};
+
 // I think this works.
 HarmonyManager.prototype.verifyHarmonyRing = function(ring) {
 	// Verify harmonies in ring go around center of board
 	// debug("In verifyHarmonyRing()");
+
+	// If completeHarmony rule, ring must contain harmonies of 3, 4, and 5 flower tiles
+	if (completeHarmony && !this.ringContains345(ring)) {
+		return false;
+	}
 
 	// We have to go through the harmonies and create an array of the points of the 'shape' that the harmony ring makes
 	var shapePoints = [];

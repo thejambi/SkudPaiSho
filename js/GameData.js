@@ -12,6 +12,9 @@ var rocksUnwheelable = true; // Rocks Unwheelable: Rocks cannot be moved by Whee
 var lotusNoCapture = true; // Lotus not able to be captured. Always on.
 var simpleRocks = false;  // Rocks don't disable Harmonies.
 var simplest = false; // Simple Accents and Special Flowers.
+var lessBonus = false;  // Can only Plant on Bonus if no Growing Flowers.
+var superHarmonies = false; // Any number flower harmonies with differently numbered flower.
+var completeHarmony = false; // Harmony Ring must contain a 3, 4, and 5
 
 var debugOn = true;
 

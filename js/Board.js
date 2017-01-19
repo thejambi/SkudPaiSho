@@ -1477,6 +1477,19 @@ Board.prototype.playerControlsLessThanTwoGates = function(player) {
 	return count < 2;
 };
 
+Board.prototype.playerHasNoGrowingFlowers = function(player) {
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var bp = this.cells[row][col];
+			if (bp.isType(GATE) && bp.hasTile() && bp.tile.ownerName === player) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+};
+
 Board.prototype.revealSpecialFlowerPlacementPoints = function(player) {
 	// Check each Gate for tile belonging to player, then check gate edge points
 	var bpCheckList = [];

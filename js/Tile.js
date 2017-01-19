@@ -112,6 +112,10 @@ Tile.prototype.formsHarmonyWith = function(otherTile) {
 		// If tiles are different types, then one must be a lotus and the other not
 		return true;
 	}
+
+	if (superHarmonies && this.basicValue !== otherTile.basicValue) {
+		return true;
+	}
 };
 
 Tile.prototype.clashesWith = function(otherTile) {

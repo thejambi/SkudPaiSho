@@ -6,7 +6,12 @@ var QueryString = function () {
   var query_string = {};
   var query = window.location.search.substring(1);
 
-  if (query.length > 0 && !(query.includes("game=") || query.includes("canon=") || query.includes("simplest=") || query.includes("rocksUnwheelable="))) {
+  if (query.length > 0 && !(query.includes("game=") || query.includes("canon=") 
+  	|| query.includes("simplest=") 
+  	|| query.includes("lessBonus=") 
+  	|| query.includes("superHarmonies=") 
+  	|| query.includes("completeHarmony=") 
+  	|| query.includes("rocksUnwheelable="))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
   	query = LZString.decompressFromEncodedURIComponent(query);
@@ -153,6 +158,16 @@ window.requestAnimationFrame(function () {
 	if (QueryString.simplest === 'y') {
 		simplest = true;
 		debug("-- 'Simplest' rules in effect --");
+	}
+
+	if (QueryString.lessBonus === 'y') {
+		lessBonus = true;
+	}
+	if (QueryString.superHarmonies === 'y') {
+		superHarmonies = true;
+	}
+	if (QueryString.completeHarmony === 'y') {
+		completeHarmony = true;
 	}
 
 	// Load metadata
@@ -479,6 +494,16 @@ function finalizeMove(ignoreNoEmail) {
 	} //else {
 	// 	linkUrl += "&specialFlowerBonusRule=n";
 	// }
+
+	if (lessBonus) {
+		linkUrl += "&lessBonus=y";
+	}
+	if (superHarmonies) {
+		linkUrl += "&superHarmonies=y";
+	}
+	if (completeHarmony) {
+		linkUrl += "&completeHarmony=y";
+	}
 
 
 	// Add start date
@@ -901,7 +926,7 @@ function pointClicked(htmlPoint) {
 
 			// If we're placing a boat, and boardPoint is a flower...
 			if (notationBuilder.bonusTileCode.endsWith("B") && boardPoint.tile.type !== ACCENT_TILE) {
-				// Boat played on basic flower, need to pick flower endpoint
+				// Boat played on flower, need to pick flower endpoint
 				notationBuilder.status = WAITING_FOR_BOAT_BONUS_POINT;
 				theGame.revealBoatBonusPoints(boardPoint);
 			} else {
@@ -1078,7 +1103,7 @@ function showTileMessage(tileDiv) {
 			heading = "Special Flower: Orchid";
 			message.push("Can move up to 6 spaces");
 			message.push("Traps opponent's surrounding Flower Tiles so they cannot move");
-			if (!lotusNoCapture && !simplest) {
+			if (!simplest) {
 				message.push("Can capture Flower Tiles if you have a Blooming White Lotus");
 			}
 			if (lotusNoCapture || simplest) {
@@ -1293,6 +1318,16 @@ function getLink(forSandbox) {
 	} //else {
 	// 	linkUrl += "&specialFlowerBonusRule=n";
 	// }
+
+	if (lessBonus) {
+		linkUrl += "&lessBonus=y";
+	}
+	if (superHarmonies) {
+		linkUrl += "&superHarmonies=y";
+	}
+	if (completeHarmony) {
+		linkUrl += "&completeHarmony=y";
+	}
 
 	
 
