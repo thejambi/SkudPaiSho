@@ -15,6 +15,8 @@ var simplest = false; // Simple Accents and Special Flowers.
 var lessBonus = false;  // Can only Plant on Bonus if no Growing Flowers.
 var superHarmonies = false; // Any number flower harmonies with differently numbered flower.
 var completeHarmony = false; // Harmony Ring must contain a 3, 4, and 5
+var superRocks = false;  // Tiles surrounding Rock cannot be moved by Wheel.
+var boatOnlyMoves = false;  // Boat moves all tiles to surrounding space. No removing of Accent Tiles.
 
 var debugOn = true;
 

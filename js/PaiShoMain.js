@@ -11,6 +11,8 @@ var QueryString = function () {
   	|| query.includes("lessBonus=") 
   	|| query.includes("superHarmonies=") 
   	|| query.includes("completeHarmony=") 
+  	|| query.includes("boatOnlyMoves=") 
+  	|| query.includes("superRocks=") 
   	|| query.includes("rocksUnwheelable="))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
@@ -168,6 +170,13 @@ window.requestAnimationFrame(function () {
 	}
 	if (QueryString.completeHarmony === 'y') {
 		completeHarmony = true;
+	}
+
+	if (QueryString.boatOnlyMoves === 'y') {
+		boatOnlyMoves = true;
+	}
+	if (QueryString.superRocks === 'y') {
+		superRocks = true;
 	}
 
 	// Load metadata
@@ -503,6 +512,13 @@ function finalizeMove(ignoreNoEmail) {
 	}
 	if (completeHarmony) {
 		linkUrl += "&completeHarmony=y";
+	}
+	
+	if (boatOnlyMoves) {
+		linkUrl += "&boatOnlyMoves=y";
+	}
+	if (superRocks) {
+		linkUrl += "&superRocks=y";
 	}
 
 
@@ -925,7 +941,7 @@ function pointClicked(htmlPoint) {
 			notationBuilder.bonusEndPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
 			// If we're placing a boat, and boardPoint is a flower...
-			if (notationBuilder.bonusTileCode.endsWith("B") && boardPoint.tile.type !== ACCENT_TILE) {
+			if (notationBuilder.bonusTileCode.endsWith("B") && (boatOnlyMoves || boardPoint.tile.type !== ACCENT_TILE)) {
 				// Boat played on flower, need to pick flower endpoint
 				notationBuilder.status = WAITING_FOR_BOAT_BONUS_POINT;
 				theGame.revealBoatBonusPoints(boardPoint);
@@ -1329,6 +1345,12 @@ function getLink(forSandbox) {
 		linkUrl += "&completeHarmony=y";
 	}
 
+	if (boatOnlyMoves) {
+		linkUrl += "&boatOnlyMoves=y";
+	}
+	if (superRocks) {
+		linkUrl += "&superRocks=y";
+	}
 	
 
 	// Add start date

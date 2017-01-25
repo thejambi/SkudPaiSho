@@ -438,6 +438,17 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 			}
 		}
 
+		if (superRocks && bp.hasTile()) {
+			// Tiles surrounding Rock cannot be moved by Wheel
+			var moreRowCols = this.getSurroundingRowAndCols(bp);
+			for (var j = 0; j < moreRowCols.length; j++) {
+				var otherBp = this.cells[moreRowCols[j].row][moreRowCols[j].col];
+				if (otherBp.hasTile() && otherBp.tile.accentType === ROCK) {
+					return false;
+				}
+			}
+		}
+
 		// If a tile would be affected, verify the target
 		if (bp.hasTile()) {
 			var targetRowCol = this.getClockwiseRowCol(boardPoint, rowCols[i]);
@@ -561,10 +572,10 @@ Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 		return false;
 	}
 
-	if (boardPoint.tile.type === ACCENT_TILE) {
+	if (boardPoint.tile.type === ACCENT_TILE && !boatOnlyMoves) {
 		if (boardPoint.tile.accentType !== KNOTWEED && !simplest && !rocksUnwheelable) {
 			if (rocksUnwheelable && boardPoint.tile.accentType !== ROCK) {
-					return false;
+				return false;
 			} else if (!rocksUnwheelable) {
 				// debug("Not played on Knotweed tile");
 				return false;
@@ -593,7 +604,7 @@ Board.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint, ignore
 		return false;
 	}
 
-	if (boardPoint.tile.type === ACCENT_TILE) {
+	if (boardPoint.tile.type === ACCENT_TILE && !boatOnlyMoves) {
 		// Validated as Knotweed
 
 		// Options for Boat behavior. Uncomment ONE
