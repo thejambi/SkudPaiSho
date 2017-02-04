@@ -13,6 +13,7 @@ var QueryString = function () {
   	|| query.includes("completeHarmony=") 
   	|| query.includes("boatOnlyMoves=") 
   	|| query.includes("superRocks=") 
+  	|| query.includes("sameStart=") 
   	|| query.includes("rocksUnwheelable="))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
@@ -177,6 +178,9 @@ window.requestAnimationFrame(function () {
 	}
 	if (QueryString.superRocks === 'y') {
 		superRocks = true;
+	}
+	if (QueryString.sameStart === 'y') {
+		sameStart = true;
 	}
 
 	// Load metadata
@@ -520,6 +524,9 @@ function finalizeMove(ignoreNoEmail) {
 	if (superRocks) {
 		linkUrl += "&superRocks=y";
 	}
+	if (sameStart) {
+		linkUrl += "&sameStart=y";
+	}
 
 
 	// Add start date
@@ -603,7 +610,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		//messageText += "<span class='skipBonus' onclick='playAiTurn();'>Submit move to AI</span>";
 		messageText += "<em>THINKING...</em>";
 	} else if (activeAi) {
-		messageText += "Your turn";
+		messageText += "Your turn. Playing against the computer can help you learn how the game works.<br /><br />Is playing against the computer too easy? Good, you know what you're doing! <a href='http://skudpaisho.com/?BYewzgLgvGDWCuATADgQwJZlAAQOYFsMAbAOgGMR8AyXVfAUygAYAJEgJQBoB1TgaU4AhKgDt6AdwDKyemXSoiAMSIhx9AE7t4RemCgjREgOKoIurTqgBPKupBlYYAKojxwevSKoARpZtgAEVNGACYmAEYAdgBaJhDYgBYgA'>Join the creator in a game</a> to play a real game or give any suggestions you might have.";
 	} else {
 		messageText += "Copy this <a href=\"" + shortUrl + "\">link</a> and send to the " + getCurrentPlayer() + ".";
 	}

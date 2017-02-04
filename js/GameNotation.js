@@ -184,7 +184,7 @@ NotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
 	builder.moveType = PLANTING;
 	builder.plantedFlowerType = Tile.getClashTileCode(tileCode);
 
-	if (simpleCanonRules) {
+	if (simpleCanonRules || sameStart) {
 		builder.plantedFlowerType = tileCode;
 	}
 
