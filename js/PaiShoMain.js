@@ -14,6 +14,9 @@ var QueryString = function () {
   	|| query.includes("boatOnlyMoves=") 
   	|| query.includes("superRocks=") 
   	|| query.includes("sameStart=") 
+  	|| query.includes("tournamentHost=") 
+  	|| query.includes("tournamentName=") 
+  	|| query.includes("tournamentMatchNotes=") 
   	|| query.includes("rocksUnwheelable="))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
@@ -43,6 +46,7 @@ return query_string;
 }();
 
 localEmailKey = "localUserEmail";
+tileDesignTypeKey = "tileDesignTypeKey";
 
 var url;
 
@@ -83,6 +87,14 @@ var metadata = new Object();
 
 window.requestAnimationFrame(function () {
 	localStorage = new LocalStorage().storage;
+
+	if (!localStorage.getItem(tileDesignTypeKey)) {
+		useHLoweTiles = true;
+	} else if (localStorage.getItem(tileDesignTypeKey) === "hlowe") {
+		useHLoweTiles = true;
+	} else {
+		useHLoweTiles = false;
+	}
 
 	url = window.location.href.split('?')[0];
 	sandboxUrl = url;
@@ -186,6 +198,9 @@ window.requestAnimationFrame(function () {
 	// Load metadata
 	metadata.startDate = QueryString.sDate;
 	metadata.endDate = QueryString.eDate;
+	metadata.tournamentName = QueryString.tournamentName;
+	metadata.tournamentHost = QueryString.tournamentHost;
+	metadata.tournamentMatchNotes = QueryString.tournamentMatchNotes;
 	// --- //
 
 	gameNotation = new GameNotation();
@@ -232,8 +247,32 @@ window.requestAnimationFrame(function () {
 	clearMessage();
 });
 
+function setUseHLoweTiles() {
+	localStorage.setItem(tileDesignTypeKey, "hlowe");
+	useHLoweTiles = true;
+	theGame.actuate();
+}
+
+function setUseStandardTiles() {
+	localStorage.setItem(tileDesignTypeKey, "standard");
+	useHLoweTiles = false;
+	theGame.actuate();
+}
+
+function toggleTileDesigns() {
+	if (useHLoweTiles) {
+		setUseStandardTiles();
+	} else {
+		setUseHLoweTiles();
+	}
+}
+
 function promptEmail() {
 	var ans = prompt("Please enter your email address:");
+
+	if (ans) {
+		ans = ans.trim();
+	}
 
 	if (localPlayerRole === HOST) {
 		if (ans) {
@@ -535,6 +574,13 @@ function finalizeMove(ignoreNoEmail) {
 	}
 	linkUrl += "&sDate=" + metadata.startDate;
 
+	// Add tournament info
+	if (metadata.tournamentName && metadata.tournamentHost) {
+		linkUrl += "&tournamentName=" + metadata.tournamentName;
+		linkUrl += "&tournamentHost=" + metadata.tournamentHost;
+		linkUrl += "&tournamentMatchNotes" + metadata.tournamentMatchNotes;
+	}
+
 	//if (theGame.board.winners.length > 0) {
 	if (theGame.getWinner()) {
 		// Add end date
@@ -548,12 +594,7 @@ function finalizeMove(ignoreNoEmail) {
 	// Compress, then build full URL
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
-	// if opponent is me, use calebhugo.com url
-	if (getCurrentPlayerEmail() === "skudpaisho@gmail.com" && !url.startsWith("file")) {
-		linkUrl = "http://skudpaisho.calebhugo.com/" + "?" + linkUrl;
-	} else {
-		linkUrl = url + "?" + linkUrl;
-	}
+	linkUrl = url + "?" + linkUrl;
 
 	// if (theGame.board.winners.length > 0) {
 	if (theGame.getWinner()) {
@@ -576,6 +617,11 @@ function finalizeMove(ignoreNoEmail) {
 function showSubmitMoveForm(url) {
 	// Move has completed, so need to send to "current player"
 	var toEmail = getCurrentPlayerEmail();
+
+	if (metadata.tournamentHost) {
+		toEmail += ", " + metadata.tournamentHost;
+	}
+	
 	var fromEmail = getUserEmail();
 
 	var bodyMessage = getEmailBody(url);
@@ -678,9 +724,17 @@ function getOpponentPlayerEmail() {
 }
 
 function getEmailBody(url) {
-	return "I just made move #" + gameNotation.getLastMoveNumber() + " in Skud Pai Sho! Click here to open our game: " + url
-		+ "[BR][BR]---- Full Details: ----[BR]Move: " + gameNotation.getLastMoveText() 
+	var bodyMessage = "I just made move #" + gameNotation.getLastMoveNumber() + " in Skud Pai Sho! Click here to open our game: " + url;
+
+	if (metadata.tournamentName) {
+		bodyMessage += "[BR][BR]This is a move submission for tournament: " + metadata.tournamentName;
+		bodyMessage += "[BR]Match Info:[BR]" + metadata.tournamentMatchNotes;
+	}
+	
+	bodyMessage += "[BR][BR]---- Full Details: ----[BR]Move: " + gameNotation.getLastMoveText() 
 		+ "[BR][BR]Game Notation: [BR]" + gameNotation.getNotationForEmail();
+
+	return bodyMessage;
 }
 
 function getCurrentPlayer() {
@@ -1010,6 +1064,8 @@ function clearMessage() {
 	if (!haveUserEmail()) {
 		document.querySelector(".helpText").innerHTML += "<p>If you <span class='skipBonus' onclick='promptEmail()'>enter your email address</span>, you can be notified when your opponent plays a move.</p>";
 	}
+
+	document.querySelector(".helpText").innerHTML += getAltTilesOptionText();
 }
 
 function haveUserEmail() {
@@ -1199,8 +1255,12 @@ function setMessage(msg) {
 	if (msg === document.querySelector(".helpText").innerHTML) {
 		clearMessage();
 	} else {
-		document.querySelector(".helpText").innerHTML = msg;
+		document.querySelector(".helpText").innerHTML = msg + getAltTilesOptionText();
 	}
+}
+
+function getAltTilesOptionText() {
+	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between standard and modern tile designs.</p>";
 }
 
 function toHeading(str) {
@@ -1473,6 +1533,10 @@ function getDateString() {
 	let date = new Date();
 	date = date.toISOString().slice(0,10);
 	return date;
+}
+
+function hostTournamentClicked() {
+	//
 }
 
 

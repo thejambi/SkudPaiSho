@@ -90,7 +90,12 @@ Actuator.prototype.addTile = function(tile, mainContainer) {
 	}
 
 	var theImg = document.createElement("img");
-	theImg.src = "images/" + tile.getImageName() + ".png";
+	
+	var srcValue = "images/";
+	if (useHLoweTiles) {
+		srcValue += "hlowe/";
+	}
+	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
 
 	theDiv.setAttribute("name", tile.getImageName());
@@ -144,7 +149,11 @@ Actuator.prototype.addBoardPoint = function(boardPoint) {
 		
 		var theImg = document.createElement("img");
 
-		theImg.src = "images/" + boardPoint.tile.getImageName() + ".png";
+		var srcValue = "images/";
+		if (useHLoweTiles) {
+			srcValue += "hlowe/";
+		}
+		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 		
 		if (boardPoint.tile.inHarmony) {
 			theDiv.classList.add(boardPoint.tile.ownerName + "harmony");
