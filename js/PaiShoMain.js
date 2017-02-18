@@ -641,7 +641,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 
 	var messageText = "";
 
-	if (currentMoveIndex == 1) {
+	if (currentMoveIndex == 1 && !haveBothEmails()) {
 		messageText += "Thank you for Hosting a game of Pai Sho! Share <a href=\"" + shortUrl + "\">this link</a> with your friends to invite them to join you in a game."
 		if (aiList.length > 0) {
 			for (var i = 0; i < aiList.length; i++) {
