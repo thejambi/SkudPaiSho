@@ -924,8 +924,8 @@ Board.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 
 	// Orchid checks
 	// Can otherTile Orchid be captured?
-	// If vulnerable, it can be captured by basic flower
-	if (otherTile.specialFlowerType === ORCHID && tile.type === BASIC_FLOWER) {
+	// If vulnerable, it can be captured by any flower tile
+	if (otherTile.specialFlowerType === ORCHID && tile.type !== ACCENT_TILE) {
 		if (this.orchidVulnerable(otherTile)) {
 			return true;
 		}
