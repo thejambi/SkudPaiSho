@@ -578,7 +578,7 @@ function finalizeMove(ignoreNoEmail) {
 	if (metadata.tournamentName && metadata.tournamentHost) {
 		linkUrl += "&tournamentName=" + metadata.tournamentName;
 		linkUrl += "&tournamentHost=" + metadata.tournamentHost;
-		linkUrl += "&tournamentMatchNotes" + metadata.tournamentMatchNotes;
+		linkUrl += "&tournamentMatchNotes=" + metadata.tournamentMatchNotes;
 	}
 
 	//if (theGame.board.winners.length > 0) {
