@@ -912,7 +912,8 @@ function unplayedTileClicked(tileDiv) {
 		}
 	} else {
 		theGame.hidePossibleMovePoints();
-		if (notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT) {
+		if (notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT 
+			|| notationBuilder.status === WAITING_FOR_BOAT_BONUS_POINT) {
 			notationBuilder.status = READY_FOR_BONUS;
 			showHarmonyBonusMessage();
 		} else {
