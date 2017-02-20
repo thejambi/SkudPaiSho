@@ -650,7 +650,9 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		}
 	} else if (haveBothEmails()) {
 		// messageText = "Click <span class='skipBonus' onclick=sendMail('" + shortUrl + "')>here</span> to email your move to the " + getCurrentPlayer() + ". Or, share this <a href=\"" + shortUrl + "\">link</a> with them.";
-		messageText += "Or, copy and share this <a href=\"" + shortUrl + "\">link</a> with your opponent.";
+		if (!metadata.tournamentName) {
+			messageText += "Or, copy and share this <a href=\"" + shortUrl + "\">link</a> with your opponent.";
+		}
 		showSubmitMoveForm(shortUrl);
 	} else if ((activeAi && getCurrentPlayer() === activeAi.player) || (activeAi2 && getCurrentPlayer() === activeAi2.player)) {
 		//messageText += "<span class='skipBonus' onclick='playAiTurn();'>Submit move to AI</span>";
