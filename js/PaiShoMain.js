@@ -1068,7 +1068,9 @@ function clearMessage() {
 		document.querySelector(".helpText").innerHTML += "<p>If you <span class='skipBonus' onclick='promptEmail()'>enter your email address</span>, you can be notified when your opponent plays a move.</p>";
 	}
 
-	document.querySelector(".helpText").innerHTML += getAltTilesOptionText();
+	document.querySelector(".helpText").innerHTML = getTournamentText() 
+		+ document.querySelector(".helpText").innerHTML
+		+ getAltTilesOptionText();
 }
 
 function haveUserEmail() {
@@ -1258,12 +1260,19 @@ function setMessage(msg) {
 	if (msg === document.querySelector(".helpText").innerHTML) {
 		clearMessage();
 	} else {
-		document.querySelector(".helpText").innerHTML = msg + getAltTilesOptionText();
+		document.querySelector(".helpText").innerHTML = getTournamentText() + msg + getAltTilesOptionText();
 	}
 }
 
 function getAltTilesOptionText() {
 	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between standard and modern tile designs.</p>";
+}
+
+function getTournamentText() {
+	if (metadata.tournamentMatchNotes) {
+		return metadata.tournamentName + "<br />" + metadata.tournamentMatchNotes + "<br />";
+	}
+	return "";
 }
 
 function toHeading(str) {
