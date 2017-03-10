@@ -658,7 +658,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		//messageText += "<span class='skipBonus' onclick='playAiTurn();'>Submit move to AI</span>";
 		messageText += "<em>THINKING...</em>";
 	} else if (activeAi) {
-		messageText += "Playing against the computer can help you learn how the game works. You should be able to beat the computer easily once you understand the game.<br /><br />Is playing against the computer too easy? Good! <a href='http://skudpaisho.com/?BYewzgLgvGDWCuATADgQwJZlAAQOYFsMAbAOgGMR8AyXVfAUygAYAJEgJQBoB1TgaU4AhKgDt6AdwDKyemXSoiAMSIhx9AE7t4RemCgjREgOKoIurTqgBPKupBlYYAKojxwevSKoARpZtgAEVNGACYmAEYAdgBaJhDYgBYgA'>Join the creator in a game</a> to play a real game or sign up for the upcoming tournament!";
+		messageText += "Playing against the computer can help you learn how the game works. You should be able to beat the computer easily once you understand the game.<br /><br />Is playing against the computer too easy? Good! <a href='http://skudpaisho.com/?BYewzgLgvGDWCuATADgQwJZlAAQOYFsMAbAOgGMR8AyXVfAUygAYAJEgJQBoB1TgaU4AhKgDt6AdwDKyemXSoiAMSIhx9AE7t4RemCgjREgOKoIurTqgBPKupBlYYAKojxwevSKoARpZtgAEVNGACYmAEYAdgBaJhDYgBYgA'>Join the creator in a game</a> to play a real game or give feedback.";
 	} else {
 		messageText += "Copy this <a href=\"" + shortUrl + "\">link</a> and send to the " + getCurrentPlayer() + ".";
 	}
@@ -1177,7 +1177,7 @@ function showTileMessage(tileDiv) {
 		} else if (tileCode === 'L') {
 			heading = "Special Flower: White Lotus";
 			message.push("Can move up to 2 spaces");
-			message.push("Forms Harmony with all Basic Flower Tiles");
+			message.push("Forms Harmony with all Basic Flower Tiles of either player");
 			if (!lotusNoCapture && !simplest) {
 				message.push("Can be captured by any Flower Tile");
 			}
