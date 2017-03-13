@@ -1437,6 +1437,13 @@ function getLink(forSandbox) {
 		linkUrl += "&sDate=" + metadata.startDate;
 	}
 
+	// Add tournament info
+	if (metadata.tournamentName && metadata.tournamentHost) {
+		linkUrl += "&tournamentName=" + metadata.tournamentName;
+		linkUrl += "&tournamentHost=" + metadata.tournamentHost;
+		linkUrl += "&tournamentMatchNotes=" + metadata.tournamentMatchNotes;
+	}
+
 	//if (theGame.board.winners.length > 0) {
 	if (theGame.getWinner()) {
 		// Add end date
