@@ -1438,7 +1438,7 @@ function getLink(forSandbox) {
 	}
 
 	// Add tournament info
-	if (metadata.tournamentName && metadata.tournamentHost) {
+	if (!forSandbox && metadata.tournamentName && metadata.tournamentHost) {
 		linkUrl += "&tournamentName=" + metadata.tournamentName;
 		linkUrl += "&tournamentHost=" + metadata.tournamentHost;
 		linkUrl += "&tournamentMatchNotes=" + metadata.tournamentMatchNotes;
