@@ -294,7 +294,10 @@ function updateFooter() {
 	var userEmail = localStorage.getItem(localEmailKey);
 	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
 		document.querySelector(".footer").innerHTML = gamePlayersMessage() + "You are playing as " + userEmail
-		+ " | <span class='skipBonus' onclick='promptEmail();'>Edit email</span> | <span class='skipBonus' onclick='forgetEmail();'>Forget email</span>"
+		+ " | <span class='skipBonus' onclick='promptEmail();'>Edit email</span> | <span class='skipBonus' onclick='forgetEmail();'>Forget email</span>";
+		if (userEmail === "skudpaisho@gmail.com") {
+			document.querySelector(".footer").innerHTML += "<br /><span class='skipBonus' onclick='getPublicTournamentLink();'>GetLink</span>";
+		}
 	} else {
 		document.querySelector(".footer").innerHTML = gamePlayersMessage() + defaultEmailMessageText;
 	}
@@ -1335,6 +1338,11 @@ function getGatePointMessage() {
 	return msg;
 }
 
+function getPublicTournamentLink() {
+	hostEmail = null;
+	guestEmail = null;
+	getLink(false);
+}
 
 function getLink(forSandbox) {
 	var notation = new GameNotation();
