@@ -541,6 +541,12 @@ HarmonyManager.prototype.isCenterInsideShape = function(shapePoints) {
 			return false;
 		}
 
+		// If one of the points is 0,0 that won't count...
+		if ((xi === 0 && yi === 0) || (xj === 0 && yj === 0)) {
+			debug("On center point, cannot count");
+			return false;
+		}
+
 		var intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
 		if (intersect) {
 			inside = !inside;
