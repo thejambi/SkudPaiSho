@@ -447,5 +447,5 @@ input[type=submit] {
 
 
 .tilePileContainer div div {
-  zoom: 1.7;
+  transform: scale(1.6);
 }
