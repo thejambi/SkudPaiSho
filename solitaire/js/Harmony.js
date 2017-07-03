@@ -239,7 +239,7 @@ HarmonyManager.prototype.getSolitaireGameSummaryText = function() {
 	*/
 	harmonyPoints = this.getHarmonyPointsForPlayer(player, this.harmonies);
 	clashPoints = this.getHarmonyPointsForPlayer(player, this.clashes);
-	var complexScore = harmonyPoints - Math.abs(harmonyPoints - clashPoints);
+	var complexScore = harmonyPoints > clashPoints ? clashPoints : harmonyPoints;
 
 	return message + "<br /><br />" 
 			+ harmonyPoints + " Harmony Points <br />" 

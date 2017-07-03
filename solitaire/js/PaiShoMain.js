@@ -703,7 +703,7 @@ function getShortUrl(url, callback) {
 
 function clearMessage() {
 	if (!defaultHelpMessageText) {
-		defaultHelpMessageText = "<h4>Solitaire Pai Sho</h4> <p>Pai Sho is a game of harmony. The goal of Solitaire Pai Sho is to place Flower Tiles to create a balance of Harmony and Disharmony on the board.</p> <p>Select tiles or points on the board to learn more or <a href='https://skudpaisho.wordpress.com/pai-sho-resources/'>view the resources page</a> for the rules, a print and play Pai Sho set, and more!</p>";
+		defaultHelpMessageText = "<h4>Solitaire Pai Sho</h4> <p>Pai Sho is a game of harmony. The goal of Solitaire Pai Sho is to place Flower Tiles to create a balance of Harmony and Disharmony on the board.</p> <p>Each turn, you are given a tile that's been drawn for you to place on the board. When all the tiles have been played, the game ends and your score will be calculated.</p> <p><a href='https://skudpaisho.wordpress.com/pai-sho-resources/'>View the resources page</a> for the rules, a print and play Pai Sho set, and more!</p>";
 	}
 	document.querySelector(".helpText").innerHTML = defaultHelpMessageText;
 	if (!haveUserEmail()) {
@@ -737,8 +737,18 @@ function showTileMessage(tileDiv) {
 
 	var heading = Tile.getTileName(tileCode);
 
-	message.push(tile.ownerName + "'s tile");
+	// message.push(tile.ownerName + "'s tile");
 
+	addTileSummaryToMessageArr(message, tileCode);
+
+	if (message.length > 1) {
+		setMessage(toHeading(heading) + toBullets(message));
+	} else {
+		setMessage(toHeading(heading) + toMessage(message));
+	}
+}
+
+function addTileSummaryToMessageArr(message, tileCode) {
 	if (tileCode.length > 1) {
 		var colorCode = tileCode.charAt(0);
 		var tileNum = parseInt(tileCode.charAt(1));
@@ -777,10 +787,10 @@ function showTileMessage(tileDiv) {
 		}
 		var clashTile = Tile.getTileName(harmTileColor + harmTileNum);
 
-		message.push("Basic Flower Tile");
-		message.push("Can move up to " + tileNum + " spaces");
-		message.push("Forms Harmony with " + harmTile1 + " and " + harmTile2);
-		message.push("Clashes with " + clashTile);
+		// message.push("Basic Flower Tile");
+		// message.push("Can move up to " + tileNum + " spaces");
+		message.push("Forms Harmony with " + harmTile1 + ", " + harmTile2 + ", and the Lotus");
+		message.push("Forms Disharmony with " + clashTile + " and the Orchid");
 	} else {
 		if (tileCode === 'R') {
 			heading = "Accent Tile: Rock";
@@ -820,19 +830,14 @@ function showTileMessage(tileDiv) {
 			}
 		} else if (tileCode === 'L') {
 			heading = "Special Flower: White Lotus";
-			message.push("Can move up to 2 spaces");
-			message.push("Forms Harmony with all Basic Flower Tiles of either player");
+			// message.push("Can move up to 2 spaces");
+			message.push("Forms Harmony with all Flower Tiles");
 		} else if (tileCode === 'O') {
 			heading = "Special Flower: Orchid";
-			message.push("Can move up to 6 spaces");
-			message.push("Traps opponent's surrounding Flower Tiles so they cannot move");
+			// message.push("Can move up to 6 spaces");
+			// message.push("Traps opponent's surrounding Flower Tiles so they cannot move");
+			message.push("Forms Disharmony will all Flower Tiles");
 		}
-	}
-
-	if (message.length > 1) {
-		setMessage(toHeading(heading) + toBullets(message));
-	} else {
-		setMessage(toHeading(heading) + toMessage(message));
 	}
 }
 
@@ -852,6 +857,8 @@ function showPointMessage(htmlPoint) {
 		* In Harmony with Chrysanthemum to the north
 		* Trapped by Orchid
 		*/
+		// Get tile summary message and then Harmony summary
+		addTileSummaryToMessageArr(message, boardPoint.tile.code);
 		var tileHarmonies = theGame.board.harmonyManager.getHarmoniesWithThisTile(boardPoint.tile);
 		if (tileHarmonies.length > 0) {
 			var bullets = [];
@@ -873,13 +880,13 @@ function showPointMessage(htmlPoint) {
 			message.push("<strong>Currently in Disharmony with: </strong>" + toBullets(bullets));
 		}
 
-		// Drained? Trapped? Anything else?
-		if (boardPoint.tile.drained) {
-			message.push("Currently <em>drained</em> by a Knotweed.");
-		}
-		if (boardPoint.tile.trapped) {
-			message.push("Currently <em>trapped</em> by an Orchid.")
-		}
+		// Drained? Trapped? Anything else? Commenting out for Solitaire
+		// if (boardPoint.tile.drained) {
+		// 	message.push("Currently <em>drained</em> by a Knotweed.");
+		// }
+		// if (boardPoint.tile.trapped) {
+		// 	message.push("Currently <em>trapped</em> by an Orchid.")
+		// }
 	} else {
 		if (boardPoint.isType(NEUTRAL)) {
 			message.push(getNeutralPointMessage());
@@ -890,7 +897,7 @@ function showPointMessage(htmlPoint) {
 		} else if (boardPoint.isType(WHITE)) {
 			message.push(getWhitePointMessage());
 		} else if (boardPoint.isType(GATE)) {
-			message.push(getGatePointMessage());
+			message.push(getNeutralPointMessage());
 		}
 	}
 
@@ -945,7 +952,7 @@ function toBullets(paragraphs) {
 function getNeutralPointMessage() {
 	var msg = "<h4>Neutral Point</h4>";
 	msg += "<ul>";
-	msg += "<li>This point is Neutral, so any tile can land here.</li>";
+	msg += "<li>This point is Neutral, so any tile can be placed here.</li>";
 	msg += "<li>If a tile that is on a point touches a Neutral area of the board, that point is considered Neutral.</li>";
 	msg += "</ul>";
 	return msg;
@@ -953,19 +960,19 @@ function getNeutralPointMessage() {
 
 function getRedPointMessage() {
 	var msg = "<h4>Red Point</h4>";
-	msg += "<p>This point is Red, so Basic White Flower Tiles are not allowed to land here.</p>";
+	msg += "<p>This point is Red, so Basic White Flower Tiles are not allowed to be placed here.</p>";
 	return msg;
 }
 
 function getWhitePointMessage() {
 	var msg = "<h4>White Point</h4>";
-	msg += "<p>This point is White, so Basic Red Flower Tiles are not allowed to land here.</p>";
+	msg += "<p>This point is White, so Basic Red Flower Tiles are not allowed to be placed here.</p>";
 	return msg;
 }
 
 function getRedWhitePointMessage() {
 	var msg = "<h4>Red/White Point</h4>";
-	msg += "<p>This point is both Red and White, so any tile is allowed to land here.</p>";
+	msg += "<p>This point is both Red and White, so any tile is allowed to be placed here.</p>";
 	return msg;
 }
 
