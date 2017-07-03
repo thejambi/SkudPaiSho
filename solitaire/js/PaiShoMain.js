@@ -52,6 +52,7 @@ var defaultEmailMessageText;
 var localStorage;
 
 var drawnTile;
+var lastDrawnTile; // Save for Undo
 
 // var hostAccentTiles = [];
 // var guestAccentTiles = [];
@@ -545,18 +546,20 @@ function showHarmonyBonusMessage() {
 }
 
 function getResetMoveText() {
-	return "<br /><br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
+	return "<br /><br /><span class='skipBonus' onclick='undoMove();'>Undo move</span>";
 }
 
 function showResetMoveMessage() {
 	document.querySelector(".gameMessage").innerHTML += getResetMoveText();
 }
 
-function resetMove() {
-	if (notationBuilder.status === BRAND_NEW) {
-		// Remove last move
-		gameNotation.removeLastMove();
-	}
+function undoMove() {
+	// Remove last move
+	gameNotation.removeLastMove();
+
+	theGame.tileManager.putTileBack(drawnTile);
+
+	drawnTile = lastDrawnTile;
 
 	rerunAll();
 	// $('#contactform').addClass('gone');
@@ -671,6 +674,7 @@ function pointClicked(htmlPoint) {
 
 function drawRandomTile() {
 	if (!theGame.getWinner()) {
+		lastDrawnTile = drawnTile;
 		drawnTile = theGame.drawRandomTile();
 	}
 }

@@ -183,15 +183,15 @@ TileManager.prototype.unselectTiles = function(player) {
 	});
 }
 
-// TileManager.prototype.putTileBack = function(tile) {
-// 	var player = tile.ownerName;
-// 	var tilePile = this.tiles;
-// 	if (player === GUEST) {
-// 		tilePile = this.tiles;
-// 	}
+TileManager.prototype.putTileBack = function(tile) {
+	var player = tile.ownerName;
+	var tilePile = this.tiles;
+	if (player === GUEST) {
+		tilePile = this.tiles;
+	}
 
-// 	tilePile.push(tile);
-// };
+	tilePile.push(tile);
+};
 
 TileManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
 	// Check Host
