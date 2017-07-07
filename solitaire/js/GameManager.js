@@ -64,7 +64,8 @@ GameManager.prototype.runNotationMove = function(move, withActuate) {
 	this.endGameWinners = [];
 	if (this.board.winners.length === 0) {
 		// If no harmony ring winners, check for player out of basic flower tiles
-		var playerOutOfTiles = this.aPlayerIsOutOfBasicFlowerTiles();
+		// For Solitaire: end game when a player out of all tiles
+		var playerOutOfTiles = this.tileManager.aPlayerIsOutOfTiles();
 		if (playerOutOfTiles) {
 			debug("PLAYER OUT OF TILES: " + playerOutOfTiles);
 			// If a player has more accent tiles, they win
@@ -153,10 +154,6 @@ GameManager.prototype.revealPossiblePlacementPoints = function(tile) {
 GameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
 	this.board.revealBoatBonusPoints(boardPoint);
 	this.actuate();
-};
-
-GameManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
-	return this.tileManager.aPlayerIsOutOfBasicFlowerTiles();
 };
 
 GameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playerName) {

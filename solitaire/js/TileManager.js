@@ -193,31 +193,11 @@ TileManager.prototype.putTileBack = function(tile) {
 	tilePile.push(tile);
 };
 
-TileManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
-	// Check Host
-	var hostHasBasic = false;
-	for (var i = 0; i < this.tiles.length; i++) {
-		if (this.tiles[i].type === BASIC_FLOWER) {
-			hostHasBasic = true;
-			break;
-		}
-	}
+TileManager.prototype.aPlayerIsOutOfTiles = function() {
+	var guestHasTiles = this.tiles.length > 0;
+	var hostHasTiles = guestHasTiles;
 
-	var guestHasBasic = false;
-	for (var i = 0; i < this.tiles.length; i++) {
-		if (this.tiles[i].type === BASIC_FLOWER) {
-			guestHasBasic = true;
-			break;
-		}
-	}
-
-	if (!hostHasBasic && guestHasBasic) {
-		return HOST;
-	} else if (!guestHasBasic && hostHasBasic) {
-		return GUEST;
-	} else if (!guestHasBasic && !hostHasBasic) {
-		return "BOTH PLAYERS";
-	}
+	return !hostHasTiles || !guestHasTiles;
 };
 
 TileManager.prototype.getPlayerWithMoreAccentTiles = function() {

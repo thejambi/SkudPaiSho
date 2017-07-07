@@ -114,9 +114,10 @@ window.requestAnimationFrame(function () {
 	refreshNotationDisplay();
 
 	notationBuilder = new NotationBuilder();
-	drawRandomTile();
 
 	rerunAll();
+
+	drawRandomTile();
 
 	defaultEmailMessageText = document.querySelector(".footer").innerHTML;
 
