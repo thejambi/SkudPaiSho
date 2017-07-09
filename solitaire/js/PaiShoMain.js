@@ -524,7 +524,9 @@ function undoMove() {
 	// Remove last move
 	gameNotation.removeLastMove();
 
-	theGame.tileManager.putTileBack(drawnTile);
+	if (drawnTile) {
+		theGame.tileManager.putTileBack(drawnTile);
+	}
 
 	drawnTile = lastDrawnTile;
 
@@ -640,10 +642,10 @@ function pointClicked(htmlPoint) {
 }
 
 function drawRandomTile() {
-	if (!theGame.getWinner()) {
+	// if (!theGame.getWinner()) {
 		lastDrawnTile = drawnTile;
 		drawnTile = theGame.drawRandomTile();
-	}
+	// }
 }
 
 function skipHarmonyBonus() {

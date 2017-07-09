@@ -114,8 +114,10 @@ TileManager.prototype.loadOneOfEach = function(ownerCode) {
 
 // For Solitaire
 TileManager.prototype.drawRandomTile = function() {
-	var tile = this.tiles[Math.floor(Math.random()*this.tiles.length)];
-	return this.peekTile(this.playerCode, tile.code);
+	if (this.tiles.length > 0) {
+		var tile = this.tiles[Math.floor(Math.random()*this.tiles.length)];
+		return this.peekTile(this.playerCode, tile.code);
+	}
 };
 
 TileManager.prototype.grabTile = function(player, tileCode) {
