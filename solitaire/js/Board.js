@@ -1481,9 +1481,9 @@ Board.prototype.hasNewHarmony = function(player, tile, startRowCol, endRowCol) {
 };
 
 Board.prototype.hasDisharmony = function(boardPoint) {
-	if (boardPoint.isType(GATE)) {
-		return false;	// Gate never has disharmony
-	}
+	// if (boardPoint.isType(GATE)) {
+	// 	return false;	// Gate never has disharmony
+	// }	// For Solitaire
 
 	var tile = boardPoint.tile;
 	var clashFound = false;
@@ -1607,7 +1607,7 @@ Board.prototype.setOpenGatePossibleMoves = function(player) {
 };
 
 /* For Solitaire */
-Board.prototype.setAllPointsOpen = function(tile) {
+Board.prototype.setAllPossiblePointsOpen = function(tile) {
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
@@ -1616,6 +1616,27 @@ Board.prototype.setAllPointsOpen = function(tile) {
 			}
 		}
 	}
+};
+
+// For Solitaire
+Board.prototype.setHarmonyAndClashPointsOpen = function(tile) {
+	var possibleMovesFound = false;
+
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var bp = this.cells[row][col];
+			if (bp.canHoldTile(tile)) {
+				var newBp = bp.getCopy();
+				newBp.putTile(tile);
+				if (this.hasDisharmony(newBp) || this.getTileHarmonies(newBp.tile, newBp).length > 0) {
+					this.cells[row][col].addType(POSSIBLE_MOVE);
+					possibleMovesFound = true;
+				}
+			}
+		}
+	}
+
+	return possibleMovesFound;
 };
 
 Board.prototype.playerControlsLessThanTwoGates = function(player) {

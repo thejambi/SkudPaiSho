@@ -115,8 +115,9 @@ GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 };
 
 GameManager.prototype.setAllLegalPointsOpen = function(player, tile, ignoreActuate) {
-	// Really should be: setAllLegalPointsOpen that blocks clashing garden placement
-	this.board.setAllPointsOpen(tile);
+	if (!this.board.setHarmonyAndClashPointsOpen(tile)) {
+		this.board.setAllPossiblePointsOpen(tile);
+	}
 	
 	if (!ignoreActuate) {
 		this.actuate();

@@ -318,9 +318,7 @@ function pauseRun() {
 function getAdditionalMessage() {
 	var msg = "";//"<br />";
 
-	//if (theGame.board.winners.length > 0) {
 	if (theGame.getWinner()) {
-		// There is a winner!
 		msg += "<br /><strong>" + theGame.getWinReason() + "</strong>";
 	}
 	return msg;
@@ -428,42 +426,9 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 
 	var messageText = "";
 
-	// if (currentMoveIndex == 1 && !haveBothEmails()) {
-	// 	messageText += "Thank you for Hosting a game of Pai Sho! Share <a href=\"" + shortUrl + "\">this link</a> with your friends to invite them to join you in a game."
-	// 	if (aiList.length > 0) {
-	// 		for (var i = 0; i < aiList.length; i++) {
-	// 			messageText += "<br /><span class='skipBonus' onclick='setAiIndex(" + i + ");'>Play " + aiList[i].getName() + "</span>";
-	// 		}
-	// 	}
-	// } else if (haveBothEmails()) {
-	// 	// messageText = "Click <span class='skipBonus' onclick=sendMail('" + shortUrl + "')>here</span> to email your move to the " + getCurrentPlayer() + ". Or, share this <a href=\"" + shortUrl + "\">link</a> with them.";
-	// 	if (!metadata.tournamentName) {
-	// 		messageText += "Or, copy and share this <a href=\"" + shortUrl + "\">link</a> with your opponent.";
-	// 	}
-	// 	showSubmitMoveForm(shortUrl);
-	// } else if ((activeAi && getCurrentPlayer() === activeAi.player) || (activeAi2 && getCurrentPlayer() === activeAi2.player)) {
-	// 	//messageText += "<span class='skipBonus' onclick='playAiTurn();'>Submit move to AI</span>";
-	// 	messageText += "<em>THINKING...</em>";
-	// } else if (activeAi) {
-	// 	messageText += "Playing against the computer can help you learn how the game works. You should be able to beat the computer easily once you understand the game.<br /><br />Is playing against the computer too easy? Good! <a href='http://skudpaisho.com/?BYewzgLgvGDWCuATADgQwJZlAAQOYFsMAbAOgGMR8AyXVfAUygAYAJEgJQBoB1TgaU4AhKgDt6AdwDKyemXSoiAMSIhx9AE7t4RemCgjREgOKoIurTqgBPKupBlYYAKojxwevSKoARpZtgAEVNGACYmAEYAdgBaJhDYgBYgA'>Join the creator in a game</a> to play a real game or give feedback.";
-	// } else {
-		// messageText += "<a href=\"" + shortUrl + "\">Direct link to game</a>";
-	// }
-
-	// if (!ignoreNoEmail && !haveUserEmail()) {
-	// 	messageText = getNoUserEmailMessage();
-	// }
-
-	//if (theGame.board.winners.length > 0) {
 	if (theGame.getWinner()) {
 		messageText += "<a href=\"" + shortUrl + "\">Direct link to game</a>";
-		// There is a winner!
-		// if (theGame.board.winners.length > 1) {
-		// 	// There are two winners???
-		// 	messageText += "<br /><strong>Both players have created Harmony Rings! It's a tie!</strong>";
-		// } else {
-		// 	messageText += "<br /><strong>" + theGame.board.winners[0] + " has created a Harmony Ring and won the game!</strong>";
-		// }
+		
 		messageText += "<br /><strong>" + theGame.getWinReason() + "</strong>";
 	} else {
 		messageText += getResetMoveText();
