@@ -318,9 +318,9 @@ function pauseRun() {
 function getAdditionalMessage() {
 	var msg = "";//"<br />";
 
-	if (theGame.getWinner()) {
+	// if (theGame.getWinner()) {
 		msg += "<br /><strong>" + theGame.getWinReason() + "</strong>";
-	}
+	// }
 	return msg;
 }
 
@@ -426,13 +426,14 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 
 	var messageText = "";
 
+	messageText += getResetMoveText();
+	messageText += "<br />";
+
 	if (theGame.getWinner()) {
 		messageText += "<a href=\"" + shortUrl + "\">Direct link to game</a>";
-		
-		messageText += "<br /><strong>" + theGame.getWinReason() + "</strong>";
-	} else {
-		messageText += getResetMoveText();
 	}
+
+	messageText += "<br /><strong>" + theGame.getWinReason() + "</strong>";
 
 	document.querySelector(".gameMessage").innerHTML = messageText;
 }

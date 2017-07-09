@@ -295,6 +295,8 @@ HarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
 	} else if (hostCount > guestCount) {
 		return HOST;
 	}
+	// For Solitaire
+	return HOST;
 };
 
 HarmonyManager.prototype.getNumCrossingCenterForPlayer = function(player) {
