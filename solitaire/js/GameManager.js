@@ -115,8 +115,12 @@ GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 };
 
 GameManager.prototype.setAllLegalPointsOpen = function(player, tile, ignoreActuate) {
-	if (!this.board.setHarmonyAndClashPointsOpen(tile)) {
-		this.board.setAllPossiblePointsOpen(tile);
+	if (tile.type === ACCENT_TILE) {
+		this.board.setSolitaireAccentPointsOpen(tile);
+	} else {
+		if (!this.board.setHarmonyAndClashPointsOpen(tile)) {
+			this.board.setAllPossiblePointsOpen(tile);
+		}
 	}
 	
 	if (!ignoreActuate) {

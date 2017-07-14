@@ -350,24 +350,25 @@ Board.prototype.newRow = function(numColumns, points) {
 };
 
 Board.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
-	if (tile.type === ACCENT_TILE) {
-		if (tile.accentType === ROCK) {
-			this.placeRock(tile, notationPoint);
-		} else if (tile.accentType === WHEEL) {
-			this.placeWheel(tile, notationPoint);
-		} else if (tile.accentType === KNOTWEED) {
-			this.placeKnotweed(tile, notationPoint);
-		} else if (tile.accentType === BOAT) {
-			this.placeBoat(tile, notationPoint, extraBoatPoint);
-		}
-	} else {
+	// Commenting out For Solitaire
+	// if (tile.type === ACCENT_TILE) {
+		// if (tile.accentType === ROCK) {
+			// this.placeRock(tile, notationPoint);
+		// } else if (tile.accentType === WHEEL) {
+			// this.placeWheel(tile, notationPoint);
+		// } else if (tile.accentType === KNOTWEED) {
+			// this.placeKnotweed(tile, notationPoint);
+		// } else if (tile.accentType === BOAT) {
+			// this.placeBoat(tile, notationPoint, extraBoatPoint);
+		// }
+	// } else {
 		this.putTileOnPoint(tile, notationPoint);
 		if (tile.specialFlowerType === WHITE_LOTUS) {
 			this.playedWhiteLotusTiles.push(tile);
 		}
-	}
+	// }
 	// Things to do after a tile is placed
-	this.flagAllTrappedAndDrainedTiles();
+	// this.flagAllTrappedAndDrainedTiles();	// Commenting out For Solitaire
 	this.analyzeHarmonies();
 };
 
@@ -1637,6 +1638,47 @@ Board.prototype.setHarmonyAndClashPointsOpen = function(tile) {
 	}
 
 	return possibleMovesFound;
+};
+
+Board.prototype.setSolitaireAccentPointsOpen = function(tile) {
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var bp = this.cells[row][col];
+			
+			var checkBps = [];
+
+			// Check up and down
+			if (row > 2) {
+				checkBps.push(this.cells[row-2][col]);
+			}
+			if (row < 14) {
+				checkBps.push(this.cells[row+2][col]);
+			}
+
+			// Check left and right
+			if (col > 2) {
+				checkBps.push(this.cells[row][col-2]);
+			}
+			if (col < 14) {
+				checkBps.push(this.cells[row][col+2]);
+			}
+
+			var checkBpIsWithinGarden = false;
+			for (var i = 0; i < checkBps.length; i++) {
+				if (checkBps[i].isCompletelyWithinRedOrWhiteGarden()) {
+					checkBpIsWithinGarden = true;
+				}
+			}
+
+			if (bp.isType(RED) && bp.isType(WHITE)) {
+				checkBpIsWithinGarden = true;
+			}
+
+			if (checkBpIsWithinGarden && bp.canHoldTile(tile)) {
+				this.cells[row][col].addType(POSSIBLE_MOVE);
+			}
+		}
+	}
 };
 
 Board.prototype.playerControlsLessThanTwoGates = function(player) {

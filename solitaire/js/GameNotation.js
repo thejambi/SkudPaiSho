@@ -91,12 +91,13 @@ NotationMove.prototype.analyzeMove = function() {
 
 	// If starts with an R or W, then it's Planting
 	// For Solitaire, also O or L is Planting
+	// For Solitaire... EVERYTHING is Planting!
 	var char0 = moveText.charAt(0);
-	if (char0 === 'R' || char0 === 'W' || char0 === 'O' || char0 === 'L') {
+	// if (char0 === 'R' || char0 === 'W' || char0 === 'O' || char0 === 'L') {
 		this.moveType = PLANTING;
-	} else if (char0 === '(') {
-		this.moveType = ARRANGING;
-	}
+	// } else if (char0 === '(') {
+		// this.moveType = ARRANGING;
+	// }
 
 	if (this.moveType === PLANTING) {
 		// Planting move stuff

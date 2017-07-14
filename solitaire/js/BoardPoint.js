@@ -143,6 +143,12 @@ BoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	return false;
 };
 
+BoardPoint.prototype.isCompletelyWithinRedOrWhiteGarden = function() {
+	return !this.isType(NEUTRAL) 
+			&& ((this.isType(RED) && !this.isType(WHITE)) 
+				|| (this.isType(WHITE) && !this.isType(RED)));
+};
+
 BoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	if (player === GUEST) {
 		return this.betweenHarmonyGuest;

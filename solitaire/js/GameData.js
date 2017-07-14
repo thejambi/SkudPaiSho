@@ -18,6 +18,7 @@ var completeHarmony = false; // Harmony Ring must contain a 3, 4, and 5
 var superRocks = false;  // Tiles surrounding Rock cannot be moved by Wheel.
 var boatOnlyMoves = false;  // Boat moves all tiles to surrounding space. No removing of Accent Tiles.
 var sameStart = true;  // Host starts with same tile, not clashing tile.
+var includeAccentTiles = false; // For Solitaire: Include Accent Tiles or not
 
 var useHLoweTiles = false;
 

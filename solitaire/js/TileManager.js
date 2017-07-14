@@ -17,6 +17,16 @@ TileManager.prototype.loadTileSet = function(ownerCode) {
 TileManager.prototype.loadSolitaireSet = function(ownerCode) {
 	var tiles = [];
 
+	if (includeAccentTiles) {
+		// 2 of each accent tile
+		for (var i = 0; i < 2; i++) {
+			tiles.push(new Tile('R', ownerCode));
+			tiles.push(new Tile('W', ownerCode));
+			tiles.push(new Tile('K', ownerCode));
+			tiles.push(new Tile('B', ownerCode));
+		}
+	}
+
 	// 3 of each basic flower
 	for (var i = 0; i < 3; i++) {
 		tiles.push(new Tile("R3", ownerCode));

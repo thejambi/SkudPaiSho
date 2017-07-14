@@ -6,7 +6,8 @@ var QueryString = function () {
   var query_string = {};
   var query = window.location.search.substring(1);
 
-  if (query.length > 0 && !(query.includes("game="))) {
+  if (query.length > 0 && !(query.includes("game=") 
+  							|| query.includes("accents="))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
   	query = LZString.decompressFromEncodedURIComponent(query);
@@ -92,6 +93,10 @@ window.requestAnimationFrame(function () {
 	// }
 
 	theGame = new GameManager();
+
+	if (QueryString.accents === 'y') {
+		includeAccentTiles = true;
+	}
 
 	// Load metadata
 	metadata.startDate = QueryString.sDate;
