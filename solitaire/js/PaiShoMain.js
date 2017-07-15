@@ -96,6 +96,8 @@ window.requestAnimationFrame(function () {
 
 	if (QueryString.accents === 'y') {
 		includeAccentTiles = true;
+	} else {
+		includeAccentTiles = false;
 	}
 
 	// Load metadata
@@ -357,6 +359,13 @@ function finalizeMove(ignoreNoEmail) {
 		linkUrl += "guest=" + guestEmail + "&";
 	}
 	linkUrl += "game=" + gameNotation.notationTextForUrl();
+
+	// Add additional parameters
+	if (includeAccentTiles) {
+		linkUrl += "&accents=y";
+	} else {
+		linkUrl += "&accents=n";
+	}
 
 	// Add start date
 	if (!metadata.startDate) {
