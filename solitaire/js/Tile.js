@@ -129,6 +129,10 @@ Tile.prototype.formsHarmonyWith = function(otherTile) {
 };
 
 Tile.prototype.clashesWith = function(otherTile) {
+	if (this.type === ACCENT_TILE || otherTile.type === ACCENT_TILE) {
+		return false;
+	}
+	
 	if (this.specialFlowerType === ORCHID || otherTile.specialFlowerType === ORCHID) {
 		return true;
 	}
