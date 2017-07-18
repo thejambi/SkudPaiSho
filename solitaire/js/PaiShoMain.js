@@ -7,7 +7,8 @@ var QueryString = function () {
   var query = window.location.search.substring(1);
 
   if (query.length > 0 && !(query.includes("game=") 
-  							|| query.includes("accents="))) {
+  							|| query.includes("accents=")
+  							|| query.includes("doubleTiles="))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
   	query = LZString.decompressFromEncodedURIComponent(query);
@@ -94,10 +95,17 @@ window.requestAnimationFrame(function () {
 
 	theGame = new GameManager();
 
-	if (QueryString.accents === 'y') {
-		includeAccentTiles = true;
-	} else {
+	// Handle options or set default values
+	if (QueryString.accents === 'n') {
 		includeAccentTiles = false;
+	} else {
+		includeAccentTiles = true;
+	}
+
+	if (QueryString.doubleTiles === 'y') {
+		doubleTiles = true;
+	} else {
+		doubleTiles = false;
 	}
 
 	// Load metadata
@@ -365,6 +373,12 @@ function finalizeMove(ignoreNoEmail) {
 		linkUrl += "&accents=y";
 	} else {
 		linkUrl += "&accents=n";
+	}
+
+	if (doubleTiles) {
+		linkUrl += "&doubleTiles=y";
+	} else {
+		linkUrl += "&doubleTiles=n";
 	}
 
 	// Add start date

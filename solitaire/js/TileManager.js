@@ -17,9 +17,15 @@ TileManager.prototype.loadTileSet = function(ownerCode) {
 TileManager.prototype.loadSolitaireSet = function(ownerCode) {
 	var tiles = [];
 
+	// Double amount of tiles if doubleTiles enabled
+	var multiplier = 1;
+	if (doubleTiles) {
+		multiplier = 2;
+	}
+
 	if (includeAccentTiles) {
 		// 2 of each accent tile
-		for (var i = 0; i < 2; i++) {
+		for (var i = 0; i < 2 * multiplier; i++) {
 			tiles.push(new Tile('R', ownerCode));
 			tiles.push(new Tile('W', ownerCode));
 			tiles.push(new Tile('K', ownerCode));
@@ -28,7 +34,7 @@ TileManager.prototype.loadSolitaireSet = function(ownerCode) {
 	}
 
 	// 3 of each basic flower
-	for (var i = 0; i < 3; i++) {
+	for (var i = 0; i < 3 * multiplier; i++) {
 		tiles.push(new Tile("R3", ownerCode));
 		tiles.push(new Tile("R4", ownerCode));
 		tiles.push(new Tile("R5", ownerCode));
@@ -38,8 +44,10 @@ TileManager.prototype.loadSolitaireSet = function(ownerCode) {
 	}
 
 	// 1 of each special flower
-	tiles.push(new Tile('L', ownerCode));
-	tiles.push(new Tile('O', ownerCode));
+	for (var i = 0; i < 1 * multiplier; i++) {
+		tiles.push(new Tile('L', ownerCode));
+		tiles.push(new Tile('O', ownerCode));
+	}
 
 	return tiles;
 };
