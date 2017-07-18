@@ -49,6 +49,11 @@ TileManager.prototype.loadSolitaireSet = function(ownerCode) {
 		tiles.push(new Tile('O', ownerCode));
 	}
 
+	// 1 extra White Lotus so White Lotus Gambit is possible
+	if (doubleTiles) {
+		tiles.push(new Tile('L', ownerCode));
+	}
+
 	return tiles;
 };
 
