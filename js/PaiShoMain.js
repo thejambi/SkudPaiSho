@@ -17,6 +17,8 @@ var QueryString = function () {
   	|| query.includes("tournamentHost=") 
   	|| query.includes("tournamentName=") 
   	|| query.includes("tournamentMatchNotes=") 
+  	|| query.includes("oneGrowingFlower=") 
+  	|| query.includes("limitedGatesRule=") 
   	|| query.includes("rocksUnwheelable="))) {
   	// Decompress first
   	// debug("Decompressing: " + query);
@@ -159,6 +161,9 @@ window.requestAnimationFrame(function () {
 		rocksUnwheelable = true;
 		debug("-- Rocks Unwheelable rule in effect --");
 	}
+
+	oneGrowingFlower = QueryString.oneGrowingFlower === 'y';
+	limitedGatesRule = QueryString.limitedGatesRule === 'y';
 
 	if (QueryString.simpleRocks === 'y') {
 		simpleRocks = true;
@@ -535,6 +540,12 @@ function finalizeMove(ignoreNoEmail) {
 	} //else {
 	// 	linkUrl += "&rocksUnwheelable=n";
 	// }
+
+	if (limitedGatesRule) {
+		linkUrl += "&limitedGatesRule=y";
+	} else {
+		linkUrl += "&limitedGatesRule=n";
+	}
 
 	if (simpleRocks) {
 		linkUrl += "&simpleRocks=y";
@@ -1407,6 +1418,12 @@ function getLink(forSandbox) {
 	} //else {
 	// 	linkUrl += "&rocksUnwheelable=n";
 	// }
+
+	if (limitedGatesRule) {
+		linkUrl += "&limitedGatesRule=y";
+	} else {
+		linkUrl += "&limitedGatesRule=n";
+	}
 
 	if (simpleRocks) {
 		linkUrl += "&simpleRocks=y";

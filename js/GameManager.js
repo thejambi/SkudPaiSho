@@ -154,6 +154,9 @@ GameManager.prototype.playerCanBonusPlant = function(player) {
 
 	if (lessBonus) {
 		return this.board.playerHasNoGrowingFlowers(player);
+	} else if (limitedGatesRule) {
+		// New Gate Rules: Player cannot plant on Bonus if already controlling any Gates
+		return this.board.playerHasNoGrowingFlowers(player);
 	} else if (newGatesRule) {
 		// New Gate Rules: Player cannot plant on Bonus if already controlling two Gates
 		return this.board.playerControlsLessThanTwoGates(player);
