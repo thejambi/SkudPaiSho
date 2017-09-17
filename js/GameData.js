@@ -25,6 +25,10 @@ var useHLoweTiles = false;
 
 var debugOn = true;
 
+/* Testing */
+var onlinePlayEnabled = false;
+/* */
+
 function debug(str) {
     if (debugOn) {
         console.log(str);

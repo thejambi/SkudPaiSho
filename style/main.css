@@ -286,7 +286,9 @@ input[type=submit] {
   text-decoration: none;
 }
 
-
+#onlinePlayTest {
+  display: none;
+}
 
 /* -------------------------- */
 

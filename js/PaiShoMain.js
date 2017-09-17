@@ -7,6 +7,7 @@ var QueryString = function () {
   var query = window.location.search.substring(1);
 
   if (query.length > 0 && !(query.includes("game=") || query.includes("canon=") 
+  	|| query.includes("onlinePlayGame") 
   	|| query.includes("simplest=") 
   	|| query.includes("lessBonus=") 
   	|| query.includes("superHarmonies=") 
@@ -86,6 +87,10 @@ var activeAi;
 var activeAi2;
 var sandboxUrl;
 var metadata = new Object();
+
+var onlinePlayEngine;
+var gameId = 0;
+var lastSubmittedGameNotation = "";
 
 window.requestAnimationFrame(function () {
 	localStorage = new LocalStorage().storage;
@@ -237,6 +242,15 @@ window.requestAnimationFrame(function () {
 		} else if (localPlayerRole === GUEST && !QueryString.guest) {
 			guestEmail = localUserEmail;
 		}
+
+		if (QueryString.onlinePlayGame === 'y') {
+			onlinePlayEnabled = true;
+			onlinePlayEngine = new OnlinePlayEngine();
+			if (QueryString.gameId > 0) {
+				gameId = QueryString.gameId;
+				debug("Game ID: " + gameId);
+			}
+		}
 	} else {
 		if (localPlayerRole === HOST) {
 			hostEmail = null;
@@ -250,7 +264,48 @@ window.requestAnimationFrame(function () {
 	defaultHelpMessageText = document.querySelector(".helpText").innerHTML;
 
 	clearMessage();
+
+	if (onlinePlayEnabled) {
+		// Turn on replay controls... TODO fix when this happens.
+		document.getElementById("replayControls").classList.remove("gone");
+
+		onlinePlayEngine.testOnlinePlay();
+		if (gameId > 0) {
+			// if (QueryString.game) {
+			// 	lastSubmittedGameNotation = gameNotation.notationTextForUrl();
+			// }
+			startWatchingGameRealTime();
+		}
+	}
 });
+
+var getGameNotationCallback = function(newGameNotation) {
+	// if (lastSubmittedGameNotation === "") {
+	// 	lastSubmittedGameNotation = newGameNotation;
+	// }
+	// if different, set new notation and rerunAll
+	if (newGameNotation !== lastSubmittedGameNotation) {
+		gameNotation.setNotationText(newGameNotation);
+		rerunAll();
+	} else {
+		// debug("GAME NOTATION THE SAME");
+	}
+
+	if (myTurnForReal()) {
+		clearInterval(gameWatchIntervalValue);
+		debug("Current player turn, so not watching game...");
+		return;
+	}
+}
+
+var gameWatchIntervalValue;
+
+function startWatchingGameRealTime() {
+	debug("Starting to watch game");
+	gameWatchIntervalValue = setInterval(function() {
+		onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
+	}, 1000);
+}
 
 function setUseHLoweTiles() {
 	localStorage.setItem(tileDesignTypeKey, "hlowe");
@@ -604,6 +659,11 @@ function finalizeMove(ignoreNoEmail) {
 		linkUrl += "&eDate=" + metadata.endDate;
 	}
 
+	if (onlinePlayEnabled && gameId > 0) {
+		// append to url: &onlinePlayGame=y&gameId=?, where ? is id value
+		linkUrl += "&onlinePlayGame=y&gameId=" + gameId;
+	}
+
 	// debug(url + "?" + linkUrl);
 	// Compress, then build full URL
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
@@ -773,6 +833,26 @@ function getCurrentPlayer() {
 	}
 }
 
+function getCurrentPlayerForReal() {
+	if (gameNotation.moves.length <= 1) {
+		if (gameNotation.moves.length === 0) {
+			return HOST;
+		} else {
+			return GUEST;
+		}
+	}
+	if (gameNotation.moves.length <= 2) {
+		return GUEST;
+	}
+	var lastPlayer = gameNotation.moves[gameNotation.moves.length - 1].player;
+
+	if (lastPlayer === HOST) {
+		return GUEST;
+	} else if (lastPlayer === GUEST) {
+		return HOST;
+	}
+}
+
 function showHarmonyBonusMessage() {
 	document.querySelector(".gameMessage").innerHTML = "Harmony Bonus! Select a tile to play or <span class='skipBonus' onclick='skipHarmonyBonus();'>skip</span>."
 	+ getResetMoveText();
@@ -821,6 +901,34 @@ function myTurn() {
 	} else {
 		return true;
 	}
+}
+
+function myTurnForReal() {
+	var userEmail = localStorage.getItem(localEmailKey);
+	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
+		if (getCurrentPlayerForReal() === HOST) {
+			return localStorage.getItem(localEmailKey) === hostEmail;
+		} else {
+			return localStorage.getItem(localEmailKey) === guestEmail;
+		}
+	} else {
+		return true;
+	}
+}
+
+var createGameCallback = function(newGameId) {
+	debug("INSIDE CreateMove CALLBACK with GameId: " + newGameId);
+	gameId = newGameId;
+	finalizeMove();
+	lastSubmittedGameNotation = gameNotation.notationTextForUrl();
+	startWatchingGameRealTime();
+}
+
+var submitMoveCallback = function() {
+	debug("Inside submitMoveCallback");
+	lastSubmittedGameNotation = gameNotation.notationTextForUrl();
+	finalizeMove();
+	startWatchingGameRealTime();
 }
 
 function unplayedTileClicked(tileDiv) {
@@ -878,7 +986,11 @@ function unplayedTileClicked(tileDiv) {
 			if (hostAccentTiles.length === 4 || (simpleCanonRules && hostAccentTiles.length === 2)) {
 				var move = new NotationMove("0H." + hostAccentTiles.join());
 				gameNotation.addMove(move);
-				finalizeMove();
+				if (onlinePlayEnabled) {
+					onlinePlayEngine.createGame(gameNotation.notationTextForUrl(), createGameCallback);
+				} else {
+					finalizeMove();
+				}
 			}
 		} else {
 			guestAccentTiles.push(tileCode);
@@ -1003,7 +1115,11 @@ function pointClicked(htmlPoint) {
 			} else if (!bonusAllowed) {
 				// Move all set. Add it to the notation!
 				gameNotation.addMove(move);
-				finalizeMove();
+				if (onlinePlayEnabled) {
+					onlinePlayEngine.submitMove(gameId, gameNotation.notationTextForUrl(), submitMoveCallback);
+				} else {
+					finalizeMove();
+				}
 			} else {
 				notationBuilder.status = READY_FOR_BONUS;
 				showHarmonyBonusMessage();
@@ -1027,7 +1143,11 @@ function pointClicked(htmlPoint) {
 				var move = gameNotation.getNotationMoveFromBuilder(notationBuilder);
 				
 				gameNotation.addMove(move);
-				finalizeMove();
+				if (onlinePlayEnabled) {
+					onlinePlayEngine.submitMove(gameId, gameNotation.notationTextForUrl(), submitMoveCallback);
+				} else {
+					finalizeMove();
+				}
 			}
 		} else {
 			theGame.hidePossibleMovePoints();
@@ -1039,7 +1159,11 @@ function pointClicked(htmlPoint) {
 			notationBuilder.boatBonusPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 			var move = gameNotation.getNotationMoveFromBuilder(notationBuilder);
 			gameNotation.addMove(move);
-			finalizeMove();
+			if (onlinePlayEnabled) {
+				onlinePlayEngine.submitMove(gameId, gameNotation.notationTextForUrl(), submitMoveCallback);
+			} else {
+				finalizeMove();
+			}
 		} else {
 			theGame.hidePossibleMovePoints();
 			notationBuilder.status = READY_FOR_BONUS;
@@ -1054,7 +1178,11 @@ function pointClicked(htmlPoint) {
 function skipHarmonyBonus() {
 	var move = gameNotation.getNotationMoveFromBuilder(notationBuilder);
 	gameNotation.addMove(move);
-	finalizeMove();
+	if (onlinePlayEnabled) {
+		onlinePlayEngine.submitMove(gameId, gameNotation.notationTextForUrl(), submitMoveCallback);
+	} else {
+		finalizeMove();
+	}
 }
 
 
