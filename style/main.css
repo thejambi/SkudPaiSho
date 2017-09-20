@@ -329,9 +329,15 @@ input[type=submit] {
 .modal-content {
     background-color: #fefefe;
     margin: auto;
-    padding: 20px;
+    padding: 8px 12px 12px 12px;
+    /*position: relative;*/
     border: 1px solid #888;
     width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    /*-webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.2s;
+    animation-name: animatetop;
+    animation-duration: 0.2s;*/
 }
 
 /* The Close Button */
@@ -353,6 +359,18 @@ input[type=submit] {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 8px;
+  margin-top: 5px;
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top: -300px; opacity: 0} 
+    to {top: 0; opacity: 1}
+}
+
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
 }
 
 /* End Modal */
