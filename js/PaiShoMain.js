@@ -168,7 +168,12 @@ window.requestAnimationFrame(function () {
 	}
 
 	oneGrowingFlower = QueryString.oneGrowingFlower === 'y';
-	limitedGatesRule = QueryString.limitedGatesRule === 'y';
+	
+	if (QueryString.limitedGatesRule === 'y') {
+		limitedGatesRule = true;
+	} else if (QueryString.limitedGatesRule === 'n') {
+		limitedGatesRule = false;
+	}
 
 	if (QueryString.simpleRocks === 'y') {
 		simpleRocks = true;

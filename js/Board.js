@@ -585,7 +585,8 @@ Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 			var newBoard = this.getCopy();
 			var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
 			newBoard.placeBoat(new Tile('B', 'G'), notationPoint, boardPoint, true);
-			if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
+			var newBoardPoint = newBoard.cells[boardPoint.row][boardPoint.col];
+			if (newBoard.moveCreatesDisharmony(newBoardPoint, newBoardPoint)) {
 				return false;
 			}
 		}
@@ -993,7 +994,7 @@ Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPoin
 	return true;
 };
 
-Board.prototype.canTransportTileToPoint = function(boardPointStart, boardPointEnd) {
+Board.prototype.canTransportTileToPointWithBoat = function(boardPointStart, boardPointEnd) {
 	// Transport Tile: used in Boat special ability
 
 	// start point must have a tile
@@ -1016,7 +1017,16 @@ Board.prototype.canTransportTileToPoint = function(boardPointStart, boardPointEn
 	}
 
 	// What if moving the tile there creates a Disharmony on the board? That can't happen!
-	if (this.moveCreatesDisharmony(boardPointStart, boardPointEnd)) {
+	// if (this.moveCreatesDisharmony(boardPointStart, boardPointEnd)) {
+	// 	return false;
+	// }	// This disharmony check needs to first pretend that a Boat tile is on the spot the tile being moved was on. Fix is below:
+
+	var newBoard = this.getCopy();
+	var newBoardPointStart = newBoard.cells[boardPointStart.row][boardPointStart.col];
+	var notationPoint = new NotationPoint(new RowAndColumn(newBoardPointStart.row, newBoardPointStart.col).notationPointString);
+	var notationPointEnd = new NotationPoint(new RowAndColumn(boardPointEnd.row, boardPointEnd.col).notationPointString);
+	newBoard.placeBoat(new Tile('B', 'G'), notationPoint, notationPointEnd, true);
+	if (newBoard.moveCreatesDisharmony(newBoardPointStart, newBoardPointStart)) {
 		return false;
 	}
 
@@ -1025,9 +1035,12 @@ Board.prototype.canTransportTileToPoint = function(boardPointStart, boardPointEn
 };
 
 Board.prototype.moveCreatesDisharmony = function(boardPointStart, boardPointEnd) {
-	// Grab tile in end point and put the start tile there
-	var endTile = boardPointEnd.removeTile();
-	boardPointEnd.putTile(boardPointStart.removeTile());
+	// Grab tile in end point and put the start tile there, unless points are the same
+	var endTile;
+	if (boardPointStart.row !== boardPointEnd.row || boardPointStart.col !== boardPointEnd.col) {
+		endTile = boardPointEnd.removeTile();
+		boardPointEnd.putTile(boardPointStart.removeTile());
+	}
 
 	var clashFound = false;
 
@@ -1045,9 +1058,11 @@ Board.prototype.moveCreatesDisharmony = function(boardPointStart, boardPointEnd)
 		}
 	}
 
-	// Put tiles back the way they were
-	boardPointStart.putTile(boardPointEnd.removeTile());
-	boardPointEnd.putTile(endTile);
+	// Put tiles back the way they were if needed
+	if (boardPointStart.row !== boardPointEnd.row || boardPointStart.col !== boardPointEnd.col) {
+		boardPointStart.putTile(boardPointEnd.removeTile());
+		boardPointEnd.putTile(endTile);
+	}
 
 	return clashFound;
 };
@@ -1586,8 +1601,7 @@ Board.prototype.revealBoatBonusPoints = function(boardPoint) {
 
 		for (var i = 0; i < rowCols.length; i++) {
 			var boardPointEnd = this.cells[rowCols[i].row][rowCols[i].col];
-			// if (this.canMoveTileToPoint(player, boardPoint, boardPointEnd)) {
-			if (this.canTransportTileToPoint(boardPoint, boardPointEnd)) {
+			if (this.canTransportTileToPointWithBoat(boardPoint, boardPointEnd)) {
 				boardPointEnd.addType(POSSIBLE_MOVE);
 			}
 		}
