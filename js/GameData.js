@@ -19,7 +19,7 @@ var superRocks = false;  // Tiles surrounding Rock cannot be moved by Wheel.
 var boatOnlyMoves = false;  // Boat moves all tiles to surrounding space. No removing of Accent Tiles.
 var sameStart = true;  // Host starts with same tile, not clashing tile.
 var oneGrowingFlower = false;
-var limitedGatesRule = false;
+var limitedGatesRule = false; // Cannot Plant Basic OR Special Flower on Harmony Bonus if already controlling one or more Gates
 
 var useHLoweTiles = false;
 

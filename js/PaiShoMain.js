@@ -89,7 +89,7 @@ var sandboxUrl;
 var metadata = new Object();
 
 var onlinePlayEngine;
-var gameId = 0;
+var gameId = -1;
 var lastSubmittedGameNotation = "";
 
 window.requestAnimationFrame(function () {
@@ -246,7 +246,7 @@ window.requestAnimationFrame(function () {
 		if (QueryString.onlinePlayGame === 'y') {
 			onlinePlayEnabled = true;
 			onlinePlayEngine = new OnlinePlayEngine();
-			if (QueryString.gameId > 0) {
+			if (QueryString.gameId >= 0) {
 				gameId = QueryString.gameId;
 				debug("Game ID: " + gameId);
 			}
@@ -270,7 +270,7 @@ window.requestAnimationFrame(function () {
 		document.getElementById("replayControls").classList.remove("gone");
 
 		onlinePlayEngine.testOnlinePlay();
-		if (gameId > 0) {
+		if (gameId >= 0) {
 			// if (QueryString.game) {
 			// 	lastSubmittedGameNotation = gameNotation.notationTextForUrl();
 			// }
@@ -464,7 +464,7 @@ function playPause() {
 	}
 	if (interval === 0) {
 		// Play
-		document.querySelector(".playPauseButton").value = "||";
+		document.querySelector(".playPauseButton").innerHTML = "<i class='fa fa-pause' aria-hidden='true'></i>";
 		if (playNextMove(true)) {
 			interval = setInterval(function() {
 				if (!playNextMove(true)) {
@@ -484,7 +484,7 @@ function playPause() {
 function pauseRun() {
 	clearInterval(interval);
 	interval = 0;
-	document.querySelector(".playPauseButton").value = ">";
+	document.querySelector(".playPauseButton").innerHTML = "<i class='fa fa-play' aria-hidden='true'></i>";
 }
 
 function getAdditionalMessage() {
@@ -659,7 +659,7 @@ function finalizeMove(ignoreNoEmail) {
 		linkUrl += "&eDate=" + metadata.endDate;
 	}
 
-	if (onlinePlayEnabled && gameId > 0) {
+	if (onlinePlayEnabled && gameId >= 0) {
 		// append to url: &onlinePlayGame=y&gameId=?, where ? is id value
 		linkUrl += "&onlinePlayGame=y&gameId=" + gameId;
 	}
@@ -853,8 +853,23 @@ function getCurrentPlayerForReal() {
 	}
 }
 
+function getExtraHarmonyBonusHelpText() {
+	if (!limitedGatesRule) {
+		if (theGame.playerCanBonusPlant(getCurrentPlayer())) {
+			return " <br />You can choose an Accent Tile, Special Flower Tile, or, since you have less than two Growing Flowers, a Basic Flower Tile.";
+		}
+		return " <br />You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have two or more Growing Flowers.";
+	} else {
+		if (theGame.playerCanBonusPlant(getCurrentPlayer())) {
+			return " <br />You can choose an Accent Tile or, since you have no Growing Flowers, a Basic or Special Flower Tile.";
+		}
+		return " <br />You can choose an Accent Tile. You cannot choose a Basic or Special Flower Tile because you have at least one Growing Flower.";
+	}
+}
+
 function showHarmonyBonusMessage() {
 	document.querySelector(".gameMessage").innerHTML = "Harmony Bonus! Select a tile to play or <span class='skipBonus' onclick='skipHarmonyBonus();'>skip</span>."
+	+ getExtraHarmonyBonusHelpText()
 	+ getResetMoveText();
 }
 
@@ -987,7 +1002,7 @@ function unplayedTileClicked(tileDiv) {
 				var move = new NotationMove("0H." + hostAccentTiles.join());
 				gameNotation.addMove(move);
 				if (onlinePlayEnabled) {
-					onlinePlayEngine.createGame(gameNotation.notationTextForUrl(), createGameCallback);
+					onlinePlayEngine.createGame(gameNotation.notationTextForUrl(), getUserEmail(), createGameCallback);
 				} else {
 					finalizeMove();
 				}
@@ -1036,7 +1051,10 @@ function unplayedTileClicked(tileDiv) {
 		} else if (tile.type === ACCENT_TILE) {
 			theGame.revealPossiblePlacementPoints(tile);
 		} else if (tile.type === SPECIAL_FLOWER) {
-			theGame.revealSpecialFlowerPlacementPoints(getCurrentPlayer());
+			if (!limitedGatesRule 
+				|| (limitedGatesRule && theGame.playerCanBonusPlant(getCurrentPlayer()))) {
+				theGame.revealSpecialFlowerPlacementPoints(getCurrentPlayer());
+			}
 		}
 	} else {
 		theGame.hidePossibleMovePoints();
@@ -1711,6 +1729,38 @@ function hostTournamentClicked() {
 	//
 }
 
+/* Modal */
+function showModal(heading, modalMessageHTMLText) {
+	// Get the modal
+	var modal = document.getElementById('myMainModal');
 
+	// Get the <span> element that closes the modal
+	var span = document.getElementsByClassName("myMainModalClose")[0];
 
+	var modalHeading = document.getElementById('modalHeading');
+	modalHeading.innerText = heading;
 
+	var modalMessage = document.getElementById('modalMessage');
+	modalMessage.innerHTML = modalMessageHTMLText;
+
+	// When the user clicks the button, open the modal 
+	modal.style.display = "block";
+
+	// When the user clicks on <span> (x), close the modal
+	span.onclick = function() {
+	    modal.style.display = "none";
+	}
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function(event) {
+	    if (event.target == modal) {
+	        modal.style.display = "none";
+	    }
+	}
+}
+
+function loginClicked() {
+	showModal("Log In / Sign Up", "Coming soon! For now, just be sure to enter your email from the option toward the bottom of the page.");
+}
+
+/* End Modal */

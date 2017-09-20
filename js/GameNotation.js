@@ -127,10 +127,14 @@ NotationMove.prototype.analyzeMove = function() {
 		// parts[1] may have harmony bonus
 		this.endPoint = new NotationPoint(parts[1].substring(0, parts[1].indexOf(')')));
 
-		if (parts[1].includes('+')) {
+		if (parts[1].includes('+') || parts[1].includes('_')) {
 			// Harmony Bonus!
+			var bonusChar = '+';
+			if (parts[1].includes('_')) {
+				bonusChar = '_';
+			}
 			// Get only that part:
-			var bonus = parts[1].substring(parts[1].indexOf('+')+1);
+			var bonus = parts[1].substring(parts[1].indexOf(bonusChar)+1);
 			
 			this.bonusTileCode = bonus.substring(0,bonus.indexOf('('));
 
@@ -193,11 +197,15 @@ NotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
 };
 
 NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
+	var bonusChar = '+';
+	// if (onlinePlayEnabled) {
+	// 	bonusChar = '_';
+	// }
 	var notationLine = moveNum + player.charAt(0) + ".";
 	if (this.moveType === ARRANGING) {
 		notationLine += "(" + this.startPoint.pointText + ")-(" + this.endPoint.pointText + ")";
 		if (this.bonusTileCode && this.bonusEndPoint) {
-			notationLine += "+" + this.bonusTileCode + "(" + this.bonusEndPoint.pointText + ")";
+			notationLine += bonusChar + this.bonusTileCode + "(" + this.bonusEndPoint.pointText + ")";
 			if (this.boatBonusPoint) {
 				notationLine += "-(" + this.boatBonusPoint.pointText + ")";
 			}

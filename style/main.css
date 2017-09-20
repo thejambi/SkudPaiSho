@@ -79,11 +79,19 @@ hr {
 }
 
 .replayButton {
-  width: 36px;
-  height: 36px;
+  /*width: 36px;*/
+  /*height: 36px;*/
+  width: 20px;
   border: 1px solid black;
   border-radius: 3px;
   background-color: #ccc;
+  display: block;
+  float: left;
+  text-align: center;
+  padding: 8px;
+  font-size: larger;
+  margin-left: 1px;
+  margin-right: 1px;
 }
 
 .svgContainer {
@@ -129,6 +137,7 @@ figure > div {
 }
 
 .gameMessage {
+  clear: left;
   width: 90%;
   margin-top: 6px;
 }
@@ -279,6 +288,15 @@ input[type=submit] {
   float: left;
 }
 
+.headerRightContainer {
+  display: block;
+  float: right;
+  margin: 0;
+  background-color: #444;
+  color: #faf8ef;
+  font-size: 14px;
+}
+
 .headerRight {
   float: right;
   margin-top: 10px;
@@ -289,6 +307,55 @@ input[type=submit] {
 #onlinePlayTest {
   display: none;
 }
+
+/* Modal - from W3Schools Modal How-To */
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+/* The Close Button */
+.myMainModalClose {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.myMainModalClose:hover,
+.myMainModalClose:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#modalHeading {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+/* End Modal */
 
 /* -------------------------- */
 
@@ -395,6 +462,10 @@ input[type=submit] {
     background-color: #77A2E6;
   }
 
+  .headerLeft {
+    display: none;
+  }
+
 }
 
 @media only screen and (max-width: 306px) {
@@ -442,6 +513,7 @@ input[type=submit] {
       box-shadow: 0px 0px 7px 3px #77A2E6;
       background-color: #77A2E6;
     }
+
 }
 
 
