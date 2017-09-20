@@ -11,47 +11,43 @@ OnlinePlayEngine.prototype.testOnlinePlay = function() {
 	setTimeout(function() { self.getGameTypeDesc(2); }, 500);
 };
 
-OnlinePlayEngine.prototype.createGame = function(gameNotationText, callback) {
-	if (window.XMLHttpRequest) {
-        // code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-    } else {
-        // code for IE6, IE5
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            var element = document.getElementById("onlinePlayTest");
-            element.innerHTML = this.responseText;
-            debug(element.innerText.trim());
-            callback(element.innerText.trim());
+OnlinePlayEngine.prototype.createGame = function(gameNotationText, hostEmail, callback) {
+    $.post("createGame.php",
+        {
+            q: gameNotationText,
+            h: hostEmail
+        },
+        function(data, status){
+            if (status === 'success') {
+                // var element = document.getElementById("onlinePlayTest");
+                // element.innerHTML = data;
+                // debug(element.innerText.trim());
+                // callback(element.innerText.trim());
+                debug(data.trim());
+                callback(data.trim());
+            }
         }
-    };
-    xmlhttp.open("GET","createGame.php?q="+gameNotationText,true);
-    xmlhttp.send();
+    );
 };
 
 OnlinePlayEngine.prototype.getGameNotation = function(gameId, callback) {
-	if (window.XMLHttpRequest) {
-        // code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-    } else {
-        // code for IE6, IE5
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            var element = document.getElementById("onlinePlayTest");
-            element.innerHTML = this.responseText;
-            debug(element.innerText.trim());
-            callback(element.innerText.trim());
+    $.get("getGameNotation.php?q="+gameId, 
+        function(data, status){
+            if (status === 'success') {
+                // var element = document.getElementById("onlinePlayTest");
+                // element.innerHTML = data;
+                // debug(element.innerText.trim());
+                // callback(element.innerText.trim());
+                debug(data.trim());
+                callback(data.trim());
+            }
         }
-    };
-    xmlhttp.open("GET","getGameNotation.php?q="+gameId,true);
-    xmlhttp.send();
+    );
 };
 
 OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, callback) {
+    /*
+    gameNotationText = encodeURIComponent(gameNotationText);
 	debug("Submit move: " + gameId + " " + gameNotationText);
 	if (window.XMLHttpRequest) {
         // code for IE7+, Firefox, Chrome, Opera, Safari
@@ -70,53 +66,35 @@ OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, callb
     };
     xmlhttp.open("GET","updateGameNotation.php?id="+gameId+"&t="+gameNotationText,true);
     xmlhttp.send();
+    */
+
+    $.post("updateGameNotation.php",
+        {
+            id: gameId,
+            t: gameNotationText
+        },
+        function(data, status){
+            if (status === 'success') {
+                // var element = document.getElementById("onlinePlayTest");
+                // element.innerHTML = data;
+                // debug(element.innerText.trim());
+                // callback(element.innerText.trim());
+                debug(data.trim());
+                callback(data.trim());
+            }
+        }
+    );
 };
 
 OnlinePlayEngine.prototype.getGameTypeDesc = function(gameTypeId) {
-	if (gameTypeId <= 0) {
-        document.getElementById("onlinePlayTest").innerHTML = "";
-        return;
-    } else {
-        if (window.XMLHttpRequest) {
-            // code for IE7+, Firefox, Chrome, Opera, Safari
-            xmlhttp = new XMLHttpRequest();
-        } else {
-            // code for IE6, IE5
-            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        xmlhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                var element = document.getElementById("onlinePlayTest");
-                element.innerHTML = this.responseText;
-                debug(element.innerText.trim());
+    $.get("getGameTypeDesc.php?q="+gameTypeId, 
+        function(data, status){
+            if (status === 'success') {
+                // var element = document.getElementById("onlinePlayTest");
+                // element.innerHTML = data;
+                // debug(element.innerText.trim());
+                debug(data.trim());
             }
-        };
-        xmlhttp.open("GET","getGameTypeDesc.php?q="+gameTypeId,true);
-        xmlhttp.send();
-    }
-}
-
-
-/* Example */
-function showUser(str) {
-    if (str == "") {
-        document.getElementById("txtHint").innerHTML = "";
-        return;
-    } else { 
-        if (window.XMLHttpRequest) {
-            // code for IE7+, Firefox, Chrome, Opera, Safari
-            xmlhttp = new XMLHttpRequest();
-        } else {
-            // code for IE6, IE5
-            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
         }
-        xmlhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                document.getElementById("txtHint").innerHTML = this.responseText;
-            }
-        };
-        xmlhttp.open("GET","getuser.php?q="+str,true);
-        xmlhttp.send();
-    }
+    );
 }
-
