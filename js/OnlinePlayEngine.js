@@ -11,6 +11,29 @@ OnlinePlayEngine.prototype.testOnlinePlay = function() {
 	setTimeout(function() { self.getGameTypeDesc(2); }, 500);
 };
 
+OnlinePlayEngine.prototype.sendVerificationCode = function(userEmail) {
+    $.post("sendVerificationCode.php",
+        {
+            toEmail: userEmail
+        },
+        function(data, status){
+            if (status === 'success') {
+                debug("Verification code sent.");
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.getVerificationCode = function(callback) {
+    $.get("getVerificationCode.php", 
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
 OnlinePlayEngine.prototype.createGame = function(gameNotationText, hostEmail, callback) {
     $.post("createGame.php",
         {

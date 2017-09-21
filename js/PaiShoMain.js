@@ -229,6 +229,8 @@ window.requestAnimationFrame(function () {
 		document.getElementById("replayControls").classList.remove("gone");
 	}
 
+	onlinePlayEngine = new OnlinePlayEngine();
+
 	refreshNotationDisplay();
 
 	notationBuilder = new NotationBuilder();
@@ -250,7 +252,6 @@ window.requestAnimationFrame(function () {
 
 		if (QueryString.onlinePlayGame === 'y') {
 			onlinePlayEnabled = true;
-			onlinePlayEngine = new OnlinePlayEngine();
 			if (QueryString.gameId >= 0) {
 				gameId = QueryString.gameId;
 				debug("Game ID: " + gameId);
@@ -272,7 +273,7 @@ window.requestAnimationFrame(function () {
 
 	if (onlinePlayEnabled) {
 		// Turn on replay controls... TODO fix when this happens.
-		document.getElementById("replayControls").classList.remove("gone");
+		// document.getElementById("replayControls").classList.remove("gone");
 
 		onlinePlayEngine.testOnlinePlay();
 		if (gameId >= 0) {
@@ -301,7 +302,7 @@ var getGameNotationCallback = function(newGameNotation) {
 		debug("Current player turn, so not watching game...");
 		return;
 	}
-}
+};
 
 var gameWatchIntervalValue;
 
@@ -333,26 +334,29 @@ function toggleTileDesigns() {
 }
 
 function promptEmail() {
-	var ans = prompt("Please enter your email address:");
+	// Just call loginClicked method to open modal dialog
+	loginClicked();
+	
+	// var ans = prompt("Please enter your email address:");
 
-	if (ans) {
-		ans = ans.trim();
-	}
+	// if (ans) {
+	// 	ans = ans.trim();
+	// }
 
-	if (localPlayerRole === HOST) {
-		if (ans) {
-			hostEmail = ans;
-			localStorage.setItem(localEmailKey, hostEmail);
-		}
-	} else if (localPlayerRole === GUEST) {
-		if (ans) {
-			guestEmail = ans;
-			localStorage.setItem(localEmailKey, guestEmail);
-		}
-	}
+	// if (localPlayerRole === HOST) {
+	// 	if (ans) {
+	// 		hostEmail = ans;
+	// 		localStorage.setItem(localEmailKey, hostEmail);
+	// 	}
+	// } else if (localPlayerRole === GUEST) {
+	// 	if (ans) {
+	// 		guestEmail = ans;
+	// 		localStorage.setItem(localEmailKey, guestEmail);
+	// 	}
+	// }
 
-	updateFooter();
-	clearMessage();
+	// updateFooter();
+	// clearMessage();
 }
 
 function updateFooter() {
@@ -942,14 +946,14 @@ var createGameCallback = function(newGameId) {
 	finalizeMove();
 	lastSubmittedGameNotation = gameNotation.notationTextForUrl();
 	startWatchingGameRealTime();
-}
+};
 
 var submitMoveCallback = function() {
 	debug("Inside submitMoveCallback");
 	lastSubmittedGameNotation = gameNotation.notationTextForUrl();
 	finalizeMove();
 	startWatchingGameRealTime();
-}
+};
 
 function unplayedTileClicked(tileDiv) {
 	if (theGame.getWinner() && notationBuilder.status !== READY_FOR_BONUS) {
@@ -1735,7 +1739,7 @@ function hostTournamentClicked() {
 }
 
 /* Modal */
-function showModal(heading, modalMessageHTMLText) {
+function showModal(headingHTMLText, modalMessageHTMLText) {
 	// Get the modal
 	var modal = document.getElementById('myMainModal');
 
@@ -1743,7 +1747,7 @@ function showModal(heading, modalMessageHTMLText) {
 	var span = document.getElementsByClassName("myMainModalClose")[0];
 
 	var modalHeading = document.getElementById('modalHeading');
-	modalHeading.innerText = heading;
+	modalHeading.innerHTML = headingHTMLText;
 
 	var modalMessage = document.getElementById('modalMessage');
 	modalMessage.innerHTML = modalMessageHTMLText;
@@ -1754,18 +1758,56 @@ function showModal(heading, modalMessageHTMLText) {
 	// When the user clicks on <span> (x), close the modal
 	span.onclick = function() {
 	    modal.style.display = "none";
-	}
+	};
 
 	// When the user clicks anywhere outside of the modal, close it
 	window.onclick = function(event) {
 	    if (event.target == modal) {
 	        modal.style.display = "none";
 	    }
+	};
+}
+
+var emailBeingVerified = "";
+
+function callSendVerificationCode(userEmail) {
+	emailBeingVerified = userEmail;
+	onlinePlayEngine.sendVerificationCode(userEmail);
+}
+
+var codeToVerify = 0;
+var verifyCodeCallback = function(actualCode) {
+	if (codeToVerify === actualCode) {
+		// save email
+		localStorage.setItem(localEmailKey, emailBeingVerified);
+		document.getElementById('myMainModal').style.display = "none";
+		showModal("<i class='fa fa-check' aria-hidden='true'></i> Email Verified", "Your email has been successfully verified and you are now signed in.");
 	}
+	emailBeingVerified = "";
+	codeToVerify = 0;
+
+	updateFooter();
+	clearMessage();
+};
+
+function verifyEmailWithCode(codeToTry) {
+	codeToVerify = codeToTry;
+	onlinePlayEngine.getVerificationCode(verifyCodeCallback);
 }
 
 function loginClicked() {
-	showModal("Log In / Sign Up", "Coming soon! For now, just be sure to enter your email from the option toward the bottom of the page.");
+	var msg = "Enter your email and enter the 4-digit code sent to you to sign into SkudPaiSho.com in this browser. \
+	<div style='text-align: center;'> <div> \
+	<br /> Email: <input id='userEmailInput' type='text' name='userEmailInput' /> </div> \
+	<div><button type='button' onclick='callSendVerificationCode(document.getElementById(\"userEmailInput\").value); document.getElementById(\"verificationCodeInput\").disabled=false;'>Send verification code</button></div> \
+	<div><br /> Code: <input id='verificationCodeInput' type='text' name='verificationCodeInput' disabled /> </div> \
+	<div><button id='verifyCodeBtn' type='button' onclick='verifyEmailWithCode(document.getElementById(\"verificationCodeInput\").value);'>Verify code</button></div> </div>";
+
+	if (getUserEmail()) {
+		msg += "<div><br /><br />You are currently signed in as " + getUserEmail() + "</div>";
+	}
+	
+	showModal("Sign In", msg);
 }
 
 /* End Modal */
