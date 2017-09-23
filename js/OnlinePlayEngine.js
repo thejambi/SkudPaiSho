@@ -11,14 +11,41 @@ OnlinePlayEngine.prototype.testOnlinePlay = function() {
 	setTimeout(function() { self.getGameTypeDesc(2); }, 500);
 };
 
-OnlinePlayEngine.prototype.sendVerificationCode = function(userEmail) {
+/* Calls callback with userId values that match username or emailAddress. */
+OnlinePlayEngine.prototype.isUserInfoAvailable = function(username, emailAddress, callback) {
+    $.get("isUserInfoAvailable.php?u=" + username + "&e=" + emailAddress, 
+        function(data, status){
+            if (status === 'success') {
+                debug(data.trim());
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.userInfoExists = function(username, emailAddress, callback) {
+    $.get("userInfoExists.php?u=" + username + "&e=" + emailAddress, 
+        function(data, status){
+            if (status === 'success') {
+                debug(data.trim());
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.sendVerificationCode = function(username, userEmail, callback) {
     $.post("sendVerificationCode.php",
         {
+            username: username,
             toEmail: userEmail
         },
         function(data, status){
             if (status === 'success') {
                 debug("Verification code sent.");
+                callback("Verification code sent to " + userEmail);
+            } else {
+                callback("Failed to send verification code, please try again.");
             }
         }
     );
@@ -34,18 +61,78 @@ OnlinePlayEngine.prototype.getVerificationCode = function(callback) {
     );
 };
 
-OnlinePlayEngine.prototype.createGame = function(gameNotationText, hostEmail, callback) {
-    $.post("createGame.php",
+OnlinePlayEngine.prototype.createUser = function(username, emailAddress, callback) {
+    $.post("createUser.php",
         {
-            q: gameNotationText,
-            h: hostEmail
+            u: username,
+            e: emailAddress
         },
         function(data, status){
             if (status === 'success') {
-                // var element = document.getElementById("onlinePlayTest");
-                // element.innerHTML = data;
-                // debug(element.innerText.trim());
-                // callback(element.innerText.trim());
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.createDeviceIdForUser = function(userId, callback) {
+    $.post("createDeviceIdForUser.php",
+        {
+            u: userId
+        },
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.createGame = function(gameNotationText, hostUserId, callback) {
+    $.post("createGame.php",
+        {
+            q: gameNotationText,
+            h: hostUserId
+        },
+        function(data, status){
+            if (status === 'success') {
+                debug(data.trim());
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.joinGameSeek = function(gameId, guestUserId, callback) {
+    $.post("joinGameSeek.php",
+        {
+            gameId: gameId,
+            guestUserId: guestUserId
+        },
+        function(data, status){
+            if (status === 'success') {
+                debug(data.trim());
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.getGameSeeks = function(callback) {
+    $.get("getGameSeeks.php", 
+        function(data, status){
+            if (status === 'success') {
+                debug(data.trim());
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.getCurrentGamesForUser = function(userId, callback) {
+    $.get("getCurrentGamesForUser.php?userId="+userId, 
+        function(data, status){
+            if (status === 'success') {
                 debug(data.trim());
                 callback(data.trim());
             }
@@ -57,10 +144,6 @@ OnlinePlayEngine.prototype.getGameNotation = function(gameId, callback) {
     $.get("getGameNotation.php?q="+gameId, 
         function(data, status){
             if (status === 'success') {
-                // var element = document.getElementById("onlinePlayTest");
-                // element.innerHTML = data;
-                // debug(element.innerText.trim());
-                // callback(element.innerText.trim());
                 debug(data.trim());
                 callback(data.trim());
             }
@@ -69,28 +152,6 @@ OnlinePlayEngine.prototype.getGameNotation = function(gameId, callback) {
 };
 
 OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, callback) {
-    /*
-    gameNotationText = encodeURIComponent(gameNotationText);
-	debug("Submit move: " + gameId + " " + gameNotationText);
-	if (window.XMLHttpRequest) {
-        // code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp = new XMLHttpRequest();
-    } else {
-        // code for IE6, IE5
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            var element = document.getElementById("onlinePlayTest");
-            element.innerHTML = this.responseText;
-            debug(element.innerText.trim());
-            callback(element.innerText.trim());
-        }
-    };
-    xmlhttp.open("GET","updateGameNotation.php?id="+gameId+"&t="+gameNotationText,true);
-    xmlhttp.send();
-    */
-
     $.post("updateGameNotation.php",
         {
             id: gameId,
@@ -98,10 +159,6 @@ OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, callb
         },
         function(data, status){
             if (status === 'success') {
-                // var element = document.getElementById("onlinePlayTest");
-                // element.innerHTML = data;
-                // debug(element.innerText.trim());
-                // callback(element.innerText.trim());
                 debug(data.trim());
                 callback(data.trim());
             }

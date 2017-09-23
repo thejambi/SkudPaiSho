@@ -30,9 +30,11 @@
   <div class="header">
     <div class="headerLeft"><h1>Skud Pai Sho</h1></div>
     <div class="headerRightContainer">
-      <span class="headerRight clickableText" onclick='loginClicked();'><i class="fa fa-user" aria-hidden="true"></i> Sign In</span>
+      <span class="headerRight clickableText" onclick='accountHeaderClicked();'><i class="fa fa-user" aria-hidden="true"></i> <span id='accountHeaderLinkText'>Sign In</span></span>
       <div class="headerRight">&nbsp;|&nbsp;</div>
       <a href="http://skudpaisho.com" target="_blank" class="headerRight clickableText"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Game</a>
+      <div class="headerRight">&nbsp;|&nbsp;</div>
+      <span class="headerRight clickableText" onclick='viewGameSeeksClicked();'><i class="fa fa-plug" aria-hidden="true"></i> Join Game</span>
       <div class="headerRight">&nbsp;|&nbsp;</div>
       <a href="https://skudpaisho.wordpress.com/skud-quick-reference/" target="_blank" class="headerRight clickableText"><i class="fa fa-book" aria-hidden="true"></i> Rules</a>
     </div>
@@ -151,6 +153,36 @@ Modern tile designs by Hector Lowe<br />
 
 </div>
 <!-- End Modal -->
+
+<!-- Modal content containers -->
+<div id='loginModalContentContainer' style='display:none;'>
+<!-- Login modal -->
+To sign up or log in, enter your username and email, then enter the 4-digit code sent to you to sign into SkudPaiSho.com in this browser.
+<div style='text-align: center;'>
+  <table style='margin:auto;'>
+    <tr>
+      <td style='text-align:right'>Username:</td>
+      <td><input id='usernameInput' type='text' name='usernameInput' /></td>
+    </tr>
+    <tr>
+      <td style='text-align:right'>Email:</td>
+      <td><input id='userEmailInput' type='text' name='userEmailInput' /></td>
+    </tr>
+  </table>
+  <div>
+    <button type='button' onclick='sendVerificationCodeClicked();'>Send verification code</button>
+    <br />
+    <div id='verificationCodeSendResponse'>&nbsp;</div>
+  </div>
+  <br />
+  <table style='margin:auto;'>
+    <tr>
+      <td style='text-align:right'>Code:</td><td><input id='verificationCodeInput' type='text' name='verificationCodeInput' disabled /></td>
+    </tr>
+  </table>
+  <div><button id='verifyCodeBtn' type='button' onclick='verifyCodeClicked();'>Verify code</button></div>
+</div>
+<!--  -->
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

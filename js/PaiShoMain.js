@@ -48,8 +48,14 @@ var QueryString = function () {
 return query_string;
 }();
 
-localEmailKey = "localUserEmail";
-tileDesignTypeKey = "tileDesignTypeKey";
+var localEmailKey = "localUserEmail";
+var tileDesignTypeKey = "tileDesignTypeKey";
+
+var usernameKey = "usernameKey";
+var userEmailKey = "userEmailKey";
+var userIdKey = "userIdKey";
+var deviceIdKey = "deviceIdKey";
+
 
 var url;
 
@@ -241,6 +247,11 @@ window.requestAnimationFrame(function () {
 
 	var localUserEmail = localStorage.getItem(localEmailKey);
 
+	if (!userIsLoggedIn()) {
+		localUserEmail = null;
+		localStorage.removeItem(localEmailKey);
+	}
+
 	localPlayerRole = getCurrentPlayer();
 
 	if (localUserEmail) {
@@ -271,6 +282,8 @@ window.requestAnimationFrame(function () {
 
 	clearMessage();
 
+	setAccountHeaderLinkText();
+
 	if (onlinePlayEnabled) {
 		// Turn on replay controls... TODO fix when this happens.
 		// document.getElementById("replayControls").classList.remove("gone");
@@ -285,6 +298,15 @@ window.requestAnimationFrame(function () {
 	}
 });
 
+function setAccountHeaderLinkText() {
+	var text = "Sign In";
+	if (userIsLoggedIn() && onlinePlayEnabled) {
+		text = "My Games";
+	}
+
+	document.getElementById('accountHeaderLinkText').innerText = text;
+}
+
 var getGameNotationCallback = function(newGameNotation) {
 	// if (lastSubmittedGameNotation === "") {
 	// 	lastSubmittedGameNotation = newGameNotation;
@@ -293,24 +315,28 @@ var getGameNotationCallback = function(newGameNotation) {
 	if (newGameNotation !== lastSubmittedGameNotation) {
 		gameNotation.setNotationText(newGameNotation);
 		rerunAll();
+		lastSubmittedGameNotation = newGameNotation;
+		document.getElementById("replayControls").classList.remove("gone");
 	} else {
 		// debug("GAME NOTATION THE SAME");
 	}
 
-	if (myTurnForReal()) {
-		clearInterval(gameWatchIntervalValue);
-		debug("Current player turn, so not watching game...");
-		return;
-	}
+	// if (myTurnForReal() && hostEmail !== guestEmail) {
+	// 	clearInterval(gameWatchIntervalValue);
+	// 	debug("Current player turn, so not watching game...");
+	// 	return;
+	// }
 };
 
 var gameWatchIntervalValue;
 
 function startWatchingGameRealTime() {
 	debug("Starting to watch game");
+	onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
+
 	gameWatchIntervalValue = setInterval(function() {
 		onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
-	}, 1000);
+	}, 3000);
 }
 
 function setUseHLoweTiles() {
@@ -363,7 +389,7 @@ function updateFooter() {
 	var userEmail = localStorage.getItem(localEmailKey);
 	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
 		document.querySelector(".footer").innerHTML = gamePlayersMessage() + "You are playing as " + userEmail
-		+ " | <span class='skipBonus' onclick='promptEmail();'>Edit email</span> | <span class='skipBonus' onclick='forgetEmail();'>Forget email</span>";
+		+ " | <span class='skipBonus' onclick='promptEmail();'>Edit email</span> | <span class='skipBonus' onclick='signOut();'>Sign out</span>";
 		if (userEmail === "skudpaisho@gmail.com") {
 			document.querySelector(".footer").innerHTML += "<br /><span class='skipBonus' onclick='getPublicTournamentLink();'>GetLink</span>";
 		}
@@ -387,7 +413,9 @@ function gamePlayersMessage() {
 	return msg;
 }
 
-function forgetEmail() {
+function signOut() {
+	// TODO turn into full sign out method
+
 	var ok = confirm("Forgetting your email will disable email notifications. Are you sure?");
 	if (!ok) {
 		updateFooter();
@@ -668,10 +696,10 @@ function finalizeMove(ignoreNoEmail) {
 		linkUrl += "&eDate=" + metadata.endDate;
 	}
 
-	if (onlinePlayEnabled && gameId >= 0) {
-		// append to url: &onlinePlayGame=y&gameId=?, where ? is id value
-		linkUrl += "&onlinePlayGame=y&gameId=" + gameId;
-	}
+	// if (onlinePlayEnabled && gameId >= 0) {
+	// 	// append to url: &onlinePlayGame=y&gameId=?, where ? is id value
+	// 	linkUrl += "&onlinePlayGame=y&gameId=" + gameId;
+	// }
 
 	// debug(url + "?" + linkUrl);
 	// Compress, then build full URL
@@ -785,7 +813,7 @@ function haveUserEmail() {
 }
 
 function getUserEmail() {
-	return localStorage.getItem(localEmailKey);
+	return localStorage.getItem(userEmailKey);
 }
 
 function getCurrentPlayerEmail() {
@@ -1011,7 +1039,7 @@ function unplayedTileClicked(tileDiv) {
 				var move = new NotationMove("0H." + hostAccentTiles.join());
 				gameNotation.addMove(move);
 				if (onlinePlayEnabled) {
-					onlinePlayEngine.createGame(gameNotation.notationTextForUrl(), getUserEmail(), createGameCallback);
+					onlinePlayEngine.createGame(gameNotation.notationTextForUrl(), getUserId(), createGameCallback);
 				} else {
 					finalizeMove();
 				}
@@ -1768,46 +1796,242 @@ function showModal(headingHTMLText, modalMessageHTMLText) {
 	};
 }
 
-var emailBeingVerified = "";
+function closeModal() {
+	document.getElementById('myMainModal').style.display = "none";
+}
 
-function callSendVerificationCode(userEmail) {
-	emailBeingVerified = userEmail;
-	onlinePlayEngine.sendVerificationCode(userEmail);
+var emailBeingVerified = "";
+var usernameBeingVerified = "";
+
+var sendVerificationCodeCallback = function(message) {
+	document.getElementById('verificationCodeSendResponse').innerHTML = message;
+}
+
+var isUserInfoAvailableCallback = function(data) {
+	if (data && data.length > 0) {
+		// user info not available
+		alert("Username or email taken.");
+	} else {
+		document.getElementById("verificationCodeInput").disabled=false;
+		document.getElementById('verificationCodeSendResponse').innerHTML = "Sending code... <i class='fa fa-circle-o-notch fa-spin fa-fw'></i>";
+		onlinePlayEngine.sendVerificationCode(usernameBeingVerified, emailBeingVerified, sendVerificationCodeCallback);
+	}
+};
+
+var userInfoExistsCallback = function(data) {
+	if (data && parseInt(data.trim()) >= 0) {
+		// existing userId found
+		tempUserId = data.trim();
+		isUserInfoAvailableCallback();	// will trigger send verification code
+	} else {
+		// userInfo entered was not exact match. Is it available?
+		onlinePlayEngine.isUserInfoAvailable(usernameBeingVerified, emailBeingVerified, isUserInfoAvailableCallback);
+	}
+}
+
+function sendVerificationCodeClicked() {
+	emailBeingVerified = document.getElementById("userEmailInput").value.trim();
+	usernameBeingVerified = document.getElementById("usernameInput").value.trim();
+
+	// Only continue if email and username pass validation
+	if (emailBeingVerified.includes("@") && emailBeingVerified.includes(".")
+		&& usernameBeingVerified.match(/^([A-Za-z0-9_])+$/g)) {
+		onlinePlayEngine.userInfoExists(usernameBeingVerified, emailBeingVerified, userInfoExistsCallback);
+	} else {
+		alert("Need valid username and email.");
+	}
 }
 
 var codeToVerify = 0;
-var verifyCodeCallback = function(actualCode) {
-	if (codeToVerify === actualCode) {
-		// save email
-		localStorage.setItem(localEmailKey, emailBeingVerified);
-		document.getElementById('myMainModal').style.display = "none";
-		showModal("<i class='fa fa-check' aria-hidden='true'></i> Email Verified", "Your email has been successfully verified and you are now signed in.");
+
+function verifyCodeClicked() {
+	codeToVerify = document.getElementById("verificationCodeInput").value;
+	onlinePlayEngine.getVerificationCode(verifyCodeCallback);
+}
+
+var tempUserId;
+
+var createDeviceIdCallback = function(generatedDeviceId) {
+	closeModal();
+
+	localStorage.setItem(deviceIdKey, parseInt(generatedDeviceId));
+	localStorage.setItem(userIdKey, parseInt(tempUserId));
+	localStorage.setItem(usernameKey, usernameBeingVerified);
+	localStorage.setItem(userEmailKey, emailBeingVerified);
+
+	localStorage.setItem(localEmailKey, emailBeingVerified); // Old field..
+
+	if (localPlayerRole === HOST) {
+		hostEmail = emailBeingVerified;
+	} else if (localPlayerRole === GUEST) {
+		guestEmail = emailBeingVerified;
 	}
+
 	emailBeingVerified = "";
+	usernameBeingVerified = "";
+	tempUserId = null;
 	codeToVerify = 0;
 
 	updateFooter();
 	clearMessage();
+
+	setAccountHeaderLinkText();
+
+	showModal("<i class='fa fa-check' aria-hidden='true'></i> Email Verified", "Hi, " + getUsername() + "! Your email has been successfully verified and you are now signed in.");
+}
+
+var createUserCallback = function(generatedUserId) {
+	tempUserId = generatedUserId;
+
+	onlinePlayEngine.createDeviceIdForUser(tempUserId, createDeviceIdCallback);
+}
+
+var verifyCodeCallback = function(actualCode) {
+	if (codeToVerify === actualCode) {
+		if (tempUserId && tempUserId >= 0) {
+			createUserCallback(tempUserId);
+		} else {
+			onlinePlayEngine.createUser(usernameBeingVerified, emailBeingVerified, createUserCallback);
+		}
+	}
 };
 
-function verifyEmailWithCode(codeToTry) {
-	codeToVerify = codeToTry;
-	onlinePlayEngine.getVerificationCode(verifyCodeCallback);
+function getUserId() {
+	return localStorage.getItem(userIdKey);
+}
+
+function getUsername() {
+	return localStorage.getItem(usernameKey);
+}
+
+function getDeviceId() {
+	return localStorage.getItem(deviceIdKey);
+}
+
+function userIsLoggedIn() {
+	return getUserId() 
+		&& getUsername() 
+		&& getUserEmail() 
+		&& getDeviceId();
+}
+
+var myGamesList = [];
+
+function jumpToGame(gameIdChosen, userIsHost, opponentUserName) {
+	gameId = gameIdChosen;
+	if (userIsHost) {
+		hostEmail = getUserEmail();
+		guestEmail = opponentUserName;
+	} else {
+		hostEmail = opponentUserName;
+		guestEmail = getUserEmail();
+	}
+	
+	startWatchingGameRealTime();
+	closeModal();
+}
+
+function showMyGames() {
+	onlinePlayEngine.getCurrentGamesForUser(getUserId(), 
+		function(results) {
+			var message = "No active games.";
+			if (results) {
+				message = "";
+				debug(results);
+				var resultRows = results.split('\n');
+
+				myGamesList = [];
+
+				for (var index in resultRows) {
+					var row = resultRows[index].split('|||');
+					debug(row);
+					var myGame = {gameId:parseInt(row[0]), hostUsername:row[1], guestUsername:row[2]};
+					myGamesList.push(myGame);
+					var gId = parseInt(myGame.gameId);
+					var userIsHost = myGame.hostUsername === getUsername();
+					var opponentUserName = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+					message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUserName + "\");'>" + myGame.hostUsername + " vs. " + myGame.guestUsername + "</div>";
+				}
+			}
+			message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='signOut();'>Click here to sign out.</span></div>";
+			showModal("Active Games", message);
+		}
+	);
+}
+
+function accountHeaderClicked() {
+	if (userIsLoggedIn() && onlinePlayEnabled) {
+		showMyGames();
+	} else {
+		loginClicked();
+	}
 }
 
 function loginClicked() {
-	var msg = "Enter your email and enter the 4-digit code sent to you to sign into SkudPaiSho.com in this browser. \
-	<div style='text-align: center;'> <div> \
-	<br /> Email: <input id='userEmailInput' type='text' name='userEmailInput' /> </div> \
-	<div><button type='button' onclick='callSendVerificationCode(document.getElementById(\"userEmailInput\").value); document.getElementById(\"verificationCodeInput\").disabled=false;'>Send verification code</button></div> \
-	<div><br /> Code: <input id='verificationCodeInput' type='text' name='verificationCodeInput' disabled /> </div> \
-	<div><button id='verifyCodeBtn' type='button' onclick='verifyEmailWithCode(document.getElementById(\"verificationCodeInput\").value);'>Verify code</button></div> </div>";
+	var msg = document.getElementById('loginModalContentContainer').innerHTML;
 
-	if (getUserEmail()) {
-		msg += "<div><br /><br />You are currently signed in as " + getUserEmail() + "</div>";
+	if (userIsLoggedIn()) {
+		msg += "<div><br /><br />You are currently signed in as " + getUsername() + "</div>";
 	}
 	
 	showModal("Sign In", msg);
 }
 
-/* End Modal */
+var gameSeekList = [];
+
+function acceptGameSeekClicked(gameIdChosen) {
+	var gameSeek;
+	for (var index in gameSeekList) {
+		debug(gameSeekList[index].gameId);
+		if (gameSeekList[index].gameId === gameIdChosen) {
+			gameSeek = gameSeekList[index];
+		}
+	}
+
+	if (gameSeek) {
+		onlinePlayEngine.joinGameSeek(gameSeek.gameId, getUserId(), 
+			function(gameJoined) {
+				if (gameJoined) {
+					gameId = gameSeek.gameId;
+					hostEmail = gameSeek.hostUsername;
+					guestEmail = getUserEmail();
+					startWatchingGameRealTime();
+					closeModal();
+				}
+			}
+		);
+	}
+}
+
+function viewGameSeeksClicked() {
+	if (onlinePlayEnabled) {
+		onlinePlayEngine.getGameSeeks(
+			function(results) {
+				var message = "No games available to join.";
+				if (results) {
+					message = "";
+					debug(results);
+					var resultRows = results.split('\n');
+
+					gameSeekList = [];
+
+					for (var index in resultRows) {
+						var row = resultRows[index].split('|||');
+						debug(row);
+						var gameSeek = {gameId:parseInt(row[0]), hostId:row[1], hostUsername:row[2], gameNotation:row[3]};
+						gameSeekList.push(gameSeek);
+						message += "<div class='clickableText' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + gameSeek.hostUsername + "</div>";
+					}
+				}
+				showModal("Join a game", message);
+			}
+		);
+	} else {
+		showModal("Join a game", "Coming soon <i class='fa fa-thumbs-o-up' aria-hidden='true'></i>");
+	}
+}
+
+
+
+
+
