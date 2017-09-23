@@ -129,6 +129,17 @@ OnlinePlayEngine.prototype.getGameSeeks = function(callback) {
     );
 };
 
+OnlinePlayEngine.prototype.getCurrentGameSeeksHostedByUser = function(userId, callback) {
+    $.get("getCurrentGameSeeksHostedByUser.php?userId="+userId, 
+        function(data, status){
+            if (status === 'success') {
+                debug(data.trim());
+                callback(data.trim());
+            }
+        }
+    );
+};
+
 OnlinePlayEngine.prototype.getCurrentGamesForUser = function(userId, callback) {
     $.get("getCurrentGamesForUser.php?userId="+userId, 
         function(data, status){

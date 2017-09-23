@@ -334,6 +334,12 @@ function startWatchingGameRealTime() {
 	debug("Starting to watch game");
 	onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
 
+	if (gameWatchIntervalValue) {
+		clearInterval(gameWatchIntervalValue);
+		gameWatchIntervalValue = null;
+		debug("Interval cleared...");
+	}
+
 	gameWatchIntervalValue = setInterval(function() {
 		onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
 	}, 3000);
@@ -974,6 +980,7 @@ var createGameCallback = function(newGameId) {
 	finalizeMove();
 	lastSubmittedGameNotation = gameNotation.notationTextForUrl();
 	startWatchingGameRealTime();
+	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game to play a game locally for fun.<br /><br />If anyone joins this game, it will show up when you click My Games.");
 };
 
 var submitMoveCallback = function() {
@@ -1039,7 +1046,7 @@ function unplayedTileClicked(tileDiv) {
 				var move = new NotationMove("0H." + hostAccentTiles.join());
 				gameNotation.addMove(move);
 				if (onlinePlayEnabled) {
-					onlinePlayEngine.createGame(gameNotation.notationTextForUrl(), getUserId(), createGameCallback);
+					createGameIfThatIsOk();
 				} else {
 					finalizeMove();
 				}
@@ -1919,7 +1926,10 @@ var myGamesList = [];
 
 function jumpToGame(gameIdChosen, userIsHost, opponentUserName) {
 	gameId = gameIdChosen;
-	if (userIsHost) {
+	if (getUsername() === opponentUserName) {
+		hostEmail = getUserEmail();
+		guestEmail = getUserEmail();
+	} else if (userIsHost) {
 		hostEmail = getUserEmail();
 		guestEmail = opponentUserName;
 	} else {
@@ -2031,7 +2041,17 @@ function viewGameSeeksClicked() {
 	}
 }
 
-
+function createGameIfThatIsOk() {
+	onlinePlayEngine.getCurrentGameSeeksHostedByUser(getUserId(), 
+		function(results) {
+			if (!results) {
+				onlinePlayEngine.createGame(gameNotation.notationTextForUrl(), getUserId(), createGameCallback);
+			} else {
+				showModal("Create Game", "You already have a game that is waiting for an opponent.");
+			}
+		}
+	);
+}
 
 
 
