@@ -287,18 +287,29 @@ window.requestAnimationFrame(function () {
 	setAccountHeaderLinkText();
 
 	if (onlinePlayEnabled) {
-		// Turn on replay controls... TODO fix when this happens.
-		// document.getElementById("replayControls").classList.remove("gone");
-
 		onlinePlayEngine.testOnlinePlay();
 		if (gameId >= 0) {
-			// if (QueryString.game) {
-			// 	lastSubmittedGameNotation = gameNotation.notationTextForUrl();
-			// }
 			startWatchingGameRealTime();
 		}
 	}
+
+	verifyLogin();
 });
+
+function verifyLogin() {
+	if (onlinePlayEnabled) {
+		onlinePlayEngine.verifyLogin(getUserId(), 
+			getUsername(), 
+			getUserEmail(), 
+			getDeviceId(), 
+			function(isVerified) {
+				if (!isVerified) {
+					//
+				}
+			}
+		);
+	}
+}
 
 function setAccountHeaderLinkText() {
 	var text = "Sign In";
@@ -422,8 +433,6 @@ function gamePlayersMessage() {
 }
 
 function signOut() {
-	// TODO turn into full sign out method
-
 	var ok = confirm("Forgetting your email will disable email notifications. Are you sure?");
 	if (!ok) {
 		updateFooter();
@@ -437,6 +446,12 @@ function signOut() {
 	}
 
 	localStorage.removeItem(localEmailKey);
+
+	// Forget online play info
+	localStorage.removeItem(deviceIdKey);
+	localStorage.removeItem(userIdKey);
+	localStorage.removeItem(usernameKey);
+	localStorage.removeItem(userEmailKey);
 
 	updateFooter();
 	clearMessage();
@@ -1193,7 +1208,7 @@ function pointClicked(htmlPoint) {
 				// Move all set. Add it to the notation!
 				gameNotation.addMove(move);
 				if (playingOnlineGame()) {
-					onlinePlayEngine.submitMove(gameId, gameNotation.notationTextForUrl(), submitMoveCallback);
+					callSubmitMove();
 				} else {
 					finalizeMove();
 				}
@@ -1221,7 +1236,7 @@ function pointClicked(htmlPoint) {
 				
 				gameNotation.addMove(move);
 				if (onlinePlayEnabled) {
-					onlinePlayEngine.submitMove(gameId, gameNotation.notationTextForUrl(), submitMoveCallback);
+					callSubmitMove();
 				} else {
 					finalizeMove();
 				}
@@ -1237,7 +1252,7 @@ function pointClicked(htmlPoint) {
 			var move = gameNotation.getNotationMoveFromBuilder(notationBuilder);
 			gameNotation.addMove(move);
 			if (onlinePlayEnabled) {
-				onlinePlayEngine.submitMove(gameId, gameNotation.notationTextForUrl(), submitMoveCallback);
+				callSubmitMove();
 			} else {
 				finalizeMove();
 			}
@@ -1256,7 +1271,7 @@ function skipHarmonyBonus() {
 	var move = gameNotation.getNotationMoveFromBuilder(notationBuilder);
 	gameNotation.addMove(move);
 	if (onlinePlayEnabled) {
-		onlinePlayEngine.submitMove(gameId, gameNotation.notationTextForUrl(), submitMoveCallback);
+		callSubmitMove();
 	} else {
 		finalizeMove();
 	}
@@ -1826,6 +1841,10 @@ function showModal(headingHTMLText, modalMessageHTMLText) {
 
 function closeModal() {
 	document.getElementById('myMainModal').style.display = "none";
+}
+
+function callSubmitMove() {
+	onlinePlayEngine.submitMove(gameId, gameNotation.notationTextForUrl(), getUserId(), submitMoveCallback);
 }
 
 var emailBeingVerified = "";

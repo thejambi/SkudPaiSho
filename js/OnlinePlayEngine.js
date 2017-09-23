@@ -162,11 +162,12 @@ OnlinePlayEngine.prototype.getGameNotation = function(gameId, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, callback) {
+OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, userId, callback) {
     $.post("updateGameNotation.php",
         {
             id: gameId,
-            t: gameNotationText
+            t: gameNotationText,
+            userId: userId
         },
         function(data, status){
             if (status === 'success') {
