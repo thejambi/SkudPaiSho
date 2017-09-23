@@ -282,6 +282,8 @@ window.requestAnimationFrame(function () {
 
 	clearMessage();
 
+	rerunAll();
+
 	setAccountHeaderLinkText();
 
 	if (onlinePlayEnabled) {
@@ -539,7 +541,11 @@ function getAdditionalMessage() {
 	}
 
 	if (gameNotation.moves.length === 0) {
-		msg += "Select 4 Accent Tiles to play with.";
+		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
+			msg += "<strong>Real-time gameplay is enabled!</strong> Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting your 4 Accent Tiles. <br />";
+		} else {
+			msg += "Select 4 Accent Tiles to play with.";
+		}
 	} else if (gameNotation.moves.length === 1) {
 		msg += "Select 4 Accent Tiles to play with, then Plant a Basic Flower Tile.";
 	} else if (gameNotation.moves.length === 2) {
@@ -581,154 +587,151 @@ function rerunAll() {
 function finalizeMove(ignoreNoEmail) {
 	rerunAll();
 
-	// var linkUrl = url + "?";
-	var linkUrl = "";
-	if (hostEmail) {
-		linkUrl += "host=" + hostEmail + "&";
-	}
-	if (guestEmail) {
-		linkUrl += "guest=" + guestEmail + "&";
-	}
-	linkUrl += "game=" + gameNotation.notationTextForUrl();
-
-	// linkUrl += "&replay=true";	// No longer needed
-
-	if (newSpecialFlowerRules) {
-		linkUrl += "&newSpecialFlowerRules=y";
-	} else {
-		linkUrl += "&newSpecialFlowerRules=n";
-	}
-
-	if (newGatesRule) {
-		linkUrl += "&newGatesRule=y";
-	} else {
-		linkUrl += "&newGatesRule=n";
-	}
-
-	if (simpleCanonRules) {
-		linkUrl += "&canon=y";
-	}
-
-	if (newOrchidVulnerableRule) {
-		linkUrl += "&newOrchidVulnerableRule=y";
-	} //else {
-	// 	linkUrl += "&newOrchidVulnerableRule=n";
-	// }
-
-	if (newOrchidCaptureRule) {
-		linkUrl += "&newOrchidCaptureRule=y";
-	} //else {
-	// 	linkUrl += "&newOrchidCaptureRule=n";
-	// }
-
-	if (newOrchidClashRule) {
-		linkUrl += "&newOrchidClashRule=y";
-	} //else {
-	// 	linkUrl += "&newOrchidClashRule=n";
-	// }
-
-	if (simpleSpecialFlowerRule) {
-		linkUrl += "&simpleSpecialFlowerRule=y";
-	} //else {
-	// 	linkUrl += "&simpleSpecialFlowerRule=n";
-	// }
-
-	if (rocksUnwheelable) {
-		linkUrl += "&rocksUnwheelable=y";
-	} //else {
-	// 	linkUrl += "&rocksUnwheelable=n";
-	// }
-
-	if (limitedGatesRule) {
-		linkUrl += "&limitedGatesRule=y";
-	} else {
-		linkUrl += "&limitedGatesRule=n";
-	}
-
-	if (simpleRocks) {
-		linkUrl += "&simpleRocks=y";
-	}
-
-	if (simplest) {
-		linkUrl += "&simplest=y";
-	}
-
-	if (specialFlowerBonusRule) {
-		linkUrl += "&specialFlowerBonusRule=y";
-	} //else {
-	// 	linkUrl += "&specialFlowerBonusRule=n";
-	// }
-
-	if (lessBonus) {
-		linkUrl += "&lessBonus=y";
-	}
-	if (superHarmonies) {
-		linkUrl += "&superHarmonies=y";
-	}
-	if (completeHarmony) {
-		linkUrl += "&completeHarmony=y";
-	}
-	
-	if (boatOnlyMoves) {
-		linkUrl += "&boatOnlyMoves=y";
-	}
-	if (superRocks) {
-		linkUrl += "&superRocks=y";
-	}
-	if (sameStart) {
-		linkUrl += "&sameStart=y";
-	}
-
-
-	// Add start date
-	if (!metadata.startDate) {
-		metadata.startDate = getDateString();
-	}
-	linkUrl += "&sDate=" + metadata.startDate;
-
-	// Add tournament info
-	if (metadata.tournamentName && metadata.tournamentHost) {
-		linkUrl += "&tournamentName=" + metadata.tournamentName;
-		linkUrl += "&tournamentHost=" + metadata.tournamentHost;
-		linkUrl += "&tournamentMatchNotes=" + metadata.tournamentMatchNotes;
-	}
-
-	//if (theGame.board.winners.length > 0) {
-	if (theGame.getWinner()) {
-		// Add end date
-		if (!metadata.endDate) {
-			metadata.endDate = getDateString();
+	// Only build url if not onlinePlay
+	if (playingOnlineGame()) {
+		// var linkUrl = url + "?";
+		var linkUrl = "";
+		if (hostEmail) {
+			linkUrl += "host=" + hostEmail + "&";
 		}
-		linkUrl += "&eDate=" + metadata.endDate;
-	}
-
-	// if (onlinePlayEnabled && gameId >= 0) {
-	// 	// append to url: &onlinePlayGame=y&gameId=?, where ? is id value
-	// 	linkUrl += "&onlinePlayGame=y&gameId=" + gameId;
-	// }
-
-	// debug(url + "?" + linkUrl);
-	// Compress, then build full URL
-	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
-
-	linkUrl = url + "?" + linkUrl;
-
-	// if (theGame.board.winners.length > 0) {
-	if (theGame.getWinner()) {
-		// Call short url because game is over
-		if (!url.startsWith("file")) {
-			getShortUrl(linkUrl);
+		if (guestEmail) {
+			linkUrl += "guest=" + guestEmail + "&";
 		}
+		linkUrl += "game=" + gameNotation.notationTextForUrl();
+
+		// linkUrl += "&replay=true";	// No longer needed
+
+		if (newSpecialFlowerRules) {
+			linkUrl += "&newSpecialFlowerRules=y";
+		} else {
+			linkUrl += "&newSpecialFlowerRules=n";
+		}
+
+		if (newGatesRule) {
+			linkUrl += "&newGatesRule=y";
+		} else {
+			linkUrl += "&newGatesRule=n";
+		}
+
+		if (simpleCanonRules) {
+			linkUrl += "&canon=y";
+		}
+
+		if (newOrchidVulnerableRule) {
+			linkUrl += "&newOrchidVulnerableRule=y";
+		} //else {
+		// 	linkUrl += "&newOrchidVulnerableRule=n";
+		// }
+
+		if (newOrchidCaptureRule) {
+			linkUrl += "&newOrchidCaptureRule=y";
+		} //else {
+		// 	linkUrl += "&newOrchidCaptureRule=n";
+		// }
+
+		if (newOrchidClashRule) {
+			linkUrl += "&newOrchidClashRule=y";
+		} //else {
+		// 	linkUrl += "&newOrchidClashRule=n";
+		// }
+
+		if (simpleSpecialFlowerRule) {
+			linkUrl += "&simpleSpecialFlowerRule=y";
+		} //else {
+		// 	linkUrl += "&simpleSpecialFlowerRule=n";
+		// }
+
+		if (rocksUnwheelable) {
+			linkUrl += "&rocksUnwheelable=y";
+		} //else {
+		// 	linkUrl += "&rocksUnwheelable=n";
+		// }
+
+		if (limitedGatesRule) {
+			linkUrl += "&limitedGatesRule=y";
+		} else {
+			linkUrl += "&limitedGatesRule=n";
+		}
+
+		if (simpleRocks) {
+			linkUrl += "&simpleRocks=y";
+		}
+
+		if (simplest) {
+			linkUrl += "&simplest=y";
+		}
+
+		if (specialFlowerBonusRule) {
+			linkUrl += "&specialFlowerBonusRule=y";
+		} //else {
+		// 	linkUrl += "&specialFlowerBonusRule=n";
+		// }
+
+		if (lessBonus) {
+			linkUrl += "&lessBonus=y";
+		}
+		if (superHarmonies) {
+			linkUrl += "&superHarmonies=y";
+		}
+		if (completeHarmony) {
+			linkUrl += "&completeHarmony=y";
+		}
+		
+		if (boatOnlyMoves) {
+			linkUrl += "&boatOnlyMoves=y";
+		}
+		if (superRocks) {
+			linkUrl += "&superRocks=y";
+		}
+		if (sameStart) {
+			linkUrl += "&sameStart=y";
+		}
+
+
+		// Add start date
+		if (!metadata.startDate) {
+			metadata.startDate = getDateString();
+		}
+		linkUrl += "&sDate=" + metadata.startDate;
+
+		// Add tournament info
+		if (metadata.tournamentName && metadata.tournamentHost) {
+			linkUrl += "&tournamentName=" + metadata.tournamentName;
+			linkUrl += "&tournamentHost=" + metadata.tournamentHost;
+			linkUrl += "&tournamentMatchNotes=" + metadata.tournamentMatchNotes;
+		}
+
+		//if (theGame.board.winners.length > 0) {
+		if (theGame.getWinner()) {
+			// Add end date
+			if (!metadata.endDate) {
+				metadata.endDate = getDateString();
+			}
+			linkUrl += "&eDate=" + metadata.endDate;
+		}
+
+		// if (onlinePlayEnabled && gameId >= 0) {
+		// 	// append to url: &onlinePlayGame=y&gameId=?, where ? is id value
+		// 	linkUrl += "&onlinePlayGame=y&gameId=" + gameId;
+		// }
+
+		// debug(url + "?" + linkUrl);
+		// Compress, then build full URL
+		linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
+
+		linkUrl = url + "?" + linkUrl;
+
+		// if (theGame.board.winners.length > 0) {
+		if (theGame.getWinner()) {
+			// Call short url because game is over
+			if (!url.startsWith("file")) {
+				getShortUrl(linkUrl);
+			}
+		}
+		linkShortenCallback(linkUrl, ignoreNoEmail);
+	} else {
+		linkShortenCallback('', ignoreNoEmail);
 	}
-
-	// debug("End result: " + linkUrl);
-
-	// if (!url.startsWith("file") && !haveBothEmails()) {
-	// 	getShortUrl(linkUrl, linkShortenCallback);
-	// } else {
-	// 	linkShortenCallback(linkUrl);//.replace(/\(/g, "%28").replace(/\)/g, "%29"));
-	// }
-	linkShortenCallback(linkUrl, ignoreNoEmail);
 }
 
 function showSubmitMoveForm(url) {
@@ -753,13 +756,23 @@ function getNoUserEmailMessage() {
 	return "Recommended: <span class='skipBonus' onclick='promptEmail(); finalizeMove();'>Enter your email address</span> to be notified when it is your turn. <br /><em><span class='skipBonus' onclick='finalizeMove(true);'>Click to ignore</span></em><br /><br />";
 }
 
+function playingOnlineGame() {
+	return onlinePlayEnabled && gameId >= 0;
+}
+
 function linkShortenCallback(shortUrl, ignoreNoEmail) {
 	debug(shortUrl);
 
 	var messageText = "";
 
+	if (playingOnlineGame()) {
+		messageText += "<em>Listening for game updates...</em><br />";
+	}
+
 	if (currentMoveIndex == 1 && !haveBothEmails()) {
-		messageText += "Thank you for Hosting a game of Pai Sho! Share <a href=\"" + shortUrl + "\">this link</a> with your friends to invite them to join you in a game."
+		if (!playingOnlineGame()) {
+			messageText += "Thank you for Hosting a game of Pai Sho! Share <a href=\"" + shortUrl + "\">this link</a> with your friends to invite them to join you in a game.";
+		}
 		if (aiList.length > 0) {
 			for (var i = 0; i < aiList.length; i++) {
 				messageText += "<br /><span class='skipBonus' onclick='setAiIndex(" + i + ");'>Play " + aiList[i].getName() + "</span>";
@@ -767,16 +780,18 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		}
 	} else if (haveBothEmails()) {
 		// messageText = "Click <span class='skipBonus' onclick=sendMail('" + shortUrl + "')>here</span> to email your move to the " + getCurrentPlayer() + ". Or, share this <a href=\"" + shortUrl + "\">link</a> with them.";
-		if (!metadata.tournamentName) {
+		if (!metadata.tournamentName && !playingOnlineGame()) {
 			messageText += "Or, copy and share this <a href=\"" + shortUrl + "\">link</a> with your opponent.";
 		}
-		showSubmitMoveForm(shortUrl);
+		if (!playingOnlineGame()) {
+			showSubmitMoveForm(shortUrl);
+		}
 	} else if ((activeAi && getCurrentPlayer() === activeAi.player) || (activeAi2 && getCurrentPlayer() === activeAi2.player)) {
 		//messageText += "<span class='skipBonus' onclick='playAiTurn();'>Submit move to AI</span>";
 		messageText += "<em>THINKING...</em>";
 	} else if (activeAi) {
 		messageText += "Playing against the computer can help you learn how the game works. You should be able to beat the computer easily once you understand the game.<br /><br />Is playing against the computer too easy? Good! <a href='http://skudpaisho.com/?BYewzgLgvGDWCuATADgQwJZlAAQOYFsMAbAOgGMR8AyXVfAUygAYAJEgJQBoB1TgaU4AhKgDt6AdwDKyemXSoiAMSIhx9AE7t4RemCgjREgOKoIurTqgBPKupBlYYAKojxwevSKoARpZtgAEVNGACYmAEYAdgBaJhDYgBYgA'>Join the creator in a game</a> to play a real game or give feedback.";
-	} else {
+	} else if (!playingOnlineGame()) {
 		messageText += "Copy this <a href=\"" + shortUrl + "\">link</a> and send to the " + getCurrentPlayer() + ".";
 	}
 
@@ -980,7 +995,7 @@ var createGameCallback = function(newGameId) {
 	finalizeMove();
 	lastSubmittedGameNotation = gameNotation.notationTextForUrl();
 	startWatchingGameRealTime();
-	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game to play a game locally for fun.<br /><br />If anyone joins this game, it will show up when you click My Games.");
+	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game to play a game locally for fun.<br /><br />If anyone joins this game, it will show up in your list of games when you click My Games.");
 };
 
 var submitMoveCallback = function() {
@@ -1177,7 +1192,7 @@ function pointClicked(htmlPoint) {
 			} else if (!bonusAllowed) {
 				// Move all set. Add it to the notation!
 				gameNotation.addMove(move);
-				if (onlinePlayEnabled) {
+				if (playingOnlineGame()) {
 					onlinePlayEngine.submitMove(gameId, gameNotation.notationTextForUrl(), submitMoveCallback);
 				} else {
 					finalizeMove();
@@ -1684,6 +1699,12 @@ function getLink(forSandbox) {
 }
 
 function setAiIndex(i) {
+	// Leave online game if needed
+	if (playingOnlineGame()) {
+		gameId = -1;
+		clearInterval(gameWatchIntervalValue);
+	}
+
 	QueryString.replay = "true";
 	if (QueryString.replay === "true") {
 		document.getElementById("replayControls").classList.remove("gone");
@@ -1999,6 +2020,7 @@ function acceptGameSeekClicked(gameIdChosen) {
 	}
 
 	if (gameSeek) {
+		// TODO Only join game if not already playing against the other player
 		onlinePlayEngine.joinGameSeek(gameSeek.gameId, getUserId(), 
 			function(gameJoined) {
 				if (gameJoined) {
@@ -2013,11 +2035,18 @@ function acceptGameSeekClicked(gameIdChosen) {
 	}
 }
 
+function tryRealTimeClicked() {
+	onlinePlayEnabled = true;
+	setAccountHeaderLinkText();
+	rerunAll();
+	closeModal();
+}
+
 function viewGameSeeksClicked() {
 	if (onlinePlayEnabled) {
 		onlinePlayEngine.getGameSeeks(
 			function(results) {
-				var message = "No games available to join.";
+				var message = "No games available to join. You should start one!";
 				if (results) {
 					message = "";
 					debug(results);
@@ -2037,7 +2066,7 @@ function viewGameSeeksClicked() {
 			}
 		);
 	} else {
-		showModal("Join a game", "Coming soon <i class='fa fa-thumbs-o-up' aria-hidden='true'></i>");
+		showModal("Join a game", "Coming soon <i class='fa fa-thumbs-o-up' aria-hidden='true'></i><br />Want to test out the real-time gameplay changes? <span class='clickableText' onclick='tryRealTimeClicked();'>Click here to try it!</span>");
 	}
 }
 
