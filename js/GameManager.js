@@ -215,6 +215,20 @@ GameManager.prototype.getWinReason = function() {
 	}
 };
 
+GameManager.prototype.getWinResultTypeCode = function() {
+	if (this.board.winners.length === 1) {
+		return 1;	// Harmony Ring is 1
+	} else if (this.endGameWinners.length === 1) {
+		if (this.tileManager.getPlayerWithMoreAccentTiles()) {
+			return 2;	// More Accent Tiles remaining
+		} else {
+			return 3;	// Most Harmonies
+		}
+	} else if (this.endGameWinners.length > 1) {
+		return 4;	// Tie
+	}
+};
+
 GameManager.prototype.getCopy = function() {
 	var copyGame = new GameManager(true, true);
 	copyGame.board = this.board.getCopy();

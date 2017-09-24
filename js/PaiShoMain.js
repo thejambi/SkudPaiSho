@@ -817,13 +817,23 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 	//if (theGame.board.winners.length > 0) {
 	if (theGame.getWinner()) {
 		// There is a winner!
-		// if (theGame.board.winners.length > 1) {
-		// 	// There are two winners???
-		// 	messageText += "<br /><strong>Both players have created Harmony Rings! It's a tie!</strong>";
-		// } else {
-		// 	messageText += "<br /><strong>" + theGame.board.winners[0] + " has created a Harmony Ring and won the game!</strong>";
-		// }
 		messageText += "<br /><strong>" + theGame.getWinner() + theGame.getWinReason() + "</strong>";
+		// Save winner
+		if (playingOnlineGame()) {
+			var winnerUsername;
+			if (theGame.getWinner() === HOST) {
+				winnerUsername = currentGameData.hostUsername;
+			} else if (theGame.getWinner() === GUEST) {
+				winnerUsername = currentGameData.guestUsername;
+			}
+
+			if (!winnerUsername) {
+				// A tie.. special case
+				onlinePlayEngine.updateGameWinInfoAsTie(gameId, theGame.getWinResultTypeCode);
+			} else {
+				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, theGame.getWinResultTypeCode());
+			}
+		}
 	} else {
 		messageText += getResetMoveText();
 	}
@@ -1963,18 +1973,28 @@ function userIsLoggedIn() {
 }
 
 var myGamesList = [];
+var currentGameOpponentUsername;
+var currentGameData = new Object();
 
-function jumpToGame(gameIdChosen, userIsHost, opponentUserName) {
+function jumpToGame(gameIdChosen, userIsHost, opponentUsername) {
 	gameId = gameIdChosen;
-	if (getUsername() === opponentUserName) {
+	currentGameOpponentUsername = opponentUsername;
+
+	if (getUsername() === opponentUsername) {
 		hostEmail = getUserEmail();
 		guestEmail = getUserEmail();
+		currentGameData.hostUsername = getUsername();
+		currentGameData.guestUsername = getUsername();
 	} else if (userIsHost) {
 		hostEmail = getUserEmail();
-		guestEmail = opponentUserName;
+		guestEmail = opponentUsername;
+		currentGameData.hostUsername = getUsername();
+		currentGameData.guestUsername = opponentUsername;
 	} else {
-		hostEmail = opponentUserName;
+		hostEmail = opponentUsername;
 		guestEmail = getUserEmail();
+		currentGameData.hostUsername = opponentUsername;
+		currentGameData.guestUsername = getUsername();
 	}
 	
 	startWatchingGameRealTime();
@@ -1999,8 +2019,8 @@ function showMyGames() {
 					myGamesList.push(myGame);
 					var gId = parseInt(myGame.gameId);
 					var userIsHost = myGame.hostUsername === getUsername();
-					var opponentUserName = userIsHost ? myGame.guestUsername : myGame.hostUsername;
-					message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUserName + "\");'>" + myGame.hostUsername + " vs. " + myGame.guestUsername + "</div>";
+					var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+					message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\");'>" + myGame.hostUsername + " vs. " + myGame.guestUsername + "</div>";
 				}
 			}
 			message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='signOut();'>Click here to sign out.</span></div>";
@@ -2044,8 +2064,11 @@ function acceptGameSeekClicked(gameIdChosen) {
 			function(gameJoined) {
 				if (gameJoined) {
 					gameId = gameSeek.gameId;
+					currentGameOpponentUsername = gameSeek.hostUsername;
 					hostEmail = gameSeek.hostUsername;
 					guestEmail = getUserEmail();
+					currentGameData.hostUsername = gameSeek.hostUsername;
+					currentGameData.guestUsername = getUsername();
 					startWatchingGameRealTime();
 					closeModal();
 				}
@@ -2076,7 +2099,7 @@ function viewGameSeeksClicked() {
 					for (var index in resultRows) {
 						var row = resultRows[index].split('|||');
 						debug(row);
-						var gameSeek = {gameId:parseInt(row[0]), hostId:row[1], hostUsername:row[2], gameNotation:row[3]};
+						var gameSeek = {gameId:parseInt(row[0]), hostId:row[1], hostUsername:row[2], guestUsername:row[3]};
 						gameSeekList.push(gameSeek);
 						message += "<div class='clickableText' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + gameSeek.hostUsername + "</div>";
 					}

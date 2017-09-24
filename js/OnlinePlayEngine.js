@@ -178,6 +178,35 @@ OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, userI
     );
 };
 
+OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, resultTypeCode) {
+    $.post("updateGameWinInfo.php",
+        {
+            gameId: gameId,
+            winnerUsername: winnerUsername,
+            resultTypeCode: resultTypeCode
+        },
+        function(data, status){
+            if (status === 'success') {
+                debug('Game win info updated.');
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.updateGameWinInfoAsTie = function(gameId, resultTypeCode) {
+    $.post("updateGameWinInfoAsTie.php",
+        {
+            gameId: gameId,
+            resultTypeCode: resultTypeCode
+        },
+        function(data, status){
+            if (status === 'success') {
+                debug('Game win info updated.');
+            }
+        }
+    );
+};
+
 OnlinePlayEngine.prototype.getGameTypeDesc = function(gameTypeId) {
     $.get("getGameTypeDesc.php?q="+gameTypeId, 
         function(data, status){
