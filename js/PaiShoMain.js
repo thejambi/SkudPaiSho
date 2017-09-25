@@ -293,7 +293,7 @@ window.requestAnimationFrame(function () {
 		}
 	}
 
-	verifyLogin();
+	verifyLogin();	// Uncomment when ok
 });
 
 function verifyLogin() {
@@ -303,8 +303,10 @@ function verifyLogin() {
 			getUserEmail(), 
 			getDeviceId(), 
 			function(isVerified) {
-				if (!isVerified) {
-					//
+				if (isVerified) {
+					startLoggingOnlineStatus();
+				} else {
+					forgetOnlinePlayInfo();
 				}
 			}
 		);
@@ -321,9 +323,6 @@ function setAccountHeaderLinkText() {
 }
 
 var getGameNotationCallback = function(newGameNotation) {
-	// if (lastSubmittedGameNotation === "") {
-	// 	lastSubmittedGameNotation = newGameNotation;
-	// }
 	// if different, set new notation and rerunAll
 	if (newGameNotation !== lastSubmittedGameNotation) {
 		gameNotation.setNotationText(newGameNotation);
@@ -333,19 +332,45 @@ var getGameNotationCallback = function(newGameNotation) {
 	} else {
 		// debug("GAME NOTATION THE SAME");
 	}
-
-	// if (myTurnForReal() && hostEmail !== guestEmail) {
-	// 	clearInterval(gameWatchIntervalValue);
-	// 	debug("Current player turn, so not watching game...");
-	// 	return;
-	// }
 };
+
+function updateCurrentGameTitle(isOpponentOnline) {
+	var opponentOnlineIconText = userOfflineIcon;
+	if (isOpponentOnline) {
+		opponentOnlineIconText = userOnlineIcon;
+	}
+
+	var title = "<strong>";
+	if (currentGameData.guestUsername === getUsername()) {
+		title += opponentOnlineIconText;
+	}
+	title += currentGameData.hostUsername;
+	title += " vs. ";
+	if (currentGameData.hostUsername === getUsername()) {
+		title += opponentOnlineIconText;
+	}
+	title += currentGameData.guestUsername;
+	title += "</strong>";
+	
+	document.getElementById("response").innerHTML = title;
+}
 
 var gameWatchIntervalValue;
 
+function gameWatchPulse() {
+	onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
+	
+	onlinePlayEngine.checkIfUserOnline(currentGameOpponentUsername, 
+		function(isOpponentOnline) {
+			updateCurrentGameTitle(isOpponentOnline);
+		}
+	);
+}
+
 function startWatchingGameRealTime() {
 	debug("Starting to watch game");
-	onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
+	
+	gameWatchPulse();
 
 	if (gameWatchIntervalValue) {
 		clearInterval(gameWatchIntervalValue);
@@ -354,7 +379,7 @@ function startWatchingGameRealTime() {
 	}
 
 	gameWatchIntervalValue = setInterval(function() {
-		onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
+		gameWatchPulse();
 	}, 3000);
 }
 
@@ -432,6 +457,14 @@ function gamePlayersMessage() {
 	return msg;
 }
 
+forgetOnlinePlayInfo = function() {
+	// Forget online play info
+	localStorage.removeItem(deviceIdKey);
+	localStorage.removeItem(userIdKey);
+	localStorage.removeItem(usernameKey);
+	localStorage.removeItem(userEmailKey);
+}
+
 function signOut() {
 	var ok = confirm("Forgetting your email will disable email notifications. Are you sure?");
 	if (!ok) {
@@ -447,11 +480,7 @@ function signOut() {
 
 	localStorage.removeItem(localEmailKey);
 
-	// Forget online play info
-	localStorage.removeItem(deviceIdKey);
-	localStorage.removeItem(userIdKey);
-	localStorage.removeItem(usernameKey);
-	localStorage.removeItem(userEmailKey);
+	forgetOnlinePlayInfo();
 
 	updateFooter();
 	clearMessage();
@@ -603,7 +632,7 @@ function finalizeMove(ignoreNoEmail) {
 	rerunAll();
 
 	// Only build url if not onlinePlay
-	if (playingOnlineGame()) {
+	if (!playingOnlineGame()) {
 		// var linkUrl = url + "?";
 		var linkUrl = "";
 		if (hostEmail) {
@@ -1020,7 +1049,7 @@ var createGameCallback = function(newGameId) {
 	finalizeMove();
 	lastSubmittedGameNotation = gameNotation.notationTextForUrl();
 	startWatchingGameRealTime();
-	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game to play a game locally for fun.<br /><br />If anyone joins this game, it will show up in your list of games when you click My Games.");
+	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game if you'd like.<br /><br />If anyone joins this game, it will show up in your list of games when you click My Games.");
 };
 
 var submitMoveCallback = function() {
@@ -1086,7 +1115,7 @@ function unplayedTileClicked(tileDiv) {
 				var move = new NotationMove("0H." + hostAccentTiles.join());
 				gameNotation.addMove(move);
 				if (onlinePlayEnabled) {
-					createGameIfThatIsOk();
+					createGameIfThatIsOk(1); // 1 for Skud Pai Sho
 				} else {
 					finalizeMove();
 				}
@@ -1934,6 +1963,8 @@ var createDeviceIdCallback = function(generatedDeviceId) {
 
 	setAccountHeaderLinkText();
 
+	verifyLogin();	// Uncomment when ok
+
 	showModal("<i class='fa fa-check' aria-hidden='true'></i> Email Verified", "Hi, " + getUsername() + "! Your email has been successfully verified and you are now signed in.");
 }
 
@@ -2001,26 +2032,58 @@ function jumpToGame(gameIdChosen, userIsHost, opponentUsername) {
 	closeModal();
 }
 
+function populateMyGamesList(results) {
+	var resultRows = results.split('\n');
+	myGamesList = [];
+	for (var index in resultRows) {
+		var row = resultRows[index].split('|||');
+		var myGame = {
+			gameId:parseInt(row[0]), 
+			hostUsername:row[1], 
+			hostOnline:parseInt(row[2]), 
+			guestUsername:row[3], 
+			guestOnline:parseInt(row[4])
+		};
+		myGamesList.push(myGame);
+	}
+}
+
 function showMyGames() {
 	onlinePlayEngine.getCurrentGamesForUser(getUserId(), 
 		function(results) {
 			var message = "No active games.";
 			if (results) {
 				message = "";
-				debug(results);
-				var resultRows = results.split('\n');
+				
+				populateMyGamesList(results);
 
-				myGamesList = [];
+				for (var index in myGamesList) {
+					var myGame = myGamesList[index];
 
-				for (var index in resultRows) {
-					var row = resultRows[index].split('|||');
-					debug(row);
-					var myGame = {gameId:parseInt(row[0]), hostUsername:row[1], guestUsername:row[2]};
-					myGamesList.push(myGame);
 					var gId = parseInt(myGame.gameId);
 					var userIsHost = myGame.hostUsername === getUsername();
 					var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
-					message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\");'>" + myGame.hostUsername + " vs. " + myGame.guestUsername + "</div>";
+
+					var gameDisplayTitle = "";
+					if (!userIsHost && opponentUsername != getUsername()) {
+						if (myGame.hostOnline) {
+							gameDisplayTitle += userOnlineIcon;
+						} else {
+							gameDisplayTitle += userOfflineIcon;
+						}
+					}
+					gameDisplayTitle += myGame.hostUsername;
+					gameDisplayTitle += " vs. ";
+					if (userIsHost && opponentUsername != getUsername()) {
+						if (myGame.guestOnline) {
+							gameDisplayTitle += userOnlineIcon;
+						} else {
+							gameDisplayTitle += userOfflineIcon;
+						}
+					}
+					gameDisplayTitle += myGame.guestUsername;
+					
+					message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\");'>" + gameDisplayTitle + "</div>";
 				}
 			}
 			message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='signOut();'>Click here to sign out.</span></div>";
@@ -2049,6 +2112,23 @@ function loginClicked() {
 
 var gameSeekList = [];
 
+function completeJoinGameSeek(gameSeek) {
+	onlinePlayEngine.joinGameSeek(gameSeek.gameId, getUserId(), 
+		function(gameJoined) {
+			if (gameJoined) {
+				gameId = gameSeek.gameId;
+				currentGameOpponentUsername = gameSeek.hostUsername;
+				hostEmail = gameSeek.hostUsername;
+				guestEmail = getUserEmail();
+				currentGameData.hostUsername = gameSeek.hostUsername;
+				currentGameData.guestUsername = getUsername();
+				startWatchingGameRealTime();
+				closeModal();
+			}
+		}
+	);
+}
+
 function acceptGameSeekClicked(gameIdChosen) {
 	var gameSeek;
 	for (var index in gameSeekList) {
@@ -2059,18 +2139,40 @@ function acceptGameSeekClicked(gameIdChosen) {
 	}
 
 	if (gameSeek) {
-		// TODO Only join game if not already playing against the other player
-		onlinePlayEngine.joinGameSeek(gameSeek.gameId, getUserId(), 
-			function(gameJoined) {
-				if (gameJoined) {
-					gameId = gameSeek.gameId;
-					currentGameOpponentUsername = gameSeek.hostUsername;
-					hostEmail = gameSeek.hostUsername;
-					guestEmail = getUserEmail();
-					currentGameData.hostUsername = gameSeek.hostUsername;
-					currentGameData.guestUsername = getUsername();
-					startWatchingGameRealTime();
-					closeModal();
+		onlinePlayEngine.getCurrentGamesForUser(getUserId(), 
+			function(results) {
+				if (results) {
+					debug(results);
+					
+					populateMyGamesList(results);
+
+					var gameExistsWithOpponent = false;
+
+					for (var index in myGamesList) {
+						var myGame = myGamesList[index];
+
+						var userIsHost = myGame.hostUsername === getUsername();
+						var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+
+						// if (userIsHost && myGame.guestUsername === gameSeek.hostUsername) {
+						// 	gameExistsWithOpponent = true;
+						// } else if (!userIsHost && myGame.hostUsername === gameSeek.hostUsername) {
+						// 	gameExistsWithOpponent = true;
+						// }
+						if (opponentUsername === gameSeek.hostUsername) {
+							gameExistsWithOpponent = true;
+						}
+					}
+
+					if (gameExistsWithOpponent) {
+						closeModal();
+						showModal("Cannot Join Game", "You are already playing a game against that user, so you will have to finish that game first.");
+					} else {
+						completeJoinGameSeek(gameSeek);
+					}
+				} else {
+					// No results, means ok to join game
+					completeJoinGameSeek(gameSeek);
 				}
 			}
 		);
@@ -2080,9 +2182,13 @@ function acceptGameSeekClicked(gameIdChosen) {
 function tryRealTimeClicked() {
 	onlinePlayEnabled = true;
 	setAccountHeaderLinkText();
+	verifyLogin();
 	rerunAll();
 	closeModal();
 }
+
+var userOnlineIcon = "<span title='Online' style='color:#35ac19;'><i class='fa fa-user-circle-o' aria-hidden='true'></i></span>";
+var userOfflineIcon = "<span title='Offline' style='color:gray;'><i class='fa fa-user-circle-o' aria-hidden='true'></i></span>";
 
 function viewGameSeeksClicked() {
 	if (onlinePlayEnabled) {
@@ -2099,9 +2205,13 @@ function viewGameSeeksClicked() {
 					for (var index in resultRows) {
 						var row = resultRows[index].split('|||');
 						debug(row);
-						var gameSeek = {gameId:parseInt(row[0]), hostId:row[1], hostUsername:row[2], guestUsername:row[3]};
+						var gameSeek = {gameId:parseInt(row[0]), hostId:row[1], hostUsername:row[2], hostOnline:parseInt(row[3])};
 						gameSeekList.push(gameSeek);
-						message += "<div class='clickableText' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + gameSeek.hostUsername + "</div>";
+						var hostOnlineOrNotIconText = userOfflineIcon;
+						if (gameSeek.hostOnline) {
+							hostOnlineOrNotIconText = userOnlineIcon;
+						}
+						message += "<div class='clickableText' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
 					}
 				}
 				showModal("Join a game", message);
@@ -2112,11 +2222,11 @@ function viewGameSeeksClicked() {
 	}
 }
 
-function createGameIfThatIsOk() {
+function createGameIfThatIsOk(gameTypeId) {
 	onlinePlayEngine.getCurrentGameSeeksHostedByUser(getUserId(), 
 		function(results) {
 			if (!results) {
-				onlinePlayEngine.createGame(gameNotation.notationTextForUrl(), getUserId(), createGameCallback);
+				onlinePlayEngine.createGame(gameTypeId, gameNotation.notationTextForUrl(), getUserId(), createGameCallback);
 			} else {
 				showModal("Create Game", "You already have a game that is waiting for an opponent.");
 			}
@@ -2124,5 +2234,27 @@ function createGameIfThatIsOk() {
 	);
 }
 
+var logOnlineStatusIntervalValue;
 
+function startLoggingOnlineStatus() {
+	// debug("Starting to log online status...");
+	onlinePlayEngine.logOnlineStatus(getUserId(), getDeviceId());
 
+	if (logOnlineStatusIntervalValue) {
+		clearInterval(logOnlineStatusIntervalValue);
+		logOnlineStatusIntervalValue = null;
+		// debug("Interval cleared...");
+	}
+
+	logOnlineStatusIntervalValue = setInterval(function() {
+		onlinePlayEngine.logOnlineStatus(getUserId(), getDeviceId());
+	}, 5000);
+}
+
+function newGameClicked() {
+	if (onlinePlayEnabled && userIsLoggedIn() && getUsername() === 'SkudPaiSho') {
+		showModal("New Game", "Hi :)");
+	} else {
+		showModal("New Game", "Under construction. Get excited! :) <br /><br />If you'd like, here is a link to open up <a href='http://skudpaisho.com' target='_blank' class='clickableText'>SkudPaiSho.com</a> in a new window.")
+	}
+}

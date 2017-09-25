@@ -5,10 +5,9 @@ function OnlinePlayEngine() {
 }
 
 OnlinePlayEngine.prototype.testOnlinePlay = function() {
-	debug("Is this working?");
 	this.getGameTypeDesc(1);
-	var self = this;
-	setTimeout(function() { self.getGameTypeDesc(2); }, 500);
+	// var self = this;
+	// setTimeout(function() { self.getGameTypeDesc(2); }, 500);
 };
 
 /* Calls callback with userId values that match username or emailAddress. */
@@ -16,7 +15,6 @@ OnlinePlayEngine.prototype.isUserInfoAvailable = function(username, emailAddress
     $.get("isUserInfoAvailable.php?u=" + username + "&e=" + emailAddress, 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
@@ -27,7 +25,22 @@ OnlinePlayEngine.prototype.userInfoExists = function(username, emailAddress, cal
     $.get("userInfoExists.php?u=" + username + "&e=" + emailAddress, 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.verifyLogin = function(userId, username, userEmail, deviceId, callback) {
+    $.post("verifyLogin.php", 
+        {
+            userId: userId, 
+            username: username, 
+            userEmail: userEmail, 
+            deviceId: deviceId
+        },
+        function(data, status){
+            if (status === 'success') {
                 callback(data.trim());
             }
         }
@@ -42,7 +55,6 @@ OnlinePlayEngine.prototype.sendVerificationCode = function(username, userEmail, 
         },
         function(data, status){
             if (status === 'success') {
-                debug("Verification code sent.");
                 callback("Verification code sent to " + userEmail);
             } else {
                 callback("Failed to send verification code, please try again.");
@@ -88,15 +100,29 @@ OnlinePlayEngine.prototype.createDeviceIdForUser = function(userId, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.createGame = function(gameNotationText, hostUserId, callback) {
+OnlinePlayEngine.prototype.logOnlineStatus = function(userId, deviceId) {
+    $.post("logOnlineStatus.php",
+        {
+            u: userId, 
+            d: deviceId
+        },
+        function(data, status){
+            if (status === 'success') {
+                //
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, hostUserId, callback) {
     $.post("createGame.php",
         {
+            t: gameTypeId, 
             q: gameNotationText,
             h: hostUserId
         },
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
@@ -111,7 +137,6 @@ OnlinePlayEngine.prototype.joinGameSeek = function(gameId, guestUserId, callback
         },
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
@@ -122,7 +147,6 @@ OnlinePlayEngine.prototype.getGameSeeks = function(callback) {
     $.get("getGameSeeks.php", 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
@@ -133,7 +157,6 @@ OnlinePlayEngine.prototype.getCurrentGameSeeksHostedByUser = function(userId, ca
     $.get("getCurrentGameSeeksHostedByUser.php?userId="+userId, 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
@@ -144,7 +167,6 @@ OnlinePlayEngine.prototype.getCurrentGamesForUser = function(userId, callback) {
     $.get("getCurrentGamesForUser.php?userId="+userId, 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
@@ -155,7 +177,16 @@ OnlinePlayEngine.prototype.getGameNotation = function(gameId, callback) {
     $.get("getGameNotation.php?q="+gameId, 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.checkIfUserOnline = function(username, callback) {
+    $.get("checkIfUserOnline.php?u="+username, 
+        function(data, status){
+            if (status === 'success') {
                 callback(data.trim());
             }
         }
@@ -171,7 +202,6 @@ OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, userI
         },
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
@@ -187,7 +217,7 @@ OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, 
         },
         function(data, status){
             if (status === 'success') {
-                debug('Game win info updated.');
+                // debug('Game win info updated.');
             }
         }
     );
@@ -201,7 +231,7 @@ OnlinePlayEngine.prototype.updateGameWinInfoAsTie = function(gameId, resultTypeC
         },
         function(data, status){
             if (status === 'success') {
-                debug('Game win info updated.');
+                // debug('Game win info updated.');
             }
         }
     );
@@ -211,9 +241,6 @@ OnlinePlayEngine.prototype.getGameTypeDesc = function(gameTypeId) {
     $.get("getGameTypeDesc.php?q="+gameTypeId, 
         function(data, status){
             if (status === 'success') {
-                // var element = document.getElementById("onlinePlayTest");
-                // element.innerHTML = data;
-                // debug(element.innerText.trim());
                 debug(data.trim());
             }
         }
