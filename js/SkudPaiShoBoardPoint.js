@@ -2,8 +2,7 @@
 
 var NON_PLAYABLE = "Non-Playable";
 var NEUTRAL = "Neutral";
-// var RED = "Red";
-// var WHITE = "White";
+
 var GATE = "Gate";
 
 var POSSIBLE_MOVE = "Possible Move";
@@ -14,19 +13,19 @@ var thickDot = "•";
 var whiteDot = "◦";
 var gateDot = "⟡";
 
-function BoardPoint() {
+function SkudPaiShoBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;
 }
 
-BoardPoint.prototype.addType = function(type) {
+SkudPaiShoBoardPoint.prototype.addType = function(type) {
 	if (!this.types.includes(type)) {
 		this.types.push(type);
 	}
 };
 
-BoardPoint.prototype.removeType = function(type) {
+SkudPaiShoBoardPoint.prototype.removeType = function(type) {
 	for (var i = 0; i < this.types.length; i++) {
 		if (this.types[i] === type) {
 			this.types.splice(i, 1);
@@ -34,7 +33,7 @@ BoardPoint.prototype.removeType = function(type) {
 	}
 };
 
-BoardPoint.prototype.getConsoleDisplay = function() {
+SkudPaiShoBoardPoint.prototype.getConsoleDisplay = function() {
 	if (this.tile) {
 		return this.tile.getConsoleDisplay();
 	} else {
@@ -71,26 +70,26 @@ BoardPoint.prototype.getConsoleDisplay = function() {
 	}
 };
 
-BoardPoint.prototype.putTile = function(tile) {
+SkudPaiShoBoardPoint.prototype.putTile = function(tile) {
 	this.tile = tile;
 };
 
-BoardPoint.prototype.hasTile = function() {
+SkudPaiShoBoardPoint.prototype.hasTile = function() {
 	if (this.tile) {
 		return true;
 	}
 	return false;
 };
 
-BoardPoint.prototype.isType = function(type) {
+SkudPaiShoBoardPoint.prototype.isType = function(type) {
 	return this.types.includes(type);
 };
 
-BoardPoint.prototype.isOpenGate = function() {
+SkudPaiShoBoardPoint.prototype.isOpenGate = function() {
 	return !this.hasTile() && this.types.includes(GATE);
 };
 
-BoardPoint.prototype.removeTile = function() {
+SkudPaiShoBoardPoint.prototype.removeTile = function() {
 	var theTile = this.tile;
 
 	this.tile = null;
@@ -98,19 +97,19 @@ BoardPoint.prototype.removeTile = function() {
 	return theTile;
 };
 
-BoardPoint.prototype.drainTile = function() {
+SkudPaiShoBoardPoint.prototype.drainTile = function() {
 	if (this.tile) {
 		this.tile.drain();
 	}
 };
 
-BoardPoint.prototype.restoreTile = function() {
+SkudPaiShoBoardPoint.prototype.restoreTile = function() {
 	if (this.tile) {
 		this.tile.restore();
 	}
 };
 
-BoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
+SkudPaiShoBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	// Validate this point's ability to hold given tile
 
 	if (this.isType(NON_PLAYABLE)) {
@@ -142,7 +141,7 @@ BoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	return false;
 };
 
-BoardPoint.prototype.betweenPlayerHarmony = function(player) {
+SkudPaiShoBoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	if (player === GUEST) {
 		return this.betweenHarmonyGuest;
 	} else if (player === HOST) {
@@ -151,8 +150,8 @@ BoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	return false;
 };
 
-BoardPoint.prototype.getCopy = function() {
-	var copy = new BoardPoint();
+SkudPaiShoBoardPoint.prototype.getCopy = function() {
+	var copy = new SkudPaiShoBoardPoint();
 
 	// this.types
 	for (var i = 0; i < this.types.length; i++) {
@@ -176,44 +175,44 @@ BoardPoint.prototype.getCopy = function() {
 
 // Point makers
 
-BoardPoint.neutral = function() {
-	var point = new BoardPoint();
+SkudPaiShoBoardPoint.neutral = function() {
+	var point = new SkudPaiShoBoardPoint();
 	point.addType(NEUTRAL);
 
 	return point;
 };
 
-BoardPoint.gate = function() {
-	var point = new BoardPoint();
+SkudPaiShoBoardPoint.gate = function() {
+	var point = new SkudPaiShoBoardPoint();
 	point.addType(GATE);
 
 	return point;
 };
 
-BoardPoint.red = function() {
-	var point = new BoardPoint();
+SkudPaiShoBoardPoint.red = function() {
+	var point = new SkudPaiShoBoardPoint();
 	point.addType(RED);
 
 	return point;
 };
 
-BoardPoint.white = function() {
-	var point = new BoardPoint();
+SkudPaiShoBoardPoint.white = function() {
+	var point = new SkudPaiShoBoardPoint();
 	point.addType(WHITE);
 
 	return point;
 };
 
-BoardPoint.redWhite = function() {
-	var point = new BoardPoint();
+SkudPaiShoBoardPoint.redWhite = function() {
+	var point = new SkudPaiShoBoardPoint();
 	point.addType(RED);
 	point.addType(WHITE);
 
 	return point;
 };
 
-BoardPoint.redWhiteNeutral = function() {
-	var point = new BoardPoint();
+SkudPaiShoBoardPoint.redWhiteNeutral = function() {
+	var point = new SkudPaiShoBoardPoint();
 	point.addType(RED);
 	point.addType(WHITE);
 	point.addType(NEUTRAL);
@@ -221,16 +220,16 @@ BoardPoint.redWhiteNeutral = function() {
 	return point;
 };
 
-BoardPoint.redNeutral = function() {
-	var point = new BoardPoint();
+SkudPaiShoBoardPoint.redNeutral = function() {
+	var point = new SkudPaiShoBoardPoint();
 	point.addType(RED);
 	point.addType(NEUTRAL);
 
 	return point;
 };
 
-BoardPoint.whiteNeutral = function() {
-	var point = new BoardPoint();
+SkudPaiShoBoardPoint.whiteNeutral = function() {
+	var point = new SkudPaiShoBoardPoint();
 	point.addType(WHITE);
 	point.addType(NEUTRAL);
 

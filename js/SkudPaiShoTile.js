@@ -1,11 +1,11 @@
-// Tile
+/* Skud Pai Sho Tile */
 
 var RED = "Red";
 var WHITE = "White";
 
 var tileId = 1;
 
-function Tile(code, ownerCode) {
+function SkudPaiShoTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -39,7 +39,7 @@ function Tile(code, ownerCode) {
 	}
 }
 
-Tile.prototype.setAccentInfo = function() {
+SkudPaiShoTile.prototype.setAccentInfo = function() {
 	if (this.code === 'R') {
 		this.accentType = ROCK;
 	} else if (this.code === 'W') {
@@ -51,7 +51,7 @@ Tile.prototype.setAccentInfo = function() {
 	}
 };
 
-Tile.prototype.setSpecialFlowerInfo = function() {
+SkudPaiShoTile.prototype.setSpecialFlowerInfo = function() {
 	if (this.code === 'L') {
 		this.specialFlowerType = WHITE_LOTUS;
 	} else if (this.code === 'O') {
@@ -59,7 +59,7 @@ Tile.prototype.setSpecialFlowerInfo = function() {
 	}
 };
 
-Tile.prototype.getConsoleDisplay = function() {
+SkudPaiShoTile.prototype.getConsoleDisplay = function() {
 	if (!this.drained) {
 		return this.ownerCode + "" + this.code;
 	} else {
@@ -67,11 +67,11 @@ Tile.prototype.getConsoleDisplay = function() {
 	}
 };
 
-Tile.prototype.getImageName = function() {
+SkudPaiShoTile.prototype.getImageName = function() {
 	return this.ownerCode + "" + this.code;
 };
 
-Tile.prototype.formsHarmonyWith = function(otherTile) {
+SkudPaiShoTile.prototype.formsHarmonyWith = function(otherTile) {
 	if (!(this.type === BASIC_FLOWER || this.code === 'L')
 		|| !(otherTile.type === BASIC_FLOWER || otherTile.code === 'L')) {
 		// debug("One of the tiles must be Basic Flower to form Harmony");
@@ -118,7 +118,7 @@ Tile.prototype.formsHarmonyWith = function(otherTile) {
 	}
 };
 
-Tile.prototype.clashesWith = function(otherTile) {
+SkudPaiShoTile.prototype.clashesWith = function(otherTile) {
 	if (newOrchidClashRule) {
 		if (this.ownerName !== otherTile.ownerName) {
 			if (this.specialFlowerType === ORCHID || otherTile.specialFlowerType === ORCHID) {
@@ -132,7 +132,7 @@ Tile.prototype.clashesWith = function(otherTile) {
 		&& this.basicValue === otherTile.basicValue);
 };
 
-Tile.prototype.getMoveDistance = function() {
+SkudPaiShoTile.prototype.getMoveDistance = function() {
 	if (this.type === BASIC_FLOWER) {
 		return parseInt(this.basicValue);
 	} else if (this.code === 'L') {
@@ -143,26 +143,26 @@ Tile.prototype.getMoveDistance = function() {
 	return 0;
 };
 
-Tile.prototype.drain = function() {
+SkudPaiShoTile.prototype.drain = function() {
 	if (this.type === BASIC_FLOWER) {
 		this.drained = true;
 	}
 };
 
-Tile.prototype.restore = function() {
+SkudPaiShoTile.prototype.restore = function() {
 	this.drained = false;
 };
 
-Tile.prototype.getName = function() {
-	return Tile.getTileName(this.code);
+SkudPaiShoTile.prototype.getName = function() {
+	return SkudPaiShoTile.getTileName(this.code);
 };
 
-Tile.prototype.getCopy = function() {
-	return new Tile(this.code, this.ownerCode);
+SkudPaiShoTile.prototype.getCopy = function() {
+	return new SkudPaiShoTile(this.code, this.ownerCode);
 };
 
 
-Tile.getTileName = function(tileCode) {
+SkudPaiShoTile.getTileName = function(tileCode) {
 	var name = "";
 	
 	if (tileCode.length > 1) {
@@ -207,7 +207,7 @@ Tile.getTileName = function(tileCode) {
 	return name;
 };
 
-Tile.getClashTileCode = function(tileCode) {
+SkudPaiShoTile.getClashTileCode = function(tileCode) {
 	if (tileCode.length === 2) {
 		if (tileCode.startsWith("R")) {
 			return "W" + tileCode.charAt(1);

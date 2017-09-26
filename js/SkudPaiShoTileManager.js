@@ -1,6 +1,6 @@
-// Tile Manager
+/* Skud Pai Sho Tile Manager */
 
-function TileManager(forActuating) {
+function SkudPaiShoTileManager(forActuating) {
 	if (forActuating) {
 		this.hostTiles = this.loadOneOfEach('H');
 		this.guestTiles = this.loadOneOfEach('G');
@@ -10,7 +10,7 @@ function TileManager(forActuating) {
 	this.guestTiles = this.loadTileSet('G');
 }
 
-TileManager.prototype.loadTileSet = function(ownerCode) {
+SkudPaiShoTileManager.prototype.loadTileSet = function(ownerCode) {
 	if (simpleCanonRules) {
 		return this.loadSimpleCanonSet(ownerCode);
 	} else {
@@ -18,15 +18,15 @@ TileManager.prototype.loadTileSet = function(ownerCode) {
 	}
 };
 
-TileManager.prototype.loadSkudSet = function(ownerCode) {
+SkudPaiShoTileManager.prototype.loadSkudSet = function(ownerCode) {
 	var tiles = [];
 
 	// 2 of each accent tile
 	for (var i = 0; i < 2; i++) {
-		tiles.push(new Tile('R', ownerCode));
-		tiles.push(new Tile('W', ownerCode));
-		tiles.push(new Tile('K', ownerCode));
-		tiles.push(new Tile('B', ownerCode));
+		tiles.push(new SkudPaiShoTile('R', ownerCode));
+		tiles.push(new SkudPaiShoTile('W', ownerCode));
+		tiles.push(new SkudPaiShoTile('K', ownerCode));
+		tiles.push(new SkudPaiShoTile('B', ownerCode));
 	}
 
 	tiles.forEach(function(tile) {
@@ -35,27 +35,27 @@ TileManager.prototype.loadSkudSet = function(ownerCode) {
 
 	// 3 of each basic flower
 	for (var i = 0; i < 3; i++) {
-		tiles.push(new Tile("R3", ownerCode));
-		tiles.push(new Tile("R4", ownerCode));
-		tiles.push(new Tile("R5", ownerCode));
-		tiles.push(new Tile("W3", ownerCode));
-		tiles.push(new Tile("W4", ownerCode));
-		tiles.push(new Tile("W5", ownerCode));
+		tiles.push(new SkudPaiShoTile("R3", ownerCode));
+		tiles.push(new SkudPaiShoTile("R4", ownerCode));
+		tiles.push(new SkudPaiShoTile("R5", ownerCode));
+		tiles.push(new SkudPaiShoTile("W3", ownerCode));
+		tiles.push(new SkudPaiShoTile("W4", ownerCode));
+		tiles.push(new SkudPaiShoTile("W5", ownerCode));
 	}
 
 	// 1 of each special flower
-	tiles.push(new Tile('L', ownerCode));
-	tiles.push(new Tile('O', ownerCode));
+	tiles.push(new SkudPaiShoTile('L', ownerCode));
+	tiles.push(new SkudPaiShoTile('O', ownerCode));
 
 	return tiles;
 };
 
-TileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
+SkudPaiShoTileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
 	var tiles = [];
 
 	// Accent tiles
 	for (var i = 0; i < 2; i++) {
-		tiles.push(new Tile('W', ownerCode));
+		tiles.push(new SkudPaiShoTile('W', ownerCode));
 	}
 
 	tiles.forEach(function(tile) {
@@ -64,39 +64,39 @@ TileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
 
 	// Basic flowers
 	for (var i = 0; i < 6; i++) {
-		tiles.push(new Tile("R3", ownerCode));
-		tiles.push(new Tile("W5", ownerCode));
+		tiles.push(new SkudPaiShoTile("R3", ownerCode));
+		tiles.push(new SkudPaiShoTile("W5", ownerCode));
 	}
 
 	// Special flowers
-	tiles.push(new Tile('L', ownerCode));
-	tiles.push(new Tile('O', ownerCode));
+	tiles.push(new SkudPaiShoTile('L', ownerCode));
+	tiles.push(new SkudPaiShoTile('O', ownerCode));
 
 	return tiles;
 };
 
-TileManager.prototype.loadOneOfEach = function(ownerCode) {
+SkudPaiShoTileManager.prototype.loadOneOfEach = function(ownerCode) {
 	var tiles = [];
 
-	tiles.push(new Tile('R', ownerCode));
-	tiles.push(new Tile('W', ownerCode));
-	tiles.push(new Tile('K', ownerCode));
-	tiles.push(new Tile('B', ownerCode));
+	tiles.push(new SkudPaiShoTile('R', ownerCode));
+	tiles.push(new SkudPaiShoTile('W', ownerCode));
+	tiles.push(new SkudPaiShoTile('K', ownerCode));
+	tiles.push(new SkudPaiShoTile('B', ownerCode));
 
-	tiles.push(new Tile("R3", ownerCode));
-	tiles.push(new Tile("R4", ownerCode));
-	tiles.push(new Tile("R5", ownerCode));
-	tiles.push(new Tile("W3", ownerCode));
-	tiles.push(new Tile("W4", ownerCode));
-	tiles.push(new Tile("W5", ownerCode));
+	tiles.push(new SkudPaiShoTile("R3", ownerCode));
+	tiles.push(new SkudPaiShoTile("R4", ownerCode));
+	tiles.push(new SkudPaiShoTile("R5", ownerCode));
+	tiles.push(new SkudPaiShoTile("W3", ownerCode));
+	tiles.push(new SkudPaiShoTile("W4", ownerCode));
+	tiles.push(new SkudPaiShoTile("W5", ownerCode));
 
-	tiles.push(new Tile('L', ownerCode));
-	tiles.push(new Tile('O', ownerCode));
+	tiles.push(new SkudPaiShoTile('L', ownerCode));
+	tiles.push(new SkudPaiShoTile('O', ownerCode));
 
 	return tiles;
 };
 
-TileManager.prototype.grabTile = function(player, tileCode) {
+SkudPaiShoTileManager.prototype.grabTile = function(player, tileCode) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -118,7 +118,7 @@ TileManager.prototype.grabTile = function(player, tileCode) {
 	return tile;
 };
 
-TileManager.prototype.peekTile = function(player, tileCode, tileId) {
+SkudPaiShoTileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -147,7 +147,7 @@ TileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	return tile;
 };
 
-TileManager.prototype.removeSelectedTileFlags = function() {
+SkudPaiShoTileManager.prototype.removeSelectedTileFlags = function() {
 	this.hostTiles.forEach(function(tile) {
 		tile.selectedFromPile = false;
 	});
@@ -156,7 +156,7 @@ TileManager.prototype.removeSelectedTileFlags = function() {
 	});
 };
 
-TileManager.prototype.unselectTiles = function(player) {
+SkudPaiShoTileManager.prototype.unselectTiles = function(player) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -167,7 +167,7 @@ TileManager.prototype.unselectTiles = function(player) {
 	});
 }
 
-// TileManager.prototype.putTileBack = function(tile) {
+// SkudPaiShoTileManager.prototype.putTileBack = function(tile) {
 // 	var player = tile.ownerName;
 // 	var tilePile = this.hostTiles;
 // 	if (player === GUEST) {
@@ -177,7 +177,7 @@ TileManager.prototype.unselectTiles = function(player) {
 // 	tilePile.push(tile);
 // };
 
-TileManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
+SkudPaiShoTileManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
 	// Check Host
 	var hostHasBasic = false;
 	for (var i = 0; i < this.hostTiles.length; i++) {
@@ -204,7 +204,7 @@ TileManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
 	}
 };
 
-TileManager.prototype.getPlayerWithMoreAccentTiles = function() {
+SkudPaiShoTileManager.prototype.getPlayerWithMoreAccentTiles = function() {
 	var hostCount = 0;
 	for (var i = 0; i < this.hostTiles.length; i++) {
 		if (this.hostTiles[i].type === ACCENT_TILE) {
@@ -226,7 +226,7 @@ TileManager.prototype.getPlayerWithMoreAccentTiles = function() {
 	}
 };
 
-TileManager.prototype.playerHasBothSpecialTilesRemaining = function(player) {
+SkudPaiShoTileManager.prototype.playerHasBothSpecialTilesRemaining = function(player) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -243,8 +243,8 @@ TileManager.prototype.playerHasBothSpecialTilesRemaining = function(player) {
 	return specialTileCount > 1;
 };
 
-TileManager.prototype.getCopy = function() {
-	var copy = new TileManager();
+SkudPaiShoTileManager.prototype.getCopy = function() {
+	var copy = new SkudPaiShoTileManager();
 
 	// copy this.hostTiles and this.guestTiles
 	copy.hostTiles = this.copyArr(this.hostTiles);
@@ -253,7 +253,7 @@ TileManager.prototype.getCopy = function() {
 	return copy;
 };
 
-TileManager.prototype.copyArr = function(arr) {
+SkudPaiShoTileManager.prototype.copyArr = function(arr) {
 	var copyArr = [];
 	for (var i = 0; i < arr.length; i++) {
 		copyArr.push(arr[i].getCopy());

@@ -1,6 +1,6 @@
-// Board
+/* Skud Pai Sho Board */
 
-function Board() {
+function SkudPaiShoBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
@@ -11,307 +11,307 @@ function Board() {
 	this.winners = [];
 }
 
-Board.prototype.brandNew = function () {
+SkudPaiShoBoard.prototype.brandNew = function () {
 	var cells = [];
 
 	cells[0] = this.newRow(9, 
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.gate(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.gate(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[1] = this.newRow(11, 
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redWhiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(), 
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.redWhiteNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(), 
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[2] = this.newRow(13, 
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.whiteNeutral(), 
-		BoardPoint.redWhite(),
-		BoardPoint.redNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.whiteNeutral(), 
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[3] = this.newRow(15,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.whiteNeutral(), 
-		BoardPoint.white(),
-		BoardPoint.redWhite(),
-		BoardPoint.red(),
-		BoardPoint.redNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.whiteNeutral(), 
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.redNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[4] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.whiteNeutral(), 
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.redWhite(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.whiteNeutral(), 
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.redNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[5] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.whiteNeutral(), 
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.redWhite(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.whiteNeutral(), 
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.redNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[6] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.whiteNeutral(), 
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.redWhite(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.whiteNeutral(), 
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.redNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[7] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.whiteNeutral(), 
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.redWhite(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.whiteNeutral(), 
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.redNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[8] = this.newRow(17,
-		[BoardPoint.gate(),
-		BoardPoint.redWhiteNeutral(), 
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhiteNeutral(),
-		BoardPoint.gate()
+		[SkudPaiShoBoardPoint.gate(),
+		SkudPaiShoBoardPoint.redWhiteNeutral(), 
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.redWhiteNeutral(),
+		SkudPaiShoBoardPoint.gate()
 		]);
 
 	cells[9] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redNeutral(), 
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redWhite(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.whiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.redNeutral(), 
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.whiteNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[10] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redNeutral(), 
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redWhite(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.whiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.redNeutral(), 
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.whiteNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[11] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redNeutral(), 
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redWhite(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.whiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.redNeutral(), 
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.whiteNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[12] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redNeutral(), 
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redWhite(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.whiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.redNeutral(), 
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.whiteNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[13] = this.newRow(15,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redNeutral(), 
-		BoardPoint.red(),
-		BoardPoint.redWhite(),
-		BoardPoint.white(),
-		BoardPoint.whiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.redNeutral(), 
+		SkudPaiShoBoardPoint.red(),
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.white(),
+		SkudPaiShoBoardPoint.whiteNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[14] = this.newRow(13,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redNeutral(), 
-		BoardPoint.redWhite(),
-		BoardPoint.whiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.redNeutral(), 
+		SkudPaiShoBoardPoint.redWhite(),
+		SkudPaiShoBoardPoint.whiteNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[15] = this.newRow(11,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redWhiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.redWhiteNeutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	cells[16] = this.newRow(9,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.gate(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.gate(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral(),
+		SkudPaiShoBoardPoint.neutral()
 		]);
 
 	for (var row = 0; row < cells.length; row++) {
@@ -324,12 +324,12 @@ Board.prototype.brandNew = function () {
 	return cells;
 };
 
-Board.prototype.newRow = function(numColumns, points) {
+SkudPaiShoBoard.prototype.newRow = function(numColumns, points) {
 	var cells = [];
 
 	var numBlanksOnSides = (this.size.row - numColumns) / 2;
 
-	var nonPoint = new BoardPoint();
+	var nonPoint = new SkudPaiShoBoardPoint();
 	nonPoint.addType(NON_PLAYABLE);
 
 	for (var i = 0; i < this.size.row; i++) {
@@ -349,7 +349,7 @@ Board.prototype.newRow = function(numColumns, points) {
 	return cells;
 };
 
-Board.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
+SkudPaiShoBoard.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
 	if (tile.type === ACCENT_TILE) {
 		if (tile.accentType === ROCK) {
 			this.placeRock(tile, notationPoint);
@@ -371,14 +371,14 @@ Board.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
 	this.analyzeHarmonies();
 };
 
-Board.prototype.putTileOnPoint = function(tile, notationPoint) {
+SkudPaiShoBoard.prototype.putTileOnPoint = function(tile, notationPoint) {
 	var point = notationPoint.rowAndColumn;
 	point = this.cells[point.row][point.col];
 	
 	point.putTile(tile);
 };
 
-Board.prototype.canPlaceRock = function(boardPoint) {
+SkudPaiShoBoard.prototype.canPlaceRock = function(boardPoint) {
 	if (boardPoint.hasTile()) {
 		// debug("Rock cannot be played on top of another tile");
 		return false;
@@ -389,7 +389,7 @@ Board.prototype.canPlaceRock = function(boardPoint) {
 	return true;
 };
 
-Board.prototype.placeRock = function(tile, notationPoint) {
+SkudPaiShoBoard.prototype.placeRock = function(tile, notationPoint) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
@@ -403,7 +403,7 @@ Board.prototype.placeRock = function(tile, notationPoint) {
 	}
 };
 
-Board.prototype.canPlaceWheel = function(boardPoint) {
+SkudPaiShoBoard.prototype.canPlaceWheel = function(boardPoint) {
 	if (boardPoint.hasTile()) {
 		// debug("Wheel cannot be played on top of another tile");
 		return false;
@@ -469,7 +469,7 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 	// Does it create Disharmony?
 	var newBoard = this.getCopy();
 	var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
-	newBoard.placeWheel(new Tile('W', 'G'), notationPoint, true);
+	newBoard.placeWheel(new SkudPaiShoTile('W', 'G'), notationPoint, true);
 	if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
 		return false;
 	}
@@ -477,11 +477,11 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 	return true;
 };
 
-Board.prototype.isValidRowCol = function(rowCol) {
+SkudPaiShoBoard.prototype.isValidRowCol = function(rowCol) {
 	return rowCol.row >= 0 && rowCol.col >= 0 && rowCol.row <= 16 && rowCol.col <= 16;
 };
 
-Board.prototype.placeWheel = function(tile, notationPoint, ignoreCheck) {
+SkudPaiShoBoard.prototype.placeWheel = function(tile, notationPoint, ignoreCheck) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
@@ -515,7 +515,7 @@ Board.prototype.placeWheel = function(tile, notationPoint, ignoreCheck) {
 	this.refreshRockRowAndCols();
 };
 
-Board.prototype.canPlaceKnotweed = function(boardPoint) {
+SkudPaiShoBoard.prototype.canPlaceKnotweed = function(boardPoint) {
 	if (boardPoint.hasTile()) {
 		// debug("Knotweed cannot be played on top of another tile");
 		return false;
@@ -542,7 +542,7 @@ Board.prototype.canPlaceKnotweed = function(boardPoint) {
 	return true;
 };
 
-Board.prototype.placeKnotweed = function(tile, notationPoint) {
+SkudPaiShoBoard.prototype.placeKnotweed = function(tile, notationPoint) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
@@ -562,7 +562,7 @@ Board.prototype.placeKnotweed = function(tile, notationPoint) {
 	}
 };
 
-Board.prototype.canPlaceBoat = function(boardPoint, tile) {
+SkudPaiShoBoard.prototype.canPlaceBoat = function(boardPoint, tile) {
 	if (!boardPoint.hasTile()) {
 		// debug("Boat always played on top of another tile");
 		return false;
@@ -584,7 +584,7 @@ Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 			// Ensure no Disharmony
 			var newBoard = this.getCopy();
 			var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
-			newBoard.placeBoat(new Tile('B', 'G'), notationPoint, boardPoint, true);
+			newBoard.placeBoat(new SkudPaiShoTile('B', 'G'), notationPoint, boardPoint, true);
 			var newBoardPoint = newBoard.cells[boardPoint.row][boardPoint.col];
 			if (newBoard.moveCreatesDisharmony(newBoardPoint, newBoardPoint)) {
 				return false;
@@ -595,7 +595,7 @@ Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 	return true;
 };
 
-Board.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint, ignoreCheck) {
+SkudPaiShoBoard.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint, ignoreCheck) {
 	// debug("extra boat point:");
 	// debug(extraBoatPoint);
 	var rowAndCol = notationPoint.rowAndColumn;
@@ -641,7 +641,7 @@ Board.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint, ignore
 	}
 };
 
-Board.prototype.getClockwiseRowCol = function(center, rowCol) {
+SkudPaiShoBoard.prototype.getClockwiseRowCol = function(center, rowCol) {
 	if (rowCol.row < center.row && rowCol.col <= center.col) {
 		return new RowAndColumn(rowCol.row, rowCol.col+1);
 	} else if (rowCol.col > center.col && rowCol.row <= center.row) {
@@ -655,7 +655,7 @@ Board.prototype.getClockwiseRowCol = function(center, rowCol) {
 	}
 }
 
-Board.prototype.getSurroundingRowAndCols = function(rowAndCol) {
+SkudPaiShoBoard.prototype.getSurroundingRowAndCols = function(rowAndCol) {
 	var rowAndCols = [];
 	for (var row = rowAndCol.row - 1; row <= rowAndCol.row + 1; row++) {
 		for (var col = rowAndCol.col - 1; col <= rowAndCol.col + 1; col++) {
@@ -671,7 +671,7 @@ Board.prototype.getSurroundingRowAndCols = function(rowAndCol) {
 	return rowAndCols;
 };
 
-Board.prototype.refreshRockRowAndCols = function() {
+SkudPaiShoBoard.prototype.refreshRockRowAndCols = function() {
 	this.rockRowAndCols = [];
 	var self = this;
 
@@ -684,14 +684,14 @@ Board.prototype.refreshRockRowAndCols = function() {
 	});
 };
 
-Board.prototype.pointIsOpenGate = function(notationPoint) {
+SkudPaiShoBoard.prototype.pointIsOpenGate = function(notationPoint) {
 	var point = notationPoint.rowAndColumn;
 	point = this.cells[point.row][point.col];
 
 	return point.isOpenGate();
 };
 
-Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
+SkudPaiShoBoard.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
 	var startRowCol = notationPointStart.rowAndColumn;
 	var endRowCol = notationPointEnd.rowAndColumn;
 
@@ -728,7 +728,7 @@ Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd
 	return this.hasNewHarmony(player, tile, startRowCol, endRowCol);
 };
 
-Board.prototype.flagAllTrappedAndDrainedTiles = function() {
+SkudPaiShoBoard.prototype.flagAllTrappedAndDrainedTiles = function() {
 	// First, untrap
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -755,7 +755,7 @@ Board.prototype.flagAllTrappedAndDrainedTiles = function() {
 	}
 };
 
-Board.prototype.drainTilesSurroundingPointIfNeeded = function(boardPoint) {
+SkudPaiShoBoard.prototype.drainTilesSurroundingPointIfNeeded = function(boardPoint) {
 	if (!newKnotweedRules) {
 		return;
 	}
@@ -777,7 +777,7 @@ Board.prototype.drainTilesSurroundingPointIfNeeded = function(boardPoint) {
 	}
 };
 
-Board.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
+SkudPaiShoBoard.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -800,7 +800,7 @@ Board.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
 	}
 };
 
-Board.prototype.whiteLotusProtected = function(lotusTile) {
+SkudPaiShoBoard.prototype.whiteLotusProtected = function(lotusTile) {
 	if (lotusNoCapture || simplest) {
 		return true;
 	}
@@ -828,7 +828,7 @@ Board.prototype.whiteLotusProtected = function(lotusTile) {
 	return isProtected;
 };
 
-Board.prototype.orchidCanCapture = function(orchidTile) {
+SkudPaiShoBoard.prototype.orchidCanCapture = function(orchidTile) {
 	if (simpleSpecialFlowerRule || simplest) {
 		return false;	// Simplest? Never can capture.
 	}
@@ -847,7 +847,7 @@ Board.prototype.orchidCanCapture = function(orchidTile) {
 	return orchidCanCapture;
 };
 
-Board.prototype.orchidVulnerable = function(orchidTile) {
+SkudPaiShoBoard.prototype.orchidVulnerable = function(orchidTile) {
 	if (newOrchidVulnerableRule) {
 		var orchidVulnerable = false;
 		// Orchid vulnerable if opponent White Lotus is on board
@@ -893,7 +893,7 @@ Board.prototype.orchidVulnerable = function(orchidTile) {
 	}
 };
 
-Board.prototype.canCapture = function(boardPointStart, boardPointEnd) {
+SkudPaiShoBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 	var tile = boardPointStart.tile;
 	var otherTile = boardPointEnd.tile;
 
@@ -933,7 +933,7 @@ Board.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 	}
 };
 
-Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
+SkudPaiShoBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
 	// start point must have a tile
 	if (!boardPointStart.hasTile()) {
 		return false;
@@ -994,7 +994,7 @@ Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPoin
 	return true;
 };
 
-Board.prototype.canTransportTileToPointWithBoat = function(boardPointStart, boardPointEnd) {
+SkudPaiShoBoard.prototype.canTransportTileToPointWithBoat = function(boardPointStart, boardPointEnd) {
 	// Transport Tile: used in Boat special ability
 
 	// start point must have a tile
@@ -1025,7 +1025,7 @@ Board.prototype.canTransportTileToPointWithBoat = function(boardPointStart, boar
 	var newBoardPointStart = newBoard.cells[boardPointStart.row][boardPointStart.col];
 	var notationPoint = new NotationPoint(new RowAndColumn(newBoardPointStart.row, newBoardPointStart.col).notationPointString);
 	var notationPointEnd = new NotationPoint(new RowAndColumn(boardPointEnd.row, boardPointEnd.col).notationPointString);
-	newBoard.placeBoat(new Tile('B', 'G'), notationPoint, notationPointEnd, true);
+	newBoard.placeBoat(new SkudPaiShoTile('B', 'G'), notationPoint, notationPointEnd, true);
 	if (newBoard.moveCreatesDisharmony(newBoardPointStart, newBoardPointStart)) {
 		return false;
 	}
@@ -1034,7 +1034,7 @@ Board.prototype.canTransportTileToPointWithBoat = function(boardPointStart, boar
 	return true;
 };
 
-Board.prototype.moveCreatesDisharmony = function(boardPointStart, boardPointEnd) {
+SkudPaiShoBoard.prototype.moveCreatesDisharmony = function(boardPointStart, boardPointEnd) {
 	// Grab tile in end point and put the start tile there, unless points are the same
 	var endTile;
 	if (boardPointStart.row !== boardPointEnd.row || boardPointStart.col !== boardPointEnd.col) {
@@ -1067,12 +1067,12 @@ Board.prototype.moveCreatesDisharmony = function(boardPointStart, boardPointEnd)
 	return clashFound;
 };
 
-Board.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {
+SkudPaiShoBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {
   // Recursion!
   return this.pathFound(boardPointStart, boardPointEnd, numMoves);
 };
 
-Board.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
+SkudPaiShoBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
   if (!boardPointStart || !boardPointEnd) {
     return false; // start or end point not given
   }
@@ -1132,7 +1132,7 @@ Board.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
   }
 };
 
-Board.prototype.rowBlockedByRock = function(rowNum) {
+SkudPaiShoBoard.prototype.rowBlockedByRock = function(rowNum) {
 	if (simpleRocks || simplest) {
 		return false;	// simpleRocks: Rocks don't disable Harmonies.
 	}
@@ -1146,7 +1146,7 @@ Board.prototype.rowBlockedByRock = function(rowNum) {
 	return blocked;
 };
 
-Board.prototype.columnBlockedByRock = function(colNum) {
+SkudPaiShoBoard.prototype.columnBlockedByRock = function(colNum) {
 	if (simpleRocks || simplest) {
 		return false;	// simpleRocks: Rocks don't disable Harmonies.
 	}
@@ -1160,7 +1160,7 @@ Board.prototype.columnBlockedByRock = function(colNum) {
 	return blocked;
 };
 
-Board.prototype.markSpacesBetweenHarmonies = function() {
+SkudPaiShoBoard.prototype.markSpacesBetweenHarmonies = function() {
 	// Unmark all
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
@@ -1213,7 +1213,7 @@ Board.prototype.markSpacesBetweenHarmonies = function() {
 	});
 };
 
-Board.prototype.analyzeHarmonies = function() {
+SkudPaiShoBoard.prototype.analyzeHarmonies = function() {
 	// We're going to find all harmonies on the board
 
 	// Check along all rows, then along all columns.. Or just check all tiles?
@@ -1249,7 +1249,7 @@ Board.prototype.analyzeHarmonies = function() {
 	}
 };
 
-Board.prototype.getTileHarmonies = function(tile, rowAndCol) {
+SkudPaiShoBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
 	var tileHarmonies = [];
 
 	if (this.cells[rowAndCol.row][rowAndCol.col].isType(GATE)) {
@@ -1283,7 +1283,7 @@ Board.prototype.getTileHarmonies = function(tile, rowAndCol) {
 	return tileHarmonies;
 };
 
-Board.prototype.getHarmonyLeft = function(tile, endRowCol) {
+SkudPaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
 	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile() 
@@ -1300,7 +1300,7 @@ Board.prototype.getHarmonyLeft = function(tile, endRowCol) {
 	}
 };
 
-Board.prototype.getHarmonyRight = function(tile, endRowCol) {
+SkudPaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
 
 	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile() 
@@ -1317,7 +1317,7 @@ Board.prototype.getHarmonyRight = function(tile, endRowCol) {
 	}
 };
 
-Board.prototype.getHarmonyUp = function(tile, endRowCol) {
+SkudPaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
 	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
@@ -1334,7 +1334,7 @@ Board.prototype.getHarmonyUp = function(tile, endRowCol) {
 	}
 };
 
-Board.prototype.getHarmonyDown = function(tile, endRowCol) {
+SkudPaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
 	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
@@ -1351,7 +1351,7 @@ Board.prototype.getHarmonyDown = function(tile, endRowCol) {
 	}
 };
 
-Board.prototype.hasNewHarmony = function(player, tile, startRowCol, endRowCol) {
+SkudPaiShoBoard.prototype.hasNewHarmony = function(player, tile, startRowCol, endRowCol) {
 	// To check if new harmony, first analyze harmonies and compare to previous set of harmonies
 	var oldHarmonies = this.harmonyManager.harmonies;
 	this.analyzeHarmonies();
@@ -1359,7 +1359,7 @@ Board.prototype.hasNewHarmony = function(player, tile, startRowCol, endRowCol) {
 	return this.harmonyManager.hasNewHarmony(player, oldHarmonies);
 };
 
-Board.prototype.hasDisharmony = function(boardPoint) {
+SkudPaiShoBoard.prototype.hasDisharmony = function(boardPoint) {
 	if (boardPoint.isType(GATE)) {
 		return false;	// Gate never has disharmony
 	}
@@ -1386,7 +1386,7 @@ Board.prototype.hasDisharmony = function(boardPoint) {
 	return clashFound;
 };
 
-Board.prototype.hasDisharmonyLeft = function(tile, endRowCol) {
+SkudPaiShoBoard.prototype.hasDisharmonyLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
 	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile() 
@@ -1403,7 +1403,7 @@ Board.prototype.hasDisharmonyLeft = function(tile, endRowCol) {
 	}
 };
 
-Board.prototype.hasDisharmonyRight = function(tile, endRowCol) {
+SkudPaiShoBoard.prototype.hasDisharmonyRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
 
 	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile() 
@@ -1420,7 +1420,7 @@ Board.prototype.hasDisharmonyRight = function(tile, endRowCol) {
 	}
 };
 
-Board.prototype.hasDisharmonyUp = function(tile, endRowCol) {
+SkudPaiShoBoard.prototype.hasDisharmonyUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
 	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
@@ -1437,7 +1437,7 @@ Board.prototype.hasDisharmonyUp = function(tile, endRowCol) {
 	}
 };
 
-Board.prototype.hasDisharmonyDown = function(tile, endRowCol) {
+SkudPaiShoBoard.prototype.hasDisharmonyDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
 	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
@@ -1454,7 +1454,7 @@ Board.prototype.hasDisharmonyDown = function(tile, endRowCol) {
 	}
 };
 
-Board.prototype.setPossibleMovePoints = function(boardPointStart) {
+SkudPaiShoBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
 	if (!boardPointStart.hasTile()) {
 		return;
 	}
@@ -1469,7 +1469,7 @@ Board.prototype.setPossibleMovePoints = function(boardPointStart) {
 	}
 };
 
-Board.prototype.removePossibleMovePoints = function() {
+SkudPaiShoBoard.prototype.removePossibleMovePoints = function() {
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
 			boardPoint.removeType(POSSIBLE_MOVE);
@@ -1477,7 +1477,7 @@ Board.prototype.removePossibleMovePoints = function() {
 	});
 };
 
-Board.prototype.setOpenGatePossibleMoves = function(player) {
+SkudPaiShoBoard.prototype.setOpenGatePossibleMoves = function(player) {
 	// Apply "open gate" type to applicable boardPoints
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -1489,7 +1489,7 @@ Board.prototype.setOpenGatePossibleMoves = function(player) {
 	}
 };
 
-Board.prototype.playerControlsLessThanTwoGates = function(player) {
+SkudPaiShoBoard.prototype.playerControlsLessThanTwoGates = function(player) {
 	var count = 0;
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -1503,7 +1503,7 @@ Board.prototype.playerControlsLessThanTwoGates = function(player) {
 	return count < 2;
 };
 
-Board.prototype.playerHasNoGrowingFlowers = function(player) {
+SkudPaiShoBoard.prototype.playerHasNoGrowingFlowers = function(player) {
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
@@ -1516,7 +1516,7 @@ Board.prototype.playerHasNoGrowingFlowers = function(player) {
 	return true;
 };
 
-Board.prototype.revealSpecialFlowerPlacementPoints = function(player) {
+SkudPaiShoBoard.prototype.revealSpecialFlowerPlacementPoints = function(player) {
 	// Check each Gate for tile belonging to player, then check gate edge points
 	var bpCheckList = [];
 	
@@ -1557,7 +1557,7 @@ Board.prototype.revealSpecialFlowerPlacementPoints = function(player) {
 	});
 };
 
-Board.prototype.setGuestGateOpen = function() {
+SkudPaiShoBoard.prototype.setGuestGateOpen = function() {
 	var row = 16;
 	var col = 8;
 	if (this.cells[row][col].isOpenGate()) {
@@ -1565,7 +1565,7 @@ Board.prototype.setGuestGateOpen = function() {
 	}
 };
 
-Board.prototype.revealPossiblePlacementPoints = function(tile) {
+SkudPaiShoBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 	var self = this;
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
@@ -1588,7 +1588,7 @@ Board.prototype.revealPossiblePlacementPoints = function(tile) {
 	});
 };
 
-Board.prototype.revealBoatBonusPoints = function(boardPoint) {
+SkudPaiShoBoard.prototype.revealBoatBonusPoints = function(boardPoint) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -1621,8 +1621,8 @@ Board.prototype.revealBoatBonusPoints = function(boardPoint) {
 	}
 };
 
-Board.prototype.getCopy = function() {
-	var copyBoard = new Board();
+SkudPaiShoBoard.prototype.getCopy = function() {
+	var copyBoard = new SkudPaiShoBoard();
 
 	// cells
 	for (var row = 0; row < this.cells.length; row++) {
@@ -1643,7 +1643,7 @@ Board.prototype.getCopy = function() {
 	return copyBoard;
 };
 
-Board.prototype.numTilesInGardensForPlayer = function(player) {
+SkudPaiShoBoard.prototype.numTilesInGardensForPlayer = function(player) {
 	var count = 0;
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -1658,7 +1658,7 @@ Board.prototype.numTilesInGardensForPlayer = function(player) {
 	return count;
 };
 
-Board.prototype.numTilesOnBoardForPlayer = function(player) {
+SkudPaiShoBoard.prototype.numTilesOnBoardForPlayer = function(player) {
 	var count = 0;
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -1671,7 +1671,7 @@ Board.prototype.numTilesOnBoardForPlayer = function(player) {
 	return count;
 };
 
-Board.prototype.getSurroundness = function(player) {
+SkudPaiShoBoard.prototype.getSurroundness = function(player) {
 	var up = 0;
 	var hasUp = 0;
 	var down = 0;

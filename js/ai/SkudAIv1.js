@@ -275,7 +275,7 @@ SkudAIv1.prototype.addAccentSelectionMoves = function(moves, game) {
 		chosenAccents.push(randomAccentTile.code);
 	}
 
-	var move = new NotationMove("0" + this.player.charAt(0) + "." + chosenAccents.join());
+	var move = new SkudPaiShoNotationMove("0" + this.player.charAt(0) + "." + chosenAccents.join());
 	moves.push(move);
 };
 
@@ -296,7 +296,7 @@ SkudAIv1.prototype.addPlantMoves = function(moves, game) {
 			var endPoints = this.getPossibleMovePoints(game);
 
 			for (var j = 0; j < endPoints.length; j++) {
-				notationBuilder = new NotationBuilder();
+				notationBuilder = new SkudPaiShoNotationBuilder();
 				notationBuilder.moveType = PLANTING;
 
 				notationBuilder.plantedFlowerType = tile.code;

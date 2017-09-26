@@ -1,6 +1,6 @@
-// Harmony
+/* Skud Pai Sho Harmony */
 
-function Harmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
+function SkudPaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = tile1RowAndColumn;
 	this.tile2 = tile2;
@@ -17,7 +17,7 @@ function Harmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	}
 }
 
-Harmony.prototype.equals = function(otherHarmony) {
+SkudPaiShoHarmony.prototype.equals = function(otherHarmony) {
 	if (this.ownerName === otherHarmony.ownerName && this.ownerCode === otherHarmony.ownerCode) {
 		if (this.tile1 === otherHarmony.tile1 || this.tile1 === otherHarmony.tile2) {
 			if (this.tile2 === otherHarmony.tile1 || this.tile2 === otherHarmony.tile2) {
@@ -28,7 +28,7 @@ Harmony.prototype.equals = function(otherHarmony) {
 	return false;
 };
 
-Harmony.prototype.notAnyOfThese = function(harmonies) {
+SkudPaiShoHarmony.prototype.notAnyOfThese = function(harmonies) {
 	for (var i = 0; i < harmonies.length; i++) {
 		if (this.equals(harmonies[i])) {
 			return false;
@@ -37,11 +37,11 @@ Harmony.prototype.notAnyOfThese = function(harmonies) {
 	return true;
 };
 
-Harmony.prototype.containsTile = function(tile) {
+SkudPaiShoHarmony.prototype.containsTile = function(tile) {
 	return (this.tile1 === tile || this.tile2 === tile);
 };
 
-Harmony.prototype.getTileThatIsNotThisOne = function(tile) {
+SkudPaiShoHarmony.prototype.getTileThatIsNotThisOne = function(tile) {
 	if (this.tile1 === tile) {
 		return this.tile2;
 	} else if (this.tile2 === tile) {
@@ -51,11 +51,11 @@ Harmony.prototype.getTileThatIsNotThisOne = function(tile) {
 	}
 };
 
-Harmony.prototype.containsTilePos = function(pos) {
+SkudPaiShoHarmony.prototype.containsTilePos = function(pos) {
 	return this.tile1Pos.samesies(pos) || this.tile2Pos.samesies(pos);
 };
 
-Harmony.prototype.getPosThatIsNotThisOne = function(pos) {
+SkudPaiShoHarmony.prototype.getPosThatIsNotThisOne = function(pos) {
 	if (this.tile1Pos.samesies(pos)) {
 		return this.tile2Pos;
 	} else if(this.tile2Pos.samesies(pos)) {
@@ -65,11 +65,11 @@ Harmony.prototype.getPosThatIsNotThisOne = function(pos) {
 	}
 };
 
-Harmony.prototype.getString = function() {
+SkudPaiShoHarmony.prototype.getString = function() {
 	return this.ownerName + " (" + this.tile1Pos.notationPointString + ")-(" + this.tile2Pos.notationPointString + ")";
 };
 
-Harmony.prototype.getDirectionForTile = function(tile) {
+SkudPaiShoHarmony.prototype.getDirectionForTile = function(tile) {
 	if (!this.containsTile(tile)) {
 		return;
 	}
@@ -98,7 +98,7 @@ Harmony.prototype.getDirectionForTile = function(tile) {
 	}
 };
 
-Harmony.prototype.crossesCenter = function() {
+SkudPaiShoHarmony.prototype.crossesCenter = function() {
 	var rowHigh = this.tile1Pos.row;
 	var rowLow = this.tile2Pos.row;
 	if (this.tile1Pos.row < this.tile2Pos.row) {
@@ -127,18 +127,18 @@ Harmony.prototype.crossesCenter = function() {
 
 
 // HarmonyManager manages list of harmonies
-function HarmonyManager() {
+function SkudPaiShoHarmonyManager() {
 	this.harmonies = [];
 }
 
-HarmonyManager.prototype.printHarmonies = function() {
+SkudPaiShoHarmonyManager.prototype.printHarmonies = function() {
 	debug("All Harmonies:");
 	for (var i = 0; i < this.harmonies.length; i++) {
 		debug(this.harmonies[i].getString());
 	}
 };
 
-HarmonyManager.prototype.getHarmoniesWithThisTile = function(tile) {
+SkudPaiShoHarmonyManager.prototype.getHarmoniesWithThisTile = function(tile) {
 	var results = [];
 	this.harmonies.forEach(function(harmony) {
 		if (harmony.containsTile(tile)) {
@@ -148,7 +148,7 @@ HarmonyManager.prototype.getHarmoniesWithThisTile = function(tile) {
 	return results;
 };
 
-HarmonyManager.prototype.addHarmony = function(harmony) {
+SkudPaiShoHarmonyManager.prototype.addHarmony = function(harmony) {
 	// Add harmony if it doesn't already exist
 
 	// Does it exist in old set of harmonies?
@@ -166,7 +166,7 @@ HarmonyManager.prototype.addHarmony = function(harmony) {
 	}
 };
 
-HarmonyManager.prototype.addHarmonies = function(harmoniesToAdd) {
+SkudPaiShoHarmonyManager.prototype.addHarmonies = function(harmoniesToAdd) {
 	if (!harmoniesToAdd) {
 		return;
 	}
@@ -176,11 +176,11 @@ HarmonyManager.prototype.addHarmonies = function(harmoniesToAdd) {
 	}
 };
 
-HarmonyManager.prototype.clearList = function() {
+SkudPaiShoHarmonyManager.prototype.clearList = function() {
 	this.harmonies = [];
 };
 
-HarmonyManager.prototype.numHarmoniesForPlayer = function(player) {
+SkudPaiShoHarmonyManager.prototype.numHarmoniesForPlayer = function(player) {
 	var count = 0;
 	for (var i = 0; i < this.harmonies.length; i++) {
 		if (this.harmonies[i].ownerName === player) {
@@ -190,7 +190,7 @@ HarmonyManager.prototype.numHarmoniesForPlayer = function(player) {
 	return count;
 };
 
-HarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
+SkudPaiShoHarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
 	var hostCount = this.numHarmoniesForPlayer(HOST);
 	var guestCount = this.numHarmoniesForPlayer(GUEST);
 
@@ -201,7 +201,7 @@ HarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
 	}
 };
 
-HarmonyManager.prototype.getNumCrossingCenterForPlayer = function(player) {
+SkudPaiShoHarmonyManager.prototype.getNumCrossingCenterForPlayer = function(player) {
 	var count = 0;
 	for (var i = 0; i < this.harmonies.length; i++) {
 		if (this.harmonies[i].ownerName === player) {
@@ -213,7 +213,7 @@ HarmonyManager.prototype.getNumCrossingCenterForPlayer = function(player) {
 	return count;
 };
 
-HarmonyManager.prototype.ringLengthForPlayer = function(player) {
+SkudPaiShoHarmonyManager.prototype.ringLengthForPlayer = function(player) {
 	var rings = this.getHarmonyChains();
 	var longest = 0;
 
@@ -222,21 +222,6 @@ HarmonyManager.prototype.ringLengthForPlayer = function(player) {
 		var h = ring.pop();	// LOL
 		var playerName = h.ownerName;
 		if (playerName === player) {
-			// // verify very nice ring - crosses center lines
-			// var crossesUp = false;
-			// var crossesDown = false;
-			// var crossesLeft = false;
-			// var crossesRight = false;
-
-			// for (var j = 0; j < ring.length; j++) {
-			// 	var h = ring[j];
-			// 	crossesUp = h.crossesUp();
-			// 	crossesDown = h.crossesDown();
-			// 	crossesLeft = h.crossesLeft();
-			// 	crossesRight = h.crossesRight();
-			// }
-
-			// var veryNice = crossesUp && crossesDown && crossesLeft && crossesRight;
 			var veryNice = true;
 			if (veryNice && ring.length > longest) {
 				longest = ring.length;
@@ -247,7 +232,7 @@ HarmonyManager.prototype.ringLengthForPlayer = function(player) {
 	return longest;
 };
 
-HarmonyManager.prototype.getPlayerWithLongestChain = function() {
+SkudPaiShoHarmonyManager.prototype.getPlayerWithLongestChain = function() {
 	var hostLength = this.ringLengthForPlayer(HOST);
 	var guestLength = this.ringLengthForPlayer(GUEST);
 
@@ -258,7 +243,7 @@ HarmonyManager.prototype.getPlayerWithLongestChain = function() {
 	}
 };
 
-HarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies) {
+SkudPaiShoHarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies) {
 	// There's a new harmony if a player's tile has a harmony with a tile it didn't before
 	
 	// If current harmony list has one that oldHarmonies does not
@@ -287,7 +272,7 @@ HarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies) {
 	return newHarmonies.length > 0;
 };
 
-HarmonyManager.prototype.getHarmonyChains = function() {
+SkudPaiShoHarmonyManager.prototype.getHarmonyChains = function() {
 	var self = this;
 
 	var rings = [];
@@ -323,41 +308,13 @@ HarmonyManager.prototype.getHarmonyChains = function() {
 	return rings;
 };
 
-HarmonyManager.prototype.harmonyRingExists = function() {
+SkudPaiShoHarmonyManager.prototype.harmonyRingExists = function() {
 	// Chain of harmonies around the center of the board
 
 	var self = this;
 
 	// var rings = [];
 	var rings = this.getHarmonyChains();
-
-	// for (var i = 0; i < this.harmonies.length; i++) {
-	// 	var hx = this.harmonies[i];
-
-	// 	var chain = [];
-	// 	chain.push(hx);
-
-	// 	var startTile = hx.tile2;
-	// 	var startTilePos = hx.tile2Pos;
-	// 	var targetTile = hx.tile1;
-	// 	var targetTilePos = hx.tile1Pos;
-
-	// 	var ringFound = this.lookForRing(startTile, targetTile, chain);
-		
-	// 	if (ringFound[0]) {
-	// 		var ringExists = false;
-			
-	// 		rings.forEach(function(ring) {
-	// 			if (self.ringsMatch(ring, ringFound[1])) {
-	// 				ringExists = true;
-	// 			}
-	// 		});
-
-	// 		if (!ringExists) {
-	// 			rings.push(ringFound[1]);
-	// 		}
-	// 	}
-	// }
 
 	var verifiedHarmonyRingOwners = [];
 	rings.forEach(function(ring) {
@@ -372,7 +329,7 @@ HarmonyManager.prototype.harmonyRingExists = function() {
 	return verifiedHarmonyRingOwners;
 };
 
-HarmonyManager.prototype.ringContains345 = function(ring) {
+SkudPaiShoHarmonyManager.prototype.ringContains345 = function(ring) {
 	// 
 	var has3 = false;
 	var has4 = false;
@@ -403,7 +360,7 @@ HarmonyManager.prototype.ringContains345 = function(ring) {
 };
 
 // I think this works.
-HarmonyManager.prototype.verifyHarmonyRing = function(ring) {
+SkudPaiShoHarmonyManager.prototype.verifyHarmonyRing = function(ring) {
 	// Verify harmonies in ring go around center of board
 	// debug("In verifyHarmonyRing()");
 
@@ -493,7 +450,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 **/
-HarmonyManager.prototype.isPointInsideShape = function(notationPoint, shapePoints) {
+SkudPaiShoHarmonyManager.prototype.isPointInsideShape = function(notationPoint, shapePoints) {
 	var x = notationPoint.x;
 	var y = notationPoint.y;
 
@@ -516,7 +473,7 @@ HarmonyManager.prototype.isPointInsideShape = function(notationPoint, shapePoint
 	return inside;
 };
 
-HarmonyManager.prototype.isPointInsideShape_alternate = function(notationPoint, poly) {
+SkudPaiShoHarmonyManager.prototype.isPointInsideShape_alternate = function(notationPoint, poly) {
 	var pt = [notationPoint.x, notationPoint.y];
     for(var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
         ((poly[i][1] <= pt[1] && pt[1] < poly[j][1]) || (poly[j][1] <= pt[1] && pt[1] < poly[i][1]))
@@ -526,7 +483,7 @@ HarmonyManager.prototype.isPointInsideShape_alternate = function(notationPoint, 
 };
 
 /* Working function */
-HarmonyManager.prototype.isCenterInsideShape = function(shapePoints) {
+SkudPaiShoHarmonyManager.prototype.isCenterInsideShape = function(shapePoints) {
 	var x = 0;
 	var y = 0;
 	var inside = false;
@@ -557,12 +514,7 @@ HarmonyManager.prototype.isCenterInsideShape = function(shapePoints) {
 };
 
 
-
-
-
-
-
-HarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
+SkudPaiShoHarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
 	// Must be same size to qualify as matching
 	if (ring1.length !== ring2.length) {
 		return false;
@@ -585,7 +537,7 @@ HarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
 	return true;
 };
 
-HarmonyManager.prototype.lookForRing = function(t1, tx, chain) {
+SkudPaiShoHarmonyManager.prototype.lookForRing = function(t1, tx, chain) {
 	// Look for different harmony that includes t1
 	for (var i = 0; i < this.harmonies.length; i++) {
 		var hx = this.harmonies[i];

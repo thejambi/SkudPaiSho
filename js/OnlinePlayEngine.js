@@ -173,6 +173,16 @@ OnlinePlayEngine.prototype.getCurrentGamesForUser = function(userId, callback) {
     );
 };
 
+OnlinePlayEngine.prototype.getCountOfGamesWhereUserTurn = function(userId, callback) {
+    $.get("getCountOfGamesWhereUserTurn.php?userId="+userId, 
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
 OnlinePlayEngine.prototype.getGameNotation = function(gameId, callback) {
     $.get("getGameNotation.php?q="+gameId, 
         function(data, status){
