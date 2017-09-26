@@ -21,6 +21,27 @@ SkudPaiShoController.prototype.resetGameNotation = function() {
 	this.gameNotation = new SkudPaiShoGameNotation();
 };
 
+SkudPaiShoController.prototype.resetMove = function(first_argument) {
+	if (this.notationBuilder.status === BRAND_NEW) {
+		// Remove last move
+		this.gameNotation.removeLastMove();
+		if (this.gameNotation.moves.length === 3) {
+			this.gameNotation.removeLastMove();	// Special case for automatic Host first move
+		}
+	} else if (this.notationBuilder.status === READY_FOR_BONUS) {
+		// Just rerun
+	}
+
+	if (this.gameNotation.moves.length <= 1) {
+		// Choosing Accent Tiles
+		if (getCurrentPlayer() === GUEST) {
+			this.guestAccentTiles = [];
+		} else if (getCurrentPlayer() === HOST) {
+			this.hostAccentTiles = [];
+		}
+	}
+};
+
 SkudPaiShoController.prototype.getDefaultHelpMessageText = function() {
 	return "<h4>Skud Pai Sho</h4> <p>Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p> <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p> <p>Select tiles or points on the board to learn more or <a href='https://skudpaisho.wordpress.com/pai-sho-resources/' target='_blank'>view the resources page</a> for the rules, a video tutorial on how to play, a print and play Pai Sho set, and more!</p>";
 };

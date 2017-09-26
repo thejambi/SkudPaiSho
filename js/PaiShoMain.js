@@ -189,10 +189,13 @@ function verifyLogin() {
 	}
 }
 
-function setAccountHeaderLinkText() {
+function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 	var text = "Sign In";
 	if (userIsLoggedIn() && onlinePlayEnabled) {
 		text = "My Games";
+		if (countOfGamesWhereUserTurn) {
+			text += "(" + countOfGamesWhereUserTurn + ")";
+		}
 	}
 	document.getElementById('accountHeaderLinkText').innerText = text;
 }
@@ -706,24 +709,7 @@ function showResetMoveMessage() {
 }
 
 function resetMove() {
-	if (notationBuilder.status === BRAND_NEW) {
-		// Remove last move
-		gameController.gameNotation.removeLastMove();
-		if (gameController.gameNotation.moves.length === 3) {
-			gameController.gameNotation.removeLastMove();	// Special case for automatic Host first move
-		}
-	} else if (notationBuilder.status === READY_FOR_BONUS) {
-		// Just rerun
-	}
-
-	if (gameController.gameNotation.moves.length <= 1) {
-		// Choosing Accent Tiles
-		if (getCurrentPlayer() === GUEST) {
-			guestAccentTiles = [];
-		} else if (getCurrentPlayer() === HOST) {
-			hostAccentTiles = [];
-		}
-	}
+	gameController.resetMove();
 
 	rerunAll();
 	$('#contactform').addClass('gone');
@@ -769,6 +755,7 @@ var submitMoveCallback = function() {
 	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
 	finalizeMove();
 	startWatchingGameRealTime();
+	startWatchingNumberOfGamesWhereUserTurn();
 };
 
 function clearMessage() {
@@ -1134,10 +1121,13 @@ function populateMyGamesList(results) {
 		var row = resultRows[index].split('|||');
 		var myGame = {
 			gameId:parseInt(row[0]), 
-			hostUsername:row[1], 
-			hostOnline:parseInt(row[2]), 
-			guestUsername:row[3], 
-			guestOnline:parseInt(row[4])
+			gameTypeId:row[1], 
+			gameTypeDesc:row[2], 
+			hostUsername:row[3], 
+			hostOnline:parseInt(row[4]), 
+			guestUsername:row[5], 
+			guestOnline:parseInt(row[6]), 
+			isUserTurn:parseInt(row[7])
 		};
 		myGamesList.push(myGame);
 	}
@@ -1159,7 +1149,8 @@ function showMyGames() {
 					var userIsHost = myGame.hostUsername === getUsername();
 					var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
 
-					var gameDisplayTitle = "";
+					var gameDisplayTitle = myGame.gameTypeDesc + ": ";
+
 					if (!userIsHost && opponentUsername != getUsername()) {
 						if (myGame.hostOnline) {
 							gameDisplayTitle += userOnlineIcon;
@@ -1177,6 +1168,9 @@ function showMyGames() {
 						}
 					}
 					gameDisplayTitle += myGame.guestUsername;
+					if (myGame.isUserTurn) {
+						gameDisplayTitle += " (Your turn)";
+					}
 					
 					message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\");'>" + gameDisplayTitle + "</div>";
 				}
@@ -1247,11 +1241,6 @@ function acceptGameSeekClicked(gameIdChosen) {
 						var userIsHost = myGame.hostUsername === getUsername();
 						var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
 
-						// if (userIsHost && myGame.guestUsername === gameSeek.hostUsername) {
-						// 	gameExistsWithOpponent = true;
-						// } else if (!userIsHost && myGame.hostUsername === gameSeek.hostUsername) {
-						// 	gameExistsWithOpponent = true;
-						// }
 						if (opponentUsername === gameSeek.hostUsername) {
 							gameExistsWithOpponent = true;
 						}
@@ -1349,7 +1338,7 @@ function loadNumberOfGamesWhereUserTurn() {
 	if (onlinePlayEnabled && userIsLoggedIn()) {
 		onlinePlayEngine.getCountOfGamesWhereUserTurn(getUserId(), 
 			function(count) {
-				document.getElementById('accountHeaderLinkText').innerText += "(" + count + ")");
+				setAccountHeaderLinkText(count);
 			}
 		);
 	}
@@ -1368,3 +1357,23 @@ function startWatchingNumberOfGamesWhereUserTurn() {
 	}, 15000);
 }
 
+/* Chat */
+
+// var sendChat = function() {
+// 	document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
+// 	var chatMessage = document.getElementById('chatMessageInput').value;
+// 	onlinePlayEngine.sendChat(gameId, getUserId(), chatMessage, 
+// 		function(result) {
+// 			document.getElementById('sendChatMessageButton').innerHTML = "Send";
+// 			document.getElementById('chatMessageInput').value = "";
+// 		}
+// 	);
+// }
+// document.getElementById('sendChatMessageButton').onclick = "sendChat();";
+
+// document.getElementById('chatMessageInput').onkeypress = function(e){
+//      var code = (e.keyCode ? e.keyCode : e.which);
+//       if(code == 13) {
+//         sendChat();
+//       }
+// };

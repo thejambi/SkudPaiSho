@@ -256,3 +256,20 @@ OnlinePlayEngine.prototype.getGameTypeDesc = function(gameTypeId) {
         }
     );
 }
+
+OnlinePlayEngine.prototype.sendChat = function(gameId, userId, chatMessage, callback) {
+    $.post("sendChatMessage.php", 
+        {
+            gameId: gameId, 
+            senderId: userId, 
+            chatMessage: chatMessage
+        }, 
+        function(data, success){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+
