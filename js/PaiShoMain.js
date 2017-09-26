@@ -1089,7 +1089,30 @@ function userIsLoggedIn() {
 		&& getDeviceId();
 }
 
-function jumpToGame(gameIdChosen, userIsHost, opponentUsername) {
+var GameType = {
+	SkudPaiSho:1, 
+	VagabondPaiSho:2, 
+	CapturePaiSho:3, 
+	SolitairePaiSho:4 
+};
+function setGameController(gameTypeId) {
+	switch(gameTypeId) {
+	    case GameType.SkudPaiSho:
+	        gameController = new SkudPaiShoController();
+	        debug("You're playing Skud Pai Sho!");
+	        break;
+	    // case GameType.VagabondPaiSho:
+	    //     gameController = new VagabondPaiShoController();
+	    //     break;
+	    default:
+	        debug("Defaulting to use Skud Pai Sho.");
+	        gameController = new SkudPaiShoController();
+	}
+}
+
+function jumpToGame(gameIdChosen, userIsHost, opponentUsername, gameTypeId) {
+	setGameController(gameTypeId);
+
 	gameId = gameIdChosen;
 	currentGameOpponentUsername = opponentUsername;
 
@@ -1121,7 +1144,7 @@ function populateMyGamesList(results) {
 		var row = resultRows[index].split('|||');
 		var myGame = {
 			gameId:parseInt(row[0]), 
-			gameTypeId:row[1], 
+			gameTypeId:parseInt(row[1]), 
 			gameTypeDesc:row[2], 
 			hostUsername:row[3], 
 			hostOnline:parseInt(row[4]), 
@@ -1142,14 +1165,23 @@ function showMyGames() {
 				
 				populateMyGamesList(results);
 
+				var gameTypeHeading = "";
 				for (var index in myGamesList) {
 					var myGame = myGamesList[index];
+
+					if (myGame.gameTypeDesc !== gameTypeHeading) {
+						if (gameTypeHeading !== "") {
+							message += "<br />";
+						}
+						gameTypeHeading = myGame.gameTypeDesc;
+						message += "<div class='modalGameTypeHeading'>" + gameTypeHeading + "</div>";
+					}
 
 					var gId = parseInt(myGame.gameId);
 					var userIsHost = myGame.hostUsername === getUsername();
 					var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
 
-					var gameDisplayTitle = myGame.gameTypeDesc + ": ";
+					var gameDisplayTitle = "";
 
 					if (!userIsHost && opponentUsername != getUsername()) {
 						if (myGame.hostOnline) {
@@ -1172,7 +1204,7 @@ function showMyGames() {
 						gameDisplayTitle += " (Your turn)";
 					}
 					
-					message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\");'>" + gameDisplayTitle + "</div>";
+					message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\"," + myGame.gameTypeId + ");'>" + gameDisplayTitle + "</div>";
 				}
 			}
 			message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='signOut();'>Click here to sign out.</span></div>";
@@ -1284,11 +1316,29 @@ function viewGameSeeksClicked() {
 					for (var index in resultRows) {
 						var row = resultRows[index].split('|||');
 						debug(row);
-						var gameSeek = {gameId:parseInt(row[0]), hostId:row[1], hostUsername:row[2], hostOnline:parseInt(row[3])};
+						var gameSeek = {
+							gameId:parseInt(row[0]), 
+							gameTypeId:parseInt(row[1]), 
+							gameTypeDesc:row[2], 
+							hostId:row[3], 
+							hostUsername:row[4], 
+							hostOnline:parseInt(row[5])
+						};
 						gameSeekList.push(gameSeek);
 						var hostOnlineOrNotIconText = userOfflineIcon;
 						if (gameSeek.hostOnline) {
 							hostOnlineOrNotIconText = userOnlineIcon;
+						}
+					}
+					var gameTypeHeading = "";
+					for (var index in gameSeekList) {
+						var gameSeek = gameSeekList[index];
+						if (gameSeek.gameTypeDesc !== gameTypeHeading) {
+							if (gameTypeHeading !== "") {
+								message += "<br />";
+							}
+							gameTypeHeading = gameSeek.gameTypeDesc;
+							message += "<div class='modalGameTypeHeading'>" + gameTypeHeading + "</div>";
 						}
 						message += "<div class='clickableText' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
 					}
