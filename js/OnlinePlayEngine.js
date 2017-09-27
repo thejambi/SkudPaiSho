@@ -264,8 +264,19 @@ OnlinePlayEngine.prototype.sendChat = function(gameId, userId, chatMessage, call
             senderId: userId, 
             chatMessage: chatMessage
         }, 
-        function(data, success){
+        function(data, status){
             if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.getNewChatMessages = function(gameId, lastChatTimestamp, callback) {
+    $.get("getNewChatMessages.php?g="+gameId + "&t=" + encodeURIComponent(lastChatTimestamp), 
+        function(data, status){
+            if (status === 'success') {
+                debug(data.trim());
                 callback(data.trim());
             }
         }

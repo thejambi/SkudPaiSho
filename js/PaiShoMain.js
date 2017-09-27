@@ -233,7 +233,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 	document.getElementById("response").innerHTML = title;
 }
 
-var lastChatTimestamp;
+var lastChatTimestamp = '1970-01-01 00:00:00';
 
 function gameWatchPulse() {
 	onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
@@ -244,12 +244,35 @@ function gameWatchPulse() {
 		}
 	);
 
-	// onlinePlayEngine.getNewChatMessages(gameId, lastChatTimestamp, 
-	// 	function(results) {
-	// 		debug(results);
+	onlinePlayEngine.getNewChatMessages(gameId, lastChatTimestamp, 
+		function(results) {
+			if (results != "") {
+				debug(results);
+				var resultRows = results.split('\n');
 
-	// 	}
-	// );
+				chatMessageList = [];
+				var newChatMessagesHtml = "";
+
+				for (var index in resultRows) {
+					var row = resultRows[index].split('|||');
+					debug(row);
+					var chatMessage = {
+						timestamp:row[0], 
+						username:row[1], 
+						message:row[2]
+					};
+					chatMessageList.push(chatMessage);
+					lastChatTimestamp = chatMessage.timestamp;
+				}
+				for (var index in chatMessageList) {
+					var chatMessage = chatMessageList[index];
+					newChatMessagesHtml += "<div class='chatMessage'>" + chatMessage.username + ": " + chatMessage.message + "</div>";
+				}
+				
+				document.getElementById('chatMessagesDisplay').innerHTML += newChatMessagesHtml;
+			}
+		}
+	);
 }
 
 function startWatchingGameRealTime() {
@@ -265,7 +288,7 @@ function startWatchingGameRealTime() {
 
 	gameWatchIntervalValue = setInterval(function() {
 		gameWatchPulse();
-	}, 3000);
+	}, 2000);
 }
 
 function setUseHLoweTiles() {
@@ -1341,14 +1364,16 @@ function viewGameSeeksClicked() {
 							hostOnline:parseInt(row[5])
 						};
 						gameSeekList.push(gameSeek);
-						var hostOnlineOrNotIconText = userOfflineIcon;
-						if (gameSeek.hostOnline) {
-							hostOnlineOrNotIconText = userOnlineIcon;
-						}
 					}
 					var gameTypeHeading = "";
 					for (var index in gameSeekList) {
 						var gameSeek = gameSeekList[index];
+						
+						var hostOnlineOrNotIconText = userOfflineIcon;
+						if (gameSeek.hostOnline) {
+							hostOnlineOrNotIconText = userOnlineIcon;
+						}
+
 						if (gameSeek.gameTypeDesc !== gameTypeHeading) {
 							if (gameTypeHeading !== "") {
 								message += "<br />";
@@ -1428,15 +1453,12 @@ function startWatchingNumberOfGamesWhereUserTurn() {
 var sendChat = function() {
 	document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
 	var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value);
-	// onlinePlayEngine.sendChat(gameId, getUserId(), chatMessage, 
-	// 	function(result) {
-	// 		document.getElementById('sendChatMessageButton').innerHTML = "Send";
-	// 		document.getElementById('chatMessageInput').value = "";
-	// 	}
-	// );
-	document.getElementById('sendChatMessageButton').innerHTML = "Send";
-	document.getElementById('chatMessageInput').value = "";
-	document.getElementById('chatMessagesDisplay').innerHTML += "<br />> " + chatMessage;
+	onlinePlayEngine.sendChat(gameId, getUserId(), chatMessage, 
+		function(result) {
+			document.getElementById('sendChatMessageButton').innerHTML = "Send";
+			document.getElementById('chatMessageInput').value = "";
+		}
+	);
 }
 
 document.getElementById('chatMessageInput').onkeypress = function(e){
