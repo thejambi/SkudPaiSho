@@ -266,7 +266,7 @@ function gameWatchPulse() {
 				}
 				for (var index in chatMessageList) {
 					var chatMessage = chatMessageList[index];
-					newChatMessagesHtml += "<div class='chatMessage'>" + chatMessage.username + ": " + chatMessage.message + "</div>";
+					newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message + "</div>";
 				}
 				
 				document.getElementById('chatMessagesDisplay').innerHTML += newChatMessagesHtml;
