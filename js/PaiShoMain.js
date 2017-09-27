@@ -196,7 +196,7 @@ function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 	var text = "Sign In";
 	if (userIsLoggedIn() && onlinePlayEnabled) {
 		text = "My Games";
-		if (countOfGamesWhereUserTurn) {
+		if (parseInt(countOfGamesWhereUserTurn)) {
 			text += "(" + countOfGamesWhereUserTurn + ")";
 		}
 	}
@@ -244,12 +244,12 @@ function gameWatchPulse() {
 		}
 	);
 
-	onlinePlayEngine.getNewChatMessages(gameId, lastChatTimestamp, 
-		function(results) {
-			debug(results);
+	// onlinePlayEngine.getNewChatMessages(gameId, lastChatTimestamp, 
+	// 	function(results) {
+	// 		debug(results);
 
-		}
-	);
+	// 	}
+	// );
 }
 
 function startWatchingGameRealTime() {
@@ -563,7 +563,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 	var messageText = "";
 
 	if (playingOnlineGame()) {
-		messageText += "<em>Listening for game updates...</em><br />";
+		messageText += "<em>Opponent's turn</em><br />";
 	}
 
 	if (currentMoveIndex == 1 && !haveBothEmails()) {
