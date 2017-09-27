@@ -110,23 +110,28 @@
       </div>
   </div>
   <div class="helpContainer" id="help">
-    <div class="helpText">
-      <h4>Skud Pai Sho</h4>
-      <p>Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p>
-      <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p>
-      <p>Select tiles or points on the board to learn more or <a href="https://skudpaisho.wordpress.com/pai-sho-resources/" target="_blank">view the resources page</a> for the rules, a video tutorial on how to play, a print and play Pai Sho set, and more!</p>
+    <div class="tab">
+      <button class="tablinks" onclick="openTab(event, 'helpTextTab')" id="defaultOpenTab">Help</button>
+      <button class="tablinks" onclick="openTab(event, 'gameChatTab')">Game Chat</button>
+    </div>
+
+    <div id='helpTextTab' class="tabcontent">
+      <div id='helpTextContent'>
+        <h4>Skud Pai Sho</h4>
+        <p>Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p>
+        <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p>
+        <p>Select tiles or points on the board to learn more or <a href="https://skudpaisho.wordpress.com/pai-sho-resources/" target="_blank">view the resources page</a> for the rules, a video tutorial on how to play, a print and play Pai Sho set, and more!</p>
+      </div>
+    </div>
+    <div id="gameChatTab" class="tabcontent">
+      <div id="chatMessagesDisplay">Real-time games will have an in-game chat feature coming soon.</div>
+      <div id="chatMessageInputContainer">
+        <input value="" id="chatMessageInput" />
+        <span id="sendChatMessageButton" class="button" onclick='sendChat();'>Send</span>
+      </div>
     </div>
   </div>
-
 </div>
-
-<!-- <div id="chatContainer" class="footer">
-  <div id="chatMessagesDisplay"></div>
-  <div id="chatMessageInputContainer" class="gone">
-    <input value="" id="chatMessageInput" />
-    <span id="sendChatMessageButton" class="button">Send</span>
-  </div>
-</div> -->
 
 <div class="footer">
   If you <span class='skipBonus' onclick='promptEmail();'>enter your email address</span>, you can be notified automatically when your opponent plays a move. Your email address is never used for any other reason, and you can edit it at any time. Click <span class='skipBonus' onclick='promptEmail();'>here</span> to edit email.

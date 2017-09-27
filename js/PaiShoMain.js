@@ -153,7 +153,7 @@ window.requestAnimationFrame(function () {
 
 	updateFooter();
 
-	defaultHelpMessageText = document.querySelector(".helpText").innerHTML;
+	defaultHelpMessageText = document.getElementById("helpTextContent").innerHTML;
 
 	clearMessage();
 
@@ -168,7 +168,10 @@ window.requestAnimationFrame(function () {
 		}
 	}
 
-	verifyLogin();	// Uncomment when ok
+	verifyLogin();
+
+	// Open default help/chat tab
+	document.getElementById("defaultOpenTab").click();
 });
 
 function verifyLogin() {
@@ -230,12 +233,21 @@ function updateCurrentGameTitle(isOpponentOnline) {
 	document.getElementById("response").innerHTML = title;
 }
 
+var lastChatTimestamp;
+
 function gameWatchPulse() {
 	onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
 	
 	onlinePlayEngine.checkIfUserOnline(currentGameOpponentUsername, 
 		function(isOpponentOnline) {
 			updateCurrentGameTitle(isOpponentOnline);
+		}
+	);
+
+	onlinePlayEngine.getNewChatMessages(gameId, lastChatTimestamp, 
+		function(results) {
+			debug(results);
+
 		}
 	);
 }
@@ -762,13 +774,13 @@ function clearMessage() {
 	if (!defaultHelpMessageText) {
 		defaultHelpMessageText = gameController.getDefaultHelpMessageText();
 	}
-	document.querySelector(".helpText").innerHTML = defaultHelpMessageText;
+	document.getElementById("helpTextContent").innerHTML = defaultHelpMessageText;
 	// if (!haveUserEmail()) {
-	// 	document.querySelector(".helpText").innerHTML += "<p>If you <span class='skipBonus' onclick='promptEmail()'>enter your email address</span>, you can be notified when your opponent plays a move.</p>";
+	// 	document.getElementById("helpTextContent").innerHTML += "<p>If you <span class='skipBonus' onclick='promptEmail()'>enter your email address</span>, you can be notified when your opponent plays a move.</p>";
 	// }
 
-	document.querySelector(".helpText").innerHTML = getTournamentText() 
-		+ document.querySelector(".helpText").innerHTML
+	document.getElementById("helpTextContent").innerHTML = getTournamentText() 
+		+ document.getElementById("helpTextContent").innerHTML
 		+ getAltTilesOptionText();
 }
 
@@ -814,10 +826,10 @@ function showPointMessage(htmlPoint) {
 }
 
 function setMessage(msg) {
-	if (msg === document.querySelector(".helpText").innerHTML) {
+	if (msg === document.getElementById("helpTextContent").innerHTML) {
 		clearMessage();
 	} else {
-		document.querySelector(".helpText").innerHTML = getTournamentText() + msg + getAltTilesOptionText();
+		document.getElementById("helpTextContent").innerHTML = getTournamentText() + msg + getAltTilesOptionText();
 	}
 }
 
@@ -839,9 +851,13 @@ function toHeading(str) {
 function toMessage(paragraphs) {
 	var message = "";
 
-	paragraphs.forEach(function(str) {
-		message += "<p>" + str + "</p>";
-	});
+	if (paragraphs.length === 1) {
+		return paragraphs[0];
+	} else {
+		paragraphs.forEach(function(str) {
+			message += "<p>" + str + "</p>";
+		});
+	}
 
 	return message;
 }
@@ -1409,21 +1425,41 @@ function startWatchingNumberOfGamesWhereUserTurn() {
 
 /* Chat */
 
-// var sendChat = function() {
-// 	document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
-// 	var chatMessage = document.getElementById('chatMessageInput').value;
-// 	onlinePlayEngine.sendChat(gameId, getUserId(), chatMessage, 
-// 		function(result) {
-// 			document.getElementById('sendChatMessageButton').innerHTML = "Send";
-// 			document.getElementById('chatMessageInput').value = "";
-// 		}
-// 	);
-// }
-// document.getElementById('sendChatMessageButton').onclick = "sendChat();";
+var sendChat = function() {
+	document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
+	var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value);
+	// onlinePlayEngine.sendChat(gameId, getUserId(), chatMessage, 
+	// 	function(result) {
+	// 		document.getElementById('sendChatMessageButton').innerHTML = "Send";
+	// 		document.getElementById('chatMessageInput').value = "";
+	// 	}
+	// );
+	document.getElementById('sendChatMessageButton').innerHTML = "Send";
+	document.getElementById('chatMessageInput').value = "";
+	document.getElementById('chatMessagesDisplay').innerHTML += "<br />> " + chatMessage;
+}
 
-// document.getElementById('chatMessageInput').onkeypress = function(e){
-//      var code = (e.keyCode ? e.keyCode : e.which);
-//       if(code == 13) {
-//         sendChat();
-//       }
-// };
+document.getElementById('chatMessageInput').onkeypress = function(e){
+     var code = (e.keyCode ? e.keyCode : e.which);
+      if(code == 13) {
+        sendChat();
+      }
+};
+
+function htmlEscape(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function openTab(evt, tabIdName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove("active");
+    }
+    document.getElementById(tabIdName).style.display = "block";
+    evt.currentTarget.classList.add("active");
+}
