@@ -277,7 +277,12 @@ function gameWatchPulse() {
 
 function startWatchingGameRealTime() {
 	debug("Starting to watch game");
-	
+
+	// Setup game watching...
+	document.getElementById('chatMessagesDisplay').innerHTML = "";
+	lastChatTimestamp = '1970-01-01 00:00:00';
+
+	// First pulse
 	gameWatchPulse();
 
 	if (gameWatchIntervalValue) {
