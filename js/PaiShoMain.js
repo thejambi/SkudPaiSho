@@ -211,7 +211,7 @@ function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 }
 
 var getGameNotationCallback = function(newGameNotation) {
-	if (newGameNotation !== lastKnownGameNotation) {
+	if (gameWatchIntervalValue && newGameNotation !== lastKnownGameNotation) {
 		gameController.gameNotation.setNotationText(newGameNotation);
 		rerunAll();
 		lastKnownGameNotation = newGameNotation;
