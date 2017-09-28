@@ -28,7 +28,7 @@ SkudPaiShoController.prototype.resetGameNotation = function() {
 
 SkudPaiShoController.prototype.getHostTilesContainerDivs = function() {
 	return '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HL"></div> <div class="HO"></div>';
-}
+};
 
 SkudPaiShoController.prototype.getGuestTilesContainerDivs = function() {
 	return '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
@@ -79,8 +79,6 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
-
-
 SkudPaiShoController.prototype.getExtraHarmonyBonusHelpText = function() {
 	if (!limitedGatesRule) {
 		if (this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
@@ -93,14 +91,13 @@ SkudPaiShoController.prototype.getExtraHarmonyBonusHelpText = function() {
 		}
 		return " <br />You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have at least one Growing Flower.";
 	}
-}
+};
 
 SkudPaiShoController.prototype.showHarmonyBonusMessage = function() {
 	document.querySelector(".gameMessage").innerHTML = "Harmony Bonus! Select a tile to play or <span class='skipBonus' onclick='gameController.skipHarmonyBonus();'>skip</span>."
 	+ this.getExtraHarmonyBonusHelpText()
 	+ getResetMoveText();
-}
-
+};
 
 SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 	if (this.theGame.getWinner() && this.notationBuilder.status !== READY_FOR_BONUS) {
@@ -158,7 +155,7 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 				var move = new SkudPaiShoNotationMove("0H." + this.hostAccentTiles.join());
 				this.gameNotation.addMove(move);
 				if (onlinePlayEnabled) {
-					createGameIfThatIsOk(1); // 1 for Skud Pai Sho
+					createGameIfThatIsOk(GameType.SkudPaiSho.id);
 				} else {
 					finalizeMove();
 				}
@@ -222,7 +219,7 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 			this.notationBuilder = new SkudPaiShoNotationBuilder();
 		}
 	}
-}
+};
 
 SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 	if (this.theGame.getWinner() && this.notationBuilder.status !== WAITING_FOR_BONUS_ENDPOINT 
@@ -343,7 +340,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 			this.notationBuilder.status = READY_FOR_BONUS;
 		}
 	}
-}
+};
 
 SkudPaiShoController.prototype.skipHarmonyBonus = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
@@ -353,7 +350,7 @@ SkudPaiShoController.prototype.skipHarmonyBonus = function() {
 	} else {
 		finalizeMove();
 	}
-}
+};
 
 SkudPaiShoController.prototype.getTileMessage = function(tileDiv) {
 	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
@@ -479,7 +476,7 @@ SkudPaiShoController.prototype.getTileMessage = function(tileDiv) {
 		heading: heading,
 		message: message
 	}
-}
+};
 
 SkudPaiShoController.prototype.getPointMessage = function(htmlPoint) {
 	var npText = htmlPoint.getAttribute("name");
@@ -534,7 +531,7 @@ SkudPaiShoController.prototype.getPointMessage = function(htmlPoint) {
 		heading: heading,
 		message: message
 	}
-}
+};
 
 SkudPaiShoController.prototype.playAiTurn = function(finalizeMove) {
 	if (this.theGame.getWinner()) {
@@ -593,11 +590,33 @@ SkudPaiShoController.prototype.startAiGame = function(finalizeMove) {
 	}
 };
 
+SkudPaiShoController.prototype.getAiList = function() {
+	return [new SkudAIv1()];
+};
 
+SkudPaiShoController.prototype.getCurrentPlayer = function() {
+	if (this.gameNotation.moves.length <= 1) {
+		if (this.gameNotation.moves.length === 0) {
+			return HOST;
+		} else {
+			return GUEST;
+		}
+	}
+	if (this.gameNotation.moves.length <= 2) {
+		return GUEST;
+	}
+	var lastPlayer = this.gameNotation.moves[this.gameNotation.moves.length - 1].player;
 
+	if (lastPlayer === HOST) {
+		return GUEST;
+	} else if (lastPlayer === GUEST) {
+		return HOST;
+	}
+};
 
-
-
+SkudPaiShoController.prototype.cleanup = function() {
+	// Nothing.
+};
 
 
 

@@ -153,8 +153,8 @@ OnlinePlayEngine.prototype.getGameSeeks = function(callback) {
     );
 };
 
-OnlinePlayEngine.prototype.getCurrentGameSeeksHostedByUser = function(userId, callback) {
-    $.get("getCurrentGameSeeksHostedByUser.php?userId="+userId, 
+OnlinePlayEngine.prototype.getCurrentGameSeeksHostedByUser = function(userId, gameTypeId, callback) {
+    $.get("getCurrentGameSeeksHostedByUser.php?userId="+userId+"&gameTypeId="+gameTypeId, 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -276,7 +276,6 @@ OnlinePlayEngine.prototype.getNewChatMessages = function(gameId, lastChatTimesta
     $.get("getNewChatMessages.php?g="+gameId + "&t=" + encodeURIComponent(lastChatTimestamp), 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }

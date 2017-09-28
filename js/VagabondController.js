@@ -4,6 +4,8 @@ function VagabondController() {
 	document.getElementById('hostTilesContainer').innerHTML = this.getHostTilesContainerDivs();
 	document.getElementById('guestTilesContainer').innerHTML = this.getGuestTilesContainerDivs();
 
+	document.querySelector(".svgContainer").classList.add("vagabondBoardRotate");
+
 	this.resetGameManager();
 	this.resetNotationBuilder();
 	this.resetGameNotation();
@@ -48,7 +50,7 @@ VagabondController.prototype.getDefaultHelpMessageText = function() {
 };
 
 VagabondController.prototype.getAdditionalMessage = function() {
-	// 
+	return "";
 };
 
 
@@ -153,7 +155,15 @@ VagabondController.prototype.pointClicked = function(htmlPoint) {
 
 			// Move all set. Add it to the notation!
 			this.gameNotation.addMove(move);
-			finalizeMove();
+			if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
+				createGameIfThatIsOk(GameType.VagabondPaiSho.id);
+			} else {
+				if (playingOnlineGame()) {
+					callSubmitMove();
+				} else {
+					finalizeMove();
+				}
+			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
 			this.resetNotationBuilder();
@@ -164,7 +174,11 @@ VagabondController.prototype.pointClicked = function(htmlPoint) {
 VagabondController.prototype.skipHarmonyBonus = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 	this.gameNotation.addMove(move);
-	finalizeMove();
+	if (playingOnlineGame()) {
+		callSubmitMove();
+	} else {
+		finalizeMove();
+	}
 }
 
 VagabondController.prototype.getTheMessage = function(tile, ownerName) {
@@ -258,10 +272,21 @@ VagabondController.prototype.startAiGame = function(finalizeMove) {
 	// 
 };
 
+VagabondController.prototype.getAiList = function() {
+	return [];
+}
 
+VagabondController.prototype.getCurrentPlayer = function() {
+	if (this.gameNotation.moves.length % 2 === 0) {
+		return HOST;
+	} else {
+		return GUEST;
+	}
+};
 
-
-
+VagabondController.prototype.cleanup = function() {
+	document.querySelector(".svgContainer").classList.remove("vagabondBoardRotate");
+};
 
 
 

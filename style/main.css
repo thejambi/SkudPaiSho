@@ -197,6 +197,24 @@ figure > div {
   display: none;
 }
 
+.vagabondBoardRotate {
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+
+  z-index:0;
+}
+
+.vagabondPointRotate {
+  -webkit-transform: rotate(315deg);
+  -moz-transform: rotate(315deg);
+  -o-transform: rotate(315deg);
+  -ms-transform: rotate(315deg);
+  transform: rotate(315deg);
+}
+
 .pointContainer {
   /*padding: 16px;*/
   padding: 17px;
@@ -210,6 +228,9 @@ figure > div {
   width: 222px;
   margin-left: 12px;
   /*min-height: 612px;*/
+
+  z-index:1;
+  position: relative;
 }
 
 .gameMessage {
@@ -397,7 +418,7 @@ input[type=submit] {
 .modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
+    z-index: 2; /* Sit on top */
     padding-top: 100px; /* Location of the box */
     left: 0;
     top: 0;

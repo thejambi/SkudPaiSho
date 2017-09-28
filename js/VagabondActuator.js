@@ -118,6 +118,7 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
+		theDiv.classList.add("vagabondPointRotate");
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 		} else if (boardPoint.betweenHarmony) {
