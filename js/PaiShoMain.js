@@ -1087,10 +1087,10 @@ function forgetCurrentGameInfo() {
 }
 
 var GameType = {
-	SkudPaiSho:{id:1, desc:"Skud Pai Sho"}, 
-	VagabondPaiSho:{id:2, desc:"Vagabond Pai Sho"}, 
-	SolitairePaiSho:{id:4, desc:"Solitaire Pai Sho"}, 
-	CapturePaiSho:{id:3, desc:"Capture Pai Sho"}
+	SkudPaiSho:{id:1, desc:"Skud Pai Sho", rulesUrl:"https://skudpaisho.wordpress.com/skud-quick-reference/"}, 
+	VagabondPaiSho:{id:2, desc:"Vagabond Pai Sho", rulesUrl:"https://skudpaisho.wordpress.com/vagabond-pai-sho/"}, 
+	SolitairePaiSho:{id:4, desc:"Solitaire Pai Sho", rulesUrl:"https://skudpaisho.wordpress.com/more/solitaire-pai-sho/"}, 
+	CapturePaiSho:{id:3, desc:"Capture Pai Sho", rulesUrl:"https://skudpaisho.wordpress.com/more/capture-pai-sho/"}
 };
 function setGameController(gameTypeId) {
 	// Previous game controller cleanup
@@ -1387,11 +1387,11 @@ function startLoggingOnlineStatus() {
 
 	logOnlineStatusIntervalValue = setInterval(function() {
 		onlinePlayEngine.logOnlineStatus(getUserId(), getDeviceId());
-	}, 5000);
+	}, 4000);
 }
 
 function getNewGameEntryForGameType(gameType) {
-	return "<div class='newGameEntry clickableText' onclick='setGameController(" + gameType.id + ")'>" + gameType.desc + "</div>";
+	return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + ")'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
 }
 
 function newGameClicked() {

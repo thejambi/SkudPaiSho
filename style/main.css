@@ -617,15 +617,11 @@ input[type=submit] {
     }
 
     .headerRight {
-      margin-right: 8px;
+      margin-right: 0;
     }
 }
 
 @media only screen and (max-width: 306px) {
-    .headerRight {
-      margin-right: 0;
-    }
-
     .svgContainer {
       width: 306px;
     }
