@@ -170,7 +170,7 @@ window.requestAnimationFrame(function () {
 		}
 	}
 
-	verifyLogin();
+	initialVerifyLogin();
 
 	// Open default help/chat tab
 	document.getElementById("defaultOpenTab").click();
@@ -181,8 +181,8 @@ function setTileContainers() {
 	document.getElementById('guestTilesContainer').innerHTML = gameController.getGuestTilesContainerDivs();
 }
 
-function verifyLogin() {
-	if (onlinePlayEnabled) {
+function initialVerifyLogin() {
+	if (onlinePlayEnabled && getUserEmail() === 'skudpaisho@gmail.com') {
 		onlinePlayEngine.verifyLogin(getUserId(), 
 			getUsername(), 
 			getUserEmail(), 
@@ -192,6 +192,27 @@ function verifyLogin() {
 					startLoggingOnlineStatus();
 					startWatchingNumberOfGamesWhereUserTurn();
 				} else {
+					// Cannot verify user login, forget all current stuff.
+					forgetCurrentGameInfo();
+					forgetOnlinePlayInfo();
+				}
+			}
+		);
+	}
+}
+
+function verifyLogin() {
+	if (onlinePlayEnabled && getUserEmail() === 'skudpaisho@gmail.com') {
+		onlinePlayEngine.verifyLogin(getUserId(), 
+			getUsername(), 
+			getUserEmail(), 
+			getDeviceId(), 
+			function(isVerified) {
+				if (isVerified) {
+					// ok
+				} else {
+					// Cannot verify user login, forget all current stuff.
+					forgetCurrentGameInfo();
 					forgetOnlinePlayInfo();
 				}
 			}
@@ -1022,7 +1043,7 @@ var createDeviceIdCallback = function(generatedDeviceId) {
 
 	setAccountHeaderLinkText();
 
-	verifyLogin();	// Uncomment when ok
+	initialVerifyLogin();
 
 	showModal("<i class='fa fa-check' aria-hidden='true'></i> Email Verified", "Hi, " + getUsername() + "! Your email has been successfully verified and you are now signed in.");
 }
@@ -1310,7 +1331,7 @@ function acceptGameSeekClicked(gameIdChosen) {
 function tryRealTimeClicked() {
 	onlinePlayEnabled = true;
 	setAccountHeaderLinkText();
-	verifyLogin();
+	initialVerifyLogin();
 	rerunAll();
 	closeModal();
 }
@@ -1387,6 +1408,7 @@ function startLoggingOnlineStatus() {
 
 	logOnlineStatusIntervalValue = setInterval(function() {
 		onlinePlayEngine.logOnlineStatus(getUserId(), getDeviceId());
+		verifyLogin(); // TODO Build in the verify step to the logOnlineStatus call
 	}, 4000);
 }
 

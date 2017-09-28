@@ -41,7 +41,7 @@ OnlinePlayEngine.prototype.verifyLogin = function(userId, username, userEmail, d
         },
         function(data, status){
             if (status === 'success') {
-                callback(data.trim());
+                callback(data.trim() === "Results exist");
             }
         }
     );
