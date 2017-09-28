@@ -1,7 +1,5 @@
 // Pai Sho Main
 
-var gameController = new SkudPaiShoController();
-
 var QueryString = function () {
   var query_string = {};
   var query = window.location.search.substring(1);
@@ -31,6 +29,8 @@ var QueryString = function () {
   } 
   return query_string;
 }();
+
+var gameController;
 
 var localEmailKey = "localUserEmail";
 var tileDesignTypeKey = "tileDesignTypeKey";
@@ -98,6 +98,8 @@ var userTurnCountInterval;
 window.requestAnimationFrame(function () {
 	localStorage = new LocalStorage().storage;
 
+	gameController = new SkudPaiShoController();
+
 	if (!localStorage.getItem(tileDesignTypeKey)) {
 		useHLoweTiles = true;
 	} else if (localStorage.getItem(tileDesignTypeKey) === "hlowe") {
@@ -123,8 +125,6 @@ window.requestAnimationFrame(function () {
 	}
 
 	onlinePlayEngine = new OnlinePlayEngine();
-
-	rerunAll();
 
 	defaultEmailMessageText = document.querySelector(".footer").innerHTML;
 
@@ -173,6 +173,11 @@ window.requestAnimationFrame(function () {
 	// Open default help/chat tab
 	document.getElementById("defaultOpenTab").click();
 });
+
+function setTileContainers() {
+	document.getElementById('hostTilesContainer').innerHTML = gameController.getHostTilesContainerDivs();
+	document.getElementById('guestTilesContainer').innerHTML = gameController.getGuestTilesContainerDivs();
+}
 
 function verifyLogin() {
 	if (onlinePlayEnabled) {
@@ -862,7 +867,9 @@ function showTileMessage(tileDiv) {
 
 function showPointMessage(htmlPoint) {
 	var messageReturned = gameController.getPointMessage(htmlPoint);
-	displayReturnedMessage(messageReturned);
+	if (messageReturned) {
+		displayReturnedMessage(messageReturned);
+	}
 }
 
 function setMessage(msg) {
@@ -874,7 +881,7 @@ function setMessage(msg) {
 }
 
 function getAltTilesOptionText() {
-	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between standard and modern tile designs.</p>";
+	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between standard and modern tile designs for Skud Pai Sho.</p>";
 }
 
 function getTournamentText() {
@@ -893,7 +900,7 @@ function toMessage(paragraphs) {
 
 	if (paragraphs.length === 1) {
 		return paragraphs[0];
-	} else {
+	} else if (paragraphs.length > 1) {
 		paragraphs.forEach(function(str) {
 			message += "<p>" + str + "</p>";
 		});
@@ -1146,24 +1153,30 @@ function userIsLoggedIn() {
 }
 
 var GameType = {
-	SkudPaiSho:1, 
-	VagabondPaiSho:2, 
-	CapturePaiSho:3, 
-	SolitairePaiSho:4 
+	SkudPaiSho:{id:1, desc:"Skud Pai Sho"}, 
+	VagabondPaiSho:{id:2, desc:"Vagabond Pai Sho"}, 
+	SolitairePaiSho:{id:4, desc:"Solitaire Pai Sho"}, 
+	CapturePaiSho:{id:3, desc:"Capture Pai Sho"}
 };
 function setGameController(gameTypeId) {
+	closeModal();
+	
 	switch(gameTypeId) {
-	    case GameType.SkudPaiSho:
+	    case GameType.SkudPaiSho.id:
 	        gameController = new SkudPaiShoController();
 	        debug("You're playing Skud Pai Sho!");
 	        break;
-	    // case GameType.VagabondPaiSho:
-	    //     gameController = new VagabondPaiShoController();
-	    //     break;
+	    case GameType.VagabondPaiSho.id:
+	        gameController = new VagabondController();
+	        break;
 	    default:
 	        debug("Defaulting to use Skud Pai Sho.");
 	        gameController = new SkudPaiShoController();
 	}
+
+	// New game stuff:
+	defaultHelpMessageText = null;
+	clearMessage();
 }
 
 function jumpToGame(gameIdChosen, userIsHost, opponentUsername, gameTypeId) {
@@ -1230,7 +1243,7 @@ function showMyGames() {
 							message += "<br />";
 						}
 						gameTypeHeading = myGame.gameTypeDesc;
-						message += "<div class='modalGameTypeHeading'>" + gameTypeHeading + "</div>";
+						message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
 					}
 
 					var gId = parseInt(myGame.gameId);
@@ -1396,7 +1409,7 @@ function viewGameSeeksClicked() {
 								message += "<br />";
 							}
 							gameTypeHeading = gameSeek.gameTypeDesc;
-							message += "<div class='modalGameTypeHeading'>" + gameTypeHeading + "</div>";
+							message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
 						}
 						message += "<div class='clickableText' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
 					}
@@ -1434,9 +1447,16 @@ function startLoggingOnlineStatus() {
 	}, 5000);
 }
 
+function getNewGameEntryForGameType(gameType) {
+	return "<div class='newGameEntry clickableText' onclick='setGameController(" + gameType.id + ")'>" + gameType.desc + "</div>";
+}
+
 function newGameClicked() {
 	if (onlinePlayEnabled && userIsLoggedIn() && getUsername() === 'SkudPaiSho') {
-		showModal("New Game", "Hi :)");
+		var message = getNewGameEntryForGameType(GameType.SkudPaiSho);
+		message += getNewGameEntryForGameType(GameType.VagabondPaiSho);
+
+		showModal("New Game", message);
 	} else {
 		showModal("New Game", "Under construction. Get excited! :) <br /><br />If you'd like, here is a link to open up <a href='http://skudpaisho.com' target='_blank' class='clickableText'>SkudPaiSho.com</a> in a new window.")
 	}

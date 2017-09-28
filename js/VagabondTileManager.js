@@ -1,30 +1,30 @@
 // Tile Manager
 
-function TileManager() {
+function VagabondTileManager() {
 	this.hostTiles = this.loadTileSet('H');
 	this.guestTiles = this.loadTileSet('G');
 }
 
-TileManager.prototype.loadTileSet = function(ownerCode) {
+VagabondTileManager.prototype.loadTileSet = function(ownerCode) {
 	var tiles = [];
 
 	// 2 of each of these tiles
 	for (var i = 0; i < 2; i++) {
-		tiles.push(new Tile('S', ownerCode));
-		tiles.push(new Tile('B', ownerCode));
-		tiles.push(new Tile('W', ownerCode));
-		tiles.push(new Tile('C', ownerCode));
+		tiles.push(new VagabondTile('S', ownerCode));
+		tiles.push(new VagabondTile('B', ownerCode));
+		tiles.push(new VagabondTile('W', ownerCode));
+		tiles.push(new VagabondTile('C', ownerCode));
 	}
 
 	// 1 of each of these tiles
-	tiles.push(new Tile('L', ownerCode));
-	tiles.push(new Tile('F', ownerCode));
-	tiles.push(new Tile('D', ownerCode));
+	tiles.push(new VagabondTile('L', ownerCode));
+	tiles.push(new VagabondTile('F', ownerCode));
+	tiles.push(new VagabondTile('D', ownerCode));
 
 	return tiles;
 };
 
-TileManager.prototype.grabTile = function(player, tileCode) {
+VagabondTileManager.prototype.grabTile = function(player, tileCode) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -46,7 +46,7 @@ TileManager.prototype.grabTile = function(player, tileCode) {
 	return tile;
 };
 
-TileManager.prototype.peekTile = function(player, tileCode, tileId) {
+VagabondTileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -75,7 +75,7 @@ TileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	return tile;
 };
 
-TileManager.prototype.removeSelectedTileFlags = function() {
+VagabondTileManager.prototype.removeSelectedTileFlags = function() {
 	this.hostTiles.forEach(function(tile) {
 		tile.selectedFromPile = false;
 	});
@@ -84,7 +84,7 @@ TileManager.prototype.removeSelectedTileFlags = function() {
 	});
 };
 
-TileManager.prototype.unselectTiles = function(player) {
+VagabondTileManager.prototype.unselectTiles = function(player) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -95,7 +95,7 @@ TileManager.prototype.unselectTiles = function(player) {
 	});
 }
 
-// TileManager.prototype.putTileBack = function(tile) {
+// VagabondTileManager.prototype.putTileBack = function(tile) {
 // 	var player = tile.ownerName;
 // 	var tilePile = this.hostTiles;
 // 	if (player === GUEST) {
@@ -105,8 +105,8 @@ TileManager.prototype.unselectTiles = function(player) {
 // 	tilePile.push(tile);
 // };
 
-TileManager.prototype.getCopy = function() {
-	var copy = new TileManager();
+VagabondTileManager.prototype.getCopy = function() {
+	var copy = new VagabondTileManager();
 
 	// copy this.hostTiles and this.guestTiles
 	

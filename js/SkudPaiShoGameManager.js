@@ -3,7 +3,7 @@
 function SkudPaiShoGameManager(ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
-	this.actuator = new Actuator();	// Can Actuator be used by all?
+	this.actuator = new SkudPaiShoActuator();
 
 	this.tileManager = new SkudPaiShoTileManager();
 

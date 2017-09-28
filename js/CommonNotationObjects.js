@@ -3,9 +3,13 @@
 var GUEST = "GUEST";
 var HOST = "HOST";
 
-// Turn actions
+// Turn actions ----------------
 var PLANTING = "Planting";
 var ARRANGING = "Arranging";
+
+var DEPLOY = "Deploy";
+var MOVE = "Move";
+// -----------------------------
 
 function RowAndColumn(row, col) {
 	this.row = row;

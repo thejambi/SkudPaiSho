@@ -68,7 +68,7 @@
       <span class='replayButton playPauseButton' onclick="playPause()"><i class="fa fa-play" aria-hidden="true"></i></span>
       <span class='replayButton' onclick="playNextMove(true); pauseRun();"><i class="fa fa-step-forward" aria-hidden="true"></i></span>
       <span class='replayButton' onclick="playAllMoves()"><i class="fa fa-fast-forward" aria-hidden="true"></i></span>
-  </div>
+    </div>
       <form class='gone' id='contactform' action='processForm.php' method='post'>
         <input class='gone' type='text' id='fromEmail' name='fromEmail' value='' />
         <input class='gone' type='text' id='toEmail' name='toEmail' value='' />
@@ -78,8 +78,8 @@
             <!--  -->
             Current Turn: Guest
         </div>
-        <div class="hostTilesContainer">
-          <div class="HR3"></div>
+        <div id="hostTilesContainer" class="hostTilesContainer">
+          <!-- <div class="HR3"></div>
           <div class="HR4"></div>
           <div class="HR5"></div>
           <div class="HW3"></div>
@@ -91,10 +91,10 @@
           <div class="HK"></div>
           <div class="HB"></div>
           <div class="HL"></div>
-          <div class="HO"></div>
+          <div class="HO"></div> -->
       </div>
-      <div class="guestTilesContainer">
-          <div class="GR3"></div>
+      <div id="guestTilesContainer" class="guestTilesContainer">
+          <!-- <div class="GR3"></div>
           <div class="GR4"></div>
           <div class="GR5"></div>
           <div class="GW3"></div>
@@ -106,7 +106,7 @@
           <div class="GK"></div>
           <div class="GB"></div>
           <div class="GL"></div>
-          <div class="GO"></div>
+          <div class="GO"></div> -->
       </div>
   </div>
   <div class="helpContainer" id="help">
@@ -214,7 +214,6 @@ To sign up or log in, enter your username and email, then enter the 4-digit code
     <script src="js/lz-string.min.js"></script>
 
     <script src="js/GameData.js"></script>
-    <script src="js/Actuator.js"></script>
     <script src="js/CommonNotationObjects.js"></script>
     <script src="js/LocalStorage.js"></script>
     
@@ -226,6 +225,7 @@ To sign up or log in, enter your username and email, then enter the 4-digit code
 
     <!-- Game Logic Controllers -->
     <script src="js/SkudPaiShoController.js"></script>
+    <script src="js/SkudPaiShoActuator.js"></script>
     <script src="js/SkudPaiShoHarmony.js"></script>
     <script src="js/SkudPaiShoGameManager.js"></script>
     <script src="js/SkudPaiShoBoardPoint.js"></script>
@@ -233,6 +233,15 @@ To sign up or log in, enter your username and email, then enter the 4-digit code
     <script src="js/SkudPaiShoGameNotation.js"></script>
     <script src="js/SkudPaiShoTile.js"></script>
     <script src="js/SkudPaiShoTileManager.js"></script>
+
+    <script src="js/VagabondController.js"></script>
+    <script src="js/VagabondActuator.js"></script>
+    <script src="js/VagabondBoard.js"></script>
+    <script src="js/VagabondBoardPoint.js"></script>
+    <script src="js/VagabondGameManager.js"></script>
+    <script src="js/VagabondGameNotation.js"></script>
+    <script src="js/VagabondTile.js"></script>
+    <script src="js/VagabondTileManager.js"></script>
 
     <!-- Main -->
     <script src="js/PaiShoMain.js"></script>

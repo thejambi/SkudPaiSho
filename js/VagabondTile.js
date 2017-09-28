@@ -2,7 +2,7 @@
 
 var tileId = 1;
 
-function Tile(code, ownerCode) {
+function VagabondTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -36,15 +36,15 @@ function Tile(code, ownerCode) {
 	// }
 }
 
-Tile.prototype.getImageName = function() {
+VagabondTile.prototype.getImageName = function() {
 	return this.ownerCode + "" + this.code;
 };
 
-Tile.prototype.canMove = function(first_argument) {
+VagabondTile.prototype.canMove = function(first_argument) {
 	return !(this.code === 'C' || this.code === 'F');
 };
 
-Tile.prototype.getMoveDistance = function() {
+VagabondTile.prototype.getMoveDistance = function() {
 	// if (this.type === BASIC_FLOWER) {
 	// 	return parseInt(this.basicValue);
 	// } else if (this.code === 'L') {
@@ -62,26 +62,26 @@ Tile.prototype.getMoveDistance = function() {
 	return 0;
 };
 
-Tile.prototype.isFlowerTile = function() {
+VagabondTile.prototype.isFlowerTile = function() {
 	// Must be L, C, F
 	return this.code === 'L' || this.code === 'C' || this.code === 'F';
 };
 
-Tile.prototype.hasCaptureAbility = function() {
+VagabondTile.prototype.hasCaptureAbility = function() {
 	// Must be D, W, S
 	return this.code === 'D' || this.code === 'W' || this.code === 'S';
 };
 
-Tile.prototype.getName = function() {
-	return Tile.getTileName(this.code);
+VagabondTile.prototype.getName = function() {
+	return VagabondTile.getTileName(this.code);
 };
 
-Tile.prototype.getCopy = function() {
-	return new Tile(this.code, this.ownerCode);
+VagabondTile.prototype.getCopy = function() {
+	return new VagabondTile(this.code, this.ownerCode);
 };
 
 
-Tile.getTileName = function(tileCode) {
+VagabondTile.getTileName = function(tileCode) {
 	var name = "";
 	
 	if (tileCode === 'L') {

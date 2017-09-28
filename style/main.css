@@ -123,6 +123,10 @@ div.tab button.active {
     min-height: 460px;
 }
 
+.chatMessage {
+  padding: 4px 0;
+}
+
 .button {
   display:inline-block;
     color:#444;

@@ -12,14 +12,14 @@ window.mobileAndTabletcheck = function() {
   return check;
 };
 
-function Actuator() {
+function SkudPaiShoActuator() {
 	this.boardContainer = document.querySelector(".pointContainer");
 	this.hostTilesContainer = document.querySelector(".hostTilesContainer");
 	this.guestTilesContainer = document.querySelector(".guestTilesContainer");
 	this.mobile = window.mobileAndTabletcheck();
 }
 
-Actuator.prototype.actuate = function(board, tileManager) {
+SkudPaiShoActuator.prototype.actuate = function(board, tileManager) {
 	var self = this;
 
 	// self.printBoard(board);
@@ -29,7 +29,7 @@ Actuator.prototype.actuate = function(board, tileManager) {
 	});
 };
 
-Actuator.prototype.htmlify = function(board, tileManager) {
+SkudPaiShoActuator.prototype.htmlify = function(board, tileManager) {
 	this.clearContainer(this.boardContainer);
 
 	var self = this;
@@ -61,20 +61,20 @@ Actuator.prototype.htmlify = function(board, tileManager) {
 	});
 };
 
-Actuator.prototype.clearContainer = function (container) {
+SkudPaiShoActuator.prototype.clearContainer = function (container) {
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-Actuator.prototype.clearTileContainer = function (tile) {
+SkudPaiShoActuator.prototype.clearTileContainer = function (tile) {
 	var container = document.querySelector("." + tile.getImageName());
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-Actuator.prototype.addTile = function(tile, mainContainer) {
+SkudPaiShoActuator.prototype.addTile = function(tile, mainContainer) {
 	var self = this;
 
 	var container = document.querySelector("." + tile.getImageName());
@@ -112,7 +112,7 @@ Actuator.prototype.addTile = function(tile, mainContainer) {
 	container.appendChild(theDiv);
 };
 
-Actuator.prototype.addBoardPoint = function(boardPoint) {
+SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint) {
 	var self = this;
 
 	var theDiv = document.createElement("div");
@@ -174,7 +174,7 @@ Actuator.prototype.addBoardPoint = function(boardPoint) {
 	}
 };
 
-Actuator.prototype.printBoard = function(board) {
+SkudPaiShoActuator.prototype.printBoard = function(board) {
 
 	debug("");
 	var rowNum = 0;

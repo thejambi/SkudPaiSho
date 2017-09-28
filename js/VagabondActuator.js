@@ -1,4 +1,4 @@
-// Actuator
+// Vagabond Actuator
 
 window.mobilecheck = function() {
   var check = false;
@@ -12,14 +12,14 @@ window.mobileAndTabletcheck = function() {
   return check;
 };
 
-function Actuator() {
+function VagabondActuator() {
 	this.boardContainer = document.querySelector(".pointContainer");
 	this.hostTilesContainer = document.querySelector(".hostTilesContainer");
 	this.guestTilesContainer = document.querySelector(".guestTilesContainer");
 	this.mobile = window.mobileAndTabletcheck();
 }
 
-Actuator.prototype.actuate = function(board, tileManager) {
+VagabondActuator.prototype.actuate = function(board, tileManager) {
 	var self = this;
 
 	// self.printBoard(board);
@@ -29,7 +29,7 @@ Actuator.prototype.actuate = function(board, tileManager) {
 	});
 };
 
-Actuator.prototype.htmlify = function(board, tileManager) {
+VagabondActuator.prototype.htmlify = function(board, tileManager) {
 	this.clearContainer(this.boardContainer);
 
 	var self = this;
@@ -42,7 +42,7 @@ Actuator.prototype.htmlify = function(board, tileManager) {
 		});
 	});
 
-	var fullTileSet = new TileManager();
+	var fullTileSet = new VagabondTileManager();
 
 	// Go through tile piles and clear containers
 	fullTileSet.hostTiles.forEach(function(tile) {
@@ -61,20 +61,20 @@ Actuator.prototype.htmlify = function(board, tileManager) {
 	});
 };
 
-Actuator.prototype.clearContainer = function (container) {
+VagabondActuator.prototype.clearContainer = function (container) {
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-Actuator.prototype.clearTileContainer = function (tile) {
+VagabondActuator.prototype.clearTileContainer = function (tile) {
 	var container = document.querySelector("." + tile.getImageName());
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-Actuator.prototype.addTile = function(tile, mainContainer) {
+VagabondActuator.prototype.addTile = function(tile, mainContainer) {
 	var self = this;
 
 	var container = document.querySelector("." + tile.getImageName());
@@ -90,7 +90,7 @@ Actuator.prototype.addTile = function(tile, mainContainer) {
 	}
 
 	var theImg = document.createElement("img");
-	theImg.src = "images/" + tile.getImageName() + ".png";
+	theImg.src = "vagabond/images/" + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
 
 	theDiv.setAttribute("name", tile.getImageName());
@@ -107,7 +107,7 @@ Actuator.prototype.addTile = function(tile, mainContainer) {
 	container.appendChild(theDiv);
 };
 
-Actuator.prototype.addBoardPoint = function(boardPoint) {
+VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 	var self = this;
 
 	var theDiv = document.createElement("div");
@@ -144,7 +144,7 @@ Actuator.prototype.addBoardPoint = function(boardPoint) {
 		
 		var theImg = document.createElement("img");
 
-		theImg.src = "images/" + boardPoint.tile.getImageName() + ".png";
+		theImg.src = "vagabond/images/" + boardPoint.tile.getImageName() + ".png";
 		
 		if (boardPoint.tile.inHarmony) {
 			theDiv.classList.add(boardPoint.tile.ownerName + "harmony");
@@ -165,7 +165,7 @@ Actuator.prototype.addBoardPoint = function(boardPoint) {
 	}
 };
 
-Actuator.prototype.printBoard = function(board) {
+VagabondActuator.prototype.printBoard = function(board) {
 
 	debug("");
 	var rowNum = 0;

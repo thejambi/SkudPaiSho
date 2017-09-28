@@ -1,13 +1,9 @@
-// Board
+// Vagabond Board
 
 function Board() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
-	this.harmonyManager = new HarmonyManager();
-
-	// this.rockRowAndCols = [];
-	// this.playedWhiteLotusTiles = [];
 	this.winners = [];
 
 	this.hlPlayed = false;
@@ -924,8 +920,6 @@ Board.prototype.revealBoatBonusPoints = function(boardPoint) {
 
 // 	/*
 // 	this.cells = this.brandNew();
-
-// 	this.harmonyManager = new HarmonyManager();	// just analyzeharmonies
 
 // 	this.rockRowAndCols = [];	// call refreshRockRowAndCo...
 // 	this.playedWhiteLotusTiles = [];
