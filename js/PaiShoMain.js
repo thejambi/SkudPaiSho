@@ -269,7 +269,19 @@ function gameWatchPulse() {
 					newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message + "</div>";
 				}
 				
-				document.getElementById('chatMessagesDisplay').innerHTML += newChatMessagesHtml;
+				/* Prepare to add chat content and keep scrolled to bottom */
+				var chatMessagesDisplay = document.getElementById('chatMessagesDisplay');
+				// allow 1px inaccuracy by adding 1
+				var isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
+				console.log(chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight,  chatMessagesDisplay.scrollTop + 1);
+				var newElement = document.createElement("div");
+				newElement.innerHTML = newChatMessagesHtml;
+				chatMessagesDisplay.appendChild(newElement);
+				// scroll to bottom if isScrolledToBottom
+				if(isScrolledToBottom) {
+					chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
+				}
+				// chatMessagesDisplay.innerHTML += newChatMessagesHtml;
 			}
 		}
 	);
