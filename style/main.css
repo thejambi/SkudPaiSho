@@ -545,6 +545,10 @@ input[type=submit] {
 }
 
 @media only screen and (max-width: 612px) {
+    .header {
+      padding: 0;
+    }
+
     .svgContainer {
       width: 100vw;
     }
@@ -607,7 +611,21 @@ input[type=submit] {
 
 }
 
+@media only screen and (max-width: 350px) {
+  .headerRulesLink {
+      display: none;
+    }
+
+    .headerRight {
+      margin-right: 8px;
+    }
+}
+
 @media only screen and (max-width: 306px) {
+    .headerRight {
+      margin-right: 0;
+    }
+
     .svgContainer {
       width: 306px;
     }
