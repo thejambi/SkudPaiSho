@@ -159,8 +159,6 @@ window.requestAnimationFrame(function () {
 
 	updateFooter();
 
-	defaultHelpMessageText = document.getElementById("helpTextContent").innerHTML;
-
 	clearMessage();
 
 	rerunAll();
@@ -245,6 +243,12 @@ var getGameNotationCallback = function(newGameNotation) {
 };
 
 function updateCurrentGameTitle(isOpponentOnline) {
+	if (!currentGameData.guestUsername || !currentGameData.hostUsername) {
+		document.getElementById("response").innerHTML = "";
+		return;
+	}
+	/* --- */
+
 	var opponentOnlineIconText = userOfflineIcon;
 	if (isOpponentOnline) {
 		opponentOnlineIconText = userOnlineIcon;
