@@ -98,6 +98,10 @@ var userTurnCountInterval;
 /* --- */
 
 window.requestAnimationFrame(function () {
+	/* Online play is enabled! */
+	onlinePlayEnabled = true;
+	/* ----------------------- */
+
 	localStorage = new LocalStorage().storage;
 
 	setGameController(GameType.SkudPaiSho.id);
@@ -1144,31 +1148,58 @@ function setGameController(gameTypeId) {
 	clearMessage();
 }
 
-function jumpToGame(gameIdChosen, userIsHost, opponentUsername, gameTypeId) {
-	setGameController(gameTypeId);
-
-	gameId = gameIdChosen;
-	currentGameOpponentUsername = opponentUsername;
-
-	if (getUsername() === opponentUsername) {
-		hostEmail = getUserEmail();
-		guestEmail = getUserEmail();
-		currentGameData.hostUsername = getUsername();
-		currentGameData.guestUsername = getUsername();
-	} else if (userIsHost) {
-		hostEmail = getUserEmail();
-		guestEmail = opponentUsername;
-		currentGameData.hostUsername = getUsername();
-		currentGameData.guestUsername = opponentUsername;
-	} else {
-		hostEmail = opponentUsername;
-		guestEmail = getUserEmail();
-		currentGameData.hostUsername = opponentUsername;
-		currentGameData.guestUsername = getUsername();
+function jumpToGame(gameIdChosen) {
+	if (!onlinePlayEnabled) {
+		return;
 	}
-	
-	startWatchingGameRealTime();
-	closeModal();
+	onlinePlayEngine.getGameInfo(getUserId(), gameIdChosen, 
+		function(results) {
+			if (results) {
+				populateMyGamesList(results);
+
+				var myGame = myGamesList[0];
+
+				setGameController(myGame.gameTypeId);
+
+				// Is user even playing this game? This could be used to "watch" games
+				var userIsPlaying = myGame.hostUsername === getUsername() 
+					|| myGame.guestUsername === getUsername();
+
+				gameId = myGame.gameId;
+				currentGameOpponentUsername = null;
+				var opponentUsername;
+
+				if (userIsPlaying) {
+					if (myGame.hostUsername === getUsername()) {
+						opponentUsername = myGame.guestUsername;
+					} else {
+						opponentUsername = myGame.hostUsername;
+					}
+				}
+
+				currentGameData.hostUsername = myGame.hostUsername;
+				currentGameData.guestUsername = myGame.guestUsername;
+
+				if (getUsername() === opponentUsername) {
+					hostEmail = getUserEmail();
+					guestEmail = getUserEmail();
+				} else if (myGame.hostUsername === getUsername()) {
+					hostEmail = getUserEmail();
+					guestEmail = opponentUsername;
+				} else if (myGame.guestUsername === getUsername()) {
+					hostEmail = opponentUsername;
+					guestEmail = getUserEmail();
+				} else {
+					// Not host or guest, just watching
+					hostEmail = null;
+					guestEmail = null;
+				}
+				
+				startWatchingGameRealTime();
+				closeModal();
+			}
+		}
+	);
 }
 
 function populateMyGamesList(results) {
@@ -1188,6 +1219,45 @@ function populateMyGamesList(results) {
 		};
 		myGamesList.push(myGame);
 	}
+}
+
+function showPastGamesClicked() {
+	closeModal();
+
+	onlinePlayEngine.getPastGamesForUser(getUserId(), 
+		function(results) {
+			var message = "No completed games.";
+			if (results) {
+				message = "";
+				
+				populateMyGamesList(results);
+
+				var gameTypeHeading = "";
+				for (var index in myGamesList) {
+					var myGame = myGamesList[index];
+
+					if (myGame.gameTypeDesc !== gameTypeHeading) {
+						if (gameTypeHeading !== "") {
+							message += "<br />";
+						}
+						gameTypeHeading = myGame.gameTypeDesc;
+						message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+					}
+
+					var gId = parseInt(myGame.gameId);
+					var userIsHost = myGame.hostUsername === getUsername();
+					var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+
+					var gameDisplayTitle = myGame.hostUsername;
+					gameDisplayTitle += " vs. ";
+					gameDisplayTitle += myGame.guestUsername;
+					
+					message += "<div class='clickableText' onclick='jumpToGame(" + gId + ");'>" + gameDisplayTitle + "</div>";
+				}
+			}
+			showModal("Completed Games", message);
+		}
+	);
 }
 
 function showMyGames() {
@@ -1238,9 +1308,11 @@ function showMyGames() {
 						gameDisplayTitle += " (Your turn)";
 					}
 					
-					message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\"," + myGame.gameTypeId + ");'>" + gameDisplayTitle + "</div>";
+					// message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\"," + myGame.gameTypeId + ");'>" + gameDisplayTitle + "</div>";
+					message += "<div class='clickableText' onclick='jumpToGame(" + gId + ");'>" + gameDisplayTitle + "</div>";
 				}
 			}
+			message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
 			message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='signOut();'>Click here to sign out.</span></div>";
 			showModal("Active Games", message);
 		}
@@ -1413,18 +1485,10 @@ function startLoggingOnlineStatus() {
 }
 
 function getNewGameEntryForGameType(gameType) {
-	return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + ")'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
+	return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + ")'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
 }
 
 function newGameClicked() {
-	// if (onlinePlayEnabled && userIsLoggedIn() && getUsername() === 'SkudPaiSho') {
-	// 	var message = getNewGameEntryForGameType(GameType.SkudPaiSho);
-	// 	message += getNewGameEntryForGameType(GameType.VagabondPaiSho);
-
-	// 	showModal("New Game", message);
-	// } else {
-	// 	showModal("New Game", "Under construction. Get excited! :) <br /><br />If you'd like, here is a link to open up <a href='http://skudpaisho.com' target='_blank' class='clickableText'>SkudPaiSho.com</a> in a new window.")
-	// }
 	var message = getNewGameEntryForGameType(GameType.SkudPaiSho);
 	message += getNewGameEntryForGameType(GameType.VagabondPaiSho);
 

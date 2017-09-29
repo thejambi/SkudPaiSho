@@ -122,6 +122,9 @@ div.tab button.active {
     overflow-x: hidden;
     min-height: 460px;
 }
+#chatMessageInput {
+  width: 70%;
+}
 
 .chatMessage {
   padding: 4px 0;

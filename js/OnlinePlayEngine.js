@@ -173,6 +173,26 @@ OnlinePlayEngine.prototype.getCurrentGamesForUser = function(userId, callback) {
     );
 };
 
+OnlinePlayEngine.prototype.getPastGamesForUser = function(userId, callback) {
+    $.get("getPastGamesForUser.php?userId="+userId, 
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.getGameInfo = function(userId, gameId, callback) {
+    $.get("getGameInfo.php?userId="+userId+"&gameId="+gameId, 
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
 OnlinePlayEngine.prototype.getCountOfGamesWhereUserTurn = function(userId, callback) {
     $.get("getCountOfGamesWhereUserTurn.php?userId="+userId, 
         function(data, status){
