@@ -184,7 +184,7 @@ function setTileContainers() {
 }
 
 function initialVerifyLogin() {
-	if (onlinePlayEnabled && getUserEmail() === 'skudpaisho@gmail.com') {
+	if (onlinePlayEnabled) {
 		onlinePlayEngine.verifyLogin(getUserId(), 
 			getUsername(), 
 			getUserEmail(), 
@@ -204,7 +204,7 @@ function initialVerifyLogin() {
 }
 
 function verifyLogin() {
-	if (onlinePlayEnabled && getUserEmail() === 'skudpaisho@gmail.com') {
+	if (onlinePlayEnabled) {
 		onlinePlayEngine.verifyLogin(getUserId(), 
 			getUsername(), 
 			getUserEmail(), 
