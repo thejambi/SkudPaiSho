@@ -723,9 +723,9 @@ function myTurn() {
 	var userEmail = localStorage.getItem(localEmailKey);
 	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
 		if (getCurrentPlayer() === HOST) {
-			return localStorage.getItem(localEmailKey) === hostEmail;
+			return !hostEmail || localStorage.getItem(localEmailKey) === hostEmail;
 		} else {
-			return localStorage.getItem(localEmailKey) === guestEmail;
+			return !guestEmail || localStorage.getItem(localEmailKey) === guestEmail;
 		}
 	} else {
 		return true;
@@ -1480,7 +1480,8 @@ function createGameIfThatIsOk(gameTypeId) {
 				if (!results) {
 					onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), getUserId(), createGameCallback);
 				} else {
-					showModal("Create Game", "You already have a game that is waiting for an opponent.");
+					finalizeMove();
+					showModal("Game Not Created", "You either already have a game that is waiting for an opponent or are not logged in. <br /><br />If you're not logged in, you can still play the game locally, but it will not be saved online.");
 				}
 			}
 		);
