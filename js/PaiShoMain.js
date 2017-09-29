@@ -1179,6 +1179,8 @@ function jumpToGame(gameIdChosen) {
 					} else {
 						opponentUsername = myGame.hostUsername;
 					}
+
+					currentGameOpponentUsername = opponentUsername;
 				}
 
 				currentGameData.hostUsername = myGame.hostUsername;
