@@ -67,7 +67,6 @@ var HOST_SELECT_ACCENTS = "HOST_SELECT_ACCENTS";
 
 var localPlayerRole = HOST;
 
-// var aiList;
 var activeAi;
 var activeAi2;
 var sandboxUrl;
@@ -121,6 +120,10 @@ window.requestAnimationFrame(function () {
 		url = "http://skudpaisho.com/";
 	}
 
+	if (url.startsWith("file")) {
+		onlinePlayEnabled = false;
+	}
+
 	gameController.gameNotation.setNotationText(QueryString.game);
 
 	hostEmail = QueryString.host;
@@ -167,7 +170,7 @@ window.requestAnimationFrame(function () {
 
 	if (onlinePlayEnabled) {
 		onlinePlayEngine.testOnlinePlay();
-		if (gameId >= 0) {
+		if (gameId > 0) {
 			startWatchingGameRealTime();
 		}
 	}
@@ -565,11 +568,12 @@ function showSubmitMoveForm(url) {
 }
 
 function getNoUserEmailMessage() {
-	return "Recommended: <span class='skipBonus' onclick='promptEmail(); finalizeMove();'>Enter your email address</span> to be notified when it is your turn. <br /><em><span class='skipBonus' onclick='finalizeMove(true);'>Click to ignore</span></em><br /><br />";
+	return "<span class='skipBonus' onclick='promptEmail(); finalizeMove();'>Sign in</span> to save your game and play with others online. <br /><em><span class='skipBonus' onclick='finalizeMove(true);'>Click to ignore</span></em><br /><br />";
+	// return "Recommended: <span class='skipBonus' onclick='promptEmail(); finalizeMove();'>Enter your email address</span> to be notified when it is your turn. <br /><em><span class='skipBonus' onclick='finalizeMove(true);'>Click to ignore</span></em><br /><br />";
 }
 
 function playingOnlineGame() {
-	return onlinePlayEnabled && gameId >= 0;
+	return onlinePlayEnabled && gameId > 0;
 }
 
 function linkShortenCallback(shortUrl, ignoreNoEmail) {
@@ -585,8 +589,14 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 
 	if (currentMoveIndex == 1 && !haveBothEmails()) {
 		if (!playingOnlineGame() && currentGameData.gameTypeId === 1) {
-			messageText += "Thank you for Hosting a game of Pai Sho! Share <a href=\"" + shortUrl + "\">this link</a> with your friends to invite them to join you in a game.";
+			if (!ignoreNoEmail && !haveUserEmail()) {
+				messageText = getNoUserEmailMessage();
+			} 
+			// else {
+			// 	messageText += "Thank you for Hosting a game of Pai Sho! Share <a href=\"" + shortUrl + "\">this link</a> with your friends to invite them to join you in a game.";
+			// }
 		}
+
 		if (aiList.length > 0) {
 			for (var i = 0; i < aiList.length; i++) {
 				messageText += "<br /><span class='skipBonus' onclick='setAiIndex(" + i + ");'>Play " + aiList[i].getName() + "</span>";
@@ -605,13 +615,10 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		messageText += "<em>THINKING...</em>";
 	} else if (activeAi) {
 		messageText += "Playing against the computer can help you learn how the game works. You should be able to beat the computer easily once you understand the game.<br /><br />Is playing against the computer too easy? Good! <a href='http://skudpaisho.com/?BYewzgLgvGDWCuATADgQwJZlAAQOYFsMAbAOgGMR8AyXVfAUygAYAJEgJQBoB1TgaU4AhKgDt6AdwDKyemXSoiAMSIhx9AE7t4RemCgjREgOKoIurTqgBPKupBlYYAKojxwevSKoARpZtgAEVNGACYmAEYAdgBaJhDYgBYgA'>Join the creator in a game</a> to play a real game or give feedback.";
-	} else if (!playingOnlineGame()) {
-		messageText += "Copy this <a href=\"" + shortUrl + "\">link</a> and send to the " + getCurrentPlayer() + ".";
-	}
-
-	if (!ignoreNoEmail && !haveUserEmail()) {
-		messageText = getNoUserEmailMessage();
-	}
+	} 
+	// else if (!playingOnlineGame()) {
+	// 	messageText += "Copy this <a href=\"" + shortUrl + "\">link</a> and send to the " + getCurrentPlayer() + ".";
+	// }
 
 	if (gameController.theGame.getWinner()) {
 		// There is a winner!
@@ -924,6 +931,8 @@ function setAiIndex(i) {
 		forgetCurrentGameInfo();
 	}
 
+	var aiList = gameController.getAiList();
+
 	if (activeAi) {
 		activeAi2 = aiList[i];
 		activeAi2.setPlayer(getCurrentPlayer());
@@ -997,7 +1006,7 @@ var isUserInfoAvailableCallback = function(data) {
 };
 
 var userInfoExistsCallback = function(data) {
-	if (data && parseInt(data.trim()) >= 0) {
+	if (data && parseInt(data.trim()) > 0) {
 		// existing userId found
 		tempUserId = data.trim();
 		isUserInfoAvailableCallback();	// will trigger send verification code
@@ -1064,7 +1073,7 @@ var createUserCallback = function(generatedUserId) {
 
 var verifyCodeCallback = function(actualCode) {
 	if (codeToVerify === actualCode) {
-		if (tempUserId && tempUserId >= 0) {
+		if (tempUserId && tempUserId > 0) {
 			createUserCallback(tempUserId);
 		} else {
 			onlinePlayEngine.createUser(usernameBeingVerified, emailBeingVerified, createUserCallback);
@@ -1465,15 +1474,19 @@ function viewGameSeeksClicked() {
 }
 
 function createGameIfThatIsOk(gameTypeId) {
-	onlinePlayEngine.getCurrentGameSeeksHostedByUser(getUserId(), gameTypeId, 
-		function(results) {
-			if (!results) {
-				onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), getUserId(), createGameCallback);
-			} else {
-				showModal("Create Game", "You already have a game that is waiting for an opponent.");
+	if (userIsLoggedIn()) {
+		onlinePlayEngine.getCurrentGameSeeksHostedByUser(getUserId(), gameTypeId, 
+			function(results) {
+				if (!results) {
+					onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), getUserId(), createGameCallback);
+				} else {
+					showModal("Create Game", "You already have a game that is waiting for an opponent.");
+				}
 			}
-		}
-	);
+		);
+	} else {
+		finalizeMove();
+	}
 }
 
 function startLoggingOnlineStatus() {
