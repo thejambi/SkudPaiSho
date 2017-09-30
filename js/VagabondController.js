@@ -34,7 +34,11 @@ VagabondController.prototype.getGuestTilesContainerDivs = function() {
 	return '<div class="GC"></div> <div class="GS"></div> <div class="GB"></div> <div class="GW"></div> <br class="clear" /> <div class="GF"></div> <div class="GD"></div> <div class="G_empty"></div> <div class="GL"></div>';
 };
 
-VagabondController.prototype.resetMove = function(first_argument) {
+VagabondController.prototype.callActuate = function() {
+	this.theGame.actuate();
+};
+
+VagabondController.prototype.resetMove = function() {
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// Remove last move
 		this.gameNotation.removeLastMove();

@@ -1,6 +1,6 @@
 // Tile Manager
 
-function TileManager(forActuating) {
+function SolitaireTileManager(forActuating) {
 	this.playerCode = 'H'
 	
 	if (forActuating) {
@@ -10,11 +10,11 @@ function TileManager(forActuating) {
 	this.tiles = this.loadTileSet(this.playerCode);
 }
 
-TileManager.prototype.loadTileSet = function(ownerCode) {
+SolitaireTileManager.prototype.loadTileSet = function(ownerCode) {
 	return this.loadSolitaireSet(ownerCode);
 };
 
-TileManager.prototype.loadSolitaireSet = function(ownerCode) {
+SolitaireTileManager.prototype.loadSolitaireSet = function(ownerCode) {
 	var tiles = [];
 
 	// Double amount of tiles if doubleTiles enabled
@@ -26,46 +26,46 @@ TileManager.prototype.loadSolitaireSet = function(ownerCode) {
 	if (includeAccentTiles) {
 		// 2 of each accent tile
 		for (var i = 0; i < 2 * multiplier; i++) {
-			tiles.push(new Tile('R', ownerCode));
-			tiles.push(new Tile('W', ownerCode));
-			tiles.push(new Tile('K', ownerCode));
-			tiles.push(new Tile('B', ownerCode));
+			tiles.push(new SolitaireTile('R', ownerCode));
+			tiles.push(new SolitaireTile('W', ownerCode));
+			tiles.push(new SolitaireTile('K', ownerCode));
+			tiles.push(new SolitaireTile('B', ownerCode));
 		}
 	}
 
 	// 3 of each basic flower
 	for (var i = 0; i < 3 * multiplier; i++) {
-		tiles.push(new Tile("R3", ownerCode));
-		tiles.push(new Tile("R4", ownerCode));
-		tiles.push(new Tile("R5", ownerCode));
-		tiles.push(new Tile("W3", ownerCode));
-		tiles.push(new Tile("W4", ownerCode));
-		tiles.push(new Tile("W5", ownerCode));
+		tiles.push(new SolitaireTile("R3", ownerCode));
+		tiles.push(new SolitaireTile("R4", ownerCode));
+		tiles.push(new SolitaireTile("R5", ownerCode));
+		tiles.push(new SolitaireTile("W3", ownerCode));
+		tiles.push(new SolitaireTile("W4", ownerCode));
+		tiles.push(new SolitaireTile("W5", ownerCode));
 	}
 
 	// 1 of each special flower
 	for (var i = 0; i < 1 * multiplier; i++) {
-		tiles.push(new Tile('L', ownerCode));
-		tiles.push(new Tile('O', ownerCode));
+		tiles.push(new SolitaireTile('L', ownerCode));
+		tiles.push(new SolitaireTile('O', ownerCode));
 	}
 
 	// 1 extra White Lotus so White Lotus Gambit is possible
 	if (doubleTiles) {
-		tiles.push(new Tile('L', ownerCode));
+		tiles.push(new SolitaireTile('L', ownerCode));
 	}
 
 	return tiles;
 };
 
-TileManager.prototype.loadSkudSet = function(ownerCode) {
+SolitaireTileManager.prototype.loadSkudSet = function(ownerCode) {
 	var tiles = [];
 
 	// 2 of each accent tile
 	for (var i = 0; i < 2; i++) {
-		tiles.push(new Tile('R', ownerCode));
-		tiles.push(new Tile('W', ownerCode));
-		tiles.push(new Tile('K', ownerCode));
-		tiles.push(new Tile('B', ownerCode));
+		tiles.push(new SolitaireTile('R', ownerCode));
+		tiles.push(new SolitaireTile('W', ownerCode));
+		tiles.push(new SolitaireTile('K', ownerCode));
+		tiles.push(new SolitaireTile('B', ownerCode));
 	}
 
 	tiles.forEach(function(tile) {
@@ -74,27 +74,27 @@ TileManager.prototype.loadSkudSet = function(ownerCode) {
 
 	// 3 of each basic flower
 	for (var i = 0; i < 3; i++) {
-		tiles.push(new Tile("R3", ownerCode));
-		tiles.push(new Tile("R4", ownerCode));
-		tiles.push(new Tile("R5", ownerCode));
-		tiles.push(new Tile("W3", ownerCode));
-		tiles.push(new Tile("W4", ownerCode));
-		tiles.push(new Tile("W5", ownerCode));
+		tiles.push(new SolitaireTile("R3", ownerCode));
+		tiles.push(new SolitaireTile("R4", ownerCode));
+		tiles.push(new SolitaireTile("R5", ownerCode));
+		tiles.push(new SolitaireTile("W3", ownerCode));
+		tiles.push(new SolitaireTile("W4", ownerCode));
+		tiles.push(new SolitaireTile("W5", ownerCode));
 	}
 
 	// 1 of each special flower
-	tiles.push(new Tile('L', ownerCode));
-	tiles.push(new Tile('O', ownerCode));
+	tiles.push(new SolitaireTile('L', ownerCode));
+	tiles.push(new SolitaireTile('O', ownerCode));
 
 	return tiles;
 };
 
-TileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
+SolitaireTileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
 	var tiles = [];
 
 	// Accent tiles
 	for (var i = 0; i < 2; i++) {
-		tiles.push(new Tile('W', ownerCode));
+		tiles.push(new SolitaireTile('W', ownerCode));
 	}
 
 	tiles.forEach(function(tile) {
@@ -103,47 +103,47 @@ TileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
 
 	// Basic flowers
 	for (var i = 0; i < 6; i++) {
-		tiles.push(new Tile("R3", ownerCode));
-		tiles.push(new Tile("W5", ownerCode));
+		tiles.push(new SolitaireTile("R3", ownerCode));
+		tiles.push(new SolitaireTile("W5", ownerCode));
 	}
 
 	// Special flowers
-	tiles.push(new Tile('L', ownerCode));
-	tiles.push(new Tile('O', ownerCode));
+	tiles.push(new SolitaireTile('L', ownerCode));
+	tiles.push(new SolitaireTile('O', ownerCode));
 
 	return tiles;
 };
 
-TileManager.prototype.loadOneOfEach = function(ownerCode) {
+SolitaireTileManager.prototype.loadOneOfEach = function(ownerCode) {
 	var tiles = [];
 
-	tiles.push(new Tile('R', ownerCode));
-	tiles.push(new Tile('W', ownerCode));
-	tiles.push(new Tile('K', ownerCode));
-	tiles.push(new Tile('B', ownerCode));
+	tiles.push(new SolitaireTile('R', ownerCode));
+	tiles.push(new SolitaireTile('W', ownerCode));
+	tiles.push(new SolitaireTile('K', ownerCode));
+	tiles.push(new SolitaireTile('B', ownerCode));
 
-	tiles.push(new Tile("R3", ownerCode));
-	tiles.push(new Tile("R4", ownerCode));
-	tiles.push(new Tile("R5", ownerCode));
-	tiles.push(new Tile("W3", ownerCode));
-	tiles.push(new Tile("W4", ownerCode));
-	tiles.push(new Tile("W5", ownerCode));
+	tiles.push(new SolitaireTile("R3", ownerCode));
+	tiles.push(new SolitaireTile("R4", ownerCode));
+	tiles.push(new SolitaireTile("R5", ownerCode));
+	tiles.push(new SolitaireTile("W3", ownerCode));
+	tiles.push(new SolitaireTile("W4", ownerCode));
+	tiles.push(new SolitaireTile("W5", ownerCode));
 
-	tiles.push(new Tile('L', ownerCode));
-	tiles.push(new Tile('O', ownerCode));
+	tiles.push(new SolitaireTile('L', ownerCode));
+	tiles.push(new SolitaireTile('O', ownerCode));
 
 	return tiles;
 };
 
 // For Solitaire
-TileManager.prototype.drawRandomTile = function() {
+SolitaireTileManager.prototype.drawRandomTile = function() {
 	if (this.tiles.length > 0) {
 		var tile = this.tiles[Math.floor(Math.random()*this.tiles.length)];
 		return this.peekTile(this.playerCode, tile.code);
 	}
 };
 
-TileManager.prototype.grabTile = function(player, tileCode) {
+SolitaireTileManager.prototype.grabTile = function(player, tileCode) {
 	var tilePile = this.tiles;
 
 	var tile;
@@ -162,7 +162,7 @@ TileManager.prototype.grabTile = function(player, tileCode) {
 	return tile;
 };
 
-TileManager.prototype.peekTile = function(player, tileCode, tileId) {
+SolitaireTileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	var tilePile = this.tiles;
 
 	var tile;
@@ -188,7 +188,7 @@ TileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	return tile;
 };
 
-TileManager.prototype.removeSelectedTileFlags = function() {
+SolitaireTileManager.prototype.removeSelectedTileFlags = function() {
 	this.tiles.forEach(function(tile) {
 		tile.selectedFromPile = false;
 	});
@@ -197,7 +197,7 @@ TileManager.prototype.removeSelectedTileFlags = function() {
 	});
 };
 
-TileManager.prototype.unselectTiles = function(player) {
+SolitaireTileManager.prototype.unselectTiles = function(player) {
 	var tilePile = this.tiles;
 	if (player === GUEST) {
 		tilePile = this.tiles;
@@ -208,7 +208,7 @@ TileManager.prototype.unselectTiles = function(player) {
 	});
 }
 
-TileManager.prototype.putTileBack = function(tile) {
+SolitaireTileManager.prototype.putTileBack = function(tile) {
 	var player = tile.ownerName;
 	var tilePile = this.tiles;
 	if (player === GUEST) {
@@ -218,14 +218,14 @@ TileManager.prototype.putTileBack = function(tile) {
 	tilePile.push(tile);
 };
 
-TileManager.prototype.aPlayerIsOutOfTiles = function() {
+SolitaireTileManager.prototype.aPlayerIsOutOfTiles = function() {
 	var guestHasTiles = this.tiles.length > 0;
 	var hostHasTiles = guestHasTiles;
 
 	return !hostHasTiles || !guestHasTiles;
 };
 
-TileManager.prototype.getPlayerWithMoreAccentTiles = function() {
+SolitaireTileManager.prototype.getPlayerWithMoreAccentTiles = function() {
 	var hostCount = 0;
 	for (var i = 0; i < this.tiles.length; i++) {
 		if (this.tiles[i].type === ACCENT_TILE) {
@@ -247,7 +247,7 @@ TileManager.prototype.getPlayerWithMoreAccentTiles = function() {
 	}
 };
 
-TileManager.prototype.playerHasBothSpecialTilesRemaining = function(player) {
+SolitaireTileManager.prototype.playerHasBothSpecialTilesRemaining = function(player) {
 	var tilePile = this.tiles;
 	if (player === GUEST) {
 		tilePile = this.tiles;
@@ -264,8 +264,8 @@ TileManager.prototype.playerHasBothSpecialTilesRemaining = function(player) {
 	return specialTileCount > 1;
 };
 
-TileManager.prototype.getCopy = function() {
-	var copy = new TileManager();
+SolitaireTileManager.prototype.getCopy = function() {
+	var copy = new SolitaireTileManager();
 
 	// copy this.tiles and this.tiles
 	copy.tiles = this.copyArr(this.tiles);
@@ -274,7 +274,7 @@ TileManager.prototype.getCopy = function() {
 	return copy;
 };
 
-TileManager.prototype.copyArr = function(arr) {
+SolitaireTileManager.prototype.copyArr = function(arr) {
 	var copyArr = [];
 	for (var i = 0; i < arr.length; i++) {
 		copyArr.push(arr[i].getCopy());

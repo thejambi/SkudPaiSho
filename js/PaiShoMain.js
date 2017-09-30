@@ -348,13 +348,13 @@ function startWatchingGameRealTime() {
 function setUseHLoweTiles() {
 	localStorage.setItem(tileDesignTypeKey, "hlowe");
 	useHLoweTiles = true;
-	gameController.theGame.actuate();
+	gameController.callActuate();
 }
 
 function setUseStandardTiles() {
 	localStorage.setItem(tileDesignTypeKey, "standard");
 	useHLoweTiles = false;
-	gameController.theGame.actuate();
+	gameController.callActuate();
 }
 
 function toggleTileDesigns() {
@@ -466,7 +466,7 @@ function playAllMoves() {
 	while (playNextMove(false)) {
 		// Nothing!
 	}
-	gameController.theGame.actuate();
+	gameController.callActuate();
 }
 
 function playPause() {
@@ -643,7 +643,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 			}
 		}
 	} else {
-		messageText += getResetMoveText();
+		messageText += gameController.getAdditionalMessage() + getResetMoveText();
 	}
 
 	document.querySelector(".gameMessage").innerHTML = messageText;
@@ -1158,6 +1158,11 @@ function setGameController(gameTypeId) {
 	    case GameType.VagabondPaiSho.id:
 	        gameController = new VagabondController();
 	        debug("You're playing Vagabond Pai Sho!");
+	        break;
+	    case GameType.SolitairePaiSho.id:
+	        gameController = new SolitaireController();
+	        debug("You're playing Solitaire Pai Sho!");
+	        gameController.callActuate();
 	        break;
 	    default:
 	        debug("Defaulting to use Skud Pai Sho.");

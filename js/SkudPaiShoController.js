@@ -34,6 +34,10 @@ SkudPaiShoController.prototype.getGuestTilesContainerDivs = function() {
 	return '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
 };
 
+SkudPaiShoController.prototype.callActuate = function() {
+	this.theGame.actuate();
+};
+
 SkudPaiShoController.prototype.resetMove = function() {
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// Remove last move

@@ -1,17 +1,17 @@
-// Board
+// Solitaire Board
 
-function Board() {
+function SolitaireBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
-	this.harmonyManager = new HarmonyManager();
+	this.harmonyManager = new SolitaireHarmonyManager();
 
 	this.rockRowAndCols = [];
 	this.playedWhiteLotusTiles = [];
 	this.winners = [];
 }
 
-Board.prototype.brandNew = function () {
+SolitaireBoard.prototype.brandNew = function () {
 	var cells = [];
 
 	cells[0] = this.newRow(9, 
@@ -324,12 +324,12 @@ Board.prototype.brandNew = function () {
 	return cells;
 };
 
-Board.prototype.newRow = function(numColumns, points) {
+SolitaireBoard.prototype.newRow = function(numColumns, points) {
 	var cells = [];
 
 	var numBlanksOnSides = (this.size.row - numColumns) / 2;
 
-	var nonPoint = new BoardPoint();
+	var nonPoint = new SolitaireBoardPoint();
 	nonPoint.addType(NON_PLAYABLE);
 
 	for (var i = 0; i < this.size.row; i++) {
@@ -349,7 +349,7 @@ Board.prototype.newRow = function(numColumns, points) {
 	return cells;
 };
 
-Board.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
+SolitaireBoard.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
 	// Commenting out For Solitaire
 	// if (tile.type === ACCENT_TILE) {
 		// if (tile.accentType === ROCK) {
@@ -372,14 +372,14 @@ Board.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
 	this.analyzeHarmonies();
 };
 
-Board.prototype.putTileOnPoint = function(tile, notationPoint) {
+SolitaireBoard.prototype.putTileOnPoint = function(tile, notationPoint) {
 	var point = notationPoint.rowAndColumn;
 	point = this.cells[point.row][point.col];
 	
 	point.putTile(tile);
 };
 
-Board.prototype.canPlaceRock = function(boardPoint) {
+SolitaireBoard.prototype.canPlaceRock = function(boardPoint) {
 	if (boardPoint.hasTile()) {
 		// debug("Rock cannot be played on top of another tile");
 		return false;
@@ -390,7 +390,7 @@ Board.prototype.canPlaceRock = function(boardPoint) {
 	return true;
 };
 
-Board.prototype.placeRock = function(tile, notationPoint) {
+SolitaireBoard.prototype.placeRock = function(tile, notationPoint) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
@@ -404,7 +404,7 @@ Board.prototype.placeRock = function(tile, notationPoint) {
 	}
 };
 
-Board.prototype.canPlaceWheel = function(boardPoint) {
+SolitaireBoard.prototype.canPlaceWheel = function(boardPoint) {
 	if (boardPoint.hasTile()) {
 		// debug("Wheel cannot be played on top of another tile");
 		return false;
@@ -470,7 +470,7 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 	// Does it create Disharmony?
 	var newBoard = this.getCopy();
 	var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
-	newBoard.placeWheel(new Tile('W', 'G'), notationPoint, true);
+	newBoard.placeWheel(new SolitaireTile('W', 'G'), notationPoint, true);
 	if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
 		return false;
 	}
@@ -478,11 +478,11 @@ Board.prototype.canPlaceWheel = function(boardPoint) {
 	return true;
 };
 
-Board.prototype.isValidRowCol = function(rowCol) {
+SolitaireBoard.prototype.isValidRowCol = function(rowCol) {
 	return rowCol.row >= 0 && rowCol.col >= 0 && rowCol.row <= 16 && rowCol.col <= 16;
 };
 
-Board.prototype.placeWheel = function(tile, notationPoint, ignoreCheck) {
+SolitaireBoard.prototype.placeWheel = function(tile, notationPoint, ignoreCheck) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
@@ -516,7 +516,7 @@ Board.prototype.placeWheel = function(tile, notationPoint, ignoreCheck) {
 	this.refreshRockRowAndCols();
 };
 
-Board.prototype.canPlaceKnotweed = function(boardPoint) {
+SolitaireBoard.prototype.canPlaceKnotweed = function(boardPoint) {
 	if (boardPoint.hasTile()) {
 		// debug("Knotweed cannot be played on top of another tile");
 		return false;
@@ -543,7 +543,7 @@ Board.prototype.canPlaceKnotweed = function(boardPoint) {
 	return true;
 };
 
-Board.prototype.placeKnotweed = function(tile, notationPoint) {
+SolitaireBoard.prototype.placeKnotweed = function(tile, notationPoint) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
@@ -563,7 +563,7 @@ Board.prototype.placeKnotweed = function(tile, notationPoint) {
 	}
 };
 
-Board.prototype.canPlaceBoat = function(boardPoint, tile) {
+SolitaireBoard.prototype.canPlaceBoat = function(boardPoint, tile) {
 	if (!boardPoint.hasTile()) {
 		// debug("Boat always played on top of another tile");
 		return false;
@@ -585,7 +585,7 @@ Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 			// Ensure no Disharmony
 			var newBoard = this.getCopy();
 			var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
-			newBoard.placeBoat(new Tile('B', 'G'), notationPoint, boardPoint, true);
+			newBoard.placeBoat(new SolitaireTile('B', 'G'), notationPoint, boardPoint, true);
 			if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
 				return false;
 			}
@@ -595,7 +595,7 @@ Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 	return true;
 };
 
-Board.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint, ignoreCheck) {
+SolitaireBoard.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint, ignoreCheck) {
 	// debug("extra boat point:");
 	// debug(extraBoatPoint);
 	var rowAndCol = notationPoint.rowAndColumn;
@@ -641,7 +641,7 @@ Board.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint, ignore
 	}
 };
 
-Board.prototype.getClockwiseRowCol = function(center, rowCol) {
+SolitaireBoard.prototype.getClockwiseRowCol = function(center, rowCol) {
 	if (rowCol.row < center.row && rowCol.col <= center.col) {
 		return new RowAndColumn(rowCol.row, rowCol.col+1);
 	} else if (rowCol.col > center.col && rowCol.row <= center.row) {
@@ -655,7 +655,7 @@ Board.prototype.getClockwiseRowCol = function(center, rowCol) {
 	}
 }
 
-Board.prototype.getSurroundingRowAndCols = function(rowAndCol) {
+SolitaireBoard.prototype.getSurroundingRowAndCols = function(rowAndCol) {
 	var rowAndCols = [];
 	for (var row = rowAndCol.row - 1; row <= rowAndCol.row + 1; row++) {
 		for (var col = rowAndCol.col - 1; col <= rowAndCol.col + 1; col++) {
@@ -671,7 +671,7 @@ Board.prototype.getSurroundingRowAndCols = function(rowAndCol) {
 	return rowAndCols;
 };
 
-Board.prototype.refreshRockRowAndCols = function() {
+SolitaireBoard.prototype.refreshRockRowAndCols = function() {
 	this.rockRowAndCols = [];
 	var self = this;
 
@@ -684,14 +684,14 @@ Board.prototype.refreshRockRowAndCols = function() {
 	});
 };
 
-Board.prototype.pointIsOpenGate = function(notationPoint) {
+SolitaireBoard.prototype.pointIsOpenGate = function(notationPoint) {
 	var point = notationPoint.rowAndColumn;
 	point = this.cells[point.row][point.col];
 
 	return point.isOpenGate();
 };
 
-Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
+SolitaireBoard.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
 	var startRowCol = notationPointStart.rowAndColumn;
 	var endRowCol = notationPointEnd.rowAndColumn;
 
@@ -728,7 +728,7 @@ Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd
 	return this.hasNewHarmony(player, tile, startRowCol, endRowCol);
 };
 
-Board.prototype.flagAllTrappedAndDrainedTiles = function() {
+SolitaireBoard.prototype.flagAllTrappedAndDrainedTiles = function() {
 	// First, untrap
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -755,7 +755,7 @@ Board.prototype.flagAllTrappedAndDrainedTiles = function() {
 	}
 };
 
-Board.prototype.drainTilesSurroundingPointIfNeeded = function(boardPoint) {
+SolitaireBoard.prototype.drainTilesSurroundingPointIfNeeded = function(boardPoint) {
 	if (!newKnotweedRules) {
 		return;
 	}
@@ -777,7 +777,7 @@ Board.prototype.drainTilesSurroundingPointIfNeeded = function(boardPoint) {
 	}
 };
 
-Board.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
+SolitaireBoard.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -800,7 +800,7 @@ Board.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
 	}
 };
 
-Board.prototype.whiteLotusProtected = function(lotusTile) {
+SolitaireBoard.prototype.whiteLotusProtected = function(lotusTile) {
 	if (lotusNoCapture || simplest) {
 		return true;
 	}
@@ -828,7 +828,7 @@ Board.prototype.whiteLotusProtected = function(lotusTile) {
 	return isProtected;
 };
 
-Board.prototype.orchidCanCapture = function(orchidTile) {
+SolitaireBoard.prototype.orchidCanCapture = function(orchidTile) {
 	if (simpleSpecialFlowerRule || simplest) {
 		return false;	// Simplest? Never can capture.
 	}
@@ -847,7 +847,7 @@ Board.prototype.orchidCanCapture = function(orchidTile) {
 	return orchidCanCapture;
 };
 
-Board.prototype.orchidVulnerable = function(orchidTile) {
+SolitaireBoard.prototype.orchidVulnerable = function(orchidTile) {
 	if (newOrchidVulnerableRule) {
 		var orchidVulnerable = false;
 		// Orchid vulnerable if opponent White Lotus is on board
@@ -893,7 +893,7 @@ Board.prototype.orchidVulnerable = function(orchidTile) {
 	}
 };
 
-Board.prototype.canCapture = function(boardPointStart, boardPointEnd) {
+SolitaireBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 	var tile = boardPointStart.tile;
 	var otherTile = boardPointEnd.tile;
 
@@ -933,7 +933,7 @@ Board.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 	}
 };
 
-Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
+SolitaireBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
 	// start point must have a tile
 	if (!boardPointStart.hasTile()) {
 		return false;
@@ -994,7 +994,7 @@ Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPoin
 	return true;
 };
 
-Board.prototype.canTransportTileToPoint = function(boardPointStart, boardPointEnd) {
+SolitaireBoard.prototype.canTransportTileToPoint = function(boardPointStart, boardPointEnd) {
 	// Transport Tile: used in Boat special ability
 
 	// start point must have a tile
@@ -1025,7 +1025,7 @@ Board.prototype.canTransportTileToPoint = function(boardPointStart, boardPointEn
 	return true;
 };
 
-Board.prototype.moveCreatesDisharmony = function(boardPointStart, boardPointEnd) {
+SolitaireBoard.prototype.moveCreatesDisharmony = function(boardPointStart, boardPointEnd) {
 	// Grab tile in end point and put the start tile there
 	var endTile = boardPointEnd.removeTile();
 	boardPointEnd.putTile(boardPointStart.removeTile());
@@ -1053,12 +1053,12 @@ Board.prototype.moveCreatesDisharmony = function(boardPointStart, boardPointEnd)
 	return clashFound;
 };
 
-Board.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {
+SolitaireBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {
   // Recursion!
   return this.pathFound(boardPointStart, boardPointEnd, numMoves);
 };
 
-Board.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
+SolitaireBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
   if (!boardPointStart || !boardPointEnd) {
     return false; // start or end point not given
   }
@@ -1118,7 +1118,7 @@ Board.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
   }
 };
 
-Board.prototype.rowBlockedByRock = function(rowNum) {
+SolitaireBoard.prototype.rowBlockedByRock = function(rowNum) {
 	if (simpleRocks || simplest) {
 		return false;	// simpleRocks: Rocks don't disable Harmonies.
 	}
@@ -1132,7 +1132,7 @@ Board.prototype.rowBlockedByRock = function(rowNum) {
 	return blocked;
 };
 
-Board.prototype.columnBlockedByRock = function(colNum) {
+SolitaireBoard.prototype.columnBlockedByRock = function(colNum) {
 	if (simpleRocks || simplest) {
 		return false;	// simpleRocks: Rocks don't disable Harmonies.
 	}
@@ -1147,7 +1147,7 @@ Board.prototype.columnBlockedByRock = function(colNum) {
 };
 
 /* For Solitaire */
-Board.prototype.markSpacesBetweenHarmonies = function() {
+SolitaireBoard.prototype.markSpacesBetweenHarmonies = function() {
 	// And Clashes!
 
 	// Unmark all
@@ -1243,7 +1243,7 @@ Board.prototype.markSpacesBetweenHarmonies = function() {
 };
 
 /* For Solitaire */
-Board.prototype.analyzeHarmonies = function() {
+SolitaireBoard.prototype.analyzeHarmonies = function() {
 	// We're going to find all harmonies on the board - And Disharmonies!
 
 	// Check along all rows, then along all columns.. Or just check all tiles?
@@ -1279,7 +1279,7 @@ Board.prototype.analyzeHarmonies = function() {
 	// }
 };
 
-Board.prototype.getTileHarmonies = function(tile, rowAndCol) {
+SolitaireBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
 	var tileHarmonies = [];
 
 	// if (this.cells[rowAndCol.row][rowAndCol.col].isType(GATE)) {
@@ -1313,7 +1313,7 @@ Board.prototype.getTileHarmonies = function(tile, rowAndCol) {
 	return tileHarmonies;
 };
 
-Board.prototype.getHarmonyLeft = function(tile, endRowCol) {
+SolitaireBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
 	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
@@ -1323,13 +1323,13 @@ Board.prototype.getHarmonyLeft = function(tile, endRowCol) {
 	if (colToCheck >= 0) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
 		if (tile.formsHarmonyWith(checkPoint.tile)) {
-			var harmony = new Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
 	}
 };
 
-Board.prototype.getHarmonyRight = function(tile, endRowCol) {
+SolitaireBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
 
 	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
@@ -1339,13 +1339,13 @@ Board.prototype.getHarmonyRight = function(tile, endRowCol) {
 	if (colToCheck <= 16) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
 		if (tile.formsHarmonyWith(checkPoint.tile)) {
-			var harmony = new Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
 	}
 };
 
-Board.prototype.getHarmonyUp = function(tile, endRowCol) {
+SolitaireBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
 	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
@@ -1355,13 +1355,13 @@ Board.prototype.getHarmonyUp = function(tile, endRowCol) {
 	if (rowToCheck >= 0) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
 		if (tile.formsHarmonyWith(checkPoint.tile)) {
-			var harmony = new Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
 	}
 };
 
-Board.prototype.getHarmonyDown = function(tile, endRowCol) {
+SolitaireBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
 	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
@@ -1371,14 +1371,14 @@ Board.prototype.getHarmonyDown = function(tile, endRowCol) {
 	if (rowToCheck <= 16) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
 		if (tile.formsHarmonyWith(checkPoint.tile)) {
-			var harmony = new Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
 	}
 };
 
 /* For Solitaire */
-Board.prototype.getTileClashes = function(tile, rowAndCol) {
+SolitaireBoard.prototype.getTileClashes = function(tile, rowAndCol) {
 	var tileHarmonies = [];
 
 	if (!this.rowBlockedByRock(rowAndCol.row)) {
@@ -1408,7 +1408,7 @@ Board.prototype.getTileClashes = function(tile, rowAndCol) {
 	return tileHarmonies;
 };
 
-Board.prototype.getClashLeft = function(tile, endRowCol) {
+SolitaireBoard.prototype.getClashLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
 	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
@@ -1418,13 +1418,13 @@ Board.prototype.getClashLeft = function(tile, endRowCol) {
 	if (colToCheck >= 0) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
 		if (tile.clashesWith(checkPoint.tile)) {
-			var harmony = new Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
 	}
 };
 
-Board.prototype.getClashRight = function(tile, endRowCol) {
+SolitaireBoard.prototype.getClashRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
 
 	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
@@ -1434,13 +1434,13 @@ Board.prototype.getClashRight = function(tile, endRowCol) {
 	if (colToCheck <= 16) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
 		if (tile.clashesWith(checkPoint.tile)) {
-			var harmony = new Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
 	}
 };
 
-Board.prototype.getClashUp = function(tile, endRowCol) {
+SolitaireBoard.prototype.getClashUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
 	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
@@ -1450,13 +1450,13 @@ Board.prototype.getClashUp = function(tile, endRowCol) {
 	if (rowToCheck >= 0) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
 		if (tile.clashesWith(checkPoint.tile)) {
-			var harmony = new Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
 	}
 };
 
-Board.prototype.getClashDown = function(tile, endRowCol) {
+SolitaireBoard.prototype.getClashDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
 	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
@@ -1466,14 +1466,14 @@ Board.prototype.getClashDown = function(tile, endRowCol) {
 	if (rowToCheck <= 16) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
 		if (tile.clashesWith(checkPoint.tile)) {
-			var harmony = new Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
 	}
 };
 /* ******************************* */
 
-Board.prototype.hasNewHarmony = function(player, tile, startRowCol, endRowCol) {
+SolitaireBoard.prototype.hasNewHarmony = function(player, tile, startRowCol, endRowCol) {
 	// To check if new harmony, first analyze harmonies and compare to previous set of harmonies
 	var oldHarmonies = this.harmonyManager.harmonies;
 	this.analyzeHarmonies();
@@ -1481,7 +1481,7 @@ Board.prototype.hasNewHarmony = function(player, tile, startRowCol, endRowCol) {
 	return this.harmonyManager.hasNewHarmony(player, oldHarmonies);
 };
 
-Board.prototype.hasDisharmony = function(boardPoint) {
+SolitaireBoard.prototype.hasDisharmony = function(boardPoint) {
 	// if (boardPoint.isType(GATE)) {
 	// 	return false;	// Gate never has disharmony
 	// }	// For Solitaire
@@ -1508,7 +1508,7 @@ Board.prototype.hasDisharmony = function(boardPoint) {
 	return clashFound;
 };
 
-Board.prototype.hasDisharmonyLeft = function(tile, endRowCol) {
+SolitaireBoard.prototype.hasDisharmonyLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
 	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
@@ -1524,7 +1524,7 @@ Board.prototype.hasDisharmonyLeft = function(tile, endRowCol) {
 	}
 };
 
-Board.prototype.hasDisharmonyRight = function(tile, endRowCol) {
+SolitaireBoard.prototype.hasDisharmonyRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
 
 	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
@@ -1540,7 +1540,7 @@ Board.prototype.hasDisharmonyRight = function(tile, endRowCol) {
 	}
 };
 
-Board.prototype.hasDisharmonyUp = function(tile, endRowCol) {
+SolitaireBoard.prototype.hasDisharmonyUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
 	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
@@ -1556,7 +1556,7 @@ Board.prototype.hasDisharmonyUp = function(tile, endRowCol) {
 	}
 };
 
-Board.prototype.hasDisharmonyDown = function(tile, endRowCol) {
+SolitaireBoard.prototype.hasDisharmonyDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
 	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
@@ -1572,7 +1572,7 @@ Board.prototype.hasDisharmonyDown = function(tile, endRowCol) {
 	}
 };
 
-Board.prototype.setPossibleMovePoints = function(boardPointStart) {
+SolitaireBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
 	if (!boardPointStart.hasTile()) {
 		return;
 	}
@@ -1587,7 +1587,7 @@ Board.prototype.setPossibleMovePoints = function(boardPointStart) {
 	}
 };
 
-Board.prototype.removePossibleMovePoints = function() {
+SolitaireBoard.prototype.removePossibleMovePoints = function() {
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
 			boardPoint.removeType(POSSIBLE_MOVE);
@@ -1595,7 +1595,7 @@ Board.prototype.removePossibleMovePoints = function() {
 	});
 };
 
-Board.prototype.setOpenGatePossibleMoves = function(player) {
+SolitaireBoard.prototype.setOpenGatePossibleMoves = function(player) {
 	// Apply "open gate" type to applicable boardPoints
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -1608,7 +1608,7 @@ Board.prototype.setOpenGatePossibleMoves = function(player) {
 };
 
 /* For Solitaire */
-Board.prototype.setAllPossiblePointsOpen = function(tile) {
+SolitaireBoard.prototype.setAllPossiblePointsOpen = function(tile) {
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
@@ -1620,7 +1620,7 @@ Board.prototype.setAllPossiblePointsOpen = function(tile) {
 };
 
 // For Solitaire
-Board.prototype.setHarmonyAndClashPointsOpen = function(tile) {
+SolitaireBoard.prototype.setHarmonyAndClashPointsOpen = function(tile) {
 	var possibleMovesFound = false;
 
 	for (var row = 0; row < this.cells.length; row++) {
@@ -1640,7 +1640,7 @@ Board.prototype.setHarmonyAndClashPointsOpen = function(tile) {
 	return possibleMovesFound;
 };
 
-Board.prototype.setSolitaireAccentPointsOpen = function(tile) {
+SolitaireBoard.prototype.setSolitaireAccentPointsOpen = function(tile) {
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
@@ -1681,7 +1681,7 @@ Board.prototype.setSolitaireAccentPointsOpen = function(tile) {
 	}
 };
 
-Board.prototype.playerControlsLessThanTwoGates = function(player) {
+SolitaireBoard.prototype.playerControlsLessThanTwoGates = function(player) {
 	var count = 0;
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -1695,7 +1695,7 @@ Board.prototype.playerControlsLessThanTwoGates = function(player) {
 	return count < 2;
 };
 
-Board.prototype.playerHasNoGrowingFlowers = function(player) {
+SolitaireBoard.prototype.playerHasNoGrowingFlowers = function(player) {
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
@@ -1708,7 +1708,7 @@ Board.prototype.playerHasNoGrowingFlowers = function(player) {
 	return true;
 };
 
-Board.prototype.revealSpecialFlowerPlacementPoints = function(player) {
+SolitaireBoard.prototype.revealSpecialFlowerPlacementPoints = function(player) {
 	// Check each Gate for tile belonging to player, then check gate edge points
 	var bpCheckList = [];
 	
@@ -1749,7 +1749,7 @@ Board.prototype.revealSpecialFlowerPlacementPoints = function(player) {
 	});
 };
 
-Board.prototype.setGuestGateOpen = function() {
+SolitaireBoard.prototype.setGuestGateOpen = function() {
 	var row = 16;
 	var col = 8;
 	if (this.cells[row][col].isOpenGate()) {
@@ -1757,7 +1757,7 @@ Board.prototype.setGuestGateOpen = function() {
 	}
 };
 
-Board.prototype.revealPossiblePlacementPoints = function(tile) {
+SolitaireBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 	var self = this;
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
@@ -1780,7 +1780,7 @@ Board.prototype.revealPossiblePlacementPoints = function(tile) {
 	});
 };
 
-Board.prototype.revealBoatBonusPoints = function(boardPoint) {
+SolitaireBoard.prototype.revealBoatBonusPoints = function(boardPoint) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -1814,8 +1814,8 @@ Board.prototype.revealBoatBonusPoints = function(boardPoint) {
 	}
 };
 
-Board.prototype.getCopy = function() {
-	var copyBoard = new Board();
+SolitaireBoard.prototype.getCopy = function() {
+	var copyBoard = new SolitaireBoard();
 
 	// cells
 	for (var row = 0; row < this.cells.length; row++) {
@@ -1836,7 +1836,7 @@ Board.prototype.getCopy = function() {
 	return copyBoard;
 };
 
-Board.prototype.numTilesInGardensForPlayer = function(player) {
+SolitaireBoard.prototype.numTilesInGardensForPlayer = function(player) {
 	var count = 0;
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -1851,7 +1851,7 @@ Board.prototype.numTilesInGardensForPlayer = function(player) {
 	return count;
 };
 
-Board.prototype.numTilesOnBoardForPlayer = function(player) {
+SolitaireBoard.prototype.numTilesOnBoardForPlayer = function(player) {
 	var count = 0;
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -1864,7 +1864,7 @@ Board.prototype.numTilesOnBoardForPlayer = function(player) {
 	return count;
 };
 
-Board.prototype.getSurroundness = function(player) {
+SolitaireBoard.prototype.getSurroundness = function(player) {
 	var up = 0;
 	var hasUp = 0;
 	var down = 0;
@@ -1914,9 +1914,5 @@ Board.prototype.getSurroundness = function(player) {
 		return lowest * 4;
 	}
 };
-
-// Board.prototype.getSolitaireGameSummaryText = function() {
-	
-// };
 
 

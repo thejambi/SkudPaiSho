@@ -12,14 +12,14 @@ window.mobileAndTabletcheck = function() {
   return check;
 };
 
-function Actuator() {
+function SolitaireActuator() {
 	this.boardContainer = document.querySelector(".pointContainer");
 	this.hostTilesContainer = document.querySelector(".hostTilesContainer");
 	this.guestTilesContainer = document.querySelector(".guestTilesContainer");
 	this.mobile = window.mobileAndTabletcheck();
 }
 
-Actuator.prototype.actuate = function(board, tileManager) {
+SolitaireActuator.prototype.actuate = function(board, tileManager) {
 	var self = this;
 
 	// self.printBoard(board);
@@ -29,7 +29,7 @@ Actuator.prototype.actuate = function(board, tileManager) {
 	});
 };
 
-Actuator.prototype.htmlify = function(board, tileManager) {
+SolitaireActuator.prototype.htmlify = function(board, tileManager) {
 	this.clearContainer(this.boardContainer);
 
 	var self = this;
@@ -42,7 +42,7 @@ Actuator.prototype.htmlify = function(board, tileManager) {
 		});
 	});
 
-	var fullTileSet = new TileManager(true);
+	var fullTileSet = new SolitaireTileManager(true);
 
 	// Go through tile piles and clear containers
 	fullTileSet.tiles.forEach(function(tile) {
@@ -60,20 +60,20 @@ Actuator.prototype.htmlify = function(board, tileManager) {
 	}
 };
 
-Actuator.prototype.clearContainer = function (container) {
+SolitaireActuator.prototype.clearContainer = function (container) {
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-Actuator.prototype.clearTileContainer = function (tile) {
+SolitaireActuator.prototype.clearTileContainer = function (tile) {
 	var container = document.querySelector("." + tile.getImageName());
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-Actuator.prototype.addTile = function(tile, mainContainer) {
+SolitaireActuator.prototype.addTile = function(tile, mainContainer) {
 	var self = this;
 
 	var container = document.querySelector("." + tile.getImageName());
@@ -111,7 +111,7 @@ Actuator.prototype.addTile = function(tile, mainContainer) {
 	container.appendChild(theDiv);
 };
 
-Actuator.prototype.addBoardPoint = function(boardPoint) {
+SolitaireActuator.prototype.addBoardPoint = function(boardPoint) {
 	var self = this;
 
 	var theDiv = document.createElement("div");
@@ -176,7 +176,7 @@ Actuator.prototype.addBoardPoint = function(boardPoint) {
 	}
 };
 
-Actuator.prototype.printBoard = function(board) {
+SolitaireActuator.prototype.printBoard = function(board) {
 
 	debug("");
 	var rowNum = 0;

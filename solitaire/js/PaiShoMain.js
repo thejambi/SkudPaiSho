@@ -44,17 +44,16 @@ tileDesignTypeKey = "tileDesignTypeKey";
 
 var url;
 
-var theGame;
-var gameNotation;
-var notationBuilder;
-var beginPhaseData;
+// var theGame;
+// var gameNotation;
+// var notationBuilder;
 var defaultHelpMessageText;
 var defaultEmailMessageText;
 
 var localStorage;
 
-var drawnTile;
-var lastDrawnTile; // Save for Undo
+// var drawnTile;
+// var lastDrawnTile; // Save for Undo
 
 // var hostAccentTiles = [];
 // var guestAccentTiles = [];
