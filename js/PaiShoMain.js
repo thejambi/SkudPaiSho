@@ -229,9 +229,10 @@ function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 	var text = "Sign In";
 	if (userIsLoggedIn() && onlinePlayEnabled) {
 		text = "My Games";
+		document.title = "Skud Pai Sho";
 		if (parseInt(countOfGamesWhereUserTurn)) {
 			text += "(" + countOfGamesWhereUserTurn + ")";
-			document.title = "(" + countOfGamesWhereUserTurn + ") " + document.title;
+			document.title = "(" + countOfGamesWhereUserTurn + ") Skud Pai Sho";
 		}
 	}
 	document.getElementById('accountHeaderLinkText').innerText = text;
@@ -1521,6 +1522,10 @@ function newGameClicked() {
 	var message = getNewGameEntryForGameType(GameType.SkudPaiSho);
 	message += getNewGameEntryForGameType(GameType.VagabondPaiSho);
 
+	if (!onlinePlayEnabled) {
+		message += getNewGameEntryForGameType(GameType.SolitairePaiSho);
+	}
+
 	showModal("New Game", message);
 }
 
@@ -1544,7 +1549,7 @@ function startWatchingNumberOfGamesWhereUserTurn() {
 
 	userTurnCountInterval = setInterval(function() {
 		loadNumberOfGamesWhereUserTurn();
-	}, 15000);
+	}, 5000);
 }
 
 /* Chat */
