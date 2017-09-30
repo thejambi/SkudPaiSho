@@ -63,28 +63,11 @@ SolitaireGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 	this.endGameWinners = [];
 	if (this.board.winners.length === 0) {
-		// If no harmony ring winners, check for player out of basic flower tiles
 		// For Solitaire: end game when a player out of all tiles
 		var playerOutOfTiles = this.tileManager.aPlayerIsOutOfTiles();
 		if (playerOutOfTiles) {
 			debug("PLAYER OUT OF TILES: " + playerOutOfTiles);
-			// If a player has more accent tiles, they win
-			var playerMoreAccentTiles = this.tileManager.getPlayerWithMoreAccentTiles();
-			if (playerMoreAccentTiles) {
-				debug("Player has more Accent Tiles: " + playerMoreAccentTiles)
-				this.endGameWinners.push(playerMoreAccentTiles);
-			} else {
-				// Calculate player with most Harmonies
-				var playerWithmostHarmonies = this.board.harmonyManager.getPlayerWithMostHarmonies();
-				if (playerWithmostHarmonies) {
-					this.endGameWinners.push(playerWithmostHarmonies);
-					debug("Most Harmonies winner: " + playerWithmostHarmonies);
-				} else {
-					this.endGameWinners.push(HOST);
-					this.endGameWinners.push(GUEST);
-					debug("Most Harmonies is a tie!");
-				}
-			}
+			this.endGameWinners.push(HOST);
 		}
 	}
 
@@ -166,28 +149,19 @@ SolitaireGameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(pl
 };
 
 SolitaireGameManager.prototype.getWinner = function() {
-	if (this.board.winners.length === 1) {
-		return this.board.winners[0];
-	} else if (this.board.winners.length > 1) {
-		return "BOTH players";
-	} else if (this.endGameWinners.length === 1) {
+	if (this.endGameWinners.length === 1) {
 		return this.endGameWinners[0];
-	} else if (this.endGameWinners.length > 1) {
-		return "BOTH players";
 	}
 };
 
 SolitaireGameManager.prototype.getWinReason = function() {
-	// if (this.board.winners.length === 1) {
-	// 	return " created a Harmony Ring and won the game!";
-	// } else if (this.endGameWinners.length === 1) {
-	// 	if (this.tileManager.getPlayerWithMoreAccentTiles()) {
-	// 		return " won the game with more Accent Tiles left.";
-	// 	} else {
-	// 		return " won the game with the most Harmonies.";
-	// 	}
-	// }
 	return this.board.harmonyManager.getSolitaireGameSummaryText();
+};
+
+SolitaireGameManager.prototype.getWinResultTypeCode = function() {
+	if (this.endGameWinners.length === 1) {
+		return 6;	// Solitaire game end
+	}
 };
 
 SolitaireGameManager.prototype.getCopy = function() {

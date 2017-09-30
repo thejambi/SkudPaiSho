@@ -124,7 +124,8 @@ window.requestAnimationFrame(function () {
 		onlinePlayEnabled = false;
 	}
 
-	gameController.gameNotation.setNotationText(QueryString.game);
+	// gameController.gameNotation.setNotationText(QueryString.game);
+	gameController.setGameNotation(QueryString.game);
 
 	hostEmail = QueryString.host;
 	guestEmail = QueryString.guest;
@@ -240,7 +241,8 @@ function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 
 var getGameNotationCallback = function(newGameNotation) {
 	if (gameWatchIntervalValue && newGameNotation !== lastKnownGameNotation) {
-		gameController.gameNotation.setNotationText(newGameNotation);
+		// gameController.gameNotation.setNotationText(newGameNotation);
+		gameController.setGameNotation(newGameNotation);
 		rerunAll();
 		lastKnownGameNotation = newGameNotation;
 		document.getElementById("replayControls").classList.remove("gone");	// TODO Put this somewhere better where it's called less often.

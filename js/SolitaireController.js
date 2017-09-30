@@ -4,9 +4,10 @@ function SolitaireController() {
 	document.getElementById('hostTilesContainer').innerHTML = this.getHostTilesContainerDivs();
 	document.getElementById('guestTilesContainer').innerHTML = this.getGuestTilesContainerDivs();
 
+	this.resetGameNotation();	// First
+
 	this.resetGameManager();
 	this.resetNotationBuilder();
-	this.resetGameNotation();
 
 	this.drawnTile = null;
 	this.lastDrawnTile = null; // Save for Undo
@@ -21,6 +22,7 @@ SolitaireController.prototype.drawRandomTile = function() {
 
 SolitaireController.prototype.resetGameManager = function() {
 	this.theGame = new SolitaireGameManager();
+	// this.setGameNotation(this.gameNotation.notationText);
 };
 
 SolitaireController.prototype.resetNotationBuilder = function() {
@@ -40,6 +42,17 @@ SolitaireController.prototype.getGuestTilesContainerDivs = function() {
 };
 
 SolitaireController.prototype.callActuate = function() {
+	// if tilemanager doesn't have drawnTile, draw tile?
+	if (this.drawnTile) {
+		var tile = this.theGame.tileManager.peekTile(HOST, this.drawnTile.code, this.drawnTile.id);
+		if (!tile) {
+			this.drawnTile = null;
+			this.lastDrawnTile = null; // Save for Undo
+
+			this.drawRandomTile();
+		}
+	}
+
 	this.theGame.actuate();
 };
 
@@ -396,5 +409,20 @@ SolitaireController.prototype.isSolitaire = function() {
 	return true;
 };
 
+SolitaireController.prototype.setGameNotation = function(newGameNotation) {
+	if (this.drawnTile) {
+		this.drawnTile.selectedFromPile = false;
+		this.theGame.tileManager.putTileBack(this.drawnTile);
+	}
+	this.resetGameManager();
+	this.gameNotation.setNotationText(newGameNotation);
+	this.drawRandomTile();
+	this.theGame.actuate();
+	// for all tiles played, call this.tileManager.grabTile(HOST, tilecode)
 
+	// for (var index in this.gameNotation.moves) {
+	// 	var move = this.gameNotation.moves[index];
+	// 	this.theGame.tileManager.grabTile(HOST, move.plantedFlowerType);
+	// }
+};
 

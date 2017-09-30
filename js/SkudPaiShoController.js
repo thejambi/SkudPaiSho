@@ -626,4 +626,6 @@ SkudPaiShoController.prototype.isSolitaire = function() {
 	return false;
 };
 
-
+SkudPaiShoController.prototype.setGameNotation = function(newGameNotation) {
+	this.gameNotation.setNotationText(newGameNotation);
+};

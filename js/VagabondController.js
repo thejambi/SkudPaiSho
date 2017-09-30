@@ -306,5 +306,7 @@ VagabondController.prototype.isSolitaire = function() {
 	return false;
 };
 
-
+VagabondController.prototype.setGameNotation = function(newGameNotation) {
+	this.gameNotation.setNotationText(newGameNotation);
+};
 
