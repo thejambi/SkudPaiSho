@@ -153,7 +153,15 @@ SolitaireController.prototype.pointClicked = function(htmlPoint) {
 				// Move all set. Add it to the notation!
 				this.gameNotation.addMove(move);
 				this.drawRandomTile();
-				finalizeMove();
+				if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
+					createGameIfThatIsOk(GameType.SolitairePaiSho.id);
+				} else {
+					if (playingOnlineGame()) {
+						callSubmitMove();
+					} else {
+						finalizeMove();
+					}
+				}
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
@@ -165,7 +173,15 @@ SolitaireController.prototype.pointClicked = function(htmlPoint) {
 SolitaireController.prototype.skipHarmonyBonus = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 	this.gameNotation.addMove(move);
-	finalizeMove();
+	if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
+		createGameIfThatIsOk(GameType.SolitairePaiSho.id);
+	} else {
+		if (playingOnlineGame()) {
+			callSubmitMove();
+		} else {
+			finalizeMove();
+		}
+	}
 }
 
 SolitaireController.prototype.addTileSummaryToMessageArr = function(message, tileCode) {
@@ -376,7 +392,9 @@ SolitaireController.prototype.cleanup = function() {
 	// 
 };
 
-
+SolitaireController.prototype.isSolitaire = function() {
+	return true;
+};
 
 
 

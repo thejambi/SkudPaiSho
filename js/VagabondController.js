@@ -302,7 +302,9 @@ VagabondController.prototype.cleanup = function() {
 	document.querySelector(".svgContainer").classList.remove("vagabondBoardRotate");
 };
 
-
+VagabondController.prototype.isSolitaire = function() {
+	return false;
+};
 
 
 

@@ -753,6 +753,12 @@ var createGameCallback = function(newGameId) {
 	gameId = newGameId;
 	finalizeMove();
 	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
+
+	// If a solitaire game, automatic-join game.
+	if (gameController.isSolitaire()) {
+		completeJoinGameSeek({gameId:newGameId});
+	}
+
 	startWatchingGameRealTime();
 	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game if you'd like.<br /><br />If anyone joins this game, it will show up in your list of games when you click My Games.");
 };
@@ -1526,10 +1532,7 @@ function getNewGameEntryForGameType(gameType) {
 function newGameClicked() {
 	var message = getNewGameEntryForGameType(GameType.SkudPaiSho);
 	message += getNewGameEntryForGameType(GameType.VagabondPaiSho);
-
-	if (!onlinePlayEnabled) {
-		message += getNewGameEntryForGameType(GameType.SolitairePaiSho);
-	}
+	message += getNewGameEntryForGameType(GameType.SolitairePaiSho);
 
 	showModal("New Game", message);
 }

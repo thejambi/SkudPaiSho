@@ -622,6 +622,8 @@ SkudPaiShoController.prototype.cleanup = function() {
 	// Nothing.
 };
 
-
+SkudPaiShoController.prototype.isSolitaire = function() {
+	return false;
+};
 
 
