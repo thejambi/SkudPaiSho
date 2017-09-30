@@ -231,6 +231,7 @@ function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 		text = "My Games";
 		if (parseInt(countOfGamesWhereUserTurn)) {
 			text += "(" + countOfGamesWhereUserTurn + ")";
+			document.title = "(" + countOfGamesWhereUserTurn + ") " + document.title;
 		}
 	}
 	document.getElementById('accountHeaderLinkText').innerText = text;
