@@ -1166,6 +1166,7 @@ function setGameController(gameTypeId) {
 	currentGameData.gameTypeId = gameTypeId;
 	defaultHelpMessageText = null;
 	clearMessage();
+	refreshMessage();
 }
 
 function jumpToGame(gameIdChosen) {
@@ -1512,7 +1513,7 @@ function startLoggingOnlineStatus() {
 }
 
 function getNewGameEntryForGameType(gameType) {
-	return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + ")'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
+	return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
 }
 
 function newGameClicked() {

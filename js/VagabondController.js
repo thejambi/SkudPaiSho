@@ -50,7 +50,17 @@ VagabondController.prototype.getDefaultHelpMessageText = function() {
 };
 
 VagabondController.prototype.getAdditionalMessage = function() {
-	return "";
+	var msg = "";
+	
+	if (this.gameNotation.moves.length === 0) {
+		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
+			msg += "<strong>Real-time gameplay is enabled!</strong> Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
+		} else {
+			msg += "Sign in to enable real-time gameplay. Or, start playing a local game by making a move.";
+		}
+	}
+
+	return msg;
 };
 
 
