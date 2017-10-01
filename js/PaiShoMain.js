@@ -43,16 +43,10 @@ var deviceIdKey = "deviceIdKey";
 
 var url;
 
-// var theGame;
-// var gameNotation;
-// var notationBuilder;
 var defaultHelpMessageText;
 var defaultEmailMessageText;
 
 var localStorage;
-
-// var hostAccentTiles = [];
-// var guestAccentTiles = [];
 
 var hostEmail;
 var guestEmail;
@@ -1138,6 +1132,8 @@ function forgetCurrentGameInfo() {
 	hostEmail = getUserEmail();
 	guestEmail = null;
 
+	document.getElementById('chatMessagesDisplay').innerHTML = "";
+	
 	updateCurrentGameTitle();
 }
 

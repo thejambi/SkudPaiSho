@@ -67,17 +67,6 @@ VagabondController.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
-
-
-VagabondController.prototype.getExtraHarmonyBonusHelpText = function() {
-	return "";
-}
-
-VagabondController.prototype.showHarmonyBonusMessage = function() {
-	// 
-}
-
-
 VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 	if (this.theGame.board.winners.length > 0 && this.notationBuilder.status !== READY_FOR_BONUS) {
 		return;

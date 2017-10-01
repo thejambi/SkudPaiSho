@@ -78,16 +78,6 @@ SolitaireController.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
-SolitaireController.prototype.getExtraHarmonyBonusHelpText = function() {
-	return this.getAdditionalMessage();
-}
-
-SolitaireController.prototype.showHarmonyBonusMessage = function() {
-	document.querySelector(".gameMessage").innerHTML = "Harmony Bonus! Select a tile to play or <span class='skipBonus' onclick='skipHarmonyBonus();'>skip</span>."
-	+ getResetMoveText();
-}
-
-
 SolitaireController.prototype.unplayedTileClicked = function(tileDiv) {
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
@@ -381,23 +371,6 @@ SolitaireController.prototype.getAiList = function() {
 }
 
 SolitaireController.prototype.getCurrentPlayer = function() {
-	// if (this.gameNotation.moves.length <= 1) {
-	// 	if (this.gameNotation.moves.length === 0) {
-	// 		return HOST;
-	// 	} else {
-	// 		return GUEST;
-	// 	}
-	// }
-	// if (currentMoveIndex <= 2) {
-	// 	return GUEST;
-	// }
-	// var lastPlayer = this.gameNotation.moves[currentMoveIndex - 1].player;
-
-	// if (lastPlayer === HOST) {
-	// 	return GUEST;
-	// } else if (lastPlayer === GUEST) {
-	// 	return HOST;
-	// }
 	return HOST;
 };
 
@@ -418,11 +391,5 @@ SolitaireController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 	this.drawRandomTile();
 	this.theGame.actuate();
-	// for all tiles played, call this.tileManager.grabTile(HOST, tilecode)
-
-	// for (var index in this.gameNotation.moves) {
-	// 	var move = this.gameNotation.moves[index];
-	// 	this.theGame.tileManager.grabTile(HOST, move.plantedFlowerType);
-	// }
 };
 
