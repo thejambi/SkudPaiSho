@@ -1561,14 +1561,16 @@ function startWatchingNumberOfGamesWhereUserTurn() {
 /* Chat */
 
 var sendChat = function() {
-	document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
-	var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value);
-	onlinePlayEngine.sendChat(gameId, getUserId(), chatMessage, 
-		function(result) {
-			document.getElementById('sendChatMessageButton').innerHTML = "Send";
-			document.getElementById('chatMessageInput').value = "";
-		}
-	);
+	var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value).trim();
+	if (chatMessage) {
+		document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
+		onlinePlayEngine.sendChat(gameId, getUserId(), chatMessage, 
+			function(result) {
+				document.getElementById('sendChatMessageButton').innerHTML = "Send";
+				document.getElementById('chatMessageInput').value = "";
+			}
+		);
+	}
 }
 
 document.getElementById('chatMessageInput').onkeypress = function(e){
