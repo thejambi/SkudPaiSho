@@ -240,7 +240,7 @@ figure > div {
   position: relative;
 }
 
-.gameMessage {
+.gameMessage, .gameMessage2 {
   clear: left;
   width: 90%;
   margin-top: 6px;
@@ -388,6 +388,7 @@ input[type=submit] {
   background-color: #444;
   color: #faf8ef;
   font-size: 14px;
+  z-index: 1;
 }
 
 .header h1 {

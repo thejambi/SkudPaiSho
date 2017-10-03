@@ -4,6 +4,10 @@ function SolitaireController() {
 	document.getElementById('hostTilesContainer').innerHTML = this.getHostTilesContainerDivs();
 	document.getElementById('guestTilesContainer').innerHTML = this.getGuestTilesContainerDivs();
 
+
+	this.showGameMessageUnderneath = true;
+
+
 	this.resetGameNotation();	// First
 
 	this.resetGameManager();
@@ -74,7 +78,10 @@ SolitaireController.prototype.getDefaultHelpMessageText = function() {
 };
 
 SolitaireController.prototype.getAdditionalMessage = function() {
-	var msg = "<br /><strong>" + this.theGame.getWinReason() + "</strong>";
+	var msg = "";
+	if (!this.theGame.getWinner()) {
+		msg += "<br /><strong>" + this.theGame.getWinReason() + "</strong>";
+	}
 	return msg;
 };
 

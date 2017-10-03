@@ -155,7 +155,7 @@ SolitaireGameManager.prototype.getWinner = function() {
 };
 
 SolitaireGameManager.prototype.getWinReason = function() {
-	return this.board.harmonyManager.getSolitaireGameSummaryText();
+	return "<br />" + this.board.harmonyManager.getSolitaireGameSummaryText();
 };
 
 SolitaireGameManager.prototype.getWinResultTypeCode = function() {

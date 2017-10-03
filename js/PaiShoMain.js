@@ -301,7 +301,7 @@ function gameWatchPulse() {
 				}
 				for (var index in chatMessageList) {
 					var chatMessage = chatMessageList[index];
-					newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message + "</div>";
+					newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
 				}
 				
 				/* Prepare to add chat content and keep scrolled to bottom */
@@ -511,8 +511,21 @@ function getAdditionalMessage() {
 	return msg;
 }
 
+function getGameMessageElement() {
+	var gameMessage = document.querySelector(".gameMessage");
+	var gameMessage2 = document.querySelector(".gameMessage2");
+	
+	if (gameController.showGameMessageUnderneath) {
+		gameMessage.innerHTML = "";
+		return gameMessage2;
+	} else {
+		gameMessage2.innerHTML = "";
+		return gameMessage;
+	}
+}
+
 function refreshMessage() {
-	document.querySelector(".gameMessage").innerHTML = "Current Player: " + getCurrentPlayer() + getAdditionalMessage();
+	getGameMessageElement().innerHTML = "Current Player: " + getCurrentPlayer() + getAdditionalMessage();
 }
 
 function rerunAll() {
@@ -642,7 +655,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		messageText += gameController.getAdditionalMessage() + getResetMoveText();
 	}
 
-	document.querySelector(".gameMessage").innerHTML = messageText;
+	getGameMessageElement().innerHTML = messageText;
 
 	// QUICK!
 	if ((activeAi && getCurrentPlayer() === activeAi.player) || (activeAi2 && getCurrentPlayer() === activeAi2.player)) {
@@ -708,7 +721,7 @@ function getResetMoveText() {
 }
 
 function showResetMoveMessage() {
-	document.querySelector(".gameMessage").innerHTML += getResetMoveText();
+	getGameMessageElement().innerHTML += getResetMoveText();
 }
 
 function resetMove() {
@@ -1597,3 +1610,12 @@ function openTab(evt, tabIdName) {
     document.getElementById(tabIdName).style.display = "block";
     evt.currentTarget.classList.add("active");
 }
+
+function showGameNotationModal {
+	var message = "<div class='modalContentHeading'>Coordinates Style</div>";
+
+	message += "<div class='modalContentHeading'>Classic Style</div>";
+
+	showModal("Game Notation", message);
+}
+
