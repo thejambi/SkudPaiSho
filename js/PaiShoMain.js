@@ -1611,10 +1611,15 @@ function openTab(evt, tabIdName) {
     evt.currentTarget.classList.add("active");
 }
 
-function showGameNotationModal {
+function showGameNotationModal() {
 	var message = "<div class='modalContentHeading'>Coordinates Style</div>";
 
+	message += "<div class='coordinatesNotation'>";
+	message += gameController.gameNotation.getNotationForEmail().replace(/\[BR\]/g,'<br />');
+	message += "</div><br />";
+
 	message += "<div class='modalContentHeading'>Classic Style</div>";
+	message += "... coming soon...";
 
 	showModal("Game Notation", message);
 }
