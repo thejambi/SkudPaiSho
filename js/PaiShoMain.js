@@ -1380,9 +1380,18 @@ function showMyGames() {
 			}
 			message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
 			message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='signOut();'>Click here to sign out.</span></div>";
+			message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div>"
 			showModal("Active Games", message);
 		}
 	);
+}
+
+function showAccountSettings() {
+	var message = "";
+
+	message += "Coming soon...";
+
+	showModal("Settings", message);
 }
 
 function accountHeaderClicked() {
@@ -1664,4 +1673,14 @@ function openGameReplay() {
 	} else {
 		showModal("About Game Replay", "Click this link when viewing an online game to open a sharable game replay link in a new window.");
 	}
+}
+
+function showPrivacyPolicy() {
+	var message = "";
+	message += "<ul>";
+	message += "<li>All online games (and associated chat conversations) are recorded and may be available to view by others.</li>";
+	message += "<li>Usernames will be shown publicly to other players and anyone viewing game replays.</li>";
+	message += "<li>Email addresses will never be purposefully shared with other players.</li>";
+	message += "</ul>";
+	showModal("Privacy Policy", message);
 }
