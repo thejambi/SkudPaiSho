@@ -1612,15 +1612,37 @@ function openTab(evt, tabIdName) {
 }
 
 function showGameNotationModal() {
-	var message = "<div class='modalContentHeading'>Coordinates Style</div>";
+	var message = "";
 
 	message += "<div class='coordinatesNotation'>";
 	message += gameController.gameNotation.getNotationForEmail().replace(/\[BR\]/g,'<br />');
 	message += "</div><br />";
 
-	message += "<div class='modalContentHeading'>Classic Style</div>";
-	message += "... coming soon...";
-
 	showModal("Game Notation", message);
 }
 
+function openGameReplay() {
+	if (currentGameData.hostUsername && currentGameData.guestUsername) {
+		var notation = new SkudPaiShoGameNotation();
+		for (var i = 0; i < currentMoveIndex; i++) {
+			notation.addMove(gameController.gameNotation.moves[i]);
+		}
+
+		var linkUrl = "";
+		
+		linkUrl += "host=" + currentGameData.hostUsername + "&";
+		linkUrl += "guest=" + currentGameData.guestUsername + "&";
+
+		linkUrl += "game=" + notation.notationTextForUrl();
+		
+		linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
+
+		linkUrl = sandboxUrl + "?" + linkUrl;
+
+		console.log(linkUrl);
+		// return linkUrl;
+		window.open(linkUrl);
+	} else {
+		showModal("About Game Replay", "Click this link when viewing an online game to open a sharable game replay link in a new window.");
+	}
+}
