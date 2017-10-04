@@ -748,9 +748,13 @@ function myTurn() {
 	var userEmail = localStorage.getItem(localEmailKey);
 	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
 		if (getCurrentPlayer() === HOST) {
-			return !hostEmail || localStorage.getItem(localEmailKey) === hostEmail;
+			return !hostEmail 
+				|| (localStorage.getItem(localEmailKey) === hostEmail 
+					|| currentGameData.hostUsername === getUsername());
 		} else {
-			return !guestEmail || localStorage.getItem(localEmailKey) === guestEmail;
+			return !guestEmail 
+				|| (localStorage.getItem(localEmailKey) === guestEmail 
+					|| currentGameData.guestUsername === getUsername());
 		}
 	} else {
 		return true;
@@ -791,6 +795,8 @@ var submitMoveCallback = function() {
 	finalizeMove();
 	startWatchingGameRealTime();
 	startWatchingNumberOfGamesWhereUserTurn();
+
+	onlinePlayEngine.notifyUser(currentGameOpponentUsername);
 };
 
 function clearMessage() {
@@ -1380,18 +1386,32 @@ function showMyGames() {
 			}
 			message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
 			message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='signOut();'>Click here to sign out.</span></div>";
-			message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div>"
+			message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
 			showModal("Active Games", message);
 		}
 	);
 }
 
+function emailNotificationsCheckboxClicked() {
+	var value = 'N';
+	if (document.getElementById("emailNotificationsCheckbox").checked) {
+		value = 'Y';
+	}
+	onlinePlayEngine.updateEmailNotificationsSetting(getUserId(), value);
+}
+
 function showAccountSettings() {
 	var message = "";
 
-	message += "Coming soon...";
+	message += "<div><input id='emailNotificationsCheckbox' type='checkbox' onclick='emailNotificationsCheckboxClicked();'>Email Notifications</div>";
 
 	showModal("Settings", message);
+
+	onlinePlayEngine.getEmailNotificationsSetting(getUserId(), 
+		function(result) {
+			document.getElementById("emailNotificationsCheckbox").checked = (result && result.startsWith("Y"));
+		}
+	);
 }
 
 function accountHeaderClicked() {

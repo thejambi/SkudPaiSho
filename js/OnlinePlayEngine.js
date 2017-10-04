@@ -302,4 +302,41 @@ OnlinePlayEngine.prototype.getNewChatMessages = function(gameId, lastChatTimesta
     );
 };
 
+OnlinePlayEngine.prototype.notifyUser = function(username) {
+    $.post("notifyUser.php", 
+        {
+            username: username
+        }, 
+        function(data, status){
+            if (status === 'success') {
+                debug(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.getEmailNotificationsSetting = function(userId, callback) {
+    $.get("getEmailNotificationsSetting.php?userId="+userId, 
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+// TODO change to 'updatePreference' and pass in the preference type id
+OnlinePlayEngine.prototype.updateEmailNotificationsSetting = function(userId, value) {
+    $.post("updateEmailNotificationsSetting.php", 
+        {
+            userId: userId, 
+            value: value
+        }, 
+        function(data, status){
+            if (status === 'success') {
+                debug(data.trim());
+            }
+        }
+    );
+};
 
