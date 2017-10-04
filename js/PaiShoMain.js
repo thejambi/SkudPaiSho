@@ -1158,6 +1158,8 @@ function forgetCurrentGameInfo() {
 	hostEmail = getUserEmail();
 	guestEmail = null;
 
+	updateFooter();
+
 	document.getElementById('chatMessagesDisplay').innerHTML = "";
 	
 	updateCurrentGameTitle();
@@ -1260,6 +1262,7 @@ function jumpToGame(gameIdChosen) {
 				
 				startWatchingGameRealTime();
 				closeModal();
+				updateFooter();
 			}
 		}
 	);
