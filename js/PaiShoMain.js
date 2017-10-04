@@ -139,19 +139,24 @@ window.requestAnimationFrame(function () {
 		localStorage.removeItem(localEmailKey);
 	}
 
-	localPlayerRole = getCurrentPlayer();
-
-	if (localUserEmail) {
-		if (localPlayerRole === HOST) {
-			hostEmail = localUserEmail;
-		} else if (localPlayerRole === GUEST) {
-			guestEmail = localUserEmail;
-		}
+	if (hostEmail && hostEmail != localUserEmail
+		&& guestEmail && guestEmail != localUserEmail) {
+		localPlayerRole = null;
 	} else {
-		if (localPlayerRole === HOST) {
-			hostEmail = null;
-		} else if (localPlayerRole === GUEST) {
-			guestEmail = null;
+		localPlayerRole = getCurrentPlayer();
+
+		if (localUserEmail) {
+			if (localPlayerRole === HOST) {
+				hostEmail = localUserEmail;
+			} else if (localPlayerRole === GUEST) {
+				guestEmail = localUserEmail;
+			}
+		} else {
+			if (localPlayerRole === HOST) {
+				hostEmail = null;
+			} else if (localPlayerRole === GUEST) {
+				guestEmail = null;
+			}
 		}
 	}
 
@@ -406,9 +411,17 @@ function signOut() {
 		return;
 	}
 
-	if (localPlayerRole === HOST) {
+	// if (localPlayerRole === HOST) {
+	// 	hostEmail = null;
+	// } else if (localPlayerRole === GUEST) {
+	// 	guestEmail = null;
+	// }
+
+	if (hostEmail = getUserEmail()) {
 		hostEmail = null;
-	} else if (localPlayerRole === GUEST) {
+	}
+
+	if (guestUsername = getUserEmail()) {
 		guestEmail = null;
 	}
 
@@ -1227,20 +1240,23 @@ function jumpToGame(gameIdChosen) {
 				currentGameData.hostUsername = myGame.hostUsername;
 				currentGameData.guestUsername = myGame.guestUsername;
 
-				if (getUsername() === opponentUsername) {
-					hostEmail = getUserEmail();
-					guestEmail = getUserEmail();
-				} else if (myGame.hostUsername === getUsername()) {
-					hostEmail = getUserEmail();
-					guestEmail = opponentUsername;
-				} else if (myGame.guestUsername === getUsername()) {
-					hostEmail = opponentUsername;
-					guestEmail = getUserEmail();
-				} else {
-					// Not host or guest, just watching
-					hostEmail = null;
-					guestEmail = null;
-				}
+				// if (getUsername() === opponentUsername) {
+				// 	hostEmail = getUserEmail();
+				// 	guestEmail = getUserEmail();
+				// } else if (myGame.hostUsername === getUsername()) {
+				// 	hostEmail = getUserEmail();
+				// 	guestEmail = opponentUsername;
+				// } else if (myGame.guestUsername === getUsername()) {
+				// 	hostEmail = opponentUsername;
+				// 	guestEmail = getUserEmail();
+				// } else {
+				// 	// Not host or guest, just watching
+				// 	hostEmail = null;
+				// 	guestEmail = null;
+				// }
+
+				hostEmail = myGame.hostUsername;
+				guestEmail = myGame.guestUsername;
 				
 				startWatchingGameRealTime();
 				closeModal();
