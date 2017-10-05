@@ -173,8 +173,14 @@ OnlinePlayEngine.prototype.getCurrentGamesForUser = function(userId, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.getPastGamesForUser = function(userId, callback) {
-    $.get("getPastGamesForUser.php?userId="+userId, 
+OnlinePlayEngine.prototype.getCurrentGamesForUserNew = function(loginToken, callback) {
+    $.post("getCurrentGamesForUserNew.php",
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId
+        },
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -183,13 +189,13 @@ OnlinePlayEngine.prototype.getPastGamesForUser = function(userId, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.getPastGamesForUserNew = function(userId, username, userEmail, deviceId, callback) {
+OnlinePlayEngine.prototype.getPastGamesForUserNew = function(loginToken, callback) {
     $.post("getPastGamesForUserNew.php",
         {
-            userId: userId,
-            username: username,
-            userEmail: userEmail, 
-            deviceId: deviceId
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId
         },
         function(data, status){
             if (status === 'success') {

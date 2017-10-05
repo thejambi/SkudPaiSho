@@ -320,6 +320,8 @@ function gameWatchPulse() {
 				if(isScrolledToBottom) {
 					chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
 				}
+
+				// TODO Set chat tab color to alert new messages..
 			}
 		}
 	);
@@ -1300,11 +1302,19 @@ function populateMyGamesList(results) {
 	}
 }
 
+function getLoginToken() {
+	return {
+		userId: getUserId(), 
+		username: getUsername(), 
+		userEmail: getUserEmail(), 
+		deviceId: getDeviceId()
+	}
+}
+
 function showPastGamesClicked() {
 	closeModal();
 
-	// onlinePlayEngine.getPastGamesForUser(getUserId(), 
-	onlinePlayEngine.getPastGamesForUserNew(getUserId(), getUsername(), getUserEmail(), getDeviceId(), 
+	onlinePlayEngine.getPastGamesForUserNew(getLoginToken(), 
 		function(results) {
 			var message = "No completed games.";
 			if (results) {
