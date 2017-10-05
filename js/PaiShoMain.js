@@ -321,7 +321,8 @@ function gameWatchPulse() {
 					chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
 				}
 
-				// TODO Set chat tab color to alert new messages..
+				// Set chat tab color to alert new messages
+				document.getElementById('chatTab').classList.add('alertTab');
 			}
 		}
 	);
@@ -1714,4 +1715,8 @@ function showPrivacyPolicy() {
 	message += "<li>Email addresses will never be purposefully shared with other players.</li>";
 	message += "</ul>";
 	showModal("Privacy Policy", message);
+}
+
+function dismissChatAlert() {
+	document.getElementById('chatTab').classList.remove('alertTab');
 }
