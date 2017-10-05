@@ -1303,6 +1303,7 @@ function populateMyGamesList(results) {
 }
 
 function getLoginToken() {
+	debug("Using login token");
 	return {
 		userId: getUserId(), 
 		username: getUsername(), 
