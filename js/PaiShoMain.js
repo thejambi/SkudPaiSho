@@ -659,7 +659,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 
 			if (!winnerUsername) {
 				// A tie.. special case
-				onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode);
+				onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode());
 			} else {
 				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode());
 			}
@@ -776,7 +776,7 @@ function myTurnForReal() {
 
 var createGameCallback = function(newGameId) {
 	debug("INSIDE CreateMove CALLBACK with GameId: " + newGameId);
-	gameId = newGameId;
+	// gameId = newGameId;	// Not watching the new game on create...
 	finalizeMove();
 	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
 
@@ -785,7 +785,7 @@ var createGameCallback = function(newGameId) {
 		completeJoinGameSeek({gameId:newGameId});
 	}
 
-	startWatchingGameRealTime();
+	// startWatchingGameRealTime();	// Not watching the new game on create...
 	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game if you'd like.<br /><br />If anyone joins this game, it will show up in your list of games when you click My Games.");
 };
 
@@ -1121,6 +1121,13 @@ var verifyCodeCallback = function(actualCode) {
 		} else {
 			onlinePlayEngine.createUser(usernameBeingVerified, emailBeingVerified, createUserCallback);
 		}
+	} else {
+		closeModal();
+		emailBeingVerified = "";
+		usernameBeingVerified = "";
+		tempUserId = null;
+		codeToVerify = 0;
+		showModal("Validation Failed", "Validation failed. Please try again.");
 	}
 };
 
