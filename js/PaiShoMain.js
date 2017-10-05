@@ -798,7 +798,8 @@ var submitMoveCallback = function() {
 	debug("Inside submitMoveCallback");
 	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
 	finalizeMove();
-	startWatchingGameRealTime();
+
+	// startWatchingGameRealTime(); // Should not have to happen
 	startWatchingNumberOfGamesWhereUserTurn();
 
 	onlinePlayEngine.notifyUser(currentGameOpponentUsername);
