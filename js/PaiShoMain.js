@@ -1352,7 +1352,6 @@ function showPastGamesClicked() {
 }
 
 function showMyGames() {
-	// onlinePlayEngine.getCurrentGamesForUser(getUserId(), 
 	onlinePlayEngine.getCurrentGamesForUserNew(getLoginToken(), 
 		function(results) {
 			var message = "No active games.";
