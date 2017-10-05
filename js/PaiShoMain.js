@@ -1116,6 +1116,7 @@ var createUserCallback = function(generatedUserId) {
 	onlinePlayEngine.createDeviceIdForUser(tempUserId, createDeviceIdCallback);
 }
 
+// TODO actualCode should be result...
 var verifyCodeCallback = function(actualCode) {
 	if (codeToVerify === actualCode) {
 		if (tempUserId && tempUserId > 0) {
@@ -1452,18 +1453,9 @@ function loginClicked() {
 }
 
 function completeJoinGameSeek(gameSeek) {
-	onlinePlayEngine.joinGameSeek(gameSeek.gameId, getUserId(), 
+	onlinePlayEngine.joinGameSeek(gameSeek.gameId, getLoginToken(), 
 		function(gameJoined) {
 			if (gameJoined) {
-				// gameId = gameSeek.gameId;
-				// currentGameOpponentUsername = gameSeek.hostUsername;
-				// hostEmail = gameSeek.hostUsername;
-				// guestEmail = getUserEmail();
-				// currentGameData.hostUsername = gameSeek.hostUsername;
-				// currentGameData.guestUsername = getUsername();
-				// startWatchingGameRealTime();
-				// closeModal();
-
 				jumpToGame(gameSeek.gameId);
 			}
 		}
@@ -1479,7 +1471,7 @@ function acceptGameSeekClicked(gameIdChosen) {
 	}
 
 	if (gameSeek) {
-		onlinePlayEngine.getCurrentGamesForUser(getUserId(), 
+		onlinePlayEngine.getCurrentGamesForUserNew(getLoginToken(), 
 			function(results) {
 				if (results) {
 					
@@ -1577,7 +1569,7 @@ function createGameIfThatIsOk(gameTypeId) {
 		onlinePlayEngine.getCurrentGameSeeksHostedByUser(getUserId(), gameTypeId, 
 			function(results) {
 				if (!results) {
-					onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), getUserId(), createGameCallback);
+					onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), getLoginToken(), createGameCallback);
 				} else {
 					finalizeMove();
 					showModal("Game Not Created", "You either already have a game that is waiting for an opponent or are not logged in. <br /><br />If you're not logged in, you can still play the game locally, but it will not be saved online.");
