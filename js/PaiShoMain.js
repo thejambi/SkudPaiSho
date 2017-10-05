@@ -307,6 +307,11 @@ function gameWatchPulse() {
 				for (var index in chatMessageList) {
 					var chatMessage = chatMessageList[index];
 					newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+					
+					if (chatMessage.username != getUsername()) {
+						// Set chat tab color to alert new messages if any new messages aren't from user
+						document.getElementById('chatTab').classList.add('alertTab');
+					}
 				}
 				
 				/* Prepare to add chat content and keep scrolled to bottom */
@@ -320,9 +325,6 @@ function gameWatchPulse() {
 				if(isScrolledToBottom) {
 					chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
 				}
-
-				// Set chat tab color to alert new messages
-				document.getElementById('chatTab').classList.add('alertTab');
 			}
 		}
 	);
