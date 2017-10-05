@@ -183,6 +183,22 @@ OnlinePlayEngine.prototype.getPastGamesForUser = function(userId, callback) {
     );
 };
 
+OnlinePlayEngine.prototype.getPastGamesForUserNew = function(userId, username, userEmail, deviceId, callback) {
+    $.post("getPastGamesForUserNew.php",
+        {
+            userId: userId,
+            username: username,
+            userEmail: userEmail, 
+            deviceId: deviceId
+        },
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+}
+
 OnlinePlayEngine.prototype.getGameInfo = function(userId, gameId, callback) {
     $.get("getGameInfo.php?userId="+userId+"&gameId="+gameId, 
         function(data, status){

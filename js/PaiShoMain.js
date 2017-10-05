@@ -1303,7 +1303,8 @@ function populateMyGamesList(results) {
 function showPastGamesClicked() {
 	closeModal();
 
-	onlinePlayEngine.getPastGamesForUser(getUserId(), 
+	// onlinePlayEngine.getPastGamesForUser(getUserId(), 
+	onlinePlayEngine.getPastGamesForUserNew(getUserId(), getUsername(), getUserEmail(), getDeviceId(), 
 		function(results) {
 			var message = "No completed games.";
 			if (results) {
