@@ -261,12 +261,16 @@ OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, login
     );
 };
 
-OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, resultTypeCode) {
+OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, resultTypeCode, loginToken) {
     $.post("updateGameWinInfo.php",
         {
             gameId: gameId,
             winnerUsername: winnerUsername,
-            resultTypeCode: resultTypeCode
+            resultTypeCode: resultTypeCode, 
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId
         },
         function(data, status){
             if (status === 'success') {
@@ -276,11 +280,15 @@ OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, 
     );
 };
 
-OnlinePlayEngine.prototype.updateGameWinInfoAsTie = function(gameId, resultTypeCode) {
+OnlinePlayEngine.prototype.updateGameWinInfoAsTie = function(gameId, resultTypeCode, loginToken) {
     $.post("updateGameWinInfoAsTie.php",
         {
             gameId: gameId,
-            resultTypeCode: resultTypeCode
+            resultTypeCode: resultTypeCode, 
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId
         },
         function(data, status){
             if (status === 'success') {
@@ -300,11 +308,14 @@ OnlinePlayEngine.prototype.getGameTypeDesc = function(gameTypeId) {
     );
 }
 
-OnlinePlayEngine.prototype.sendChat = function(gameId, userId, chatMessage, callback) {
+OnlinePlayEngine.prototype.sendChat = function(gameId, loginToken, chatMessage, callback) {
     $.post("sendChatMessage.php", 
         {
             gameId: gameId, 
-            senderId: userId, 
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId, 
             chatMessage: chatMessage
         }, 
         function(data, status){

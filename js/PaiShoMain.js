@@ -661,9 +661,9 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 
 			if (!winnerUsername) {
 				// A tie.. special case
-				onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode());
+				onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken());
 			} else {
-				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode());
+				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode(), getLoginToken());
 			}
 		}
 	} else {
@@ -1636,7 +1636,7 @@ var sendChat = function() {
 	var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value).trim();
 	if (chatMessage) {
 		document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
-		onlinePlayEngine.sendChat(gameId, getUserId(), chatMessage, 
+		onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, 
 			function(result) {
 				document.getElementById('sendChatMessageButton').innerHTML = "Send";
 				document.getElementById('chatMessageInput').value = "";
