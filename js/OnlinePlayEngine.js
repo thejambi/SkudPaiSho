@@ -243,12 +243,15 @@ OnlinePlayEngine.prototype.checkIfUserOnline = function(username, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, userId, callback) {
+OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, loginToken, callback) {
     $.post("updateGameNotation.php",
         {
             id: gameId,
             t: gameNotationText,
-            userId: userId
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId
         },
         function(data, status){
             if (status === 'success') {

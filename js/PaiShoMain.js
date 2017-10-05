@@ -1026,7 +1026,7 @@ function closeModal() {
 }
 
 function callSubmitMove() {
-	onlinePlayEngine.submitMove(gameId, gameController.gameNotation.notationTextForUrl(), getUserId(), submitMoveCallback);
+	onlinePlayEngine.submitMove(gameId, gameController.gameNotation.notationTextForUrl(), getLoginToken(), submitMoveCallback);
 }
 
 var sendVerificationCodeCallback = function(message) {
@@ -1304,7 +1304,7 @@ function populateMyGamesList(results) {
 }
 
 function getLoginToken() {
-	debug("Using login token");
+	// debug("Using login token");
 	return {
 		userId: getUserId(), 
 		username: getUsername(), 
