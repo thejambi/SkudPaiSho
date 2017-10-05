@@ -100,11 +100,13 @@ OnlinePlayEngine.prototype.createDeviceIdForUser = function(userId, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.logOnlineStatus = function(userId, deviceId) {
+OnlinePlayEngine.prototype.logOnlineStatus = function(loginToken) {
     $.post("logOnlineStatus.php",
         {
-            u: userId, 
-            d: deviceId
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId
         },
         function(data, status){
             if (status === 'success') {

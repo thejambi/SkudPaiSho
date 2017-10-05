@@ -1582,7 +1582,7 @@ function createGameIfThatIsOk(gameTypeId) {
 }
 
 function startLoggingOnlineStatus() {
-	onlinePlayEngine.logOnlineStatus(getUserId(), getDeviceId());
+	onlinePlayEngine.logOnlineStatus(getLoginToken());
 
 	if (logOnlineStatusIntervalValue) {
 		clearInterval(logOnlineStatusIntervalValue);
@@ -1590,7 +1590,7 @@ function startLoggingOnlineStatus() {
 	}
 
 	logOnlineStatusIntervalValue = setInterval(function() {
-		onlinePlayEngine.logOnlineStatus(getUserId(), getDeviceId());
+		onlinePlayEngine.logOnlineStatus(getLoginToken());
 		verifyLogin(); // TODO Build in the verify step to the logOnlineStatus call
 	}, 4000);
 }
