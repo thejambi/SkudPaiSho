@@ -1723,6 +1723,26 @@ document.getElementById('chatMessageInput').onkeypress = function(e){
       }
 };
 
+var sendGlobalChat = function() {
+	var chatMessage = htmlEscape(document.getElementById('globalChatMessageInput').value).trim();
+	if (chatMessage) {
+		document.getElementById('sendGlobalChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
+		onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, 
+			function(result) {
+				document.getElementById('sendGlobalChatMessageButton').innerHTML = "Send";
+				document.getElementById('globalChatMessageInput').value = "";
+			}
+		);
+	}
+}
+
+document.getElementById('globalChatMessageInput').onkeypress = function(e){
+     var code = (e.keyCode ? e.keyCode : e.which);
+      if(code == 13) {
+        sendGlobalChat();
+      }
+};
+
 function htmlEscape(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
