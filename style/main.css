@@ -193,6 +193,9 @@ div.tab .alertTab, div.tab .alertTab.active {
 
   display: inline;
   float: left;
+
+  /*transition: all 2s;*/
+  transition: transform 2.5s;
 }
 .bg-svg {
   width: 100%;
