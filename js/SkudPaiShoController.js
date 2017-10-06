@@ -330,6 +330,9 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_BOAT_BONUS_POINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
+			
+			this.notationBuilder.status = MOVE_DONE;
+
 			this.theGame.hidePossibleMovePoints();
 			this.notationBuilder.boatBonusPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
@@ -347,12 +350,15 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 };
 
 SkudPaiShoController.prototype.skipHarmonyBonus = function() {
-	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-	this.gameNotation.addMove(move);
-	if (playingOnlineGame()) {
-		callSubmitMove();
-	} else {
-		finalizeMove();
+	if (this.notationBuilder.status !== MOVE_DONE) {
+		this.notationBuilder.status = MOVE_DONE;
+		var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+		this.gameNotation.addMove(move);
+		if (playingOnlineGame()) {
+			callSubmitMove();
+		} else {
+			finalizeMove();
+		}
 	}
 };
 

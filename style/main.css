@@ -81,20 +81,24 @@ hr {
 /* Style the tab */
 div.tab {
     overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
+    /*border: 1px solid #ccc;*/
+    border-left: 1px solid #ccc;
+    /*background-color: #f1f1f1;*/
 }
 
 /* Style the buttons inside the tab */
 div.tab button {
-    background-color: inherit;
+    /*background-color: inherit;*/
+    background-color: #f1f1f1;
     float: left;
-    border: none;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    border-left: none;
     outline: none;
     cursor: pointer;
-    padding: 6px 8px;
+    padding: 4px 4px;
     transition: 0.3s;
-    font-size: 17px;
+    font-size: 15px;
 }
 
 /* Change background color of buttons on hover */
@@ -116,21 +120,21 @@ div.tab .alertTab, div.tab .alertTab.active {
     display: none;
     padding: 0px 0px;
     border: 1px solid #ccc;
-    border-top: none;
+    /*border-top: none;*/
 }
 
-#chatContainer {
+.chatContainer {
   display: inline;
   float: left;
 }
-#chatMessagesDisplay {
+.chatMessagesDisplay {
     /*background-color: #00FFFF;*/
     max-height: 460px;
     overflow-y: scroll;
     overflow-x: hidden;
     min-height: 460px;
 }
-#chatMessageInput {
+.chatMessageInput {
   width: 70%;
 }
 

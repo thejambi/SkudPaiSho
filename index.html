@@ -113,6 +113,7 @@
   <div class="helpContainer" id="help">
     <div class="tab">
       <button class="tablinks" onclick="openTab(event, 'helpTextTab')" id="defaultOpenTab">Help</button>
+      <button id='globalChatTabHeader' class="tablinks" onclick="openTab(event, 'globalChatTab');">Global Chat</button>
       <button id='chatTab' class="tablinks" onclick="openTab(event, 'gameChatTab'); dismissChatAlert();">Game Chat</button>
     </div>
 
@@ -124,10 +125,17 @@
         <p>Select tiles or points on the board to learn more or <a href="https://skudpaisho.wordpress.com/pai-sho-resources/" target="_blank">view the resources page</a> for the rules, a video tutorial on how to play, a print and play Pai Sho set, and more!</p>
       </div>
     </div>
+    <div id="globalChatTab" class="tabcontent">
+      <div id="globalChatMessagesDisplay" class="chatMessagesDisplay"></div>
+      <div id="globalChatMessageInputContainer" class="chatMessageInputContainer">
+        <input value="" id="globalChatMessageInput" class="chatMessageInput" />
+        <span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span>
+      </div>
+    </div>
     <div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
-      <div id="chatMessagesDisplay"></div>
-      <div id="chatMessageInputContainer">
-        <input value="" id="chatMessageInput" />
+      <div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
+      <div id="chatMessageInputContainer" class="chatMessageInputContainer">
+        <input value="" id="chatMessageInput" class="chatMessageInput" />
         <span id="sendChatMessageButton" class="button" onclick='sendChat();'>Send</span>
       </div>
     </div>

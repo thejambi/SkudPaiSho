@@ -52,6 +52,7 @@ var hostEmail;
 var guestEmail;
 
 var BRAND_NEW = "Brand New";
+var MOVE_DONE = "Move Done";
 var WAITING_FOR_ENDPOINT = "Waiting for endpoint";
 var READY_FOR_BONUS = "READY_FOR_BONUS";
 var WAITING_FOR_BONUS_ENDPOINT = "WAITING_FOR_BONUS_ENDPOINT";
@@ -1595,6 +1596,61 @@ function createGameIfThatIsOk(gameTypeId) {
 	}
 }
 
+var lastGlobalChatTimestamp = '1970-01-01 00:00:00';
+function fetchGlobalChats() {
+	if (getUsername() != 'SkudPaiSho') {
+		return;
+	}
+	onlinePlayEngine.getNewChatMessages(0, lastGlobalChatTimestamp, 
+		function(results) {
+			if (results != "") {
+				var resultRows = results.split('\n');
+
+				chatMessageList = [];
+				var newChatMessagesHtml = "";
+
+				var actuallyLoadMessages = true;
+
+				if (lastGlobalChatTimestamp === '1970-01-01 00:00:00') {
+					// just loading timestamp of latest message...
+					actuallyLoadMessages = false;
+				}
+
+				for (var index in resultRows) {
+					var row = resultRows[index].split('|||');
+					var chatMessage = {
+						timestamp:row[0], 
+						username:row[1], 
+						message:row[2]
+					};
+					chatMessageList.push(chatMessage);
+					lastGlobalChatTimestamp = chatMessage.timestamp;
+				}
+
+				if (actuallyLoadMessages) {
+
+					for (var index in chatMessageList) {
+						var chatMessage = chatMessageList[index];
+						newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+					}
+					
+					/* Prepare to add chat content and keep scrolled to bottom */
+					var chatMessagesDisplay = document.getElementById('globalChatMessagesDisplay');
+					// allow 1px inaccuracy by adding 1
+					var isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
+					var newElement = document.createElement("div");
+					newElement.innerHTML = newChatMessagesHtml;
+					chatMessagesDisplay.appendChild(newElement);
+					// scroll to bottom if isScrolledToBottom
+					if(isScrolledToBottom) {
+						chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
+					}
+				}
+			}
+		}
+	);
+}
+
 function startLoggingOnlineStatus() {
 	onlinePlayEngine.logOnlineStatus(getLoginToken());
 
@@ -1606,6 +1662,7 @@ function startLoggingOnlineStatus() {
 	logOnlineStatusIntervalValue = setInterval(function() {
 		onlinePlayEngine.logOnlineStatus(getLoginToken());
 		verifyLogin(); // TODO Build in the verify step to the logOnlineStatus call
+		fetchGlobalChats();
 	}, 4000);
 }
 
