@@ -521,7 +521,7 @@ input[type=submit] {
     text-align: center;
   }
 
-  #chatMessagesDisplay {
+  .chatMessagesDisplay {
     max-height: 280px;
     min-height: 280px;
   }
