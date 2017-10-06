@@ -304,14 +304,24 @@ function gameWatchPulse() {
 					chatMessageList.push(chatMessage);
 					lastChatTimestamp = chatMessage.timestamp;
 				}
+
+				var alertNewMessages = false;
+
 				for (var index in chatMessageList) {
 					var chatMessage = chatMessageList[index];
 					newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
 					
+					// The most recent message will determine whether to alert
 					if (chatMessage.username != getUsername()) {
-						// Set chat tab color to alert new messages if any new messages aren't from user
-						document.getElementById('chatTab').classList.add('alertTab');
+						// Set chat tab color to alert new messages if newest message is not from user
+						alertNewMessages = true;
+					} else {
+						alertNewMessages = false;
 					}
+				}
+
+				if (alertNewMessages) {
+					document.getElementById('chatTab').classList.add('alertTab');
 				}
 				
 				/* Prepare to add chat content and keep scrolled to bottom */
@@ -789,7 +799,7 @@ var createGameCallback = function(newGameId) {
 	if (gameController.isSolitaire()) {
 		completeJoinGameSeek({gameId:newGameId});
 	}
-
+	
 	// startWatchingGameRealTime();	// Not watching the new game on create...
 	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game if you'd like.<br /><br />If anyone joins this game, it will show up in your list of games when you click My Games.");
 };
