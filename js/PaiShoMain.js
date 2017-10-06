@@ -1598,9 +1598,9 @@ function createGameIfThatIsOk(gameTypeId) {
 
 var lastGlobalChatTimestamp = '1970-01-01 00:00:00';
 function fetchGlobalChats() {
-	if (getUsername() != 'SkudPaiSho') {
-		return;
-	}
+	// if (getUsername() != 'SkudPaiSho' && getUsername() != 'Zach') {
+	// 	return;
+	// }
 	onlinePlayEngine.getNewChatMessages(0, lastGlobalChatTimestamp, 
 		function(results) {
 			if (results != "") {
@@ -1615,6 +1615,9 @@ function fetchGlobalChats() {
 					// just loading timestamp of latest message...
 					actuallyLoadMessages = false;
 				}
+
+				// So actuallyLoadMessages only turns false once...
+				lastGlobalChatTimestamp = '1970-01-02 00:00:00';
 
 				for (var index in resultRows) {
 					var row = resultRows[index].split('|||');
@@ -1724,10 +1727,13 @@ document.getElementById('chatMessageInput').onkeypress = function(e){
 };
 
 var sendGlobalChat = function() {
+	// if (getUsername() != 'SkudPaiSho' && getUsername() != 'Zach') {
+	// 	return;
+	// }
 	var chatMessage = htmlEscape(document.getElementById('globalChatMessageInput').value).trim();
 	if (chatMessage) {
 		document.getElementById('sendGlobalChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
-		onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, 
+		onlinePlayEngine.sendChat(0, getLoginToken(), chatMessage, 
 			function(result) {
 				document.getElementById('sendGlobalChatMessageButton').innerHTML = "Send";
 				document.getElementById('globalChatMessageInput').value = "";
