@@ -66,7 +66,7 @@ var activeAi;
 var activeAi2;
 var sandboxUrl;
 var metadata = new Object();
-var replayIntervalLength = 800;
+var replayIntervalLength = 1500;
 
 /* Online Play variables */
 var onlinePlayEngine;
