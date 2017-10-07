@@ -336,6 +336,16 @@ OnlinePlayEngine.prototype.getNewChatMessages = function(gameId, lastChatTimesta
     );
 };
 
+OnlinePlayEngine.prototype.getInitialGlobalChatMessages = function(callback) {
+    $.get("getInitialGlobalChatMessages.php?", 
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
 OnlinePlayEngine.prototype.notifyUser = function(username) {
     $.post("notifyUser.php", 
         {

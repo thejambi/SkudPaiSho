@@ -1596,6 +1596,54 @@ function createGameIfThatIsOk(gameTypeId) {
 	}
 }
 
+function handleNewGlobalChatMessages(results) {
+	var resultRows = results.split('\n');
+
+	chatMessageList = [];
+	var newChatMessagesHtml = "";
+
+	// var actuallyLoadMessages = true;
+
+	// if (lastGlobalChatTimestamp === '1970-01-01 00:00:00') {
+	// 	// just loading timestamp of latest message...
+	// 	actuallyLoadMessages = false;
+	// }
+
+	// // So actuallyLoadMessages only turns false once...
+	// lastGlobalChatTimestamp = '1970-01-02 00:00:00';
+
+	for (var index in resultRows) {
+		var row = resultRows[index].split('|||');
+		var chatMessage = {
+			timestamp:row[0], 
+			username:row[1], 
+			message:row[2]
+		};
+		chatMessageList.push(chatMessage);
+		lastGlobalChatTimestamp = chatMessage.timestamp;
+	}
+
+	// if (actuallyLoadMessages) {
+
+		for (var index in chatMessageList) {
+			var chatMessage = chatMessageList[index];
+			newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+		}
+		
+		/* Prepare to add chat content and keep scrolled to bottom */
+		var chatMessagesDisplay = document.getElementById('globalChatMessagesDisplay');
+		// allow 1px inaccuracy by adding 1
+		var isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
+		var newElement = document.createElement("div");
+		newElement.innerHTML = newChatMessagesHtml;
+		chatMessagesDisplay.appendChild(newElement);
+		// scroll to bottom if isScrolledToBottom
+		if(isScrolledToBottom) {
+			chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
+		}
+	// }
+}
+
 var lastGlobalChatTimestamp = '1970-01-01 00:00:00';
 function fetchGlobalChats() {
 	// if (getUsername() != 'SkudPaiSho' && getUsername() != 'Zach') {
@@ -1604,51 +1652,21 @@ function fetchGlobalChats() {
 	onlinePlayEngine.getNewChatMessages(0, lastGlobalChatTimestamp, 
 		function(results) {
 			if (results != "") {
-				var resultRows = results.split('\n');
+				handleNewGlobalChatMessages(results);
+			}
+		}
+	);
+}
 
-				chatMessageList = [];
-				var newChatMessagesHtml = "";
+function fetchInitialGlobalChats() {
+	// Clear all global chats..
+	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! This global chat will show messages sent to it while you're here. Say hi and see if anyone else is online :)<hr />";
 
-				var actuallyLoadMessages = true;
-
-				if (lastGlobalChatTimestamp === '1970-01-01 00:00:00') {
-					// just loading timestamp of latest message...
-					actuallyLoadMessages = false;
-				}
-
-				// So actuallyLoadMessages only turns false once...
-				lastGlobalChatTimestamp = '1970-01-02 00:00:00';
-
-				for (var index in resultRows) {
-					var row = resultRows[index].split('|||');
-					var chatMessage = {
-						timestamp:row[0], 
-						username:row[1], 
-						message:row[2]
-					};
-					chatMessageList.push(chatMessage);
-					lastGlobalChatTimestamp = chatMessage.timestamp;
-				}
-
-				if (actuallyLoadMessages) {
-
-					for (var index in chatMessageList) {
-						var chatMessage = chatMessageList[index];
-						newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
-					}
-					
-					/* Prepare to add chat content and keep scrolled to bottom */
-					var chatMessagesDisplay = document.getElementById('globalChatMessagesDisplay');
-					// allow 1px inaccuracy by adding 1
-					var isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
-					var newElement = document.createElement("div");
-					newElement.innerHTML = newChatMessagesHtml;
-					chatMessagesDisplay.appendChild(newElement);
-					// scroll to bottom if isScrolledToBottom
-					if(isScrolledToBottom) {
-						chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
-					}
-				}
+	// Fetch global chats..
+	onlinePlayEngine.getInitialGlobalChatMessages(
+		function(results) {
+			if (results != "") {
+				handleNewGlobalChatMessages(results);
 			}
 		}
 	);
@@ -1656,6 +1674,8 @@ function fetchGlobalChats() {
 
 function startLoggingOnlineStatus() {
 	onlinePlayEngine.logOnlineStatus(getLoginToken());
+
+	fetchInitialGlobalChats();
 
 	if (logOnlineStatusIntervalValue) {
 		clearInterval(logOnlineStatusIntervalValue);
