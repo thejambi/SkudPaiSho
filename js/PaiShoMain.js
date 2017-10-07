@@ -1660,7 +1660,7 @@ function fetchGlobalChats() {
 
 function fetchInitialGlobalChats() {
 	// Clear all global chats..
-	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! This global chat will show messages sent to it while you're here. Say hi and see if anyone else is online :)<hr />";
+	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! This global chat will show the latest messages sent to it. Say hi and see if anyone else is online :)<hr />";
 
 	// Fetch global chats..
 	onlinePlayEngine.getInitialGlobalChatMessages(
