@@ -184,6 +184,10 @@ div.tab .alertTab, div.tab .alertTab.active {
   margin-right: 1px;
 }
 
+.replayButton:active {
+  background-color: #bbb;
+}
+
 .svgContainer {
   /*width: 576px;*/
   width: 612px;
