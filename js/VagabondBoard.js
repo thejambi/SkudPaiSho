@@ -1,6 +1,6 @@
 // Vagabond Board
 
-function Board() {
+function VagabondBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
@@ -10,307 +10,307 @@ function Board() {
 	this.glPlayed = false;
 }
 
-Board.prototype.brandNew = function () {
+VagabondBoard.prototype.brandNew = function () {
 	var cells = [];
 
 	cells[0] = this.newRow(9, 
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.gate(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.gate(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[1] = this.newRow(11, 
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redWhiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(), 
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.redWhiteNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(), 
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[2] = this.newRow(13, 
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.whiteNeutral(), 
-		BoardPoint.redWhite(),
-		BoardPoint.redNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.whiteNeutral(), 
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[3] = this.newRow(15,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.whiteNeutral(), 
-		BoardPoint.white(),
-		BoardPoint.redWhite(),
-		BoardPoint.red(),
-		BoardPoint.redNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.whiteNeutral(), 
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.redNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[4] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.whiteNeutral(), 
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.redWhite(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.whiteNeutral(), 
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.redNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[5] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.whiteNeutral(), 
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.redWhite(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.whiteNeutral(), 
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.redNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[6] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.whiteNeutral(), 
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.redWhite(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.whiteNeutral(), 
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.redNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[7] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.whiteNeutral(), 
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.redWhite(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.whiteNeutral(), 
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.redNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[8] = this.newRow(17,
-		[BoardPoint.gate(),
-		BoardPoint.redWhiteNeutral(), 
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhite(),
-		BoardPoint.redWhiteNeutral(),
-		BoardPoint.gate()
+		[VagabondBoardPoint.gate(),
+		VagabondBoardPoint.redWhiteNeutral(), 
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.redWhiteNeutral(),
+		VagabondBoardPoint.gate()
 		]);
 
 	cells[9] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redNeutral(), 
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redWhite(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.whiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.redNeutral(), 
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.whiteNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[10] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redNeutral(), 
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redWhite(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.whiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.redNeutral(), 
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.whiteNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[11] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redNeutral(), 
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redWhite(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.whiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.redNeutral(), 
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.whiteNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[12] = this.newRow(17,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redNeutral(), 
-		BoardPoint.red(),
-		BoardPoint.red(),
-		BoardPoint.redWhite(),
-		BoardPoint.white(),
-		BoardPoint.white(),
-		BoardPoint.whiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.redNeutral(), 
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.whiteNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[13] = this.newRow(15,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redNeutral(), 
-		BoardPoint.red(),
-		BoardPoint.redWhite(),
-		BoardPoint.white(),
-		BoardPoint.whiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.redNeutral(), 
+		VagabondBoardPoint.red(),
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.white(),
+		VagabondBoardPoint.whiteNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[14] = this.newRow(13,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redNeutral(), 
-		BoardPoint.redWhite(),
-		BoardPoint.whiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.redNeutral(), 
+		VagabondBoardPoint.redWhite(),
+		VagabondBoardPoint.whiteNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[15] = this.newRow(11,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.redWhiteNeutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.redWhiteNeutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	cells[16] = this.newRow(9,
-		[BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.gate(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral(),
-		BoardPoint.neutral()
+		[VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.gate(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral(),
+		VagabondBoardPoint.neutral()
 		]);
 
 	for (var row = 0; row < cells.length; row++) {
@@ -323,12 +323,12 @@ Board.prototype.brandNew = function () {
 	return cells;
 };
 
-Board.prototype.newRow = function(numColumns, points) {
+VagabondBoard.prototype.newRow = function(numColumns, points) {
 	var cells = [];
 
 	var numBlanksOnSides = (this.size.row - numColumns) / 2;
 
-	var nonPoint = new BoardPoint();
+	var nonPoint = new VagabondBoardPoint();
 	nonPoint.addType(NON_PLAYABLE);
 
 	for (var i = 0; i < this.size.row; i++) {
@@ -348,7 +348,7 @@ Board.prototype.newRow = function(numColumns, points) {
 	return cells;
 };
 
-Board.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
+VagabondBoard.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
 	this.putTileOnPoint(tile, notationPoint);
 
 	if (tile.code === 'L') {
@@ -363,14 +363,14 @@ Board.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
 	this.setPointFlags();
 };
 
-Board.prototype.putTileOnPoint = function(tile, notationPoint) {
+VagabondBoard.prototype.putTileOnPoint = function(tile, notationPoint) {
 	var point = notationPoint.rowAndColumn;
 	point = this.cells[point.row][point.col];
 	
 	point.putTile(tile);
 };
 
-Board.prototype.getSurroundingRowAndCols = function(rowAndCol) {
+VagabondBoard.prototype.getSurroundingRowAndCols = function(rowAndCol) {
 	var rowAndCols = [];
 	for (var row = rowAndCol.row - 1; row <= rowAndCol.row + 1; row++) {
 		for (var col = rowAndCol.col - 1; col <= rowAndCol.col + 1; col++) {
@@ -386,7 +386,7 @@ Board.prototype.getSurroundingRowAndCols = function(rowAndCol) {
 	return rowAndCols;
 };
 
-Board.prototype.getAdjacentRowAndCols = function(rowAndCol) {
+VagabondBoard.prototype.getAdjacentRowAndCols = function(rowAndCol) {
 	var rowAndCols = [];
 
 	if (rowAndCol.row > 0) {
@@ -405,14 +405,14 @@ Board.prototype.getAdjacentRowAndCols = function(rowAndCol) {
 	return rowAndCols;
 };
 
-Board.prototype.pointIsOpenGate = function(notationPoint) {
+VagabondBoard.prototype.pointIsOpenGate = function(notationPoint) {
 	var point = notationPoint.rowAndColumn;
 	point = this.cells[point.row][point.col];
 
 	return point.isOpenGate();
 };
 
-Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
+VagabondBoard.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
 	var startRowCol = notationPointStart.rowAndColumn;
 	var endRowCol = notationPointEnd.rowAndColumn;
 
@@ -445,7 +445,7 @@ Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd
 	this.setPointFlags();
 };
 
-Board.prototype.setPointFlags = function() {
+VagabondBoard.prototype.setPointFlags = function() {
 	// First, unblock, unprotect
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -466,7 +466,7 @@ Board.prototype.setPointFlags = function() {
 	}
 };
 
-Board.prototype.blockTilesAdjacentToPointIfNeeded = function(boardPoint) {
+VagabondBoard.prototype.blockTilesAdjacentToPointIfNeeded = function(boardPoint) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -490,7 +490,7 @@ Board.prototype.blockTilesAdjacentToPointIfNeeded = function(boardPoint) {
 	}
 };
 
-Board.prototype.protectTilesAdjacentToPointIfNeeded = function(boardPoint) {
+VagabondBoard.prototype.protectTilesAdjacentToPointIfNeeded = function(boardPoint) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -514,7 +514,7 @@ Board.prototype.protectTilesAdjacentToPointIfNeeded = function(boardPoint) {
 	}
 };
 
-Board.prototype.canCapture = function(boardPointStart, boardPointEnd) {
+VagabondBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 	var tile = boardPointStart.tile;
 	var otherTile = boardPointEnd.tile;
 
@@ -551,7 +551,7 @@ Board.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 	}
 };
 
-Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
+VagabondBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
 	// start point must have a tile
 	if (!boardPointStart.hasTile()) {
 		return false;
@@ -698,7 +698,7 @@ Board.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPoin
 	return true;
 };
 
-Board.prototype.inLineWithAdjacentFlowerTile = function(bp, bp2) {
+VagabondBoard.prototype.inLineWithAdjacentFlowerTile = function(bp, bp2) {
 	var flowerPoint;
 
 	if (bp.row === bp2.row) {
@@ -723,12 +723,12 @@ Board.prototype.inLineWithAdjacentFlowerTile = function(bp, bp2) {
 	return false;
 };
 
-Board.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {
+VagabondBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {
   // Recursion!
   return this.pathFound(boardPointStart, boardPointEnd, numMoves);
 };
 
-Board.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
+VagabondBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
   if (!boardPointStart || !boardPointEnd) {
     return false; // start or end point not given
   }
@@ -788,7 +788,7 @@ Board.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
   }
 };
 
-Board.prototype.setPossibleMovePoints = function(boardPointStart) {
+VagabondBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
 	if (!boardPointStart.hasTile()) {
 		return;
 	}
@@ -803,7 +803,7 @@ Board.prototype.setPossibleMovePoints = function(boardPointStart) {
 	}
 };
 
-Board.prototype.removePossibleMovePoints = function() {
+VagabondBoard.prototype.removePossibleMovePoints = function() {
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
 			boardPoint.removeType(POSSIBLE_MOVE);
@@ -811,7 +811,7 @@ Board.prototype.removePossibleMovePoints = function() {
 	});
 };
 
-Board.prototype.getFireLilyPoint = function(player) {
+VagabondBoard.prototype.getFireLilyPoint = function(player) {
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
@@ -824,7 +824,7 @@ Board.prototype.getFireLilyPoint = function(player) {
 	}
 };
 
-Board.prototype.setDeployPointsPossibleMoves = function(player, tileCode) {
+VagabondBoard.prototype.setDeployPointsPossibleMoves = function(player, tileCode) {
 	// Dragon is special
 	if (tileCode === 'D') {
 		// Must have Fire Lily
@@ -866,7 +866,7 @@ Board.prototype.setDeployPointsPossibleMoves = function(player, tileCode) {
 	}
 };
 
-Board.prototype.setGuestGateOpen = function() {
+VagabondBoard.prototype.setGuestGateOpen = function() {
 	var row = 16;
 	var col = 8;
 	if (this.cells[row][col].isOpenGate()) {
@@ -874,7 +874,7 @@ Board.prototype.setGuestGateOpen = function() {
 	}
 };
 
-Board.prototype.revealPossiblePlacementPoints = function(tile) {
+VagabondBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 	var self = this;
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
@@ -897,7 +897,7 @@ Board.prototype.revealPossiblePlacementPoints = function(tile) {
 	});
 };
 
-Board.prototype.revealBoatBonusPoints = function(boardPoint) {
+VagabondBoard.prototype.revealBoatBonusPoints = function(boardPoint) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -915,7 +915,7 @@ Board.prototype.revealBoatBonusPoints = function(boardPoint) {
 	}
 };
 
-// Board.prototype.getCopy = function() {
+// VagabondBoard.prototype.getCopy = function() {
 // 	var copyBoard = new Board();
 
 // 	/*

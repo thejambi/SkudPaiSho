@@ -13,7 +13,7 @@ function VagabondGameManager(ignoreActuate, isCopy) {
 // Set up the game
 VagabondGameManager.prototype.setup = function (ignoreActuate) {
 
-	this.board = new Board();
+	this.board = new VagabondBoard();
 
 	// Update the actuator
 	if (!ignoreActuate) {

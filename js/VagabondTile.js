@@ -13,27 +13,7 @@ function VagabondTile(code, ownerCode) {
 		debug("INCORRECT OWNER CODE");
 	}
 	this.id = tileId++;
-	// this.drained = false;
 	this.selectedFromPile = false;
-
-	// if (this.code.length === 2 && (this.code.includes('R') || this.code.includes('W'))) {
-	// 	this.type = BASIC_FLOWER;
-	// 	this.basicColorCode = this.code.charAt(0);
-	// 	this.basicValue = this.code.charAt(1);
-	// 	if (this.basicColorCode === 'R') {
-	// 		this.basicColorName = RED;
-	// 	} else if (this.basicColorCode === 'W') {
-	// 		this.basicColorName = WHITE;
-	// 	}
-	// } else if (this.code === 'L' || this.code === 'O') {
-	// 	this.type = SPECIAL_FLOWER;
-	// 	this.setSpecialFlowerInfo();
-	// } else if (this.code === 'R' || this.code === 'W' || this.code === 'K' || this.code === 'B') {
-	// 	this.type = ACCENT_TILE;
-	// 	this.setAccentInfo();
-	// } else {
-	// 	debug("Error: Unknown tile type");
-	// }
 }
 
 VagabondTile.prototype.getImageName = function() {
@@ -45,14 +25,6 @@ VagabondTile.prototype.canMove = function(first_argument) {
 };
 
 VagabondTile.prototype.getMoveDistance = function() {
-	// if (this.type === BASIC_FLOWER) {
-	// 	return parseInt(this.basicValue);
-	// } else if (this.code === 'L') {
-	// 	return 2;
-	// } else if (this.code === 'O') {
-	// 	return 6;
-	// }
-
 	if (this.code === 'L' || this.code === 'B') {
 		return 1;
 	} else if (this.code === 'S') {

@@ -1,4 +1,4 @@
-// Board Point
+// Vababond Board Point
 
 var NON_PLAYABLE = "Non-Playable";
 var NEUTRAL = "Neutral";
@@ -14,19 +14,19 @@ var thickDot = "•";
 var whiteDot = "◦";
 var gateDot = "⟡";
 
-function BoardPoint() {
+function VagabondBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;
 }
 
-BoardPoint.prototype.addType = function(type) {
+VagabondBoardPoint.prototype.addType = function(type) {
 	if (!this.types.includes(type)) {
 		this.types.push(type);
 	}
 };
 
-BoardPoint.prototype.removeType = function(type) {
+VagabondBoardPoint.prototype.removeType = function(type) {
 	for (var i = 0; i < this.types.length; i++) {
 		if (this.types[i] === type) {
 			this.types.splice(i, 1);
@@ -34,7 +34,7 @@ BoardPoint.prototype.removeType = function(type) {
 	}
 };
 
-// BoardPoint.prototype.getConsoleDisplay = function() {
+// VagabondBoardPoint.prototype.getConsoleDisplay = function() {
 // 	if (this.tile) {
 // 		return this.tile.getConsoleDisplay();
 // 	} else {
@@ -71,26 +71,26 @@ BoardPoint.prototype.removeType = function(type) {
 // 	}
 // };
 
-BoardPoint.prototype.putTile = function(tile) {
+VagabondBoardPoint.prototype.putTile = function(tile) {
 	this.tile = tile;
 };
 
-BoardPoint.prototype.hasTile = function() {
+VagabondBoardPoint.prototype.hasTile = function() {
 	if (this.tile) {
 		return true;
 	}
 	return false;
 };
 
-BoardPoint.prototype.isType = function(type) {
+VagabondBoardPoint.prototype.isType = function(type) {
 	return this.types.includes(type);
 };
 
-BoardPoint.prototype.isOpenGate = function() {
+VagabondBoardPoint.prototype.isOpenGate = function() {
 	return !this.hasTile() && this.types.includes(GATE);
 };
 
-BoardPoint.prototype.removeTile = function() {
+VagabondBoardPoint.prototype.removeTile = function() {
 	var theTile = this.tile;
 
 	this.tile = null;
@@ -98,19 +98,19 @@ BoardPoint.prototype.removeTile = function() {
 	return theTile;
 };
 
-BoardPoint.prototype.drainTile = function() {
+VagabondBoardPoint.prototype.drainTile = function() {
 	if (this.tile) {
 		this.tile.drain();
 	}
 };
 
-BoardPoint.prototype.restoreTile = function() {
+VagabondBoardPoint.prototype.restoreTile = function() {
 	if (this.tile) {
 		this.tile.restore();
 	}
 };
 
-BoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
+VagabondBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	// Validate this point's ability to hold given tile
 
 	if (this.isType(NON_PLAYABLE)) {
@@ -142,7 +142,7 @@ BoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	return false;
 };
 
-BoardPoint.prototype.betweenPlayerHarmony = function(player) {
+VagabondBoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	if (player === GUEST) {
 		return this.betweenHarmonyGuest;
 	} else if (player === HOST) {
@@ -151,8 +151,8 @@ BoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	return false;
 };
 
-BoardPoint.prototype.getCopy = function() {
-	var copy = new BoardPoint();
+VagabondBoardPoint.prototype.getCopy = function() {
+	var copy = new VagabondBoardPoint();
 
 	// this.types
 	for (var i = 0; i < this.types.length; i++) {
@@ -176,44 +176,44 @@ BoardPoint.prototype.getCopy = function() {
 
 // Point makers
 
-BoardPoint.neutral = function() {
-	var point = new BoardPoint();
+VagabondBoardPoint.neutral = function() {
+	var point = new VagabondBoardPoint();
 	point.addType(NEUTRAL);
 
 	return point;
 };
 
-BoardPoint.gate = function() {
-	var point = new BoardPoint();
+VagabondBoardPoint.gate = function() {
+	var point = new VagabondBoardPoint();
 	point.addType(GATE);
 
 	return point;
 };
 
-BoardPoint.red = function() {
-	var point = new BoardPoint();
+VagabondBoardPoint.red = function() {
+	var point = new VagabondBoardPoint();
 	point.addType(RED);
 
 	return point;
 };
 
-BoardPoint.white = function() {
-	var point = new BoardPoint();
+VagabondBoardPoint.white = function() {
+	var point = new VagabondBoardPoint();
 	point.addType(WHITE);
 
 	return point;
 };
 
-BoardPoint.redWhite = function() {
-	var point = new BoardPoint();
+VagabondBoardPoint.redWhite = function() {
+	var point = new VagabondBoardPoint();
 	point.addType(RED);
 	point.addType(WHITE);
 
 	return point;
 };
 
-BoardPoint.redWhiteNeutral = function() {
-	var point = new BoardPoint();
+VagabondBoardPoint.redWhiteNeutral = function() {
+	var point = new VagabondBoardPoint();
 	point.addType(RED);
 	point.addType(WHITE);
 	point.addType(NEUTRAL);
@@ -221,16 +221,16 @@ BoardPoint.redWhiteNeutral = function() {
 	return point;
 };
 
-BoardPoint.redNeutral = function() {
-	var point = new BoardPoint();
+VagabondBoardPoint.redNeutral = function() {
+	var point = new VagabondBoardPoint();
 	point.addType(RED);
 	point.addType(NEUTRAL);
 
 	return point;
 };
 
-BoardPoint.whiteNeutral = function() {
-	var point = new BoardPoint();
+VagabondBoardPoint.whiteNeutral = function() {
+	var point = new VagabondBoardPoint();
 	point.addType(WHITE);
 	point.addType(NEUTRAL);
 
