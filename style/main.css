@@ -137,23 +137,30 @@ div.tab .alertTab, div.tab .alertTab.active {
 }
 .chatMessageInput {
   width: 70%;
+  padding: 0;
+  margin: 0;
 }
 
 .chatMessage {
   padding: 4px 0;
 }
 
+.chatMessageInputContainer * {
+  vertical-align: middle;
+}
+
 .button {
   display:inline-block;
-    color:#444;
-    border:1px solid #CCC;
-    background:#DDD;
-    box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
-    cursor:pointer;
-    vertical-align:middle;
-    max-width: 100px;
-    padding: 5px;
-    text-align: center;
+  color:#444;
+  border:1px solid #CCC;
+  background:#DDD;
+  box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+  cursor:pointer;
+  /*vertical-align:middle;*/
+  max-width: 100px;
+  padding: 5px;
+  text-align: center;
+
 }
 .button:active {
     box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);

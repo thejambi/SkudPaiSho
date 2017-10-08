@@ -128,14 +128,16 @@
     <div id="globalChatTab" class="tabcontent">
       <div id="globalChatMessagesDisplay" class="chatMessagesDisplay"><!-- <strong>SkudPaiSho: </strong> Hi everybody! This global chat will show messages sent to it while you're here. Say hi and see if anyone else is online :)<hr /> --></div>
       <div id="globalChatMessageInputContainer" class="chatMessageInputContainer">
-        <input value="" id="globalChatMessageInput" class="chatMessageInput" />
+        <!-- <input value="" id="globalChatMessageInput" class="chatMessageInput" /> -->
+        <textarea id="globalChatMessageInput" class="chatMessageInput"></textarea>
         <span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span>
       </div>
     </div>
     <div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
       <div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
       <div id="chatMessageInputContainer" class="chatMessageInputContainer">
-        <input value="" id="chatMessageInput" class="chatMessageInput" />
+        <!-- <input value="" id="chatMessageInput" class="chatMessageInput" /> -->
+        <textarea id="chatMessageInput" class="chatMessageInput"></textarea>
         <span id="sendChatMessageButton" class="button" onclick='sendChat();'>Send</span>
       </div>
     </div>
