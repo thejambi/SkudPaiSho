@@ -352,6 +352,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 SkudPaiShoController.prototype.skipHarmonyBonus = function() {
 	if (this.notationBuilder.status !== MOVE_DONE) {
 		this.notationBuilder.status = MOVE_DONE;
+		this.notationBuilder.bonusEndPoint = null;
 		var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 		this.gameNotation.addMove(move);
 		if (playingOnlineGame()) {
