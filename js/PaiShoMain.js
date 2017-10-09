@@ -1812,7 +1812,6 @@ function showGameNotationModal() {
 function openGameReplay() {
 	if (currentGameData.hostUsername && currentGameData.guestUsername) {
 		var notation = getGameControllerForGameType(currentGameData.gameTypeId);
-		var notation = 
 		for (var i = 0; i < currentMoveIndex; i++) {
 			notation.addMove(gameController.gameNotation.moves[i]);
 		}
