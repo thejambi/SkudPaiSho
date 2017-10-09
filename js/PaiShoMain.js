@@ -972,10 +972,7 @@ function getLink(forSandbox) {
 		linkUrl += "gameType=" + currentGameData.gameTypeId + "&";
 	}
 
-	if (forSandbox && userIsLoggedIn()) {
-		linkUrl += "host=" + getUsername() + "&";
-		linkUrl += "guest=" + getUsername() + "&";
-	} else if (forSandbox && getUserEmail()) {
+	if (forSandbox && getUserEmail()) {
 		linkUrl += "host=" + getUserEmail() + "&";
 		linkUrl += "guest=" + getUserEmail() + "&";
 	}
