@@ -99,7 +99,7 @@ window.requestAnimationFrame(function () {
 	localStorage = new LocalStorage().storage;
 
 	if (QueryString.gameType) {
-		setGameController(QueryString.gameType);
+		setGameController(parseInt(QueryString.gameType));
 	} else {
 		setGameController(GameType.SkudPaiSho.id);
 	}
@@ -972,7 +972,10 @@ function getLink(forSandbox) {
 		linkUrl += "gameType=" + currentGameData.gameTypeId + "&";
 	}
 
-	if (forSandbox && getUserEmail()) {
+	if (forSandbox && userIsLoggedIn()) {
+		linkUrl += "host=" + getUsername() + "&";
+		linkUrl += "guest=" + getUsername() + "&";
+	} else if (forSandbox && getUserEmail()) {
 		linkUrl += "host=" + getUserEmail() + "&";
 		linkUrl += "guest=" + getUserEmail() + "&";
 	}
