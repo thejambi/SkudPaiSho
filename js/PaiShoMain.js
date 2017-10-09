@@ -98,7 +98,11 @@ window.requestAnimationFrame(function () {
 
 	localStorage = new LocalStorage().storage;
 
-	setGameController(GameType.SkudPaiSho.id);
+	if (QueryString.gameType) {
+		setGameController(QueryString.gameType);
+	} else {
+		setGameController(GameType.SkudPaiSho.id);
+	}
 
 	if (!localStorage.getItem(tileDesignTypeKey)) {
 		useHLoweTiles = true;
@@ -964,6 +968,10 @@ function getLink(forSandbox) {
 
 	var linkUrl = "";
 
+	if (currentGameData && currentGameData.gameTypeId) {
+		linkUrl += "gameType=" + currentGameData.gameTypeId + "&";
+	}
+
 	if (forSandbox && getUserEmail()) {
 		linkUrl += "host=" + getUserEmail() + "&";
 		linkUrl += "guest=" + getUserEmail() + "&";
@@ -1800,6 +1808,9 @@ function openGameReplay() {
 
 		var linkUrl = "";
 		
+		if (currentGameData && currentGameData.gameTypeId) {
+			linkUrl += "gameType=" + currentGameData.gameTypeId + "&";
+		}
 		linkUrl += "host=" + currentGameData.hostUsername + "&";
 		linkUrl += "guest=" + currentGameData.guestUsername + "&";
 
