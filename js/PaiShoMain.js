@@ -962,6 +962,9 @@ function getGatePointMessage() {
 
 function getLink(forSandbox) {
 	var notation = new SkudPaiShoGameNotation();
+	if (currentGameData) {
+		notation = getGameControllerForGameType(currentGameData.gameTypeId);
+	}	
 	for (var i = 0; i < currentMoveIndex; i++) {
 		notation.addMove(gameController.gameNotation.moves[i]);
 	}
@@ -1210,6 +1213,30 @@ var GameType = {
 	SolitairePaiSho:{id:4, desc:"Solitaire Pai Sho", rulesUrl:"https://skudpaisho.wordpress.com/more/solitaire-pai-sho/"}, 
 	CapturePaiSho:{id:3, desc:"Capture Pai Sho", rulesUrl:"https://skudpaisho.wordpress.com/more/capture-pai-sho/"}
 };
+function getGameControllerForGameType(gameTypeId) {
+	var controller;
+
+	switch(gameTypeId) {
+	    case GameType.SkudPaiSho.id:
+	        controller = new SkudPaiShoController();
+	        debug("You're playing Skud Pai Sho!");
+	        break;
+	    case GameType.VagabondPaiSho.id:
+	        controller = new VagabondController();
+	        debug("You're playing Vagabond Pai Sho!");
+	        break;
+	    case GameType.SolitairePaiSho.id:
+	        controller = new SolitaireController();
+	        debug("You're playing Solitaire Pai Sho!");
+	        controller.callActuate();
+	        break;
+	    default:
+	        debug("Defaulting to use Skud Pai Sho.");
+	        controller = new SkudPaiShoController();
+	}
+
+	return controller;
+}
 function setGameController(gameTypeId) {
 	// Previous game controller cleanup
 	if (gameController) {
@@ -1221,24 +1248,7 @@ function setGameController(gameTypeId) {
 
 	closeModal();
 	
-	switch(gameTypeId) {
-	    case GameType.SkudPaiSho.id:
-	        gameController = new SkudPaiShoController();
-	        debug("You're playing Skud Pai Sho!");
-	        break;
-	    case GameType.VagabondPaiSho.id:
-	        gameController = new VagabondController();
-	        debug("You're playing Vagabond Pai Sho!");
-	        break;
-	    case GameType.SolitairePaiSho.id:
-	        gameController = new SolitaireController();
-	        debug("You're playing Solitaire Pai Sho!");
-	        gameController.callActuate();
-	        break;
-	    default:
-	        debug("Defaulting to use Skud Pai Sho.");
-	        gameController = new SkudPaiShoController();
-	}
+	gameController = getGameControllerForGameType(gameTypeId);
 
 	// New game stuff:
 	currentGameData.gameTypeId = gameTypeId;
@@ -1801,7 +1811,8 @@ function showGameNotationModal() {
 
 function openGameReplay() {
 	if (currentGameData.hostUsername && currentGameData.guestUsername) {
-		var notation = new SkudPaiShoGameNotation();
+		var notation = getGameControllerForGameType(currentGameData.gameTypeId);
+		var notation = 
 		for (var i = 0; i < currentMoveIndex; i++) {
 			notation.addMove(gameController.gameNotation.moves[i]);
 		}
