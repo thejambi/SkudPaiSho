@@ -963,7 +963,7 @@ function getGatePointMessage() {
 function getLink(forSandbox) {
 	var notation = new SkudPaiShoGameNotation();
 	if (currentGameData) {
-		notation = getGameControllerForGameType(currentGameData.gameTypeId);
+		notation = getGameControllerForGameType(currentGameData.gameTypeId).gameNotation;
 	}	
 	for (var i = 0; i < currentMoveIndex; i++) {
 		notation.addMove(gameController.gameNotation.moves[i]);
@@ -1811,7 +1811,7 @@ function showGameNotationModal() {
 
 function openGameReplay() {
 	if (currentGameData.hostUsername && currentGameData.guestUsername) {
-		var notation = getGameControllerForGameType(currentGameData.gameTypeId);
+		var notation = getGameControllerForGameType(currentGameData.gameTypeId).gameNotation;
 		for (var i = 0; i < currentMoveIndex; i++) {
 			notation.addMove(gameController.gameNotation.moves[i]);
 		}
