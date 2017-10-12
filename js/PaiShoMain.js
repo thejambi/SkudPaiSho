@@ -425,7 +425,7 @@ forgetOnlinePlayInfo = function() {
 }
 
 function signOut() {
-	var ok = confirm("Forgetting your email will disable email notifications. Are you sure?");
+	var ok = confirm("Are you sure you want to sign out?");
 	if (!ok) {
 		updateFooter();
 		return;
@@ -829,9 +829,14 @@ function clearMessage() {
 	// 	document.getElementById("helpTextContent").innerHTML += "<p>If you <span class='skipBonus' onclick='promptEmail()'>enter your email address</span>, you can be notified when your opponent plays a move.</p>";
 	// }
 
-	document.getElementById("helpTextContent").innerHTML = getTournamentText() 
-		+ document.getElementById("helpTextContent").innerHTML
-		+ getAltTilesOptionText();
+	var message = getTournamentText() 
+		+ document.getElementById("helpTextContent").innerHTML;
+
+	if (gameController.getGameTypeId && gameController.getGameTypeId() === GameType.SkudPaiSho.id) {
+		message += getAltTilesOptionText();
+	}
+
+	document.getElementById("helpTextContent").innerHTML = message;
 }
 
 function haveUserEmail() {
@@ -1228,8 +1233,11 @@ function getGameControllerForGameType(gameTypeId) {
 	    case GameType.SolitairePaiSho.id:
 	        controller = new SolitaireController();
 	        debug("You're playing Solitaire Pai Sho!");
-	        controller.callActuate();
 	        break;
+	    case GameType.CapturePaiSho.id:
+	    	controller = new CaptureController();
+	    	debug("You're playing Capture Pai Sho!");
+	    	break;
 	    default:
 	        debug("Defaulting to use Skud Pai Sho.");
 	        controller = new SkudPaiShoController();
@@ -1249,6 +1257,9 @@ function setGameController(gameTypeId) {
 	closeModal();
 	
 	gameController = getGameControllerForGameType(gameTypeId);
+	if (gameController.completeSetup) {
+		gameController.completeSetup();
+	}
 
 	// New game stuff:
 	currentGameData.gameTypeId = gameTypeId;
@@ -1454,7 +1465,7 @@ function emailNotificationsCheckboxClicked() {
 }
 
 function showAccountSettings() {
-	var message = "";
+	var message = "Note: Email notifications are not working right now. Maybe in the future they will be back.<br />";
 
 	message += "<div><input id='emailNotificationsCheckbox' type='checkbox' onclick='emailNotificationsCheckboxClicked();'>Email Notifications</div>";
 
@@ -1712,6 +1723,10 @@ function newGameClicked() {
 	var message = getNewGameEntryForGameType(GameType.SkudPaiSho);
 	message += getNewGameEntryForGameType(GameType.VagabondPaiSho);
 	message += getNewGameEntryForGameType(GameType.SolitairePaiSho);
+
+	if (!onlinePlayEnabled) {
+		message += getNewGameEntryForGameType(GameType.CapturePaiSho);
+	}
 
 	showModal("New Game", message);
 }

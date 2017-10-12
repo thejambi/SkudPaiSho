@@ -53,7 +53,7 @@ SolitaireActuator.prototype.htmlify = function(board, theGame, drawnTile) {
 	// });
 
 	// Add the randomTileContainer... wherever that tile comes from
-	if (!theGame.getWinner()) {
+	if (!theGame.getWinner() && drawnTile) {
 		this.addTile(drawnTile);
 	}
 };

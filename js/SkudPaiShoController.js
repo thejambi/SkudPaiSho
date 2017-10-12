@@ -14,6 +14,10 @@ function SkudPaiShoController() {
 	this.guestAccentTiles = [];
 }
 
+SkudPaiShoController.prototype.getGameTypeId = function() {
+	return GameType.SkudPaiSho.id;
+};
+
 SkudPaiShoController.prototype.resetGameManager = function() {
 	this.theGame = new SkudPaiShoGameManager();
 };

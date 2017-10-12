@@ -14,6 +14,10 @@ function VagabondController() {
 	this.guestAccentTiles = [];
 }
 
+VagabondController.prototype.getGameTypeId = function() {
+	return GameType.VagabondPaiSho.id;
+};
+
 VagabondController.prototype.resetGameManager = function() {
 	this.theGame = new VagabondGameManager();
 };

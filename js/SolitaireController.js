@@ -7,7 +7,6 @@ function SolitaireController() {
 
 	this.showGameMessageUnderneath = true;
 
-
 	this.resetGameNotation();	// First
 
 	this.resetGameManager();
@@ -18,6 +17,14 @@ function SolitaireController() {
 
 	this.drawRandomTile();
 }
+
+SolitaireController.prototype.getGameTypeId = function() {
+	return GameType.SolitairePaiSho.id;
+};
+
+SolitaireController.prototype.completeSetup = function() {
+	this.callActuate();
+};
 
 SolitaireController.prototype.drawRandomTile = function() {
 	this.lastDrawnTile = this.drawnTile;
