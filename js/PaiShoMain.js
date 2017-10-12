@@ -1723,10 +1723,7 @@ function newGameClicked() {
 	var message = getNewGameEntryForGameType(GameType.SkudPaiSho);
 	message += getNewGameEntryForGameType(GameType.VagabondPaiSho);
 	message += getNewGameEntryForGameType(GameType.SolitairePaiSho);
-
-	if (!onlinePlayEnabled) {
-		message += getNewGameEntryForGameType(GameType.CapturePaiSho);
-	}
+	message += getNewGameEntryForGameType(GameType.CapturePaiSho) + " (beta)";
 
 	showModal("New Game", message);
 }
