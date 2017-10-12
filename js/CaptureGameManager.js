@@ -109,7 +109,7 @@ CaptureGameManager.prototype.getWinReason = function() {
 CaptureGameManager.prototype.getWinResultTypeCode = function() {
 	if (this.board.winners.length === 1) {
 		return 7;	// Capture Pai Sho win is 7
-	} else if (this.endGameWinners.length > 1) {
+	} else {
 		return 4;	// Tie
 	}
 };

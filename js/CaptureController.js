@@ -78,9 +78,13 @@ CaptureController.prototype.getDefaultHelpMessageText = function() {
 	return "<h4>Capture Pai Sho</h4> <p>Coming soon! Select tiles to learn more or <a href='https://skudpaisho.wordpress.com/more/capture-pai-sho/' target='_blank'>view the rules</a>.</p>";
 };
 
+CaptureController.prototype.endGameNow = function() {
+	onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken());
+};
+
 CaptureController.prototype.getAdditionalMessage = function() {
-	var msg = "";
-	
+	var msg = "<span class='clickableText' onclick='gameController.endGameNow();'>End this game.</span>";
+
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
 			msg += "<strong>Real-time gameplay is enabled!</strong> Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
