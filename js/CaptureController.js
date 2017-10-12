@@ -75,7 +75,7 @@ CaptureController.prototype.resetMove = function() {
 };
 
 CaptureController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Capture Pai Sho</h4> <p>Select tiles to learn more or <a href='https://skudpaisho.wordpress.com/more/capture-pai-sho/' target='_blank'>view the rules</a>.</p>";
+	return "<h4>Capture Pai Sho</h4> <p>Coming soon! Select tiles to learn more or <a href='https://skudpaisho.wordpress.com/more/capture-pai-sho/' target='_blank'>view the rules</a>.</p>";
 };
 
 CaptureController.prototype.getAdditionalMessage = function() {
@@ -102,48 +102,6 @@ CaptureController.prototype.showHarmonyBonusMessage = function() {
 
 CaptureController.prototype.unplayedTileClicked = function(tileDiv) {
 	/* Tiles are all on the board for Capture Pai Sho */
-
-	// if (this.theGame.board.winners.length > 0 && this.notationBuilder.status !== READY_FOR_BONUS) {
-	// 	return;
-	// }
-	// if (!myTurn()) {
-	// 	return;
-	// }
-	// if (currentMoveIndex !== this.gameNotation.moves.length) {
-	// 	debug("Can only interact if all moves are played.");
-	// 	return;
-	// }
-
-	// var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
-	// var tileId = parseInt(tileDiv.getAttribute("id"));
-	// var playerCode = divName.charAt(0);
-	// var tileCode = divName.substring(1);
-
-	// var player = GUEST;
-	// if (playerCode === 'H') {
-	// 	player = HOST;
-	// }
-
-	// var tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
-
-	// if (tile.ownerName !== getCurrentPlayer()) {
-	// 	// debug("That's not your tile!");
-	// 	return;
-	// }
-
-	// if (this.notationBuilder.status === BRAND_NEW) {
-	// 	// new Deploy turn
-	// 	tile.selectedFromPile = true;
-
-	// 	this.notationBuilder.moveType = DEPLOY;
-	// 	this.notationBuilder.tileType = tileCode;
-	// 	this.notationBuilder.status = WAITING_FOR_ENDPOINT;
-
-	// 	this.theGame.revealDeployPoints(getCurrentPlayer(), tileCode);
-	// } else {
-	// 	this.theGame.hidePossibleMovePoints();
-	// 	this.resetNotationBuilder();
-	// }
 }
 
 CaptureController.prototype.pointClicked = function(htmlPoint) {

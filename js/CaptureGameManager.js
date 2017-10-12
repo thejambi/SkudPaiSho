@@ -37,7 +37,10 @@ CaptureGameManager.prototype.runNotationMove = function(move, withActuate) {
 	debug("Running Move: " + move.fullMoveText);
 
 	if (move.moveType === MOVE) {
-		this.board.moveTile(move.player, move.startPoint, move.endPoint);
+		var capturedTile = this.board.moveTile(move.player, move.startPoint, move.endPoint);
+		if (capturedTile) {
+			this.tileManager.putTileBack(capturedTile);
+		}
 	} else if (INITIAL_SETUP) {
 		var tileList = [];
 		// convert move.initialTileCodeList into tileList. Grab all tiles

@@ -103,15 +103,15 @@ CaptureTileManager.prototype.unselectTiles = function(player) {
 	});
 }
 
-// CaptureTileManager.prototype.putTileBack = function(tile) {
-// 	var player = tile.ownerName;
-// 	var tilePile = this.hostTiles;
-// 	if (player === GUEST) {
-// 		tilePile = this.guestTiles;
-// 	}
+CaptureTileManager.prototype.putTileBack = function(tile) {
+	var player = tile.ownerName;
+	var tilePile = this.hostTiles;
+	if (player === GUEST) {
+		tilePile = this.guestTiles;
+	}
 
-// 	tilePile.push(tile);
-// };
+	tilePile.push(tile);
+};
 
 CaptureTileManager.prototype.getCopy = function() {
 	var copy = new CaptureTileManager();

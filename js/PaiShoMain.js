@@ -1723,9 +1723,7 @@ function newGameClicked() {
 	var message = getNewGameEntryForGameType(GameType.SkudPaiSho);
 	message += getNewGameEntryForGameType(GameType.VagabondPaiSho);
 	message += getNewGameEntryForGameType(GameType.SolitairePaiSho);
-	if (getUsername() === 'SkudPaiSho' || getUsername() === 'TimeLoad' || getUsername() === 'Zach') {
-		message += getNewGameEntryForGameType(GameType.CapturePaiSho);
-	}
+	message += getNewGameEntryForGameType(GameType.CapturePaiSho);
 
 	showModal("New Game", message);
 }

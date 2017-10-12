@@ -466,14 +466,21 @@ CaptureBoard.prototype.moveTile = function(player, notationPointStart, notationP
 		debug("Error: No tile to move!");
 	}
 
-	// If tile is capturing a White Lotus, there's a winner
-	if (boardPointEnd.hasTile() && boardPointEnd.tile.code === 'L' && tile.ownerName !== boardPointEnd.tile.ownerName) {
-		this.winners.push(tile.ownerName);
+	// // If tile is capturing a White Lotus, there's a winner
+	// if (boardPointEnd.hasTile() && boardPointEnd.tile.code === 'L' && tile.ownerName !== boardPointEnd.tile.ownerName) {
+	// 	this.winners.push(tile.ownerName);
+	// }
+
+	var capturedTile;
+	if (boardPointEnd.hasTile()) {
+		capturedTile = boardPointEnd.removeTile();
 	}
 
 	boardPointEnd.putTile(tile);
 
 	this.setPointFlags();
+
+	return capturedTile;
 };
 
 CaptureBoard.prototype.setPointFlags = function() {
@@ -507,6 +514,20 @@ CaptureBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, bo
 		return false;
 	}
 
+	var canCapture = false;
+	if (boardPointEnd.hasTile()) {
+		canCapture = this.canCapture(boardPointStart, boardPointEnd);
+	}
+
+	// If endpoint has a tile there that can't be captured, that is wrong.
+	if (boardPointEnd.hasTile() && !canCapture) {
+		return false;
+	}
+
+	// Jumping
+	if (this.canJump(boardPointStart, boardPointEnd)) {
+		return true;
+	}
 
 	// Normal tile movement:
 	// If endpoint is too far away, that is wrong. Multiply by 2 to account for longest possible diagonal move.
@@ -515,16 +536,6 @@ CaptureBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, bo
 		// end point is too far away, can't move that far
 		return false;
 	} else {
-		var canCapture = false;
-		if (boardPointEnd.hasTile()) {
-			canCapture = this.canCapture(boardPointStart, boardPointEnd);
-		}
-
-		// If endpoint has a tile there that can't be captured, that is wrong.
-		if (boardPointEnd.hasTile() && !canCapture) {
-			return false;
-		}
-
 		// Move may be possible. But there may be tiles in the way...
 		if (!this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves)) {
 			return false;
@@ -533,6 +544,77 @@ CaptureBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, bo
 
 	// I guess we made it through
 	return true;
+};
+
+CaptureBoard.prototype.pointsHaveFriendlyTiles = function(bp1, bp2) {
+	return bp1.hasTile() 
+		&& bp2.hasTile()
+		&& bp1.tile.ownerCode === bp2.tile.ownerCode;
+};
+
+CaptureBoard.prototype.canJump = function(boardPointStart, boardPointEnd) {
+	// Note: Assume can capture target point tile, or target point empty
+
+	var startRow = boardPointStart.row;
+	var endRow = boardPointEnd.row;
+	var startCol = boardPointStart.col;
+	var endCol = boardPointEnd.col;
+
+	if ((startCol === endCol && Math.abs(startRow - endRow) === 2)
+		|| (startRow === endRow && Math.abs(startCol - endCol) === 2)
+		|| (Math.abs(boardPointStart.row - boardPointEnd.row) === 1
+			&& Math.abs(boardPointStart.col - boardPointEnd.col) === 1)) {
+		
+		if (endRow > startRow) {
+			// Jumping to higher number row (down)
+			if (this.pointsHaveFriendlyTiles(boardPointStart, this.cells[startRow + 1][startCol])) {
+				return true;
+			}
+		} else if (endRow < startRow) {
+			// Jumping to lower number row (up)
+			if (this.pointsHaveFriendlyTiles(boardPointStart, this.cells[startRow - 1][startCol])) {
+				return true;
+			}
+		}
+
+		if (endCol > startCol) {
+			// Jumping to higher number col (right)
+			if (this.pointsHaveFriendlyTiles(boardPointStart, this.cells[startRow][startCol + 1])) {
+				return true;
+			}
+		} else if (endCol < startCol) {
+			// Jumping to lower number col (left)
+			if (this.pointsHaveFriendlyTiles(boardPointStart, this.cells[startRow][startCol - 1])) {
+				return true;
+			}
+		}
+	} else if (Math.abs(boardPointStart.row - boardPointEnd.row) === 2
+		&& Math.abs(boardPointStart.col - boardPointEnd.col) === 2) {
+		// Row and Col both 2 away, so it's a possible jump along a diagonal
+		if (endRow > startRow && endCol > startCol && this.onUpLeftDiagonal(boardPointStart)) {
+			// Jumping to higher number row (down) and higher col (right)
+			if (this.pointsHaveFriendlyTiles(boardPointStart, this.cells[startRow + 1][startCol + 1])) {
+				return true;
+			}
+		} else if (endRow < startRow && endCol > startCol && this.onUpRightDiagonal(boardPointStart)) {
+			// Jumping to lower number row (up) and higher col (right)
+			if (this.pointsHaveFriendlyTiles(boardPointStart, this.cells[startRow - 1][startCol + 1])) {
+				return true;
+			}
+		} else if (endRow > startRow && endCol < startCol && this.onUpRightDiagonal(boardPointStart)) {
+			// Jumping to higher number row (down) and lower col (left)
+			if (this.pointsHaveFriendlyTiles(boardPointStart, this.cells[startRow + 1][startCol - 1])) {
+				return true;
+			}
+		} else if (endRow < startRow && endCol < startCol && this.onUpLeftDiagonal(boardPointStart)) {
+			// Jumping to lower number row (up) and lower col (left)
+			if (this.pointsHaveFriendlyTiles(boardPointStart, this.cells[startRow - 1][startCol - 1])) {
+				return true;
+			}
+		}
+	}
+
+	return false;
 };
 
 CaptureBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {
