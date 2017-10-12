@@ -9,6 +9,8 @@ var ARRANGING = "Arranging";
 
 var DEPLOY = "Deploy";
 var MOVE = "Move";
+
+var INITIAL_SETUP = "Initial Setup";
 // -----------------------------
 
 function RowAndColumn(row, col) {
@@ -22,6 +24,10 @@ function RowAndColumn(row, col) {
 
 RowAndColumn.prototype.samesies = function(other) {
 	return this.row === other.row && this.col === other.col;
+};
+
+RowAndColumn.prototype.getNotationPoint = function() {
+	return new NotationPoint(this.notationPointString);
 };
 
 // --------------------------------------------- // 
