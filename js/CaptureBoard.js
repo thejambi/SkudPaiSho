@@ -851,6 +851,7 @@ CaptureBoard.prototype.getPlayerTilesOnBoard = function(ownerName) {
 			}
 		});
 	});
+	return playerTiles;
 };
 
 CaptureBoard.prototype.checkForEndOfGame = function() {
