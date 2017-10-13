@@ -842,20 +842,40 @@ CaptureBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 	});
 };
 
-CaptureBoard.prototype.revealBoatBonusPoints = function(boardPoint) {
-	if (!boardPoint.hasTile()) {
-		return;
-	}
-	// Apply "possible move point" type to applicable boardPoints
-	var player = boardPoint.tile.ownerName;
-	for (var row = 0; row < this.cells.length; row++) {
-		for (var col = 0; col < this.cells[row].length; col++) {
-			var boardPointEnd = this.cells[row][col];
-			if (Math.abs(boardPoint.row - boardPointEnd.row) + Math.abs(boardPoint.col - boardPointEnd.col) === 1) {
-				if (this.canMoveTileToPoint(player, boardPoint, boardPointEnd)) {
-					boardPointEnd.addType(POSSIBLE_MOVE);
-				}
+CaptureBoard.prototype.getPlayerTilesOnBoard = function(ownerName) {
+	var playerTiles = [];
+	this.cells.forEach(function(row) {
+		row.forEach(function(boardPoint) {
+			if (boardPoint.hasTile() && boardPoint.tile.ownerName === ownerName) {
+				playerTiles.push(boardPoint);
 			}
+		});
+	});
+};
+
+CaptureBoard.prototype.checkForEndOfGame = function() {
+	// Check each player's tiles remaining on the board. All gone? No more captures possible?
+	var hostTiles = this.getPlayerTilesOnBoard(HOST);
+	var guestTiles = this.getPlayerTilesOnBoard(GUEST);
+
+	if (hostTiles.length === 0) {
+		this.winners.push(GUEST);
+	} else if (guestTiles.length === 0) {
+		this.winners.push(HOST);
+	} else {
+		var hostCannotCapture = this.playerCannotCaptureAny(hostTiles, guestTiles);
+		var guestCannotCapture = this.playerCannotCaptureAny(guestTiles, hostTiles);
+		if (hostCannotCapture || guestCannotCapture) {
+			// Most remaining tiles wins
+			// Checking >= and not using else to handle tie situation, if that's possible
+			if (hostTiles.length >= guestTiles.length) {
+				this.winners.push(HOST);
+			}
+			if (guestTiles.length >= hostTiles.length) {
+				this.winners.push(GUEST);
+			}
+		} else {
+			// Host or Guest can still capture
 		}
 	}
 };

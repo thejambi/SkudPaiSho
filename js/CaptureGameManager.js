@@ -40,6 +40,9 @@ CaptureGameManager.prototype.runNotationMove = function(move, withActuate) {
 		var capturedTile = this.board.moveTile(move.player, move.startPoint, move.endPoint);
 		if (capturedTile) {
 			this.tileManager.putTileBack(capturedTile);
+
+			// Analyze board for end of game conditions
+			this.board.checkForEndOfGame();
 		}
 	} else if (INITIAL_SETUP) {
 		var tileList = [];
@@ -91,14 +94,11 @@ CaptureGameManager.prototype.revealPossiblePlacementPoints = function(tile) {
 	this.actuate();
 };
 
-CaptureGameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
-	this.board.revealBoatBonusPoints(boardPoint);
-	this.actuate();
-};
-
 CaptureGameManager.prototype.getWinner = function() {
 	if (this.board.winners.length === 1) {
 		return this.board.winners[0];
+	} else if (this.board.winners.length > 1) {
+		return "BOTH players";
 	}
 };
 
