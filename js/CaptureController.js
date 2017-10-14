@@ -140,7 +140,7 @@ CaptureController.prototype.pointClicked = function(htmlPoint) {
 			this.flagCaptureHelp(boardPoint);
 			this.flagCapturedByHelp(boardPoint);
 
-			if (boardPoint.tile.ownerName !== getCurrentPlayer()) {
+			if (boardPoint.tile.ownerName !== getCurrentPlayer() || !myTurn()) {
 				debug("That's not your tile!");
 				this.callActuate();
 				return;
