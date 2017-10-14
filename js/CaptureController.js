@@ -205,7 +205,7 @@ CaptureController.prototype.getTheMessage = function(tile, ownerName) {
 
 	var tileCode = tile.code;
 
-	var heading = CaptureTile.getTileName(tileCode);
+	var heading = ownerName + "'s " + CaptureTile.getTileName(tileCode);
 
 	message.push(this.getCommonHelpMessageChunk());
 
