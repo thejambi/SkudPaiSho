@@ -141,6 +141,9 @@ CaptureActuator.prototype.addBoardPoint = function(boardPoint) {
 		if (boardPoint.tile.captureHelpFlag) {
 			theDiv.classList.add("GUESTharmony");
 		}
+		if (boardPoint.tile.capturedByHelpFlag) {
+			theDiv.classList.add("HOSTharmony");
+		}
 		// if (boardPoint.tile.drained || boardPoint.tile.trapped) {
 		// 	theDiv.classList.add("drained");
 		// }

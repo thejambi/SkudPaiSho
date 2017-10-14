@@ -54,20 +54,30 @@ CaptureTile.prototype.getCopy = function() {
 CaptureTile.getTileName = function(tileCode) {
 	var name = "";
 	
-	if (tileCode === 'L') {
-		name = "White Lotus";
-	} else if (tileCode === 'S') {
-		name = "Sky Bison";
+	if (tileCode === 'A') {
+		name = "Dai Li Agent";
+	} else if (tileCode === 'V') {
+		name = "Vaatu";
 	} else if (tileCode === 'B') {
-		name = "Badgermole";
-	} else if (tileCode === 'W') {
-		name = "Wheel";
-	} else if (tileCode === 'C') {
-		name = "Chrysanthemum";
+		name = "Flying Boar";
+	} else if (tileCode === 'P') {
+		name = "Piandao";
 	} else if (tileCode === 'F') {
-		name = "Fire Lily";
+		name = "Spirit Oasis Fish";
+	} else if (tileCode === 'U') {
+		name = "Unagi";
+	} else if (tileCode === 'K') {
+		name = "Kyoshi Warrior";
+	} else if (tileCode === 'L') {
+		name = "Lotus";
 	} else if (tileCode === 'D') {
-		name = "White Dragon";
+		name = "Dragon";
+	} else if (tileCode === 'M') {
+		name = "Air Monk";
+	} else if (tileCode === 'T') {
+		name = "Tree of Time";
+	} else if (tileCode === 'O') {
+		name = "Owl Spirit";
 	}
 
 	return name;

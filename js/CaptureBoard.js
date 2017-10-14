@@ -919,19 +919,40 @@ CaptureBoard.prototype.flagPointsTileCanCapture = function(tile) {
 	return flaggedTiles;
 };
 
+CaptureBoard.prototype.flagPointsTileCapturedBy = function(tile) {
+	var flaggedTiles = [];
+
+	this.cells.forEach(function(row) {
+		row.forEach(function(boardPoint) {
+			if (boardPoint.hasTile() && boardPoint.tile.canCapture(tile) && !boardPoint.tile.capturedByHelpFlag) {
+				boardPoint.tile.capturedByHelpFlag = true;
+				flaggedTiles.push(boardPoint.tile.id);
+			}
+		});
+	});
+
+	return flaggedTiles;
+};
+
 CaptureBoard.prototype.clearCaptureHelp = function() {
-	var unflaggedTiles = [];
+	var unflaggedCaptureTiles = [];
+	var unflaggedCapturedByTiles = [];
 
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
 			if (boardPoint.hasTile() && boardPoint.tile.captureHelpFlag) {
 				boardPoint.tile.captureHelpFlag = false;
-				unflaggedTiles.push(boardPoint.tile.id);
+				unflaggedCaptureTiles.push(boardPoint.tile.id);
+			}
+			if (boardPoint.hasTile() && boardPoint.tile.capturedByHelpFlag) {
+				boardPoint.tile.capturedByHelpFlag = false;
+				unflaggedCapturedByTiles.push(boardPoint.tile.id);
 			}
 		});
 	});
 
-	return unflaggedTiles;
+	return {unflaggedCaptureTiles: unflaggedCaptureTiles, 
+			unflaggedCapturedByTiles: unflaggedCapturedByTiles};
 };
 
 // CaptureBoard.prototype.getCopy = function() {

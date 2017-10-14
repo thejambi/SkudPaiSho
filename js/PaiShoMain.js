@@ -886,7 +886,7 @@ function setMessage(msg) {
 	if (msg === document.getElementById("helpTextContent").innerHTML) {
 		clearMessage();
 	} else {
-		document.getElementById("helpTextContent").innerHTML = getTournamentText() + msg + getAltTilesOptionText();
+		document.getElementById("helpTextContent").innerHTML = getTournamentText() + msg;// + getAltTilesOptionText();
 	}
 }
 
