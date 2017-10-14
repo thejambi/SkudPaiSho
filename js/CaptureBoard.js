@@ -847,11 +847,34 @@ CaptureBoard.prototype.getPlayerTilesOnBoard = function(ownerName) {
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
 			if (boardPoint.hasTile() && boardPoint.tile.ownerName === ownerName) {
-				playerTiles.push(boardPoint);
+				playerTiles.push(boardPoint.tile);
 			}
 		});
 	});
 	return playerTiles;
+};
+
+CaptureBoard.prototype.playerCanStillCapture = function(playerTiles, opponentTiles) {
+	// For each player tile, check if it can capture any of opponent's tiles
+	var canCaptureSomething = false;
+
+	playerTiles.forEach(
+		function(playerTile) {
+			opponentTiles.forEach(
+				function(opponentTile) {
+					if (playerTile.canCapture(opponentTile)) {
+						canCaptureSomething = true;
+						return;
+					}
+				}
+			);
+			if (canCaptureSomething) {
+				return;
+			}
+		}
+	);
+
+	return canCaptureSomething;
 };
 
 CaptureBoard.prototype.checkForEndOfGame = function() {
@@ -864,8 +887,8 @@ CaptureBoard.prototype.checkForEndOfGame = function() {
 	} else if (guestTiles.length === 0) {
 		this.winners.push(HOST);
 	} else {
-		var hostCannotCapture = this.playerCannotCaptureAny(hostTiles, guestTiles);
-		var guestCannotCapture = this.playerCannotCaptureAny(guestTiles, hostTiles);
+		var hostCannotCapture = !this.playerCanStillCapture(hostTiles, guestTiles);
+		var guestCannotCapture = !this.playerCanStillCapture(guestTiles, hostTiles);
 		if (hostCannotCapture || guestCannotCapture) {
 			// Most remaining tiles wins
 			// Checking >= and not using else to handle tie situation, if that's possible
@@ -879,6 +902,36 @@ CaptureBoard.prototype.checkForEndOfGame = function() {
 			// Host or Guest can still capture
 		}
 	}
+};
+
+CaptureBoard.prototype.flagPointsTileCanCapture = function(tile) {
+	var flaggedTiles = [];
+
+	this.cells.forEach(function(row) {
+		row.forEach(function(boardPoint) {
+			if (boardPoint.hasTile() && tile.canCapture(boardPoint.tile) && !boardPoint.tile.captureHelpFlag) {
+				boardPoint.tile.captureHelpFlag = true;
+				flaggedTiles.push(boardPoint.tile.id);
+			}
+		});
+	});
+
+	return flaggedTiles;
+};
+
+CaptureBoard.prototype.clearCaptureHelp = function() {
+	var unflaggedTiles = [];
+
+	this.cells.forEach(function(row) {
+		row.forEach(function(boardPoint) {
+			if (boardPoint.hasTile() && boardPoint.tile.captureHelpFlag) {
+				boardPoint.tile.captureHelpFlag = false;
+				unflaggedTiles.push(boardPoint.tile.id);
+			}
+		});
+	});
+
+	return unflaggedTiles;
 };
 
 // CaptureBoard.prototype.getCopy = function() {

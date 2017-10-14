@@ -126,7 +126,7 @@ CaptureActuator.prototype.addBoardPoint = function(boardPoint) {
 			theDiv.setAttribute("ontouchstart", "pointClicked(this); showPointMessage(this);");
 		} else {
 			theDiv.setAttribute("onclick", "pointClicked(this);");
-			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
+			theDiv.setAttribute("onmouseover", "showPointMessage(this); gameController.showCaptureHelpOnHover(this);");
 			theDiv.setAttribute("onmouseout", "clearMessage();");
 		}
 	}
@@ -138,9 +138,9 @@ CaptureActuator.prototype.addBoardPoint = function(boardPoint) {
 
 		theImg.src = "capture/images/" + boardPoint.tile.getImageName() + ".png";
 		
-		// if (boardPoint.tile.inHarmony) {
-		// 	theDiv.classList.add(boardPoint.tile.ownerName + "harmony");
-		// }
+		if (boardPoint.tile.captureHelpFlag) {
+			theDiv.classList.add("GUESTharmony");
+		}
 		// if (boardPoint.tile.drained || boardPoint.tile.trapped) {
 		// 	theDiv.classList.add("drained");
 		// }

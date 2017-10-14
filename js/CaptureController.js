@@ -83,7 +83,7 @@ CaptureController.prototype.endGameNow = function() {
 };
 
 CaptureController.prototype.getAdditionalMessage = function() {
-	var msg = "<span class='clickableText' onclick='gameController.endGameNow();'>End this game.</span>";
+	var msg = "";//"<span class='clickableText' onclick='gameController.endGameNow();'>End this game.</span>";
 
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
@@ -109,6 +109,9 @@ CaptureController.prototype.unplayedTileClicked = function(tileDiv) {
 }
 
 CaptureController.prototype.pointClicked = function(htmlPoint) {
+	if (this.clearCaptureHelp()) {
+		this.callActuate();
+	}
 	if (this.theGame.board.winners.length > 0) {
 		return;
 	}
@@ -128,8 +131,11 @@ CaptureController.prototype.pointClicked = function(htmlPoint) {
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
+			this.flagCaptureHelp(boardPoint);
+
 			if (boardPoint.tile.ownerName !== getCurrentPlayer()) {
 				debug("That's not your tile!");
+				this.callActuate();
 				return;
 			}
 
@@ -138,6 +144,10 @@ CaptureController.prototype.pointClicked = function(htmlPoint) {
 			this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
 			this.theGame.revealPossibleMovePoints(boardPoint);
+		} else {
+			if (this.clearCaptureHelp()) {
+				this.callActuate();
+			}
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
@@ -291,4 +301,43 @@ CaptureController.prototype.isSolitaire = function() {
 CaptureController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 };
+
+/* Capture Pai Sho specific methods */
+CaptureController.prototype.flagCaptureHelp = function(boardPoint) {
+	if (boardPoint.hasTile()) {
+		var selectedTile = boardPoint.tile;
+		return this.theGame.board.flagPointsTileCanCapture(selectedTile);
+	}
+	return [];
+};
+
+CaptureController.prototype.clearCaptureHelp = function() {
+	return this.theGame.board.clearCaptureHelp();
+};
+
+CaptureController.prototype.showCaptureHelpOnHover = function(htmlPoint) {
+	if (this.notationBuilder.status === BRAND_NEW) {
+		var clearedTiles = this.clearCaptureHelp();
+
+		var npText = htmlPoint.getAttribute("name");
+
+		var notationPoint = new NotationPoint(npText);
+		var rowCol = notationPoint.rowAndColumn;
+		var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+		var flaggedTiles = [];
+		if (boardPoint.hasTile()) {
+			flaggedTiles = this.flagCaptureHelp(boardPoint);
+		}
+
+		if (!(clearedTiles.length === 0 && flaggedTiles.length === 0)
+			&& !clearedTiles.equals(flaggedTiles)) {
+			this.callActuate();
+		}
+	}
+};
+
+
+
+
 
