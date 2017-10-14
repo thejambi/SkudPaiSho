@@ -121,9 +121,9 @@ CaptureController.prototype.pointClicked = function(htmlPoint) {
 	if (this.theGame.board.winners.length > 0) {
 		return;
 	}
-	if (!myTurn()) {
-		return;
-	}
+	// if (!myTurn()) {
+	// 	return;
+	// }
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
 		return;
