@@ -313,9 +313,8 @@ CaptureController.prototype.showCaptureHelpOnHover = function(htmlPoint) {
 			flaggedCapturedByTiles = this.flagCapturedByHelp(boardPoint);
 		}
 
-		if (!(clearedTiles.length === 0 && flaggedTiles.length === 0 && flaggedCapturedByTiles.length === 0)
-			&& !clearedTiles.unflaggedCaptureTiles.equals(flaggedTiles)
-			&& !clearedTiles.unflaggedCapturedByTiles.equals(flaggedCapturedByTiles)) {
+		if (!(clearedTiles.unflaggedCaptureTiles.length === 0 && clearedTiles.unflaggedCapturedByTiles.length === 0 && flaggedTiles.length === 0 && flaggedCapturedByTiles.length === 0)
+			&& (!clearedTiles.unflaggedCaptureTiles.equals(flaggedTiles) || !clearedTiles.unflaggedCapturedByTiles.equals(flaggedCapturedByTiles))) {
 			this.callActuate();
 		}
 	}
