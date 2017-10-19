@@ -541,6 +541,9 @@ function getAdditionalMessage() {
 		// There is a winner!
 		msg += "<br /><strong>" + gameController.theGame.getWinner() + gameController.theGame.getWinReason() + "</strong>";
 	}
+	if (msg === "<br />") {
+		msg = "";
+	}
 	return msg;
 }
 
