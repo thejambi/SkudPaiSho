@@ -771,7 +771,7 @@ SkudPaiShoBoard.prototype.drainTilesSurroundingPointIfNeeded = function(boardPoi
 
 	for (var i = 0; i < rowCols.length; i++) {
 		var bp = this.cells[rowCols[i].row][rowCols[i].col];
-		if (bp.hasTile()) {
+		if (bp.hasTile() && !bp.isType(GATE) && bp.tile.type !== ACCENT_TILE && bp.tile.specialFlowerType !== ORCHID) {
 			bp.tile.drained = true;
 		}
 	}
