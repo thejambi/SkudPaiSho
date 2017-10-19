@@ -475,7 +475,7 @@ SkudPaiShoController.prototype.getTileMessage = function(tileDiv) {
 		} else if (tileCode === 'O') {
 			heading = "Special Flower: Orchid";
 			message.push("Can move up to 6 spaces");
-			message.push("Traps opponent's surrounding Flower Tiles so they cannot move");
+			message.push("Traps opponent's surrounding Blooming Flower Tiles so they cannot move");
 			if (!simplest) {
 				message.push("Can capture Flower Tiles if you have a Blooming White Lotus");
 			}
