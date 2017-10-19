@@ -889,7 +889,7 @@ CaptureBoard.prototype.checkForEndOfGame = function() {
 	} else {
 		var hostCannotCapture = !this.playerCanStillCapture(hostTiles, guestTiles);
 		var guestCannotCapture = !this.playerCanStillCapture(guestTiles, hostTiles);
-		if (hostCannotCapture || guestCannotCapture) {
+		if (hostCannotCapture && guestCannotCapture) {
 			// Most remaining tiles wins
 			// Checking >= and not using else to handle tie situation, if that's possible
 			if (hostTiles.length >= guestTiles.length) {
