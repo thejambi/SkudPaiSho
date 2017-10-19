@@ -653,6 +653,10 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 			for (var i = 0; i < aiList.length; i++) {
 				messageText += "<br /><span class='skipBonus' onclick='setAiIndex(" + i + ");'>Play " + aiList[i].getName() + "</span>";
 			}
+			if (aiList.length > 1) {
+				messageText += "<br /><span class='skipBonus' onclick='goai();'>AI vs AI</span>";
+			}
+			messageText += "<br />";
 		}
 	} else if (haveBothEmails()) {
 		// messageText = "Click <span class='skipBonus' onclick=sendMail('" + shortUrl + "')>here</span> to email your move to the " + getCurrentPlayer() + ". Or, share this <a href=\"" + shortUrl + "\">link</a> with them.";
@@ -1869,4 +1873,11 @@ function showPrivacyPolicy() {
 
 function dismissChatAlert() {
 	document.getElementById('chatTab').classList.remove('alertTab');
+}
+
+function goai() {
+	if (gameController.getAiList().length > 1) {
+		setAiIndex(0);
+		setAiIndex(1);
+	}
 }
