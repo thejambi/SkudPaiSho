@@ -559,6 +559,10 @@ function getGameMessageElement() {
 
 function refreshMessage() {
 	getGameMessageElement().innerHTML = "Current Player: " + getCurrentPlayer() + getAdditionalMessage();
+
+	if (playingOnlineGame() && !myTurn() && !gameController.theGame.getWinner()) {
+		showResetMoveMessage();
+	}
 }
 
 function rerunAll() {
