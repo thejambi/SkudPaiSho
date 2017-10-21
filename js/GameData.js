@@ -27,13 +27,26 @@ var useHLoweTiles = false;
 
 var debugOn = true;
 
+/* Set to true if building for iOS, else set to false */
+var ios = false;
+
 /* Testing */
 var onlinePlayEnabled = false;
 /* */
 
 function debug(str) {
     if (debugOn) {
-        console.log(str);
+      if (ios) {
+        try {
+          webkit.messageHandlers.callbackHandler.postMessage(
+              "{debugMessage:" + str + "}"
+          );
+        } catch(err) {
+            console.log('error');
+        }
+      }
+      
+      console.log(str);
     }
 }
 
