@@ -41,7 +41,7 @@ OnlinePlayEngine.prototype.verifyLogin = function(userId, username, userEmail, d
         },
         function(data, status){
             if (status === 'success') {
-                callback(data.trim() === "Results exist");
+                callback(data.trim());
             }
         }
     );
@@ -54,11 +54,7 @@ OnlinePlayEngine.prototype.sendVerificationCode = function(username, userEmail, 
             toEmail: userEmail
         },
         function(data, status){
-            if (status === 'success') {
-                callback("Verification code sent to " + userEmail);
-            } else {
-                callback("Failed to send verification code, please try again.");
-            }
+            callback(data.trim());
         }
     );
 };
@@ -100,7 +96,7 @@ OnlinePlayEngine.prototype.createDeviceIdForUser = function(userId, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.logOnlineStatus = function(loginToken) {
+OnlinePlayEngine.prototype.logOnlineStatus = function(loginToken, callback) {
     $.post("logOnlineStatus.php",
         {
             userId: loginToken.userId,
@@ -261,7 +257,7 @@ OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, login
     );
 };
 
-OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, resultTypeCode, loginToken) {
+OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, resultTypeCode, loginToken, callback) {
     $.post("updateGameWinInfo.php",
         {
             gameId: gameId,
@@ -280,7 +276,7 @@ OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, 
     );
 };
 
-OnlinePlayEngine.prototype.updateGameWinInfoAsTie = function(gameId, resultTypeCode, loginToken) {
+OnlinePlayEngine.prototype.updateGameWinInfoAsTie = function(gameId, resultTypeCode, loginToken, callback) {
     $.post("updateGameWinInfoAsTie.php",
         {
             gameId: gameId,
@@ -298,7 +294,7 @@ OnlinePlayEngine.prototype.updateGameWinInfoAsTie = function(gameId, resultTypeC
     );
 };
 
-OnlinePlayEngine.prototype.getGameTypeDesc = function(gameTypeId) {
+OnlinePlayEngine.prototype.getGameTypeDesc = function(gameTypeId, callback) {
     $.get("getGameTypeDesc.php?q="+gameTypeId, 
         function(data, status){
             if (status === 'success') {
@@ -346,7 +342,7 @@ OnlinePlayEngine.prototype.getInitialGlobalChatMessages = function(callback) {
     );
 };
 
-OnlinePlayEngine.prototype.notifyUser = function(username) {
+OnlinePlayEngine.prototype.notifyUser = function(username, callback) {
     $.post("notifyUser.php", 
         {
             username: username
@@ -370,7 +366,7 @@ OnlinePlayEngine.prototype.getEmailNotificationsSetting = function(userId, callb
 };
 
 // TODO change to 'updatePreference' and pass in the preference type id
-OnlinePlayEngine.prototype.updateEmailNotificationsSetting = function(userId, value) {
+OnlinePlayEngine.prototype.updateEmailNotificationsSetting = function(userId, value, callback) {
     $.post("updateEmailNotificationsSetting.php", 
         {
             userId: userId, 

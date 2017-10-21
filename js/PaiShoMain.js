@@ -119,7 +119,7 @@ window.requestAnimationFrame(function () {
 		url = "http://skudpaisho.com/";
 	}
 
-	if (url.startsWith("file")) {
+	if (url.startsWith("file") && !ios) {
 		onlinePlayEnabled = false;
 	}
 
@@ -134,6 +134,10 @@ window.requestAnimationFrame(function () {
 	}
 
 	onlinePlayEngine = new OnlinePlayEngine();
+
+	if (ios) {
+		onlinePlayEngine = new OnlinePlayEngineIOS();
+	}
 
 	defaultEmailMessageText = document.querySelector(".footer").innerHTML;
 
@@ -191,14 +195,8 @@ function setTileContainers() {
 	document.getElementById('guestTilesContainer').innerHTML = gameController.getGuestTilesContainerDivs();
 }
 
-function initialVerifyLogin() {
-	if (onlinePlayEnabled) {
-		onlinePlayEngine.verifyLogin(getUserId(), 
-			getUsername(), 
-			getUserEmail(), 
-			getDeviceId(), 
-			function(isVerified) {
-				if (isVerified) {
+var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
+				if (response === "Results exist") {
 					startLoggingOnlineStatus();
 					startWatchingNumberOfGamesWhereUserTurn();
 				} else {
@@ -206,10 +204,28 @@ function initialVerifyLogin() {
 					forgetCurrentGameInfo();
 					forgetOnlinePlayInfo();
 				}
-			}
+			};
+
+function initialVerifyLogin() {
+	if (onlinePlayEnabled) {
+		onlinePlayEngine.verifyLogin(getUserId(), 
+			getUsername(), 
+			getUserEmail(), 
+			getDeviceId(), 
+			initialVerifyLoginCallback
 		);
 	}
 }
+
+var verifyLoginCallback = function verifyLoginCallback(response) {
+				if (response === "Results exist") {
+					// ok
+				} else {
+					// Cannot verify user login, forget all current stuff.
+					forgetCurrentGameInfo();
+					forgetOnlinePlayInfo();
+				}
+			};
 
 function verifyLogin() {
 	if (onlinePlayEnabled) {
@@ -217,15 +233,7 @@ function verifyLogin() {
 			getUsername(), 
 			getUserEmail(), 
 			getDeviceId(), 
-			function(isVerified) {
-				if (isVerified) {
-					// ok
-				} else {
-					// Cannot verify user login, forget all current stuff.
-					forgetCurrentGameInfo();
-					forgetOnlinePlayInfo();
-				}
-			}
+			verifyLoginCallback
 		);
 	}
 }
@@ -243,7 +251,7 @@ function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 	document.getElementById('accountHeaderLinkText').innerText = text;
 }
 
-var getGameNotationCallback = function(newGameNotation) {
+var getGameNotationCallback = function getGameNotationCallback(newGameNotation) {
 	if (gameWatchIntervalValue && newGameNotation !== lastKnownGameNotation) {
 		// gameController.gameNotation.setNotationText(newGameNotation);
 		gameController.setGameNotation(newGameNotation);
@@ -282,67 +290,67 @@ function updateCurrentGameTitle(isOpponentOnline) {
 
 var lastChatTimestamp = '1970-01-01 00:00:00';
 
+var checkIfUserOnlineCallback = function checkIfUserOnlineCallback(isOpponentOnline) {
+	updateCurrentGameTitle(isOpponentOnline);
+};
+
+var getNewChatMessagesCallback = function getNewChatMessagesCallback(results) {
+	if (results != "") {
+		var resultRows = results.split('\n');
+
+		chatMessageList = [];
+		var newChatMessagesHtml = "";
+
+		for (var index in resultRows) {
+			var row = resultRows[index].split('|||');
+			var chatMessage = {
+				timestamp:row[0], 
+				username:row[1], 
+				message:row[2]
+			};
+			chatMessageList.push(chatMessage);
+			lastChatTimestamp = chatMessage.timestamp;
+		}
+
+		var alertNewMessages = false;
+
+		for (var index in chatMessageList) {
+			var chatMessage = chatMessageList[index];
+			newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+			
+			// The most recent message will determine whether to alert
+			if (chatMessage.username != getUsername()) {
+				// Set chat tab color to alert new messages if newest message is not from user
+				alertNewMessages = true;
+			} else {
+				alertNewMessages = false;
+			}
+		}
+
+		if (alertNewMessages) {
+			document.getElementById('chatTab').classList.add('alertTab');
+		}
+		
+		/* Prepare to add chat content and keep scrolled to bottom */
+		var chatMessagesDisplay = document.getElementById('chatMessagesDisplay');
+		// allow 1px inaccuracy by adding 1
+		var isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
+		var newElement = document.createElement("div");
+		newElement.innerHTML = newChatMessagesHtml;
+		chatMessagesDisplay.appendChild(newElement);
+		// scroll to bottom if isScrolledToBottom
+		if(isScrolledToBottom) {
+			chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
+		}
+	}
+};
+
 function gameWatchPulse() {
 	onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
 	
-	onlinePlayEngine.checkIfUserOnline(currentGameOpponentUsername, 
-		function(isOpponentOnline) {
-			updateCurrentGameTitle(isOpponentOnline);
-		}
-	);
+	onlinePlayEngine.checkIfUserOnline(currentGameOpponentUsername, checkIfUserOnlineCallback);
 
-	onlinePlayEngine.getNewChatMessages(gameId, lastChatTimestamp, 
-		function(results) {
-			if (results != "") {
-				var resultRows = results.split('\n');
-
-				chatMessageList = [];
-				var newChatMessagesHtml = "";
-
-				for (var index in resultRows) {
-					var row = resultRows[index].split('|||');
-					var chatMessage = {
-						timestamp:row[0], 
-						username:row[1], 
-						message:row[2]
-					};
-					chatMessageList.push(chatMessage);
-					lastChatTimestamp = chatMessage.timestamp;
-				}
-
-				var alertNewMessages = false;
-
-				for (var index in chatMessageList) {
-					var chatMessage = chatMessageList[index];
-					newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
-					
-					// The most recent message will determine whether to alert
-					if (chatMessage.username != getUsername()) {
-						// Set chat tab color to alert new messages if newest message is not from user
-						alertNewMessages = true;
-					} else {
-						alertNewMessages = false;
-					}
-				}
-
-				if (alertNewMessages) {
-					document.getElementById('chatTab').classList.add('alertTab');
-				}
-				
-				/* Prepare to add chat content and keep scrolled to bottom */
-				var chatMessagesDisplay = document.getElementById('chatMessagesDisplay');
-				// allow 1px inaccuracy by adding 1
-				var isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
-				var newElement = document.createElement("div");
-				newElement.innerHTML = newChatMessagesHtml;
-				chatMessagesDisplay.appendChild(newElement);
-				// scroll to bottom if isScrolledToBottom
-				if(isScrolledToBottom) {
-					chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
-				}
-			}
-		}
-	);
+	onlinePlayEngine.getNewChatMessages(gameId, lastChatTimestamp, getNewChatMessagesCallback);
 }
 
 function startWatchingGameRealTime() {
@@ -690,9 +698,9 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 
 			if (!winnerUsername) {
 				// A tie.. special case
-				onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken());
+				onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
 			} else {
-				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode(), getLoginToken());
+				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
 			}
 		}
 	} else {
@@ -805,7 +813,7 @@ function myTurnForReal() {
 	}
 }
 
-var createGameCallback = function(newGameId) {
+var createGameCallback = function createGameCallback(newGameId) {
 	debug("INSIDE CreateMove CALLBACK with GameId: " + newGameId);
 	// gameId = newGameId;	// Not watching the new game on create...
 	finalizeMove();
@@ -820,7 +828,7 @@ var createGameCallback = function(newGameId) {
 	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game if you'd like.<br /><br />If anyone joins this game, it will show up in your list of games when you click My Games.");
 };
 
-var submitMoveCallback = function() {
+var submitMoveCallback = function submitMoveCallback() {
 	debug("Inside submitMoveCallback");
 	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
 	finalizeMove();
@@ -828,7 +836,7 @@ var submitMoveCallback = function() {
 	// startWatchingGameRealTime(); // Should not have to happen
 	startWatchingNumberOfGamesWhereUserTurn();
 
-	onlinePlayEngine.notifyUser(currentGameOpponentUsername);
+	onlinePlayEngine.notifyUser(currentGameOpponentUsername, emptyCallback);
 };
 
 function clearMessage() {
@@ -1068,26 +1076,35 @@ function closeModal() {
 }
 
 function callSubmitMove() {
-	onlinePlayEngine.submitMove(gameId, gameController.gameNotation.notationTextForUrl(), getLoginToken(), submitMoveCallback);
+	onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), submitMoveCallback);
 }
 
-var sendVerificationCodeCallback = function(message) {
+var sendVerificationCodeCallback = function sendVerificationCodeCallback(response) {
+	var message;
+	if (response.includes('has been sent')) {
+        message = "Verification code sent to " + emailBeingVerified;
+    } else {
+        message = "Failed to send verification code, please try again.";
+    }
 	document.getElementById('verificationCodeSendResponse').innerHTML = message;
 }
 
-var isUserInfoAvailableCallback = function(data) {
+var isUserInfoAvailableCallback = function isUserInfoAvailableCallback(data) {
 	if (data && data.length > 0) {
 		// user info not available
 		alert("Username or email taken.");
 	} else {
+		debug("Checkpoint");
 		document.getElementById("verificationCodeInput").disabled=false;
 		document.getElementById('verificationCodeSendResponse').innerHTML = "Sending code... <i class='fa fa-circle-o-notch fa-spin fa-fw'></i>";
 		onlinePlayEngine.sendVerificationCode(usernameBeingVerified, emailBeingVerified, sendVerificationCodeCallback);
 	}
 };
 
-var userInfoExistsCallback = function(data) {
+var userInfoExistsCallback = function userInfoExistsCallback(data) {
+	debug('WHOA MAN THIS IS SERIOUS ' + data);
 	if (data && parseInt(data.trim()) > 0) {
+		debug("Checkpoint");
 		// existing userId found
 		tempUserId = data.trim();
 		isUserInfoAvailableCallback();	// will trigger send verification code
@@ -1121,7 +1138,7 @@ function verifyCodeClicked() {
 	}
 }
 
-var createDeviceIdCallback = function(generatedDeviceId) {
+var createDeviceIdCallback = function createDeviceIdCallback(generatedDeviceId) {
 	closeModal();
 
 	localStorage.setItem(deviceIdKey, parseInt(generatedDeviceId));
@@ -1152,14 +1169,14 @@ var createDeviceIdCallback = function(generatedDeviceId) {
 	showModal("<i class='fa fa-check' aria-hidden='true'></i> Email Verified", "Hi, " + getUsername() + "! Your email has been successfully verified and you are now signed in.");
 }
 
-var createUserCallback = function(generatedUserId) {
+var createUserCallback = function createUserCallback(generatedUserId) {
 	tempUserId = generatedUserId;
 
 	onlinePlayEngine.createDeviceIdForUser(tempUserId, createDeviceIdCallback);
 }
 
 // TODO actualCode should be result...
-var verifyCodeCallback = function(actualCode) {
+var verifyCodeCallback = function verifyCodeCallback(actualCode) {
 	if (codeToVerify === actualCode) {
 		if (tempUserId && tempUserId > 0) {
 			createUserCallback(tempUserId);
@@ -1279,12 +1296,7 @@ function setGameController(gameTypeId) {
 	refreshMessage();
 }
 
-function jumpToGame(gameIdChosen) {
-	if (!onlinePlayEnabled) {
-		return;
-	}
-	onlinePlayEngine.getGameInfo(getUserId(), gameIdChosen, 
-		function(results) {
+var jumpToGameCallback = function jumpToGameCallback(results) {
 			if (results) {
 				populateMyGamesList(results);
 
@@ -1313,21 +1325,6 @@ function jumpToGame(gameIdChosen) {
 				currentGameData.hostUsername = myGame.hostUsername;
 				currentGameData.guestUsername = myGame.guestUsername;
 
-				// if (getUsername() === opponentUsername) {
-				// 	hostEmail = getUserEmail();
-				// 	guestEmail = getUserEmail();
-				// } else if (myGame.hostUsername === getUsername()) {
-				// 	hostEmail = getUserEmail();
-				// 	guestEmail = opponentUsername;
-				// } else if (myGame.guestUsername === getUsername()) {
-				// 	hostEmail = opponentUsername;
-				// 	guestEmail = getUserEmail();
-				// } else {
-				// 	// Not host or guest, just watching
-				// 	hostEmail = null;
-				// 	guestEmail = null;
-				// }
-
 				hostEmail = myGame.hostUsername;
 				guestEmail = myGame.guestUsername;
 				
@@ -1335,8 +1332,13 @@ function jumpToGame(gameIdChosen) {
 				closeModal();
 				updateFooter();
 			}
-		}
-	);
+		};
+
+function jumpToGame(gameIdChosen) {
+	if (!onlinePlayEnabled) {
+		return;
+	}
+	onlinePlayEngine.getGameInfo(getUserId(), gameIdChosen, jumpToGameCallback);
 }
 
 function populateMyGamesList(results) {
@@ -1368,11 +1370,7 @@ function getLoginToken() {
 	}
 }
 
-function showPastGamesClicked() {
-	closeModal();
-
-	onlinePlayEngine.getPastGamesForUserNew(getLoginToken(), 
-		function(results) {
+var showPastGamesCallback = function showPastGamesCallback(results) {
 			var message = "No completed games.";
 			if (results) {
 				message = "";
@@ -1403,77 +1401,89 @@ function showPastGamesClicked() {
 				}
 			}
 			showModal("Completed Games", message);
-		}
-	);
+		};
+
+function showPastGamesClicked() {
+	closeModal();
+
+	onlinePlayEngine.getPastGamesForUserNew(getLoginToken(), showPastGamesCallback);
 }
 
-function showMyGames() {
-	onlinePlayEngine.getCurrentGamesForUserNew(getLoginToken(), 
-		function(results) {
-			var message = "No active games.";
-			if (results) {
-				message = "";
-				
-				populateMyGamesList(results);
+var showMyGamesCallback = function showMyGamesCallback(results) {
+	var message = "No active games.";
+	if (results) {
+		message = "";
+		
+		populateMyGamesList(results);
 
-				var gameTypeHeading = "";
-				for (var index in myGamesList) {
-					var myGame = myGamesList[index];
+		var gameTypeHeading = "";
+		for (var index in myGamesList) {
+			var myGame = myGamesList[index];
 
-					if (myGame.gameTypeDesc !== gameTypeHeading) {
-						if (gameTypeHeading !== "") {
-							message += "<br />";
-						}
-						gameTypeHeading = myGame.gameTypeDesc;
-						message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
-					}
+			if (myGame.gameTypeDesc !== gameTypeHeading) {
+				if (gameTypeHeading !== "") {
+					message += "<br />";
+				}
+				gameTypeHeading = myGame.gameTypeDesc;
+				message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+			}
 
-					var gId = parseInt(myGame.gameId);
-					var userIsHost = myGame.hostUsername === getUsername();
-					var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+			var gId = parseInt(myGame.gameId);
+			var userIsHost = myGame.hostUsername === getUsername();
+			var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
 
-					var gameDisplayTitle = "";
+			var gameDisplayTitle = "";
 
-					if (!userIsHost && opponentUsername != getUsername()) {
-						if (myGame.hostOnline) {
-							gameDisplayTitle += userOnlineIcon;
-						} else {
-							gameDisplayTitle += userOfflineIcon;
-						}
-					}
-					gameDisplayTitle += myGame.hostUsername;
-					gameDisplayTitle += " vs. ";
-					if (userIsHost && opponentUsername != getUsername()) {
-						if (myGame.guestOnline) {
-							gameDisplayTitle += userOnlineIcon;
-						} else {
-							gameDisplayTitle += userOfflineIcon;
-						}
-					}
-					gameDisplayTitle += myGame.guestUsername;
-					if (myGame.isUserTurn) {
-						gameDisplayTitle += " (Your turn)";
-					}
-					
-					// message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\"," + myGame.gameTypeId + ");'>" + gameDisplayTitle + "</div>";
-					message += "<div class='clickableText' onclick='jumpToGame(" + gId + ");'>" + gameDisplayTitle + "</div>";
+			if (!userIsHost && opponentUsername != getUsername()) {
+				if (myGame.hostOnline) {
+					gameDisplayTitle += userOnlineIcon;
+				} else {
+					gameDisplayTitle += userOfflineIcon;
 				}
 			}
-			message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
-			message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='signOut();'>Click here to sign out.</span></div>";
-			message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
-			showModal("Active Games", message);
+			gameDisplayTitle += myGame.hostUsername;
+			gameDisplayTitle += " vs. ";
+			if (userIsHost && opponentUsername != getUsername()) {
+				if (myGame.guestOnline) {
+					gameDisplayTitle += userOnlineIcon;
+				} else {
+					gameDisplayTitle += userOfflineIcon;
+				}
+			}
+			gameDisplayTitle += myGame.guestUsername;
+			if (myGame.isUserTurn) {
+				gameDisplayTitle += " (Your turn)";
+			}
+			
+			// message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\"," + myGame.gameTypeId + ");'>" + gameDisplayTitle + "</div>";
+			message += "<div class='clickableText' onclick='jumpToGame(" + gId + ");'>" + gameDisplayTitle + "</div>";
 		}
-	);
+	}
+	message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
+	message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='signOut();'>Click here to sign out.</span></div>";
+	message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
+	showModal("Active Games", message);
+};
+
+function showMyGames() {
+	onlinePlayEngine.getCurrentGamesForUserNew(getLoginToken(), showMyGamesCallback);
 }
+
+var emptyCallback = function emptyCallback(results) {
+	// Nothing to do
+};
 
 function emailNotificationsCheckboxClicked() {
 	var value = 'N';
 	if (document.getElementById("emailNotificationsCheckbox").checked) {
 		value = 'Y';
 	}
-	onlinePlayEngine.updateEmailNotificationsSetting(getUserId(), value);
+	onlinePlayEngine.updateEmailNotificationsSetting(getUserId(), value, emptyCallback);
 }
+
+var getEmailNotificationsSettingCallback = function getEmailNotificationsSettingCallback(result) {
+	document.getElementById("emailNotificationsCheckbox").checked = (result && result.startsWith("Y"));
+};
 
 function showAccountSettings() {
 	var message = "Note: Email notifications are not working right now. Maybe in the future they will be back.<br />";
@@ -1482,11 +1492,7 @@ function showAccountSettings() {
 
 	showModal("Settings", message);
 
-	onlinePlayEngine.getEmailNotificationsSetting(getUserId(), 
-		function(result) {
-			document.getElementById("emailNotificationsCheckbox").checked = (result && result.startsWith("Y"));
-		}
-	);
+	onlinePlayEngine.getEmailNotificationsSetting(getUserId(), getEmailNotificationsSettingCallback);
 }
 
 function accountHeaderClicked() {
@@ -1507,15 +1513,51 @@ function loginClicked() {
 	showModal("Sign In", msg);
 }
 
+var completeJoinGameSeekCallback = function completeJoinGameSeekCallback(gameJoined) {
+	var gameSeek = selectedGameSeek;
+	if (gameJoined) {
+		jumpToGame(gameSeek.gameId);
+	}
+};
+
 function completeJoinGameSeek(gameSeek) {
-	onlinePlayEngine.joinGameSeek(gameSeek.gameId, getLoginToken(), 
-		function(gameJoined) {
-			if (gameJoined) {
-				jumpToGame(gameSeek.gameId);
+	selectedGameSeek = gameSeek;
+	onlinePlayEngine.joinGameSeek(gameSeek.gameId, getLoginToken(), completeJoinGameSeekCallback);
+}
+
+var getCurrentGamesForUserNewCallback = function getCurrentGamesForUserNewCallback(results) {
+	var gameSeek = selectedGameSeek;
+	if (results) {
+		
+		populateMyGamesList(results);
+
+		var gameExistsWithOpponent = false;
+
+		for (var index in myGamesList) {
+			var myGame = myGamesList[index];
+
+			var userIsHost = myGame.hostUsername === getUsername();
+			var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+
+			if (opponentUsername === gameSeek.hostUsername
+				&& gameSeek.gameTypeId === myGame.gameTypeId) {
+				gameExistsWithOpponent = true;
 			}
 		}
-	);
-}
+
+		if (gameExistsWithOpponent) {
+			closeModal();
+			showModal("Cannot Join Game", "You are already playing a game against that user, so you will have to finish that game first.");
+		} else {
+			completeJoinGameSeek(gameSeek);
+		}
+	} else {
+		// No results, means ok to join game
+		completeJoinGameSeek(gameSeek);
+	}
+};
+
+var selectedGameSeek;
 
 function acceptGameSeekClicked(gameIdChosen) {
 	var gameSeek;
@@ -1526,38 +1568,8 @@ function acceptGameSeekClicked(gameIdChosen) {
 	}
 
 	if (gameSeek) {
-		onlinePlayEngine.getCurrentGamesForUserNew(getLoginToken(), 
-			function(results) {
-				if (results) {
-					
-					populateMyGamesList(results);
-
-					var gameExistsWithOpponent = false;
-
-					for (var index in myGamesList) {
-						var myGame = myGamesList[index];
-
-						var userIsHost = myGame.hostUsername === getUsername();
-						var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
-
-						if (opponentUsername === gameSeek.hostUsername
-							&& gameSeek.gameTypeId === myGame.gameTypeId) {
-							gameExistsWithOpponent = true;
-						}
-					}
-
-					if (gameExistsWithOpponent) {
-						closeModal();
-						showModal("Cannot Join Game", "You are already playing a game against that user, so you will have to finish that game first.");
-					} else {
-						completeJoinGameSeek(gameSeek);
-					}
-				} else {
-					// No results, means ok to join game
-					completeJoinGameSeek(gameSeek);
-				}
-			}
-		);
+		selectedGameSeek = gameSeek;
+		onlinePlayEngine.getCurrentGamesForUserNew(getLoginToken(), getCurrentGamesForUserNewCallback);
 	}
 }
 
@@ -1569,68 +1581,71 @@ function tryRealTimeClicked() {
 	closeModal();
 }
 
+var getGameSeeksCallback = function getGameSeeksCallback(results) {
+	var message = "No games available to join. You should start one!";
+	if (results) {
+		message = "";
+		var resultRows = results.split('\n');
+
+		gameSeekList = [];
+
+		for (var index in resultRows) {
+			var row = resultRows[index].split('|||');
+			var gameSeek = {
+				gameId:parseInt(row[0]), 
+				gameTypeId:parseInt(row[1]), 
+				gameTypeDesc:row[2], 
+				hostId:row[3], 
+				hostUsername:row[4], 
+				hostOnline:parseInt(row[5])
+			};
+			gameSeekList.push(gameSeek);
+		}
+		var gameTypeHeading = "";
+		for (var index in gameSeekList) {
+			var gameSeek = gameSeekList[index];
+			
+			var hostOnlineOrNotIconText = userOfflineIcon;
+			if (gameSeek.hostOnline) {
+				hostOnlineOrNotIconText = userOnlineIcon;
+			}
+
+			if (gameSeek.gameTypeDesc !== gameTypeHeading) {
+				if (gameTypeHeading !== "") {
+					message += "<br />";
+				}
+				gameTypeHeading = gameSeek.gameTypeDesc;
+				message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+			}
+			message += "<div class='clickableText' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
+		}
+	}
+	showModal("Join a game", message);
+};
+
 function viewGameSeeksClicked() {
 	if (onlinePlayEnabled) {
-		onlinePlayEngine.getGameSeeks(
-			function(results) {
-				var message = "No games available to join. You should start one!";
-				if (results) {
-					message = "";
-					var resultRows = results.split('\n');
-
-					gameSeekList = [];
-
-					for (var index in resultRows) {
-						var row = resultRows[index].split('|||');
-						var gameSeek = {
-							gameId:parseInt(row[0]), 
-							gameTypeId:parseInt(row[1]), 
-							gameTypeDesc:row[2], 
-							hostId:row[3], 
-							hostUsername:row[4], 
-							hostOnline:parseInt(row[5])
-						};
-						gameSeekList.push(gameSeek);
-					}
-					var gameTypeHeading = "";
-					for (var index in gameSeekList) {
-						var gameSeek = gameSeekList[index];
-						
-						var hostOnlineOrNotIconText = userOfflineIcon;
-						if (gameSeek.hostOnline) {
-							hostOnlineOrNotIconText = userOnlineIcon;
-						}
-
-						if (gameSeek.gameTypeDesc !== gameTypeHeading) {
-							if (gameTypeHeading !== "") {
-								message += "<br />";
-							}
-							gameTypeHeading = gameSeek.gameTypeDesc;
-							message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
-						}
-						message += "<div class='clickableText' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
-					}
-				}
-				showModal("Join a game", message);
-			}
-		);
+		onlinePlayEngine.getGameSeeks(getGameSeeksCallback);
 	} else {
 		showModal("Join a game", "Coming soon <i class='fa fa-thumbs-o-up' aria-hidden='true'></i><br />Want to test out the real-time gameplay changes? <span class='clickableText' onclick='tryRealTimeClicked();'>Click here to try it!</span>");
 	}
 }
 
+var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHostedByUserCallback(results) {
+	var gameTypeId = tempGameTypeId;
+	if (!results) {
+		onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), getLoginToken(), createGameCallback);
+	} else {
+		finalizeMove();
+		showModal("Game Not Created", "You either already have a game that is waiting for an opponent or are not logged in. <br /><br />If you're not logged in, you can still play the game locally, but it will not be saved online.");
+	}
+};
+
+var tempGameTypeId;
 function createGameIfThatIsOk(gameTypeId) {
+	tempGameTypeId = gameTypeId;
 	if (userIsLoggedIn()) {
-		onlinePlayEngine.getCurrentGameSeeksHostedByUser(getUserId(), gameTypeId, 
-			function(results) {
-				if (!results) {
-					onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), getLoginToken(), createGameCallback);
-				} else {
-					finalizeMove();
-					showModal("Game Not Created", "You either already have a game that is waiting for an opponent or are not logged in. <br /><br />If you're not logged in, you can still play the game locally, but it will not be saved online.");
-				}
-			}
-		);
+		onlinePlayEngine.getCurrentGameSeeksHostedByUser(getUserId(), gameTypeId, getCurrentGameSeeksHostedByUserCallback);
 	} else {
 		finalizeMove();
 	}
@@ -1684,33 +1699,33 @@ function handleNewGlobalChatMessages(results) {
 	// }
 }
 
+var getNewGlobalChatsCallback = function getNewGlobalChatsCallback(results) {
+	if (results != "") {
+		handleNewGlobalChatMessages(results);
+	}
+};
+
 var lastGlobalChatTimestamp = '1970-01-01 00:00:00';
 function fetchGlobalChats() {
-	onlinePlayEngine.getNewChatMessages(0, lastGlobalChatTimestamp, 
-		function(results) {
-			if (results != "") {
-				handleNewGlobalChatMessages(results);
-			}
-		}
-	);
+	onlinePlayEngine.getNewChatMessages(0, lastGlobalChatTimestamp, getNewGlobalChatsCallback);
 }
+
+var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(results) {
+	if (results != "") {
+		handleNewGlobalChatMessages(results);
+	}
+};
 
 function fetchInitialGlobalChats() {
 	// Clear all global chats..
 	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! This global chat will show the latest messages sent to it. Say hi and see if anyone else is online :)<hr />";
 
 	// Fetch global chats..
-	onlinePlayEngine.getInitialGlobalChatMessages(
-		function(results) {
-			if (results != "") {
-				handleNewGlobalChatMessages(results);
-			}
-		}
-	);
+	onlinePlayEngine.getInitialGlobalChatMessages(getInitialGlobalChatsCallback);
 }
 
 function startLoggingOnlineStatus() {
-	onlinePlayEngine.logOnlineStatus(getLoginToken());
+	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 
 	fetchInitialGlobalChats();
 
@@ -1720,7 +1735,7 @@ function startLoggingOnlineStatus() {
 	}
 
 	logOnlineStatusIntervalValue = setInterval(function() {
-		onlinePlayEngine.logOnlineStatus(getLoginToken());
+		onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 		verifyLogin(); // TODO Build in the verify step to the logOnlineStatus call
 		fetchGlobalChats();
 	}, 4000);
@@ -1739,13 +1754,13 @@ function newGameClicked() {
 	showModal("New Game", message);
 }
 
+var getCountOfGamesWhereUserTurnCallback = function getCountOfGamesWhereUserTurnCallback(count) {
+	setAccountHeaderLinkText(count);
+};
+
 function loadNumberOfGamesWhereUserTurn() {
 	if (onlinePlayEnabled && userIsLoggedIn()) {
-		onlinePlayEngine.getCountOfGamesWhereUserTurn(getUserId(), 
-			function(count) {
-				setAccountHeaderLinkText(count);
-			}
-		);
+		onlinePlayEngine.getCountOfGamesWhereUserTurn(getUserId(), getCountOfGamesWhereUserTurnCallback);
 	}
 }
 
@@ -1764,16 +1779,16 @@ function startWatchingNumberOfGamesWhereUserTurn() {
 
 /* Chat */
 
+var sendChatCallback = function sendChatCallback(result) {
+	document.getElementById('sendChatMessageButton').innerHTML = "Send";
+	document.getElementById('chatMessageInput').value = "";
+};
+
 var sendChat = function() {
 	var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value).trim();
 	if (chatMessage) {
 		document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
-		onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, 
-			function(result) {
-				document.getElementById('sendChatMessageButton').innerHTML = "Send";
-				document.getElementById('chatMessageInput').value = "";
-			}
-		);
+		onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, sendChatCallback);
 	}
 }
 
@@ -1784,16 +1799,16 @@ document.getElementById('chatMessageInput').onkeypress = function(e){
       }
 };
 
+var sendGlobalChatCallback = function sendGlobalChatCallback(result) {
+	document.getElementById('sendGlobalChatMessageButton').innerHTML = "Send";
+	document.getElementById('globalChatMessageInput').value = "";
+};
+
 var sendGlobalChat = function() {
 	var chatMessage = htmlEscape(document.getElementById('globalChatMessageInput').value).trim();
 	if (chatMessage) {
 		document.getElementById('sendGlobalChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
-		onlinePlayEngine.sendChat(0, getLoginToken(), chatMessage, 
-			function(result) {
-				document.getElementById('sendGlobalChatMessageButton').innerHTML = "Send";
-				document.getElementById('globalChatMessageInput').value = "";
-			}
-		);
+		onlinePlayEngine.sendChat(0, getLoginToken(), chatMessage, sendGlobalChatCallback);
 	}
 }
 
