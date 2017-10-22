@@ -254,7 +254,7 @@ function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 var getGameNotationCallback = function getGameNotationCallback(newGameNotation) {
 	if (gameWatchIntervalValue && newGameNotation !== lastKnownGameNotation) {
 		// gameController.gameNotation.setNotationText(newGameNotation);
-		gameController.setGameNotation(newGameNotation);
+		gameController.setGameNotation(decodeURIComponent(newGameNotation));
 		rerunAll();
 		lastKnownGameNotation = newGameNotation;
 		document.getElementById("replayControls").classList.remove("gone");	// TODO Put this somewhere better where it's called less often.
