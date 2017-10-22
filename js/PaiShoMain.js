@@ -433,7 +433,7 @@ forgetOnlinePlayInfo = function() {
 }
 
 function showSignOutModal() {
-	var ok = confirm("Are you sure you want to sign out?");
+	// var ok = confirm("Are you sure you want to sign out?");
 	// if (!ok) {
 	// 	updateFooter();
 	// 	return;
