@@ -98,6 +98,8 @@ window.requestAnimationFrame(function () {
 
 	localStorage = new LocalStorage().storage;
 
+	defaultEmailMessageText = document.querySelector(".footer").innerHTML;
+
 	if (QueryString.gameType) {
 		setGameController(parseInt(QueryString.gameType));
 	} else {
@@ -138,8 +140,6 @@ window.requestAnimationFrame(function () {
 	if (ios) {
 		onlinePlayEngine = new OnlinePlayEngineIOS();
 	}
-
-	defaultEmailMessageText = document.querySelector(".footer").innerHTML;
 
 	var localUserEmail = localStorage.getItem(localEmailKey);
 
@@ -433,27 +433,6 @@ forgetOnlinePlayInfo = function() {
 }
 
 function showSignOutModal() {
-	// var ok = confirm("Are you sure you want to sign out?");
-	// if (!ok) {
-	// 	updateFooter();
-	// 	return;
-	// }
-
-	// if (hostEmail = getUserEmail()) {
-	// 	hostEmail = null;
-	// }
-
-	// if (guestUsername = getUserEmail()) {
-	// 	guestEmail = null;
-	// }
-
-	// localStorage.removeItem(localEmailKey);
-
-	// forgetOnlinePlayInfo();
-
-	// updateFooter();
-	// clearMessage();
-
 	var message = "<div class='clickableText' onclick='signOut(true);'>Yes, sign out</div>";
 	message += "<br /><div class='clickableText' onclick='signOut(false);'>Cancel</div>";
 
@@ -461,6 +440,8 @@ function showSignOutModal() {
 }
 
 function signOut(reallySignOut) {
+	closeModal();
+
 	if (!reallySignOut) {
 		updateFooter();
 		return;
@@ -474,12 +455,15 @@ function signOut(reallySignOut) {
 		guestEmail = null;
 	}
 
+	document.title = "Skud Pai Sho";
+
 	localStorage.removeItem(localEmailKey);
 
 	forgetOnlinePlayInfo();
 
 	updateFooter();
 	clearMessage();
+	setAccountHeaderLinkText();
 }
 
 function rewindAllMoves() {
