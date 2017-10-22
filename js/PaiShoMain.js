@@ -403,7 +403,7 @@ function updateFooter() {
 	var userEmail = localStorage.getItem(localEmailKey);
 	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
 		document.querySelector(".footer").innerHTML = gamePlayersMessage() + "You are playing as " + userEmail
-		+ " | <span class='skipBonus' onclick='promptEmail();'>Edit email</span> | <span class='skipBonus' onclick='signOut();'>Sign out</span>";
+		+ " | <span class='skipBonus' onclick='promptEmail();'>Edit email</span> | <span class='skipBonus' onclick='showSignOutModal();'>Sign out</span>";
 	} else {
 		document.querySelector(".footer").innerHTML = gamePlayersMessage() + defaultEmailMessageText;
 	}
@@ -432,18 +432,39 @@ forgetOnlinePlayInfo = function() {
 	localStorage.removeItem(userEmailKey);
 }
 
-function signOut() {
+function showSignOutModal() {
 	var ok = confirm("Are you sure you want to sign out?");
-	if (!ok) {
+	// if (!ok) {
+	// 	updateFooter();
+	// 	return;
+	// }
+
+	// if (hostEmail = getUserEmail()) {
+	// 	hostEmail = null;
+	// }
+
+	// if (guestUsername = getUserEmail()) {
+	// 	guestEmail = null;
+	// }
+
+	// localStorage.removeItem(localEmailKey);
+
+	// forgetOnlinePlayInfo();
+
+	// updateFooter();
+	// clearMessage();
+
+	var message = "<div class='clickableText' onclick='signOut(true);'>Yes, sign out</div>";
+	message += "<br /><div class='clickableText' onclick='signOut(false);'>Cancel</div>";
+
+	showModal("Really sign out?", message);
+}
+
+function signOut(reallySignOut) {
+	if (!reallySignOut) {
 		updateFooter();
 		return;
 	}
-
-	// if (localPlayerRole === HOST) {
-	// 	hostEmail = null;
-	// } else if (localPlayerRole === GUEST) {
-	// 	guestEmail = null;
-	// }
 
 	if (hostEmail = getUserEmail()) {
 		hostEmail = null;
@@ -814,17 +835,14 @@ function myTurnForReal() {
 }
 
 var createGameCallback = function createGameCallback(newGameId) {
-	debug("INSIDE CreateMove CALLBACK with GameId: " + newGameId);
-	// gameId = newGameId;	// Not watching the new game on create...
 	finalizeMove();
 	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
 
-	// If a solitaire game, automatic-join game.
+	// If a solitaire game, automatically join game.
 	if (gameController.isSolitaire()) {
 		completeJoinGameSeek({gameId:newGameId});
 	}
 	
-	// startWatchingGameRealTime();	// Not watching the new game on create...
 	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game if you'd like.<br /><br />If anyone joins this game, it will show up in your list of games when you click My Games.");
 };
 
@@ -833,7 +851,6 @@ var submitMoveCallback = function submitMoveCallback() {
 	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
 	finalizeMove();
 
-	// startWatchingGameRealTime(); // Should not have to happen
 	startWatchingNumberOfGamesWhereUserTurn();
 
 	onlinePlayEngine.notifyUser(currentGameOpponentUsername, emptyCallback);
@@ -844,9 +861,6 @@ function clearMessage() {
 		defaultHelpMessageText = gameController.getDefaultHelpMessageText();
 	}
 	document.getElementById("helpTextContent").innerHTML = defaultHelpMessageText;
-	// if (!haveUserEmail()) {
-	// 	document.getElementById("helpTextContent").innerHTML += "<p>If you <span class='skipBonus' onclick='promptEmail()'>enter your email address</span>, you can be notified when your opponent plays a move.</p>";
-	// }
 
 	var message = getTournamentText() 
 		+ document.getElementById("helpTextContent").innerHTML;
@@ -905,7 +919,7 @@ function setMessage(msg) {
 	if (msg === document.getElementById("helpTextContent").innerHTML) {
 		clearMessage();
 	} else {
-		document.getElementById("helpTextContent").innerHTML = getTournamentText() + msg;// + getAltTilesOptionText();
+		document.getElementById("helpTextContent").innerHTML = getTournamentText() + msg;
 	}
 }
 
@@ -1460,7 +1474,7 @@ var showMyGamesCallback = function showMyGamesCallback(results) {
 		}
 	}
 	message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
-	message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='signOut();'>Click here to sign out.</span></div>";
+	message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
 	message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
 	showModal("Active Games", message);
 };
