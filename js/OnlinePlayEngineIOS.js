@@ -146,6 +146,9 @@ OnlinePlayEngineIOS.prototype.checkIfUserOnline = function(username, callback) {
 };
 
 OnlinePlayEngineIOS.prototype.submitMove = function(gameId, gameNotationText, loginToken, callback) {
+    // For iOS, need to encodeURI on notation again before sending...
+    gameNotationText = encodeURIComponent(gameNotationText);
+
     this.swiftPost("updateGameNotation.php",
         "id=" + gameId
         + "&t=" + gameNotationText
@@ -195,6 +198,9 @@ OnlinePlayEngineIOS.prototype.sendChat = function(gameId, loginToken, chatMessag
 };
 
 OnlinePlayEngineIOS.prototype.getNewChatMessages = function(gameId, lastChatTimestamp, callback) {
+    // For iOS, need to encodeURI on timestamp again before sending...
+    lastChatTimestamp = encodeURIComponent(lastChatTimestamp);
+
     this.swiftGet("getNewChatMessages.php?g="+gameId + "&t=" + encodeURIComponent(lastChatTimestamp), 
         callback);
 };
