@@ -132,7 +132,7 @@ window.requestAnimationFrame(function () {
 	guestEmail = QueryString.guest;
 
 	if (gameController.gameNotation.moves.length > 1) {
-		document.getElementById("replayControls").classList.remove("gone");
+		showReplayControls();
 	}
 
 	onlinePlayEngine = new OnlinePlayEngine();
@@ -189,6 +189,10 @@ window.requestAnimationFrame(function () {
 	// Open default help/chat tab
 	document.getElementById("defaultOpenTab").click();
 });
+
+function showReplayControls() {
+	document.getElementById("replayControls").classList.remove("gone");
+}
 
 function setTileContainers() {
 	document.getElementById('hostTilesContainer').innerHTML = gameController.getHostTilesContainerDivs();
@@ -257,7 +261,7 @@ var getGameNotationCallback = function getGameNotationCallback(newGameNotation) 
 		gameController.setGameNotation(decodeURIComponent(newGameNotation));
 		rerunAll();
 		lastKnownGameNotation = newGameNotation;
-		document.getElementById("replayControls").classList.remove("gone");	// TODO Put this somewhere better where it's called less often.
+		showReplayControls();	// TODO Put this somewhere better where it's called less often.
 	}
 };
 
@@ -794,11 +798,11 @@ function myTurn() {
 		if (getCurrentPlayer() === HOST) {
 			return !hostEmail 
 				|| (localStorage.getItem(localEmailKey) === hostEmail 
-					|| currentGameData.hostUsername === getUsername());
+					|| currentGameData.hostUsername.toLowerCase() === getUsername().toLowerCase());
 		} else {
 			return !guestEmail 
 				|| (localStorage.getItem(localEmailKey) === guestEmail 
-					|| currentGameData.guestUsername === getUsername());
+					|| currentGameData.guestUsername.toLowerCase() === getUsername().toLowerCase());
 		}
 	} else {
 		return true;
@@ -982,6 +986,24 @@ function getGatePointMessage() {
 	return msg;
 }
 
+function sandboxitize() {
+	var notation = notation = getGameControllerForGameType(currentGameData.gameTypeId).gameNotation;
+	for (var i = 0; i < currentMoveIndex; i++) {
+		notation.addMove(gameController.gameNotation.moves[i]);
+	}
+
+	setGameController(currentGameData.gameTypeId);
+
+	if (userIsLoggedIn()) {
+		currentGameData.hostUsername = getUsername();
+		currentGameData.guestUsername = getUsername();
+	}
+
+	gameController.setGameNotation(notation.notationTextForUrl());
+	rerunAll();
+	showReplayControls();
+}
+
 function getLink(forSandbox) {
 	var notation = new SkudPaiShoGameNotation();
 	if (currentGameData) {
@@ -1035,12 +1057,16 @@ function playAiTurn() {
 }
 
 function sandboxFromMove() {
-	var link = getLink(true);
-	window.open(link);
+	// var link = getLink(true);
+	// window.open(link);
+	sandboxitize();
 }
 
 /* Modal */
 function showModal(headingHTMLText, modalMessageHTMLText) {
+	// Make sure sidenav is closed
+	closeNav();
+
 	// Get the modal
 	var modal = document.getElementById('myMainModal');
 
@@ -1113,7 +1139,7 @@ var userInfoExistsCallback = function userInfoExistsCallback(data) {
 }
 
 function sendVerificationCodeClicked() {
-	emailBeingVerified = document.getElementById("userEmailInput").value.trim();
+	emailBeingVerified = document.getElementById("userEmailInput").value.trim().toLowerCase();
 	usernameBeingVerified = document.getElementById("usernameInput").value.trim();
 
 	// Only continue if email and username pass validation
@@ -1625,7 +1651,7 @@ function viewGameSeeksClicked() {
 	if (onlinePlayEnabled) {
 		onlinePlayEngine.getGameSeeks(getGameSeeksCallback);
 	} else {
-		showModal("Join a game", "Coming soon <i class='fa fa-thumbs-o-up' aria-hidden='true'></i><br />Want to test out the real-time gameplay changes? <span class='clickableText' onclick='tryRealTimeClicked();'>Click here to try it!</span>");
+		showModal("Join a game", "Online play is disabled right now. Maybe you are offline. Try again later!");
 	}
 }
 
@@ -1894,3 +1920,25 @@ function goai() {
 		setAiIndex(1);
 	}
 }
+
+/* Sidenav */
+function openNav() {
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function(event) {
+	    if (event.target !== document.getElementById("mySidenav")
+	    	&& event.target !== document.getElementById("sidenavMenuButton")
+	    	&& event.target !== document.getElementById("siteHeading")) {
+	        closeNav();
+	    }
+	};
+    // document.getElementById("mySidenav").style.width = "250px";
+    document.getElementById("mySidenav").classList.add("sideNavOpen");
+}
+
+function closeNav() {
+    // document.getElementById("mySidenav").style.width = "0";
+    document.getElementById("mySidenav").classList.remove("sideNavOpen");
+}
+
+
+

@@ -15,7 +15,8 @@ html, body {
 
 #mainWrapper {
   max-width: 1198px;
-  margin: auto;
+  min-width: 306px;
+  margin: 32px auto 0 auto;
 }
 
 .footer {
@@ -404,15 +405,18 @@ input[type=submit] {
 }
 
 .header {
-  position: relative;
+  position: fixed;
+  overflow: hidden;
+  top: 0;
   width: 100%;
+  min-width: 306px;
   height: 32px;
   margin: 0;
   padding: 0 12px;
   background-color: #444;
   color: #faf8ef;
   font-size: 14px;
-  z-index: 1;
+  z-index: 2;
 }
 
 .header h1 {
@@ -422,6 +426,14 @@ input[type=submit] {
 
 .headerLeft {
   float: left;
+}
+
+.sidenavMenuButton {
+  float: left;
+}
+
+.sidenavMenuButtonText {
+  font-weight: normal;
 }
 
 .headerRightContainer {
@@ -450,7 +462,7 @@ input[type=submit] {
 .modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
-    z-index: 2; /* Sit on top */
+    z-index: 99; /* Sit on top */
     padding-top: 100px; /* Location of the box */
     left: 0;
     top: 0;
@@ -465,7 +477,7 @@ input[type=submit] {
 .modal-content {
     background-color: #fefefe;
     margin: auto;
-    padding: 8px 12px 12px 12px;
+    padding: 4px 12px 12px 12px;
     /*position: relative;*/
     border: 1px solid #888;
     width: 80%;
@@ -481,8 +493,9 @@ input[type=submit] {
 .myMainModalClose {
     color: #aaaaaa;
     float: right;
-    font-size: 28px;
-    font-weight: bold;
+    font-size: 32px;
+    font-weight: 900;
+    padding-right: 2px;
 }
 
 .myMainModalClose:hover,
@@ -496,7 +509,7 @@ input[type=submit] {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 8px;
-  margin-top: 5px;
+  margin-top: 7px;
 }
 
 /* Add Animation */
@@ -511,6 +524,71 @@ input[type=submit] {
 }
 
 /* End Modal */
+
+/* Sidenav */
+
+.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
+}
+
+.sideNavOpen {
+  width: 307px;
+}
+
+.sidenavContent {
+  margin: 2px 2px 2px 16px;
+}
+
+.sidenav .skipBonus {
+    /*padding: 2px 2px 2px 16px;*/
+    text-decoration: none;
+    font-size: 14px;
+    color: #aaa;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav .skipBonus:hover {
+    color: #eee;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 20px;
+    font-size: 36px;
+    margin-left: 50px;
+    font-weight: 900;
+}
+
+.closebtn {
+  cursor: pointer;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+
+/* End Sidenav */
+
+.stretchText {
+  display: inline-block;
+  -webkit-transform:scale(1.5,1.4); /* Safari and Chrome */
+  -moz-transform:scale(1.5,1.4); /* Firefox */
+  -ms-transform:scale(1.5,1.4); /* IE 9 */
+  -o-transform:scale(1.5,1.4); /* Opera */
+  transform:scale(1.5,1.4); /* W3C */
+}
 
 /* -------------------------- */
 
@@ -577,9 +655,9 @@ input[type=submit] {
 }
 
 @media only screen and (max-width: 612px) {
-    .header {
+    /*.header {
       padding: 0;
-    }
+    }*/
 
     .svgContainer {
       width: 100vw;
@@ -641,6 +719,12 @@ input[type=submit] {
     display: none;
   }
 
+}
+
+@media only screen and (max-width: 450px) {
+  .sideNavOpen {
+    width: 100%;
+  }
 }
 
 @media only screen and (max-width: 350px) {

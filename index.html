@@ -25,9 +25,36 @@
     
 </head>
 
-<body> <div id='mainWrapper'>
+<body> 
+  <!-- Sidenav -->
+  <div id="mySidenav" class="sidenav">
+    <div class="sidenavContent">
+      <div class="closebtn" onclick="closeNav();">&nbsp;&times;</div>
+      <div class='skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div><br />
+      <div class='skipBonus' onclick='openGameReplay();'>Open game replay link</div><br />
+      <div class='skipBonus' onclick='showGameNotationModal();'>Show game notation</div><br />
+      <!-- <div class='skipBonus'><a href="https://skudpaisho.wordpress.com/tournaments/">Skud Pai Sho tournament information</a></div> -->
+      <br />
+      <div>
+      Modern tile designs by Hector Lowe<br />
+      ©2017 | Used with permission<br />
+      <a href="http://hector-lowe.com/" target="_blank">www.hector-lowe.com</a>
+      </div>
+
+      <div class="license"><a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/us/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/3.0/us/88x31.png" /></a>&nbsp;All other content of this work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/us/">Creative Commons Attribution-NonCommercial 3.0 United States License</a>.</div>
+      <br />
+      <div><span class='skipBonus' onclick='showPrivacyPolicy();'>Privacy policy</span></div>
+
+      <div id="onlinePlayTest"></div>
+    </div>
+  </div>
+  <!-- End Sidenav -->
+
   <div class="header">
-    <div class="headerLeft"><h1>Skud Pai Sho</h1></div>
+    <!-- <div class="sidenavMenuButton"><span style="cursor:pointer; vertical-align: top;" onclick="openNav();"><h1><i class="fa fa-bars" aria-hidden="true"></i></h1></span></div> -->
+    <div class="sidenavMenuButton"><span style="cursor:pointer; vertical-align: top;" onclick="openNav();"><h1><span class="stretchText sidenavMenuButtonText" id='sidenavMenuButton'>&#8801;</span></h1></span></div>
+    <div class="headerLeft"><h1>&nbsp;</h1></div>
+    <div class="headerLeft" style="cursor:pointer;" onclick="openNav();"><h1 id='siteHeading'>Skud Pai Sho</h1></div>
     <div class="headerRightContainer">
       <span class="headerRight clickableText" onclick='accountHeaderClicked();'><i class="fa fa-user" aria-hidden="true"></i> <span id='accountHeaderLinkText'>Sign In</span></span>
       <div class="headerRight">&nbsp;|&nbsp;</div>
@@ -38,6 +65,8 @@
       <a href="https://skudpaisho.wordpress.com/skud-quick-reference/" target="_blank" class="headerRulesLink headerRight clickableText"><i class='fa fa-book' aria-hidden='true'></i> Rules</a> -->
     </div>
   </div>
+
+  <div id='mainWrapper'>
 
 	<div class="leftContainer">
 
@@ -149,7 +178,7 @@
 </div>
 <!-- <div class="rules"><a href="https://skudpaisho.wordpress.com/" target="_blank">Skud Pai Sho Rules</a></div> -->
 <br />
-<div class='skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div><br />
+<!-- <div class='skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div><br />
 <div class='skipBonus' onclick='openGameReplay();'>Open game replay link</div><br />
 <div class='skipBonus' onclick='showGameNotationModal();'>Show game notation</div><br />
 <div class='skipBonus'><a href="https://skudpaisho.wordpress.com/tournaments/">Skud Pai Sho tournament information</a></div>
@@ -164,7 +193,7 @@ Modern tile designs by Hector Lowe<br />
 
 <div><span class='skipBonus' onclick='showPrivacyPolicy();'>Privacy policy</span></div>
 
-<div id="onlinePlayTest"></div>
+<div id="onlinePlayTest"></div> -->
 
 <!-- Modal -->
 <!-- The Modal -->
@@ -172,7 +201,7 @@ Modern tile designs by Hector Lowe<br />
 
   <!-- Modal content -->
   <div class="modal-content">
-    <span class="myMainModalClose"><i class="fa fa-times" aria-hidden="true"></i></span>
+    <span class="myMainModalClose">&nbsp;&times;<!-- <i class="fa fa-times" aria-hidden="true"></i> --></span>
     <div id='modalHeading'>&nbsp;</div>
     <div id='modalMessage'>&nbsp;</div>
   </div>
