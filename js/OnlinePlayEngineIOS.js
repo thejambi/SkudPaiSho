@@ -187,6 +187,8 @@ OnlinePlayEngineIOS.prototype.getGameTypeDesc = function(gameTypeId, callback) {
 }
 
 OnlinePlayEngineIOS.prototype.sendChat = function(gameId, loginToken, chatMessage, callback) {
+    chatMessage = encodeURIComponent(chatMessage);
+    
     this.swiftPost("sendChatMessage.php", 
         "gameId=" + gameId
         + "&userId=" + loginToken.userId
