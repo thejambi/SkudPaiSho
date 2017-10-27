@@ -127,6 +127,7 @@ window.requestAnimationFrame(function () {
 
 	if (ios) {
 		url = "http://skudpaisho.com/";
+		sandboxUrl = url;
 	}
 
 	// gameController.gameNotation.setNotationText(QueryString.game);
@@ -1907,11 +1908,11 @@ function showGameReplayLink() {
 
 		linkUrl = sandboxUrl + "?" + linkUrl;
 
-		debug(linkUrl);
-		var message = "Here is the <a href=\"" + shortUrl + "\">game replay link</a>. Click to open it or copy it to save and share later."
+		debug("GameReplayLinkUrl: " + linkUrl);
+		var message = "Here is the <a href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.";
 		showModal("Game Replay Link", message);
 	} else {
-		showModal("About Game Replay", "Click this link when viewing an online game to open a sharable game replay link in a new window.");
+		showModal("About Game Replay", "Click this link when viewing an online game to get a sharable game replay link.");
 	}
 }
 
