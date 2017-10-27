@@ -125,6 +125,10 @@ window.requestAnimationFrame(function () {
 		onlinePlayEnabled = false;
 	}
 
+	if (ios) {
+		url = "http://skudpaisho.com/";
+	}
+
 	// gameController.gameNotation.setNotationText(QueryString.game);
 	gameController.setGameNotation(QueryString.game);
 
@@ -375,7 +379,7 @@ function startWatchingGameRealTime() {
 
 	gameWatchIntervalValue = setInterval(function() {
 		gameWatchPulse();
-	}, 2000);
+	}, 3000);
 }
 
 function setUseHLoweTiles() {
@@ -1058,8 +1062,18 @@ function playAiTurn() {
 
 function sandboxFromMove() {
 	// var link = getLink(true);
-	// window.open(link);
+	// openLink(link);
 	sandboxitize();
+}
+
+function openLink(linkUrl) {
+	if (ios) {
+		webkit.messageHandlers.callbackHandler.postMessage(
+            '{"linkUrl":"' + linkUrl + '"}'
+        );
+	} else {
+		window.open(linkUrl);
+	}
 }
 
 /* Modal */
@@ -1762,7 +1776,7 @@ function startLoggingOnlineStatus() {
 		onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 		verifyLogin(); // TODO Build in the verify step to the logOnlineStatus call
 		fetchGlobalChats();
-	}, 4000);
+	}, 5000);
 }
 
 function getNewGameEntryForGameType(gameType) {
@@ -1798,7 +1812,7 @@ function startWatchingNumberOfGamesWhereUserTurn() {
 
 	userTurnCountInterval = setInterval(function() {
 		loadNumberOfGamesWhereUserTurn();
-	}, 5000);
+	}, 6000);
 }
 
 /* Chat */
@@ -1871,12 +1885,13 @@ function showGameNotationModal() {
 	showModal("Game Notation", message);
 }
 
-function openGameReplay() {
+function showGameReplayLink() {
 	if (currentGameData.hostUsername && currentGameData.guestUsername) {
 		var notation = getGameControllerForGameType(currentGameData.gameTypeId).gameNotation;
 		for (var i = 0; i < currentMoveIndex; i++) {
 			notation.addMove(gameController.gameNotation.moves[i]);
 		}
+		rerunAll();
 
 		var linkUrl = "";
 		
@@ -1892,9 +1907,38 @@ function openGameReplay() {
 
 		linkUrl = sandboxUrl + "?" + linkUrl;
 
-		console.log(linkUrl);
-		// return linkUrl;
-		window.open(linkUrl);
+		debug(linkUrl);
+		var message = "Here is the <a href=\"" + shortUrl + "\">game replay link</a>. Click to open it or copy it to save and share later."
+		showModal("Game Replay Link", message);
+	} else {
+		showModal("About Game Replay", "Click this link when viewing an online game to open a sharable game replay link in a new window.");
+	}
+}
+
+function openGameReplay() {
+	if (currentGameData.hostUsername && currentGameData.guestUsername) {
+		var notation = getGameControllerForGameType(currentGameData.gameTypeId).gameNotation;
+		for (var i = 0; i < currentMoveIndex; i++) {
+			notation.addMove(gameController.gameNotation.moves[i]);
+		}
+		rerunAll();
+
+		var linkUrl = "";
+		
+		if (currentGameData && currentGameData.gameTypeId) {
+			linkUrl += "gameType=" + currentGameData.gameTypeId + "&";
+		}
+		linkUrl += "host=" + currentGameData.hostUsername + "&";
+		linkUrl += "guest=" + currentGameData.guestUsername + "&";
+
+		linkUrl += "game=" + notation.notationTextForUrl();
+		
+		linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
+
+		linkUrl = sandboxUrl + "?" + linkUrl;
+
+		debug(linkUrl);
+		openLink(linkUrl);
 	} else {
 		showModal("About Game Replay", "Click this link when viewing an online game to open a sharable game replay link in a new window.");
 	}
