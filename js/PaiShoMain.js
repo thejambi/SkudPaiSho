@@ -1665,8 +1665,10 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 };
 
 function viewGameSeeksClicked() {
-	if (onlinePlayEnabled) {
+	if (onlinePlayEnabled && userIsLoggedIn()) {
 		onlinePlayEngine.getGameSeeks(getGameSeeksCallback);
+	} else if (onlinePlayEnabled) {
+		showModal("Join a game", "<span class='skipBonus' onclick='loginClicked();'>Sign in</span> to play real-time games with others online. When you are signed in, this is where you can join games against other players.");
 	} else {
 		showModal("Join a game", "Online play is disabled right now. Maybe you are offline. Try again later!");
 	}
@@ -1797,7 +1799,7 @@ function closeGame() {
 
 function getSidenavNewGameEntryForGameType(gameType) {
 	// <div class='sidenavOption skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div>
-	return "<div class='sidenavEntry skipBonus'><span class='sidenavLink' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink sidenavLink'>Rules</a></div>";
+	return "<div class='sidenavEntry'><span class='sidenavLink skipBonus' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink sidenavLink'>Rules</a></div>";
 }
 
 function getNewGameEntryForGameType(gameType) {
@@ -2004,6 +2006,14 @@ function closeNav() {
     // document.getElementById("mySidenav").style.width = "0";
     document.getElementById("mySidenav").classList.remove("sideNavOpen");
 }
+
+function aboutClicked() {
+	//var message = "<div><em>The Garden Gate</em> is a place to play various fan-made <em>Pai Sho</em> games created by Avatar: The Last Airbender fans who are inspired by the very idea of <em>Pai Sho</em>. A Pai Sho game is a game played on a board for the fictional game of Pai Sho as seen in Avatar: The Last Airbender.</div>";
+	var message = "<div><em>Skud Pai Sho</em> is a place to play various fan-made <em>Pai Sho</em> games created by Avatar: The Last Airbender fans who are inspired by the very idea of <em>Pai Sho</em>. A Pai Sho game is a game played on a board for the fictional game of Pai Sho as seen in Avatar: The Last Airbender.</div>";
+	message += "<hr /><div> Modern tile designs by Hector Lowe<br /> ©2017 | Used with permission<br /> <a href='http://hector-lowe.com/' target='_blank'>www.hector-lowe.com</a> </div> <div class='license'><a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'><img alt='Creative Commons License' style='border-width:0' src='https://i.creativecommons.org/l/by-nc/3.0/us/88x31.png' /></a>&nbsp;All other content of this work is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'>Creative Commons Attribution-NonCommercial 3.0 United States License</a>.</div> <br /> <div><span class='skipBonus' onclick='showPrivacyPolicy();'>Privacy policy</span></div>";
+	showModal("About", message);
+}
+
 
 
 
