@@ -69,8 +69,9 @@ strong.important {
 hr {
   border: none;
   border-bottom: 1px solid #d8d4d0;
-  margin-top: 20px;
-  margin-bottom: 30px; }
+  margin-top: 12px;
+  margin-bottom: 12px; 
+}
 
 
 /* --------------------------------------- */
@@ -534,10 +535,10 @@ input[type=submit] {
     z-index: 3;
     top: 0;
     left: 0;
-    background-color: #111;
+    background-color: #222;
+    color: #faf8ef;
     overflow-x: hidden;
     transition: 0.5s;
-    padding-top: 60px;
 }
 
 .sideNavOpen {
@@ -546,18 +547,23 @@ input[type=submit] {
 
 .sidenavContent {
   margin: 2px 2px 2px 16px;
+  transition: 0.3s;
 }
 
-.sidenav .skipBonus {
+.sidenav .sidenavEntry {
     /*padding: 2px 2px 2px 16px;*/
     text-decoration: none;
     font-size: 14px;
     color: #aaa;
-    display: block;
-    transition: 0.3s;
+    /*display: block;*/
 }
 
-.sidenav .skipBonus:hover {
+.sidenavLink {
+  text-decoration: none;
+  color: #aaa;
+}
+
+.sidenavLink:hover {
     color: #eee;
 }
 
@@ -572,6 +578,21 @@ input[type=submit] {
 
 .closebtn {
   cursor: pointer;
+}
+
+.sidenavContent h1 {
+  margin: 10px 0;
+  font-size: 26px;
+}
+
+.sidenavSectionHeader {
+  font-style: italic;
+  /*font-weight: bold;*/
+}
+
+.sidenavEntry {
+  padding-left: 12px;
+  padding-top: 6px;
 }
 
 @media screen and (max-height: 450px) {
@@ -727,6 +748,23 @@ input[type=submit] {
   .sideNavOpen {
     width: 100%;
   }
+
+  .header {
+    height: 36px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+  }
+
+  .headerRight {
+    margin-right: 0;
+    padding: 0;
+  }
+
+  .headerRightContainer {
+    font-size: 15px;
+  }
 }
 
 @media only screen and (max-width: 350px) {
@@ -737,6 +775,10 @@ input[type=submit] {
     .headerRight {
       margin-right: 0;
     }
+
+  .headerRightContainer {
+    font-size: 13px;
+  }
 }
 
 @media only screen and (max-width: 306px) {

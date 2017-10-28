@@ -182,6 +182,8 @@ window.requestAnimationFrame(function () {
 
 	setAccountHeaderLinkText();
 
+	setSidenavNewGameSection();
+
 	if (onlinePlayEnabled) {
 		onlinePlayEngine.testOnlinePlay();
 		if (gameId > 0) {
@@ -1778,6 +1780,24 @@ function startLoggingOnlineStatus() {
 		verifyLogin(); // TODO Build in the verify step to the logOnlineStatus call
 		fetchGlobalChats();
 	}, 5000);
+}
+
+function setSidenavNewGameSection() {
+	var message = getSidenavNewGameEntryForGameType(GameType.SkudPaiSho);
+	message += getSidenavNewGameEntryForGameType(GameType.VagabondPaiSho);
+	message += getSidenavNewGameEntryForGameType(GameType.SolitairePaiSho);
+	message += getSidenavNewGameEntryForGameType(GameType.CapturePaiSho);
+
+	document.getElementById("sidenavNewGameSection").innerHTML = message;
+}
+
+function closeGame() {
+	setGameController(GameType.SkudPaiSho.id);
+}
+
+function getSidenavNewGameEntryForGameType(gameType) {
+	// <div class='sidenavOption skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div>
+	return "<div class='sidenavEntry skipBonus'><span class='sidenavLink' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink sidenavLink'>Rules</a></div>";
 }
 
 function getNewGameEntryForGameType(gameType) {

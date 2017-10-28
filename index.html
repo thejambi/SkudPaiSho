@@ -30,11 +30,18 @@
   <div id="mySidenav" class="sidenav">
     <div class="sidenavContent">
       <div class="closebtn" onclick="closeNav();">&nbsp;&times;</div>
-      <div class='skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div><br />
-      <div class='skipBonus' onclick='showGameReplayLink();'>Get game replay link</div><br />
-      <div class='skipBonus' onclick='showGameNotationModal();'>Show game notation</div><br />
+      <h1>Skud Pai Sho</h1>
+      <hr />
+      <div class='sidenavSectionHeader'>New Game</div>
+      <div id="sidenavNewGameSection"></div>
+      <hr />
+      <div class='sidenavSectionHeader'>Current Game</div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameReplayLink();'>Get game replay link</div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameNotationModal();'>Show game notation</div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='closeGame();'>Close this game</div>
       <!-- <div class='skipBonus'><a href="https://skudpaisho.wordpress.com/tournaments/">Skud Pai Sho tournament information</a></div> -->
-      <br />
+      <hr />
       <div>
       Modern tile designs by Hector Lowe<br />
       ©2017 | Used with permission<br />
