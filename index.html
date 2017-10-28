@@ -3,7 +3,8 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>Skud Pai Sho</title>
+	<!-- <title>The Garden Gate</title> -->
+  <title>Skud Pai Sho</title>
 
 	<!-- Images used in Skud Pai Sho are originally from the Lotus Gambit rules community at http://lotusgambit.pbworks.com/w/page/45592429/Home -->
 
@@ -30,7 +31,12 @@
   <div id="mySidenav" class="sidenav">
     <div class="sidenavContent">
       <div class="closebtn" onclick="closeNav();">&nbsp;&times;</div>
+      <!-- <h1>The Garden Gate</h1> -->
       <h1>Skud Pai Sho</h1>
+      <hr />
+      <div class='sidenavSectionHeader'>Play</div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='accountHeaderClicked();'><i class="fa fa-user" aria-hidden="true"></i> View my games</div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameSeeksClicked();'><i class="fa fa-plug" aria-hidden="true"></i> Join a game</div>
       <hr />
       <div class='sidenavSectionHeader'>New Game</div>
       <div id="sidenavNewGameSection"></div>
@@ -42,16 +48,11 @@
       <div class='sidenavEntry sidenavLink skipBonus' onclick='closeGame();'>Close this game</div>
       <!-- <div class='skipBonus'><a href="https://skudpaisho.wordpress.com/tournaments/">Skud Pai Sho tournament information</a></div> -->
       <hr />
-      <div>
-      Modern tile designs by Hector Lowe<br />
-      ©2017 | Used with permission<br />
-      <a href="http://hector-lowe.com/" target="_blank">www.hector-lowe.com</a>
-      </div>
-
-      <div class="license"><a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/us/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/3.0/us/88x31.png" /></a>&nbsp;All other content of this work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/us/">Creative Commons Attribution-NonCommercial 3.0 United States License</a>.</div>
-      <br />
-      <div><span class='skipBonus' onclick='showPrivacyPolicy();'>Privacy policy</span></div>
-
+      <div class='sidenavSectionHeader'>About</div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='aboutClicked();'>About <em>Skud Pai Sho<!-- The Garden Gate --></em></div>
+      <!-- <div class='sidenavEntry sidenavLink skipBonus' onclick='helpClicked();'>Show welcome screens</div> -->
+      
+      <!--  -->
       <div id="onlinePlayTest"></div>
     </div>
   </div>
@@ -61,7 +62,7 @@
     <!-- <div class="sidenavMenuButton"><span style="cursor:pointer; vertical-align: top;" onclick="openNav();"><h1><i class="fa fa-bars" aria-hidden="true"></i></h1></span></div> -->
     <div class="sidenavMenuButton"><span style="cursor:pointer; vertical-align: top;" onclick="openNav();"><h1><span class="stretchText sidenavMenuButtonText" id='sidenavMenuButton'>&#8801;</span></h1></span></div>
     <div class="headerLeft"><h1>&nbsp;</h1></div>
-    <div class="headerLeft" style="cursor:pointer;" onclick="openNav();"><h1 id='siteHeading'>Skud Pai Sho</h1></div>
+    <div class="headerLeft" style="cursor:pointer;" onclick="openNav();"><h1 id='siteHeading'>Skud Pai Sho<!-- The Garden Gate --></h1></div>
     <div class="headerRightContainer">
       <span class="headerRight clickableText" onclick='accountHeaderClicked();'><i class="fa fa-user" aria-hidden="true"></i> <span id='accountHeaderLinkText'>Sign In</span></span>
       <div class="headerRight">&nbsp;|&nbsp;</div>
@@ -219,7 +220,7 @@ Modern tile designs by Hector Lowe<br />
 <!-- Modal content containers -->
 <div id='loginModalContentContainer' style='display:none;'>
 <!-- Login modal -->
-To sign up or log in, enter your username and email, then enter the 4-digit code sent to you to sign into SkudPaiSho.com in this browser.
+To sign up or log in, enter your username and email, then enter the 4-digit code sent to you to sign into Skud Pai Sho.
 <div style='text-align: center;'>
   <table style='margin:auto;'>
     <tr>
