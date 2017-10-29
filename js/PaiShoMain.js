@@ -813,11 +813,11 @@ function myTurn() {
 		if (getCurrentPlayer() === HOST) {
 			return !hostEmail 
 				|| (localStorage.getItem(localEmailKey) === hostEmail 
-					|| currentGameData.hostUsername.toLowerCase() === getUsername().toLowerCase());
+					|| (currentGameData.hostUsername && currentGameData.hostUsername.toLowerCase() === getUsername().toLowerCase()));
 		} else {
 			return !guestEmail 
 				|| (localStorage.getItem(localEmailKey) === guestEmail 
-					|| currentGameData.guestUsername.toLowerCase() === getUsername().toLowerCase());
+					|| (currentGameData.guestUsername && currentGameData.guestUsername.toLowerCase() === getUsername().toLowerCase()));
 		}
 	} else {
 		return true;
