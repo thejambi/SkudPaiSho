@@ -197,7 +197,7 @@ window.requestAnimationFrame(function () {
 	// Open default help/chat tab
 	document.getElementById("defaultOpenTab").click();
 
-	if (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn()) {
+	if (!QueryString.game && (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn())) {
 		showWelcomeTutorial();
 	}
 });
