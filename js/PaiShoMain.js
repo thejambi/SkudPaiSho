@@ -1775,6 +1775,20 @@ function fetchInitialGlobalChats() {
 	onlinePlayEngine.getInitialGlobalChatMessages(getInitialGlobalChatsCallback);
 }
 
+var callLogOnlineStatusPulse = function callLogOnlineStatusPulse() {
+	logOnlineStatusIntervalValue = setTimeout(function() {
+		debug("inside timeout call");
+		logOnlineStatusPulse();
+	}, 5000);
+	debug("timeout set");
+}
+
+function logOnlineStatusPulse() {
+	onlinePlayEngine.logOnlineStatus(getLoginToken(), callLogOnlineStatusPulse);
+	verifyLogin();
+	fetchGlobalChats();
+}
+
 function startLoggingOnlineStatus() {
 	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 
@@ -1785,11 +1799,7 @@ function startLoggingOnlineStatus() {
 		logOnlineStatusIntervalValue = null;
 	}
 
-	logOnlineStatusIntervalValue = setInterval(function() {
-		onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
-		verifyLogin(); // TODO Build in the verify step to the logOnlineStatus call
-		fetchGlobalChats();
-	}, 5000);
+	callLogOnlineStatusPulse();
 }
 
 function setSidenavNewGameSection() {
@@ -1806,7 +1816,6 @@ function closeGame() {
 }
 
 function getSidenavNewGameEntryForGameType(gameType) {
-	// <div class='sidenavOption skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div>
 	return "<div class='sidenavEntry'><span class='sidenavLink skipBonus' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink sidenavLink'>Rules</a></div>";
 }
 
