@@ -5,9 +5,7 @@ function OnlinePlayEngine() {
 }
 
 OnlinePlayEngine.prototype.testOnlinePlay = function() {
-	this.getGameTypeDesc(1);
-	// var self = this;
-	// setTimeout(function() { self.getGameTypeDesc(2); }, 500);
+	this.getGameTypeDesc(1, emptyCallback);
 };
 
 /* Calls callback with userId values that match username or emailAddress. */

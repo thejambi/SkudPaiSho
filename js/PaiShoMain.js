@@ -1775,16 +1775,16 @@ function fetchInitialGlobalChats() {
 	onlinePlayEngine.getInitialGlobalChatMessages(getInitialGlobalChatsCallback);
 }
 
-var callLogOnlineStatusPulse = function callLogOnlineStatusPulse() {
-	logOnlineStatusIntervalValue = setTimeout(function() {
-		debug("inside timeout call");
-		logOnlineStatusPulse();
-	}, 5000);
-	debug("timeout set");
-}
+// var callLogOnlineStatusPulse = function callLogOnlineStatusPulse() {
+// 	logOnlineStatusIntervalValue = setTimeout(function() {
+// 		debug("inside timeout call");
+// 		logOnlineStatusPulse();
+// 	}, 5000);
+// 	debug("timeout set");
+// }
 
 function logOnlineStatusPulse() {
-	onlinePlayEngine.logOnlineStatus(getLoginToken(), callLogOnlineStatusPulse);
+	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 	verifyLogin();
 	fetchGlobalChats();
 }
@@ -1799,7 +1799,9 @@ function startLoggingOnlineStatus() {
 		logOnlineStatusIntervalValue = null;
 	}
 
-	callLogOnlineStatusPulse();
+	logOnlineStatusIntervalValue = setInterval(function() {
+		logOnlineStatusPulse();
+	}, 5000);
 }
 
 function setSidenavNewGameSection() {
@@ -2149,5 +2151,9 @@ function continueTutorial() {
 	localStorage.setItem(welcomeTutorialDismissedKey, "true");
 	tutorialInProgress = false;
 }
+
+/* Internet connection checking */
+// window.addEventListener('online',  updateIndicator);
+// window.addEventListener('offline', updateIndicator);
 
 
