@@ -262,7 +262,7 @@ function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 		// document.title = "Skud Pai Sho";
 		document.title = "The Garden Gate";
 		if (parseInt(countOfGamesWhereUserTurn)) {
-			numMovesText = "(" + countOfGamesWhereUserTurn + ")";
+			numMovesText = " (" + countOfGamesWhereUserTurn + ")";
 			text += numMovesText;
 			// document.title = "(" + countOfGamesWhereUserTurn + ") Skud Pai Sho";
 			document.title = "(" + countOfGamesWhereUserTurn + ") The Garden Gate";
