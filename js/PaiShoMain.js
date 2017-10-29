@@ -253,10 +253,12 @@ function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 	var text = "Sign In";
 	if (userIsLoggedIn() && onlinePlayEnabled) {
 		text = "My Games";
-		document.title = "Skud Pai Sho";
+		// document.title = "Skud Pai Sho";
+		document.title = "The Garden Gate";
 		if (parseInt(countOfGamesWhereUserTurn)) {
 			text += "(" + countOfGamesWhereUserTurn + ")";
-			document.title = "(" + countOfGamesWhereUserTurn + ") Skud Pai Sho";
+			// document.title = "(" + countOfGamesWhereUserTurn + ") Skud Pai Sho";
+			document.title = "(" + countOfGamesWhereUserTurn + ") The Garden Gate";
 		}
 	}
 	document.getElementById('accountHeaderLinkText').innerText = text;
@@ -466,7 +468,8 @@ function signOut(reallySignOut) {
 		guestEmail = null;
 	}
 
-	document.title = "Skud Pai Sho";
+	// document.title = "Skud Pai Sho";
+	document.title = "The Garden Gate";
 
 	localStorage.removeItem(localEmailKey);
 
@@ -768,7 +771,7 @@ function getOpponentPlayerEmail() {
 }
 
 function getEmailBody(url) {
-	var bodyMessage = "I just made move #" + gameController.gameNotation.getLastMoveNumber() + " in Skud Pai Sho! Click here to open our game: " + url;
+	var bodyMessage = "I just made move #" + gameController.gameNotation.getLastMoveNumber() + " in a game of Pai Sho! Click here to open our game: " + url;
 	
 	bodyMessage += "[BR][BR]---- Full Details: ----[BR]Move: " + gameController.gameNotation.getLastMoveText() 
 		+ "[BR][BR]Game Notation: [BR]" + gameController.gameNotation.getNotationForEmail();
@@ -2008,12 +2011,49 @@ function closeNav() {
 }
 
 function aboutClicked() {
-	//var message = "<div><em>The Garden Gate</em> is a place to play various fan-made <em>Pai Sho</em> games created by Avatar: The Last Airbender fans who are inspired by the very idea of <em>Pai Sho</em>. A Pai Sho game is a game played on a board for the fictional game of Pai Sho as seen in Avatar: The Last Airbender.</div>";
-	var message = "<div><em>Skud Pai Sho</em> is a place to play various fan-made <em>Pai Sho</em> games created by Avatar: The Last Airbender fans who are inspired by the very idea of <em>Pai Sho</em>. A Pai Sho game is a game played on a board for the fictional game of Pai Sho as seen in Avatar: The Last Airbender.</div>";
+	var message = "<div><em>The Garden Gate</em> is a place to play various fan-made <em>Pai Sho</em> games created by Avatar: The Last Airbender fans who are inspired by the very idea of <em>Pai Sho</em>. A Pai Sho game is a game played on a board for the fictional game of Pai Sho as seen in Avatar: The Last Airbender.</div>";
+	// var message = "<div><em>Skud Pai Sho</em> is a place to play various fan-made <em>Pai Sho</em> games created by Avatar: The Last Airbender fans who are inspired by the very idea of <em>Pai Sho</em>. A Pai Sho game is a game played on a board for the fictional game of Pai Sho as seen in Avatar: The Last Airbender.</div>";
 	message += "<hr /><div> Modern tile designs by Hector Lowe<br /> ©2017 | Used with permission<br /> <a href='http://hector-lowe.com/' target='_blank'>www.hector-lowe.com</a> </div> <div class='license'><a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'><img alt='Creative Commons License' style='border-width:0' src='https://i.creativecommons.org/l/by-nc/3.0/us/88x31.png' /></a>&nbsp;All other content of this work is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'>Creative Commons Attribution-NonCommercial 3.0 United States License</a>.</div> <br /> <div><span class='skipBonus' onclick='showPrivacyPolicy();'>Privacy policy</span></div>";
 	showModal("About", message);
 }
 
+function resignGameClicked() {
+	var message = "";
+	if (playingOnlineGame()) {
+		message = "<div>Are you sure you want to resign this game?</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal(); resignGame();'>Yes - resign game</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+	} else {
+		message = "When playing an online game, this is where you can resign or leave a game if you wish to do so.";
+	}
+	
+	showModal("Resign Game", message);
+}
 
+function resignGameCallback() {
+	if (gameController) {
+		setGameController(gameController.gameTypeId);
+	} else {
+		setGameController(GameType.SkudPaiSho.id);
+	}
+}
+
+function resignGame() {
+	// TODO eventually make it so if guest never made a move, then player only "leaves" game instead of updating the game result, so it returns to being an available game seek.
+	if (gameController.guestNeverMoved && gameController.guestNeverMoved()) {
+		// Guest never moved, only leave game. TODO
+	}// else {....}
+
+	onlinePlayEngine.updateGameWinInfo(gameId, getOpponentPlayerEmail(), 8, getLoginToken(), resignGameCallback);
+}
+
+function showWelcomeTutorial() {
+	showModal("The Garden Gate", "<div id='tutorialContent'></div>");
+	runTutorial();
+}
+
+function runTutorial() {
+	// 
+}
 
 
