@@ -1114,7 +1114,7 @@ function showModal(headingHTMLText, modalMessageHTMLText) {
 
 	// When the user clicks anywhere outside of the modal, close it
 	window.onclick = function(event) {
-	    if (event.target == modal) {
+	    if (event.target == modal && !tutorialInProgress) {
 	        modal.style.display = "none";
 	    }
 	};
@@ -2064,7 +2064,10 @@ function resignGameClicked() {
 	showModal("Resign Game", message);
 }
 
+var tutorialInProgress = false;
+
 function showWelcomeTutorial() {
+	tutorialInProgress = true;
 	showModal("The Garden Gate", "<div id='tutorialContent'></div>");
 	setTimeout(function(){runTutorial();}, 400);
 }
@@ -2135,6 +2138,7 @@ function continueTutorial() {
 	tutContent.appendChild(div1);
 
 	localStorage.setItem(welcomeTutorialDismissedKey, "true");
+	tutorialInProgress = false;
 }
 
 
