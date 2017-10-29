@@ -197,7 +197,7 @@ window.requestAnimationFrame(function () {
 	// Open default help/chat tab
 	document.getElementById("defaultOpenTab").click();
 
-	if (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true') {
+	if (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn()) {
 		showWelcomeTutorial();
 	}
 });
@@ -1109,19 +1109,20 @@ function showModal(headingHTMLText, modalMessageHTMLText) {
 
 	// When the user clicks on <span> (x), close the modal
 	span.onclick = function() {
-	    modal.style.display = "none";
+	    closeModal();
 	};
 
 	// When the user clicks anywhere outside of the modal, close it
 	window.onclick = function(event) {
 	    if (event.target == modal && !tutorialInProgress) {
-	        modal.style.display = "none";
+	        closeModal();
 	    }
 	};
 }
 
 function closeModal() {
 	document.getElementById('myMainModal').style.display = "none";
+	tutorialInProgress = false;
 }
 
 function callSubmitMove() {
