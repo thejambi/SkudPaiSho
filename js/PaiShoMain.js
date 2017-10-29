@@ -2018,11 +2018,11 @@ function aboutClicked() {
 }
 
 function getOnlineGameOpponentUsername() {
+	var opponentUsername = "";
 	if (playingOnlineGame()) {
-		var opponentUsername;
-		if (gameController.hostUsername === getUsername()) {
+		if (currentGameData.hostUsername === getUsername()) {
 			opponentUsername = currentGameData.guestUsername;
-		} else if (gameController.guestUsername === getUsername()) {
+		} else if (currentGameData.guestUsername === getUsername()) {
 			opponentUsername = currentGameData.hostUsername;
 		}
 	}
