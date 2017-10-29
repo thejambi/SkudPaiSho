@@ -271,6 +271,7 @@ OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, 
         function(data, status){
             if (status === 'success') {
                 // debug('Game win info updated.');
+                callback(data.trim());
             }
         }
     );

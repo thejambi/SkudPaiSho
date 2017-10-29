@@ -2017,17 +2017,16 @@ function aboutClicked() {
 	showModal("About", message);
 }
 
-function resignGameClicked() {
-	var message = "";
+function getOnlineGameOpponentUsername() {
 	if (playingOnlineGame()) {
-		message = "<div>Are you sure you want to resign this game?</div>";
-		message += "<br /><div class='clickableText' onclick='closeModal(); resignGame();'>Yes - resign game</div>";
-		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
-	} else {
-		message = "When playing an online game, this is where you can resign or leave a game if you wish to do so.";
+		var opponentUsername;
+		if (gameController.hostUsername === getUsername()) {
+			opponentUsername = currentGameData.guestUsername;
+		} else if (gameController.guestUsername === getUsername()) {
+			opponentUsername = currentGameData.hostUsername;
+		}
 	}
-	
-	showModal("Resign Game", message);
+	return opponentUsername;
 }
 
 function resignGameCallback() {
@@ -2044,7 +2043,20 @@ function resignGame() {
 		// Guest never moved, only leave game. TODO
 	}// else {....}
 
-	onlinePlayEngine.updateGameWinInfo(gameId, getOpponentPlayerEmail(), 8, getLoginToken(), resignGameCallback);
+	onlinePlayEngine.updateGameWinInfo(gameId, getOnlineGameOpponentUsername(), 8, getLoginToken(), resignGameCallback);
+}
+
+function resignGameClicked() {
+	var message = "";
+	if (playingOnlineGame()) {
+		message = "<div>Are you sure you want to resign this game?</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal(); resignGame();'>Yes - resign game</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+	} else {
+		message = "When playing an online game, this is where you can resign or leave a game if you wish to do so.";
+	}
+	
+	showModal("Resign Game", message);
 }
 
 function showWelcomeTutorial() {
