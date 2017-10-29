@@ -40,6 +40,7 @@ var userEmailKey = "userEmailKey";
 var userIdKey = "userIdKey";
 var deviceIdKey = "deviceIdKey";
 
+var welcomeTutorialDismissedKey = "welcomeTutorialDismissedKey";
 
 var url;
 
@@ -195,6 +196,10 @@ window.requestAnimationFrame(function () {
 
 	// Open default help/chat tab
 	document.getElementById("defaultOpenTab").click();
+
+	if (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true') {
+		showWelcomeTutorial();
+	}
 });
 
 function showReplayControls() {
@@ -2061,7 +2066,7 @@ function resignGameClicked() {
 
 function showWelcomeTutorial() {
 	showModal("The Garden Gate", "<div id='tutorialContent'></div>");
-	runTutorial();
+	setTimeout(function(){runTutorial();}, 400);
 }
 
 function runTutorial() {
@@ -2108,14 +2113,26 @@ function runTutorial() {
 								div2.classList.add('gone');
 								div3.classList.add('gone');
 								continueTutorial();
-							}, 3000);
+							}, 2000);
 						}, 2000);
 				}, 2000);
 		}, 3000);
 }
 
 function continueTutorial() {
+	var tutContent = document.getElementById('tutorialContent');
 
+	var div1 = document.createElement("div");
+	div1.innerHTML = "<p>Welcome to <em>The Garden Gate</em>, a place to play a variety of Pai Sho games against other players online.</p>";
+	div1.innerHTML += "<p>You can sign in (or sign up) by entering your username and verifying your email address.</p>";
+	div1.innerHTML += "<p>Use options in the side menu (select the <strong class='stretchText'>&nbsp;&#8801&nbsp;</strong> at the top left) to create a new game, join games set up by other players, or to view any of your games that are in progress. You can have any number of online games in progress at once.</p>";
+	div1.innerHTML += "<p>Also in the side menu you can find links to the rules for all of the games you can play here.</p>";
+	div1.innerHTML += "<p><span class='skipBonus' onclick='loginClicked();'>Sign in</span> now to get started.</p>";
+	// div1.classList.add('tutContentMessage');
+	div1.classList.add('tutContentFadeIn');
+	tutContent.appendChild(div1);
+
+	localStorage.setItem(welcomeTutorialDismissedKey, "true");
 }
 
 
