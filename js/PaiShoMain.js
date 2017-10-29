@@ -2030,8 +2030,8 @@ function getOnlineGameOpponentUsername() {
 }
 
 function resignGameCallback() {
-	if (gameController) {
-		setGameController(gameController.gameTypeId);
+	if (currentGameData) {
+		setGameController(currentGameData.gameTypeId);
 	} else {
 		setGameController(GameType.SkudPaiSho.id);
 	}
