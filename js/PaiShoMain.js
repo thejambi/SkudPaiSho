@@ -256,17 +256,20 @@ function verifyLogin() {
 
 function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 	var text = "Sign In";
+	var numMovesText = "";
 	if (userIsLoggedIn() && onlinePlayEnabled) {
 		text = "My Games";
 		// document.title = "Skud Pai Sho";
 		document.title = "The Garden Gate";
 		if (parseInt(countOfGamesWhereUserTurn)) {
-			text += "(" + countOfGamesWhereUserTurn + ")";
+			numMovesText = "(" + countOfGamesWhereUserTurn + ")";
+			text += numMovesText;
 			// document.title = "(" + countOfGamesWhereUserTurn + ") Skud Pai Sho";
 			document.title = "(" + countOfGamesWhereUserTurn + ") The Garden Gate";
 		}
 	}
 	document.getElementById('accountHeaderLinkText').innerText = text;
+	document.getElementById('myGamesNumberMyTurn').innerText = numMovesText;
 }
 
 var getGameNotationCallback = function getGameNotationCallback(newGameNotation) {
