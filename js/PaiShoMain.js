@@ -2065,7 +2065,57 @@ function showWelcomeTutorial() {
 }
 
 function runTutorial() {
-	// 
+	// Who knocks
+	var tutContent = document.getElementById('tutorialContent');
+
+	var div1 = document.createElement("div");
+	var node = document.createTextNode("Who knocks at the Garden Gate?");
+	div1.appendChild(node);
+	div1.classList.add('tutContentMessage');
+	div1.classList.add('tutContentFadeIn');
+	tutContent.appendChild(div1);
+
+	setTimeout(
+		function() {
+			var div2 = document.createElement("div");
+			var node = document.createTextNode("One who has eaten the fruit...");
+			div2.appendChild(node);
+			div2.classList.add('tutContentMessage');
+			div2.classList.add('tutContentFadeIn');
+			tutContent.appendChild(div2);
+
+			div1.classList.remove('tutContentFadeIn');
+			div1.classList.add('tutContentFadeOut');
+
+			setTimeout(
+				function() {
+					var div3 = document.createElement("div");
+					var node = document.createTextNode("... and tasted its mysteries.");
+					div3.appendChild(node);
+					div3.classList.add('tutContentMessage');
+					div3.classList.add('tutContentFadeIn');
+					tutContent.appendChild(div3);
+
+					setTimeout(
+						function() {
+							div2.classList.remove('tutContentFadeIn');
+							div2.classList.add('tutContentFadeOut');
+							div3.classList.remove('tutContentFadeIn');
+							div3.classList.add('tutContentFadeOut');
+
+							setTimeout(function() {
+								div1.classList.add('gone');
+								div2.classList.add('gone');
+								div3.classList.add('gone');
+								continueTutorial();
+							}, 3000);
+						}, 2000);
+				}, 2000);
+		}, 3000);
+}
+
+function continueTutorial() {
+
 }
 
 
