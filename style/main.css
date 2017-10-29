@@ -198,12 +198,17 @@ div.tab .alertTab, div.tab .alertTab.active {
   background-color: #bbb;
 }
 
-.svgContainer {
-  /*width: 576px;*/
+.svgContainerContainer {
+  display: inline;
+  float: left;
   width: 612px;
   margin-top: 8px;
-  /*border: 1px dotted gray;*/
-  /*padding-left: 1px;*/
+  overflow: hidden;
+}
+
+.svgContainer {
+  /*width: 612px;
+  margin-top: 8px;*/
 
   display: inline;
   float: left;
@@ -774,6 +779,9 @@ input[type=submit] {
       padding: 0;
     }*/
 
+    .svgContainerContainer {
+      width: 100vw;
+    }
     .svgContainer {
       width: 100vw;
     }
@@ -874,6 +882,9 @@ input[type=submit] {
 }
 
 @media only screen and (max-width: 306px) {
+    .svgContainerContainer {
+      width: 306px;
+    }
     .svgContainer {
       width: 306px;
     }
