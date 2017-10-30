@@ -2068,12 +2068,12 @@ function resignGame() {
 
 function resignGameClicked() {
 	var message = "";
-	if (playingOnlineGame()) {
+	if (playingOnlineGame() && !gameController.theGame.getWinner()) {
 		message = "<div>Are you sure you want to resign this game?</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal(); resignGame();'>Yes - resign game</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
 	} else {
-		message = "When playing an online game, this is where you can resign or leave a game if you wish to do so.";
+		message = "When playing an unfinished online game, this is where you can resign or leave a game if you wish to do so.";
 	}
 	
 	showModal("Resign Game", message);
