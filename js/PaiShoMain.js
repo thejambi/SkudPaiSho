@@ -705,7 +705,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		//messageText += "<span class='skipBonus' onclick='playAiTurn();'>Submit move to AI</span>";
 		messageText += "<em>THINKING...</em>";
 	} else if (activeAi) {
-		messageText += "Playing against the computer can help you learn how the game works. You should be able to beat the computer easily once you understand the game.<br /><br />Is playing against the computer too easy? Good! <a href='http://skudpaisho.com/?BYewzgLgvGDWCuATADgQwJZlAAQOYFsMAbAOgGMR8AyXVfAUygAYAJEgJQBoB1TgaU4AhKgDt6AdwDKyemXSoiAMSIhx9AE7t4RemCgjREgOKoIurTqgBPKupBlYYAKojxwevSKoARpZtgAEVNGACYmAEYAdgBaJhDYgBYgA'>Join the creator in a game</a> to play a real game or give feedback.";
+		messageText += "Playing against the computer can help you learn how the game works. You should be able to beat the computer easily once you understand the game.";
 	} 
 	// else if (!playingOnlineGame()) {
 	// 	messageText += "Copy this <a href=\"" + shortUrl + "\">link</a> and send to the " + getCurrentPlayer() + ".";
@@ -1071,7 +1071,12 @@ function setAiIndex(i) {
 }
 
 function playAiTurn() {
-	gameController.playAiTurn(finalizeMove);
+	if (playingOnlineGame()) {
+		activeAi = null;
+		activeAi2 = null;
+	} else {
+		gameController.playAiTurn(finalizeMove);
+	}
 }
 
 function sandboxFromMove() {
@@ -1870,7 +1875,7 @@ var sendChatCallback = function sendChatCallback(result) {
 
 var sendChat = function() {
 	var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value).trim();
-	chatMessage = chatMesage.replace(/\n/g, ' ');	// Convert newlines to spaces.
+	chatMessage = chatMessage.replace(/\n/g, ' ');	// Convert newlines to spaces.
 	if (chatMessage) {
 		document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
 		onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, sendChatCallback);
@@ -1891,7 +1896,7 @@ var sendGlobalChatCallback = function sendGlobalChatCallback(result) {
 
 var sendGlobalChat = function() {
 	var chatMessage = htmlEscape(document.getElementById('globalChatMessageInput').value).trim();
-	chatMessage = chatMesage.replace(/\n/g, ' ');	// Convert newlines to spaces.
+	chatMessage = chatMessage.replace(/\n/g, ' ');	// Convert newlines to spaces.
 	if (chatMessage) {
 		document.getElementById('sendGlobalChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
 		onlinePlayEngine.sendChat(0, getLoginToken(), chatMessage, sendGlobalChatCallback);
