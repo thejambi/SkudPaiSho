@@ -282,6 +282,10 @@ var getGameNotationCallback = function getGameNotationCallback(newGameNotation) 
 	}
 };
 
+function usernameEquals(otherUsername) {
+	return otherUsername.toLowerCase() === getUsername().toLowerCase();
+}
+
 function updateCurrentGameTitle(isOpponentOnline) {
 	if (!currentGameData.guestUsername || !currentGameData.hostUsername) {
 		document.getElementById("response").innerHTML = "";
@@ -295,12 +299,12 @@ function updateCurrentGameTitle(isOpponentOnline) {
 	}
 
 	var title = "<strong>";
-	if (currentGameData.guestUsername === getUsername()) {
+	if (usernameEquals(currentGameData.guestUsername)) {
 		title += opponentOnlineIconText;
 	}
 	title += currentGameData.hostUsername;
 	title += " vs. ";
-	if (currentGameData.hostUsername === getUsername()) {
+	if (usernameEquals(currentGameData.hostUsername)) {
 		title += opponentOnlineIconText;
 	}
 	title += currentGameData.guestUsername;
@@ -340,7 +344,7 @@ var getNewChatMessagesCallback = function getNewChatMessagesCallback(results) {
 			newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
 			
 			// The most recent message will determine whether to alert
-			if (chatMessage.username != getUsername()) {
+			if (!usernameEquals(chatMessage.username)) {
 				// Set chat tab color to alert new messages if newest message is not from user
 				alertNewMessages = true;
 			} else {
@@ -1276,7 +1280,7 @@ function userIsLoggedIn() {
 
 function forgetCurrentGameInfo() {
 	clearAiPlayers();
-	
+
 	if (gameWatchIntervalValue) {
 		clearInterval(gameWatchIntervalValue);
 		gameWatchIntervalValue = null;
