@@ -1070,10 +1070,14 @@ function setAiIndex(i) {
 	gameController.startAiGame(finalizeMove);
 }
 
+function clearAiPlayers() {
+	activeAi = null;
+	activeAi2 = null;
+}
+
 function playAiTurn() {
 	if (playingOnlineGame()) {
-		activeAi = null;
-		activeAi2 = null;
+		clearAiPlayers();
 	} else {
 		gameController.playAiTurn(finalizeMove);
 	}
@@ -1271,6 +1275,8 @@ function userIsLoggedIn() {
 }
 
 function forgetCurrentGameInfo() {
+	clearAiPlayers();
+	
 	if (gameWatchIntervalValue) {
 		clearInterval(gameWatchIntervalValue);
 		gameWatchIntervalValue = null;
