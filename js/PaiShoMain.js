@@ -820,11 +820,11 @@ function myTurn() {
 		if (getCurrentPlayer() === HOST) {
 			return !hostEmail 
 				|| (localStorage.getItem(localEmailKey) === hostEmail 
-					|| (currentGameData.hostUsername && currentGameData.hostUsername.toLowerCase() === getUsername().toLowerCase()));
+					|| (currentGameData.hostUsername && usernameEquals(currentGameData.hostUsername)));
 		} else {
 			return !guestEmail 
 				|| (localStorage.getItem(localEmailKey) === guestEmail 
-					|| (currentGameData.guestUsername && currentGameData.guestUsername.toLowerCase() === getUsername().toLowerCase()));
+					|| (currentGameData.guestUsername && usernameEquals(currentGameData.guestUsername)));
 		}
 	} else {
 		return true;
@@ -1373,15 +1373,15 @@ var jumpToGameCallback = function jumpToGameCallback(results) {
 				setGameController(myGame.gameTypeId);
 
 				// Is user even playing this game? This could be used to "watch" games
-				var userIsPlaying = myGame.hostUsername === getUsername() 
-					|| myGame.guestUsername === getUsername();
+				var userIsPlaying = usernameEquals(myGame.hostUsername) 
+					|| usernameEquals(myGame.guestUsername);
 
 				gameId = myGame.gameId;
 				currentGameOpponentUsername = null;
 				var opponentUsername;
 
 				if (userIsPlaying) {
-					if (myGame.hostUsername === getUsername()) {
+					if (usernameEquals(myGame.hostUsername)) {
 						opponentUsername = myGame.guestUsername;
 					} else {
 						opponentUsername = myGame.hostUsername;
@@ -1458,7 +1458,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 					}
 
 					var gId = parseInt(myGame.gameId);
-					var userIsHost = myGame.hostUsername === getUsername();
+					var userIsHost = usernameEquals(myGame.hostUsername);
 					var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
 
 					var gameDisplayTitle = myGame.hostUsername;
@@ -1497,12 +1497,12 @@ var showMyGamesCallback = function showMyGamesCallback(results) {
 			}
 
 			var gId = parseInt(myGame.gameId);
-			var userIsHost = myGame.hostUsername === getUsername();
+			var userIsHost = usernameEquals(myGame.hostUsername);
 			var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
 
 			var gameDisplayTitle = "";
 
-			if (!userIsHost && opponentUsername != getUsername()) {
+			if (!userIsHost && !usernameEquals(opponentUsername)) {
 				if (myGame.hostOnline) {
 					gameDisplayTitle += userOnlineIcon;
 				} else {
@@ -1511,7 +1511,7 @@ var showMyGamesCallback = function showMyGamesCallback(results) {
 			}
 			gameDisplayTitle += myGame.hostUsername;
 			gameDisplayTitle += " vs. ";
-			if (userIsHost && opponentUsername != getUsername()) {
+			if (userIsHost && !usernameEquals(opponentUsername)) {
 				if (myGame.guestOnline) {
 					gameDisplayTitle += userOnlineIcon;
 				} else {
@@ -1604,7 +1604,7 @@ var getCurrentGamesForUserNewCallback = function getCurrentGamesForUserNewCallba
 		for (var index in myGamesList) {
 			var myGame = myGamesList[index];
 
-			var userIsHost = myGame.hostUsername === getUsername();
+			var userIsHost = usernameEquals(myGame.hostUsername);
 			var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
 
 			if (opponentUsername === gameSeek.hostUsername
@@ -2056,9 +2056,9 @@ function aboutClicked() {
 function getOnlineGameOpponentUsername() {
 	var opponentUsername = "";
 	if (playingOnlineGame()) {
-		if (currentGameData.hostUsername === getUsername()) {
+		if (usernameEquals(currentGameData.hostUsername)) {
 			opponentUsername = currentGameData.guestUsername;
-		} else if (currentGameData.guestUsername === getUsername()) {
+		} else if (usernameEquals(currentGameData.guestUsername)) {
 			opponentUsername = currentGameData.hostUsername;
 		}
 	}
