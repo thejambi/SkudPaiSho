@@ -680,9 +680,6 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		if (!playingOnlineGame() && (currentGameData.gameTypeId === 1 || !currentGameData.gameTypeId)) {
 			if (!ignoreNoEmail && !userIsLoggedIn()) {
 				messageText = getNoUserEmailMessage();
-			} 
-			else {
-				messageText += "<span class='skipBonus' onclick='loginClicked(); finalizeMove();'>Sign in</span> to play real-time games with others online. <br />";
 			}
 		}
 
