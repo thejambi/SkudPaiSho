@@ -103,7 +103,7 @@ div.tab button {
     transition: 0.3s;
     font-size: 15px;
     min-width: 70px;
-    min-height: 35px;
+    min-height: 40px;
 }
 
 /* Change background color of buttons on hover */
