@@ -600,11 +600,13 @@ function getAdditionalMessage() {
 
 	if (gameController.theGame.getWinner()) {
 		// There is a winner!
-		msg += "<br /><strong>" + gameController.theGame.getWinner() + gameController.theGame.getWinReason() + "</strong>";
+		msg += " <strong>" + gameController.theGame.getWinner() + gameController.theGame.getWinReason() + "</strong>";
 	}
+
 	if (msg === "<br />") {
 		msg = "";
 	}
+
 	return msg;
 }
 
