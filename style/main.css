@@ -609,11 +609,11 @@ input[type=submit] {
 
 .stretchText {
   display: inline-block;
-  -webkit-transform:scale(2,1.4); /* Safari and Chrome */
-  -moz-transform:scale(2,1.4); /* Firefox */
-  -ms-transform:scale(2,1.4); /* IE 9 */
-  -o-transform:scale(2,1.4); /* Opera */
-  transform:scale(2,1.4); /* W3C */
+  -webkit-transform:scale(2,1.8); /* Safari and Chrome */
+  -moz-transform:scale(2,1.8); /* Firefox */
+  -ms-transform:scale(2,1.8); /* IE 9 */
+  -o-transform:scale(2,1.8); /* Opera */
+  transform:scale(2,1.8); /* W3C */
   
   padding-right: 2px;
 }
