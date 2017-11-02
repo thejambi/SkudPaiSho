@@ -203,7 +203,9 @@ window.requestAnimationFrame(function () {
 });
 
 function showReplayControls() {
-	document.getElementById("replayControls").classList.remove("gone");
+	if (window.navigator.onLine) {
+		document.getElementById("replayControls").classList.remove("gone");
+	}
 }
 
 function setTileContainers() {
@@ -2204,8 +2206,9 @@ function continueTutorial() {
 
 function iOSShake() {
 	// If undo move is allowed, ask user if they wanna
-	if (playingOnlineGame() && !myTurn() && !gameController.theGame.getWinner()) {
-		var message = "<br /><div class='clickableText' onclick='resetMove();'>Yes, undo move</div>";
+	if ((playingOnlineGame() && !myTurn() && !gameController.theGame.getWinner())
+		|| (!playingOnlineGame())) {
+		var message = "<br /><div class='clickableText' onclick='resetMove(); closeModal();'>Yes, undo move</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>Cancel</div>";
 
 		showModal("Undo move?", message);
