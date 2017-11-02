@@ -1581,8 +1581,16 @@ function showAccountSettings() {
 	onlinePlayEngine.getEmailNotificationsSetting(getUserId(), getEmailNotificationsSettingCallback);
 }
 
+function showCurrentlyOfflineModal() {
+	if (!window.navigator.onLine) {
+		showModal("Currently Offline", "Currently offline, please try again when connected to the Internet. <br /><br /><span class='skipBonus' onclick='closeModal();'>OK</span>");
+	}
+}
+
 function accountHeaderClicked() {
-	if (userIsLoggedIn() && onlinePlayEnabled) {
+	if (!window.navigator.onLine) {
+		showCurrentlyOfflineModal();
+	} else if (userIsLoggedIn() && onlinePlayEnabled) {
 		showMyGames();
 	} else {
 		loginClicked();
@@ -1710,7 +1718,9 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 };
 
 function viewGameSeeksClicked() {
-	if (onlinePlayEnabled && userIsLoggedIn()) {
+	if (!window.navigator.onLine) {
+		showCurrentlyOfflineModal();
+	} else if (onlinePlayEnabled && userIsLoggedIn()) {
 		onlinePlayEngine.getGameSeeks(getGameSeeksCallback);
 	} else if (onlinePlayEnabled) {
 		showModal("Join a game", "<span class='skipBonus' onclick='loginClicked();'>Sign in</span> to play real-time games with others online. When you are signed in, this is where you can join games against other players.");
