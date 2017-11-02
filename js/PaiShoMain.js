@@ -658,8 +658,7 @@ function showSubmitMoveForm(url) {
 }
 
 function getNoUserEmailMessage() {
-	return "<span class='skipBonus' onclick='loginClicked(); finalizeMove();'>Sign in</span> to play real-time games with others online. <br />";
-	// return "Recommended: <span class='skipBonus' onclick='promptEmail(); finalizeMove();'>Enter your email address</span> to be notified when it is your turn. <br /><em><span class='skipBonus' onclick='finalizeMove(true);'>Click to ignore</span></em><br /><br />";
+	return "<span class='skipBonus' onclick='loginClicked(); finalizeMove();'>Sign in</span> to play games with others online. <br />";
 }
 
 function playingOnlineGame() {
@@ -679,11 +678,10 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 
 	if (currentMoveIndex == 1 && !haveBothEmails()) {
 		if (!playingOnlineGame() && (currentGameData.gameTypeId === 1 || !currentGameData.gameTypeId)) {
-			if (!ignoreNoEmail && !haveUserEmail()) {
+			if (!ignoreNoEmail && !userIsLoggedIn()) {
 				messageText = getNoUserEmailMessage();
 			} 
 			else {
-				// messageText += "Thank you for Hosting a game of Pai Sho! Share <a href=\"" + shortUrl + "\">this link</a> with your friends to invite them to join you in a game.";
 				messageText += "<span class='skipBonus' onclick='loginClicked(); finalizeMove();'>Sign in</span> to play real-time games with others online. <br />";
 			}
 		}
@@ -698,7 +696,6 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 			messageText += "<br />";
 		}
 	} else if (haveBothEmails()) {
-		// messageText = "Click <span class='skipBonus' onclick=sendMail('" + shortUrl + "')>here</span> to email your move to the " + getCurrentPlayer() + ". Or, share this <a href=\"" + shortUrl + "\">link</a> with them.";
 		if (!metadata.tournamentName && !playingOnlineGame()) {
 			messageText += "Or, copy and share this <a href=\"" + shortUrl + "\">link</a> with your opponent.";
 		}
@@ -751,13 +748,6 @@ function haveBothEmails() {
 	return hostEmail && guestEmail && haveUserEmail();
 }
 
-function haveUserEmail() {
-	if (localStorage.getItem(localEmailKey)) {
-		return true;
-	}
-	return false;
-}
-
 function getUserEmail() {
 	return localStorage.getItem(userEmailKey);
 }
@@ -800,7 +790,7 @@ function getCurrentPlayerForReal() {
 }
 
 function getResetMoveText() {
-	return "<br /><br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
+	return "<br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
 }
 
 function showResetMoveMessage() {
