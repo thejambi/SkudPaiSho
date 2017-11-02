@@ -558,7 +558,7 @@ input[type=submit] {
 .sidenav .sidenavEntry {
     /*padding: 2px 2px 2px 16px;*/
     text-decoration: none;
-    font-size: 14px;
+    /*font-size: 14px;*/
     color: #aaa;
     /*display: block;*/
 }
