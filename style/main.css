@@ -383,6 +383,10 @@ figure > div {
   display: none;
 }
 
+.underline {
+  text-decoration: underline;
+}
+
 input[type=submit] {
   /*background: #24333d;
   color: #FFF;*/

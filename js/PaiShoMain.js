@@ -283,7 +283,7 @@ var getGameNotationCallback = function getGameNotationCallback(newGameNotation) 
 };
 
 function usernameEquals(otherUsername) {
-	return otherUsername.toLowerCase() === getUsername().toLowerCase();
+	return getUsername() && otherUsername.toLowerCase() === getUsername().toLowerCase();
 }
 
 function updateCurrentGameTitle(isOpponentOnline) {
@@ -298,16 +298,37 @@ function updateCurrentGameTitle(isOpponentOnline) {
 		opponentOnlineIconText = userOnlineIcon;
 	}
 
-	var title = "<strong>";
+	var currentPlayer = getCurrentPlayer();
+
+	// Build HOST username
+	var hostUsernameTag = "";
+	if (currentPlayer === HOST) {
+		hostUsernameTag = "<span class='underline'>";
+	} else {
+		hostUsernameTag = "<span>";
+	}
 	if (usernameEquals(currentGameData.guestUsername)) {
-		title += opponentOnlineIconText;
+		hostUsernameTag += opponentOnlineIconText;
 	}
-	title += currentGameData.hostUsername;
-	title += " vs. ";
+	hostUsernameTag += currentGameData.hostUsername;
+	hostUsernameTag += "</span>";
+
+	var guestUsernameTag = "";
+	if (currentPlayer === GUEST) {
+		guestUsernameTag = "<span class='underline'>";
+	} else {
+		guestUsernameTag = "<span>";
+	}
 	if (usernameEquals(currentGameData.hostUsername)) {
-		title += opponentOnlineIconText;
+		guestUsernameTag += opponentOnlineIconText;
 	}
-	title += currentGameData.guestUsername;
+	guestUsernameTag += currentGameData.guestUsername;
+	guestUsernameTag += "</span>";
+
+	var title = "<strong>";
+	title += hostUsernameTag;
+	title += " vs. ";
+	title += guestUsernameTag;
 	title += "</strong>";
 	
 	document.getElementById("response").innerHTML = title;
@@ -1173,10 +1194,10 @@ function sendVerificationCodeClicked() {
 
 	// Only continue if email and username pass validation
 	if (emailBeingVerified.includes("@") && emailBeingVerified.includes(".")
-		&& usernameBeingVerified.match(/^([A-Za-z0-9_])+$/g)) {
+		&& usernameBeingVerified.match(/^([A-Za-z0-9_]){3,25}$/g)) {
 		onlinePlayEngine.userInfoExists(usernameBeingVerified, emailBeingVerified, userInfoExistsCallback);
 	} else {
-		alert("Need valid username and email.");
+		alert("Need valid username and email. Your username cannot be too short or too long, and cannot contain spaces.");
 	}
 }
 
