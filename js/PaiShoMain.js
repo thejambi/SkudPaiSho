@@ -446,13 +446,13 @@ function promptEmail() {
 }
 
 function updateFooter() {
-	var userEmail = localStorage.getItem(localEmailKey);
-	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
-		document.querySelector(".footer").innerHTML = gamePlayersMessage() + "You are playing as " + userEmail
-		+ " | <span class='skipBonus' onclick='promptEmail();'>Edit email</span> | <span class='skipBonus' onclick='showSignOutModal();'>Sign out</span>";
-	} else {
-		document.querySelector(".footer").innerHTML = gamePlayersMessage() + defaultEmailMessageText;
-	}
+	// var userEmail = localStorage.getItem(localEmailKey);
+	// if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
+	// 	document.querySelector(".footer").innerHTML = gamePlayersMessage() + "You are playing as " + userEmail
+	// 	+ " | <span class='skipBonus' onclick='promptEmail();'>Edit email</span> | <span class='skipBonus' onclick='showSignOutModal();'>Sign out</span>";
+	// } else {
+	// 	document.querySelector(".footer").innerHTML = gamePlayersMessage() + defaultEmailMessageText;
+	// }
 }
 
 function gamePlayersMessage() {
