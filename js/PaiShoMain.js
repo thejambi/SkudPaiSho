@@ -2149,7 +2149,7 @@ function runTutorial() {
 								continueTutorial();
 							}, 2000);
 						}, 2000);
-				}, 2000);
+				}, 1400);
 		}, 3000);
 }
 
