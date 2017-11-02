@@ -303,7 +303,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 	// Build HOST username
 	var hostUsernameTag = "";
 	if (currentPlayer === HOST) {
-		hostUsernameTag = "<span class='underline'>";
+		hostUsernameTag = "<span class='currentPlayerUsername'>";
 	} else {
 		hostUsernameTag = "<span>";
 	}
@@ -315,7 +315,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 
 	var guestUsernameTag = "";
 	if (currentPlayer === GUEST) {
-		guestUsernameTag = "<span class='underline'>";
+		guestUsernameTag = "<span class='currentPlayerUsername'>";
 	} else {
 		guestUsernameTag = "<span>";
 	}
@@ -325,11 +325,11 @@ function updateCurrentGameTitle(isOpponentOnline) {
 	guestUsernameTag += currentGameData.guestUsername;
 	guestUsernameTag += "</span>";
 
-	var title = "<strong>";
+	var title = "<span>";
 	title += hostUsernameTag;
 	title += " vs. ";
 	title += guestUsernameTag;
-	title += "</strong>";
+	title += "</span>";
 	
 	document.getElementById("response").innerHTML = title;
 }

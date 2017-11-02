@@ -387,6 +387,11 @@ figure > div {
   text-decoration: underline;
 }
 
+.currentPlayerUsername {
+  font-weight: bold;
+  font-style: italic;
+}
+
 input[type=submit] {
   /*background: #24333d;
   color: #FFF;*/
