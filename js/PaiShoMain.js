@@ -1183,9 +1183,7 @@ var isUserInfoAvailableCallback = function isUserInfoAvailableCallback(data) {
 };
 
 var userInfoExistsCallback = function userInfoExistsCallback(data) {
-	debug('WHOA MAN THIS IS SERIOUS ' + data);
 	if (data && parseInt(data.trim()) > 0) {
-		debug("Checkpoint");
 		// existing userId found
 		tempUserId = data.trim();
 		isUserInfoAvailableCallback();	// will trigger send verification code
