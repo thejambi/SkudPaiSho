@@ -753,7 +753,7 @@ input[type=submit] {
   }
 
   .footer {
-    border-top: 1px solid #776e65;
+    /*border-top: 1px solid #776e65;*/
   }
 }
 
