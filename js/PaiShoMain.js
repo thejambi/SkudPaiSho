@@ -591,7 +591,8 @@ function getAdditionalMessage() {
 	var msg = "<br />";
 
 	// Is it the player's turn?
-	if (myTurn()) {
+	// TODO Could maybe get rid of this
+	if (myTurn() && !userIsLoggedIn()) {
 		msg = " (You)" + msg;
 	}
 
@@ -700,9 +701,9 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 
 	var messageText = "";
 
-	if (playingOnlineGame()) {
-		messageText += "<em>Opponent's turn</em><br />";
-	}
+	// if (playingOnlineGame()) {
+	// 	messageText += "<em>Opponent's turn</em><br />";
+	// }
 
 	if (currentMoveIndex == 1 && !haveBothEmails()) {
 		if (!playingOnlineGame() && (currentGameData.gameTypeId === 1 || !currentGameData.gameTypeId)) {
