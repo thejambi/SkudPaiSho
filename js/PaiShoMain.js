@@ -679,16 +679,16 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 	if (currentMoveIndex == 1 && !haveBothEmails()) {
 		if (!playingOnlineGame() && (currentGameData.gameTypeId === 1 || !currentGameData.gameTypeId)) {
 			if (!ignoreNoEmail && !userIsLoggedIn()) {
-				messageText = getNoUserEmailMessage();
+				messageText = getNoUserEmailMessage() + "<br />";
 			}
 		}
 
 		if (aiList.length > 0) {
 			for (var i = 0; i < aiList.length; i++) {
-				messageText += "<br /><span class='skipBonus' onclick='setAiIndex(" + i + ");'>Play " + aiList[i].getName() + "</span>";
+				messageText += "<span class='skipBonus' onclick='setAiIndex(" + i + ");'>Play " + aiList[i].getName() + "</span>";
 			}
 			if (aiList.length > 1) {
-				messageText += "<br /><span class='skipBonus' onclick='goai();'>AI vs AI</span>";
+				messageText += "<span class='skipBonus' onclick='goai();'>AI vs AI</span>";
 			}
 			messageText += "<br />";
 		}
