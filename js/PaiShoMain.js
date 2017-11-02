@@ -1194,7 +1194,7 @@ function sendVerificationCodeClicked() {
 
 	// Only continue if email and username pass validation
 	if (emailBeingVerified.includes("@") && emailBeingVerified.includes(".")
-		&& usernameBeingVerified.match(/^([A-Za-z0-9_]){3,25}$/g)) {
+		&& usernameBeingVerified.match(/^([A-Za-z0-9_]){3,20}$/g)) {
 		onlinePlayEngine.userInfoExists(usernameBeingVerified, emailBeingVerified, userInfoExistsCallback);
 	} else {
 		alert("Need valid username and email. Your username cannot be too short or too long, and cannot contain spaces.");
