@@ -479,7 +479,7 @@ forgetOnlinePlayInfo = function() {
 }
 
 function showSignOutModal() {
-	var message = "<div class='clickableText' onclick='signOut(true);'>Yes, sign out</div>";
+	var message = "<br /><div class='clickableText' onclick='signOut(true);'>Yes, sign out</div>";
 	message += "<br /><div class='clickableText' onclick='signOut(false);'>Cancel</div>";
 
 	showModal("Really sign out?", message);
@@ -2197,4 +2197,13 @@ function continueTutorial() {
 // window.addEventListener('online',  updateIndicator);
 // window.addEventListener('offline', updateIndicator);
 
+function iOSShake() {
+	// If undo move is allowed, ask user if they wanna
+	if (playingOnlineGame() && !myTurn() && !gameController.theGame.getWinner()) {
+		var message = "<br /><div class='clickableText' onclick='resetMove();'>Yes, undo move</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal();'>Cancel</div>";
+
+		showModal("Undo move?", message);
+	}
+}
 
