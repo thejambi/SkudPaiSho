@@ -302,7 +302,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 
 	// Build HOST username
 	var hostUsernameTag = "";
-	if (currentPlayer === HOST) {
+	if (currentPlayer === HOST && !gameController.theGame.getWinner()) {
 		hostUsernameTag = "<span class='currentPlayerUsername'>";
 	} else {
 		hostUsernameTag = "<span>";
@@ -314,7 +314,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 	hostUsernameTag += "</span>";
 
 	var guestUsernameTag = "";
-	if (currentPlayer === GUEST) {
+	if (currentPlayer === GUEST && !gameController.theGame.getWinner()) {
 		guestUsernameTag = "<span class='currentPlayerUsername'>";
 	} else {
 		guestUsernameTag = "<span>";
@@ -588,7 +588,7 @@ function pauseRun() {
 }
 
 function getAdditionalMessage() {
-	var msg = "<br />";
+	var msg = "";
 
 	// Is it the player's turn?
 	// TODO Could maybe get rid of this
@@ -626,7 +626,7 @@ function getGameMessageElement() {
 function refreshMessage() {
 	var message = "";
 	if (!playingOnlineGame()) {
-		message += "Current Player: " + getCurrentPlayer();
+		message += "Current Player: " + getCurrentPlayer() + "<br />";
 	}
 	message += getAdditionalMessage();
 
