@@ -621,7 +621,14 @@ function getGameMessageElement() {
 }
 
 function refreshMessage() {
-	getGameMessageElement().innerHTML = "Current Player: " + getCurrentPlayer() + getAdditionalMessage();
+	var message = "";
+	if (!playingOnlineGame()) {
+		message += "Current Player: " + getCurrentPlayer();
+	}
+	message += getAdditionalMessage();
+
+	// getGameMessageElement().innerHTML = "Current Player: " + getCurrentPlayer() + getAdditionalMessage();
+	getGameMessageElement().innerHTML = message;
 
 	if (playingOnlineGame() && !myTurn() && !gameController.theGame.getWinner()) {
 		showResetMoveMessage();
