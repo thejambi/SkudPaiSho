@@ -1176,7 +1176,7 @@ var sendVerificationCodeCallback = function sendVerificationCodeCallback(respons
 var isUserInfoAvailableCallback = function isUserInfoAvailableCallback(data) {
 	if (data && data.length > 0) {
 		// user info not available
-		alert("Username or email taken.");
+		showModal("Sign In", "Username or email unavailable.<br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
 	} else {
 		debug("Checkpoint");
 		document.getElementById("verificationCodeInput").disabled=false;
@@ -1205,7 +1205,7 @@ function sendVerificationCodeClicked() {
 		&& usernameBeingVerified.match(/^([A-Za-z0-9_]){3,20}$/g)) {
 		onlinePlayEngine.userInfoExists(usernameBeingVerified, emailBeingVerified, userInfoExistsCallback);
 	} else {
-		alert("Need valid username and email. Your username cannot be too short or too long, and cannot contain spaces.");
+		showModal("Sign In", "Invalid username or email. Your username cannot be too short or too long, and cannot contain spaces. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
 	}
 }
 
@@ -2179,19 +2179,22 @@ function runTutorial() {
 function continueTutorial() {
 	var tutContent = document.getElementById('tutorialContent');
 
-	var div1 = document.createElement("div");
-	div1.innerHTML = "<p>Welcome to <em>The Garden Gate</em>, a place to play a variety of Pai Sho games against other players online.</p>";
-	div1.innerHTML += "<p>You can sign in (or sign up) by entering your username and verifying your email address.</p>";
-	div1.innerHTML += "<p>Use options in the side menu (select the <strong class='stretchText'>&nbsp;&#8801&nbsp;</strong> at the top left) to create a new game, join games set up by other players, or to view any of your games that are in progress. You can have any number of online games in progress at once.</p>";
-	div1.innerHTML += "<p>Also in the side menu you can find links to the rules for all of the games you can play here.</p>";
-	if (!userIsLoggedIn()) {
-		div1.innerHTML += "<p><span class='skipBonus' onclick='loginClicked();'>Sign in</span> now to get started.</p>";
-	}
-	// div1.classList.add('tutContentMessage');
-	div1.classList.add('tutContentFadeIn');
-	tutContent.appendChild(div1);
+	if (tutContent) {
+		var div1 = document.createElement("div");
+		div1.innerHTML = "<p>Welcome to <em>The Garden Gate</em>, a place to play a variety of Pai Sho games against other players online.</p>";
+		div1.innerHTML += "<p>You can sign in (or sign up) by entering your username and verifying your email address.</p>";
+		div1.innerHTML += "<p>Use options in the side menu (select the <strong class='stretchText'>&nbsp;&#8801&nbsp;</strong> at the top left) to create a new game, join games set up by other players, or to view any of your games that are in progress. You can have any number of online games in progress at once.</p>";
+		div1.innerHTML += "<p>Also in the side menu you can find links to the rules for all of the games you can play here.</p>";
+		if (!userIsLoggedIn()) {
+			div1.innerHTML += "<p><span class='skipBonus' onclick='loginClicked();'>Sign in</span> now to get started.</p>";
+		}
+		// div1.classList.add('tutContentMessage');
+		div1.classList.add('tutContentFadeIn');
+		tutContent.appendChild(div1);
 
-	localStorage.setItem(welcomeTutorialDismissedKey, "true");
+		localStorage.setItem(welcomeTutorialDismissedKey, "true");
+	}
+
 	tutorialInProgress = false;
 }
 
