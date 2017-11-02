@@ -1694,7 +1694,14 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 		onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), getLoginToken(), createGameCallback);
 	} else {
 		finalizeMove();
-		showModal("Game Not Created", "You either already have a game that is waiting for an opponent or are not logged in. <br /><br />If you're not logged in, you can still play the game locally, but it will not be saved online.");
+		var message = "";
+		if (userIsLoggedIn()) {
+			message = "You already have a game that is waiting for an opponent.";
+		} else {
+			message = "You are not signed in. ";
+		}
+		message += "<br /><br />You can still play the game locally, but it will not be saved online.";
+		showModal("Game Not Created", message);
 	}
 };
 
