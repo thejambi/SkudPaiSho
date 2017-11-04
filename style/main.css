@@ -727,6 +727,10 @@ input[type=submit] {
   .helpContainer {
     width: 230px;
   }
+
+  div.tab button {
+    min-width: 20px;
+  }
 }
 
 @media only screen and (max-width: 1090px) {
@@ -740,6 +744,10 @@ input[type=submit] {
     width: 612px;
     margin-bottom: 20px;
     margin-top: 16px;
+  }
+
+  div.tab button {
+    min-width: 70px;
   }
 
   .helpContainer h4 {
