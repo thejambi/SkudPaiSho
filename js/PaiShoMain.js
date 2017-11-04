@@ -888,9 +888,7 @@ var submitMoveCallback = function submitMoveCallback() {
 
 	startWatchingNumberOfGamesWhereUserTurn();
 
-	if (currentGameOpponentUsername === 'SkudPaiSho' || currentGameOpponentUsername === 'Zach') {
-		onlinePlayEngine.notifyUser(getLoginToken(), currentGameOpponentUsername, emptyCallback);
-	}
+	onlinePlayEngine.notifyUser(getLoginToken(), currentGameOpponentUsername, emptyCallback);
 };
 
 function clearMessage() {
