@@ -39,6 +39,7 @@ var usernameKey = "usernameKey";
 var userEmailKey = "userEmailKey";
 var userIdKey = "userIdKey";
 var deviceIdKey = "deviceIdKey";
+var deviceTokenKey = "deviceTokenKey";
 
 var welcomeTutorialDismissedKey = "welcomeTutorialDismissedKey";
 
@@ -71,6 +72,7 @@ var replayIntervalLength = 1500;
 
 /* Online Play variables */
 var onlinePlayEngine;
+var appCaller;
 
 var gameId = -1;
 var lastKnownGameNotation = "";
@@ -142,9 +144,11 @@ window.requestAnimationFrame(function () {
 	}
 
 	onlinePlayEngine = new OnlinePlayEngine();
+	appCaller = new DummyAppCaller();
 
 	if (ios) {
 		onlinePlayEngine = new OnlinePlayEngineIOS();
+		appCaller = new IOSCaller();
 	}
 
 	var localUserEmail = localStorage.getItem(localEmailKey);
@@ -217,6 +221,7 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 				if (response === "Results exist") {
 					startLoggingOnlineStatus();
 					startWatchingNumberOfGamesWhereUserTurn();
+					appCaller.alertAppLoaded();
 				} else {
 					// Cannot verify user login, forget all current stuff.
 					forgetCurrentGameInfo();
@@ -883,7 +888,9 @@ var submitMoveCallback = function submitMoveCallback() {
 
 	startWatchingNumberOfGamesWhereUserTurn();
 
-	onlinePlayEngine.notifyUser(currentGameOpponentUsername, emptyCallback);
+	if (currentGameOpponentUsername === 'SkudPaiSho' || currentGameOpponentUsername === 'Zach') {
+		onlinePlayEngine.notifyUser(getLoginToken(), currentGameOpponentUsername, emptyCallback);
+	}
 };
 
 function clearMessage() {
@@ -1547,7 +1554,7 @@ var showMyGamesCallback = function showMyGamesCallback(results) {
 	}
 	message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
 	message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
-	message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
+	// message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
 	showModal("Active Games", message);
 };
 
@@ -1890,6 +1897,7 @@ function newGameClicked() {
 
 var getCountOfGamesWhereUserTurnCallback = function getCountOfGamesWhereUserTurnCallback(count) {
 	setAccountHeaderLinkText(count);
+	appCaller.setCountOfGamesWhereUserTurn(count);
 };
 
 function loadNumberOfGamesWhereUserTurn() {
@@ -2224,4 +2232,31 @@ function iOSShake() {
 		showModal("Undo move?", message);
 	}
 }
+
+function saveDeviceTokenIfNeeded() {
+	var deviceToken = localStorage.getItem(deviceTokenKey);
+	if (ios && deviceToken && userIsLoggedIn()) {
+		onlinePlayEngine.addUserPreferenceValue(getLoginToken(), 3, deviceToken, emptyCallback);
+	}
+}
+
+function setDeviceToken(deviceToken) {
+	localStorage.setItem(deviceTokenKey, deviceToken);
+	saveDeviceTokenIfNeeded();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -228,3 +228,14 @@ OnlinePlayEngineIOS.prototype.updateEmailNotificationsSetting = function(userId,
         callback);
 };
 
+OnlinePlayEngineIOS.prototype.addUserPreferenceValue = function(loginToken, prefTypeId, value, callback) {
+    this.swiftPost("addUserPreferenceValue.php", 
+        "userId=" + loginToken.userId
+        + "&username=" + loginToken.username
+        + "&userEmail=" + loginToken.userEmail
+        + "&deviceId=" + loginToken.deviceId
+        + "&prefTypeId=" + prefTypeId
+        + "&value=" + value, 
+        callback);
+};
+

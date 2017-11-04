@@ -343,10 +343,14 @@ OnlinePlayEngine.prototype.getInitialGlobalChatMessages = function(callback) {
     );
 };
 
-OnlinePlayEngine.prototype.notifyUser = function(username, callback) {
+OnlinePlayEngine.prototype.notifyUser = function(loginToken, userToNotify, callback) {
     $.post("notifyUser.php", 
         {
-            username: username
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId, 
+            userToNotify: userToNotify
         }, 
         function(data, status){
             if (status === 'success') {
@@ -372,6 +376,25 @@ OnlinePlayEngine.prototype.updateEmailNotificationsSetting = function(userId, va
     $.post("updateEmailNotificationsSetting.php", 
         {
             userId: userId, 
+            value: value
+        }, 
+        function(data, status){
+            if (status === 'success') {
+                debug(data.trim());
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.addUserPreferenceValue = function(loginToken, prefTypeId, value, callback) {
+    $.post("addUserPreferenceValue.php", 
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId, 
+            prefTypeId: prefTypeId, 
             value: value
         }, 
         function(data, status){
