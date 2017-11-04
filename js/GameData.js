@@ -34,6 +34,17 @@ var ios = false;
 var onlinePlayEnabled = false;
 /* */
 
+
+// Redirect if needed
+if (shouldRedirectIfNotHttps() && window.location.href.includes("http://")) {
+  window.location.replace(window.location.href.replace("http://", "https://"));
+}
+
+function shouldRedirectIfNotHttps() {
+  return !ios;
+}
+
+
 function debug(str) {
     if (debugOn) {
       if (ios) {
