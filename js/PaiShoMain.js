@@ -1755,7 +1755,7 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 var tempGameTypeId;
 function createGameIfThatIsOk(gameTypeId) {
 	tempGameTypeId = gameTypeId;
-	if (userIsLoggedIn()) {
+	if (userIsLoggedIn() && window.navigator.onLine) {
 		onlinePlayEngine.getCurrentGameSeeksHostedByUser(getUserId(), gameTypeId, getCurrentGameSeeksHostedByUserCallback);
 	} else {
 		finalizeMove();
