@@ -888,7 +888,8 @@ var submitMoveCallback = function submitMoveCallback() {
 
 	startWatchingNumberOfGamesWhereUserTurn();
 
-	onlinePlayEngine.notifyUser(getLoginToken(), currentGameOpponentUsername, emptyCallback);
+	// Removing: Building this into the submit move
+	// onlinePlayEngine.notifyUser(getLoginToken(), currentGameOpponentUsername, emptyCallback);
 };
 
 function clearMessage() {
