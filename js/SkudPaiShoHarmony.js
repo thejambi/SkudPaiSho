@@ -522,8 +522,9 @@ SkudPaiShoHarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
 
 	// They're the same length if we're here
 	// Now, all harmonies must match 
+	var h1Matches = false;
 	ring1.forEach(function(h1) {
-		var h1Matches = false;
+		h1Matches = false;
 		ring2.forEach(function(h2) {
 			if (h1.equals(h2)) {
 				h1Matches = true;
@@ -534,7 +535,7 @@ SkudPaiShoHarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
 		}
 	});
 
-	return true;
+	return h1Matches;
 };
 
 SkudPaiShoHarmonyManager.prototype.lookForRing = function(t1, tx, chain) {
