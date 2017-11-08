@@ -13,27 +13,35 @@ OnlinePlayEngineIOS.prototype.getCallbackName = function(callback) {
 };
 
 OnlinePlayEngineIOS.prototype.swiftPost = function(postUrl, postData, callback) {
-    debug("Attempting Swift Post");
+    if (ios) {
+        debug("Attempting Swift Post");
 
-    var callbackName = this.getCallbackName(callback);
+        var callbackName = this.getCallbackName(callback);
 
-    try {
-        webkit.messageHandlers.callbackHandler.postMessage(
-            '{"postUrl":"' + postUrl + '","postData":"' + postData + '","callbackName":"' + callbackName + '"}'
-        );
-    } catch(err) {
-        console.log('error');
+        try {
+            webkit.messageHandlers.callbackHandler.postMessage(
+                '{"postUrl":"' + postUrl + '","postData":"' + postData + '","callbackName":"' + callbackName + '"}'
+            );
+        } catch(err) {
+            console.log('error');
+        }
+    } else if(runningOnAndroid) {
+        Android.sendPostRequest(postUrl, postData, this.getCallbackName(callback));
     }
 };
 
 OnlinePlayEngineIOS.prototype.swiftGet = function(getUrl, callback) {
-    debug("Attempting Swift Get");
-    try {
-        webkit.messageHandlers.callbackHandler.postMessage(
-            '{"getUrl":"' + getUrl + '","callbackName":"' + callback.name + '"}'
-        );
-    } catch(err) {
-        console.log('error');
+    if (ios) {
+        debug("Attempting Swift Get");
+        try {
+            webkit.messageHandlers.callbackHandler.postMessage(
+                '{"getUrl":"' + getUrl + '","callbackName":"' + callback.name + '"}'
+            );
+        } catch(err) {
+            console.log('error');
+        }
+    } else if (runningOnAndroid) {
+        Android.sendGetRequest(getUrl, this.getCallbackName(callback));
     }
 };
 

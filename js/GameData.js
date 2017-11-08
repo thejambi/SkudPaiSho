@@ -30,6 +30,9 @@ var debugOn = true;
 /* Set to true if building for iOS, else set to false */
 var ios = false;
 
+/* Set to true if building for Android, else set to false */
+var runningOnAndroid = false;
+
 /* Testing */
 var onlinePlayEnabled = false;
 /* */

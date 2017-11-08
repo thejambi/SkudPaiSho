@@ -121,19 +121,18 @@ window.requestAnimationFrame(function () {
 	sandboxUrl = url;
 
 	if (url.includes("calebhugo.com")) {
-		url = "http://skudpaisho.com/";
+		url = "https://skudpaisho.com/";
 	}
 
-	if (url.startsWith("file") && !ios) {
+	if (url.startsWith("file") && !ios && !runningOnAndroid) {
 		onlinePlayEnabled = false;
 	}
 
-	if (ios) {
-		url = "http://skudpaisho.com/";
+	if (ios || runningOnAndroid) {
+		url = "https://skudpaisho.com/";
 		sandboxUrl = url;
 	}
 
-	// gameController.gameNotation.setNotationText(QueryString.game);
 	gameController.setGameNotation(QueryString.game);
 
 	hostEmail = QueryString.host;
@@ -149,6 +148,9 @@ window.requestAnimationFrame(function () {
 	if (ios) {
 		onlinePlayEngine = new OnlinePlayEngineIOS();
 		appCaller = new IOSCaller();
+	} else if (runningOnAndroid) {
+		onlinePlayEngine = new OnlinePlayEngineIOS();
+		// appCaller = new AndroidCaller();// keeping dummy for now
 	}
 
 	var localUserEmail = localStorage.getItem(localEmailKey);
@@ -190,7 +192,7 @@ window.requestAnimationFrame(function () {
 	setSidenavNewGameSection();
 
 	if (onlinePlayEnabled) {
-		onlinePlayEngine.testOnlinePlay();
+		onlinePlayEngine.testOnlinePlay(emptyCallback);
 		if (gameId > 0) {
 			startWatchingGameRealTime();
 		}
@@ -1205,6 +1207,7 @@ var userInfoExistsCallback = function userInfoExistsCallback(data) {
 }
 
 function sendVerificationCodeClicked() {
+	debug("Send verification code clicked");
 	emailBeingVerified = document.getElementById("userEmailInput").value.trim().toLowerCase();
 	usernameBeingVerified = document.getElementById("usernameInput").value.trim();
 
