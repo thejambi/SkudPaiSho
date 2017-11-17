@@ -11,6 +11,9 @@ html, body {
   color: #776e65;
   font-family: "San Francisco", "Helvetica Neue", Arial, sans-serif;
   font-size: 15px;
+
+  /* Android bottom padding */
+  /*padding-bottom: 250px;*/
 }
 
 #mainWrapper {
