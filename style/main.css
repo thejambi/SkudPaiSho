@@ -292,10 +292,7 @@ figure > div {
   float: left;
 }
 .activePoint:hover {
-/*  -moz-box-shadow: 0px 0px 32px #054;
-  -webkit-box-shadow: 0px 0px 32px #054;*/
-  /*box-shadow: 0px 0px 32px #054;*/
-  box-shadow: 0px 0px 34px #054;
+  box-shadow: 0px 0px 24px 2px #054;
 }
 
 .hasTile {
@@ -311,8 +308,7 @@ figure > div {
 }
 
 .possibleMove {
-  /*box-shadow: 0px 0px 32px #421;*/
-  box-shadow: 0px 0px 34px #421;
+  box-shadow: 0px 0px 24px 2px #421;
 }
 
 .possibleMove img {
