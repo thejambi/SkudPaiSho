@@ -68,7 +68,6 @@
   <!-- End Sidenav -->
 
   <div class="header">
-    <!-- <div class="sidenavMenuButton"><span style="cursor:pointer; vertical-align: top;" onclick="openNav();"><h1><i class="fa fa-bars" aria-hidden="true"></i></h1></span></div> -->
     <div class="sidenavMenuButton"><span style="cursor:pointer; vertical-align: top;" onclick="openNav();"><h1><span class="stretchText sidenavMenuButtonText" id='sidenavMenuButton'>&#8801;</span></h1></span></div>
     <div class="headerLeft"><h1>&nbsp;</h1></div>
     <div class="headerLeft" style="cursor:pointer;" onclick="openNav();"><h1 id='siteHeading'>The Garden Gate</h1></div>
@@ -78,8 +77,6 @@
       <span class="headerRight clickableText" onclick='newGameClicked();'><i class="fa fa-plus-circle" aria-hidden="true"></i> New</span>
       <div class="headerRight">&nbsp;|&nbsp;</div>
       <span class="headerRight clickableText" onclick='viewGameSeeksClicked();'><i class="fa fa-plug" aria-hidden="true"></i> Join Game</span>
-      <!-- <div class="headerRulesLink headerRight">&nbsp;|&nbsp;</div>
-      <a href="https://skudpaisho.wordpress.com/skud-quick-reference/" target="_blank" class="headerRulesLink headerRight clickableText"><i class='fa fa-book' aria-hidden='true'></i> Rules</a> -->
     </div>
   </div>
 
@@ -87,7 +84,6 @@
 
 	<div class="leftContainer">
 
-		<!-- <div class="game-container gone" id="the-game-container"> -->
     <div class="game-container" id="the-game-container">
 			<div class="notationText gone" id="notationText">
 
@@ -124,36 +120,8 @@
             <!--  -->
             Current Turn: Guest
         </div>
-        <div id="hostTilesContainer" class="hostTilesContainer">
-          <!-- <div class="HR3"></div>
-          <div class="HR4"></div>
-          <div class="HR5"></div>
-          <div class="HW3"></div>
-          <div class="HW4"></div>
-          <div class="HW5"></div>
-          <br class="clear" />
-          <div class="HR"></div>
-          <div class="HW"></div>
-          <div class="HK"></div>
-          <div class="HB"></div>
-          <div class="HL"></div>
-          <div class="HO"></div> -->
-      </div>
-      <div id="guestTilesContainer" class="guestTilesContainer">
-          <!-- <div class="GR3"></div>
-          <div class="GR4"></div>
-          <div class="GR5"></div>
-          <div class="GW3"></div>
-          <div class="GW4"></div>
-          <div class="GW5"></div>
-          <br class="clear" />
-          <div class="GR"></div>
-          <div class="GW"></div>
-          <div class="GK"></div>
-          <div class="GB"></div>
-          <div class="GL"></div>
-          <div class="GO"></div> -->
-      </div>
+        <div id="hostTilesContainer" class="hostTilesContainer"></div>
+        <div id="guestTilesContainer" class="guestTilesContainer"></div>
       <div class="gameMessage2"></div>
   </div>
   <div class="helpContainer" id="help">
@@ -172,9 +140,8 @@
       </div>
     </div>
     <div id="globalChatTab" class="tabcontent">
-      <div id="globalChatMessagesDisplay" class="chatMessagesDisplay"><!-- <strong>SkudPaiSho: </strong> Hi everybody! This global chat will show messages sent to it while you're here. Say hi and see if anyone else is online :)<hr /> --></div>
+      <div id="globalChatMessagesDisplay" class="chatMessagesDisplay"></div>
       <div id="globalChatMessageInputContainer" class="chatMessageInputContainer">
-        <!-- <input value="" id="globalChatMessageInput" class="chatMessageInput" /> -->
         <textarea id="globalChatMessageInput" class="chatMessageInput"></textarea>
         <span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span>
       </div>
@@ -182,7 +149,6 @@
     <div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
       <div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
       <div id="chatMessageInputContainer" class="chatMessageInputContainer">
-        <!-- <input value="" id="chatMessageInput" class="chatMessageInput" /> -->
         <textarea id="chatMessageInput" class="chatMessageInput"></textarea>
         <span id="sendChatMessageButton" class="button" onclick='sendChat();'>Send</span>
       </div>
