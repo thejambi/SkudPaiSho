@@ -1470,6 +1470,9 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 			var message = "No completed games.";
 			if (results) {
 				message = "";
+
+				var showAll = showAllCompletedGamesInList;
+				var countOfGamesShown = 0;
 				
 				populateMyGamesList(results);
 
@@ -1494,14 +1497,33 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 					gameDisplayTitle += myGame.guestUsername;
 					
 					message += "<div class='clickableText' onclick='jumpToGame(" + gId + ");'>" + gameDisplayTitle + "</div>";
+					
+					countOfGamesShown++;
+					if (!showAll && countOfGamesShown > 20) {
+						break;
+					}
 				}
 			}
+
+			if (!showAll) {
+				message += "<br /><div class='clickableText' onclick='showAllCompletedGames();'>Show all</div>";
+			}
+
 			showModal("Completed Games", message);
 		};
 
+var showAllCompletedGamesInList = false;
 function showPastGamesClicked() {
 	closeModal();
 
+	showAllCompletedGamesInList = false;
+	onlinePlayEngine.getPastGamesForUserNew(getLoginToken(), showPastGamesCallback);
+}
+
+function showAllCompletedGames() {
+	closeModal();
+
+	showAllCompletedGamesInList = true;
 	onlinePlayEngine.getPastGamesForUserNew(getLoginToken(), showPastGamesCallback);
 }
 
