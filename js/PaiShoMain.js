@@ -2270,7 +2270,9 @@ function setDeviceToken(deviceToken) {
 	saveDeviceTokenIfNeeded();
 }
 
-
+function openShop() {
+	openLink("https://skudpaisho.ecwid.com");
+}
 
 
 
