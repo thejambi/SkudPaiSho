@@ -49,7 +49,7 @@
       <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameNotationModal();'>Show game notation</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='resignGameClicked();'>Resign game</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='closeGame();'>Close this game</div>
-      <!-- <div class='skipBonus'><a href="https://skudpaisho.wordpress.com/tournaments/">Skud Pai Sho tournament information</a></div> -->
+      <!-- <div class='skipBonus'><a href="https://skudpaisho.com/site/tournaments/">Skud Pai Sho tournament information</a></div> -->
       <hr />
       <div class='sidenavSectionHeader'>About</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='aboutClicked();'>About <em>The Garden Gate</em></div>
@@ -139,7 +139,7 @@
         <h4>Skud Pai Sho</h4>
         <p>Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p>
         <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p>
-        <p>Select tiles or points on the board to learn more or <a href="https://skudpaisho.wordpress.com/pai-sho-resources/" target="_blank">view the resources page</a> for the rules, a video tutorial on how to play, a print and play Pai Sho set, and more!</p>
+        <p>Select tiles or points on the board to learn more or <a href="https://skudpaisho.com/site/pai-sho-resources/" target="_blank">view the resources page</a> for the rules, a video tutorial on how to play, a print and play Pai Sho set, and more!</p>
       </div>
     </div>
     <div id="globalChatTab" class="tabcontent">
@@ -159,27 +159,7 @@
   </div>
 </div>
 
-<div class="footer">
-  <!-- <span class='skipBonus' onclick='loginClicked(); finalizeMove();'>Sign in</span> to play real-time games with others online. <br /> -->
-</div>
-<!-- <div class="rules"><a href="https://skudpaisho.wordpress.com/" target="_blank">Skud Pai Sho Rules</a></div> -->
-<!-- <br /> -->
-<!-- <div class='skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div><br />
-<div class='skipBonus' onclick='openGameReplay();'>Open game replay link</div><br />
-<div class='skipBonus' onclick='showGameNotationModal();'>Show game notation</div><br />
-<div class='skipBonus'><a href="https://skudpaisho.wordpress.com/tournaments/">Skud Pai Sho tournament information</a></div>
-<br />
-<div>
-Modern tile designs by Hector Lowe<br />
-©2017 | Used with permission<br />
-<a href="http://hector-lowe.com/" target="_blank">www.hector-lowe.com</a>
-</div>
-
-<div class="license"><a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/us/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/3.0/us/88x31.png" /></a>&nbsp;All other content of this work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc/3.0/us/">Creative Commons Attribution-NonCommercial 3.0 United States License</a>.</div>
-
-<div><span class='skipBonus' onclick='showPrivacyPolicy();'>Privacy policy</span></div>
-
-<div id="onlinePlayTest"></div> -->
+<div class="footer"></div>
 
 <!-- Modal -->
 <!-- The Modal -->
@@ -287,7 +267,6 @@ To sign up or log in, enter your username and email, then enter the 4-digit code
     <script src="js/SolitaireTile.js"></script>
     <script src="js/SolitaireTileManager.js"></script>
 
-    <!-- Test: Capture -->
     <script src="js/CaptureController.js"></script>
     <script src="js/CaptureActuator.js"></script>
     <script src="js/CaptureBoard.js"></script>
@@ -296,6 +275,16 @@ To sign up or log in, enter your username and email, then enter the 4-digit code
     <script src="js/CaptureGameNotation.js"></script>
     <script src="js/CaptureTile.js"></script>
     <script src="js/CaptureTileManager.js"></script>
+
+    <script src="js/street/StreetController.js"></script>
+    <script src="js/street/StreetActuator.js"></script>
+    <script src="js/street/StreetHarmony.js"></script>
+    <script src="js/street/StreetGameManager.js"></script>
+    <script src="js/street/StreetBoardPoint.js"></script>
+    <script src="js/street/StreetBoard.js"></script>
+    <script src="js/street/StreetGameNotation.js"></script>
+    <script src="js/street/StreetTile.js"></script>
+    <script src="js/street/StreetTileManager.js"></script>
 
     <!-- Main -->
     <script src="js/PaiShoMain.js"></script>

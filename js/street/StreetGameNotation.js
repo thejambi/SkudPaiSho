@@ -1,13 +1,11 @@
-// Capture Notation
+/* Skud Pai Sho Notation */
 
-// --------------------------------------------- // 
-
-function CaptureNotationMove(text) {
+function StreetNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
 
-CaptureNotationMove.prototype.analyzeMove = function() {
+StreetNotationMove.prototype.analyzeMove = function() {
 	this.valid = true;
 
 	// Get move number
@@ -32,26 +30,39 @@ CaptureNotationMove.prototype.analyzeMove = function() {
 		return;
 	}
 
-	// If starts with a ( then it's MOVE
+	// If starts with an L, then it's Planting
 	var char0 = moveText.charAt(0);
-	if (char0 === '(') {
-		this.moveType = MOVE;
+	if (char0 === 'L') {
+		this.moveType = PLANTING;
+	} else if (char0 === '(') {
+		this.moveType = ARRANGING;
 	} else {
 		this.moveType = INITIAL_SETUP;
 	}
 
 	if (this.moveType === INITIAL_SETUP) {
-		// Example: VFBDOKUMLTAP
+		// Move contains board setup code
+		this.boardSetupCode = moveText;
+	} else if (this.moveType === PLANTING) {
+		// Planting move stuff
+		// var char1 = moveText.charAt(1);
+		this.plantedFlowerType = char0;
 
-		if (moveText.length !== 12) {
+		if (moveText.charAt(1) === '(') {
+			// debug("parens checks out");
+		} else {
+			debug("Failure to plant");
 			this.valid = false;
 		}
 
-		this.initialTileCodeList = [];
-		for (var i = 0; i < 12; i++) {
-			this.initialTileCodeList.push(moveText.charAt(i));
+		if (moveText.endsWith(')')) {
+			this.endPoint = new NotationPoint(moveText.substring(moveText.indexOf('(')+1, moveText.indexOf(')')));
+		} else {
+			this.valid = false;
 		}
-	} else if (this.moveType === MOVE) {
+	} if (this.moveType === ARRANGING) {
+		// Arranging move stuff
+
 		// Get the two points from string like: (-8,0)-(-6,3)
 		var parts = moveText.substring(moveText.indexOf('(')+1).split(')-(');
 
@@ -61,11 +72,15 @@ CaptureNotationMove.prototype.analyzeMove = function() {
 	}
 };
 
-CaptureNotationMove.prototype.isValidNotation = function() {
+StreetNotationMove.prototype.hasHarmonyBonus = function() {
+	return typeof this.bonusTileCode !== 'undefined';
+};
+
+StreetNotationMove.prototype.isValidNotation = function() {
 	return this.valid;
 };
 
-CaptureNotationMove.prototype.equals = function(otherMove) {
+StreetNotationMove.prototype.equals = function(otherMove) {
 	return this.fullMoveText === otherMove.fullMoveText;
 };
 
@@ -73,53 +88,77 @@ CaptureNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function CaptureNotationBuilder() {
-	// this.moveNum;	// Let's try making this magic
+function StreetNotationBuilder() {
+	// this.moveNum;	// Magic
 	// this.player;		// Magic
 	this.moveType;
 
-	// DEPLOY
-	this.tileType;
+	// PLANTING
+	this.plantedFlowerType;
 	this.endPoint;
 
-	// MOVE
+	// ARRANGING
 	this.startPoint;
-	//this.endPoint; // Also used in DEPLOY
+	/* this.endPoint; // Also used in Planting */
+	this.bonusTileCode;
+	this.bonusEndPoint;
+	this.boatBonusPoint;
 
 	this.status = BRAND_NEW;
 }
 
-CaptureNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
+StreetNotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
+	var builder = new StreetNotationBuilder();
+	builder.moveType = PLANTING;
+	builder.plantedFlowerType = StreetTile.getClashTileCode(tileCode);
+
+	if (simpleCanonRules || sameStart) {
+		builder.plantedFlowerType = tileCode;
+	}
+
+	builder.endPoint = new NotationPoint("0,8");
+	return builder;
+};
+
+StreetNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
+	var bonusChar = '+';
+	
 	var notationLine = moveNum + player.charAt(0) + ".";
-	if (this.moveType === MOVE) {
+	if (this.moveType === ARRANGING) {
 		notationLine += "(" + this.startPoint.pointText + ")-(" + this.endPoint.pointText + ")";
-	} else if (this.moveType === DEPLOY) {
-		notationLine += this.tileType + "(" + this.endPoint.pointText + ")";
+		if (this.bonusTileCode && this.bonusEndPoint) {
+			notationLine += bonusChar + this.bonusTileCode + "(" + this.bonusEndPoint.pointText + ")";
+			if (this.boatBonusPoint) {
+				notationLine += "-(" + this.boatBonusPoint.pointText + ")";
+			}
+		}
+	} else if (this.moveType === PLANTING) {
+		notationLine += this.plantedFlowerType + "(" + this.endPoint.pointText + ")";
 	}
 	
-	return new CaptureNotationMove(notationLine);
+	return new StreetNotationMove(notationLine);
 };
 
 // --------------------------------------- //
 
 
 
-function CaptureGameNotation() {
+function StreetGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }
 
-CaptureGameNotation.prototype.setNotationText = function(text) {
+StreetGameNotation.prototype.setNotationText = function(text) {
 	this.notationText = text;
 	this.loadMoves();
 };
 
-CaptureGameNotation.prototype.addNotationLine = function(text) {
+StreetGameNotation.prototype.addNotationLine = function(text) {
 	this.notationText += ";" + text.trim();
 	this.loadMoves();
 };
 
-CaptureGameNotation.prototype.addMove = function(move) {
+StreetGameNotation.prototype.addMove = function(move) {
 	if (this.notationText) {
 		this.notationText += ";" + move.fullMoveText;
 	} else {
@@ -128,12 +167,12 @@ CaptureGameNotation.prototype.addMove = function(move) {
 	this.loadMoves();
 };
 
-CaptureGameNotation.prototype.removeLastMove = function() {
+StreetGameNotation.prototype.removeLastMove = function() {
 	this.notationText = this.notationText.substring(0, this.notationText.lastIndexOf(";"));
 	this.loadMoves();
 };
 
-CaptureGameNotation.prototype.getPlayerMoveNum = function() {
+StreetGameNotation.prototype.getPlayerMoveNum = function() {
 	var moveNum = 0;
 	var lastMove = this.moves[this.moves.length-1];
 
@@ -146,9 +185,7 @@ CaptureGameNotation.prototype.getPlayerMoveNum = function() {
 	return moveNum;
 };
 
-CaptureGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
-	// Example simple Arranging move: 7G.(8,0)-(7,1)
-
+StreetGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	var moveNum = 0;
 	var player = HOST;
 
@@ -166,7 +203,7 @@ CaptureGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	return builder.getNotationMove(moveNum, player);
 };
 
-CaptureGameNotation.prototype.loadMoves = function() {
+StreetGameNotation.prototype.loadMoves = function() {
 	this.moves = [];
 	var lines = [];
 	if (this.notationText) {
@@ -180,8 +217,10 @@ CaptureGameNotation.prototype.loadMoves = function() {
 	var self = this;
 	var lastPlayer = GUEST;
 	lines.forEach(function(line) {
-		var move = new CaptureNotationMove(line);
-		if (move.isValidNotation() && move.player !== lastPlayer) {
+		var move = new StreetNotationMove(line);
+		if (move.moveNum === 0 && move.isValidNotation()) {
+			self.moves.push(move);
+		} else if (move.isValidNotation() && move.player !== lastPlayer) {
 			self.moves.push(move);
 			lastPlayer = move.player;
 		} else {
@@ -190,7 +229,7 @@ CaptureGameNotation.prototype.loadMoves = function() {
 	});
 };
 
-CaptureGameNotation.prototype.getNotationHtml = function() {
+StreetGameNotation.prototype.getNotationHtml = function() {
 	var lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
@@ -209,12 +248,7 @@ CaptureGameNotation.prototype.getNotationHtml = function() {
 	return notationHtml;
 };
 
-CaptureGameNotation.prototype.notationTextForUrl = function() {
-	var str = this.notationText;
-	return str;
-};
-
-CaptureGameNotation.prototype.getNotationForEmail = function() {
+StreetGameNotation.prototype.getNotationForEmail = function() {
 	var lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
@@ -233,14 +267,17 @@ CaptureGameNotation.prototype.getNotationForEmail = function() {
 	return notationHtml;
 };
 
-CaptureGameNotation.prototype.getLastMoveText = function() {
+StreetGameNotation.prototype.notationTextForUrl = function() {
+	var str = this.notationText;
+	return str;
+};
+
+StreetGameNotation.prototype.getLastMoveText = function() {
 	return this.moves[this.moves.length - 1].fullMoveText;
 };
 
-CaptureGameNotation.prototype.getLastMoveNumber = function() {
+StreetGameNotation.prototype.getLastMoveNumber = function() {
 	return this.moves[this.moves.length - 1].moveNum;
 };
-
-
 
 

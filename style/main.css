@@ -299,6 +299,10 @@ figure > div {
   box-shadow: 0px 0px 4px #555;
 }
 
+.hasCapturedTile {
+  box-shadow: 0px 3px 0px 1px #333; 
+}
+
 .point img {
   width: 100%;
 }
@@ -361,6 +365,10 @@ figure > div {
   float: left;
   width: 34px;
   margin-top: 8px;
+}
+
+.streetTileContainer {
+  width: 100%;
 }
 
 .clear {

@@ -1337,10 +1337,11 @@ function forgetCurrentGameInfo() {
 }
 
 var GameType = {
-	SkudPaiSho:{id:1, desc:"Skud Pai Sho", rulesUrl:"https://skudpaisho.wordpress.com/skud-quick-reference/"}, 
-	VagabondPaiSho:{id:2, desc:"Vagabond Pai Sho", rulesUrl:"https://skudpaisho.wordpress.com/vagabond-pai-sho/"}, 
-	SolitairePaiSho:{id:4, desc:"Solitaire Pai Sho", rulesUrl:"https://skudpaisho.wordpress.com/more/solitaire-pai-sho/"}, 
-	CapturePaiSho:{id:3, desc:"Capture Pai Sho", rulesUrl:"https://skudpaisho.wordpress.com/more/capture-pai-sho/"}
+	SkudPaiSho:{id:1, desc:"Skud Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/skud-pai-sho/"}, 
+	VagabondPaiSho:{id:2, desc:"Vagabond Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/vagabond-pai-sho/"}, 
+	SolitairePaiSho:{id:4, desc:"Solitaire Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/solitaire-pai-sho/"}, 
+	CapturePaiSho:{id:3, desc:"Capture Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/capture-pai-sho/"},
+	StreetPaiSho:{id:5, desc:"Street Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/street-pai-sho/"}
 };
 function getGameControllerForGameType(gameTypeId) {
 	var controller;
@@ -1361,6 +1362,10 @@ function getGameControllerForGameType(gameTypeId) {
 	    case GameType.CapturePaiSho.id:
 	    	controller = new CaptureController();
 	    	debug("You're playing Capture Pai Sho!");
+	    	break;
+	    case GameType.StreetPaiSho.id:
+	    	controller = new StreetController();
+	    	debug("You're playing Street Pai Sho!");
 	    	break;
 	    default:
 	        debug("Defaulting to use Skud Pai Sho.");
@@ -1730,20 +1735,23 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 		var gameTypeHeading = "";
 		for (var index in gameSeekList) {
 			var gameSeek = gameSeekList[index];
-			
-			var hostOnlineOrNotIconText = userOfflineIcon;
-			if (gameSeek.hostOnline) {
-				hostOnlineOrNotIconText = userOnlineIcon;
-			}
 
-			if (gameSeek.gameTypeDesc !== gameTypeHeading) {
-				if (gameTypeHeading !== "") {
-					message += "<br />";
+			if (gameSeek.gameTypeId !== GameType.StreetPaiSho.id || (getUsername() === "SkudPaiSho")) {
+			
+				var hostOnlineOrNotIconText = userOfflineIcon;
+				if (gameSeek.hostOnline) {
+					hostOnlineOrNotIconText = userOnlineIcon;
 				}
-				gameTypeHeading = gameSeek.gameTypeDesc;
-				message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+
+				if (gameSeek.gameTypeDesc !== gameTypeHeading) {
+					if (gameTypeHeading !== "") {
+						message += "<br />";
+					}
+					gameTypeHeading = gameSeek.gameTypeDesc;
+					message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+				}
+				message += "<div class='clickableText' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
 			}
-			message += "<div class='clickableText' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
 		}
 	}
 	showModal("Join a game", message);
@@ -1896,6 +1904,10 @@ function setSidenavNewGameSection() {
 	message += getSidenavNewGameEntryForGameType(GameType.SolitairePaiSho);
 	message += getSidenavNewGameEntryForGameType(GameType.CapturePaiSho);
 
+	if (getUsername() === "SkudPaiSho" || url.startsWith("file")) {
+		message += getSidenavNewGameEntryForGameType(GameType.StreetPaiSho);
+	}
+
 	document.getElementById("sidenavNewGameSection").innerHTML = message;
 }
 
@@ -1916,6 +1928,10 @@ function newGameClicked() {
 	message += getNewGameEntryForGameType(GameType.VagabondPaiSho);
 	message += getNewGameEntryForGameType(GameType.SolitairePaiSho);
 	message += getNewGameEntryForGameType(GameType.CapturePaiSho);
+
+	if (getUsername() === "SkudPaiSho" || url.startsWith("file")) {
+		message += getNewGameEntryForGameType(GameType.StreetPaiSho);
+	}
 
 	showModal("New Game", message);
 }

@@ -193,7 +193,7 @@ CaptureController.prototype.skipHarmonyBonus = function() {
 };
 
 CaptureController.prototype.getCommonHelpMessageChunk = function() {
-	return this.getCaptureCycleImageTag() + "<p>Each tile captures the next three tiles in the Capture Cycle (going clockwise). <a href='https://skudpaisho.wordpress.com/more/capture-pai-sho/' target='_blank'>View the rules</a> to learn about how tiles move and jump on the board and more.</p><p><em>Capture Pai Sho is created and designed by <a href='https://redallure.deviantart.com/art/What-you-get-502701647' target='_blank'>Tom Ford</a>.</em></p>";
+	return this.getCaptureCycleImageTag() + "<p>Each tile captures the next three tiles in the Capture Cycle (going clockwise). <a href='https://skudpaisho.com/site/games/capture-pai-sho/' target='_blank'>View the rules</a> to learn about how tiles move and jump on the board and more.</p><p><em>Capture Pai Sho is created and designed by <a href='https://redallure.deviantart.com/art/What-you-get-502701647' target='_blank'>Tom Ford</a>.</em></p>";
 };
 
 CaptureController.prototype.getCaptureCycleImageTag = function() {

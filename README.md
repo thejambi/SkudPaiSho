@@ -1,3 +1,3 @@
 # Skud Pai Sho
 
-Skud Pai Sho is the most accessible, playable, and complete ruleset for Pai Sho. Play online at [skudpaisho.com](https://skudpaisho.com) and learn more at [skudpaisho.wordpress.com](https://skudpaisho.wordpress.com/).
+Skud Pai Sho is the most accessible, playable, and complete ruleset for Pai Sho. Play online and learn more at [The Garden Gate - SkudPaiSho.com](https://skudpaisho.com).
