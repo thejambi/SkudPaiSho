@@ -59,10 +59,12 @@ StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
 		}
 	} else if (INITIAL_SETUP) {
 		// Place tiles on board according to board setup code
+		
+		// Create point list
+		var pointList = [];
+
 		switch (move.boardSetupCode) {
 			case "1":
-				// Create point list
-				var pointList = [];
 				if (move.player === HOST) {
 					// North side of board
 					pointList.push(new NotationPoint("-7,0"));
