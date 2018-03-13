@@ -9,6 +9,8 @@ function StreetGameManager(ignoreActuate, isCopy) {
 
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
+
+	this.winnerTurnWaitCount = -1;
 }
 
 // Set up the game
@@ -108,7 +110,7 @@ StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
 	this.endGameWinners = [];
 	if (this.board.winners.length === 0) {
 		// If no harmony set winners, check for player out of tiles
-		var playerOutOfTiles = this.tileManager.aPlayerIsOutOfTiles();
+		var playerOutOfTiles = this.board.aPlayerIsOutOfTilesWithoutOpenGate();
 		if (playerOutOfTiles) {
 			debug("PLAYER OUT OF TILES: " + playerOutOfTiles);
 			if (playerOutOfTiles === HOST) {
@@ -117,6 +119,10 @@ StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
 				this.endGameWinners.push(HOST);
 			}
 		}
+	}
+
+	if (this.board.winners.length === 1) {
+		this.winnerTurnWaitCount++;
 	}
 };
 
@@ -192,7 +198,7 @@ StreetGameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playe
 };
 
 StreetGameManager.prototype.getWinner = function() {
-	if (this.board.winners.length === 1) {
+	if (this.board.winners.length === 1 && this.winnerTurnWaitCount > 0) {
 		return this.board.winners[0];
 	} else if (this.board.winners.length > 1) {
 		return "BOTH players";
@@ -207,11 +213,7 @@ StreetGameManager.prototype.getWinReason = function() {
 	if (this.board.winners.length === 1) {
 		return " achieved Harmony across all midlines and won the game!";
 	} else if (this.endGameWinners.length === 1) {
-		if (this.tileManager.getPlayerWithMoreAccentTiles()) {
-			return " won the game with more Accent Tiles left.";
-		} else {
-			return " won the game with the most Harmonies.";
-		}
+		return " won the game by eliminating opponent's tiles.";
 	}
 };
 

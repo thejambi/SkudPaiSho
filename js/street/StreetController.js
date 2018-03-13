@@ -132,29 +132,6 @@ StreetController.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
 		this.theGame.revealOpenGates(getCurrentPlayer(), this.gameNotation.moves.length);
-	} else if (this.notationBuilder.status === READY_FOR_BONUS) {
-		if (simpleSpecialFlowerRule && tile.type === SPECIAL_FLOWER) {
-			// Other special tile still needs to be in that player's tile pile
-			if (!this.theGame.playerHasNotPlayedEitherSpecialTile(tile.ownerName)) {
-				return false;
-			}
-		}
-
-		tile.selectedFromPile = true;
-		// Bonus Plant! Can be any tile
-		this.notationBuilder.bonusTileCode = tileCode;
-		this.notationBuilder.status = WAITING_FOR_BONUS_ENDPOINT;
-
-		if (tile.type === BASIC_FLOWER && this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
-			this.theGame.revealOpenGates(getCurrentPlayer());
-		} else if (tile.type === ACCENT_TILE) {
-			this.theGame.revealPossiblePlacementPoints(tile);
-		} else if (tile.type === SPECIAL_FLOWER) {
-			if (!specialFlowerLimitedRule 
-				|| (specialFlowerLimitedRule && this.theGame.playerCanBonusPlant(getCurrentPlayer()))) {
-				this.theGame.revealSpecialFlowerPlacementPoints(getCurrentPlayer());
-			}
-		}
 	} else {
 		this.theGame.hidePossibleMovePoints();
 		if (this.notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT 

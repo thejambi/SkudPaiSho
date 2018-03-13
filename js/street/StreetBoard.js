@@ -612,6 +612,7 @@ StreetBoard.prototype.analyzeHarmonies = function() {
 
 	// this.harmonyManager.printHarmonies();
 
+	/* Winning doesn't happen until the beginning of the turn after you form the win pattern, so GameManager needs to take care of that. */
 	this.winners = [];
 	var self = this;
 	var harmonyRingOwners = this.harmonyManager.harmonyRingExists();
@@ -803,6 +804,18 @@ StreetBoard.prototype.setHostGateOpen = function() {
 	}
 };
 
+StreetBoard.prototype.isHostGateOpen = function() {
+	var row = 1;	// Street Pai Sho Gates are one space closer to center
+	var col = 8;
+	return this.cells[row][col].isOpenGate();
+};
+
+StreetBoard.prototype.isGuestGateOpen = function() {
+	var row = 15;	// Street Pai Sho Gates are one space closer to center
+	var col = 8;
+	return this.cells[row][col].isOpenGate();
+};
+
 StreetBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 	var self = this;
 	this.cells.forEach(function(row) {
@@ -838,5 +851,25 @@ StreetBoard.prototype.getCopy = function() {
 	return copyBoard;
 };
 
+StreetBoard.prototype.aPlayerIsOutOfTilesWithoutOpenGate = function() {
+	if (this.numTilesOnBoardForPlayer(HOST) === 0 && !this.isHostGateOpen()) {
+		return HOST;
+	} else if (this.numTilesOnBoardForPlayer(GUEST) === 0 && !this.isGuestGateOpen()) {
+		return GUEST;
+	}
+};
+
+StreetBoard.prototype.numTilesOnBoardForPlayer = function(player) {
+	var count = 0;
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var bp = this.cells[row][col];
+			if (bp.hasTile() && bp.tile.ownerName === player) {
+				count++;
+			}
+		}
+	}
+	return count;
+};
 
 
