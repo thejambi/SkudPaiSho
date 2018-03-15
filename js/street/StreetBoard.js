@@ -772,19 +772,15 @@ StreetBoard.prototype.removePossibleMovePoints = function() {
 };
 
 StreetBoard.prototype.setOpenGatePossibleMoves = function(player) {
-	// /* Apply "open gate" type to applicable boardPoints */
-	// for (var row = 0; row < this.cells.length; row++) {
-	// 	for (var col = 0; col < this.cells[row].length; col++) {
-	// 		var bp = this.cells[row][col];
-	// 		if (bp.isOpenGate()) {
-	// 			this.cells[row][col].addType(POSSIBLE_MOVE);
-	// 		}
-	// 	}
-	// }
-	if (player === HOST) {
-		this.setHostGateOpen();
-	} else {
-		this.setGuestGateOpen();
+	/* Apply "open gate" type to applicable boardPoints
+	 * but only if player has less than 16 tiles on board. 
+	 */
+	if (this.numTilesOnBoardForPlayer(player) < 16) {
+		if (player === HOST) {
+			this.setHostGateOpen();
+		} else {
+			this.setGuestGateOpen();
+		}
 	}
 };
 
@@ -860,11 +856,14 @@ StreetBoard.prototype.aPlayerIsOutOfTilesWithoutOpenGate = function() {
 };
 
 StreetBoard.prototype.numTilesOnBoardForPlayer = function(player) {
+	/* Includes tiles that are currently captured (underneath opponent's tiles) */
 	var count = 0;
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
-			if (bp.hasTile() && bp.tile.ownerName === player) {
+			if (bp.hasTile() 
+				&& (bp.tile.ownerName === player
+					|| (bp.tile.ownerName !== player && bp.tile.capturedTile))) {
 				count++;
 			}
 		}
