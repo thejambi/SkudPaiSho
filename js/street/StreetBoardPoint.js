@@ -87,6 +87,10 @@ StreetBoardPoint.prototype.hasTile = function() {
 	return false;
 };
 
+StreetBoardPoint.prototype.hasEnemyTile = function(player) {
+	return this.tile && this.tile.ownerName !== player;
+};
+
 StreetBoardPoint.prototype.isType = function(type) {
 	return this.types.includes(type);
 };

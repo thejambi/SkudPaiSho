@@ -460,7 +460,7 @@ StreetBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boa
 		return false;
 	} else {
 		// Move may be possible. But there may be tiles in the way...
-		if (!this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves)) {
+		if (!this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves, player)) {
 			// debug("Tiles are in the way, so you can't reach that spot.");
 			return false;
 		}
@@ -470,12 +470,12 @@ StreetBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boa
 	return true;
 };
 
-StreetBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {
+StreetBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves, playerMoving) {
   // Recursion!
-  return this.pathFound(boardPointStart, boardPointEnd, numMoves);
+  return this.pathFound(boardPointStart, boardPointEnd, numMoves, playerMoving);
 };
 
-StreetBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
+StreetBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves, playerMoving) {
   if (!boardPointStart || !boardPointEnd) {
     return false; // start or end point not given
   }
@@ -502,7 +502,7 @@ StreetBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMo
   var nextRow = boardPointStart.row - 1;
   if (nextRow >= 0) {
     var nextPoint = this.cells[nextRow][boardPointStart.col];
-    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
+    if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving)) {
       return true; // Yay!
     }
   }
@@ -511,7 +511,7 @@ StreetBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMo
   nextRow = boardPointStart.row + 1;
   if (nextRow < 17) {
     var nextPoint = this.cells[nextRow][boardPointStart.col];
-    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
+    if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving)) {
       return true; // Yay!
     }
   }
@@ -520,7 +520,7 @@ StreetBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMo
   var nextCol = boardPointStart.col - 1;
   if (nextCol >= 0) {
     var nextPoint = this.cells[boardPointStart.row][nextCol];
-    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
+    if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving)) {
       return true; // Yay!
     }
   }
@@ -529,7 +529,7 @@ StreetBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMo
   nextCol = boardPointStart.col + 1;
   if (nextCol < 17) {
     var nextPoint = this.cells[boardPointStart.row][nextCol];
-    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
+    if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving)) {
       return true; // Yay!
     }
   }
