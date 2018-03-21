@@ -17,8 +17,8 @@ StreetTileManager.prototype.loadTileSet = function(ownerCode) {
 StreetTileManager.prototype.loadStreetSet = function(ownerCode) {
 	var tiles = [];
 
-	// 16 tiles
-	for (var i = 0; i < 16; i++) {
+	// 22 tiles
+	for (var i = 0; i < 22; i++) {
 		tiles.push(new StreetTile(ownerCode));
 	}
 

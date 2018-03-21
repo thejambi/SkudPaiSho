@@ -78,7 +78,7 @@ StreetController.prototype.resetMove = function() {
 };
 
 StreetController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Street Pai Sho</h4> <p>Street Pai Sho is meant to be a great game that is simple and easy to learn.</p>";
+	return "<h4>Street Pai Sho</h4> <p>Street Pai Sho is meant to be a great game that is simple and easy to learn.</p><p>The goal is to form a Harmony across each <em>midline</em>, which are the lines from the center of the board to the edge of the board that divide each quadrant. Tiles can move up to 3 spaces and may move over friendly tiles but not opponent's tiles. Tiles capture by landing on an opponent's tile, but a tile that has a captured tile underneath it cannot capture again. Full rules coming soon. Enjoy!</p>";
 };
 
 StreetController.prototype.getAdditionalMessage = function() {
