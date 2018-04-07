@@ -683,8 +683,7 @@ StreetBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
 StreetBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
-	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile() 
-		&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
+	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
 		colToCheck--;
 	}
 
@@ -700,8 +699,7 @@ StreetBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
 StreetBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
 
-	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile() 
-		&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
+	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
 		colToCheck++;
 	}
 
@@ -717,8 +715,7 @@ StreetBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
 StreetBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
-	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
-		&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
+	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
 		rowToCheck--;
 	}
 
@@ -734,8 +731,7 @@ StreetBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
 StreetBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
-	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
-		&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
+	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
 		rowToCheck++;
 	}
 
