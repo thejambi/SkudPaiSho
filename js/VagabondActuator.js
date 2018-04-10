@@ -90,7 +90,13 @@ VagabondActuator.prototype.addTile = function(tile, mainContainer) {
 	}
 
 	var theImg = document.createElement("img");
-	theImg.src = "vagabond/images/" + tile.getImageName() + ".png";
+
+	var srcValue = "vagabond/images/";
+	if (useDeLionTiles) {
+		srcValue += "delion/";
+	}
+
+	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
 
 	theDiv.setAttribute("name", tile.getImageName());
@@ -145,7 +151,12 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 		
 		var theImg = document.createElement("img");
 
-		theImg.src = "vagabond/images/" + boardPoint.tile.getImageName() + ".png";
+		var srcValue = "vagabond/images/";
+		if (useDeLionTiles) {
+			srcValue += "delion/";
+		}
+
+		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 		
 		if (boardPoint.tile.inHarmony) {
 			theDiv.classList.add(boardPoint.tile.ownerName + "harmony");

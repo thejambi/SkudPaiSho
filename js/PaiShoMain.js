@@ -34,6 +34,7 @@ var gameController;
 
 var localEmailKey = "localUserEmail";
 var tileDesignTypeKey = "tileDesignTypeKey";
+var vagabondTileDesignTypeKey = "vagabondTileDesignTypeKey";
 
 var usernameKey = "usernameKey";
 var userEmailKey = "userEmailKey";
@@ -109,6 +110,7 @@ window.requestAnimationFrame(function () {
 		setGameController(GameType.SkudPaiSho.id);
 	}
 
+	/* Tile Design Preferences */
 	if (!localStorage.getItem(tileDesignTypeKey)) {
 		useHLoweTiles = true;
 	} else if (localStorage.getItem(tileDesignTypeKey) === "hlowe") {
@@ -116,6 +118,22 @@ window.requestAnimationFrame(function () {
 	} else {
 		useHLoweTiles = false;
 	}
+
+	try {
+		useDeLionTiles = false;
+	} catch (err) {
+		/* Completely reload */
+		location.reload(true);
+	}
+
+	if (!localStorage.getItem(vagabondTileDesignTypeKey)) {
+		useDeLionTiles = true;
+	} else if (localStorage.getItem(vagabondTileDesignTypeKey) === "delion") {
+		useDeLionTiles = true;
+	} else {
+		useDeLionTiles = false;
+	}
+	/* --- */
 
 	url = window.location.href.split('?')[0];
 	sandboxUrl = url;
@@ -429,6 +447,7 @@ function startWatchingGameRealTime() {
 	}, 3000);
 }
 
+/* Skud Pai Sho Tile Design Switches */
 function setUseHLoweTiles() {
 	localStorage.setItem(tileDesignTypeKey, "hlowe");
 	useHLoweTiles = true;
@@ -448,6 +467,29 @@ function toggleTileDesigns() {
 		setUseHLoweTiles();
 	}
 }
+/* --- */
+
+/* Vagabond Tile Design Switches */
+function setUseDeLionVagabondTiles() {
+	localStorage.setItem(vagabondTileDesignTypeKey, "delion");
+	useDeLionTiles = true;
+	gameController.callActuate();
+}
+
+function setUseStandardVagabondTiles() {
+	localStorage.setItem(vagabondTileDesignTypeKey, "standard");
+	useDeLionTiles = false;
+	gameController.callActuate();
+}
+
+function toggleVagabondTileDesigns() {
+	if (useDeLionTiles) {
+		setUseStandardVagabondTiles();
+	} else {
+		setUseDeLionVagabondTiles();
+	}
+}
+/* --- */
 
 function promptEmail() {
 	// Just call loginClicked method to open modal dialog
@@ -906,6 +948,8 @@ function clearMessage() {
 
 	if (gameController.getGameTypeId && gameController.getGameTypeId() === GameType.SkudPaiSho.id) {
 		message += getAltTilesOptionText();
+	} else if (gameController.getGameTypeId && gameController.getGameTypeId() === GameType.VagabondPaiSho.id) {
+		message += getAltVagabondTilesOptionText();
 	}
 
 	document.getElementById("helpTextContent").innerHTML = message;
@@ -964,6 +1008,10 @@ function setMessage(msg) {
 
 function getAltTilesOptionText() {
 	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between standard and modern tile designs for Skud Pai Sho.</p>";
+}
+
+function getAltVagabondTilesOptionText() {
+	return "<p><span class='skipBonus' onclick='toggleVagabondTileDesigns();'>Click here</span> to switch between standard and modern tile designs for Vagabond Pai Sho.</p>";
 }
 
 function getTournamentText() {

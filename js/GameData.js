@@ -24,6 +24,7 @@ var limitedGatesRule = true; // Cannot Plant Basic Flower on Harmony Bonus if al
 var specialFlowerLimitedRule = false; // NOT UI READY, DO NOT SET TO TRUE. Cannot Plant Special Flower on Harmony Bonus if not able to Plant Basic Flower either. 
 
 var useHLoweTiles = false;
+var useDeLionTiles = false;
 
 var debugOn = true;
 
