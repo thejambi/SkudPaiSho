@@ -498,7 +498,7 @@ VagabondBoard.prototype.protectTilesAdjacentToPointIfNeeded = function(boardPoin
 		return;
 	}
 
-	// Badgermole protects same player's Flower Tiles
+	/* Badgermole protects same player's Flower Tiles */
 
 	var badgermoleOwner = boardPoint.tile.ownerName;
 
@@ -672,11 +672,11 @@ VagabondBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, b
 		}
 	}
 
-	// Special for Badgermole
+	/* Special for Badgermole */
 	if (boardPointStart.tile.code === 'B') {
-		// Can move directly next to Flower Tile if in line
-		// Is there a Flower Tile next to this end point?
-		if (this.inLineWithAdjacentFlowerTile(boardPointStart, boardPointEnd)) {
+		/* Can move directly next to Flower Tile if in line
+		Is there a Flower Tile next to this end point? */
+		if (this.inLineWithAdjacentFlowerTileWithNothingBetween(boardPointStart, boardPointEnd)) {
 			return true;
 		}
 	}
@@ -698,22 +698,48 @@ VagabondBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, b
 	return true;
 };
 
-VagabondBoard.prototype.inLineWithAdjacentFlowerTile = function(bp, bp2) {
+VagabondBoard.prototype.inLineWithAdjacentFlowerTileWithNothingBetween = function(bp, bp2) {
 	var flowerPoint;
 
 	if (bp.row === bp2.row) {
 		// On same row
+		var scanFromCol = bp2.col + 1;
+		var scanToCol = bp.col;
+		
 		if (bp.col > bp2.col && bp2.col > 0) {
 			flowerPoint = this.cells[bp2.row][bp2.col - 1];
 		} else if (bp.col < bp2.col && bp2.col < 16) {
 			flowerPoint = this.cells[bp2.row][bp2.col + 1];
+
+			scanFromCol = bp.col + 1;
+			scanToCol = bp2.col;
+		}
+
+		/* Return false if there's a tile in-between target points */
+		for (var checkCol = scanFromCol; checkCol < scanToCol; checkCol++) {
+			if (this.cells[bp.row][checkCol].hasTile()) {
+				return false;
+			}
 		}
 	} else if (bp.col === bp2.col) {
 		// On same col
+		var scanFromRow = bp2.row + 1;
+		var scanToRow = bp.row;
+
 		if (bp.row > bp2.row && bp2.row > 0) {
 			flowerPoint = this.cells[bp2.row - 1][bp2.col];
 		} else if (bp.row < bp2.row && bp2.row < 16) {
 			flowerPoint = this.cells[bp2.row + 1][bp2.col];
+
+			scanFromRow = bp.row + 1;
+			scanToRow = bp2.row;
+		}
+
+		/* Return false if there's a tile in-between target points */
+		for (var checkRow = scanFromRow; checkRow < scanToRow; checkRow++) {
+			if (this.cells[checkRow][bp.col].hasTile()) {
+				return false;
+			}
 		}
 	}
 

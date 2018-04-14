@@ -2072,7 +2072,7 @@ function showGameNotationModal() {
 }
 
 function showGameReplayLink() {
-	if (currentGameData.hostUsername && currentGameData.guestUsername) {
+	// if (currentGameData.hostUsername && currentGameData.guestUsername) {
 		var notation = getGameControllerForGameType(currentGameData.gameTypeId).gameNotation;
 		for (var i = 0; i < currentMoveIndex; i++) {
 			notation.addMove(gameController.gameNotation.moves[i]);
@@ -2096,9 +2096,9 @@ function showGameReplayLink() {
 		debug("GameReplayLinkUrl: " + linkUrl);
 		var message = "Here is the <a href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.";
 		showModal("Game Replay Link", message);
-	} else {
-		showModal("About Game Replay", "Click this link when viewing an online game to get a sharable game replay link.");
-	}
+	// } else {
+	// 	showModal("About Game Replay", "Click this link when viewing an online game to get a sharable game replay link.");
+	// }
 }
 
 function openGameReplay() {
