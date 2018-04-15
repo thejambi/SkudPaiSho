@@ -216,6 +216,8 @@ window.requestAnimationFrame(function () {
 		}
 	}
 
+	resetGlobalChats();
+
 	initialVerifyLogin();
 
 	// Open default help/chat tab
@@ -1906,9 +1908,13 @@ var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(resul
 	}
 };
 
-function fetchInitialGlobalChats() {
+function resetGlobalChats() {
 	// Clear all global chats..
-	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! This global chat will show the latest messages sent to it. Say hi and see if anyone else is online :)<hr />";
+	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! This global chat will show the latest messages sent to it for anyone signed in. Say hi and see if anyone else is online :)<br />Better yet, for any questions and other talk about the games here, join The Garden Gate <a href='https://discord.gg/dStDZx7' target='_blank'>Discord server</a>.<hr />";
+}
+
+function fetchInitialGlobalChats() {
+	resetGlobalChats();
 
 	// Fetch global chats..
 	onlinePlayEngine.getInitialGlobalChatMessages(getInitialGlobalChatsCallback);
