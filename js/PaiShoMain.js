@@ -435,6 +435,10 @@ function startWatchingGameRealTime() {
 	document.getElementById('chatMessagesDisplay').innerHTML = "";
 	lastChatTimestamp = '1970-01-01 00:00:00';
 
+	/* Setup chat heading message with link to previously active game */
+	// TODO 
+	// onlinePlayEngine
+
 	// First pulse
 	gameWatchPulse();
 
@@ -2332,7 +2336,7 @@ function setDeviceToken(deviceToken) {
 }
 
 function openShop() {
-	openLink("https://skudpaisho.ecwid.com");
+	openLink("https://www.etsy.com/shop/SkudPaiSho");
 }
 
 
