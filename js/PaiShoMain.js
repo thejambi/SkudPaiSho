@@ -428,6 +428,7 @@ function gameWatchPulse() {
 	onlinePlayEngine.getNewChatMessages(gameId, lastChatTimestamp, getNewChatMessagesCallback);
 }
 
+var REAL_TIME_GAME_WATCH_INTERVAL = 6000;
 function startWatchingGameRealTime() {
 	debug("Starting to watch game");
 
@@ -450,7 +451,7 @@ function startWatchingGameRealTime() {
 
 	gameWatchIntervalValue = setInterval(function() {
 		gameWatchPulse();
-	}, 3000);
+	}, REAL_TIME_GAME_WATCH_INTERVAL);
 }
 
 /* Skud Pai Sho Tile Design Switches */
@@ -1938,6 +1939,7 @@ function logOnlineStatusPulse() {
 	fetchGlobalChats();
 }
 
+var LOG_ONLINE_STATUS_INTERVAL = 20000;
 function startLoggingOnlineStatus() {
 	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 
@@ -1950,7 +1952,7 @@ function startLoggingOnlineStatus() {
 
 	logOnlineStatusIntervalValue = setInterval(function() {
 		logOnlineStatusPulse();
-	}, 5000);
+	}, 20000);
 }
 
 function setSidenavNewGameSection() {
@@ -1996,6 +1998,7 @@ function loadNumberOfGamesWhereUserTurn() {
 	}
 }
 
+var USER_TURN_GAME_WATCH_INTERVAL = 10000;
 function startWatchingNumberOfGamesWhereUserTurn() {
 	loadNumberOfGamesWhereUserTurn();
 
@@ -2006,7 +2009,7 @@ function startWatchingNumberOfGamesWhereUserTurn() {
 
 	userTurnCountInterval = setInterval(function() {
 		loadNumberOfGamesWhereUserTurn();
-	}, 6000);
+	}, USER_TURN_GAME_WATCH_INTERVAL);
 }
 
 /* Chat */
