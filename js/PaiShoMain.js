@@ -2339,7 +2339,7 @@ function setDeviceToken(deviceToken) {
 }
 
 function openShop() {
-	openLink("https://www.etsy.com/shop/SkudPaiSho");
+	openLink("https://skudpaisho.com/site/buying-pai-sho/");
 }
 
 
