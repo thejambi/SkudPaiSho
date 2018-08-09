@@ -428,7 +428,7 @@ function gameWatchPulse() {
 	onlinePlayEngine.getNewChatMessages(gameId, lastChatTimestamp, getNewChatMessagesCallback);
 }
 
-var REAL_TIME_GAME_WATCH_INTERVAL = 6000;
+var REAL_TIME_GAME_WATCH_INTERVAL = 3000;
 function startWatchingGameRealTime() {
 	debug("Starting to watch game");
 
@@ -1232,7 +1232,7 @@ function callSubmitMove() {
 var sendVerificationCodeCallback = function sendVerificationCodeCallback(response) {
 	var message;
 	if (response.includes('has been sent')) {
-        message = "Verification code sent to " + emailBeingVerified;
+        message = "Verification code sent to " + emailBeingVerified + ". Be sure to check your spam or junk mail for the email.";
     } else {
         message = "Failed to send verification code, please try again.";
     }
@@ -1939,7 +1939,7 @@ function logOnlineStatusPulse() {
 	fetchGlobalChats();
 }
 
-var LOG_ONLINE_STATUS_INTERVAL = 20000;
+var LOG_ONLINE_STATUS_INTERVAL = 5000;
 function startLoggingOnlineStatus() {
 	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 
@@ -1998,7 +1998,7 @@ function loadNumberOfGamesWhereUserTurn() {
 	}
 }
 
-var USER_TURN_GAME_WATCH_INTERVAL = 10000;
+var USER_TURN_GAME_WATCH_INTERVAL = 6000;
 function startWatchingNumberOfGamesWhereUserTurn() {
 	loadNumberOfGamesWhereUserTurn();
 
