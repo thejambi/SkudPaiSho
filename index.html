@@ -4,9 +4,8 @@
 	<meta charset="utf-8">
 
 	<title>The Garden Gate</title>
-  <!-- <title>Skud Pai Sho</title> -->
 
-	<!-- Images used in Skud Pai Sho are originally from the Lotus Gambit rules community at http://lotusgambit.pbworks.com/w/page/45592429/Home -->
+	<!-- Images of classic tile designs used in Skud Pai Sho are originally from the Lotus Gambit rules community at http://lotusgambit.pbworks.com/w/page/45592429/Home -->
 
 	<link href="style/main.css" rel="stylesheet" type="text/css">
 
@@ -25,6 +24,15 @@
   <meta name="apple-itunes-app" content="app-id=1302567785">
 
   <script src="https://use.fontawesome.com/8d1446c26f.js"></script>
+
+  <!-- Global site tag (gtag.js) - Google AdWords: 972849224 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-972849224"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'AW-972849224');
+  </script>
     
 </head>
 
@@ -34,7 +42,6 @@
     <div class="sidenavContent">
       <div class="closebtn" onclick="closeNav();">&nbsp;&times;</div>
       <h1>The Garden Gate</h1>
-      <!-- <h1>Skud Pai Sho</h1> -->
       <hr />
       <div class='sidenavSectionHeader'>Play</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='accountHeaderClicked();'><i class="fa fa-user" aria-hidden="true"></i> View my games<span id='myGamesNumberMyTurn'></span></div>
@@ -153,6 +160,7 @@
       </div>
     </div>
     <div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
+      <div id="chatMessagesHeader" class="chatMessagesHeader"></div>
       <div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
       <div id="chatMessageInputContainer" class="chatMessageInputContainer">
         <textarea id="chatMessageInput" class="chatMessageInput"></textarea>
@@ -251,14 +259,14 @@ To sign up or log in, enter your username and email, then enter the 4-digit code
     <script src="js/SkudPaiShoTile.js"></script>
     <script src="js/SkudPaiShoTileManager.js"></script>
 
-    <script src="js/VagabondController.js"></script>
-    <script src="js/VagabondActuator.js"></script>
-    <script src="js/VagabondBoard.js"></script>
-    <script src="js/VagabondBoardPoint.js"></script>
-    <script src="js/VagabondGameManager.js"></script>
-    <script src="js/VagabondGameNotation.js"></script>
-    <script src="js/VagabondTile.js"></script>
-    <script src="js/VagabondTileManager.js"></script>
+    <script src="js/vagabond/VagabondController.js"></script>
+    <script src="js/vagabond/VagabondActuator.js"></script>
+    <script src="js/vagabond/VagabondBoard.js"></script>
+    <script src="js/vagabond/VagabondBoardPoint.js"></script>
+    <script src="js/vagabond/VagabondGameManager.js"></script>
+    <script src="js/vagabond/VagabondGameNotation.js"></script>
+    <script src="js/vagabond/VagabondTile.js"></script>
+    <script src="js/vagabond/VagabondTileManager.js"></script>
 
     <script src="js/SolitaireController.js"></script>
     <script src="js/SolitaireActuator.js"></script>

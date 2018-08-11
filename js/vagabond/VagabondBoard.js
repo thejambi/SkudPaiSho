@@ -386,6 +386,22 @@ VagabondBoard.prototype.getSurroundingRowAndCols = function(rowAndCol) {
 	return rowAndCols;
 };
 
+VagabondBoard.prototype.getSurroundingBoardPoints = function(initialBoardPoint) {
+	var surroundingPoints = [];
+	for (var row = initialBoardPoint.row - 1; row <= initialBoardPoint.row + 1; row++) {
+		for (var col = initialBoardPoint.col - 1; col <= initialBoardPoint.col + 1; col++) {
+			if ((row !== initialBoardPoint.row || col !== initialBoardPoint.col)	// Not the center given point
+				&& (row >= 0 && col >= 0) && (row < 17 && col < 17)) {	// Not outside range of the grid
+				var boardPoint = this.cells[row][col];
+				if (!boardPoint.isType(NON_PLAYABLE)) {	// Not non-playable
+					surroundingPoints.push(boardPoint);
+				}
+			}
+		}
+	}
+	return surroundingPoints;
+};
+
 VagabondBoard.prototype.getAdjacentRowAndCols = function(rowAndCol) {
 	var rowAndCols = [];
 
@@ -424,10 +440,11 @@ VagabondBoard.prototype.moveTile = function(player, notationPointStart, notation
 	var boardPointStart = this.cells[startRowCol.row][startRowCol.col];
 	var boardPointEnd = this.cells[endRowCol.row][endRowCol.col];
 
-	if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)) {
-		debug("Bad move bears");
-		return false;
-	}
+	/* Disabling move validation for replay. */
+	// if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)) {
+	// 	debug("Bad move bears");
+	// 	return false;
+	// }
 
 	var tile = boardPointStart.removeTile();
 
@@ -586,7 +603,7 @@ VagabondBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, b
 	if (boardPointStart.tile.code === 'S') {
 		// If overlaps with another Bison zone, return false
 		// Get all other Sky Bison tiles, check their zones
-		var bisons = [];
+		var bisons = [];	// Incorrect plural is an LOK reference
 		for (var row = 0; row < this.cells.length; row++) {
 			for (var col = 0; col < this.cells[row].length; col++) {
 				var bp = this.cells[row][col];
@@ -689,7 +706,7 @@ VagabondBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, b
 		return false;
 	} else {
 		// Move may be possible. But there may be tiles in the way...
-		if (!this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves)) {
+		if (!this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves, boardPointStart.tile)) {
 			return false;
 		}
 	}
@@ -749,12 +766,12 @@ VagabondBoard.prototype.inLineWithAdjacentFlowerTileWithNothingBetween = functio
 	return false;
 };
 
-VagabondBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {
+VagabondBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves, movingTile) {
   // Recursion!
-  return this.pathFound(boardPointStart, boardPointEnd, numMoves);
+  return this.pathFound(boardPointStart, boardPointEnd, numMoves, movingTile);
 };
 
-VagabondBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
+VagabondBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves, movingTile) {
   if (!boardPointStart || !boardPointEnd) {
     return false; // start or end point not given
   }
@@ -769,6 +786,11 @@ VagabondBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, num
   if (numMoves <= 0) {
     return false; // No more moves left
   }
+
+	// If this point is surrounded by a Chrysanthemum and moving tile is Sky Bison, cannot keep moving.
+	if (movingTile.code === 'S' && this.pointIsNextToOpponentTile(boardPointStart, movingTile.ownerCode, 'C')) {
+		return false;
+	}
   
   // Idea: Get min num moves necessary!
   var minMoves = Math.abs(boardPointStart.row - boardPointEnd.row) + Math.abs(boardPointStart.col - boardPointEnd.col);
@@ -781,7 +803,7 @@ VagabondBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, num
   var nextRow = boardPointStart.row - 1;
   if (nextRow >= 0) {
     var nextPoint = this.cells[nextRow][boardPointStart.col];
-    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
+    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, movingTile)) {
       return true; // Yay!
     }
   }
@@ -790,7 +812,7 @@ VagabondBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, num
   nextRow = boardPointStart.row + 1;
   if (nextRow < 17) {
     var nextPoint = this.cells[nextRow][boardPointStart.col];
-    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
+    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, movingTile)) {
       return true; // Yay!
     }
   }
@@ -799,7 +821,7 @@ VagabondBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, num
   var nextCol = boardPointStart.col - 1;
   if (nextCol >= 0) {
     var nextPoint = this.cells[boardPointStart.row][nextCol];
-    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
+    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, movingTile)) {
       return true; // Yay!
     }
   }
@@ -808,11 +830,23 @@ VagabondBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, num
   nextCol = boardPointStart.col + 1;
   if (nextCol < 17) {
     var nextPoint = this.cells[boardPointStart.row][nextCol];
-    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1)) {
+    if (!nextPoint.hasTile() && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, movingTile)) {
       return true; // Yay!
     }
   }
 };
+
+VagabondBoard.prototype.pointIsNextToOpponentTile = function(bp, originalPlayerCode, tileCode) {
+	var adjacentPoints = this.getAdjacentRowAndCols(bp);
+	for (var i = 0; i < adjacentPoints.length; i++) {
+		if (adjacentPoints[i].hasTile()
+			&& adjacentPoints[i].tile.code === tileCode
+			&& adjacentPoints[i].tile.ownerCode !== originalPlayerCode) {
+			return true;
+		}
+	}
+	return false;
+}
 
 VagabondBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
 	if (!boardPointStart.hasTile()) {
@@ -921,24 +955,6 @@ VagabondBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 			}
 		});
 	});
-};
-
-VagabondBoard.prototype.revealBoatBonusPoints = function(boardPoint) {
-	if (!boardPoint.hasTile()) {
-		return;
-	}
-	// Apply "possible move point" type to applicable boardPoints
-	var player = boardPoint.tile.ownerName;
-	for (var row = 0; row < this.cells.length; row++) {
-		for (var col = 0; col < this.cells[row].length; col++) {
-			var boardPointEnd = this.cells[row][col];
-			if (Math.abs(boardPoint.row - boardPointEnd.row) + Math.abs(boardPoint.col - boardPointEnd.col) === 1) {
-				if (this.canMoveTileToPoint(player, boardPoint, boardPointEnd)) {
-					boardPointEnd.addType(POSSIBLE_MOVE);
-				}
-			}
-		}
-	}
 };
 
 // VagabondBoard.prototype.getCopy = function() {

@@ -78,11 +78,6 @@ VagabondGameManager.prototype.revealPossiblePlacementPoints = function(tile) {
 	this.actuate();
 };
 
-VagabondGameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
-	this.board.revealBoatBonusPoints(boardPoint);
-	this.actuate();
-};
-
 VagabondGameManager.prototype.getWinner = function() {
 	if (this.board.winners.length === 1) {
 		return this.board.winners[0];
