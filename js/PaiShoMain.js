@@ -2342,9 +2342,28 @@ function openShop() {
 	openLink("https://skudpaisho.com/site/buying-pai-sho/");
 }
 
+/* Options */
+var ggOptions = [];
 
+function addOption(option) {
+	ggOptions.push(option);
+}
 
+function clearOptions() {
+	ggOptions = [];
+}
 
+function addOptionFromInput() {
+	addOption(document.getElementById('optionAddInput').value);
+	closeModal();
+}
+
+function promptAddOption() {
+	var message = "<br /><input type='text' id='optionAddInput' name='optionAddInput' />";
+	message += "<br /><div class='clickableText' onclick='addOptionFromInput()'>Add</div>";
+
+	showModal("Add Option", message);
+}
 
 
 

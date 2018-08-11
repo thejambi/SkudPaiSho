@@ -21,6 +21,13 @@ VagabondTileManager.prototype.loadTileSet = function(ownerCode) {
 	tiles.push(new VagabondTile('F', ownerCode));
 	tiles.push(new VagabondTile('D', ownerCode));
 
+	if (ggOptions.includes('vagabond-more-mums')) {
+		tiles.push(new VagabondTile('C', ownerCode));
+		tiles.push(new VagabondTile('C', ownerCode));
+		tiles.push(new VagabondTile('C', ownerCode));
+		tiles.push(new VagabondTile('C', ownerCode));
+	}
+
 	return tiles;
 };
 
