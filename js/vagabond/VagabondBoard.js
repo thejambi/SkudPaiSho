@@ -760,7 +760,7 @@ VagabondBoard.prototype.inLineWithAdjacentFlowerTileWithNothingBetween = functio
 		}
 	}
 
-	if (flowerPoint && flowerPoint.hasTile() && flowerPoint.tile.ownerName === bp.tile.ownerName) {
+	if (flowerPoint && flowerPoint.hasTile()) {
 		return flowerPoint.tile.isFlowerTile();
 	}
 	return false;
