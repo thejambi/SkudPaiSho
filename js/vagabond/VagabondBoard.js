@@ -607,7 +607,8 @@ VagabondBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, b
 		for (var row = 0; row < this.cells.length; row++) {
 			for (var col = 0; col < this.cells[row].length; col++) {
 				var bp = this.cells[row][col];
-				if (bp.hasTile() && bp.tile.code === 'S' && bp.tile.id !== boardPointStart.tile.id && !bp.isType(GATE) && !bp.tile.blocked) {
+				if (bp.hasTile() && bp.tile.code === 'S' && bp.tile.id !== boardPointStart.tile.id && !bp.isType(GATE) && !bp.tile.blocked
+					&& bp.tile.ownerCode != boardPointStart.tile.ownerCode) {
 					bisons.push(bp);
 				}
 			}
