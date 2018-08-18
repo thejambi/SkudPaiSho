@@ -1,6 +1,6 @@
-// Solitaire Harmony
+// Coop Solitaire Harmony
 
-function SolitaireHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
+function CoopSolitaireHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = tile1RowAndColumn;
 	this.tile2 = tile2;
@@ -17,7 +17,7 @@ function SolitaireHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	}
 }
 
-SolitaireHarmony.prototype.equals = function(otherHarmony) {
+CoopSolitaireHarmony.prototype.equals = function(otherHarmony) {
 	if (this.ownerName === otherHarmony.ownerName && this.ownerCode === otherHarmony.ownerCode) {
 		if (this.tile1 === otherHarmony.tile1 || this.tile1 === otherHarmony.tile2) {
 			if (this.tile2 === otherHarmony.tile1 || this.tile2 === otherHarmony.tile2) {
@@ -28,7 +28,7 @@ SolitaireHarmony.prototype.equals = function(otherHarmony) {
 	return false;
 };
 
-SolitaireHarmony.prototype.notAnyOfThese = function(harmonies) {
+CoopSolitaireHarmony.prototype.notAnyOfThese = function(harmonies) {
 	for (var i = 0; i < harmonies.length; i++) {
 		if (this.equals(harmonies[i])) {
 			return false;
@@ -37,11 +37,11 @@ SolitaireHarmony.prototype.notAnyOfThese = function(harmonies) {
 	return true;
 };
 
-SolitaireHarmony.prototype.containsTile = function(tile) {
+CoopSolitaireHarmony.prototype.containsTile = function(tile) {
 	return (this.tile1 === tile || this.tile2 === tile);
 };
 
-SolitaireHarmony.prototype.getTileThatIsNotThisOne = function(tile) {
+CoopSolitaireHarmony.prototype.getTileThatIsNotThisOne = function(tile) {
 	if (this.tile1 === tile) {
 		return this.tile2;
 	} else if (this.tile2 === tile) {
@@ -51,11 +51,11 @@ SolitaireHarmony.prototype.getTileThatIsNotThisOne = function(tile) {
 	}
 };
 
-SolitaireHarmony.prototype.containsTilePos = function(pos) {
+CoopSolitaireHarmony.prototype.containsTilePos = function(pos) {
 	return this.tile1Pos.samesies(pos) || this.tile2Pos.samesies(pos);
 };
 
-SolitaireHarmony.prototype.getPosThatIsNotThisOne = function(pos) {
+CoopSolitaireHarmony.prototype.getPosThatIsNotThisOne = function(pos) {
 	if (this.tile1Pos.samesies(pos)) {
 		return this.tile2Pos;
 	} else if(this.tile2Pos.samesies(pos)) {
@@ -65,11 +65,11 @@ SolitaireHarmony.prototype.getPosThatIsNotThisOne = function(pos) {
 	}
 };
 
-SolitaireHarmony.prototype.getString = function() {
+CoopSolitaireHarmony.prototype.getString = function() {
 	return this.ownerName + " (" + this.tile1Pos.notationPointString + ")-(" + this.tile2Pos.notationPointString + ")";
 };
 
-SolitaireHarmony.prototype.getDirectionForTile = function(tile) {
+CoopSolitaireHarmony.prototype.getDirectionForTile = function(tile) {
 	if (!this.containsTile(tile)) {
 		return;
 	}
@@ -98,7 +98,7 @@ SolitaireHarmony.prototype.getDirectionForTile = function(tile) {
 	}
 };
 
-SolitaireHarmony.prototype.crossesCenter = function() {
+CoopSolitaireHarmony.prototype.crossesCenter = function() {
 	var rowHigh = this.tile1Pos.row;
 	var rowLow = this.tile2Pos.row;
 	if (this.tile1Pos.row < this.tile2Pos.row) {
@@ -127,19 +127,19 @@ SolitaireHarmony.prototype.crossesCenter = function() {
 
 
 // HarmonyManager manages list of harmonies
-function SolitaireHarmonyManager() {
+function CoopSolitaireHarmonyManager() {
 	this.harmonies = [];
 	this.clashes = [];
 }
 
-SolitaireHarmonyManager.prototype.printHarmonies = function() {
+CoopSolitaireHarmonyManager.prototype.printHarmonies = function() {
 	debug("All Harmonies:");
 	for (var i = 0; i < this.harmonies.length; i++) {
 		debug(this.harmonies[i].getString());
 	}
 };
 
-SolitaireHarmonyManager.prototype.getHarmoniesWithThisTile = function(tile) {
+CoopSolitaireHarmonyManager.prototype.getHarmoniesWithThisTile = function(tile) {
 	var results = [];
 	this.harmonies.forEach(function(harmony) {
 		if (harmony.containsTile(tile)) {
@@ -149,7 +149,7 @@ SolitaireHarmonyManager.prototype.getHarmoniesWithThisTile = function(tile) {
 	return results;
 };
 
-SolitaireHarmonyManager.prototype.getClashesWithThisTile = function(tile) {
+CoopSolitaireHarmonyManager.prototype.getClashesWithThisTile = function(tile) {
 	var results = [];
 	this.clashes.forEach(function(harmony) {
 		if (harmony.containsTile(tile)) {
@@ -159,7 +159,7 @@ SolitaireHarmonyManager.prototype.getClashesWithThisTile = function(tile) {
 	return results;
 };
 
-SolitaireHarmonyManager.prototype.addHarmony = function(harmony) {
+CoopSolitaireHarmonyManager.prototype.addHarmony = function(harmony) {
 	// Add harmony if it doesn't already exist
 
 	// Does it exist in old set of harmonies?
@@ -177,7 +177,7 @@ SolitaireHarmonyManager.prototype.addHarmony = function(harmony) {
 	}
 };
 
-SolitaireHarmonyManager.prototype.addHarmonies = function(harmoniesToAdd) {
+CoopSolitaireHarmonyManager.prototype.addHarmonies = function(harmoniesToAdd) {
 	if (!harmoniesToAdd) {
 		return;
 	}
@@ -187,7 +187,7 @@ SolitaireHarmonyManager.prototype.addHarmonies = function(harmoniesToAdd) {
 	}
 };
 
-SolitaireHarmonyManager.prototype.addClash = function(harmony) {
+CoopSolitaireHarmonyManager.prototype.addClash = function(harmony) {
 	// Add harmony if it doesn't already exist
 
 	// Does it exist in old set of harmonies?
@@ -203,7 +203,7 @@ SolitaireHarmonyManager.prototype.addClash = function(harmony) {
 	}
 };
 
-SolitaireHarmonyManager.prototype.addClashes = function(harmoniesToAdd) {
+CoopSolitaireHarmonyManager.prototype.addClashes = function(harmoniesToAdd) {
 	if (!harmoniesToAdd) {
 		return;
 	}
@@ -213,12 +213,12 @@ SolitaireHarmonyManager.prototype.addClashes = function(harmoniesToAdd) {
 	}
 };
 
-SolitaireHarmonyManager.prototype.clearList = function() {
+CoopSolitaireHarmonyManager.prototype.clearList = function() {
 	this.harmonies = [];
 	this.clashes = [];
 };
 
-SolitaireHarmonyManager.prototype.getSolitaireGameSummaryText = function() {
+CoopSolitaireHarmonyManager.prototype.getSolitaireGameSummaryText = function() {
 	var player = this.getPlayerWithMostHarmonies();
 
 	// Calculate Simple score (based on number of Harmonies and Disharmonies)
@@ -248,7 +248,7 @@ SolitaireHarmonyManager.prototype.getSolitaireGameSummaryText = function() {
 	// return "Score: " + totalScore;
 };
 
-SolitaireHarmonyManager.prototype.getHarmonyPointsForPlayer = function(player, harmonyList) {
+CoopSolitaireHarmonyManager.prototype.getHarmonyPointsForPlayer = function(player, harmonyList) {
 	var points = 0;
 	for (var i = 0; i < harmonyList.length; i++) {
 		var harmony = harmonyList[i];
@@ -266,7 +266,7 @@ SolitaireHarmonyManager.prototype.getHarmonyPointsForPlayer = function(player, h
 	return points;
 };
 
-SolitaireHarmonyManager.prototype.numHarmoniesForPlayer = function(player) {
+CoopSolitaireHarmonyManager.prototype.numHarmoniesForPlayer = function(player) {
 	var count = 0;
 	for (var i = 0; i < this.harmonies.length; i++) {
 		if (this.harmonies[i].ownerName === player) {
@@ -276,7 +276,7 @@ SolitaireHarmonyManager.prototype.numHarmoniesForPlayer = function(player) {
 	return count;
 };
 
-SolitaireHarmonyManager.prototype.numClashesForPlayer = function(player) {
+CoopSolitaireHarmonyManager.prototype.numClashesForPlayer = function(player) {
 	var count = 0;
 	for (var i = 0; i < this.clashes.length; i++) {
 		if (this.clashes[i].ownerName === player) {
@@ -286,7 +286,7 @@ SolitaireHarmonyManager.prototype.numClashesForPlayer = function(player) {
 	return count;
 };
 
-SolitaireHarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
+CoopSolitaireHarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
 	var hostCount = this.numHarmoniesForPlayer(HOST);
 	var guestCount = this.numHarmoniesForPlayer(GUEST);
 
@@ -299,7 +299,7 @@ SolitaireHarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
 	return HOST;
 };
 
-SolitaireHarmonyManager.prototype.getNumCrossingCenterForPlayer = function(player) {
+CoopSolitaireHarmonyManager.prototype.getNumCrossingCenterForPlayer = function(player) {
 	var count = 0;
 	for (var i = 0; i < this.harmonies.length; i++) {
 		if (this.harmonies[i].ownerName === player) {
@@ -311,7 +311,7 @@ SolitaireHarmonyManager.prototype.getNumCrossingCenterForPlayer = function(playe
 	return count;
 };
 
-SolitaireHarmonyManager.prototype.ringLengthForPlayer = function(player) {
+CoopSolitaireHarmonyManager.prototype.ringLengthForPlayer = function(player) {
 	var rings = this.getHarmonyChains();
 	var longest = 0;
 
@@ -345,7 +345,7 @@ SolitaireHarmonyManager.prototype.ringLengthForPlayer = function(player) {
 	return longest;
 };
 
-SolitaireHarmonyManager.prototype.getPlayerWithLongestChain = function() {
+CoopSolitaireHarmonyManager.prototype.getPlayerWithLongestChain = function() {
 	var hostLength = this.ringLengthForPlayer(HOST);
 	var guestLength = this.ringLengthForPlayer(GUEST);
 
@@ -356,7 +356,7 @@ SolitaireHarmonyManager.prototype.getPlayerWithLongestChain = function() {
 	}
 };
 
-SolitaireHarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies) {
+CoopSolitaireHarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies) {
 	// There's a new harmony if a player's tile has a harmony with a tile it didn't before
 	
 	// If current harmony list has one that oldHarmonies does not
@@ -385,7 +385,7 @@ SolitaireHarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies)
 	return newHarmonies.length > 0;
 };
 
-SolitaireHarmonyManager.prototype.getHarmonyChains = function() {
+CoopSolitaireHarmonyManager.prototype.getHarmonyChains = function() {
 	var self = this;
 
 	var rings = [];
@@ -421,7 +421,7 @@ SolitaireHarmonyManager.prototype.getHarmonyChains = function() {
 	return rings;
 };
 
-SolitaireHarmonyManager.prototype.harmonyRingExists = function() {
+CoopSolitaireHarmonyManager.prototype.harmonyRingExists = function() {
 	// Chain of harmonies around the center of the board
 
 	var self = this;
@@ -470,7 +470,7 @@ SolitaireHarmonyManager.prototype.harmonyRingExists = function() {
 	return verifiedHarmonyRingOwners;
 };
 
-SolitaireHarmonyManager.prototype.ringContains345 = function(ring) {
+CoopSolitaireHarmonyManager.prototype.ringContains345 = function(ring) {
 	// 
 	var has3 = false;
 	var has4 = false;
@@ -501,7 +501,7 @@ SolitaireHarmonyManager.prototype.ringContains345 = function(ring) {
 };
 
 // I think this works.
-SolitaireHarmonyManager.prototype.verifyHarmonyRing = function(ring) {
+CoopSolitaireHarmonyManager.prototype.verifyHarmonyRing = function(ring) {
 	// Verify harmonies in ring go around center of board
 	// debug("In verifyHarmonyRing()");
 
@@ -591,7 +591,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 **/
-SolitaireHarmonyManager.prototype.isPointInsideShape = function(notationPoint, shapePoints) {
+CoopSolitaireHarmonyManager.prototype.isPointInsideShape = function(notationPoint, shapePoints) {
 	var x = notationPoint.x;
 	var y = notationPoint.y;
 
@@ -614,7 +614,7 @@ SolitaireHarmonyManager.prototype.isPointInsideShape = function(notationPoint, s
 	return inside;
 };
 
-SolitaireHarmonyManager.prototype.isPointInsideShape_alternate = function(notationPoint, poly) {
+CoopSolitaireHarmonyManager.prototype.isPointInsideShape_alternate = function(notationPoint, poly) {
 	var pt = [notationPoint.x, notationPoint.y];
     for(var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
         ((poly[i][1] <= pt[1] && pt[1] < poly[j][1]) || (poly[j][1] <= pt[1] && pt[1] < poly[i][1]))
@@ -624,7 +624,7 @@ SolitaireHarmonyManager.prototype.isPointInsideShape_alternate = function(notati
 };
 
 /* Working function */
-SolitaireHarmonyManager.prototype.isCenterInsideShape = function(shapePoints) {
+CoopSolitaireHarmonyManager.prototype.isCenterInsideShape = function(shapePoints) {
 	var x = 0;
 	var y = 0;
 	var inside = false;
@@ -660,7 +660,7 @@ SolitaireHarmonyManager.prototype.isCenterInsideShape = function(shapePoints) {
 
 
 
-SolitaireHarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
+CoopSolitaireHarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
 	// Must be same size to qualify as matching
 	if (ring1.length !== ring2.length) {
 		return false;
@@ -683,7 +683,7 @@ SolitaireHarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
 	return true;
 };
 
-SolitaireHarmonyManager.prototype.lookForRing = function(t1, tx, chain) {
+CoopSolitaireHarmonyManager.prototype.lookForRing = function(t1, tx, chain) {
 	// Look for different harmony that includes t1
 	for (var i = 0; i < this.harmonies.length; i++) {
 		var hx = this.harmonies[i];

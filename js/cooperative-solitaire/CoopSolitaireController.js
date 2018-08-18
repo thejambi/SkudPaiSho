@@ -1,6 +1,6 @@
-/* Solitaire Pai Sho specific UI interaction logic */
+/* Cooperative Solitaire Pai Sho specific UI interaction logic */
 
-function SolitaireController() {
+function CoopSolitaireController() {
 	document.getElementById('hostTilesContainer').innerHTML = this.getHostTilesContainerDivs();
 	document.getElementById('guestTilesContainer').innerHTML = this.getGuestTilesContainerDivs();
 
@@ -18,41 +18,41 @@ function SolitaireController() {
 	this.drawRandomTile();
 }
 
-SolitaireController.prototype.getGameTypeId = function() {
-	return GameType.SolitairePaiSho.id;
+CoopSolitaireController.prototype.getGameTypeId = function() {
+	return GameType.CoopSolitaire.id;
 };
 
-SolitaireController.prototype.completeSetup = function() {
+CoopSolitaireController.prototype.completeSetup = function() {
 	this.callActuate();
 };
 
-SolitaireController.prototype.drawRandomTile = function() {
+CoopSolitaireController.prototype.drawRandomTile = function() {
 	this.lastDrawnTile = this.drawnTile;
 	this.drawnTile = this.theGame.drawRandomTile();
 };
 
-SolitaireController.prototype.resetGameManager = function() {
-	this.theGame = new SolitaireGameManager();
+CoopSolitaireController.prototype.resetGameManager = function() {
+	this.theGame = new CoopSolitaireGameManager();
 	// this.setGameNotation(this.gameNotation.notationText);
 };
 
-SolitaireController.prototype.resetNotationBuilder = function() {
+CoopSolitaireController.prototype.resetNotationBuilder = function() {
 	this.notationBuilder = new SolitaireNotationBuilder();
 };
 
-SolitaireController.prototype.resetGameNotation = function() {
-	this.gameNotation = new SolitaireGameNotation();
+CoopSolitaireController.prototype.resetGameNotation = function() {
+	this.gameNotation = new CoopSolitaireGameNotation();
 };
 
-SolitaireController.prototype.getHostTilesContainerDivs = function() {
+CoopSolitaireController.prototype.getHostTilesContainerDivs = function() {
 	return '<div class="HR3 HR4 HR5 HW3 HW4 HW5 HR HW HK HB HL HO">';
 }
 
-SolitaireController.prototype.getGuestTilesContainerDivs = function() {
+CoopSolitaireController.prototype.getGuestTilesContainerDivs = function() {
 	return '<div></div>';
 };
 
-SolitaireController.prototype.callActuate = function() {
+CoopSolitaireController.prototype.callActuate = function() {
 	// if tilemanager doesn't have drawnTile, draw tile?
 	if (this.drawnTile) {
 		var tile = this.theGame.tileManager.peekTile(HOST, this.drawnTile.code, this.drawnTile.id);
@@ -67,7 +67,7 @@ SolitaireController.prototype.callActuate = function() {
 	this.theGame.actuate();
 };
 
-SolitaireController.prototype.resetMove = function() {
+CoopSolitaireController.prototype.resetMove = function() {
 	// Remove last move
 	this.gameNotation.removeLastMove();
 
@@ -80,11 +80,11 @@ SolitaireController.prototype.resetMove = function() {
 	this.drawnTile.selectedFromPile = false;
 };
 
-SolitaireController.prototype.getDefaultHelpMessageText = function() {
+CoopSolitaireController.prototype.getDefaultHelpMessageText = function() {
 	return "<h4>Solitaire Pai Sho</h4> <p>Pai Sho is a game of harmony. The goal of Solitaire Pai Sho is to place Flower Tiles to create a balance of Harmony and Disharmony on the board.</p> <p>Each turn, you are given a tile that's been drawn for you to place on the board. When all the tiles have been played, the game ends and your score will be calculated.</p> <p><a href='https://skudpaisho.com/site/games/solitaire-pai-sho/'>View the resources page</a> for the rules.</p>";
 };
 
-SolitaireController.prototype.getAdditionalMessage = function() {
+CoopSolitaireController.prototype.getAdditionalMessage = function() {
 	var msg = "";
 	if (!this.theGame.getWinner()) {
 		msg += "<br /><strong>" + this.theGame.getWinReason() + "</strong>";
@@ -92,7 +92,7 @@ SolitaireController.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
-SolitaireController.prototype.unplayedTileClicked = function(tileDiv) {
+CoopSolitaireController.prototype.unplayedTileClicked = function(tileDiv) {
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
 		return;
@@ -121,11 +121,11 @@ SolitaireController.prototype.unplayedTileClicked = function(tileDiv) {
 		this.theGame.setAllLegalPointsOpen(getCurrentPlayer(), tile);
 	} else {
 		this.theGame.hidePossibleMovePoints();
-		this.notationBuilder = new SolitaireNotationBuilder();
+		this.notationBuilder = new CoopSolitaireNotationBuilder();
 	}
 }
 
-SolitaireController.prototype.pointClicked = function(htmlPoint) {
+CoopSolitaireController.prototype.pointClicked = function(htmlPoint) {
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
 		return;
@@ -187,7 +187,7 @@ SolitaireController.prototype.pointClicked = function(htmlPoint) {
 	}
 }
 
-SolitaireController.prototype.skipHarmonyBonus = function() {
+CoopSolitaireController.prototype.skipHarmonyBonus = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 	this.gameNotation.addMove(move);
 	if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
@@ -201,7 +201,7 @@ SolitaireController.prototype.skipHarmonyBonus = function() {
 	}
 }
 
-SolitaireController.prototype.addTileSummaryToMessageArr = function(message, tileCode) {
+CoopSolitaireController.prototype.addTileSummaryToMessageArr = function(message, tileCode) {
 	if (tileCode.length > 1) {
 		var colorCode = tileCode.charAt(0);
 		var tileNum = parseInt(tileCode.charAt(1));
@@ -289,7 +289,7 @@ SolitaireController.prototype.addTileSummaryToMessageArr = function(message, til
 	}
 };
 
-SolitaireController.prototype.getTileMessage = function(tileDiv) {
+CoopSolitaireController.prototype.getTileMessage = function(tileDiv) {
 	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 
@@ -314,7 +314,7 @@ SolitaireController.prototype.getTileMessage = function(tileDiv) {
 	}
 }
 
-SolitaireController.prototype.getPointMessage = function(htmlPoint) {
+CoopSolitaireController.prototype.getPointMessage = function(htmlPoint) {
 	var npText = htmlPoint.getAttribute("name");
 
 	var notationPoint = new NotationPoint(npText);
@@ -372,31 +372,31 @@ SolitaireController.prototype.getPointMessage = function(htmlPoint) {
 	}
 }
 
-SolitaireController.prototype.playAiTurn = function(finalizeMove) {
+CoopSolitaireController.prototype.playAiTurn = function(finalizeMove) {
 	// 
 };
 
-SolitaireController.prototype.startAiGame = function(finalizeMove) {
+CoopSolitaireController.prototype.startAiGame = function(finalizeMove) {
 	// 
 };
 
-SolitaireController.prototype.getAiList = function() {
+CoopSolitaireController.prototype.getAiList = function() {
 	return [];
 }
 
-SolitaireController.prototype.getCurrentPlayer = function() {
+CoopSolitaireController.prototype.getCurrentPlayer = function() {
 	return HOST;
 };
 
-SolitaireController.prototype.cleanup = function() {
+CoopSolitaireController.prototype.cleanup = function() {
 	// 
 };
 
-SolitaireController.prototype.isSolitaire = function() {
+CoopSolitaireController.prototype.isSolitaire = function() {
 	return true;
 };
 
-SolitaireController.prototype.setGameNotation = function(newGameNotation) {
+CoopSolitaireController.prototype.setGameNotation = function(newGameNotation) {
 	if (this.drawnTile) {
 		this.drawnTile.selectedFromPile = false;
 		this.theGame.tileManager.putTileBack(this.drawnTile);

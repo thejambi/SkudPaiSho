@@ -1,11 +1,11 @@
-// Solitaire Notation
+// Coop Solitaire Notation
 
-function SolitaireNotationMove(text) {
+function CoopSolitaireNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
 
-SolitaireNotationMove.prototype.analyzeMove = function() {
+CoopSolitaireNotationMove.prototype.analyzeMove = function() {
 	this.valid = true;
 
 	// Get move number
@@ -97,15 +97,15 @@ SolitaireNotationMove.prototype.analyzeMove = function() {
 	}
 };
 
-SolitaireNotationMove.prototype.hasHarmonyBonus = function() {
+CoopSolitaireNotationMove.prototype.hasHarmonyBonus = function() {
 	return typeof this.bonusTileCode !== 'undefined';
 };
 
-SolitaireNotationMove.prototype.isValidNotation = function() {
+CoopSolitaireNotationMove.prototype.isValidNotation = function() {
 	return this.valid;
 };
 
-SolitaireNotationMove.prototype.equals = function(otherMove) {
+CoopSolitaireNotationMove.prototype.equals = function(otherMove) {
 	return this.fullMoveText === otherMove.fullMoveText;
 };
 
@@ -113,7 +113,7 @@ SolitaireNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function SolitaireNotationBuilder() {
+function CoopSolitaireNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -132,8 +132,8 @@ function SolitaireNotationBuilder() {
 	this.status = BRAND_NEW;
 }
 
-SolitaireNotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
-	var builder = new SolitaireNotationBuilder();
+CoopSolitaireNotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
+	var builder = new CoopSolitaireNotationBuilder();
 	builder.moveType = PLANTING;
 	builder.plantedFlowerType = Tile.getClashTileCode(tileCode);
 
@@ -145,7 +145,7 @@ SolitaireNotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
 	return builder;
 };
 
-SolitaireNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
+CoopSolitaireNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 	var notationLine = moveNum + player.charAt(0) + ".";
 	if (this.moveType === ARRANGING) {
 		notationLine += "(" + this.startPoint.pointText + ")-(" + this.endPoint.pointText + ")";
@@ -159,29 +159,29 @@ SolitaireNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 		notationLine += this.plantedFlowerType + "(" + this.endPoint.pointText + ")";
 	}
 	
-	return new SolitaireNotationMove(notationLine);
+	return new CoopSolitaireNotationMove(notationLine);
 };
 
 // --------------------------------------- //
 
 
 
-function SolitaireGameNotation() {
+function CoopSolitaireGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }
 
-SolitaireGameNotation.prototype.setNotationText = function(text) {
+CoopSolitaireGameNotation.prototype.setNotationText = function(text) {
 	this.notationText = text;
 	this.loadMoves();
 };
 
-SolitaireGameNotation.prototype.addNotationLine = function(text) {
+CoopSolitaireGameNotation.prototype.addNotationLine = function(text) {
 	this.notationText += ";" + text.trim();
 	this.loadMoves();
 };
 
-SolitaireGameNotation.prototype.addMove = function(move) {
+CoopSolitaireGameNotation.prototype.addMove = function(move) {
 	if (this.notationText) {
 		this.notationText += ";" + move.fullMoveText;
 	} else {
@@ -190,12 +190,12 @@ SolitaireGameNotation.prototype.addMove = function(move) {
 	this.loadMoves();
 };
 
-SolitaireGameNotation.prototype.removeLastMove = function() {
+CoopSolitaireGameNotation.prototype.removeLastMove = function() {
 	this.notationText = this.notationText.substring(0, this.notationText.lastIndexOf(";"));
 	this.loadMoves();
 };
 
-SolitaireGameNotation.prototype.getPlayerMoveNum = function() {
+CoopSolitaireGameNotation.prototype.getPlayerMoveNum = function() {
 	var moveNum = 0;
 	var lastMove = this.moves[this.moves.length-1];
 
@@ -216,7 +216,7 @@ SolitaireGameNotation.prototype.getPlayerMoveNum = function() {
 	return moveNum;
 };
 
-SolitaireGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
+CoopSolitaireGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	// Example simple Arranging move: 7G.(8,0)-(7,1)
 
 	var moveNum = 1;
@@ -242,7 +242,7 @@ SolitaireGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	return builder.getNotationMove(moveNum, player);
 };
 
-SolitaireGameNotation.prototype.loadMoves = function() {
+CoopSolitaireGameNotation.prototype.loadMoves = function() {
 	this.moves = [];
 	var lines = [];
 	if (this.notationText) {
@@ -256,7 +256,7 @@ SolitaireGameNotation.prototype.loadMoves = function() {
 	var self = this;
 	var lastPlayer = HOST;
 	lines.forEach(function(line) {
-		var move = new SolitaireNotationMove(line);
+		var move = new CoopSolitaireNotationMove(line);
 		if (move.moveNum === 0 && move.isValidNotation()) {
 			self.moves.push(move);
 		} else if (move.isValidNotation() && move.player !== lastPlayer) {
@@ -268,7 +268,7 @@ SolitaireGameNotation.prototype.loadMoves = function() {
 	});
 };
 
-SolitaireGameNotation.prototype.getNotationHtml = function() {
+CoopSolitaireGameNotation.prototype.getNotationHtml = function() {
 	var lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
@@ -287,7 +287,7 @@ SolitaireGameNotation.prototype.getNotationHtml = function() {
 	return notationHtml;
 };
 
-SolitaireGameNotation.prototype.getNotationForEmail = function() {
+CoopSolitaireGameNotation.prototype.getNotationForEmail = function() {
 	var lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
@@ -306,16 +306,16 @@ SolitaireGameNotation.prototype.getNotationForEmail = function() {
 	return notationHtml;
 };
 
-SolitaireGameNotation.prototype.notationTextForUrl = function() {
+CoopSolitaireGameNotation.prototype.notationTextForUrl = function() {
 	var str = this.notationText;
 	return str;
 };
 
-SolitaireGameNotation.prototype.getLastMoveText = function() {
+CoopSolitaireGameNotation.prototype.getLastMoveText = function() {
 	return this.moves[this.moves.length - 1].fullMoveText;
 };
 
-SolitaireGameNotation.prototype.getLastMoveNumber = function() {
+CoopSolitaireGameNotation.prototype.getLastMoveNumber = function() {
 	return this.moves[this.moves.length - 1].moveNum;
 };
 

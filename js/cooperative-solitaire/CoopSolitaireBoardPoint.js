@@ -1,32 +1,18 @@
-// Solitaire Board Point
+// Board Point
 
-var NON_PLAYABLE = "Non-Playable";
-var NEUTRAL = "Neutral";
-// var RED = "Red";
-// var WHITE = "White";
-var GATE = "Gate";
-
-var POSSIBLE_MOVE = "Possible Move";
-var OPEN_GATE = "OPEN GATE";
-
-var thinDot = "·";
-var thickDot = "•";
-var whiteDot = "◦";
-var gateDot = "⟡";
-
-function SolitaireBoardPoint() {
+function CoopSolitaireBoardPoint() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;
 }
 
-SolitaireBoardPoint.prototype.addType = function(type) {
+CoopSolitaireBoardPoint.prototype.addType = function(type) {
 	if (!this.types.includes(type)) {
 		this.types.push(type);
 	}
 };
 
-SolitaireBoardPoint.prototype.removeType = function(type) {
+CoopSolitaireBoardPoint.prototype.removeType = function(type) {
 	for (var i = 0; i < this.types.length; i++) {
 		if (this.types[i] === type) {
 			this.types.splice(i, 1);
@@ -34,7 +20,7 @@ SolitaireBoardPoint.prototype.removeType = function(type) {
 	}
 };
 
-SolitaireBoardPoint.prototype.getConsoleDisplay = function() {
+CoopSolitaireBoardPoint.prototype.getConsoleDisplay = function() {
 	if (this.tile) {
 		return this.tile.getConsoleDisplay();
 	} else {
@@ -71,26 +57,26 @@ SolitaireBoardPoint.prototype.getConsoleDisplay = function() {
 	}
 };
 
-SolitaireBoardPoint.prototype.putTile = function(tile) {
+CoopSolitaireBoardPoint.prototype.putTile = function(tile) {
 	this.tile = tile;
 };
 
-SolitaireBoardPoint.prototype.hasTile = function() {
+CoopSolitaireBoardPoint.prototype.hasTile = function() {
 	if (this.tile) {
 		return true;
 	}
 	return false;
 };
 
-SolitaireBoardPoint.prototype.isType = function(type) {
+CoopSolitaireBoardPoint.prototype.isType = function(type) {
 	return this.types.includes(type);
 };
 
-SolitaireBoardPoint.prototype.isOpenGate = function() {
+CoopSolitaireBoardPoint.prototype.isOpenGate = function() {
 	return !this.hasTile() && this.types.includes(GATE);
 };
 
-SolitaireBoardPoint.prototype.removeTile = function() {
+CoopSolitaireBoardPoint.prototype.removeTile = function() {
 	var theTile = this.tile;
 
 	this.tile = null;
@@ -98,19 +84,19 @@ SolitaireBoardPoint.prototype.removeTile = function() {
 	return theTile;
 };
 
-SolitaireBoardPoint.prototype.drainTile = function() {
+CoopSolitaireBoardPoint.prototype.drainTile = function() {
 	if (this.tile) {
 		this.tile.drain();
 	}
 };
 
-SolitaireBoardPoint.prototype.restoreTile = function() {
+CoopSolitaireBoardPoint.prototype.restoreTile = function() {
 	if (this.tile) {
 		this.tile.restore();
 	}
 };
 
-SolitaireBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
+CoopSolitaireBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	// Validate this point's ability to hold given tile
 
 	if (this.isType(NON_PLAYABLE)) {
@@ -143,13 +129,13 @@ SolitaireBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	return false;
 };
 
-SolitaireBoardPoint.prototype.isCompletelyWithinRedOrWhiteGarden = function() {
+CoopSolitaireBoardPoint.prototype.isCompletelyWithinRedOrWhiteGarden = function() {
 	return !this.isType(NEUTRAL) 
 			&& ((this.isType(RED) && !this.isType(WHITE)) 
 				|| (this.isType(WHITE) && !this.isType(RED)));
 };
 
-SolitaireBoardPoint.prototype.betweenPlayerHarmony = function(player) {
+CoopSolitaireBoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	if (player === GUEST) {
 		return this.betweenHarmonyGuest;
 	} else if (player === HOST) {
@@ -158,8 +144,8 @@ SolitaireBoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	return false;
 };
 
-SolitaireBoardPoint.prototype.getCopy = function() {
-	var copy = new SolitaireBoardPoint();
+CoopSolitaireBoardPoint.prototype.getCopy = function() {
+	var copy = new CoopSolitaireBoardPoint();
 
 	// this.types
 	for (var i = 0; i < this.types.length; i++) {
@@ -183,44 +169,44 @@ SolitaireBoardPoint.prototype.getCopy = function() {
 
 // Point makers
 
-SolitaireBoardPoint.neutral = function() {
-	var point = new SolitaireBoardPoint();
+CoopSolitaireBoardPoint.neutral = function() {
+	var point = new CoopSolitaireBoardPoint();
 	point.addType(NEUTRAL);
 
 	return point;
 };
 
-SolitaireBoardPoint.gate = function() {
-	var point = new SolitaireBoardPoint();
+CoopSolitaireBoardPoint.gate = function() {
+	var point = new CoopSolitaireBoardPoint();
 	point.addType(GATE);
 
 	return point;
 };
 
-SolitaireBoardPoint.red = function() {
-	var point = new SolitaireBoardPoint();
+CoopSolitaireBoardPoint.red = function() {
+	var point = new CoopSolitaireBoardPoint();
 	point.addType(RED);
 
 	return point;
 };
 
-SolitaireBoardPoint.white = function() {
-	var point = new SolitaireBoardPoint();
+CoopSolitaireBoardPoint.white = function() {
+	var point = new CoopSolitaireBoardPoint();
 	point.addType(WHITE);
 
 	return point;
 };
 
-SolitaireBoardPoint.redWhite = function() {
-	var point = new SolitaireBoardPoint();
+CoopSolitaireBoardPoint.redWhite = function() {
+	var point = new CoopSolitaireBoardPoint();
 	point.addType(RED);
 	point.addType(WHITE);
 
 	return point;
 };
 
-SolitaireBoardPoint.redWhiteNeutral = function() {
-	var point = new SolitaireBoardPoint();
+CoopSolitaireBoardPoint.redWhiteNeutral = function() {
+	var point = new CoopSolitaireBoardPoint();
 	point.addType(RED);
 	point.addType(WHITE);
 	point.addType(NEUTRAL);
@@ -228,16 +214,16 @@ SolitaireBoardPoint.redWhiteNeutral = function() {
 	return point;
 };
 
-SolitaireBoardPoint.redNeutral = function() {
-	var point = new SolitaireBoardPoint();
+CoopSolitaireBoardPoint.redNeutral = function() {
+	var point = new CoopSolitaireBoardPoint();
 	point.addType(RED);
 	point.addType(NEUTRAL);
 
 	return point;
 };
 
-SolitaireBoardPoint.whiteNeutral = function() {
-	var point = new SolitaireBoardPoint();
+CoopSolitaireBoardPoint.whiteNeutral = function() {
+	var point = new CoopSolitaireBoardPoint();
 	point.addType(WHITE);
 	point.addType(NEUTRAL);
 

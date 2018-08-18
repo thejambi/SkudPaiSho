@@ -1,6 +1,6 @@
 // Tile Manager
 
-function SolitaireTileManager(forActuating) {
+function CoopSolitaireTileManager(forActuating) {
 	this.playerCode = 'H'
 	
 	if (forActuating) {
@@ -10,11 +10,11 @@ function SolitaireTileManager(forActuating) {
 	this.tiles = this.loadTileSet(this.playerCode);
 }
 
-SolitaireTileManager.prototype.loadTileSet = function(ownerCode) {
+CoopSolitaireTileManager.prototype.loadTileSet = function(ownerCode) {
 	return this.loadSolitaireSet(ownerCode, false, true);
 };
 
-SolitaireTileManager.prototype.loadSolitaireSet = function(ownerCode, doubleTiles, includeAccentTiles) {
+CoopSolitaireTileManager.prototype.loadSolitaireSet = function(ownerCode, doubleTiles, includeAccentTiles) {
 	var tiles = [];
 
 	// Double amount of tiles if doubleTiles enabled
@@ -57,7 +57,7 @@ SolitaireTileManager.prototype.loadSolitaireSet = function(ownerCode, doubleTile
 	return tiles;
 };
 
-SolitaireTileManager.prototype.loadSkudSet = function(ownerCode) {
+CoopSolitaireTileManager.prototype.loadSkudSet = function(ownerCode) {
 	var tiles = [];
 
 	// 2 of each accent tile
@@ -89,7 +89,7 @@ SolitaireTileManager.prototype.loadSkudSet = function(ownerCode) {
 	return tiles;
 };
 
-SolitaireTileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
+CoopSolitaireTileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
 	var tiles = [];
 
 	// Accent tiles
@@ -114,7 +114,7 @@ SolitaireTileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
 	return tiles;
 };
 
-SolitaireTileManager.prototype.loadOneOfEach = function(ownerCode) {
+CoopSolitaireTileManager.prototype.loadOneOfEach = function(ownerCode) {
 	var tiles = [];
 
 	tiles.push(new SolitaireTile('R', ownerCode));
@@ -136,14 +136,14 @@ SolitaireTileManager.prototype.loadOneOfEach = function(ownerCode) {
 };
 
 // For Solitaire
-SolitaireTileManager.prototype.drawRandomTile = function() {
+CoopSolitaireTileManager.prototype.drawRandomTile = function() {
 	if (this.tiles.length > 0) {
 		var tile = this.tiles[Math.floor(Math.random()*this.tiles.length)];
 		return this.peekTile(this.playerCode, tile.code);
 	}
 };
 
-SolitaireTileManager.prototype.grabTile = function(player, tileCode) {
+CoopSolitaireTileManager.prototype.grabTile = function(player, tileCode) {
 	var tilePile = this.tiles;
 
 	var tile;
@@ -162,7 +162,7 @@ SolitaireTileManager.prototype.grabTile = function(player, tileCode) {
 	return tile;
 };
 
-SolitaireTileManager.prototype.peekTile = function(player, tileCode, tileId) {
+CoopSolitaireTileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	var tilePile = this.tiles;
 
 	var tile;
@@ -188,7 +188,7 @@ SolitaireTileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	return tile;
 };
 
-SolitaireTileManager.prototype.removeSelectedTileFlags = function() {
+CoopSolitaireTileManager.prototype.removeSelectedTileFlags = function() {
 	this.tiles.forEach(function(tile) {
 		tile.selectedFromPile = false;
 	});
@@ -197,7 +197,7 @@ SolitaireTileManager.prototype.removeSelectedTileFlags = function() {
 	});
 };
 
-SolitaireTileManager.prototype.unselectTiles = function(player) {
+CoopSolitaireTileManager.prototype.unselectTiles = function(player) {
 	var tilePile = this.tiles;
 	if (player === GUEST) {
 		tilePile = this.tiles;
@@ -208,7 +208,7 @@ SolitaireTileManager.prototype.unselectTiles = function(player) {
 	});
 }
 
-SolitaireTileManager.prototype.putTileBack = function(tile) {
+CoopSolitaireTileManager.prototype.putTileBack = function(tile) {
 	var player = tile.ownerName;
 	var tilePile = this.tiles;
 	if (player === GUEST) {
@@ -218,14 +218,14 @@ SolitaireTileManager.prototype.putTileBack = function(tile) {
 	tilePile.push(tile);
 };
 
-SolitaireTileManager.prototype.aPlayerIsOutOfTiles = function() {
+CoopSolitaireTileManager.prototype.aPlayerIsOutOfTiles = function() {
 	var guestHasTiles = this.tiles.length > 0;
 	var hostHasTiles = guestHasTiles;
 
 	return !hostHasTiles || !guestHasTiles;
 };
 
-SolitaireTileManager.prototype.getPlayerWithMoreAccentTiles = function() {
+CoopSolitaireTileManager.prototype.getPlayerWithMoreAccentTiles = function() {
 	var hostCount = 0;
 	for (var i = 0; i < this.tiles.length; i++) {
 		if (this.tiles[i].type === ACCENT_TILE) {
@@ -247,7 +247,7 @@ SolitaireTileManager.prototype.getPlayerWithMoreAccentTiles = function() {
 	}
 };
 
-SolitaireTileManager.prototype.playerHasBothSpecialTilesRemaining = function(player) {
+CoopSolitaireTileManager.prototype.playerHasBothSpecialTilesRemaining = function(player) {
 	var tilePile = this.tiles;
 	if (player === GUEST) {
 		tilePile = this.tiles;
@@ -264,8 +264,8 @@ SolitaireTileManager.prototype.playerHasBothSpecialTilesRemaining = function(pla
 	return specialTileCount > 1;
 };
 
-SolitaireTileManager.prototype.getCopy = function() {
-	var copy = new SolitaireTileManager();
+CoopSolitaireTileManager.prototype.getCopy = function() {
+	var copy = new CoopSolitaireTileManager();
 
 	// copy this.tiles and this.tiles
 	copy.tiles = this.copyArr(this.tiles);
@@ -274,7 +274,7 @@ SolitaireTileManager.prototype.getCopy = function() {
 	return copy;
 };
 
-SolitaireTileManager.prototype.copyArr = function(arr) {
+CoopSolitaireTileManager.prototype.copyArr = function(arr) {
 	var copyArr = [];
 	for (var i = 0; i < arr.length; i++) {
 		copyArr.push(arr[i].getCopy());

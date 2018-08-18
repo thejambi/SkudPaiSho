@@ -1,20 +1,20 @@
 // Solitaire Game Manager
 
-function SolitaireGameManager(ignoreActuate, isCopy) {
+function CoopSolitaireGameManager(ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
-	this.actuator = new SolitaireActuator();
+	this.actuator = new CoopSolitaireActuator();
 
-	this.tileManager = new SolitaireTileManager();
+	this.tileManager = new CoopSolitaireTileManager();
 
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
 }
 
 // Set up the game
-SolitaireGameManager.prototype.setup = function (ignoreActuate) {
+CoopSolitaireGameManager.prototype.setup = function (ignoreActuate) {
 
-	this.board = new SolitaireBoard();
+	this.board = new CoopSolitaireBoard();
 
 	// Update the actuator
 	// if (!ignoreActuate) {
@@ -23,14 +23,14 @@ SolitaireGameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-SolitaireGameManager.prototype.actuate = function() {
+CoopSolitaireGameManager.prototype.actuate = function() {
 	if (this.isCopy) {
 		return;
 	}
 	this.actuator.actuate(this.board, gameController.theGame, gameController.drawnTile);
 };
 
-SolitaireGameManager.prototype.runNotationMove = function(move, withActuate) {
+CoopSolitaireGameManager.prototype.runNotationMove = function(move, withActuate) {
 	debug("Running Move: " + move.fullMoveText);
 
 	var errorFound = false;
@@ -74,11 +74,11 @@ SolitaireGameManager.prototype.runNotationMove = function(move, withActuate) {
 	return bonusAllowed;
 };
 
-SolitaireGameManager.prototype.drawRandomTile = function() {
+CoopSolitaireGameManager.prototype.drawRandomTile = function() {
 	return this.tileManager.drawRandomTile();
 };
 
-SolitaireGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
+CoopSolitaireGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -89,7 +89,7 @@ SolitaireGameManager.prototype.revealPossibleMovePoints = function(boardPoint, i
 	}
 };
 
-SolitaireGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
+CoopSolitaireGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	this.board.removePossibleMovePoints();
 	this.tileManager.removeSelectedTileFlags();
 	if (!ignoreActuate) {
@@ -97,7 +97,7 @@ SolitaireGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) 
 	}
 };
 
-SolitaireGameManager.prototype.setAllLegalPointsOpen = function(player, tile, ignoreActuate) {
+CoopSolitaireGameManager.prototype.setAllLegalPointsOpen = function(player, tile, ignoreActuate) {
 	if (tile.type === ACCENT_TILE) {
 		this.board.setSolitaireAccentPointsOpen(tile);
 	} else {
@@ -111,7 +111,7 @@ SolitaireGameManager.prototype.setAllLegalPointsOpen = function(player, tile, ig
 	}
 };
 
-SolitaireGameManager.prototype.playerCanBonusPlant = function(player) {
+CoopSolitaireGameManager.prototype.playerCanBonusPlant = function(player) {
 	if (!newGatesRule) {
 		return true;
 	}
@@ -124,7 +124,7 @@ SolitaireGameManager.prototype.playerCanBonusPlant = function(player) {
 	}
 };
 
-SolitaireGameManager.prototype.revealSpecialFlowerPlacementPoints = function(player) {
+CoopSolitaireGameManager.prototype.revealSpecialFlowerPlacementPoints = function(player) {
 	if (!newSpecialFlowerRules) {
 		this.revealOpenGates(player);
 		return;
@@ -134,38 +134,38 @@ SolitaireGameManager.prototype.revealSpecialFlowerPlacementPoints = function(pla
 	this.actuate();
 };
 
-SolitaireGameManager.prototype.revealPossiblePlacementPoints = function(tile) {
+CoopSolitaireGameManager.prototype.revealPossiblePlacementPoints = function(tile) {
 	this.board.revealPossiblePlacementPoints(tile);
 	this.actuate();
 };
 
-SolitaireGameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
+CoopSolitaireGameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
 	this.board.revealBoatBonusPoints(boardPoint);
 	this.actuate();
 };
 
-SolitaireGameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playerName) {
+CoopSolitaireGameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playerName) {
 	return this.tileManager.playerHasBothSpecialTilesRemaining(playerName);
 };
 
-SolitaireGameManager.prototype.getWinner = function() {
+CoopSolitaireGameManager.prototype.getWinner = function() {
 	if (this.endGameWinners.length === 1) {
 		return this.endGameWinners[0];
 	}
 };
 
-SolitaireGameManager.prototype.getWinReason = function() {
+CoopSolitaireGameManager.prototype.getWinReason = function() {
 	return "<br />" + this.board.harmonyManager.getSolitaireGameSummaryText();
 };
 
-SolitaireGameManager.prototype.getWinResultTypeCode = function() {
+CoopSolitaireGameManager.prototype.getWinResultTypeCode = function() {
 	if (this.endGameWinners.length === 1) {
 		return 6;	// Solitaire game end
 	}
 };
 
-SolitaireGameManager.prototype.getCopy = function() {
-	var copyGame = new SolitaireGameManager(true, true);
+CoopSolitaireGameManager.prototype.getCopy = function() {
+	var copyGame = new CoopSolitaireGameManager(true, true);
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;

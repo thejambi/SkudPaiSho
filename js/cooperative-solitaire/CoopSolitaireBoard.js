@@ -1,6 +1,6 @@
 // Board
 
-function SolitaireBoard() {
+function CoopSolitaireBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
@@ -11,307 +11,307 @@ function SolitaireBoard() {
 	this.winners = [];
 }
 
-SolitaireBoard.prototype.brandNew = function () {
+CoopSolitaireBoard.prototype.brandNew = function () {
 	var cells = [];
 
 	cells[0] = this.newRow(9, 
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.gate(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.gate(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[1] = this.newRow(11, 
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.redWhiteNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(), 
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.redWhiteNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(), 
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[2] = this.newRow(13, 
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.whiteNeutral(), 
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.whiteNeutral(), 
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[3] = this.newRow(15,
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.whiteNeutral(), 
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.redNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.whiteNeutral(), 
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.redNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[4] = this.newRow(17,
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.whiteNeutral(), 
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.redNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.whiteNeutral(), 
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.redNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[5] = this.newRow(17,
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.whiteNeutral(), 
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.redNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.whiteNeutral(), 
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.redNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[6] = this.newRow(17,
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.whiteNeutral(), 
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.redNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.whiteNeutral(), 
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.redNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[7] = this.newRow(17,
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.whiteNeutral(), 
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.redNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.whiteNeutral(), 
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.redNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[8] = this.newRow(17,
-		[SolitaireBoardPoint.gate(),
-		SolitaireBoardPoint.redWhiteNeutral(), 
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.redWhiteNeutral(),
-		SolitaireBoardPoint.gate()
+		[CoopSolitaireBoardPoint.gate(),
+		CoopSolitaireBoardPoint.redWhiteNeutral(), 
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.redWhiteNeutral(),
+		CoopSolitaireBoardPoint.gate()
 		]);
 
 	cells[9] = this.newRow(17,
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.redNeutral(), 
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.whiteNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.redNeutral(), 
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.whiteNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[10] = this.newRow(17,
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.redNeutral(), 
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.whiteNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.redNeutral(), 
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.whiteNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[11] = this.newRow(17,
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.redNeutral(), 
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.whiteNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.redNeutral(), 
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.whiteNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[12] = this.newRow(17,
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.redNeutral(), 
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.whiteNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.redNeutral(), 
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.whiteNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[13] = this.newRow(15,
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.redNeutral(), 
-		SolitaireBoardPoint.red(),
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.white(),
-		SolitaireBoardPoint.whiteNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.redNeutral(), 
+		CoopSolitaireBoardPoint.red(),
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.white(),
+		CoopSolitaireBoardPoint.whiteNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[14] = this.newRow(13,
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.redNeutral(), 
-		SolitaireBoardPoint.redWhite(),
-		SolitaireBoardPoint.whiteNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.redNeutral(), 
+		CoopSolitaireBoardPoint.redWhite(),
+		CoopSolitaireBoardPoint.whiteNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[15] = this.newRow(11,
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.redWhiteNeutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.redWhiteNeutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	cells[16] = this.newRow(9,
-		[SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.gate(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral(),
-		SolitaireBoardPoint.neutral()
+		[CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.gate(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral(),
+		CoopSolitaireBoardPoint.neutral()
 		]);
 
 	for (var row = 0; row < cells.length; row++) {
@@ -324,12 +324,12 @@ SolitaireBoard.prototype.brandNew = function () {
 	return cells;
 };
 
-SolitaireBoard.prototype.newRow = function(numColumns, points) {
+CoopSolitaireBoard.prototype.newRow = function(numColumns, points) {
 	var cells = [];
 
 	var numBlanksOnSides = (this.size.row - numColumns) / 2;
 
-	var nonPoint = new SolitaireBoardPoint();
+	var nonPoint = new CoopSolitaireBoardPoint();
 	nonPoint.addType(NON_PLAYABLE);
 
 	for (var i = 0; i < this.size.row; i++) {
@@ -349,7 +349,7 @@ SolitaireBoard.prototype.newRow = function(numColumns, points) {
 	return cells;
 };
 
-SolitaireBoard.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
+CoopSolitaireBoard.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
 	// Commenting out For Solitaire
 	// if (tile.type === ACCENT_TILE) {
 		// if (tile.accentType === ROCK) {
@@ -372,14 +372,14 @@ SolitaireBoard.prototype.placeTile = function(tile, notationPoint, extraBoatPoin
 	this.analyzeHarmonies();
 };
 
-SolitaireBoard.prototype.putTileOnPoint = function(tile, notationPoint) {
+CoopSolitaireBoard.prototype.putTileOnPoint = function(tile, notationPoint) {
 	var point = notationPoint.rowAndColumn;
 	point = this.cells[point.row][point.col];
 	
 	point.putTile(tile);
 };
 
-SolitaireBoard.prototype.canPlaceRock = function(boardPoint) {
+CoopSolitaireBoard.prototype.canPlaceRock = function(boardPoint) {
 	if (boardPoint.hasTile()) {
 		// debug("Rock cannot be played on top of another tile");
 		return false;
@@ -390,7 +390,7 @@ SolitaireBoard.prototype.canPlaceRock = function(boardPoint) {
 	return true;
 };
 
-SolitaireBoard.prototype.placeRock = function(tile, notationPoint) {
+CoopSolitaireBoard.prototype.placeRock = function(tile, notationPoint) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
@@ -404,7 +404,7 @@ SolitaireBoard.prototype.placeRock = function(tile, notationPoint) {
 	}
 };
 
-SolitaireBoard.prototype.canPlaceWheel = function(boardPoint) {
+CoopSolitaireBoard.prototype.canPlaceWheel = function(boardPoint) {
 	if (boardPoint.hasTile()) {
 		// debug("Wheel cannot be played on top of another tile");
 		return false;
@@ -478,11 +478,11 @@ SolitaireBoard.prototype.canPlaceWheel = function(boardPoint) {
 	return true;
 };
 
-SolitaireBoard.prototype.isValidRowCol = function(rowCol) {
+CoopSolitaireBoard.prototype.isValidRowCol = function(rowCol) {
 	return rowCol.row >= 0 && rowCol.col >= 0 && rowCol.row <= 16 && rowCol.col <= 16;
 };
 
-SolitaireBoard.prototype.placeWheel = function(tile, notationPoint, ignoreCheck) {
+CoopSolitaireBoard.prototype.placeWheel = function(tile, notationPoint, ignoreCheck) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
@@ -516,7 +516,7 @@ SolitaireBoard.prototype.placeWheel = function(tile, notationPoint, ignoreCheck)
 	this.refreshRockRowAndCols();
 };
 
-SolitaireBoard.prototype.canPlaceKnotweed = function(boardPoint) {
+CoopSolitaireBoard.prototype.canPlaceKnotweed = function(boardPoint) {
 	if (boardPoint.hasTile()) {
 		// debug("Knotweed cannot be played on top of another tile");
 		return false;
@@ -543,7 +543,7 @@ SolitaireBoard.prototype.canPlaceKnotweed = function(boardPoint) {
 	return true;
 };
 
-SolitaireBoard.prototype.placeKnotweed = function(tile, notationPoint) {
+CoopSolitaireBoard.prototype.placeKnotweed = function(tile, notationPoint) {
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
@@ -563,7 +563,7 @@ SolitaireBoard.prototype.placeKnotweed = function(tile, notationPoint) {
 	}
 };
 
-SolitaireBoard.prototype.canPlaceBoat = function(boardPoint, tile) {
+CoopSolitaireBoard.prototype.canPlaceBoat = function(boardPoint, tile) {
 	if (!boardPoint.hasTile()) {
 		// debug("Boat always played on top of another tile");
 		return false;
@@ -595,7 +595,7 @@ SolitaireBoard.prototype.canPlaceBoat = function(boardPoint, tile) {
 	return true;
 };
 
-SolitaireBoard.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint, ignoreCheck) {
+CoopSolitaireBoard.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint, ignoreCheck) {
 	// debug("extra boat point:");
 	// debug(extraBoatPoint);
 	var rowAndCol = notationPoint.rowAndColumn;
@@ -641,7 +641,7 @@ SolitaireBoard.prototype.placeBoat = function(tile, notationPoint, extraBoatPoin
 	}
 };
 
-SolitaireBoard.prototype.getClockwiseRowCol = function(center, rowCol) {
+CoopSolitaireBoard.prototype.getClockwiseRowCol = function(center, rowCol) {
 	if (rowCol.row < center.row && rowCol.col <= center.col) {
 		return new RowAndColumn(rowCol.row, rowCol.col+1);
 	} else if (rowCol.col > center.col && rowCol.row <= center.row) {
@@ -655,7 +655,7 @@ SolitaireBoard.prototype.getClockwiseRowCol = function(center, rowCol) {
 	}
 }
 
-SolitaireBoard.prototype.getSurroundingRowAndCols = function(rowAndCol) {
+CoopSolitaireBoard.prototype.getSurroundingRowAndCols = function(rowAndCol) {
 	var rowAndCols = [];
 	for (var row = rowAndCol.row - 1; row <= rowAndCol.row + 1; row++) {
 		for (var col = rowAndCol.col - 1; col <= rowAndCol.col + 1; col++) {
@@ -671,7 +671,7 @@ SolitaireBoard.prototype.getSurroundingRowAndCols = function(rowAndCol) {
 	return rowAndCols;
 };
 
-SolitaireBoard.prototype.refreshRockRowAndCols = function() {
+CoopSolitaireBoard.prototype.refreshRockRowAndCols = function() {
 	this.rockRowAndCols = [];
 	var self = this;
 
@@ -684,14 +684,14 @@ SolitaireBoard.prototype.refreshRockRowAndCols = function() {
 	});
 };
 
-SolitaireBoard.prototype.pointIsOpenGate = function(notationPoint) {
+CoopSolitaireBoard.prototype.pointIsOpenGate = function(notationPoint) {
 	var point = notationPoint.rowAndColumn;
 	point = this.cells[point.row][point.col];
 
 	return point.isOpenGate();
 };
 
-SolitaireBoard.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
+CoopSolitaireBoard.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
 	var startRowCol = notationPointStart.rowAndColumn;
 	var endRowCol = notationPointEnd.rowAndColumn;
 
@@ -728,7 +728,7 @@ SolitaireBoard.prototype.moveTile = function(player, notationPointStart, notatio
 	return this.hasNewHarmony(player, tile, startRowCol, endRowCol);
 };
 
-SolitaireBoard.prototype.flagAllTrappedAndDrainedTiles = function() {
+CoopSolitaireBoard.prototype.flagAllTrappedAndDrainedTiles = function() {
 	// First, untrap
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -755,7 +755,7 @@ SolitaireBoard.prototype.flagAllTrappedAndDrainedTiles = function() {
 	}
 };
 
-SolitaireBoard.prototype.drainTilesSurroundingPointIfNeeded = function(boardPoint) {
+CoopSolitaireBoard.prototype.drainTilesSurroundingPointIfNeeded = function(boardPoint) {
 	if (!newKnotweedRules) {
 		return;
 	}
@@ -777,7 +777,7 @@ SolitaireBoard.prototype.drainTilesSurroundingPointIfNeeded = function(boardPoin
 	}
 };
 
-SolitaireBoard.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
+CoopSolitaireBoard.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -800,7 +800,7 @@ SolitaireBoard.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint
 	}
 };
 
-SolitaireBoard.prototype.whiteLotusProtected = function(lotusTile) {
+CoopSolitaireBoard.prototype.whiteLotusProtected = function(lotusTile) {
 	if (lotusNoCapture || simplest) {
 		return true;
 	}
@@ -828,7 +828,7 @@ SolitaireBoard.prototype.whiteLotusProtected = function(lotusTile) {
 	return isProtected;
 };
 
-SolitaireBoard.prototype.orchidCanCapture = function(orchidTile) {
+CoopSolitaireBoard.prototype.orchidCanCapture = function(orchidTile) {
 	if (simpleSpecialFlowerRule || simplest) {
 		return false;	// Simplest? Never can capture.
 	}
@@ -847,7 +847,7 @@ SolitaireBoard.prototype.orchidCanCapture = function(orchidTile) {
 	return orchidCanCapture;
 };
 
-SolitaireBoard.prototype.orchidVulnerable = function(orchidTile) {
+CoopSolitaireBoard.prototype.orchidVulnerable = function(orchidTile) {
 	if (newOrchidVulnerableRule) {
 		var orchidVulnerable = false;
 		// Orchid vulnerable if opponent White Lotus is on board
@@ -893,7 +893,7 @@ SolitaireBoard.prototype.orchidVulnerable = function(orchidTile) {
 	}
 };
 
-SolitaireBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) {
+CoopSolitaireBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 	var tile = boardPointStart.tile;
 	var otherTile = boardPointEnd.tile;
 
@@ -933,7 +933,7 @@ SolitaireBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 	}
 };
 
-SolitaireBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
+CoopSolitaireBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
 	// start point must have a tile
 	if (!boardPointStart.hasTile()) {
 		return false;
@@ -994,7 +994,7 @@ SolitaireBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, 
 	return true;
 };
 
-SolitaireBoard.prototype.canTransportTileToPoint = function(boardPointStart, boardPointEnd) {
+CoopSolitaireBoard.prototype.canTransportTileToPoint = function(boardPointStart, boardPointEnd) {
 	// Transport Tile: used in Boat special ability
 
 	// start point must have a tile
@@ -1025,7 +1025,7 @@ SolitaireBoard.prototype.canTransportTileToPoint = function(boardPointStart, boa
 	return true;
 };
 
-SolitaireBoard.prototype.moveCreatesDisharmony = function(boardPointStart, boardPointEnd) {
+CoopSolitaireBoard.prototype.moveCreatesDisharmony = function(boardPointStart, boardPointEnd) {
 	// Grab tile in end point and put the start tile there
 	var endTile = boardPointEnd.removeTile();
 	boardPointEnd.putTile(boardPointStart.removeTile());
@@ -1053,12 +1053,12 @@ SolitaireBoard.prototype.moveCreatesDisharmony = function(boardPointStart, board
 	return clashFound;
 };
 
-SolitaireBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {
+CoopSolitaireBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {
   // Recursion!
   return this.pathFound(boardPointStart, boardPointEnd, numMoves);
 };
 
-SolitaireBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
+CoopSolitaireBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves) {
   if (!boardPointStart || !boardPointEnd) {
     return false; // start or end point not given
   }
@@ -1118,7 +1118,7 @@ SolitaireBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, nu
   }
 };
 
-SolitaireBoard.prototype.rowBlockedByRock = function(rowNum) {
+CoopSolitaireBoard.prototype.rowBlockedByRock = function(rowNum) {
 	if (simpleRocks || simplest) {
 		return false;	// simpleRocks: Rocks don't disable Harmonies.
 	}
@@ -1132,7 +1132,7 @@ SolitaireBoard.prototype.rowBlockedByRock = function(rowNum) {
 	return blocked;
 };
 
-SolitaireBoard.prototype.columnBlockedByRock = function(colNum) {
+CoopSolitaireBoard.prototype.columnBlockedByRock = function(colNum) {
 	if (simpleRocks || simplest) {
 		return false;	// simpleRocks: Rocks don't disable Harmonies.
 	}
@@ -1147,7 +1147,7 @@ SolitaireBoard.prototype.columnBlockedByRock = function(colNum) {
 };
 
 /* For Solitaire */
-SolitaireBoard.prototype.markSpacesBetweenHarmonies = function() {
+CoopSolitaireBoard.prototype.markSpacesBetweenHarmonies = function() {
 	// And Clashes!
 
 	// Unmark all
@@ -1243,7 +1243,7 @@ SolitaireBoard.prototype.markSpacesBetweenHarmonies = function() {
 };
 
 /* For Solitaire */
-SolitaireBoard.prototype.analyzeHarmonies = function() {
+CoopSolitaireBoard.prototype.analyzeHarmonies = function() {
 	// We're going to find all harmonies on the board - And Disharmonies!
 
 	// Check along all rows, then along all columns.. Or just check all tiles?
@@ -1279,7 +1279,7 @@ SolitaireBoard.prototype.analyzeHarmonies = function() {
 	// }
 };
 
-SolitaireBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
+CoopSolitaireBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
 	var tileHarmonies = [];
 
 	// if (this.cells[rowAndCol.row][rowAndCol.col].isType(GATE)) {
@@ -1313,7 +1313,7 @@ SolitaireBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
 	return tileHarmonies;
 };
 
-SolitaireBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
+CoopSolitaireBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
 	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
@@ -1329,7 +1329,7 @@ SolitaireBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
 	}
 };
 
-SolitaireBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
+CoopSolitaireBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
 
 	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
@@ -1345,7 +1345,7 @@ SolitaireBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
 	}
 };
 
-SolitaireBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
+CoopSolitaireBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
 	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
@@ -1361,7 +1361,7 @@ SolitaireBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
 	}
 };
 
-SolitaireBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
+CoopSolitaireBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
 	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
@@ -1378,7 +1378,7 @@ SolitaireBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
 };
 
 /* For Solitaire */
-SolitaireBoard.prototype.getTileClashes = function(tile, rowAndCol) {
+CoopSolitaireBoard.prototype.getTileClashes = function(tile, rowAndCol) {
 	var tileHarmonies = [];
 
 	if (!this.rowBlockedByRock(rowAndCol.row)) {
@@ -1408,7 +1408,7 @@ SolitaireBoard.prototype.getTileClashes = function(tile, rowAndCol) {
 	return tileHarmonies;
 };
 
-SolitaireBoard.prototype.getClashLeft = function(tile, endRowCol) {
+CoopSolitaireBoard.prototype.getClashLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
 	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
@@ -1424,7 +1424,7 @@ SolitaireBoard.prototype.getClashLeft = function(tile, endRowCol) {
 	}
 };
 
-SolitaireBoard.prototype.getClashRight = function(tile, endRowCol) {
+CoopSolitaireBoard.prototype.getClashRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
 
 	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
@@ -1440,7 +1440,7 @@ SolitaireBoard.prototype.getClashRight = function(tile, endRowCol) {
 	}
 };
 
-SolitaireBoard.prototype.getClashUp = function(tile, endRowCol) {
+CoopSolitaireBoard.prototype.getClashUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
 	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
@@ -1456,7 +1456,7 @@ SolitaireBoard.prototype.getClashUp = function(tile, endRowCol) {
 	}
 };
 
-SolitaireBoard.prototype.getClashDown = function(tile, endRowCol) {
+CoopSolitaireBoard.prototype.getClashDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
 	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
@@ -1473,7 +1473,7 @@ SolitaireBoard.prototype.getClashDown = function(tile, endRowCol) {
 };
 /* ******************************* */
 
-SolitaireBoard.prototype.hasNewHarmony = function(player, tile, startRowCol, endRowCol) {
+CoopSolitaireBoard.prototype.hasNewHarmony = function(player, tile, startRowCol, endRowCol) {
 	// To check if new harmony, first analyze harmonies and compare to previous set of harmonies
 	var oldHarmonies = this.harmonyManager.harmonies;
 	this.analyzeHarmonies();
@@ -1481,7 +1481,7 @@ SolitaireBoard.prototype.hasNewHarmony = function(player, tile, startRowCol, end
 	return this.harmonyManager.hasNewHarmony(player, oldHarmonies);
 };
 
-SolitaireBoard.prototype.hasDisharmony = function(boardPoint) {
+CoopSolitaireBoard.prototype.hasDisharmony = function(boardPoint) {
 	// if (boardPoint.isType(GATE)) {
 	// 	return false;	// Gate never has disharmony
 	// }	// For Solitaire
@@ -1508,7 +1508,7 @@ SolitaireBoard.prototype.hasDisharmony = function(boardPoint) {
 	return clashFound;
 };
 
-SolitaireBoard.prototype.hasDisharmonyLeft = function(tile, endRowCol) {
+CoopSolitaireBoard.prototype.hasDisharmonyLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
 	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
@@ -1524,7 +1524,7 @@ SolitaireBoard.prototype.hasDisharmonyLeft = function(tile, endRowCol) {
 	}
 };
 
-SolitaireBoard.prototype.hasDisharmonyRight = function(tile, endRowCol) {
+CoopSolitaireBoard.prototype.hasDisharmonyRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
 
 	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile()) {
@@ -1540,7 +1540,7 @@ SolitaireBoard.prototype.hasDisharmonyRight = function(tile, endRowCol) {
 	}
 };
 
-SolitaireBoard.prototype.hasDisharmonyUp = function(tile, endRowCol) {
+CoopSolitaireBoard.prototype.hasDisharmonyUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
 	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
@@ -1556,7 +1556,7 @@ SolitaireBoard.prototype.hasDisharmonyUp = function(tile, endRowCol) {
 	}
 };
 
-SolitaireBoard.prototype.hasDisharmonyDown = function(tile, endRowCol) {
+CoopSolitaireBoard.prototype.hasDisharmonyDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
 	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile()) {
@@ -1572,7 +1572,7 @@ SolitaireBoard.prototype.hasDisharmonyDown = function(tile, endRowCol) {
 	}
 };
 
-SolitaireBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
+CoopSolitaireBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
 	if (!boardPointStart.hasTile()) {
 		return;
 	}
@@ -1587,7 +1587,7 @@ SolitaireBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
 	}
 };
 
-SolitaireBoard.prototype.removePossibleMovePoints = function() {
+CoopSolitaireBoard.prototype.removePossibleMovePoints = function() {
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
 			boardPoint.removeType(POSSIBLE_MOVE);
@@ -1595,7 +1595,7 @@ SolitaireBoard.prototype.removePossibleMovePoints = function() {
 	});
 };
 
-SolitaireBoard.prototype.setOpenGatePossibleMoves = function(player) {
+CoopSolitaireBoard.prototype.setOpenGatePossibleMoves = function(player) {
 	// Apply "open gate" type to applicable boardPoints
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -1608,7 +1608,7 @@ SolitaireBoard.prototype.setOpenGatePossibleMoves = function(player) {
 };
 
 /* For Solitaire */
-SolitaireBoard.prototype.setAllPossiblePointsOpen = function(tile) {
+CoopSolitaireBoard.prototype.setAllPossiblePointsOpen = function(tile) {
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
@@ -1620,7 +1620,7 @@ SolitaireBoard.prototype.setAllPossiblePointsOpen = function(tile) {
 };
 
 // For Solitaire
-SolitaireBoard.prototype.setHarmonyAndClashPointsOpen = function(tile) {
+CoopSolitaireBoard.prototype.setHarmonyAndClashPointsOpen = function(tile) {
 	var possibleMovesFound = false;
 
 	for (var row = 0; row < this.cells.length; row++) {
@@ -1640,7 +1640,7 @@ SolitaireBoard.prototype.setHarmonyAndClashPointsOpen = function(tile) {
 	return possibleMovesFound;
 };
 
-SolitaireBoard.prototype.setSolitaireAccentPointsOpen = function(tile) {
+CoopSolitaireBoard.prototype.setSolitaireAccentPointsOpen = function(tile) {
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
@@ -1681,7 +1681,7 @@ SolitaireBoard.prototype.setSolitaireAccentPointsOpen = function(tile) {
 	}
 };
 
-SolitaireBoard.prototype.playerControlsLessThanTwoGates = function(player) {
+CoopSolitaireBoard.prototype.playerControlsLessThanTwoGates = function(player) {
 	var count = 0;
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -1695,7 +1695,7 @@ SolitaireBoard.prototype.playerControlsLessThanTwoGates = function(player) {
 	return count < 2;
 };
 
-SolitaireBoard.prototype.playerHasNoGrowingFlowers = function(player) {
+CoopSolitaireBoard.prototype.playerHasNoGrowingFlowers = function(player) {
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
@@ -1708,7 +1708,7 @@ SolitaireBoard.prototype.playerHasNoGrowingFlowers = function(player) {
 	return true;
 };
 
-SolitaireBoard.prototype.revealSpecialFlowerPlacementPoints = function(player) {
+CoopSolitaireBoard.prototype.revealSpecialFlowerPlacementPoints = function(player) {
 	// Check each Gate for tile belonging to player, then check gate edge points
 	var bpCheckList = [];
 	
@@ -1749,7 +1749,7 @@ SolitaireBoard.prototype.revealSpecialFlowerPlacementPoints = function(player) {
 	});
 };
 
-SolitaireBoard.prototype.setGuestGateOpen = function() {
+CoopSolitaireBoard.prototype.setGuestGateOpen = function() {
 	var row = 16;
 	var col = 8;
 	if (this.cells[row][col].isOpenGate()) {
@@ -1757,7 +1757,7 @@ SolitaireBoard.prototype.setGuestGateOpen = function() {
 	}
 };
 
-SolitaireBoard.prototype.revealPossiblePlacementPoints = function(tile) {
+CoopSolitaireBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 	var self = this;
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
@@ -1780,7 +1780,7 @@ SolitaireBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 	});
 };
 
-SolitaireBoard.prototype.revealBoatBonusPoints = function(boardPoint) {
+CoopSolitaireBoard.prototype.revealBoatBonusPoints = function(boardPoint) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
@@ -1814,8 +1814,8 @@ SolitaireBoard.prototype.revealBoatBonusPoints = function(boardPoint) {
 	}
 };
 
-SolitaireBoard.prototype.getCopy = function() {
-	var copyBoard = new SolitaireBoard();
+CoopSolitaireBoard.prototype.getCopy = function() {
+	var copyBoard = new CoopSolitaireBoard();
 
 	// cells
 	for (var row = 0; row < this.cells.length; row++) {
@@ -1836,7 +1836,7 @@ SolitaireBoard.prototype.getCopy = function() {
 	return copyBoard;
 };
 
-SolitaireBoard.prototype.numTilesInGardensForPlayer = function(player) {
+CoopSolitaireBoard.prototype.numTilesInGardensForPlayer = function(player) {
 	var count = 0;
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -1851,7 +1851,7 @@ SolitaireBoard.prototype.numTilesInGardensForPlayer = function(player) {
 	return count;
 };
 
-SolitaireBoard.prototype.numTilesOnBoardForPlayer = function(player) {
+CoopSolitaireBoard.prototype.numTilesOnBoardForPlayer = function(player) {
 	var count = 0;
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -1864,7 +1864,7 @@ SolitaireBoard.prototype.numTilesOnBoardForPlayer = function(player) {
 	return count;
 };
 
-SolitaireBoard.prototype.getSurroundness = function(player) {
+CoopSolitaireBoard.prototype.getSurroundness = function(player) {
 	var up = 0;
 	var hasUp = 0;
 	var down = 0;

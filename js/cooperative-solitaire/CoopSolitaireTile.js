@@ -1,11 +1,6 @@
 // Tile
 
-var RED = "Red";
-var WHITE = "White";
-
-var tileId = 1;
-
-function SolitaireTile(code, ownerCode) {
+function CoopSolitaireTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -41,7 +36,7 @@ function SolitaireTile(code, ownerCode) {
 	}
 }
 
-SolitaireTile.prototype.setAccentInfo = function() {
+CoopSolitaireTile.prototype.setAccentInfo = function() {
 	if (this.code === 'R') {
 		this.accentType = ROCK;
 	} else if (this.code === 'W') {
@@ -53,7 +48,7 @@ SolitaireTile.prototype.setAccentInfo = function() {
 	}
 };
 
-SolitaireTile.prototype.setSpecialFlowerInfo = function() {
+CoopSolitaireTile.prototype.setSpecialFlowerInfo = function() {
 	if (this.code === 'L') {
 		this.specialFlowerType = WHITE_LOTUS;
 	} else if (this.code === 'O') {
@@ -61,7 +56,7 @@ SolitaireTile.prototype.setSpecialFlowerInfo = function() {
 	}
 };
 
-SolitaireTile.prototype.getConsoleDisplay = function() {
+CoopSolitaireTile.prototype.getConsoleDisplay = function() {
 	if (!this.drained) {
 		return this.ownerCode + "" + this.code;
 	} else {
@@ -69,11 +64,11 @@ SolitaireTile.prototype.getConsoleDisplay = function() {
 	}
 };
 
-SolitaireTile.prototype.getImageName = function() {
+CoopSolitaireTile.prototype.getImageName = function() {
 	return this.ownerCode + "" + this.code;
 };
 
-SolitaireTile.prototype.formsHarmonyWith = function(otherTile) {
+CoopSolitaireTile.prototype.formsHarmonyWith = function(otherTile) {
 	// For Solitaire:
 	if ((this.code === 'L' && otherTile.code === 'O') 
 		|| (otherTile.code === 'L' && this.code === 'O')) {
@@ -128,7 +123,7 @@ SolitaireTile.prototype.formsHarmonyWith = function(otherTile) {
 
 };
 
-SolitaireTile.prototype.clashesWith = function(otherTile) {
+CoopSolitaireTile.prototype.clashesWith = function(otherTile) {
 	if (this.type === ACCENT_TILE || otherTile.type === ACCENT_TILE) {
 		return false;
 	}
@@ -142,7 +137,7 @@ SolitaireTile.prototype.clashesWith = function(otherTile) {
 		&& this.basicValue === otherTile.basicValue);
 };
 
-SolitaireTile.prototype.getMoveDistance = function() {
+CoopSolitaireTile.prototype.getMoveDistance = function() {
 	if (this.type === BASIC_FLOWER) {
 		return parseInt(this.basicValue);
 	} else if (this.code === 'L') {
@@ -153,26 +148,26 @@ SolitaireTile.prototype.getMoveDistance = function() {
 	return 0;
 };
 
-SolitaireTile.prototype.drain = function() {
+CoopSolitaireTile.prototype.drain = function() {
 	if (this.type === BASIC_FLOWER) {
 		this.drained = true;
 	}
 };
 
-SolitaireTile.prototype.restore = function() {
+CoopSolitaireTile.prototype.restore = function() {
 	this.drained = false;
 };
 
-SolitaireTile.prototype.getName = function() {
-	return SolitaireTile.getTileName(this.code);
+CoopSolitaireTile.prototype.getName = function() {
+	return CoopSolitaireTile.getTileName(this.code);
 };
 
-SolitaireTile.prototype.getCopy = function() {
-	return new SolitaireTile(this.code, this.ownerCode);
+CoopSolitaireTile.prototype.getCopy = function() {
+	return new CoopSolitaireTile(this.code, this.ownerCode);
 };
 
 
-SolitaireTile.getTileName = function(tileCode) {
+CoopSolitaireTile.getTileName = function(tileCode) {
 	var name = "";
 	
 	if (tileCode.length > 1) {
@@ -217,7 +212,7 @@ SolitaireTile.getTileName = function(tileCode) {
 	return name;
 };
 
-SolitaireTile.getClashTileCode = function(tileCode) {
+CoopSolitaireTile.getClashTileCode = function(tileCode) {
 	if (tileCode.length === 2) {
 		if (tileCode.startsWith("R")) {
 			return "W" + tileCode.charAt(1);
