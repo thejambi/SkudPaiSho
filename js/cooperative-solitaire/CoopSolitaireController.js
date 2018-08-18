@@ -93,6 +93,9 @@ CoopSolitaireController.prototype.getAdditionalMessage = function() {
 };
 
 CoopSolitaireController.prototype.unplayedTileClicked = function(tileDiv) {
+	if (!myTurn()) {
+		return;
+	}
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
 		return;
@@ -385,7 +388,11 @@ CoopSolitaireController.prototype.getAiList = function() {
 }
 
 CoopSolitaireController.prototype.getCurrentPlayer = function() {
-	return HOST;
+	if (this.gameNotation.moves.length % 2 === 0) {
+		return HOST;
+	} else {
+		return GUEST;
+	}
 };
 
 CoopSolitaireController.prototype.cleanup = function() {
@@ -393,7 +400,7 @@ CoopSolitaireController.prototype.cleanup = function() {
 };
 
 CoopSolitaireController.prototype.isSolitaire = function() {
-	return true;
+	return false;
 };
 
 CoopSolitaireController.prototype.setGameNotation = function(newGameNotation) {

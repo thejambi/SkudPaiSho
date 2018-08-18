@@ -651,7 +651,7 @@ function getAdditionalMessage() {
 	// Is it the player's turn?
 	// TODO Could maybe get rid of this
 	if (myTurn() && !userIsLoggedIn()) {
-		msg = " (You)" + msg;
+		msg = " (You) " + msg;
 	}
 
 	msg += gameController.getAdditionalMessage();
@@ -762,10 +762,6 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 
 	var messageText = "";
 
-	// if (playingOnlineGame()) {
-	// 	messageText += "<em>Opponent's turn</em><br />";
-	// }
-
 	if (currentMoveIndex == 1 && !haveBothEmails()) {
 		if (!playingOnlineGame() && (currentGameData.gameTypeId === 1 || !currentGameData.gameTypeId)) {
 			if (!ignoreNoEmail && !userIsLoggedIn()) {
@@ -794,10 +790,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		messageText += "<em>THINKING...</em>";
 	} else if (activeAi) {
 		messageText += "Playing against the computer can help you learn how the game works. You should be able to beat the computer easily once you understand the game.";
-	} 
-	// else if (!playingOnlineGame()) {
-	// 	messageText += "Copy this <a href=\"" + shortUrl + "\">link</a> and send to the " + getCurrentPlayer() + ".";
-	// }
+	}
 
 	if (gameController.theGame.getWinner()) {
 		// There is a winner!
@@ -819,6 +812,9 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 			}
 		}
 	} else {
+		if (!playingOnlineGame()) {
+			messageText += "Current Player: " + getCurrentPlayer() + "<br />";
+		}
 		messageText += gameController.getAdditionalMessage() + getResetMoveText();
 	}
 
@@ -1419,7 +1415,9 @@ function getGameControllerForGameType(gameTypeId) {
 	    	controller = new StreetController();
 			break;
 		case GameType.CoopSolitaire.id:
-			controller = new CoopSolitaireController();
+			if (getUsername === 'SkudPaiSho' || !onlinePlayEnabled) {
+				controller = new CoopSolitaireController();
+			}
 			break;
 	    default:
 			debug("Game Controller unavailable.");
