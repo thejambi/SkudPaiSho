@@ -651,7 +651,7 @@ function getAdditionalMessage() {
 	// Is it the player's turn?
 	// TODO Could maybe get rid of this
 	if (myTurn() && !userIsLoggedIn()) {
-		msg = " (You)" + msg;
+		msg = " (You) " + msg;
 	}
 
 	msg += gameController.getAdditionalMessage();
@@ -762,10 +762,6 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 
 	var messageText = "";
 
-	// if (playingOnlineGame()) {
-	// 	messageText += "<em>Opponent's turn</em><br />";
-	// }
-
 	if (currentMoveIndex == 1 && !haveBothEmails()) {
 		if (!playingOnlineGame() && (currentGameData.gameTypeId === 1 || !currentGameData.gameTypeId)) {
 			if (!ignoreNoEmail && !userIsLoggedIn()) {
@@ -794,10 +790,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		messageText += "<em>THINKING...</em>";
 	} else if (activeAi) {
 		messageText += "Playing against the computer can help you learn how the game works. You should be able to beat the computer easily once you understand the game.";
-	} 
-	// else if (!playingOnlineGame()) {
-	// 	messageText += "Copy this <a href=\"" + shortUrl + "\">link</a> and send to the " + getCurrentPlayer() + ".";
-	// }
+	}
 
 	if (gameController.theGame.getWinner()) {
 		// There is a winner!
@@ -819,6 +812,9 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 			}
 		}
 	} else {
+		if (!playingOnlineGame()) {
+			messageText += "Current Player: " + getCurrentPlayer() + "<br />";
+		}
 		messageText += gameController.getAdditionalMessage() + getResetMoveText();
 	}
 
@@ -1396,7 +1392,8 @@ var GameType = {
 	VagabondPaiSho:{id:2, desc:"Vagabond Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/vagabond-pai-sho/"}, 
 	SolitairePaiSho:{id:4, desc:"Solitaire Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/solitaire-pai-sho/"}, 
 	CapturePaiSho:{id:3, desc:"Capture Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/capture-pai-sho/"},
-	StreetPaiSho:{id:5, desc:"Street Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/street-pai-sho/"}
+	StreetPaiSho:{id:5, desc:"Street Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/street-pai-sho/"},
+	CoopSolitaire:{id:6, desc:"Cooperative Solitaire", rulesUrl:"https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/"},
 };
 function getGameControllerForGameType(gameTypeId) {
 	var controller;
@@ -1404,32 +1401,32 @@ function getGameControllerForGameType(gameTypeId) {
 	switch(gameTypeId) {
 	    case GameType.SkudPaiSho.id:
 	        controller = new SkudPaiShoController();
-	        debug("You're playing Skud Pai Sho!");
 	        break;
 	    case GameType.VagabondPaiSho.id:
 	        controller = new VagabondController();
-	        debug("You're playing Vagabond Pai Sho!");
 	        break;
 	    case GameType.SolitairePaiSho.id:
 	        controller = new SolitaireController();
-	        debug("You're playing Solitaire Pai Sho!");
 	        break;
 	    case GameType.CapturePaiSho.id:
 	    	controller = new CaptureController();
-	    	debug("You're playing Capture Pai Sho!");
 	    	break;
 	    case GameType.StreetPaiSho.id:
 	    	controller = new StreetController();
-	    	debug("You're playing Street Pai Sho!");
-	    	break;
+			break;
+		case GameType.CoopSolitaire.id:
+			if (getUsername === 'SkudPaiSho' || !onlinePlayEnabled) {
+				controller = new CoopSolitaireController();
+			}
+			break;
 	    default:
-	        debug("Defaulting to use Skud Pai Sho.");
-	        controller = new SkudPaiShoController();
+			debug("Game Controller unavailable.");
 	}
 
 	return controller;
 }
 function setGameController(gameTypeId) {
+	var successResult = true;
 	// Previous game controller cleanup
 	if (gameController) {
 		gameController.cleanup();
@@ -1441,6 +1438,12 @@ function setGameController(gameTypeId) {
 	closeModal();
 	
 	gameController = getGameControllerForGameType(gameTypeId);
+	if (!gameController) {
+		gameController = getGameControllerForGameType(GameType.VagabondPaiSho.id);
+		debug("Defaulting to use Vagabond Pai Sho.");
+		showModal("Cannot Load Game", "This game is unavailable. Try Vagabond Pai Sho instead :)<br /><br />To know why the selected game is unavailable, ask in The Garden Gate Discord. Perhaps you have selected a new game that is coming soon!");
+		successResult = false;
+	}
 	if (gameController.completeSetup) {
 		gameController.completeSetup();
 	}
@@ -1450,45 +1453,50 @@ function setGameController(gameTypeId) {
 	defaultHelpMessageText = null;
 	clearMessage();
 	refreshMessage();
+	return successResult;
 }
 
 var jumpToGameCallback = function jumpToGameCallback(results) {
-			if (results) {
-				populateMyGamesList(results);
+	if (results) {
+		populateMyGamesList(results);
+		
+		var myGame = myGamesList[0];
+		
+		var gameControllerSuccess = setGameController(myGame.gameTypeId);
 
-				var myGame = myGamesList[0];
+		if (!gameControllerSuccess) {
+			return;
+		}
 
-				setGameController(myGame.gameTypeId);
-
-				// Is user even playing this game? This could be used to "watch" games
-				var userIsPlaying = usernameEquals(myGame.hostUsername) 
-					|| usernameEquals(myGame.guestUsername);
-
-				gameId = myGame.gameId;
-				currentGameOpponentUsername = null;
-				var opponentUsername;
-
-				if (userIsPlaying) {
-					if (usernameEquals(myGame.hostUsername)) {
-						opponentUsername = myGame.guestUsername;
-					} else {
-						opponentUsername = myGame.hostUsername;
-					}
-
-					currentGameOpponentUsername = opponentUsername;
-				}
-
-				currentGameData.hostUsername = myGame.hostUsername;
-				currentGameData.guestUsername = myGame.guestUsername;
-
-				hostEmail = myGame.hostUsername;
-				guestEmail = myGame.guestUsername;
-				
-				startWatchingGameRealTime();
-				closeModal();
-				updateFooter();
+		// Is user even playing this game? This could be used to "watch" games
+		var userIsPlaying = usernameEquals(myGame.hostUsername) ||
+		usernameEquals(myGame.guestUsername);
+		
+		gameId = myGame.gameId;
+		currentGameOpponentUsername = null;
+		var opponentUsername;
+		
+		if (userIsPlaying) {
+			if (usernameEquals(myGame.hostUsername)) {
+				opponentUsername = myGame.guestUsername;
+			} else {
+				opponentUsername = myGame.hostUsername;
 			}
-		};
+			
+			currentGameOpponentUsername = opponentUsername;
+		}
+		
+		currentGameData.hostUsername = myGame.hostUsername;
+		currentGameData.guestUsername = myGame.guestUsername;
+		
+		hostEmail = myGame.hostUsername;
+		guestEmail = myGame.guestUsername;
+		
+		startWatchingGameRealTime();
+		closeModal();
+		updateFooter();
+	}
+};
 
 function jumpToGame(gameIdChosen) {
 	if (!onlinePlayEnabled) {
@@ -1743,6 +1751,10 @@ var getCurrentGamesForUserNewCallback = function getCurrentGamesForUserNewCallba
 	}
 };
 
+function gameIdSupported(id) {
+	return getGameControllerForGameType(id) !== undefined;
+}
+
 var selectedGameSeek;
 
 function acceptGameSeekClicked(gameIdChosen) {
@@ -1753,7 +1765,7 @@ function acceptGameSeekClicked(gameIdChosen) {
 		}
 	}
 
-	if (gameSeek) {
+	if (gameSeek && gameIdSupported(gameSeek.gameId)) {
 		selectedGameSeek = gameSeek;
 		onlinePlayEngine.getCurrentGamesForUserNew(getLoginToken(), getCurrentGamesForUserNewCallback);
 	}
@@ -1952,15 +1964,15 @@ function startLoggingOnlineStatus() {
 
 	logOnlineStatusIntervalValue = setInterval(function() {
 		logOnlineStatusPulse();
-	}, 20000);
+	}, LOG_ONLINE_STATUS_INTERVAL);
 }
 
 function setSidenavNewGameSection() {
-	var message = getSidenavNewGameEntryForGameType(GameType.SkudPaiSho);
-	message += getSidenavNewGameEntryForGameType(GameType.VagabondPaiSho);
-	message += getSidenavNewGameEntryForGameType(GameType.SolitairePaiSho);
-	message += getSidenavNewGameEntryForGameType(GameType.CapturePaiSho);
-	message += getSidenavNewGameEntryForGameType(GameType.StreetPaiSho);
+	var message = "";
+	
+	Object.keys(GameType).forEach(function(key,index) {
+		message += getSidenavNewGameEntryForGameType(GameType[key]);
+	});
 
 	document.getElementById("sidenavNewGameSection").innerHTML = message;
 }
@@ -1978,11 +1990,11 @@ function getNewGameEntryForGameType(gameType) {
 }
 
 function newGameClicked() {
-	var message = getNewGameEntryForGameType(GameType.SkudPaiSho);
-	message += getNewGameEntryForGameType(GameType.VagabondPaiSho);
-	message += getNewGameEntryForGameType(GameType.SolitairePaiSho);
-	message += getNewGameEntryForGameType(GameType.CapturePaiSho);
-	message += getNewGameEntryForGameType(GameType.StreetPaiSho);
+	var message = "";
+	
+	Object.keys(GameType).forEach(function(key,index) {
+		message += getNewGameEntryForGameType(GameType[key]);
+	});
 
 	showModal("New Game", message);
 }
