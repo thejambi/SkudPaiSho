@@ -2425,6 +2425,18 @@ function addGameOption(option) {
 	setGameController(gameController.getGameTypeId(), true);
 }
 
+function getGameOptionsMessageHtml(options) {
+	var msg = "<br /><br />";
+
+	for (var i = 0; i < options.length; i++) {
+		if (!ggOptions.includes(options[i])) {
+			msg += "<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>Add game option: " + options[i] + "</span><br />";
+		}
+	}
+
+	return msg;
+};
+
 
 
 

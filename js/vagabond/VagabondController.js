@@ -67,22 +67,7 @@ VagabondController.prototype.getAdditionalMessage = function() {
 			msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move.";
 		}
 
-		msg += this.getGameOptionsMessageHtml();
-	}
-
-	return msg;
-};
-
-VagabondController.prototype.getGameOptionsMessageHtml = function() {
-	var msg = "<br /><br />";
-
-	var options = [];
-	options.push(OPTION_DOUBLE_TILES);
-
-	for (var i = 0; i < options.length; i++) {
-		if (!ggOptions.includes(options[i])) {
-			msg += "<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>Add game option: " + options[i] + "</span><br />";
-		}
+		msg += getGameOptionsMessageHtml([OPTION_DOUBLE_TILES]);
 	}
 
 	return msg;
