@@ -40,6 +40,7 @@ var onlinePlayEnabled = false;
 
 /* Game Options */
 var OPTION_DOUBLE_TILES = "Double Tiles";
+var OPTION_INSANE_TILES = "Insane Tiles";
 
 /* --- */
 
