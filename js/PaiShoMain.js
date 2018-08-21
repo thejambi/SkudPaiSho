@@ -1464,7 +1464,13 @@ var jumpToGameCallback = function jumpToGameCallback(results) {
 		
 		var myGame = myGamesList[0];
 		
-		var gameControllerSuccess = setGameController(myGame.gameTypeId);
+		clearOptions();
+		if (myGame.gameOptions) {
+			for (var i = 0; i < myGame.gameOptions.length; i++) {
+				addOption(myGame.gameOptions[i]);
+			}
+		}
+		var gameControllerSuccess = setGameController(myGame.gameTypeId, true);
 
 		if (!gameControllerSuccess) {
 			return;
@@ -1520,7 +1526,8 @@ function populateMyGamesList(results) {
 			hostOnline:parseInt(row[4]), 
 			guestUsername:row[5], 
 			guestOnline:parseInt(row[6]), 
-			isUserTurn:parseInt(row[7])
+			isUserTurn:parseInt(row[7]),
+			gameOptions:parseGameOptions(row[8])
 		};
 		myGamesList.push(myGame);
 	}
