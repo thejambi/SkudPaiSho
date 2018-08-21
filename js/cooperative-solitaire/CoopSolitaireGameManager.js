@@ -101,8 +101,8 @@ CoopSolitaireGameManager.prototype.setAllLegalPointsOpen = function(player, tile
 	if (tile.type === ACCENT_TILE) {
 		this.board.setSolitaireAccentPointsOpen(tile);
 	} else {
-		if (!this.board.setHarmonyAndClashPointsOpen(tile)) {
-			this.board.setAllPossiblePointsOpen(tile);
+		if (!this.board.setHarmonyOrClashPointsOpen(tile, player)) {
+			this.board.setAllPossiblePointsOpen(tile, player);
 		}
 	}
 	

@@ -87,6 +87,12 @@ CoopSolitaireController.prototype.getDefaultHelpMessageText = function() {
 CoopSolitaireController.prototype.getAdditionalMessage = function() {
 	var msg = "";
 	if (!this.theGame.getWinner()) {
+		var playerName = this.getCurrentPlayer();
+		var typeNotAllowed = "Harmonies";
+		if (playerName === HOST) {
+			typeNotAllowed = "Disharmonies";
+		}
+		msg += "<br />The " + playerName + " is not allowed to form " + typeNotAllowed + ".";
 		msg += "<br /><strong>" + this.theGame.getWinReason() + "</strong>";
 	}
 	return msg;

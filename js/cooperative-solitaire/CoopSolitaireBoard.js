@@ -1608,19 +1608,31 @@ CoopSolitaireBoard.prototype.setOpenGatePossibleMoves = function(player) {
 };
 
 /* For Solitaire */
-CoopSolitaireBoard.prototype.setAllPossiblePointsOpen = function(tile) {
+CoopSolitaireBoard.prototype.setAllPossiblePointsOpen = function(tile, player) {
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
 			if (bp.canHoldTile(tile)) {
-				this.cells[row][col].addType(POSSIBLE_MOVE);
+				var newBp = bp.getCopy();
+				newBp.putTile(tile);
+				if (player === HOST) {
+					// Clash not allowed
+					if (!this.hasDisharmony(newBp)) {
+						this.cells[row][col].addType(POSSIBLE_MOVE);
+					}
+				} else if (player === GUEST) {
+					// Harmony not allowed
+					if (!this.getTileHarmonies(newBp.tile, newBp).length > 0) {
+						this.cells[row][col].addType(POSSIBLE_MOVE);
+					}
+				}
 			}
 		}
 	}
 };
 
 // For Solitaire
-CoopSolitaireBoard.prototype.setHarmonyAndClashPointsOpen = function(tile) {
+CoopSolitaireBoard.prototype.setHarmonyOrClashPointsOpen = function(tile, player) {
 	var possibleMovesFound = false;
 
 	for (var row = 0; row < this.cells.length; row++) {
@@ -1629,9 +1641,18 @@ CoopSolitaireBoard.prototype.setHarmonyAndClashPointsOpen = function(tile) {
 			if (bp.canHoldTile(tile)) {
 				var newBp = bp.getCopy();
 				newBp.putTile(tile);
-				if (this.hasDisharmony(newBp) || this.getTileHarmonies(newBp.tile, newBp).length > 0) {
-					this.cells[row][col].addType(POSSIBLE_MOVE);
-					possibleMovesFound = true;
+				if (player === HOST) {
+					// Clash not allowed
+					if (!this.hasDisharmony(newBp) && this.getTileHarmonies(newBp.tile, newBp).length > 0) {
+						this.cells[row][col].addType(POSSIBLE_MOVE);
+						possibleMovesFound = true;
+					}
+				} else if (player === GUEST) {
+					// Harmony not allowed
+					if (this.hasDisharmony(newBp) && !this.getTileHarmonies(newBp.tile, newBp).length > 0) {
+						this.cells[row][col].addType(POSSIBLE_MOVE);
+						possibleMovesFound = true;
+					}
 				}
 			}
 		}
