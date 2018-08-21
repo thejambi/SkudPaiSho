@@ -705,6 +705,7 @@ SkudPaiShoBoard.prototype.moveTile = function(player, notationPointStart, notati
 
 	if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)) {
 		debug("Bad move bears");
+		showBadMoveModal();
 		return false;
 	}
 

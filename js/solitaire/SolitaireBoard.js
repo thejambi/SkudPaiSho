@@ -705,6 +705,7 @@ SolitaireBoard.prototype.moveTile = function(player, notationPointStart, notatio
 
 	if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)) {
 		debug("Bad move bears");
+		showBadMoveModal();
 		return false;
 	}
 

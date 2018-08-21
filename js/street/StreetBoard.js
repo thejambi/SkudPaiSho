@@ -390,6 +390,7 @@ StreetBoard.prototype.moveTile = function(player, notationPointStart, notationPo
 
 	if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)) {
 		debug("Bad move bears");
+		showBadMoveModal();
 		return false;
 	}
 

@@ -457,6 +457,7 @@ CaptureBoard.prototype.moveTile = function(player, notationPointStart, notationP
 
 	if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)) {
 		debug("Bad move bears");
+		showBadMoveModal();
 		return false;
 	}
 

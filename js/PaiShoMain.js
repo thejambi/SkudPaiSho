@@ -2440,6 +2440,9 @@ function getGameOptionsMessageHtml(options) {
 	return msg;
 };
 
+function showBadMoveModal() {
+	showModal("Uh Oh", "A move went wrong somewhere. This game may be corrupt due to players not both using latest updates. The app is not be compatible with new features.<br /><br />Please let your opponent know that you saw this message. You may want to resign this game and try again.");
+}
 
 
 

@@ -440,11 +440,11 @@ VagabondBoard.prototype.moveTile = function(player, notationPointStart, notation
 	var boardPointStart = this.cells[startRowCol.row][startRowCol.col];
 	var boardPointEnd = this.cells[endRowCol.row][endRowCol.col];
 
-	/* Disabling move validation for replay. */
-	// if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)) {
-	// 	debug("Bad move bears");
-	// 	return false;
-	// }
+	if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)) {
+		debug("Bad move bears");
+		showBadMoveModal();
+		return false;
+	}
 
 	var tile = boardPointStart.removeTile();
 

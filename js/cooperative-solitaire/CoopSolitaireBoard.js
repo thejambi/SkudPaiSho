@@ -705,6 +705,7 @@ CoopSolitaireBoard.prototype.moveTile = function(player, notationPointStart, not
 
 	if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)) {
 		debug("Bad move bears");
+		showBadMoveModal();
 		return false;
 	}
 
