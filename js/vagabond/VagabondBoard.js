@@ -624,19 +624,31 @@ VagabondBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, b
 	// Dragon special: Can move within Fire Lily range
 	if (boardPointStart.tile.code === 'D') {
 		// Must have Fire Lily
-		var fireLilyPoint = this.getFireLilyPoint(boardPointStart.tile.ownerName);
+		var fireLilyPoints = this.getFireLilyPoints(boardPointStart.tile.ownerName);
 
-		if (!fireLilyPoint) {
+		if (!fireLilyPoints || fireLilyPoints.length === 0) {
 			debug("No Fire Lily");
 			return false;
 		}
 
-		if (Math.abs(fireLilyPoint.row - boardPointEnd.row) + Math.abs(fireLilyPoint.col - boardPointEnd.col) <= 5) {
-			// Point inside Fire Lily range
-			return true;
-		} else {
-			return false;
+		var closeFireLilyPoints = [];
+		for (var i = 0; i < fireLilyPoints.length; i++) {
+			var fp = fireLilyPoints[i];
+			var dist = Math.abs(fp.row - boardPointStart.row) + Math.abs(fp.col - boardPointStart.col);
+			if (dist <= 5) {
+				closeFireLilyPoints.push(fp);
+			}
 		}
+
+		for (var i = 0; i < closeFireLilyPoints.length; i++) {
+			var fireLilyPoint = closeFireLilyPoints[i];
+			if (Math.abs(fireLilyPoint.row - boardPointEnd.row) + Math.abs(fireLilyPoint.col - boardPointEnd.col) <= 5) {
+				// Point inside Fire Lily range
+				return true;
+			}
+		}
+		// If we haven't returned true, we need to return false here
+		return false;
 	}
 
 	// Wheel
@@ -885,24 +897,42 @@ VagabondBoard.prototype.getFireLilyPoint = function(player) {
 	}
 };
 
+VagabondBoard.prototype.getFireLilyPoints = function(player) {
+	var points = [];
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var bp = this.cells[row][col];
+			if (bp.hasTile()) {
+				if (bp.tile.ownerName === player && bp.tile.code === 'F') {
+					points.push(bp);
+				}
+			}
+		}
+	}
+	return points;
+};
+
 VagabondBoard.prototype.setDeployPointsPossibleMoves = function(player, tileCode) {
 	// Dragon is special
 	if (tileCode === 'D') {
 		// Must have Fire Lily
-		var fireLilyPoint = this.getFireLilyPoint(player);
+		var fireLilyPoints = this.getFireLilyPoints(player);
 
-		if (!fireLilyPoint) {
+		if (!fireLilyPoints || fireLilyPoints.length === 0) {
 			debug("No Fire Lily");
 			return;
 		}
 
-		for (var row = 0; row < this.cells.length; row++) {
-			for (var col = 0; col < this.cells[row].length; col++) {
-				var bp = this.cells[row][col];
-				if (!bp.hasTile()) {
-					if (Math.abs(fireLilyPoint.row - bp.row) + Math.abs(fireLilyPoint.col - bp.col) <= 5) {
-						// Point within Fire Lily range
-						bp.addType(POSSIBLE_MOVE);
+		for (var i = 0; i < fireLilyPoints.length; i++) {
+			var fireLilyPoint = fireLilyPoints[i];
+			for (var row = 0; row < this.cells.length; row++) {
+				for (var col = 0; col < this.cells[row].length; col++) {
+					var bp = this.cells[row][col];
+					if (!bp.hasTile()) {
+						if (Math.abs(fireLilyPoint.row - bp.row) + Math.abs(fireLilyPoint.col - bp.col) <= 5) {
+							// Point within Fire Lily range
+							bp.addType(POSSIBLE_MOVE);
+						}
 					}
 				}
 			}

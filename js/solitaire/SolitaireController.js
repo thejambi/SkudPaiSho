@@ -86,6 +86,12 @@ SolitaireController.prototype.getDefaultHelpMessageText = function() {
 
 SolitaireController.prototype.getAdditionalMessage = function() {
 	var msg = "";
+	if (this.gameNotation.moves.length === 0) {
+		msg += getGameOptionsMessageHtml([
+			OPTION_DOUBLE_TILES, 
+			OPTION_INSANE_TILES
+		]);
+	}
 	if (!this.theGame.getWinner()) {
 		msg += "<br /><strong>" + this.theGame.getWinReason() + "</strong>";
 	}

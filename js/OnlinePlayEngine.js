@@ -110,7 +110,7 @@ OnlinePlayEngine.prototype.logOnlineStatus = function(loginToken, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, loginToken, callback) {
+OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, optionsString, loginToken, callback) {
     $.post("createGame.php",
         {
             t: gameTypeId, 
@@ -118,7 +118,8 @@ OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, l
             userId: loginToken.userId,
             username: loginToken.username,
             userEmail: loginToken.userEmail, 
-            deviceId: loginToken.deviceId
+            deviceId: loginToken.deviceId,
+            options: optionsString
         },
         function(data, status){
             if (status === 'success') {
@@ -195,7 +196,25 @@ OnlinePlayEngine.prototype.getPastGamesForUserNew = function(loginToken, callbac
             }
         }
     );
-}
+};
+
+OnlinePlayEngine.prototype.getPreviouslyActiveGameId = function(loginToken, gameId, opponentUsername, callback) {
+    $.post("getPreviouslyActiveGameId.php",
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId, 
+            gameId: gameId, 
+            opponentUsername: opponentUsername
+        },
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
 
 OnlinePlayEngine.prototype.getGameInfo = function(userId, gameId, callback) {
     $.get("getGameInfo.php?userId="+userId+"&gameId="+gameId, 

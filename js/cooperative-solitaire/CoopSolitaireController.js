@@ -86,7 +86,19 @@ CoopSolitaireController.prototype.getDefaultHelpMessageText = function() {
 
 CoopSolitaireController.prototype.getAdditionalMessage = function() {
 	var msg = "";
+	if (this.gameNotation.moves.length === 0) {
+		msg += getGameOptionsMessageHtml([
+			OPTION_DOUBLE_TILES, 
+			OPTION_INSANE_TILES
+		]);
+	}
 	if (!this.theGame.getWinner()) {
+		var playerName = this.getCurrentPlayer();
+		var typeNotAllowed = "Harmonies";
+		if (playerName === HOST) {
+			typeNotAllowed = "Disharmonies";
+		}
+		msg += "<br />The " + playerName + " is not allowed to form " + typeNotAllowed + ".";
 		msg += "<br /><strong>" + this.theGame.getWinReason() + "</strong>";
 	}
 	return msg;
@@ -174,7 +186,7 @@ CoopSolitaireController.prototype.pointClicked = function(htmlPoint) {
 				this.gameNotation.addMove(move);
 				this.drawRandomTile();
 				if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-					createGameIfThatIsOk(GameType.SolitairePaiSho.id);
+					createGameIfThatIsOk(GameType.CoopSolitaire.id);
 				} else {
 					if (playingOnlineGame()) {
 						callSubmitMove();
@@ -194,7 +206,7 @@ CoopSolitaireController.prototype.skipHarmonyBonus = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 	this.gameNotation.addMove(move);
 	if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-		createGameIfThatIsOk(GameType.SolitairePaiSho.id);
+		createGameIfThatIsOk(GameType.CoopSolitaire.id);
 	} else {
 		if (playingOnlineGame()) {
 			callSubmitMove();

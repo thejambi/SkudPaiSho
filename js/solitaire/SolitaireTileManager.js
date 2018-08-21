@@ -17,41 +17,30 @@ SolitaireTileManager.prototype.loadTileSet = function(ownerCode) {
 SolitaireTileManager.prototype.loadSolitaireSet = function(ownerCode, doubleTiles, includeAccentTiles) {
 	var tiles = [];
 
-	// Double amount of tiles if doubleTiles enabled
-	var multiplier = 1;
-	if (doubleTiles) {
-		multiplier = 2;
+	var tileMultiplier = 1;
+	if (ggOptions.includes(OPTION_DOUBLE_TILES)) {
+		tileMultiplier = 2;
+		tiles.push(new SolitaireTile('L', ownerCode));
+	}
+	if (ggOptions.includes(OPTION_INSANE_TILES)) {
+		tileMultiplier = 4;
 	}
 
-	if (includeAccentTiles) {
-		// 2 of each accent tile
-		for (var i = 0; i < 2 * multiplier; i++) {
-			tiles.push(new SolitaireTile('R', ownerCode));
-			tiles.push(new SolitaireTile('W', ownerCode));
-			tiles.push(new SolitaireTile('K', ownerCode));
-			tiles.push(new SolitaireTile('B', ownerCode));
-		}
-	}
+	for (var i = 0; i < tileMultiplier; i++) {
+		tiles.push(new SolitaireTile('R', ownerCode));
+		tiles.push(new SolitaireTile('W', ownerCode));
+		tiles.push(new SolitaireTile('K', ownerCode));
+		tiles.push(new SolitaireTile('B', ownerCode));
 
-	// 3 of each basic flower
-	for (var i = 0; i < 3 * multiplier; i++) {
 		tiles.push(new SolitaireTile("R3", ownerCode));
 		tiles.push(new SolitaireTile("R4", ownerCode));
 		tiles.push(new SolitaireTile("R5", ownerCode));
 		tiles.push(new SolitaireTile("W3", ownerCode));
 		tiles.push(new SolitaireTile("W4", ownerCode));
 		tiles.push(new SolitaireTile("W5", ownerCode));
-	}
 
-	// 1 of each special flower
-	for (var i = 0; i < 1 * multiplier; i++) {
 		tiles.push(new SolitaireTile('L', ownerCode));
 		tiles.push(new SolitaireTile('O', ownerCode));
-	}
-
-	// 1 extra White Lotus so White Lotus Gambit is possible
-	if (doubleTiles) {
-		tiles.push(new SolitaireTile('L', ownerCode));
 	}
 
 	return tiles;

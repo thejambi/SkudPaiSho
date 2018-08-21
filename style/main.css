@@ -384,6 +384,10 @@ figure > div {
   cursor: pointer;
 }
 
+.gameSeekEntry {
+  margin-top: 4px;
+}
+
 .hidden {
   visibility: hidden;
 }

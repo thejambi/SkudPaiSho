@@ -66,6 +66,8 @@ VagabondController.prototype.getAdditionalMessage = function() {
 		} else {
 			msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move.";
 		}
+
+		msg += getGameOptionsMessageHtml([OPTION_DOUBLE_TILES]);
 	}
 
 	return msg;

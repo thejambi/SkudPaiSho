@@ -117,20 +117,31 @@ CoopSolitaireTileManager.prototype.loadSimpleCanonSet = function(ownerCode) {
 CoopSolitaireTileManager.prototype.loadOneOfEach = function(ownerCode) {
 	var tiles = [];
 
-	tiles.push(new SolitaireTile('R', ownerCode));
-	tiles.push(new SolitaireTile('W', ownerCode));
-	tiles.push(new SolitaireTile('K', ownerCode));
-	tiles.push(new SolitaireTile('B', ownerCode));
+	var tileMultiplier = 1;
+	if (ggOptions.includes(OPTION_DOUBLE_TILES)) {
+		tileMultiplier = 2;
+		tiles.push(new SolitaireTile('L', ownerCode));
+	}
+	if (ggOptions.includes(OPTION_INSANE_TILES)) {
+		tileMultiplier = 4;
+	}
 
-	tiles.push(new SolitaireTile("R3", ownerCode));
-	tiles.push(new SolitaireTile("R4", ownerCode));
-	tiles.push(new SolitaireTile("R5", ownerCode));
-	tiles.push(new SolitaireTile("W3", ownerCode));
-	tiles.push(new SolitaireTile("W4", ownerCode));
-	tiles.push(new SolitaireTile("W5", ownerCode));
+	for (var i = 0; i < tileMultiplier; i++) {
+		tiles.push(new SolitaireTile('R', ownerCode));
+		tiles.push(new SolitaireTile('W', ownerCode));
+		tiles.push(new SolitaireTile('K', ownerCode));
+		tiles.push(new SolitaireTile('B', ownerCode));
 
-	tiles.push(new SolitaireTile('L', ownerCode));
-	tiles.push(new SolitaireTile('O', ownerCode));
+		tiles.push(new SolitaireTile("R3", ownerCode));
+		tiles.push(new SolitaireTile("R4", ownerCode));
+		tiles.push(new SolitaireTile("R5", ownerCode));
+		tiles.push(new SolitaireTile("W3", ownerCode));
+		tiles.push(new SolitaireTile("W4", ownerCode));
+		tiles.push(new SolitaireTile("W5", ownerCode));
+
+		tiles.push(new SolitaireTile('L', ownerCode));
+		tiles.push(new SolitaireTile('O', ownerCode));
+	}
 
 	return tiles;
 };
