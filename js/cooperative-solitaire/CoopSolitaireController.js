@@ -174,7 +174,7 @@ CoopSolitaireController.prototype.pointClicked = function(htmlPoint) {
 				this.gameNotation.addMove(move);
 				this.drawRandomTile();
 				if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-					createGameIfThatIsOk(GameType.SolitairePaiSho.id);
+					createGameIfThatIsOk(GameType.CoopSolitaire.id);
 				} else {
 					if (playingOnlineGame()) {
 						callSubmitMove();
@@ -194,7 +194,7 @@ CoopSolitaireController.prototype.skipHarmonyBonus = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 	this.gameNotation.addMove(move);
 	if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-		createGameIfThatIsOk(GameType.SolitairePaiSho.id);
+		createGameIfThatIsOk(GameType.CoopSolitaire.id);
 	} else {
 		if (playingOnlineGame()) {
 			callSubmitMove();

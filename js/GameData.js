@@ -38,6 +38,11 @@ var runningOnAndroid = false;
 var onlinePlayEnabled = false;
 /* */
 
+/* Game Options */
+var OPTION_DOUBLE_TILES = "Double Tiles";
+
+/* --- */
+
 
 // Redirect if needed
 if (shouldRedirectIfNotHttps() && window.location.href.includes("http://")) {

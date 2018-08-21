@@ -8,6 +8,19 @@ function VagabondTileManager() {
 VagabondTileManager.prototype.loadTileSet = function(ownerCode) {
 	var tiles = [];
 
+	this.addTiles(tiles, ownerCode);
+
+	if (ggOptions.includes(OPTION_DOUBLE_TILES)) {
+		this.addTiles(tiles, ownerCode);
+	}
+
+	// Only ever 1 Lotus tile
+	tiles.push(new VagabondTile('L', ownerCode));
+
+	return tiles;
+};
+
+VagabondTileManager.prototype.addTiles = function(tiles, ownerCode) {
 	// 2 of each of these tiles
 	for (var i = 0; i < 2; i++) {
 		tiles.push(new VagabondTile('S', ownerCode));
@@ -17,18 +30,8 @@ VagabondTileManager.prototype.loadTileSet = function(ownerCode) {
 	}
 
 	// 1 of each of these tiles
-	tiles.push(new VagabondTile('L', ownerCode));
 	tiles.push(new VagabondTile('F', ownerCode));
 	tiles.push(new VagabondTile('D', ownerCode));
-
-	if (ggOptions.includes('vagabond-more-mums')) {
-		tiles.push(new VagabondTile('C', ownerCode));
-		tiles.push(new VagabondTile('C', ownerCode));
-		tiles.push(new VagabondTile('C', ownerCode));
-		tiles.push(new VagabondTile('C', ownerCode));
-	}
-
-	return tiles;
 };
 
 VagabondTileManager.prototype.grabTile = function(player, tileCode) {
