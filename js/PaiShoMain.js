@@ -1652,6 +1652,9 @@ var showMyGamesCallback = function showMyGamesCallback(results) {
 			
 			// message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\"," + myGame.gameTypeId + ");'>" + gameDisplayTitle + "</div>";
 			message += "<div class='clickableText' onclick='jumpToGame(" + gId + ");'>" + gameDisplayTitle + "</div>";
+			for (var i = 0; i < myGame.gameOptions.length; i++) {
+				message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + myGame.gameOptions[i] + "</em></div>"
+			}
 		}
 	}
 	message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
