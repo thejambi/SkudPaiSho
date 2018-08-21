@@ -1094,7 +1094,7 @@ function sandboxitize() {
 		notation.addMove(gameController.gameNotation.moves[i]);
 	}
 
-	setGameController(currentGameData.gameTypeId);
+	setGameController(currentGameData.gameTypeId, true);
 
 	if (userIsLoggedIn()) {
 		currentGameData.hostUsername = getUsername();
@@ -1415,9 +1415,7 @@ function getGameControllerForGameType(gameTypeId) {
 	    	controller = new StreetController();
 			break;
 		case GameType.CoopSolitaire.id:
-			if (getUsername === 'SkudPaiSho' || !onlinePlayEnabled) {
-				controller = new CoopSolitaireController();
-			}
+			controller = new CoopSolitaireController();
 			break;
 	    default:
 			debug("Game Controller unavailable.");
@@ -1425,11 +1423,15 @@ function getGameControllerForGameType(gameTypeId) {
 
 	return controller;
 }
-function setGameController(gameTypeId) {
+function setGameController(gameTypeId, keepGameOptions) {
 	var successResult = true;
 	// Previous game controller cleanup
 	if (gameController) {
 		gameController.cleanup();
+	}
+
+	if (!keepGameOptions) {
+		clearOptions();
 	}
 
 	// Forget current game info
@@ -1751,7 +1753,7 @@ var getCurrentGamesForUserNewCallback = function getCurrentGamesForUserNewCallba
 	}
 };
 
-function gameIdSupported(id) {
+function gameTypeIdSupported(id) {
 	return getGameControllerForGameType(id) !== undefined;
 }
 
@@ -1765,7 +1767,7 @@ function acceptGameSeekClicked(gameIdChosen) {
 		}
 	}
 
-	if (gameSeek && gameIdSupported(gameSeek.gameId)) {
+	if (gameSeek && gameTypeIdSupported(gameSeek.gameTypeId)) {
 		selectedGameSeek = gameSeek;
 		onlinePlayEngine.getCurrentGamesForUserNew(getLoginToken(), getCurrentGamesForUserNewCallback);
 	}
@@ -1795,7 +1797,8 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 				gameTypeDesc:row[2], 
 				hostId:row[3], 
 				hostUsername:row[4], 
-				hostOnline:parseInt(row[5])
+				hostOnline:parseInt(row[5]),
+				gameOptions:parseGameOptions(row[6])
 			};
 			gameSeekList.push(gameSeek);
 		}
@@ -1815,11 +1818,33 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 				gameTypeHeading = gameSeek.gameTypeDesc;
 				message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
 			}
-			message += "<div class='clickableText' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
+			message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
+			for (var i = 0; i < gameSeek.gameOptions.length; i++) {
+				message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + gameSeek.gameOptions[i] + "</em></div>"
+			}
+			message += "</div>";
 		}
 	}
 	showModal("Join a game", message);
 };
+
+/* From https://css-tricks.com/snippets/javascript/unescape-html-in-js/ */
+function htmlDecode(input){
+	var e = document.createElement('div');
+	e.innerHTML = input;
+	return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
+}
+
+function parseGameOptions(optionsJsonString) {
+	try {
+		var decoded = htmlDecode(optionsJsonString);
+		var optionsArray = JSON.parse(decoded);
+		return optionsArray;
+	}
+	catch(err) {
+		return [];
+	}
+}
 
 function viewGameSeeksClicked() {
 	if (!window.navigator.onLine) {
@@ -1836,7 +1861,7 @@ function viewGameSeeksClicked() {
 var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHostedByUserCallback(results) {
 	var gameTypeId = tempGameTypeId;
 	if (!results) {
-		onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), getLoginToken(), createGameCallback);
+		onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), getLoginToken(), createGameCallback);
 	} else {
 		finalizeMove();
 		var message = "";
@@ -2386,6 +2411,11 @@ function promptAddOption() {
 	}
 
 	showModal("Add Option", message);
+}
+
+function addGameOption(option) {
+	addOption(option);
+	setGameController(gameController.getGameTypeId(), true);
 }
 
 
