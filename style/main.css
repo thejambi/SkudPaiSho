@@ -203,22 +203,32 @@ div.tab .alertTab, div.tab .alertTab.active {
   background-color: #bbb;
 }
 
-.svgContainerContainer {
-  display: inline;
+.board-container {
+  display: inline-block;
   float: left;
   width: 612px;
   margin-top: 8px;
   overflow: hidden;
 }
 
-.svgContainer {
-  /*width: 612px;
-  margin-top: 8px;*/
+.game-title {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  text-align: center;
+}
 
+/* .svgContainerContainer {
+  display: inline;
+  float: left;
+  width: 612px;
+  margin-top: 8px;
+  overflow: hidden;
+} */
+
+.svgContainer {
   display: inline;
   float: left;
 
-  /*transition: all 2s;*/
   transition: transform 2.5s;
 }
 .bg-svg {

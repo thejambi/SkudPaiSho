@@ -1,25 +1,28 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<meta charset="utf-8">
+  <meta charset="utf-8">
 
-	<title>The Garden Gate</title>
+  <title>The Garden Gate</title>
 
-	<!-- Images of classic tile designs used in Skud Pai Sho are originally from the Lotus Gambit rules community at http://lotusgambit.pbworks.com/w/page/45592429/Home -->
+  <!-- Images of classic tile designs used in Skud Pai Sho are originally from the Lotus Gambit rules community at http://lotusgambit.pbworks.com/w/page/45592429/Home -->
 
-	<link href="style/main.css" rel="stylesheet" type="text/css">
+  <link href="style/main.css" rel="stylesheet" type="text/css">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
-	<!-- <link href="favicon.ico" rel="shortcut icon"> -->
-	<link href="meta/apple-touch-icon.png" rel="apple-touch-icon">
-	<link href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
-	<!-- iPhone 5+ -->
-	<link href="meta/apple-touch-startup-image-640x920.png" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
-	<!-- iPhone, retina -->
-	<meta content="yes" name="apple-mobile-web-app-capable">
-	<meta content="black" name="apple-mobile-web-app-status-bar-style">
-	<meta content="True" name="HandheldFriendly">
-	<meta content="320" name="MobileOptimized">
+  <!-- <link href="favicon.ico" rel="shortcut icon"> -->
+  <link href="meta/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
+    rel="apple-touch-startup-image">
+  <!-- iPhone 5+ -->
+  <link href="meta/apple-touch-startup-image-640x920.png" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)"
+    rel="apple-touch-startup-image">
+  <!-- iPhone, retina -->
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <meta content="black" name="apple-mobile-web-app-status-bar-style">
+  <meta content="True" name="HandheldFriendly">
+  <meta content="320" name="MobileOptimized">
 
   <meta name="apple-itunes-app" content="app-id=1302567785">
 
@@ -29,14 +32,17 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=AW-972849224"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
     gtag('js', new Date());
     gtag('config', 'AW-972849224');
   </script>
-    
+
 </head>
 
-<body> 
+<body>
   <!-- Sidenav -->
   <div id="mySidenav" class="sidenav">
     <div class="sidenavContent">
@@ -44,8 +50,12 @@
       <h1>The Garden Gate</h1>
       <hr />
       <div class='sidenavSectionHeader'>Play</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='accountHeaderClicked();'><i class="fa fa-user" aria-hidden="true"></i> View my games<span id='myGamesNumberMyTurn'></span></div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameSeeksClicked();'><i class="fa fa-plug" aria-hidden="true"></i> Join a game</div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='accountHeaderClicked();'>
+        <i class="fa fa-user" aria-hidden="true"></i> View my games
+        <span id='myGamesNumberMyTurn'></span>
+      </div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameSeeksClicked();'>
+        <i class="fa fa-plug" aria-hidden="true"></i> Join a game</div>
       <hr />
       <div class='sidenavSectionHeader'>New Game</div>
       <div id="sidenavNewGameSection"></div>
@@ -59,7 +69,9 @@
       <!-- <div class='skipBonus'><a href="https://skudpaisho.com/site/tournaments/">Skud Pai Sho tournament information</a></div> -->
       <hr />
       <div class='sidenavSectionHeader'>About</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='aboutClicked();'>About <em>The Garden Gate</em></div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='aboutClicked();'>About
+        <em>The Garden Gate</em>
+      </div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='showWelcomeTutorial();'>Show welcome screens</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='openShop();'>Buy Pai Sho sets at The Garden Gate Shop</div>
       <div class='sidenavEntry'>
@@ -82,160 +94,215 @@
   <!-- End Sidenav -->
 
   <div class="header">
-    <div class="sidenavMenuButton"><span style="cursor:pointer; vertical-align: top;" onclick="openNav();"><h1><span class="stretchText sidenavMenuButtonText" id='sidenavMenuButton'>&#8801;</span></h1></span></div>
-    <div class="headerLeft"><h1>&nbsp;</h1></div>
-    <div class="headerLeft" style="cursor:pointer;" onclick="openNav();"><h1 id='siteHeading'>The Garden Gate</h1></div>
+    <div class="sidenavMenuButton">
+      <span style="cursor:pointer; vertical-align: top;" onclick="openNav();">
+        <h1>
+          <span class="stretchText sidenavMenuButtonText" id='sidenavMenuButton'>&#8801;</span>
+        </h1>
+      </span>
+    </div>
+    <div class="headerLeft">
+      <h1>&nbsp;</h1>
+    </div>
+    <div class="headerLeft" style="cursor:pointer;" onclick="openNav();">
+      <h1 id='siteHeading'>The Garden Gate</h1>
+    </div>
     <div class="headerRightContainer">
-      <span class="headerRight clickableText" onclick='accountHeaderClicked();'><i class="fa fa-user" aria-hidden="true"></i> <span id='accountHeaderLinkText'>Sign In</span></span>
+      <span class="headerRight clickableText" onclick='accountHeaderClicked();'>
+        <i class="fa fa-user" aria-hidden="true"></i>
+        <span id='accountHeaderLinkText'>Sign In</span>
+      </span>
       <div class="headerRight">&nbsp;|&nbsp;</div>
-      <span class="headerRight clickableText" onclick='newGameClicked();'><i class="fa fa-plus-circle" aria-hidden="true"></i> New</span>
+      <span class="headerRight clickableText" onclick='newGameClicked();'>
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> New</span>
       <div class="headerRight">&nbsp;|&nbsp;</div>
-      <span class="headerRight clickableText" onclick='viewGameSeeksClicked();'><i class="fa fa-plug" aria-hidden="true"></i> Join Game</span>
+      <span class="headerRight clickableText" onclick='viewGameSeeksClicked();'>
+        <i class="fa fa-plug" aria-hidden="true"></i> Join Game</span>
       <div class="headerRight">&nbsp;|&nbsp;</div>
-      <span class="headerRight clickableText" onclick='openShop();'><i class="fa fa-shopping-cart" aria-hidden="true"></i></span>
+      <span class="headerRight clickableText" onclick='openShop();'>
+        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+      </span>
     </div>
   </div>
 
   <div id='mainWrapper'>
 
-	<div class="leftContainer">
+    <div class="game-container">
 
-    <div class="game-container" id="the-game-container">
-			<div class="notationText gone" id="notationText">
+      <div class="notation-container" id="notation-container">
+        <div class="notationText gone" id="notationText">
+        </div>
+        <div class="notationInput gone">
+          <input type="text" id="notationInput" />
+          <input type="button" onclick="inputNow()" value="Enter" />
+        </div>
+      </div>
 
-			</div>
-			<div class="notationInput gone">
-				<input type="text" id="notationInput" />
-				<input type="button" onclick="inputNow()" value="Enter" />
-			</div>
-
-    </div>
-      <div class='svgContainerContainer'>
-        <div class="svgContainer">
-          <div class="bg-svg">
-            <div class="pointContainer">
-              <!--  -->
+      <div class="board-container">
+        <div class='svgContainerContainer'>
+          <div class="svgContainer">
+            <div class="bg-svg">
+              <div class="pointContainer">
+                <!--  -->
+              </div>
             </div>
           </div>
         </div>
       </div>
-  <div class="tilePileContainer">
-    <div id="replayControls" class="gone">
-      <span class='replayButton' onclick="rewindAllMoves()"><i class="fa fa-fast-backward" aria-hidden="true"></i></span>
-      <span class='replayButton' onclick="playPrevMove()"><i class="fa fa-step-backward" aria-hidden="true"></i></span>
-      <span class='replayButton playPauseButton' onclick="playPause()"><i class="fa fa-play" aria-hidden="true"></i></span>
-      <span class='replayButton' onclick="playNextMove(true); pauseRun();"><i class="fa fa-step-forward" aria-hidden="true"></i></span>
-      <span class='replayButton' onclick="playAllMoves()"><i class="fa fa-fast-forward" aria-hidden="true"></i></span>
-    </div>
-      <form class='gone' id='contactform' action='processForm.php' method='post'>
-        <input class='gone' type='text' id='fromEmail' name='fromEmail' value='' />
-        <input class='gone' type='text' id='toEmail' name='toEmail' value='' />
-        <input class='gone' type='text' id='message' name='message' value=''></input>
-        <input type='submit' value='Submit move!' id='send' /></form><div id='response'></div>
+      <div class="tilePileContainer">
+        <div id="replayControls" class="gone">
+          <span class='replayButton' onclick="rewindAllMoves()">
+            <i class="fa fa-fast-backward" aria-hidden="true"></i>
+          </span>
+          <span class='replayButton' onclick="playPrevMove()">
+            <i class="fa fa-step-backward" aria-hidden="true"></i>
+          </span>
+          <span class='replayButton playPauseButton' onclick="playPause()">
+            <i class="fa fa-play" aria-hidden="true"></i>
+          </span>
+          <span class='replayButton' onclick="playNextMove(true); pauseRun();">
+            <i class="fa fa-step-forward" aria-hidden="true"></i>
+          </span>
+          <span class='replayButton' onclick="playAllMoves()">
+            <i class="fa fa-fast-forward" aria-hidden="true"></i>
+          </span>
+        </div>
+        <form class='gone' id='contactform' action='processForm.php' method='post'>
+          <input class='gone' type='text' id='fromEmail' name='fromEmail' value='' />
+          <input class='gone' type='text' id='toEmail' name='toEmail' value='' />
+          <input class='gone' type='text' id='message' name='message' value=''>
+          <input type='submit' value='Submit move!' id='send' />
+        </form>
+        <div id='response'></div>
         <div class="gameMessage">
-            <!--  -->
-            Current Turn: Guest
+          <!--  -->
+          Current Turn: Guest
         </div>
         <div id="hostTilesContainer" class="hostTilesContainer"></div>
         <div id="guestTilesContainer" class="guestTilesContainer"></div>
-      <div class="gameMessage2"></div>
-  </div>
-  <div class="helpContainer" id="help">
-    <div class="tab">
-      <button class="tablinks" onclick="openTab(event, 'helpTextTab')" id="defaultOpenTab">Help</button>
-      <button id='globalChatTabHeader' class="tablinks" onclick="openTab(event, 'globalChatTab');">Global Chat</button>
-      <button id='chatTab' class="tablinks" onclick="openTab(event, 'gameChatTab'); dismissChatAlert();">Game Chat</button>
-    </div>
+        <div class="gameMessage2"></div>
+      </div>
+      <div class="helpContainer" id="help">
+        <div class="tab">
+          <button class="tablinks" onclick="openTab(event, 'helpTextTab')" id="defaultOpenTab">Help</button>
+          <button id='globalChatTabHeader' class="tablinks" onclick="openTab(event, 'globalChatTab');">Global Chat</button>
+          <button id='chatTab' class="tablinks" onclick="openTab(event, 'gameChatTab'); dismissChatAlert();">Game Chat</button>
+        </div>
 
-    <div id='helpTextTab' class="tabcontent">
-      <div id='helpTextContent'>
-        <h4>Skud Pai Sho</h4>
-        <p>Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p>
-        <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p>
-        <p>Select tiles or points on the board to learn more or <a href="https://skudpaisho.com/site/pai-sho-resources/" target="_blank">view the resources page</a> for the rules, a video tutorial on how to play, a print and play Pai Sho set, and more!</p>
+        <div id='helpTextTab' class="tabcontent">
+          <div id='helpTextContent'>
+            <h4>Skud Pai Sho</h4>
+            <p>Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds
+              the center of the board.</p>
+            <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them.
+              But be careful; tiles that clash can never be lined up on the board.</p>
+            <p>Select tiles or points on the board to learn more or
+              <a href="https://skudpaisho.com/site/pai-sho-resources/" target="_blank">view the resources page</a> for the rules, a video tutorial on how to play, a print and play Pai Sho set, and
+              more!
+            </p>
+          </div>
+        </div>
+        <div id="globalChatTab" class="tabcontent">
+          <div id="globalChatMessagesDisplay" class="chatMessagesDisplay"></div>
+          <div id="globalChatMessageInputContainer" class="chatMessageInputContainer">
+            <textarea id="globalChatMessageInput" class="chatMessageInput"></textarea>
+            <span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span>
+          </div>
+        </div>
+        <div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
+          <div id="chatMessagesHeader" class="chatMessagesHeader"></div>
+          <div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
+          <div id="chatMessageInputContainer" class="chatMessageInputContainer">
+            <textarea id="chatMessageInput" class="chatMessageInput"></textarea>
+            <span id="sendChatMessageButton" class="button" onclick='sendChat();'>Send</span>
+          </div>
+        </div>
       </div>
     </div>
-    <div id="globalChatTab" class="tabcontent">
-      <div id="globalChatMessagesDisplay" class="chatMessagesDisplay"></div>
-      <div id="globalChatMessageInputContainer" class="chatMessageInputContainer">
-        <textarea id="globalChatMessageInput" class="chatMessageInput"></textarea>
-        <span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span>
+  </div>
+
+  <div class="footer"></div>
+
+  <!-- Modal -->
+  <!-- The Modal -->
+  <div id="myMainModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+      <span class="myMainModalClose">&nbsp;&times;
+        <!-- <i class="fa fa-times" aria-hidden="true"></i> -->
+      </span>
+      <div id='modalHeading'>&nbsp;</div>
+      <div id='modalMessage'>&nbsp;</div>
+    </div>
+
+  </div>
+  <!-- End Modal -->
+
+  <!-- Modal content containers -->
+  <div id='loginModalContentContainer' style='display:none;'>
+    <!-- Login modal -->
+    To sign up or log in, enter your username and email, then enter the 4-digit code sent to you to sign into The Garden Gate.
+    <div style='text-align: center;'>
+      <table style='margin:auto;'>
+        <tr>
+          <td style='text-align:right'>Username:</td>
+          <td>
+            <input id='usernameInput' type='text' name='usernameInput' />
+          </td>
+        </tr>
+        <tr>
+          <td style='text-align:right'>Email:</td>
+          <td>
+            <input id='userEmailInput' type='email' name='userEmailInput' />
+          </td>
+        </tr>
+      </table>
+      <div>
+        <button type='button' onclick='sendVerificationCodeClicked();'>Send verification code</button>
+        <br />
+        <div id='verificationCodeSendResponse'>&nbsp;</div>
+      </div>
+      <br />
+      <table style='margin:auto;'>
+        <tr>
+          <td style='text-align:right'>Code:</td>
+          <td>
+            <input id='verificationCodeInput' type='text' name='verificationCodeInput' disabled />
+          </td>
+        </tr>
+      </table>
+      <div>
+        <button id='verifyCodeBtn' type='button' onclick='verifyCodeClicked();'>Verify code</button>
       </div>
     </div>
-    <div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
-      <div id="chatMessagesHeader" class="chatMessagesHeader"></div>
-      <div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
-      <div id="chatMessageInputContainer" class="chatMessageInputContainer">
-        <textarea id="chatMessageInput" class="chatMessageInput"></textarea>
-        <span id="sendChatMessageButton" class="button" onclick='sendChat();'>Send</span>
-      </div>
-    </div>
   </div>
-</div>
+  <!--  -->
 
-<div class="footer"></div>
+  <script>
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r;
+      i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+      }, i[r].l = 1 * new Date();
+      a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0];
+      a.async = 1;
+      a.src = g;
+      m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
-<!-- Modal -->
-<!-- The Modal -->
-<div id="myMainModal" class="modal">
+    ga('create', 'UA-85118304-1', 'auto');
+    ga('send', 'pageview');
+  </script>
 
-  <!-- Modal content -->
-  <div class="modal-content">
-    <span class="myMainModalClose">&nbsp;&times;<!-- <i class="fa fa-times" aria-hidden="true"></i> --></span>
-    <div id='modalHeading'>&nbsp;</div>
-    <div id='modalMessage'>&nbsp;</div>
-  </div>
-
-</div>
-<!-- End Modal -->
-
-<!-- Modal content containers -->
-<div id='loginModalContentContainer' style='display:none;'>
-<!-- Login modal -->
-To sign up or log in, enter your username and email, then enter the 4-digit code sent to you to sign into The Garden Gate.
-<div style='text-align: center;'>
-  <table style='margin:auto;'>
-    <tr>
-      <td style='text-align:right'>Username:</td>
-      <td><input id='usernameInput' type='text' name='usernameInput' /></td>
-    </tr>
-    <tr>
-      <td style='text-align:right'>Email:</td>
-      <td><input id='userEmailInput' type='email' name='userEmailInput' /></td>
-    </tr>
-  </table>
-  <div>
-    <button type='button' onclick='sendVerificationCodeClicked();'>Send verification code</button>
-    <br />
-    <div id='verificationCodeSendResponse'>&nbsp;</div>
-  </div>
-  <br />
-  <table style='margin:auto;'>
-    <tr>
-      <td style='text-align:right'>Code:</td><td><input id='verificationCodeInput' type='text' name='verificationCodeInput' disabled /></td>
-    </tr>
-  </table>
-  <div><button id='verifyCodeBtn' type='button' onclick='verifyCodeClicked();'>Verify code</button></div>
-</div>
-<!--  -->
-
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-85118304-1', 'auto');
-  ga('send', 'pageview');
-
-</script>
-
-<!-- jquery cloud reference -->
-<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> -->
+  <!-- jquery cloud reference -->
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> -->
 
 
-    <script type="text/javascript" src="js/jquery.min.js"></script>
-    <!-- <script type="text/javascript" src="js/jquery.validate.min.js"></script>
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+
+  <!-- <script type="text/javascript" src="js/jquery.validate.min.js"></script>
     <script type="text/javascript" src="js/jquery.form.js"></script>
     <script type="text/javascript" src="js/contact.js"></script>
     <script src="js/lz-string.min.js"></script>
@@ -313,11 +380,21 @@ To sign up or log in, enter your username and email, then enter the 4-digit code
     <script src="js/street/StreetTile.js"></script>
     <script src="js/street/StreetTileManager.js"></script>
 
+    <script src="js/playground/PlaygroundController.js"></script>
+    <script src="js/playground/PlaygroundActuator.js"></script>
+    <script src="js/playground/PlaygroundHarmony.js"></script>
+    <script src="js/playground/PlaygroundGameManager.js"></script>
+    <script src="js/playground/PlaygroundBoardPoint.js"></script>
+    <script src="js/playground/PlaygroundBoard.js"></script>
+    <script src="js/playground/PlaygroundGameNotation.js"></script>
+    <script src="js/playground/PlaygroundTile.js"></script>
+    <script src="js/playground/PlaygroundTileManager.js"></script>
+
 
     <script src="js/PaiShoMain.js"></script> -->
 
-    <!-- Compressed -->
-    <script src="js/psmin.js"></script>
-</div>
+  <!-- Compressed -->
+  <script src="js/psmin.js"></script>
 </body>
+
 </html>

@@ -107,7 +107,7 @@ window.requestAnimationFrame(function () {
 	if (QueryString.gameType) {
 		setGameController(parseInt(QueryString.gameType));
 	} else {
-		setGameController(GameType.SkudPaiSho.id);
+		closeGame();
 	}
 
 	/* Tile Design Preferences */
@@ -1394,6 +1394,7 @@ var GameType = {
 	CapturePaiSho:{id:3, desc:"Capture Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/capture-pai-sho/"},
 	StreetPaiSho:{id:5, desc:"Street Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/street-pai-sho/"},
 	CoopSolitaire:{id:6, desc:"Cooperative Solitaire", rulesUrl:"https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/"},
+	Playground:{id:7, desc:"Pai Sho Playground", rulesUrl:"https://skudpaisho.com/site/games/pai-sho-playground/"}
 };
 function getGameControllerForGameType(gameTypeId) {
 	var controller;
@@ -1416,6 +1417,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.CoopSolitaire.id:
 			controller = new CoopSolitaireController();
+			break;
+		case GameType.Playground.id:
+			controller = new PlaygroundController();
 			break;
 	    default:
 			debug("Game Controller unavailable.");
@@ -2012,8 +2016,12 @@ function setSidenavNewGameSection() {
 	document.getElementById("sidenavNewGameSection").innerHTML = message;
 }
 
+function randomIntFromInterval(min, max) {
+	return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 function closeGame() {
-	setGameController(GameType.SkudPaiSho.id);
+	setGameController(randomIntFromInterval(1,2));
 }
 
 function getSidenavNewGameEntryForGameType(gameType) {
@@ -2252,7 +2260,7 @@ function resignGameCallback() {
 	if (currentGameData) {
 		setGameController(currentGameData.gameTypeId);
 	} else {
-		setGameController(GameType.SkudPaiSho.id);
+		closeGame();
 	}
 }
 
