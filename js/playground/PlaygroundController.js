@@ -155,6 +155,7 @@ PlaygroundController.prototype.pointClicked = function(htmlPoint) {
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
+			this.notationBuilder.playingPlayer = this.currentPlayingPlayer;
 			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 			this.notationBuilder.moveType = MOVE;
 			this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
