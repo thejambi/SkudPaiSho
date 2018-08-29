@@ -1,9 +1,9 @@
 // Solitaire Game Manager
 
-function SolitaireGameManager(ignoreActuate, isCopy) {
+function SolitaireGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
-	this.actuator = new SolitaireActuator();
+	this.actuator = actuator;
 
 	this.tileManager = new SolitaireTileManager();
 
@@ -165,7 +165,7 @@ SolitaireGameManager.prototype.getWinResultTypeCode = function() {
 };
 
 SolitaireGameManager.prototype.getCopy = function() {
-	var copyGame = new SolitaireGameManager(true, true);
+	var copyGame = new SolitaireGameManager(this.actuator, true, true);
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;

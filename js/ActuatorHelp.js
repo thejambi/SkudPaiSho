@@ -87,8 +87,8 @@ function setupPaiShoBoard(gameContainer,
 	}
 
 	return {
-		boardContainer,
-		hostTilesContainer,
-		guestTilesContainer,
+		boardContainer: boardContainer,
+		hostTilesContainer: hostTilesContainer,
+		guestTilesContainer: guestTilesContainer
 	}
 }

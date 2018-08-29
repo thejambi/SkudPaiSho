@@ -1,9 +1,7 @@
 /* Solitaire Pai Sho specific UI interaction logic */
 
-function SolitaireController() {
-	document.getElementById('hostTilesContainer').innerHTML = this.getHostTilesContainerDivs();
-	document.getElementById('guestTilesContainer').innerHTML = this.getGuestTilesContainerDivs();
-
+function SolitaireController(gameContainer, isMobile) {
+	this.actuator = new SolitaireActuator(gameContainer, isMobile);
 
 	this.showGameMessageUnderneath = true;
 
@@ -32,8 +30,7 @@ SolitaireController.prototype.drawRandomTile = function() {
 };
 
 SolitaireController.prototype.resetGameManager = function() {
-	this.theGame = new SolitaireGameManager();
-	// this.setGameNotation(this.gameNotation.notationText);
+	this.theGame = new SolitaireGameManager(this.actuator);
 };
 
 SolitaireController.prototype.resetNotationBuilder = function() {
@@ -44,11 +41,11 @@ SolitaireController.prototype.resetGameNotation = function() {
 	this.gameNotation = new SolitaireGameNotation();
 };
 
-SolitaireController.prototype.getHostTilesContainerDivs = function() {
+SolitaireController.getHostTilesContainerDivs = function() {
 	return '<div class="HR3 HR4 HR5 HW3 HW4 HW5 HR HW HK HB HL HO">';
 }
 
-SolitaireController.prototype.getGuestTilesContainerDivs = function() {
+SolitaireController.getGuestTilesContainerDivs = function() {
 	return '<div></div>';
 };
 

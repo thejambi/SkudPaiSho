@@ -1405,7 +1405,8 @@ var GameType = {
 	CapturePaiSho:{id:3, desc:"Capture Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/capture-pai-sho/"},
 	StreetPaiSho:{id:5, desc:"Street Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/street-pai-sho/"},
 	CoopSolitaire:{id:6, desc:"Cooperative Solitaire", rulesUrl:"https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/"},
-	Playground:{id:7, desc:"Pai Sho Playground", rulesUrl:"https://skudpaisho.com/site/games/pai-sho-playground/"}
+	Playground:{id:7, desc:"Pai Sho Playground", rulesUrl:"https://skudpaisho.com/site/games/pai-sho-playground/"},
+	OvergrowthPaiSho:{id:8, desc:"Overgrowth Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/overgrowth-pai-sho/"}
 };
 function getGameControllerForGameType(gameTypeId) {
 	var controller;
@@ -1433,6 +1434,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Playground.id:
 			controller = new PlaygroundController(gameContainerDiv, isMobile);
+			break;
+		case GameType.OvergrowthPaiSho.id:
+			controller = new OvergrowthController(gameContainerDiv, isMobile);
 			break;
 	    default:
 			debug("Game Controller unavailable.");

@@ -44,11 +44,6 @@ CoopSolitaireActuator.prototype.htmlify = function(board, theGame, drawnTile) {
 		self.clearTileContainer(tile);
 	});
 
-	// Go through tile piles and display
-	// tileManager.tiles.forEach(function(tile) {
-	// 	self.addTile(tile, this.hostTilesContainer);
-	// });
-
 	// Add the randomTileContainer... wherever that tile comes from
 	if (!theGame.getWinner() && drawnTile) {
 		this.addTile(drawnTile);
