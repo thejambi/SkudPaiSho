@@ -217,13 +217,13 @@ div.tab .alertTab, div.tab .alertTab.active {
   text-align: center;
 }
 
-/* .svgContainerContainer {
+.svgContainerContainer {
   display: inline;
   float: left;
   width: 612px;
   margin-top: 8px;
   overflow: hidden;
-} */
+}
 
 .svgContainer {
   display: inline;
@@ -819,7 +819,7 @@ input[type=submit] {
       padding: 0;
     }*/
 
-    .svgContainerContainer {
+    .svgContainerContainer, .board-container {
       width: 100vw;
     }
     .svgContainer {
@@ -927,7 +927,7 @@ input[type=submit] {
 }
 
 @media only screen and (max-width: 306px) {
-    .svgContainerContainer {
+    .svgContainerContainer, .board-container {
       width: 306px;
     }
     .svgContainer {
