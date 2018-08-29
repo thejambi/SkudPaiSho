@@ -1,10 +1,12 @@
 /* Skud Pai Sho specific UI interaction logic */
 
-function SkudPaiShoController() {
-	var htc = document.getElementById('hostTilesContainer');
-	htc.innerHTML = this.getHostTilesContainerDivs();
-	var gtc = document.getElementById('guestTilesContainer');
-	gtc.innerHTML = this.getGuestTilesContainerDivs();
+function SkudPaiShoController(gameContainer, isMobile) {
+	// var htc = document.getElementById('hostTilesContainer');
+	// htc.innerHTML = this.getHostTilesContainerDivs();
+	// var gtc = document.getElementById('guestTilesContainer');
+	// gtc.innerHTML = this.getGuestTilesContainerDivs();
+
+	this.actuator = new SkudPaiShoActuator(gameContainer, isMobile);
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -19,7 +21,7 @@ SkudPaiShoController.prototype.getGameTypeId = function() {
 };
 
 SkudPaiShoController.prototype.resetGameManager = function() {
-	this.theGame = new SkudPaiShoGameManager();
+	this.theGame = new SkudPaiShoGameManager(this.actuator);
 };
 
 SkudPaiShoController.prototype.resetNotationBuilder = function() {
@@ -30,11 +32,11 @@ SkudPaiShoController.prototype.resetGameNotation = function() {
 	this.gameNotation = new SkudPaiShoGameNotation();
 };
 
-SkudPaiShoController.prototype.getHostTilesContainerDivs = function() {
+SkudPaiShoController.getHostTilesContainerDivs = function() {
 	return '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HL"></div> <div class="HO"></div>';
 };
 
-SkudPaiShoController.prototype.getGuestTilesContainerDivs = function() {
+SkudPaiShoController.getGuestTilesContainerDivs = function() {
 	return '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
 };
 

@@ -1,9 +1,9 @@
 // Skud Pai Sho Game Manager
 
-function SkudPaiShoGameManager(ignoreActuate, isCopy) {
+function SkudPaiShoGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
-	this.actuator = new SkudPaiShoActuator();
+	this.actuator = actuator;
 
 	this.tileManager = new SkudPaiShoTileManager();
 
