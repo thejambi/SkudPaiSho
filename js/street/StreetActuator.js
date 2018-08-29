@@ -1,10 +1,19 @@
 // Actuator
 
-function StreetActuator() {
-	this.boardContainer = document.querySelector(".pointContainer");
-	this.hostTilesContainer = document.querySelector(".hostTilesContainer");
-	this.guestTilesContainer = document.querySelector(".guestTilesContainer");
-	this.mobile = window.mobileAndTabletcheck();
+function StreetActuator(gameContainer, isMobile) {
+	this.gameContainer = gameContainer;
+	this.mobile = isMobile;
+
+	var containers = setupPaiShoBoard(
+		this.gameContainer, 
+		StreetController.getHostTilesContainerDivs(),
+		StreetController.getGuestTilesContainerDivs(), 
+		false
+	);
+
+	this.boardContainer = containers.boardContainer;
+	this.hostTilesContainer = containers.hostTilesContainer;
+	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
 StreetActuator.prototype.actuate = function(board, tileManager) {

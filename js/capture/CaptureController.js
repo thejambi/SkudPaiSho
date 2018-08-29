@@ -1,9 +1,8 @@
 /* Capture Pai Sho specific UI interaction logic */
 
-function CaptureController() {
-	document.getElementById('hostTilesContainer').innerHTML = this.getHostTilesContainerDivs();
-	document.getElementById('guestTilesContainer').innerHTML = this.getGuestTilesContainerDivs();
-
+function CaptureController(gameContainer, isMobile) {
+	this.actuator = new CaptureActuator(gameContainer, isMobile);
+	
 	this.resetGameManager();
 	this.resetNotationBuilder();
 	this.resetGameNotation();
@@ -42,7 +41,7 @@ CaptureController.prototype.addSetupForPlayerCode = function(playerCode) {
 };
 
 CaptureController.prototype.resetGameManager = function() {
-	this.theGame = new CaptureGameManager();
+	this.theGame = new CaptureGameManager(this.actuator);
 };
 
 CaptureController.prototype.resetNotationBuilder = function() {
@@ -53,11 +52,11 @@ CaptureController.prototype.resetGameNotation = function() {
 	this.gameNotation = new CaptureGameNotation();
 };
 
-CaptureController.prototype.getHostTilesContainerDivs = function() {
+CaptureController.getHostTilesContainerDivs = function() {
 	return '<div class="HA"></div> <div class="HV"></div> <div class="HB"></div> <div class="HP"></div> <div class="HF"></div> <div class="HU"></div> <br class="clear" /> <div class="HK"></div> <div class="HL"></div> <div class="HD"></div> <div class="HM"></div> <div class="HT"></div> <div class="HO"></div>';
 };
 
-CaptureController.prototype.getGuestTilesContainerDivs = function() {
+CaptureController.getGuestTilesContainerDivs = function() {
 	return '<div class="GA"></div> <div class="GV"></div> <div class="GB"></div> <div class="GP"></div> <div class="GF"></div> <div class="GU"></div> <br class="clear" /> <div class="GK"></div> <div class="GL"></div> <div class="GD"></div> <div class="GM"></div> <div class="GT"></div> <div class="GO"></div>';
 };
 

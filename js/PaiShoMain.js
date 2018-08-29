@@ -93,6 +93,8 @@ var userOnlineIcon = "<span title='Online' style='color:#35ac19;'><i class='fa f
 var userOfflineIcon = "<span title='Offline' style='color:gray;'><i class='fa fa-user-circle-o' aria-hidden='true'></i></span>";
 var logOnlineStatusIntervalValue;
 var userTurnCountInterval;
+
+var gameContainerDiv = document.getElementById("game-container");
 /* --- */
 
 window.requestAnimationFrame(function () {
@@ -315,9 +317,16 @@ function usernameEquals(otherUsername) {
 	return getUsername() && otherUsername.toLowerCase() === getUsername().toLowerCase();
 }
 
+function setResponseText(text) {
+	var responseDiv = document.getElementById("response");
+	if (responseDiv) {
+		responseDiv.innerHTML = text;
+	}
+}
+
 function updateCurrentGameTitle(isOpponentOnline) {
 	if (!currentGameData.guestUsername || !currentGameData.hostUsername) {
-		document.getElementById("response").innerHTML = "";
+		setResponseText(" ");
 		return;
 	}
 	/* --- */
@@ -360,7 +369,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 	title += guestUsernameTag;
 	title += "</span>";
 	
-	document.getElementById("response").innerHTML = title;
+	setResponseText(title);
 }
 
 var lastChatTimestamp = '1970-01-01 00:00:00';
@@ -676,7 +685,9 @@ function getGameMessageElement() {
 		gameMessage.innerHTML = "";
 		return gameMessage2;
 	} else {
-		gameMessage2.innerHTML = "";
+		if (gameMessage2) {
+			gameMessage2.innerHTML = "";
+		}
 		return gameMessage;
 	}
 }
@@ -1399,27 +1410,29 @@ var GameType = {
 function getGameControllerForGameType(gameTypeId) {
 	var controller;
 
+	var isMobile = window.mobileAndTabletcheck();
+
 	switch(gameTypeId) {
 	    case GameType.SkudPaiSho.id:
-	        controller = new SkudPaiShoController();
+	        controller = new SkudPaiShoController(gameContainerDiv, isMobile);
 	        break;
 	    case GameType.VagabondPaiSho.id:
-	        controller = new VagabondController();
+	        controller = new VagabondController(gameContainerDiv, isMobile);
 	        break;
 	    case GameType.SolitairePaiSho.id:
-	        controller = new SolitaireController();
+	        controller = new SolitaireController(gameContainerDiv, isMobile);
 	        break;
 	    case GameType.CapturePaiSho.id:
-	    	controller = new CaptureController();
+	    	controller = new CaptureController(gameContainerDiv, isMobile);
 	    	break;
 	    case GameType.StreetPaiSho.id:
-	    	controller = new StreetController();
+	    	controller = new StreetController(gameContainerDiv, isMobile);
 			break;
 		case GameType.CoopSolitaire.id:
-			controller = new CoopSolitaireController();
+			controller = new CoopSolitaireController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Playground.id:
-			controller = new PlaygroundController();
+			controller = new PlaygroundController(gameContainerDiv, isMobile);
 			break;
 	    default:
 			debug("Game Controller unavailable.");
@@ -2021,7 +2034,8 @@ function randomIntFromInterval(min, max) {
 }
 
 function closeGame() {
-	setGameController(randomIntFromInterval(1,2));
+	// setGameController(randomIntFromInterval(1,2));
+	setGameController(randomIntFromInterval(1,1));
 }
 
 function getSidenavNewGameEntryForGameType(gameType) {

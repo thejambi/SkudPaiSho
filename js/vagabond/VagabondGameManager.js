@@ -1,9 +1,9 @@
 // Vagabond Game Manager
 
-function VagabondGameManager(ignoreActuate, isCopy) {
+function VagabondGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
-	this.actuator = new VagabondActuator();
+	this.actuator = actuator;
 
 	this.tileManager = new VagabondTileManager();
 
@@ -103,7 +103,7 @@ VagabondGameManager.prototype.getWinResultTypeCode = function() {
 };
 
 VagabondGameManager.prototype.getCopy = function() {
-	var copyGame = new VagabondGameManager(true, true);
+	var copyGame = new VagabondGameManager(this.actuator, true, true);
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;

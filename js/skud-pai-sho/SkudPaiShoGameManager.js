@@ -230,7 +230,7 @@ SkudPaiShoGameManager.prototype.getWinResultTypeCode = function() {
 };
 
 SkudPaiShoGameManager.prototype.getCopy = function() {
-	var copyGame = new SkudPaiShoGameManager(true, true);
+	var copyGame = new SkudPaiShoGameManager(this.actuator, true, true);
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;

@@ -1,10 +1,7 @@
 /* Vagabond Pai Sho specific UI interaction logic */
 
-function VagabondController() {
-	document.getElementById('hostTilesContainer').innerHTML = this.getHostTilesContainerDivs();
-	document.getElementById('guestTilesContainer').innerHTML = this.getGuestTilesContainerDivs();
-
-	document.querySelector(".svgContainer").classList.add("vagabondBoardRotate");
+function VagabondController(gameContainer, isMobile) {
+	this.actuator = new VagabondActuator(gameContainer, isMobile);
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -19,7 +16,7 @@ VagabondController.prototype.getGameTypeId = function() {
 };
 
 VagabondController.prototype.resetGameManager = function() {
-	this.theGame = new VagabondGameManager();
+	this.theGame = new VagabondGameManager(this.actuator);
 };
 
 VagabondController.prototype.resetNotationBuilder = function() {
@@ -30,11 +27,11 @@ VagabondController.prototype.resetGameNotation = function() {
 	this.gameNotation = new VagabondGameNotation();
 };
 
-VagabondController.prototype.getHostTilesContainerDivs = function() {
+VagabondController.getHostTilesContainerDivs = function() {
 	return '<div class="HC"></div> <div class="HS"></div> <div class="HB"></div> <div class="HW"></div> <br class="clear" /> <div class="HF"></div> <div class="HD"></div> <div class="H_empty"></div> <div class="HL"></div>';
 }
 
-VagabondController.prototype.getGuestTilesContainerDivs = function() {
+VagabondController.getGuestTilesContainerDivs = function() {
 	return '<div class="GC"></div> <div class="GS"></div> <div class="GB"></div> <div class="GW"></div> <br class="clear" /> <div class="GF"></div> <div class="GD"></div> <div class="G_empty"></div> <div class="GL"></div>';
 };
 
@@ -294,7 +291,7 @@ VagabondController.prototype.getCurrentPlayer = function() {
 };
 
 VagabondController.prototype.cleanup = function() {
-	document.querySelector(".svgContainer").classList.remove("vagabondBoardRotate");
+	// document.querySelector(".svgContainer").classList.remove("vagabondBoardRotate");
 };
 
 VagabondController.prototype.isSolitaire = function() {

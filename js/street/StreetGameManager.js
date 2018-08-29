@@ -1,9 +1,9 @@
 // Street Pai Sho Game Manager
 
-function StreetGameManager(ignoreActuate, isCopy) {
+function StreetGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
-	this.actuator = new StreetActuator();
+	this.actuator = actuator;
 
 	this.tileManager = new StreetTileManager();
 
@@ -232,7 +232,7 @@ StreetGameManager.prototype.getWinResultTypeCode = function() {
 };
 
 StreetGameManager.prototype.getCopy = function() {
-	var copyGame = new StreetGameManager(true, true);
+	var copyGame = new StreetGameManager(this.actuator, true, true);
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;

@@ -1,9 +1,9 @@
 // Capture Game Manager
 
-function CaptureGameManager(ignoreActuate, isCopy) {
+function CaptureGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
-	this.actuator = new CaptureActuator();
+	this.actuator = actuator;
 
 	this.tileManager = new CaptureTileManager();
 
@@ -115,7 +115,7 @@ CaptureGameManager.prototype.getWinResultTypeCode = function() {
 };
 
 CaptureGameManager.prototype.getCopy = function() {
-	var copyGame = new CaptureGameManager(true, true);
+	var copyGame = new CaptureGameManager(this.actuator, true, true);
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;

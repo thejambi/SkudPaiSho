@@ -1,14 +1,14 @@
-// Vagabond Actuator
+// Actuator
 
-function VagabondActuator(gameContainer, isMobile) {
+function SkudPaiShoActuator(gameContainer, isMobile) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
 	var containers = setupPaiShoBoard(
 		this.gameContainer, 
-		VagabondController.getHostTilesContainerDivs(),
-		VagabondController.getGuestTilesContainerDivs(), 
-		true
+		SkudPaiShoController.getHostTilesContainerDivs(),
+		SkudPaiShoController.getGuestTilesContainerDivs(), 
+		false
 	);
 
 	this.boardContainer = containers.boardContainer;
@@ -16,17 +16,17 @@ function VagabondActuator(gameContainer, isMobile) {
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-VagabondActuator.prototype.actuate = function(board, tileManager) {
+SkudPaiShoActuator.prototype.actuate = function(board, tileManager) {
 	var self = this;
 
 	// self.printBoard(board);
 
-	window.requestAnimationFrame(function () {
+	window.requestAnimationFrame(function() {
 		self.htmlify(board, tileManager);
 	});
 };
 
-VagabondActuator.prototype.htmlify = function(board, tileManager) {
+SkudPaiShoActuator.prototype.htmlify = function(board, tileManager) {
 	this.clearContainer(this.boardContainer);
 
 	var self = this;
@@ -39,7 +39,7 @@ VagabondActuator.prototype.htmlify = function(board, tileManager) {
 		});
 	});
 
-	var fullTileSet = new VagabondTileManager();
+	var fullTileSet = new SkudPaiShoTileManager(true);
 
 	// Go through tile piles and clear containers
 	fullTileSet.hostTiles.forEach(function(tile) {
@@ -58,20 +58,20 @@ VagabondActuator.prototype.htmlify = function(board, tileManager) {
 	});
 };
 
-VagabondActuator.prototype.clearContainer = function (container) {
+SkudPaiShoActuator.prototype.clearContainer = function (container) {
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-VagabondActuator.prototype.clearTileContainer = function (tile) {
+SkudPaiShoActuator.prototype.clearTileContainer = function (tile) {
 	var container = document.querySelector("." + tile.getImageName());
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-VagabondActuator.prototype.addTile = function(tile, mainContainer) {
+SkudPaiShoActuator.prototype.addTile = function(tile, mainContainer) {
 	var self = this;
 
 	var container = document.querySelector("." + tile.getImageName());
@@ -87,12 +87,11 @@ VagabondActuator.prototype.addTile = function(tile, mainContainer) {
 	}
 
 	var theImg = document.createElement("img");
-
-	var srcValue = "vagabond/images/";
-	if (useDeLionTiles) {
-		srcValue += "delion/";
+	
+	var srcValue = "images/";
+	if (useHLoweTiles) {
+		srcValue += "hlowe/";
 	}
-
 	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
 
@@ -110,7 +109,7 @@ VagabondActuator.prototype.addTile = function(tile, mainContainer) {
 	container.appendChild(theDiv);
 };
 
-VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
+SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint) {
 	var self = this;
 
 	var theDiv = document.createElement("div");
@@ -121,7 +120,6 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
-		theDiv.classList.add("vagabondPointRotate");
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 		} else if (boardPoint.betweenHarmony) {
@@ -148,11 +146,10 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 		
 		var theImg = document.createElement("img");
 
-		var srcValue = "vagabond/images/";
-		if (useDeLionTiles) {
-			srcValue += "delion/";
+		var srcValue = "images/";
+		if (useHLoweTiles) {
+			srcValue += "hlowe/";
 		}
-
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 		
 		if (boardPoint.tile.inHarmony) {
@@ -174,7 +171,7 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 	}
 };
 
-VagabondActuator.prototype.printBoard = function(board) {
+SkudPaiShoActuator.prototype.printBoard = function(board) {
 
 	debug("");
 	var rowNum = 0;

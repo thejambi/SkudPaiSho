@@ -1,10 +1,7 @@
 /* Street Pai Sho specific UI interaction logic */
 
-function StreetController() {
-	var htc = document.getElementById('hostTilesContainer');
-	htc.innerHTML = this.getHostTilesContainerDivs();
-	var gtc = document.getElementById('guestTilesContainer');
-	gtc.innerHTML = this.getGuestTilesContainerDivs();
+function StreetController(gameContainer, isMobile) {
+	this.actuator = new StreetActuator(gameContainer, isMobile);
 
 	/* Board setup code determines initial tile placement pattern on the board. */
 	this.hostBoardSetupCode = 1;
@@ -45,7 +42,7 @@ StreetController.prototype.addSetupForPlayerCode = function(playerCode, boardSet
 };
 
 StreetController.prototype.resetGameManager = function() {
-	this.theGame = new StreetGameManager();
+	this.theGame = new StreetGameManager(this.actuator);
 };
 
 StreetController.prototype.resetNotationBuilder = function() {
@@ -56,11 +53,11 @@ StreetController.prototype.resetGameNotation = function() {
 	this.gameNotation = new StreetGameNotation();
 };
 
-StreetController.prototype.getHostTilesContainerDivs = function() {
+StreetController.getHostTilesContainerDivs = function() {
 	return '<span class="HL streetTileContainer"></span>';
 };
 
-StreetController.prototype.getGuestTilesContainerDivs = function() {
+StreetController.getGuestTilesContainerDivs = function() {
 	return '<span class="GL streetTileContainer"></span>';
 };
 
