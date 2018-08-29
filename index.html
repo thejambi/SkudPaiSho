@@ -11,18 +11,23 @@
   <link href="style/main.css" rel="stylesheet" type="text/css">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+
   <!-- <link href="favicon.ico" rel="shortcut icon"> -->
-  <link href="meta/apple-touch-icon.png" rel="apple-touch-icon">
-  <link href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
-    rel="apple-touch-startup-image">
-  <!-- iPhone 5+ -->
-  <link href="meta/apple-touch-startup-image-640x920.png" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)"
-    rel="apple-touch-startup-image">
-  <!-- iPhone, retina -->
-  <meta content="yes" name="apple-mobile-web-app-capable">
-  <meta content="black" name="apple-mobile-web-app-status-bar-style">
-  <meta content="True" name="HandheldFriendly">
-  <meta content="320" name="MobileOptimized">
+	<link href="meta/apple-touch-icon.png" rel="apple-touch-icon">
+	<link href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+	<!-- iPhone 5+ -->
+	<link href="meta/apple-touch-startup-image-640x920.png" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
+	<!-- iPhone, retina -->
+	<meta content="yes" name="apple-mobile-web-app-capable">
+	<meta content="black" name="apple-mobile-web-app-status-bar-style">
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
+  
+  
+  
+  
+  
 
   <meta name="apple-itunes-app" content="app-id=1302567785">
 
@@ -127,61 +132,35 @@
 
   <div id='mainWrapper'>
 
-    <div class="game-container">
+    <div class="game-container-wrapper">
 
-      <div class="notation-container" id="notation-container">
+      <div id="game-container" class="game-container"></div>
+
+      <!-- <div class="notation-container" id="notation-container">
         <div class="notationText gone" id="notationText">
         </div>
         <div class="notationInput gone">
           <input type="text" id="notationInput" />
           <input type="button" onclick="inputNow()" value="Enter" />
         </div>
-      </div>
+      </div> -->
 
-      <div class="board-container">
-        <div class='svgContainerContainer'>
+      <!-- <div id="board-container" class="board-container"> -->
+        <!-- <div class='svgContainerContainer'>
           <div class="svgContainer">
             <div class="bg-svg">
-              <div class="pointContainer">
-                <!--  -->
-              </div>
+              <div class="pointContainer"></div>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="tilePileContainer">
-        <div id="replayControls" class="gone">
-          <span class='replayButton' onclick="rewindAllMoves()">
-            <i class="fa fa-fast-backward" aria-hidden="true"></i>
-          </span>
-          <span class='replayButton' onclick="playPrevMove()">
-            <i class="fa fa-step-backward" aria-hidden="true"></i>
-          </span>
-          <span class='replayButton playPauseButton' onclick="playPause()">
-            <i class="fa fa-play" aria-hidden="true"></i>
-          </span>
-          <span class='replayButton' onclick="playNextMove(true); pauseRun();">
-            <i class="fa fa-step-forward" aria-hidden="true"></i>
-          </span>
-          <span class='replayButton' onclick="playAllMoves()">
-            <i class="fa fa-fast-forward" aria-hidden="true"></i>
-          </span>
-        </div>
-        <form class='gone' id='contactform' action='processForm.php' method='post'>
-          <input class='gone' type='text' id='fromEmail' name='fromEmail' value='' />
-          <input class='gone' type='text' id='toEmail' name='toEmail' value='' />
-          <input class='gone' type='text' id='message' name='message' value=''>
-          <input type='submit' value='Submit move!' id='send' />
-        </form>
+        </div> -->
+      <!-- </div> -->
+      <!-- <div id="tilePileContainer" class="tilePileContainer">
         <div id='response'></div>
-        <div class="gameMessage">
-          <!--  -->
-          Current Turn: Guest
-        </div>
+        <div class="gameMessage"></div>
         <div id="hostTilesContainer" class="hostTilesContainer"></div>
         <div id="guestTilesContainer" class="guestTilesContainer"></div>
         <div class="gameMessage2"></div>
-      </div>
+      </div> -->
       <div class="helpContainer" id="help">
         <div class="tab">
           <button class="tablinks" onclick="openTab(event, 'helpTextTab')" id="defaultOpenTab">Help</button>
@@ -190,16 +169,24 @@
         </div>
 
         <div id='helpTextTab' class="tabcontent">
+            <div id="replayControls" class="gone">
+                <span class='replayButton' onclick="rewindAllMoves()">
+                  <i class="fa fa-fast-backward" aria-hidden="true"></i>
+                </span>
+                <span class='replayButton' onclick="playPrevMove()">
+                  <i class="fa fa-step-backward" aria-hidden="true"></i>
+                </span>
+                <span class='replayButton playPauseButton' onclick="playPause()">
+                  <i class="fa fa-play" aria-hidden="true"></i>
+                </span>
+                <span class='replayButton' onclick="playNextMove(true); pauseRun();">
+                  <i class="fa fa-step-forward" aria-hidden="true"></i>
+                </span>
+                <span class='replayButton' onclick="playAllMoves()">
+                  <i class="fa fa-fast-forward" aria-hidden="true"></i>
+                </span>
+              </div>
           <div id='helpTextContent'>
-            <h4>Skud Pai Sho</h4>
-            <p>Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds
-              the center of the board.</p>
-            <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them.
-              But be careful; tiles that clash can never be lined up on the board.</p>
-            <p>Select tiles or points on the board to learn more or
-              <a href="https://skudpaisho.com/site/pai-sho-resources/" target="_blank">view the resources page</a> for the rules, a video tutorial on how to play, a print and play Pai Sho set, and
-              more!
-            </p>
           </div>
         </div>
         <div id="globalChatTab" class="tabcontent">
@@ -302,7 +289,7 @@
 
   <script type="text/javascript" src="js/jquery.min.js"></script>
 
-  <!-- <script type="text/javascript" src="js/jquery.validate.min.js"></script>
+  <script type="text/javascript" src="js/jquery.validate.min.js"></script>
     <script type="text/javascript" src="js/jquery.form.js"></script>
     <script type="text/javascript" src="js/contact.js"></script>
     <script src="js/lz-string.min.js"></script>
@@ -310,6 +297,7 @@
     <script src="js/GameData.js"></script>
     <script src="js/CommonNotationObjects.js"></script>
     <script src="js/LocalStorage.js"></script>
+    <script src="js/ActuatorHelp.js"></script>
     
 
     <script src="js/ai/SkudAIv1.js"></script>
@@ -322,15 +310,15 @@
     <script src="js/AppCaller.js"></script>
 
 
-    <script src="js/SkudPaiShoController.js"></script>
-    <script src="js/SkudPaiShoActuator.js"></script>
-    <script src="js/SkudPaiShoHarmony.js"></script>
-    <script src="js/SkudPaiShoGameManager.js"></script>
-    <script src="js/SkudPaiShoBoardPoint.js"></script>
-    <script src="js/SkudPaiShoBoard.js"></script>
-    <script src="js/SkudPaiShoGameNotation.js"></script>
-    <script src="js/SkudPaiShoTile.js"></script>
-    <script src="js/SkudPaiShoTileManager.js"></script>
+    <script src="js/skud-pai-sho/SkudPaiShoController.js"></script>
+    <script src="js/skud-pai-sho/SkudPaiShoActuator.js"></script>
+    <script src="js/skud-pai-sho/SkudPaiShoHarmony.js"></script>
+    <script src="js/skud-pai-sho/SkudPaiShoGameManager.js"></script>
+    <script src="js/skud-pai-sho/SkudPaiShoBoardPoint.js"></script>
+    <script src="js/skud-pai-sho/SkudPaiShoBoard.js"></script>
+    <script src="js/skud-pai-sho/SkudPaiShoGameNotation.js"></script>
+    <script src="js/skud-pai-sho/SkudPaiShoTile.js"></script>
+    <script src="js/skud-pai-sho/SkudPaiShoTileManager.js"></script>
 
     <script src="js/vagabond/VagabondController.js"></script>
     <script src="js/vagabond/VagabondActuator.js"></script>
@@ -361,14 +349,14 @@
     <script src="js/cooperative-solitaire/CoopSolitaireTile.js"></script>
     <script src="js/cooperative-solitaire/CoopSolitaireTileManager.js"></script>
 
-    <script src="js/CaptureController.js"></script>
-    <script src="js/CaptureActuator.js"></script>
-    <script src="js/CaptureBoard.js"></script>
-    <script src="js/CaptureBoardPoint.js"></script>
-    <script src="js/CaptureGameManager.js"></script>
-    <script src="js/CaptureGameNotation.js"></script>
-    <script src="js/CaptureTile.js"></script>
-    <script src="js/CaptureTileManager.js"></script>
+    <script src="js/capture/CaptureController.js"></script>
+    <script src="js/capture/CaptureActuator.js"></script>
+    <script src="js/capture/CaptureBoard.js"></script>
+    <script src="js/capture/CaptureBoardPoint.js"></script>
+    <script src="js/capture/CaptureGameManager.js"></script>
+    <script src="js/capture/CaptureGameNotation.js"></script>
+    <script src="js/capture/CaptureTile.js"></script>
+    <script src="js/capture/CaptureTileManager.js"></script>
 
     <script src="js/street/StreetController.js"></script>
     <script src="js/street/StreetActuator.js"></script>
@@ -390,11 +378,21 @@
     <script src="js/playground/PlaygroundTile.js"></script>
     <script src="js/playground/PlaygroundTileManager.js"></script>
 
+    <script src="js/overgrowth/OvergrowthController.js"></script>
+    <script src="js/overgrowth/OvergrowthActuator.js"></script>
+    <script src="js/overgrowth/OvergrowthHarmony.js"></script>
+    <script src="js/overgrowth/OvergrowthGameManager.js"></script>
+    <script src="js/overgrowth/OvergrowthBoardPoint.js"></script>
+    <script src="js/overgrowth/OvergrowthBoard.js"></script>
+    <script src="js/overgrowth/OvergrowthGameNotation.js"></script>
+    <script src="js/overgrowth/OvergrowthTile.js"></script>
+    <script src="js/overgrowth/OvergrowthTileManager.js"></script>
 
-    <script src="js/PaiShoMain.js"></script> -->
+
+    <script src="js/PaiShoMain.js"></script>
 
   <!-- Compressed -->
-  <script src="js/psmin.js"></script>
+  <!-- <script src="js/psmin.js"></script> -->
 </body>
 
 </html>
