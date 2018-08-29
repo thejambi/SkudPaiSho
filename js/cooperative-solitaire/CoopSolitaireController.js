@@ -1,9 +1,7 @@
 /* Cooperative Solitaire Pai Sho specific UI interaction logic */
 
-function CoopSolitaireController() {
-	document.getElementById('hostTilesContainer').innerHTML = this.getHostTilesContainerDivs();
-	document.getElementById('guestTilesContainer').innerHTML = this.getGuestTilesContainerDivs();
-
+function CoopSolitaireController(gameContainer, isMobile) {
+	this.actuator = new CoopSolitaireActuator(gameContainer, isMobile);
 
 	this.showGameMessageUnderneath = true;
 
@@ -32,8 +30,7 @@ CoopSolitaireController.prototype.drawRandomTile = function() {
 };
 
 CoopSolitaireController.prototype.resetGameManager = function() {
-	this.theGame = new CoopSolitaireGameManager();
-	// this.setGameNotation(this.gameNotation.notationText);
+	this.theGame = new CoopSolitaireGameManager(this.actuator);
 };
 
 CoopSolitaireController.prototype.resetNotationBuilder = function() {
@@ -44,11 +41,11 @@ CoopSolitaireController.prototype.resetGameNotation = function() {
 	this.gameNotation = new CoopSolitaireGameNotation();
 };
 
-CoopSolitaireController.prototype.getHostTilesContainerDivs = function() {
+CoopSolitaireController.getHostTilesContainerDivs = function() {
 	return '<div class="HR3 HR4 HR5 HW3 HW4 HW5 HR HW HK HB HL HO">';
 }
 
-CoopSolitaireController.prototype.getGuestTilesContainerDivs = function() {
+CoopSolitaireController.getGuestTilesContainerDivs = function() {
 	return '<div></div>';
 };
 

@@ -1,10 +1,7 @@
 /* Playground specific UI interaction logic */
 
-function PlaygroundController() {
-	var htc = document.getElementById('hostTilesContainer');
-	htc.innerHTML = this.getHostTilesContainerDivs();
-	var gtc = document.getElementById('guestTilesContainer');
-	gtc.innerHTML = this.getGuestTilesContainerDivs();
+function PlaygroundController(gameContainer, isMobile) {
+	this.actuator = new PlaygroundActuator(gameContainer, isMobile);
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -23,7 +20,7 @@ PlaygroundController.prototype.getGameTypeId = function() {
 };
 
 PlaygroundController.prototype.resetGameManager = function() {
-	this.theGame = new PlaygroundGameManager();
+	this.theGame = new PlaygroundGameManager(this.actuator);
 };
 
 PlaygroundController.prototype.resetNotationBuilder = function() {
@@ -34,11 +31,11 @@ PlaygroundController.prototype.resetGameNotation = function() {
 	this.gameNotation = new PlaygroundGameNotation();
 };
 
-PlaygroundController.prototype.getHostTilesContainerDivs = function() {
+PlaygroundController.getHostTilesContainerDivs = function() {
 	return '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HL"></div> <div class="HO"></div>';
 };
 
-PlaygroundController.prototype.getGuestTilesContainerDivs = function() {
+PlaygroundController.getGuestTilesContainerDivs = function() {
 	return '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
 };
 

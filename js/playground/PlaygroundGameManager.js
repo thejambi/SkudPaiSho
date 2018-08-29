@@ -1,9 +1,9 @@
 // Skud Pai Sho Game Manager
 
-function PlaygroundGameManager(ignoreActuate, isCopy) {
+function PlaygroundGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
-	this.actuator = new PlaygroundActuator();
+	this.actuator = actuator;
 
 	this.tileManager = new PlaygroundTileManager();
 
@@ -167,7 +167,7 @@ PlaygroundGameManager.prototype.getWinResultTypeCode = function() {
 };
 
 PlaygroundGameManager.prototype.getCopy = function() {
-	var copyGame = new PlaygroundGameManager(true, true);
+	var copyGame = new PlaygroundGameManager(this.actuator, true, true);
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;
