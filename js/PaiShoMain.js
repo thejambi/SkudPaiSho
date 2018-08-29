@@ -2034,8 +2034,7 @@ function randomIntFromInterval(min, max) {
 }
 
 function closeGame() {
-	// setGameController(randomIntFromInterval(1,2));
-	setGameController(randomIntFromInterval(1,1));
+	setGameController(randomIntFromInterval(1,2));
 }
 
 function getSidenavNewGameEntryForGameType(gameType) {
