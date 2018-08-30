@@ -243,6 +243,17 @@ function showReplayControls() {
 	}
 }
 
+function toggleReplayControls() {
+	var id = "replayControls";
+	var classToToggle = "gone";
+	var replayControls = document.getElementById(id);
+	if (replayControls.classList.contains(classToToggle)) {
+		replayControls.classList.remove(classToToggle);
+	} else {
+		replayControls.classList.add(classToToggle);
+	}
+}
+
 function setTileContainers() {
 	document.getElementById('hostTilesContainer').innerHTML = gameController.getHostTilesContainerDivs();
 	document.getElementById('guestTilesContainer').innerHTML = gameController.getGuestTilesContainerDivs();

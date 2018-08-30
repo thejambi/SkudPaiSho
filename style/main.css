@@ -179,15 +179,48 @@ div.tab .alertTab, div.tab .alertTab.active {
 }
 
 #replayControls {
-  margin-top: 12px;
+  /* display: block;
+  margin: 12px auto 0 auto;
   height: 40px;
+  text-align: center; */
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  z-index: 3;
+  background-color: #444;
+}
+
+#replayControls .center {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  width: 210px;
+  padding: 4px;
+}
+
+.replayControlsCloseButton {
+  color: #aaa;
+  float: right;
+  font-size: 32px;
+  font-weight: 900;
+  padding-right: 2px;
+}
+
+.replayControlsCloseButton:hover,
+.replayControlsCloseButton:focus {
+    color: #ddd;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .replayButton {
-  /*width: 36px;*/
-  /*height: 36px;*/
+  /* width: 36px;
+  height: 40px; */
   width: 20px;
-  border: 1px solid black;
+  /* border: 1px solid black; */
+  border: 1px solid #ccc;
   border-radius: 3px;
   background-color: #ccc;
   display: block;
@@ -197,6 +230,7 @@ div.tab .alertTab, div.tab .alertTab.active {
   font-size: larger;
   margin-left: 1px;
   margin-right: 1px;
+  margin-bottom: 4px;
 }
 
 .replayButton:active {

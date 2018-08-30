@@ -11,23 +11,25 @@
   <link href="style/main.css" rel="stylesheet" type="text/css">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  
+
 
   <!-- <link href="favicon.ico" rel="shortcut icon"> -->
-	<link href="meta/apple-touch-icon.png" rel="apple-touch-icon">
-	<link href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
-	<!-- iPhone 5+ -->
-	<link href="meta/apple-touch-startup-image-640x920.png" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image">
-	<!-- iPhone, retina -->
-	<meta content="yes" name="apple-mobile-web-app-capable">
-	<meta content="black" name="apple-mobile-web-app-status-bar-style">
-	<meta content="True" name="HandheldFriendly">
-	<meta content="320" name="MobileOptimized">
-  
-  
-  
-  
-  
+  <link href="meta/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
+    rel="apple-touch-startup-image">
+  <!-- iPhone 5+ -->
+  <link href="meta/apple-touch-startup-image-640x920.png" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)"
+    rel="apple-touch-startup-image">
+  <!-- iPhone, retina -->
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <meta content="black" name="apple-mobile-web-app-status-bar-style">
+  <meta content="True" name="HandheldFriendly">
+  <meta content="320" name="MobileOptimized">
+
+
+
+
+
 
   <meta name="apple-itunes-app" content="app-id=1302567785">
 
@@ -66,6 +68,7 @@
       <div id="sidenavNewGameSection"></div>
       <hr />
       <div class='sidenavSectionHeader'>Current Game</div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleReplayControls();'>Toggle replay controls</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameReplayLink();'>Get game replay link</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameNotationModal();'>Show game notation</div>
@@ -146,7 +149,7 @@
       </div> -->
 
       <!-- <div id="board-container" class="board-container"> -->
-        <!-- <div class='svgContainerContainer'>
+      <!-- <div class='svgContainerContainer'>
           <div class="svgContainer">
             <div class="bg-svg">
               <div class="pointContainer"></div>
@@ -169,23 +172,6 @@
         </div>
 
         <div id='helpTextTab' class="tabcontent">
-            <div id="replayControls" class="gone">
-                <span class='replayButton' onclick="rewindAllMoves()">
-                  <i class="fa fa-fast-backward" aria-hidden="true"></i>
-                </span>
-                <span class='replayButton' onclick="playPrevMove()">
-                  <i class="fa fa-step-backward" aria-hidden="true"></i>
-                </span>
-                <span class='replayButton playPauseButton' onclick="playPause()">
-                  <i class="fa fa-play" aria-hidden="true"></i>
-                </span>
-                <span class='replayButton' onclick="playNextMove(true); pauseRun();">
-                  <i class="fa fa-step-forward" aria-hidden="true"></i>
-                </span>
-                <span class='replayButton' onclick="playAllMoves()">
-                  <i class="fa fa-fast-forward" aria-hidden="true"></i>
-                </span>
-              </div>
           <div id='helpTextContent'>
           </div>
         </div>
@@ -210,6 +196,29 @@
 
   <div class="footer"></div>
 
+  <div id="replayControls" class="gone">
+    <div class="center">
+      <span class='replayButton' onclick="rewindAllMoves()">
+        <i class="fa fa-fast-backward" aria-hidden="true"></i>
+      </span>
+      <span class='replayButton' onclick="playPrevMove()">
+        <i class="fa fa-step-backward" aria-hidden="true"></i>
+      </span>
+      <span class='replayButton playPauseButton' onclick="playPause()">
+        <i class="fa fa-play" aria-hidden="true"></i>
+      </span>
+      <span class='replayButton' onclick="playNextMove(true); pauseRun();">
+        <i class="fa fa-step-forward" aria-hidden="true"></i>
+      </span>
+      <span class='replayButton' onclick="playAllMoves()">
+        <i class="fa fa-fast-forward" aria-hidden="true"></i>
+      </span>
+    </div>
+    <span class="replayControlsCloseButton" onClick='toggleReplayControls()'>&nbsp;&times;
+        <!-- <i class="fa fa-times" aria-hidden="true"></i> -->
+      </span>
+  </div>
+
   <!-- Modal -->
   <!-- The Modal -->
   <div id="myMainModal" class="modal">
@@ -229,7 +238,8 @@
   <!-- Modal content containers -->
   <div id='loginModalContentContainer' style='display:none;'>
     <!-- Login modal -->
-    To sign up or log in, enter your username and email, then enter the 4-digit code sent to you to sign into The Garden Gate.
+    To sign up or log in, enter your username and email, then enter the 4-digit code sent to you to sign into The
+    Garden Gate.
     <div style='text-align: center;'>
       <table style='margin:auto;'>
         <tr>
@@ -288,11 +298,11 @@
 
 
   <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script src="js/lz-string.min.js"></script>
 
-  <script type="text/javascript" src="js/jquery.validate.min.js"></script>
+  <!-- <script type="text/javascript" src="js/jquery.validate.min.js"></script>
     <script type="text/javascript" src="js/jquery.form.js"></script>
     <script type="text/javascript" src="js/contact.js"></script>
-    <script src="js/lz-string.min.js"></script>
 
     <script src="js/GameData.js"></script>
     <script src="js/CommonNotationObjects.js"></script>
@@ -389,10 +399,10 @@
     <script src="js/overgrowth/OvergrowthTileManager.js"></script>
 
 
-    <script src="js/PaiShoMain.js"></script>
+    <script src="js/PaiShoMain.js"></script> -->
 
   <!-- Compressed -->
-  <!-- <script src="js/psmin.js"></script> -->
+  <script src="js/psmin.js"></script>
 </body>
 
 </html>
