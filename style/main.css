@@ -255,7 +255,6 @@ div.tab .alertTab, div.tab .alertTab.active {
   display: inline;
   float: left;
   width: 612px;
-  margin-top: 8px;
   overflow: hidden;
 }
 
