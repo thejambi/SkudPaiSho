@@ -34,7 +34,7 @@ CoopSolitaireController.prototype.resetGameManager = function() {
 };
 
 CoopSolitaireController.prototype.resetNotationBuilder = function() {
-	this.notationBuilder = new SolitaireNotationBuilder();
+	this.notationBuilder = new CoopSolitaireNotationBuilder();
 };
 
 CoopSolitaireController.prototype.resetGameNotation = function() {
@@ -198,7 +198,7 @@ CoopSolitaireController.prototype.pointClicked = function(htmlPoint) {
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
-			this.notationBuilder = new SolitaireNotationBuilder();
+			this.notationBuilder = new CoopSolitaireNotationBuilder();
 		}
 	}
 }
