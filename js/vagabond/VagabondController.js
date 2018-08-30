@@ -24,7 +24,11 @@ VagabondController.prototype.resetNotationBuilder = function() {
 };
 
 VagabondController.prototype.resetGameNotation = function() {
-	this.gameNotation = new VagabondGameNotation();
+	this.gameNotation = this.getNewGameNotation();
+};
+
+VagabondController.prototype.getNewGameNotation = function() {
+	return new VagabondGameNotation();
 };
 
 VagabondController.getHostTilesContainerDivs = function() {

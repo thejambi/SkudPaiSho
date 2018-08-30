@@ -38,7 +38,11 @@ CoopSolitaireController.prototype.resetNotationBuilder = function() {
 };
 
 CoopSolitaireController.prototype.resetGameNotation = function() {
-	this.gameNotation = new CoopSolitaireGameNotation();
+	this.gameNotation = this.getNewGameNotation();
+};
+
+CoopSolitaireController.prototype.getNewGameNotation = function() {
+	return new CoopSolitaireGameNotation();
 };
 
 CoopSolitaireController.getHostTilesContainerDivs = function() {

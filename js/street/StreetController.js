@@ -50,7 +50,11 @@ StreetController.prototype.resetNotationBuilder = function() {
 };
 
 StreetController.prototype.resetGameNotation = function() {
-	this.gameNotation = new StreetGameNotation();
+	this.gameNotation = this.getNewGameNotation();
+};
+
+StreetController.prototype.getNewGameNotation = function() {
+	return new StreetGameNotation();
 };
 
 StreetController.getHostTilesContainerDivs = function() {

@@ -29,7 +29,11 @@ SkudPaiShoController.prototype.resetNotationBuilder = function() {
 };
 
 SkudPaiShoController.prototype.resetGameNotation = function() {
-	this.gameNotation = new SkudPaiShoGameNotation();
+	this.gameNotation = this.getNewGameNotation();
+};
+
+SkudPaiShoController.prototype.getNewGameNotation = function() {
+	return new SkudPaiShoGameNotation();
 };
 
 SkudPaiShoController.getHostTilesContainerDivs = function() {

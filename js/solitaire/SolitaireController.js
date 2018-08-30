@@ -38,7 +38,11 @@ SolitaireController.prototype.resetNotationBuilder = function() {
 };
 
 SolitaireController.prototype.resetGameNotation = function() {
-	this.gameNotation = new SolitaireGameNotation();
+	this.gameNotation = this.getNewGameNotation();
+};
+
+SolitaireController.prototype.getNewGameNotation = function() {
+	return new SolitaireGameNotation();
 };
 
 SolitaireController.getHostTilesContainerDivs = function() {

@@ -107,7 +107,14 @@ window.requestAnimationFrame(function () {
 	defaultEmailMessageText = document.querySelector(".footer").innerHTML;
 
 	if (QueryString.gameType) {
-		setGameController(parseInt(QueryString.gameType));
+		clearOptions();
+		if (QueryString.gameOptions) {
+			var optionsArray = parseGameOptions(QueryString.gameOptions);
+			for (var i = 0; i < optionsArray.length; i++) {
+				addOption(optionsArray[i]);
+			}
+		}
+		setGameController(parseInt(QueryString.gameType), true);
 	} else {
 		closeGame();
 	}
@@ -732,6 +739,10 @@ var finalizeMove = function(ignoreNoEmail) {
 			linkUrl += "guest=" + guestEmail + "&";
 		}
 		linkUrl += "game=" + gameController.gameNotation.notationTextForUrl();
+		
+		if (ggOptions.length > 0) {
+			linkUrl += "&gameOptions=" + JSON.stringify(ggOptions);
+		}
 
 		// Compress, then build full URL
 		linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
@@ -1100,7 +1111,7 @@ function getGatePointMessage() {
 }
 
 function sandboxitize() {
-	var notation = notation = getGameControllerForGameType(currentGameData.gameTypeId).gameNotation;
+	var notation = gameController.getNewGameNotation();
 	for (var i = 0; i < currentMoveIndex; i++) {
 		notation.addMove(gameController.gameNotation.moves[i]);
 	}
@@ -1118,10 +1129,8 @@ function sandboxitize() {
 }
 
 function getLink(forSandbox) {
-	var notation = new SkudPaiShoGameNotation();
-	if (currentGameData) {
-		notation = getGameControllerForGameType(currentGameData.gameTypeId).gameNotation;
-	}	
+	var notation = gameController.getNewGameNotation();
+
 	for (var i = 0; i < currentMoveIndex; i++) {
 		notation.addMove(gameController.gameNotation.moves[i]);
 	}
@@ -1405,8 +1414,8 @@ var GameType = {
 	CapturePaiSho:{id:3, desc:"Capture Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/capture-pai-sho/"},
 	StreetPaiSho:{id:5, desc:"Street Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/street-pai-sho/"},
 	CoopSolitaire:{id:6, desc:"Cooperative Solitaire", rulesUrl:"https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/"},
-	Playground:{id:7, desc:"Pai Sho Playground", rulesUrl:"https://skudpaisho.com/site/games/pai-sho-playground/"},
-	OvergrowthPaiSho:{id:8, desc:"Overgrowth Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/overgrowth-pai-sho/"}
+	Playground:{id:7, desc:"Pai Sho Playground", rulesUrl:"https://skudpaisho.com/site/games/pai-sho-playground/"}
+	// OvergrowthPaiSho:{id:8, desc:"Overgrowth Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/overgrowth-pai-sho/"}
 };
 function getGameControllerForGameType(gameTypeId) {
 	var controller;
@@ -2158,7 +2167,7 @@ function showGameNotationModal() {
 
 function showGameReplayLink() {
 	// if (currentGameData.hostUsername && currentGameData.guestUsername) {
-		var notation = getGameControllerForGameType(currentGameData.gameTypeId).gameNotation;
+		var notation = gameController.getNewGameNotation();
 		for (var i = 0; i < currentMoveIndex; i++) {
 			notation.addMove(gameController.gameNotation.moves[i]);
 		}
@@ -2173,6 +2182,10 @@ function showGameReplayLink() {
 		linkUrl += "guest=" + currentGameData.guestUsername + "&";
 
 		linkUrl += "game=" + notation.notationTextForUrl();
+
+		if (ggOptions.length > 0) {
+			linkUrl += "&gameOptions=" + JSON.stringify(ggOptions);
+		}
 		
 		linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
@@ -2188,7 +2201,7 @@ function showGameReplayLink() {
 
 function openGameReplay() {
 	if (currentGameData.hostUsername && currentGameData.guestUsername) {
-		var notation = getGameControllerForGameType(currentGameData.gameTypeId).gameNotation;
+		var notation = gameController.getNewGameNotation();
 		for (var i = 0; i < currentMoveIndex; i++) {
 			notation.addMove(gameController.gameNotation.moves[i]);
 		}
@@ -2203,6 +2216,10 @@ function openGameReplay() {
 		linkUrl += "guest=" + currentGameData.guestUsername + "&";
 
 		linkUrl += "game=" + notation.notationTextForUrl();
+
+		if (ggOptions.length > 0) {
+			linkUrl += "&gameOptions=" + JSON.stringify(ggOptions);
+		}
 		
 		linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 

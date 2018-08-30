@@ -28,7 +28,11 @@ PlaygroundController.prototype.resetNotationBuilder = function() {
 };
 
 PlaygroundController.prototype.resetGameNotation = function() {
-	this.gameNotation = new PlaygroundGameNotation();
+	this.gameNotation = this.getNewGameNotation();
+};
+
+PlaygroundController.prototype.getNewGameNotation = function() {
+	return new PlaygroundGameNotation();
 };
 
 PlaygroundController.getHostTilesContainerDivs = function() {

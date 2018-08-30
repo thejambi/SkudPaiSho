@@ -49,7 +49,11 @@ CaptureController.prototype.resetNotationBuilder = function() {
 };
 
 CaptureController.prototype.resetGameNotation = function() {
-	this.gameNotation = new CaptureGameNotation();
+	this.gameNotation = this.getNewGameNotation();
+};
+
+CaptureController.prototype.getNewGameNotation = function() {
+	return new CaptureGameNotation();
 };
 
 CaptureController.getHostTilesContainerDivs = function() {
