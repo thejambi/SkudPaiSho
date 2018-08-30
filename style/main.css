@@ -315,6 +315,8 @@ figure > div {
   margin-left: 12px;
   /*min-height: 612px;*/
 
+  margin-top: 6px;
+
   z-index:1;
   position: relative;
 }
