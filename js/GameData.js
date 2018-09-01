@@ -86,6 +86,14 @@ var WHITE_LOTUS = "White Lotus";
 var ORCHID = "Orchid";
 
 
+function copyArray(arr) {
+	var copyArr = [];
+	for (var i = 0; i < arr.length; i++) {
+		copyArr.push(arr[i].getCopy());
+	}
+	return copyArr;
+}
+
 // Array shuffle
 function shuffleArray(array) {
   var i = 0

@@ -4,7 +4,7 @@ function CoopSolitaireBoard() {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
-	this.harmonyManager = new SolitaireHarmonyManager();
+	this.harmonyManager = new CoopSolitaireHarmonyManager();
 
 	this.rockRowAndCols = [];
 	this.playedWhiteLotusTiles = [];

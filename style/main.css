@@ -196,7 +196,7 @@ div.tab .alertTab, div.tab .alertTab.active {
   margin-left: auto;
   margin-right: auto;
   text-align: center;
-  width: 210px;
+  width: 242px;
   padding: 4px;
 }
 
@@ -205,7 +205,8 @@ div.tab .alertTab, div.tab .alertTab.active {
   float: right;
   font-size: 32px;
   font-weight: 900;
-  padding-right: 2px;
+  padding-right: 12px;
+  margin-top: -6px;
 }
 
 .replayControlsCloseButton:hover,
@@ -218,7 +219,7 @@ div.tab .alertTab, div.tab .alertTab.active {
 .replayButton {
   /* width: 36px;
   height: 40px; */
-  width: 20px;
+  width: 26px;
   /* border: 1px solid black; */
   border: 1px solid #ccc;
   border-radius: 3px;
