@@ -155,7 +155,7 @@ OvergrowthController.prototype.pointClicked = function(htmlPoint) {
 			this.gameNotation.addMove(move);
 			this.drawRandomTile();
 			if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-				createGameIfThatIsOk(GameType.Overgrowth.id);
+				createGameIfThatIsOk(GameType.OvergrowthPaiSho.id);
 			} else {
 				if (playingOnlineGame()) {
 					callSubmitMove();
