@@ -1,11 +1,6 @@
 /* Skud Pai Sho specific UI interaction logic */
 
 function SkudPaiShoController(gameContainer, isMobile) {
-	// var htc = document.getElementById('hostTilesContainer');
-	// htc.innerHTML = this.getHostTilesContainerDivs();
-	// var gtc = document.getElementById('guestTilesContainer');
-	// gtc.innerHTML = this.getGuestTilesContainerDivs();
-
 	this.actuator = new SkudPaiShoActuator(gameContainer, isMobile);
 
 	this.resetGameManager();
@@ -37,11 +32,19 @@ SkudPaiShoController.prototype.getNewGameNotation = function() {
 };
 
 SkudPaiShoController.getHostTilesContainerDivs = function() {
-	return '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HL"></div> <div class="HO"></div>';
+	var divs = '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HL"></div> <div class="HO"></div>';
+	if (ggOptions.includes(OPTION_TESTING_NEW_ACCENT_TILES)) {
+		divs += '<br class="clear" /> <div class="HM"></div> <div class="HP"></div> <div class="HT"></div>';
+	}
+	return divs;
 };
 
 SkudPaiShoController.getGuestTilesContainerDivs = function() {
-	return '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
+	var divs = '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
+	if (ggOptions.includes(OPTION_TESTING_NEW_ACCENT_TILES)) {
+		divs += '<br class="clear" /> <div class="GM"></div> <div class="GP"></div> <div class="GT"></div>';
+	}
+	return divs;
 };
 
 SkudPaiShoController.prototype.callActuate = function() {
@@ -78,10 +81,20 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 	
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting your 4 Accent Tiles. <br />";
+			if (ggOptions.includes(OPTION_ALL_ACCENT_TILES)) {
+				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting ALL of your Accent Tiles. <br />";
+			} else {
+				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting your 4 Accent Tiles. <br />";
+			}
 		} else {
-			msg += "Select 4 Accent Tiles to play with.";
+			if (ggOptions.includes(OPTION_ALL_ACCENT_TILES)) {
+				msg += "Select ALL Accent Tiles to begin the game.";
+			} else {
+				msg += "Select 4 Accent Tiles to play with.";
+			}
 		}
+
+		msg += getGameOptionsMessageHtml([OPTION_ALL_ACCENT_TILES, OPTION_TESTING_NEW_ACCENT_TILES]);
 	} else if (this.gameNotation.moves.length === 1) {
 		msg += "Select 4 Accent Tiles to play with, then Plant a Basic Flower Tile.";
 	} else if (this.gameNotation.moves.length === 2) {
@@ -165,7 +178,12 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 		if (getCurrentPlayer() === HOST) {
 			this.hostAccentTiles.push(tileCode);
 
-			if (this.hostAccentTiles.length === 4 || (simpleCanonRules && this.hostAccentTiles.length === 2)) {
+			var accentTilesNeededToStart = 4;
+			if (ggOptions.includes(OPTION_ALL_ACCENT_TILES)) {
+				accentTilesNeededToStart = this.theGame.tileManager.numberOfAccentTilesPerPlayerSet();
+			}
+
+			if (this.hostAccentTiles.length === accentTilesNeededToStart || (simpleCanonRules && this.hostAccentTiles.length === 2)) {
 				var move = new SkudPaiShoNotationMove("0H." + this.hostAccentTiles.join());
 				this.gameNotation.addMove(move);
 				if (onlinePlayEnabled) {
@@ -199,7 +217,7 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.plantedFlowerType = tileCode;
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
-		this.theGame.revealOpenGates(getCurrentPlayer(), this.gameNotation.moves.length);
+		this.theGame.revealOpenGates(getCurrentPlayer(), tile, this.gameNotation.moves.length);
 	} else if (this.notationBuilder.status === READY_FOR_BONUS) {
 		if (simpleSpecialFlowerRule && tile.type === SPECIAL_FLOWER) {
 			// Other special tile still needs to be in that player's tile pile
@@ -214,13 +232,13 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.status = WAITING_FOR_BONUS_ENDPOINT;
 
 		if (tile.type === BASIC_FLOWER && this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
-			this.theGame.revealOpenGates(getCurrentPlayer());
+			this.theGame.revealOpenGates(getCurrentPlayer(), tile);
 		} else if (tile.type === ACCENT_TILE) {
 			this.theGame.revealPossiblePlacementPoints(tile);
 		} else if (tile.type === SPECIAL_FLOWER) {
 			if (!specialFlowerLimitedRule 
 				|| (specialFlowerLimitedRule && this.theGame.playerCanBonusPlant(getCurrentPlayer()))) {
-				this.theGame.revealSpecialFlowerPlacementPoints(getCurrentPlayer());
+				this.theGame.revealSpecialFlowerPlacementPoints(getCurrentPlayer(), tile);
 			}
 		}
 	} else {

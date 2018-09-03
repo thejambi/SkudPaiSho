@@ -65,16 +65,16 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
 		// Just placing tile on board
 		var tile = this.tileManager.grabTile(move.player, move.plantedFlowerType);
 
-		this.board.placeTile(tile, move.endPoint);
+		this.board.placeTile(tile, move.endPoint, this.tileManager);
 	} else if (move.moveType === ARRANGING) {
 		bonusAllowed = this.board.moveTile(move.player, move.startPoint, move.endPoint);
 
 		if (bonusAllowed && move.hasHarmonyBonus()) {
 			var tile = this.tileManager.grabTile(move.player, move.bonusTileCode);
 			if (move.boatBonusPoint) {
-				this.board.placeTile(tile, move.bonusEndPoint, move.boatBonusPoint);
+				this.board.placeTile(tile, move.bonusEndPoint, this.tileManager, move.boatBonusPoint);
 			} else {
-				this.board.placeTile(tile, move.bonusEndPoint);
+				this.board.placeTile(tile, move.bonusEndPoint, this.tileManager);
 			}
 		} else if (!bonusAllowed && move.hasHarmonyBonus()) {
 			debug("BONUS NOT ALLOWED so I won't give it to you!");
@@ -134,12 +134,12 @@ SkudPaiShoGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate)
 	}
 };
 
-SkudPaiShoGameManager.prototype.revealOpenGates = function(player, moveNum, ignoreActuate) {
+SkudPaiShoGameManager.prototype.revealOpenGates = function(player, tile, moveNum, ignoreActuate) {
 	if (moveNum === 2) {
 		// guest selecting first tile
 		this.board.setGuestGateOpen();
 	} else {
-		this.board.setOpenGatePossibleMoves(player);
+		this.board.setOpenGatePossibleMoves(player, tile);
 	}
 	
 	if (!ignoreActuate) {
@@ -163,9 +163,9 @@ SkudPaiShoGameManager.prototype.playerCanBonusPlant = function(player) {
 	}
 };
 
-SkudPaiShoGameManager.prototype.revealSpecialFlowerPlacementPoints = function(player) {
+SkudPaiShoGameManager.prototype.revealSpecialFlowerPlacementPoints = function(player, tile) {
 	if (!newSpecialFlowerRules) {
-		this.revealOpenGates(player);
+		this.revealOpenGates(player, tile);
 		return;
 	}
 

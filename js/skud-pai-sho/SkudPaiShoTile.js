@@ -31,7 +31,8 @@ function SkudPaiShoTile(code, ownerCode) {
 	} else if (this.code === 'L' || this.code === 'O') {
 		this.type = SPECIAL_FLOWER;
 		this.setSpecialFlowerInfo();
-	} else if (this.code === 'R' || this.code === 'W' || this.code === 'K' || this.code === 'B') {
+	} else if (this.code === 'R' || this.code === 'W' || this.code === 'K' || this.code === 'B'
+				|| this.code === 'P' || this.code === 'M' || this.code === 'T') {
 		this.type = ACCENT_TILE;
 		this.setAccentInfo();
 	} else {
@@ -48,6 +49,12 @@ SkudPaiShoTile.prototype.setAccentInfo = function() {
 		this.accentType = KNOTWEED;
 	} else if (this.code === 'B') {
 		this.accentType = BOAT;
+	} else if (this.code === 'P') {
+		this.accentType = POND;
+	} else if (this.code === 'M') {
+		this.accentType = BAMBOO;
+	} else if (this.code === 'T') {
+		this.accentType = LION_TURTLE;
 	}
 };
 

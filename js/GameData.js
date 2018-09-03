@@ -38,10 +38,6 @@ var runningOnAndroid = false;
 var onlinePlayEnabled = false;
 /* */
 
-/* Game Options */
-var OPTION_DOUBLE_TILES = "Double Tiles";
-var OPTION_INSANE_TILES = "Insane Tiles";
-
 /* --- */
 
 
@@ -81,6 +77,10 @@ var ROCK = "Rock";
 var WHEEL = "Wheel";
 var KNOTWEED = "Knotweed";
 var BOAT = "Boat";
+
+var POND = "Pond";
+var BAMBOO = "Bamboo";
+var LION_TURTLE = "Lion Turtle";
 
 var WHITE_LOTUS = "White Lotus";
 var ORCHID = "Orchid";

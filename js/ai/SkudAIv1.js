@@ -293,7 +293,7 @@ SkudAIv1.prototype.addPlantMoves = function(moves, game, player) {
 			// For each basic flower
 			// Get possible plant points
 			var convertedMoveNum = this.moveNum * 2;
-			game.revealOpenGates(player, convertedMoveNum, true);
+			game.revealOpenGates(player, tile, convertedMoveNum, true);
 			var endPoints = this.getPossibleMovePoints(game);
 
 			for (var j = 0; j < endPoints.length; j++) {
@@ -504,7 +504,7 @@ SkudAIv1.prototype.ensurePlant = function(move, game, player) {
 
 	move.bonusTileCode = randomMove.plantedFlowerType;
 
-	game.revealOpenGates(player, 5, true);
+	game.revealOpenGates(player, null, 5, true);
 	var endPoints = this.getPossibleMovePoints(game);
 
 	randomIndex = Math.floor(Math.random() * endPoints.length);

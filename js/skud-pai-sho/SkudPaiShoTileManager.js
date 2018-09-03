@@ -29,6 +29,13 @@ SkudPaiShoTileManager.prototype.loadSkudSet = function(ownerCode) {
 		tiles.push(new SkudPaiShoTile('B', ownerCode));
 	}
 
+	if (ggOptions.includes(OPTION_TESTING_NEW_ACCENT_TILES)) {
+		// Only 1 of each of these
+		tiles.push(new SkudPaiShoTile('P', ownerCode));
+		tiles.push(new SkudPaiShoTile('M', ownerCode));
+		tiles.push(new SkudPaiShoTile('T', ownerCode));
+	}
+
 	tiles.forEach(function(tile) {
 		tile.selectedFromPile = true;
 	});
@@ -83,6 +90,12 @@ SkudPaiShoTileManager.prototype.loadOneOfEach = function(ownerCode) {
 	tiles.push(new SkudPaiShoTile('K', ownerCode));
 	tiles.push(new SkudPaiShoTile('B', ownerCode));
 
+	if (ggOptions.includes(OPTION_TESTING_NEW_ACCENT_TILES)) {
+		tiles.push(new SkudPaiShoTile('P', ownerCode));
+		tiles.push(new SkudPaiShoTile('M', ownerCode));
+		tiles.push(new SkudPaiShoTile('T', ownerCode));
+	}
+
 	tiles.push(new SkudPaiShoTile("R3", ownerCode));
 	tiles.push(new SkudPaiShoTile("R4", ownerCode));
 	tiles.push(new SkudPaiShoTile("R5", ownerCode));
@@ -116,6 +129,17 @@ SkudPaiShoTileManager.prototype.grabTile = function(player, tileCode) {
 	}
 
 	return tile;
+};
+
+SkudPaiShoTileManager.prototype.numberOfAccentTilesPerPlayerSet = function() {
+	var tileSet = this.loadSkudSet(hostPlayerCode);
+	var accentTileCount = 0;
+	for (var i = 0; i < tileSet.length; i++) {
+		if (tileSet[i].type === ACCENT_TILE) {
+			accentTileCount++;
+		}
+	}
+	return accentTileCount;
 };
 
 SkudPaiShoTileManager.prototype.peekTile = function(player, tileCode, tileId) {
@@ -167,15 +191,15 @@ SkudPaiShoTileManager.prototype.unselectTiles = function(player) {
 	});
 }
 
-// SkudPaiShoTileManager.prototype.putTileBack = function(tile) {
-// 	var player = tile.ownerName;
-// 	var tilePile = this.hostTiles;
-// 	if (player === GUEST) {
-// 		tilePile = this.guestTiles;
-// 	}
+SkudPaiShoTileManager.prototype.putTileBack = function(tile) {
+	var player = tile.ownerName;
+	var tilePile = this.hostTiles;
+	if (player === GUEST) {
+		tilePile = this.guestTiles;
+	}
 
-// 	tilePile.push(tile);
-// };
+	tilePile.push(tile);
+};
 
 SkudPaiShoTileManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
 	// Check Host

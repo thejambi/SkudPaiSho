@@ -661,13 +661,6 @@ OvergrowthBoard.prototype.getCopy = function () {
 		}
 	}
 
-	// playedWhiteLotusTiles
-	for (var i = 0; i < this.playedWhiteLotusTiles.length; i++) {
-		copyBoard.playedWhiteLotusTiles.push(this.playedWhiteLotusTiles[i].getCopy());
-	}
-
-	// Everything else...
-	copyBoard.refreshRockRowAndCols();
 	copyBoard.analyzeHarmonies();
 
 	return copyBoard;

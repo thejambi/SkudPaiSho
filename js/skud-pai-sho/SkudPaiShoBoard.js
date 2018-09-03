@@ -349,7 +349,7 @@ SkudPaiShoBoard.prototype.newRow = function(numColumns, points) {
 	return cells;
 };
 
-SkudPaiShoBoard.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
+SkudPaiShoBoard.prototype.placeTile = function(tile, notationPoint, tileManager, extraBoatPoint) {
 	if (tile.type === ACCENT_TILE) {
 		if (tile.accentType === ROCK) {
 			this.placeRock(tile, notationPoint);
@@ -359,6 +359,10 @@ SkudPaiShoBoard.prototype.placeTile = function(tile, notationPoint, extraBoatPoi
 			this.placeKnotweed(tile, notationPoint);
 		} else if (tile.accentType === BOAT) {
 			this.placeBoat(tile, notationPoint, extraBoatPoint);
+		} else if (tile.accentType === BAMBOO) {
+			this.placeBamboo(tile, notationPoint, false, tileManager);
+		} else if (tile.accentType === POND) {
+			this.placePond(tile, notationPoint);
 		}
 	} else {
 		this.putTileOnPoint(tile, notationPoint);
@@ -641,6 +645,83 @@ SkudPaiShoBoard.prototype.placeBoat = function(tile, notationPoint, extraBoatPoi
 	}
 };
 
+SkudPaiShoBoard.prototype.canPlaceBamboo = function(boardPoint, tile) {
+	// if (!boardPoint.hasTile()) {
+	// 	// debug("Bamboo always played on top of another tile");
+	// 	return false;
+	// }
+	// if (boardPoint.isType(GATE)) {
+	// 	return false;
+	// }
+	// return true;
+
+
+	if (boardPoint.hasTile()) {
+		// debug("Bamboo cannot be played on top of another tile");
+		return false;
+	}
+
+	if (boardPoint.isType(GATE)) {
+		return false;
+	}
+
+	// Does it create Disharmony?
+	var newBoard = this.getCopy();
+	var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
+	newBoard.placeBamboo(new SkudPaiShoTile('M', 'G'), notationPoint, true);
+	if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
+		return false;
+	}
+
+	return true;
+};
+
+SkudPaiShoBoard.prototype.placeBamboo = function(tile, notationPoint, ignoreCheck, tileManager) {
+	var rowAndCol = notationPoint.rowAndColumn;
+	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
+
+	if (!ignoreCheck && !this.canPlaceBamboo(boardPoint, tile)) {
+		return false;
+	}
+
+	// Option 1: Play on top of tile, return to hand
+	// Option 2: All surrounding tiles returned to hand.. crazy, let's try it
+
+	// Place tile
+	boardPoint.putTile(tile);
+
+	var rowCols = this.getSurroundingRowAndCols(rowAndCol);
+	// Return each tile to hand
+	for (var i = 0; i < rowCols.length; i++) {
+		var bp = this.cells[rowCols[i].row][rowCols[i].col];
+		if (bp.hasTile()) {
+			// Put it back
+			var removedTile = bp.removeTile();
+			if (tileManager) {
+				tileManager.putTileBack(removedTile);
+			}
+		}
+	}
+	
+	this.refreshRockRowAndCols();
+};
+
+SkudPaiShoBoard.prototype.canPlacePond = function(boardPoint, tile) {
+	return !boardPoint.hasTile() && !boardPoint.isType(GATE);
+};
+
+SkudPaiShoBoard.prototype.placePond = function(tile, notationPoint, ignoreCheck) {
+	var rowAndCol = notationPoint.rowAndColumn;
+	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
+
+	if (!ignoreCheck && !this.canPlacePond(boardPoint, tile)) {
+		return false;
+	}
+
+	// Place tile
+	boardPoint.putTile(tile);
+};
+
 SkudPaiShoBoard.prototype.getClockwiseRowCol = function(center, rowCol) {
 	if (rowCol.row < center.row && rowCol.col <= center.col) {
 		return new RowAndColumn(rowCol.row, rowCol.col+1);
@@ -688,7 +769,21 @@ SkudPaiShoBoard.prototype.pointIsOpenGate = function(notationPoint) {
 	var point = notationPoint.rowAndColumn;
 	point = this.cells[point.row][point.col];
 
-	return point.isOpenGate();
+	return point.isOpenGate() || this.pointIsOpenAndSurroundsPond(point);
+};
+
+SkudPaiShoBoard.prototype.pointIsOpenAndSurroundsPond = function(boardPoint) {
+	if (boardPoint.hasTile()) {
+		return false;
+	}
+	var rowCols = this.getSurroundingRowAndCols(boardPoint);
+	for (var i = 0; i < rowCols.length; i++) {
+		var surroundingPoint = this.cells[rowCols[i].row][rowCols[i].col];
+		if (surroundingPoint.hasTile() && surroundingPoint.tile.accentType === POND) {
+			return true;
+		}
+	}
+	return false;
 };
 
 SkudPaiShoBoard.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
@@ -1478,13 +1573,30 @@ SkudPaiShoBoard.prototype.removePossibleMovePoints = function() {
 	});
 };
 
-SkudPaiShoBoard.prototype.setOpenGatePossibleMoves = function(player) {
+SkudPaiShoBoard.prototype.setOpenGatePossibleMoves = function(player, tile) {
 	// Apply "open gate" type to applicable boardPoints
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
 			if (bp.isOpenGate()) {
 				this.cells[row][col].addType(POSSIBLE_MOVE);
+			}
+
+			// If Pond, mark surrounding points
+			if (tile && bp.hasTile() && bp.tile.accentType === POND) {
+				var rowCols = this.getSurroundingRowAndCols(bp);
+				for (var i = 0; i < rowCols.length; i++) {
+					var surroundingPoint = this.cells[rowCols[i].row][rowCols[i].col];
+					if (surroundingPoint.canHoldTile(tile)) {
+						// If does not cause clash...
+						var newBoard = this.getCopy();
+						var notationPoint = new NotationPoint(new RowAndColumn(surroundingPoint.row, surroundingPoint.col).notationPointString);
+						newBoard.placeTile(tile, notationPoint);
+						if (!newBoard.moveCreatesDisharmony(notationPoint, notationPoint)) {
+							surroundingPoint.addType(POSSIBLE_MOVE);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -1568,17 +1680,31 @@ SkudPaiShoBoard.prototype.setGuestGateOpen = function() {
 
 SkudPaiShoBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 	var self = this;
+
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
 			var valid = false;
 
-			if (tile.accentType === ROCK && self.canPlaceRock(boardPoint)) {
-				valid = true;
-			} else if (tile.accentType === WHEEL && self.canPlaceWheel(boardPoint)) {
-				valid = true;
-			} else if (tile.accentType === KNOTWEED && self.canPlaceKnotweed(boardPoint)) {
-				valid = true;
-			} else if (tile.accentType === BOAT && self.canPlaceBoat(boardPoint, tile)) {
+			// if (tile.accentType === ROCK && self.canPlaceRock(boardPoint)) {
+			// 	valid = true;
+			// } else if (tile.accentType === WHEEL && self.canPlaceWheel(boardPoint)) {
+			// 	valid = true;
+			// } else if (tile.accentType === KNOTWEED && self.canPlaceKnotweed(boardPoint)) {
+			// 	valid = true;
+			// } else if (tile.accentType === BOAT && self.canPlaceBoat(boardPoint, tile)) {
+			// 	valid = true;
+			// } else if (tile.accentType === BAMBOO && self.canPlaceBamboo(boardPoint, tile)) {
+			// 	valid = true;
+			// }
+			
+			if (
+				(tile.accentType === ROCK && self.canPlaceRock(boardPoint))
+				|| (tile.accentType === WHEEL && self.canPlaceWheel(boardPoint))
+				|| (tile.accentType === KNOTWEED && self.canPlaceKnotweed(boardPoint))
+				|| (tile.accentType === BOAT && self.canPlaceBoat(boardPoint, tile))
+				|| (tile.accentType === BAMBOO && self.canPlaceBamboo(boardPoint, tile))
+				|| (tile.accentType === POND && self.canPlacePond(boardPoint, tile))
+			) {
 				valid = true;
 			}
 
