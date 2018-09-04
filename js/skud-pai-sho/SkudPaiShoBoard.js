@@ -725,8 +725,20 @@ SkudPaiShoBoard.prototype.placePond = function(tile, notationPoint, ignoreCheck)
 };
 
 SkudPaiShoBoard.prototype.canPlaceLionTurtle = function(boardPoint, tile) {
-	return !boardPoint.hasTile() && !boardPoint.isType(GATE);
+	return !boardPoint.hasTile() 
+		&& !boardPoint.isType(GATE)
+		&& !this.pointSurroundsPointSurroundingLionTurtle(boardPoint);
 };
+
+SkudPaiShoBoard.prototype.pointSurroundsPointSurroundingLionTurtle = function(boardPoint) {
+	var rowCols = this.getSurroundingRowAndCols(boardPoint);
+	for (var i = 0; i < rowCols.length; i++) {
+		if (this.getSurroundingLionTurtleTile(rowCols[i])) {
+			return true;
+		}
+	}
+	return false;
+}
 
 SkudPaiShoBoard.prototype.placeLionTurtle = function(tile, notationPoint, ignoreCheck) {
 	var rowAndCol = notationPoint.rowAndColumn;
@@ -1372,6 +1384,18 @@ SkudPaiShoBoard.prototype.analyzeHarmonies = function() {
 	}
 };
 
+SkudPaiShoBoard.prototype.getSurroundingLionTurtleTile = function(boardPoint) {
+	var surroundingLionTurtleTile = null;
+	var rowCols = this.getSurroundingRowAndCols(boardPoint);
+	for (var i = 0; i < rowCols.length; i++) {
+		var surroundingPoint = this.cells[rowCols[i].row][rowCols[i].col];
+		if (surroundingPoint.hasTile() && surroundingPoint.tile.accentType === LION_TURTLE) {
+			surroundingLionTurtleTile = surroundingPoint.tile;
+			return surroundingLionTurtleTile;
+		}
+	}
+};
+
 SkudPaiShoBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
 	var tileHarmonies = [];
 
@@ -1379,34 +1403,27 @@ SkudPaiShoBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
 		return tileHarmonies;
 	}
 
-	var tileSurroundsLionTurtle = false;
-	var rowCols = this.getSurroundingRowAndCols(rowAndCol);
-	for (var i = 0; i < rowCols.length; i++) {
-		var surroundingPoint = this.cells[rowCols[i].row][rowCols[i].col];
-		if (surroundingPoint.hasTile() && surroundingPoint.tile.accentType === LION_TURTLE) {
-			tileSurroundsLionTurtle = true;
-		}
-	}
+	var surroundingLionTurtleTile = this.getSurroundingLionTurtleTile(rowAndCol);
 
 	if (!this.rowBlockedByRock(rowAndCol.row)) {
-		var leftHarmony = this.getHarmonyLeft(tile, rowAndCol, tileSurroundsLionTurtle);
+		var leftHarmony = this.getHarmonyLeft(tile, rowAndCol, surroundingLionTurtleTile);
 		if (leftHarmony) {
 			tileHarmonies.push(leftHarmony);
 		}
 
-		var rightHarmony = this.getHarmonyRight(tile, rowAndCol, tileSurroundsLionTurtle);
+		var rightHarmony = this.getHarmonyRight(tile, rowAndCol, surroundingLionTurtleTile);
 		if (rightHarmony) {
 			tileHarmonies.push(rightHarmony);
 		}
 	}
 
 	if (!this.columnBlockedByRock(rowAndCol.col)) {
-		var upHarmony = this.getHarmonyUp(tile, rowAndCol, tileSurroundsLionTurtle);
+		var upHarmony = this.getHarmonyUp(tile, rowAndCol, surroundingLionTurtleTile);
 		if (upHarmony) {
 			tileHarmonies.push(upHarmony);
 		}
 
-		var downHarmony = this.getHarmonyDown(tile, rowAndCol, tileSurroundsLionTurtle);
+		var downHarmony = this.getHarmonyDown(tile, rowAndCol, surroundingLionTurtleTile);
 		if (downHarmony) {
 			tileHarmonies.push(downHarmony);
 		}
@@ -1415,7 +1432,7 @@ SkudPaiShoBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
 	return tileHarmonies;
 };
 
-SkudPaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol, tileSurroundsLionTurtle) {
+SkudPaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol, surroundingLionTurtleTile) {
 	var colToCheck = endRowCol.col - 1;
 
 	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile() 
@@ -1425,14 +1442,14 @@ SkudPaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol, tileSurroun
 
 	if (colToCheck >= 0) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, tileSurroundsLionTurtle)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), tileSurroundsLionTurtle);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundingLionTurtleTile)) {
+			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), surroundingLionTurtleTile);
 			return harmony;
 		}
 	}
 };
 
-SkudPaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol, tileSurroundsLionTurtle) {
+SkudPaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol, surroundingLionTurtleTile) {
 	var colToCheck = endRowCol.col + 1;
 
 	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile() 
@@ -1442,14 +1459,14 @@ SkudPaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol, tileSurrou
 
 	if (colToCheck <= 16) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, tileSurroundsLionTurtle)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), tileSurroundsLionTurtle);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundingLionTurtleTile)) {
+			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), surroundingLionTurtleTile);
 			return harmony;
 		}
 	}
 };
 
-SkudPaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol, tileSurroundsLionTurtle) {
+SkudPaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol, surroundingLionTurtleTile) {
 	var rowToCheck = endRowCol.row - 1;
 
 	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
@@ -1459,14 +1476,14 @@ SkudPaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol, tileSurrounds
 
 	if (rowToCheck >= 0) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, tileSurroundsLionTurtle)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), tileSurroundsLionTurtle);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundingLionTurtleTile)) {
+			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), surroundingLionTurtleTile);
 			return harmony;
 		}
 	}
 };
 
-SkudPaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol, tileSurroundsLionTurtle) {
+SkudPaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol, surroundingLionTurtleTile) {
 	var rowToCheck = endRowCol.row + 1;
 
 	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
@@ -1476,8 +1493,8 @@ SkudPaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol, tileSurroun
 
 	if (rowToCheck <= 16) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, tileSurroundsLionTurtle)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), tileSurroundsLionTurtle);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundingLionTurtleTile)) {
+			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), surroundingLionTurtleTile);
 			return harmony;
 		}
 	}

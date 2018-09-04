@@ -2,6 +2,7 @@
 var hostPlayerCode = 'H';
 var guestPlayerCode = 'G';
 
+
 function getPlayerCodeFromName(playerName) {
 	if (playerName === HOST) {
 		return hostPlayerCode;
@@ -10,3 +11,10 @@ function getPlayerCodeFromName(playerName) {
 	}
 }
 
+function getPlayerNameFromCode(playerCode) {
+	if (playerCode === hostPlayerCode) {
+		return HOST;
+	} else if (playerCode === guestPlayerCode) {
+		return GUEST;
+	}
+}

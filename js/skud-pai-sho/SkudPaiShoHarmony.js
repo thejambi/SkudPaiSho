@@ -1,27 +1,27 @@
 /* Skud Pai Sho Harmony */
 
-function SkudPaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn, tile1SurroundsLionTurtle) {
+function SkudPaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn, ownerCodeOverrideTile) {
 	this.tile1 = tile1;
 	this.tile1Pos = tile1RowAndColumn;
 	this.tile2 = tile2;
 	this.tile2Pos = tile2RowAndColumn;
 
-	if (this.tile1.type === BASIC_FLOWER) {
-		if (tile1SurroundsLionTurtle) {
+	if (ownerCodeOverrideTile) {
+		this.ownerCode = ownerCodeOverrideTile.ownerCode;
+		this.ownerName = ownerCodeOverrideTile.ownerName;
+	} else {
+		if (this.tile1.type === BASIC_FLOWER) {
+			this.ownerCode = this.tile1.ownerCode;
+			this.ownerName = this.tile1.ownerName;
+		} else if (this.tile2.type === BASIC_FLOWER) {
 			this.ownerCode = this.tile2.ownerCode;
 			this.ownerName = this.tile2.ownerName;
 		} else {
-			this.ownerCode = this.tile1.ownerCode;
-			this.ownerName = this.tile1.ownerName;
+			debug("ERROR: HARMONY REQUIRES A BASIC FLOWER TILE");
 		}
-	} else if (this.tile2.type === BASIC_FLOWER) {
-		this.ownerCode = this.tile2.ownerCode;
-		this.ownerName = this.tile2.ownerName;
-	} else {
-		debug("ERROR: HARMONY REQUIRES A BASIC FLOWER TILE");
 	}
 
-	if (tile1SurroundsLionTurtle) {
+	if (ownerCodeOverrideTile) {
 		this.overwriteOtherHarmonyEntries = true;
 	}
 }
