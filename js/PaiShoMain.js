@@ -455,6 +455,13 @@ function gameWatchPulse() {
 	onlinePlayEngine.getNewChatMessages(gameId, lastChatTimestamp, getNewChatMessagesCallback);
 }
 
+function clearGameWatchInterval() {
+	if (gameWatchIntervalValue) {
+		clearInterval(gameWatchIntervalValue);
+		gameWatchIntervalValue = null;
+		debug("Interval cleared...");
+	}
+}
 var REAL_TIME_GAME_WATCH_INTERVAL = 3000;
 function startWatchingGameRealTime() {
 	debug("Starting to watch game");
@@ -470,11 +477,7 @@ function startWatchingGameRealTime() {
 	// First pulse
 	gameWatchPulse();
 
-	if (gameWatchIntervalValue) {
-		clearInterval(gameWatchIntervalValue);
-		gameWatchIntervalValue = null;
-		debug("Interval cleared...");
-	}
+	clearGameWatchInterval();
 
 	gameWatchIntervalValue = setInterval(function() {
 		gameWatchPulse();
@@ -1261,7 +1264,7 @@ var sendVerificationCodeCallback = function sendVerificationCodeCallback(respons
 	if (response.includes('has been sent')) {
         message = "Verification code sent to " + emailBeingVerified + ". Be sure to check your spam or junk mail for the email.";
     } else {
-        message = "Failed to send verification code, please try again.";
+        message = "Failed to send verification code, please try again. Join the Discord for help, or try another email address.";
     }
 	document.getElementById('verificationCodeSendResponse').innerHTML = message;
 }
@@ -1501,6 +1504,8 @@ function setGameController(gameTypeId, keepGameOptions) {
 
 var jumpToGameCallback = function jumpToGameCallback(results) {
 	if (results) {
+		clearGameWatchInterval();
+
 		populateMyGamesList(results);
 		
 		var myGame = myGamesList[0];
@@ -2486,7 +2491,7 @@ function getGameOptionsMessageHtml(options) {
 
 	for (var i = 0; i < options.length; i++) {
 		if (!ggOptions.includes(options[i])) {
-			msg += "<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>Add game option: " + options[i] + "</span><br />";
+			msg += "<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>&bull;&nbsp;Add game option: " + options[i] + "</span><br />";
 		}
 	}
 

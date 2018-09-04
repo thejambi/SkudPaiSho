@@ -1,30 +1,39 @@
 /* Skud Pai Sho Harmony */
 
-function SkudPaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
+function SkudPaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn, tile1SurroundsLionTurtle) {
 	this.tile1 = tile1;
 	this.tile1Pos = tile1RowAndColumn;
 	this.tile2 = tile2;
 	this.tile2Pos = tile2RowAndColumn;
 
 	if (this.tile1.type === BASIC_FLOWER) {
-		this.ownerCode = this.tile1.ownerCode;
-		this.ownerName = this.tile1.ownerName;
+		if (tile1SurroundsLionTurtle) {
+			this.ownerCode = this.tile2.ownerCode;
+			this.ownerName = this.tile2.ownerName;
+		} else {
+			this.ownerCode = this.tile1.ownerCode;
+			this.ownerName = this.tile1.ownerName;
+		}
 	} else if (this.tile2.type === BASIC_FLOWER) {
 		this.ownerCode = this.tile2.ownerCode;
 		this.ownerName = this.tile2.ownerName;
 	} else {
 		debug("ERROR: HARMONY REQUIRES A BASIC FLOWER TILE");
 	}
+
+	if (tile1SurroundsLionTurtle) {
+		this.overwriteOtherHarmonyEntries = true;
+	}
 }
 
 SkudPaiShoHarmony.prototype.equals = function(otherHarmony) {
-	if (this.ownerName === otherHarmony.ownerName && this.ownerCode === otherHarmony.ownerCode) {
+	// if (this.ownerName === otherHarmony.ownerName && this.ownerCode === otherHarmony.ownerCode) {
 		if (this.tile1 === otherHarmony.tile1 || this.tile1 === otherHarmony.tile2) {
 			if (this.tile2 === otherHarmony.tile1 || this.tile2 === otherHarmony.tile2) {
 				return true;
 			}
 		}
-	}
+	// }
 	return false;
 };
 
@@ -152,11 +161,21 @@ SkudPaiShoHarmonyManager.prototype.addHarmony = function(harmony) {
 	// Add harmony if it doesn't already exist
 
 	// Does it exist in old set of harmonies?
+	var harmonyIndexesToRemove = [];
 	var exists = false;
 	for (var j = 0; j < this.harmonies.length; j++) {
 		if (harmony.equals(this.harmonies[j])) {
+			var existingHarmony = this.harmonies[j];
 			exists = true;
+			if (harmony.overwriteOtherHarmonyEntries) {
+				harmonyIndexesToRemove.push(j);
+				exists = false;
+			}
 		}
+	}
+
+	for (var i = 0; i < harmonyIndexesToRemove.length; i++) {
+		this.harmonies.splice(harmonyIndexesToRemove[i], 1);
 	}
 
 	if (!exists) {

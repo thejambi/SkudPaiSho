@@ -27,13 +27,12 @@ SkudPaiShoTileManager.prototype.loadSkudSet = function(ownerCode) {
 		tiles.push(new SkudPaiShoTile('W', ownerCode));
 		tiles.push(new SkudPaiShoTile('K', ownerCode));
 		tiles.push(new SkudPaiShoTile('B', ownerCode));
-	}
-
-	if (ggOptions.includes(OPTION_TESTING_NEW_ACCENT_TILES)) {
-		// Only 1 of each of these
-		tiles.push(new SkudPaiShoTile('P', ownerCode));
-		tiles.push(new SkudPaiShoTile('M', ownerCode));
-		tiles.push(new SkudPaiShoTile('T', ownerCode));
+		
+		if (ggOptions.includes(OPTION_ACCENT_TILE_EXPANSION_2018)) {
+			tiles.push(new SkudPaiShoTile('P', ownerCode));
+			tiles.push(new SkudPaiShoTile('M', ownerCode));
+			tiles.push(new SkudPaiShoTile('T', ownerCode));
+		}
 	}
 
 	tiles.forEach(function(tile) {
@@ -90,7 +89,7 @@ SkudPaiShoTileManager.prototype.loadOneOfEach = function(ownerCode) {
 	tiles.push(new SkudPaiShoTile('K', ownerCode));
 	tiles.push(new SkudPaiShoTile('B', ownerCode));
 
-	if (ggOptions.includes(OPTION_TESTING_NEW_ACCENT_TILES)) {
+	if (ggOptions.includes(OPTION_ACCENT_TILE_EXPANSION_2018)) {
 		tiles.push(new SkudPaiShoTile('P', ownerCode));
 		tiles.push(new SkudPaiShoTile('M', ownerCode));
 		tiles.push(new SkudPaiShoTile('T', ownerCode));

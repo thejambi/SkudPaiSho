@@ -78,11 +78,13 @@ SkudPaiShoTile.prototype.getImageName = function() {
 	return this.ownerCode + "" + this.code;
 };
 
-SkudPaiShoTile.prototype.formsHarmonyWith = function(otherTile) {
-	if (!(this.type === BASIC_FLOWER || this.code === 'L')
-		|| !(otherTile.type === BASIC_FLOWER || otherTile.code === 'L')) {
-		// debug("One of the tiles must be Basic Flower to form Harmony");
-		return false;
+SkudPaiShoTile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTurtle) {
+	if (!surroundsLionTurtle) {
+		if (!(this.type === BASIC_FLOWER || this.code === 'L')
+			|| !(otherTile.type === BASIC_FLOWER || otherTile.code === 'L')) {
+			// debug("One of the tiles must be Basic Flower to form Harmony");
+			return false;
+		}
 	}
 
 	if ((this.code === 'L' && otherTile.type !== BASIC_FLOWER)
@@ -102,7 +104,7 @@ SkudPaiShoTile.prototype.formsHarmonyWith = function(otherTile) {
 	}
 
 	// For normal Harmonies, tiles must belong to same player
-	if (otherTile.ownerName !== this.ownerName) {
+	if (!surroundsLionTurtle && otherTile.ownerName !== this.ownerName) {
 		// debug("Tiles drained or have different owners - NO Harmony");
 		return false;
 	}
@@ -115,10 +117,9 @@ SkudPaiShoTile.prototype.formsHarmonyWith = function(otherTile) {
 		return true;
 	}
 
-	if (this.type !== otherTile.type) {
-		// If tiles are different types, then one must be a lotus and the other not
-		return true;
-	}
+	// if (this.type !== otherTile.type) {
+	// 	return true;
+	// }
 
 	if (superHarmonies && this.basicValue !== otherTile.basicValue) {
 		return true;

@@ -33,7 +33,7 @@ SkudPaiShoController.prototype.getNewGameNotation = function() {
 
 SkudPaiShoController.getHostTilesContainerDivs = function() {
 	var divs = '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HL"></div> <div class="HO"></div>';
-	if (ggOptions.includes(OPTION_TESTING_NEW_ACCENT_TILES)) {
+	if (ggOptions.includes(OPTION_ACCENT_TILE_EXPANSION_2018)) {
 		divs += '<br class="clear" /> <div class="HM"></div> <div class="HP"></div> <div class="HT"></div>';
 	}
 	return divs;
@@ -41,7 +41,7 @@ SkudPaiShoController.getHostTilesContainerDivs = function() {
 
 SkudPaiShoController.getGuestTilesContainerDivs = function() {
 	var divs = '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
-	if (ggOptions.includes(OPTION_TESTING_NEW_ACCENT_TILES)) {
+	if (ggOptions.includes(OPTION_ACCENT_TILE_EXPANSION_2018)) {
 		divs += '<br class="clear" /> <div class="GM"></div> <div class="GP"></div> <div class="GT"></div>';
 	}
 	return divs;
@@ -83,18 +83,22 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
 			if (ggOptions.includes(OPTION_ALL_ACCENT_TILES)) {
 				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting ALL of your Accent Tiles. <br />";
+			} else if (ggOptions.includes(OPTION_DOUBLE_ACCENT_TILES)) {
+				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting 8 of your Accent Tiles. <br />";
 			} else {
 				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting your 4 Accent Tiles. <br />";
 			}
 		} else {
 			if (ggOptions.includes(OPTION_ALL_ACCENT_TILES)) {
 				msg += "Select ALL Accent Tiles to begin the game.";
+			} else if (ggOptions.includes(OPTION_DOUBLE_ACCENT_TILES)) {
+				msg += "Select 8 Accent Tiles to play with.";
 			} else {
 				msg += "Select 4 Accent Tiles to play with.";
 			}
 		}
 
-		msg += getGameOptionsMessageHtml([OPTION_ALL_ACCENT_TILES, OPTION_TESTING_NEW_ACCENT_TILES]);
+		msg += getGameOptionsMessageHtml([OPTION_DOUBLE_ACCENT_TILES]);
 	} else if (this.gameNotation.moves.length === 1) {
 		msg += "Select 4 Accent Tiles to play with, then Plant a Basic Flower Tile.";
 	} else if (this.gameNotation.moves.length === 2) {
@@ -181,6 +185,8 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 			var accentTilesNeededToStart = 4;
 			if (ggOptions.includes(OPTION_ALL_ACCENT_TILES)) {
 				accentTilesNeededToStart = this.theGame.tileManager.numberOfAccentTilesPerPlayerSet();
+			} else if (ggOptions.includes(OPTION_DOUBLE_ACCENT_TILES)) {
+				accentTilesNeededToStart = accentTilesNeededToStart * 2;
 			}
 
 			if (this.hostAccentTiles.length === accentTilesNeededToStart || (simpleCanonRules && this.hostAccentTiles.length === 2)) {
