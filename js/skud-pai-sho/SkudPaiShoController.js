@@ -179,15 +179,16 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 		}
 
 		tile.selectedFromPile = false;
+
+		var accentTilesNeededToStart = 4;
+		if (ggOptions.includes(OPTION_ALL_ACCENT_TILES)) {
+			accentTilesNeededToStart = this.theGame.tileManager.numberOfAccentTilesPerPlayerSet();
+		} else if (ggOptions.includes(OPTION_DOUBLE_ACCENT_TILES)) {
+			accentTilesNeededToStart = accentTilesNeededToStart * 2;
+		}
+
 		if (getCurrentPlayer() === HOST) {
 			this.hostAccentTiles.push(tileCode);
-
-			var accentTilesNeededToStart = 4;
-			if (ggOptions.includes(OPTION_ALL_ACCENT_TILES)) {
-				accentTilesNeededToStart = this.theGame.tileManager.numberOfAccentTilesPerPlayerSet();
-			} else if (ggOptions.includes(OPTION_DOUBLE_ACCENT_TILES)) {
-				accentTilesNeededToStart = accentTilesNeededToStart * 2;
-			}
 
 			if (this.hostAccentTiles.length === accentTilesNeededToStart || (simpleCanonRules && this.hostAccentTiles.length === 2)) {
 				var move = new SkudPaiShoNotationMove("0H." + this.hostAccentTiles.join());
@@ -201,7 +202,7 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 		} else {
 			this.guestAccentTiles.push(tileCode);
 			
-			if (this.guestAccentTiles.length === 4 || (simpleCanonRules && this.guestAccentTiles.length === 2)) {
+			if (this.guestAccentTiles.length === accentTilesNeededToStart || (simpleCanonRules && this.guestAccentTiles.length === 2)) {
 				var move = new SkudPaiShoNotationMove("0G." + this.guestAccentTiles.join());
 				this.gameNotation.addMove(move);
 				// No finalize move because it is still Guest's turn
