@@ -82,7 +82,7 @@ OvergrowthController.prototype.resetMove = function() {
 };
 
 OvergrowthController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Overgrowth Pai Sho</h4> <p>A competitive variant of Solitaire Pai Sho.</p>";
+	return "<h4>Overgrowth Pai Sho</h4> <p>A competitive variant of Solitaire Pai Sho.</p><p>Players alternate drawing and placing a tile, following the same placement rules as Solitaire Pai Sho, with these clarifications:<ul><li>Tiles form harmony or disharmony regardless of whose tile it is</li><li>Like tiles form disharmony (for example, Rose (R3) forms disharmony with Rose (R3))</li></ul></p><p>The game ends when all tiles have been played. The winner is as follows: <ul><li>The Host wins if there are more Harmonies on the board</li><li>The Guest wins if there are more Disharmonies on the board</li></ul></p>";
 };
 
 OvergrowthController.prototype.getAdditionalMessage = function() {
