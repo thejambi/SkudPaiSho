@@ -1396,6 +1396,47 @@ SkudPaiShoBoard.prototype.getSurroundingLionTurtleTile = function(boardPoint) {
 	}
 };
 
+SkudPaiShoBoard.prototype.getSurroundingLionTurtleGrantedPlayer = function(boardPoint) {
+	var surroundingLionTurtleTile = null;
+	var surroundingLionTurtlePoint = null;
+	var rowCols = this.getSurroundingRowAndCols(boardPoint);
+	for (var i = 0; i < rowCols.length; i++) {
+		var surroundingPoint = this.cells[rowCols[i].row][rowCols[i].col];
+		if (surroundingPoint.hasTile() && surroundingPoint.tile.accentType === LION_TURTLE) {
+			surroundingLionTurtleTile = surroundingPoint.tile;
+			surroundingLionTurtlePoint = surroundingPoint;
+			break;
+		}
+	}
+
+	if (!surroundingLionTurtleTile) {
+		return null;
+	}
+
+	var hostCount = 0;
+	var guestCount = 0;
+	rowCols = this.getSurroundingRowAndCols(surroundingLionTurtlePoint);
+	for (var i = 0; i < rowCols.length; i++) {
+		var surroundingPoint = this.cells[rowCols[i].row][rowCols[i].col];
+		if (surroundingPoint.hasTile() && surroundingPoint.tile.ownerName === HOST) {
+			hostCount++;
+		} else if (surroundingPoint.hasTile() && surroundingPoint.tile.ownerName === GUEST) {
+			guestCount++;
+		}
+	}
+
+	var ownerName = surroundingLionTurtleTile.ownerName;
+	if (hostCount > guestCount) {
+		ownerName = HOST;
+	} else if (guestCount > hostCount) {
+		ownerName = GUEST;
+	}
+	return {
+		ownerName: ownerName,
+		ownerCode: getPlayerCodeFromName(ownerName)
+	}
+};
+
 SkudPaiShoBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
 	var tileHarmonies = [];
 
@@ -1403,27 +1444,27 @@ SkudPaiShoBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
 		return tileHarmonies;
 	}
 
-	var surroundingLionTurtleTile = this.getSurroundingLionTurtleTile(rowAndCol);
+	var grantedPlayer = this.getSurroundingLionTurtleGrantedPlayer(rowAndCol);
 
 	if (!this.rowBlockedByRock(rowAndCol.row)) {
-		var leftHarmony = this.getHarmonyLeft(tile, rowAndCol, surroundingLionTurtleTile);
+		var leftHarmony = this.getHarmonyLeft(tile, rowAndCol, grantedPlayer);
 		if (leftHarmony) {
 			tileHarmonies.push(leftHarmony);
 		}
 
-		var rightHarmony = this.getHarmonyRight(tile, rowAndCol, surroundingLionTurtleTile);
+		var rightHarmony = this.getHarmonyRight(tile, rowAndCol, grantedPlayer);
 		if (rightHarmony) {
 			tileHarmonies.push(rightHarmony);
 		}
 	}
 
 	if (!this.columnBlockedByRock(rowAndCol.col)) {
-		var upHarmony = this.getHarmonyUp(tile, rowAndCol, surroundingLionTurtleTile);
+		var upHarmony = this.getHarmonyUp(tile, rowAndCol, grantedPlayer);
 		if (upHarmony) {
 			tileHarmonies.push(upHarmony);
 		}
 
-		var downHarmony = this.getHarmonyDown(tile, rowAndCol, surroundingLionTurtleTile);
+		var downHarmony = this.getHarmonyDown(tile, rowAndCol, grantedPlayer);
 		if (downHarmony) {
 			tileHarmonies.push(downHarmony);
 		}
@@ -1432,7 +1473,7 @@ SkudPaiShoBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
 	return tileHarmonies;
 };
 
-SkudPaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol, surroundingLionTurtleTile) {
+SkudPaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol, grantedPlayer) {
 	var colToCheck = endRowCol.col - 1;
 
 	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile() 
@@ -1442,14 +1483,14 @@ SkudPaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol, surrounding
 
 	if (colToCheck >= 0) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundingLionTurtleTile)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), surroundingLionTurtleTile);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, grantedPlayer)) {
+			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), grantedPlayer);
 			return harmony;
 		}
 	}
 };
 
-SkudPaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol, surroundingLionTurtleTile) {
+SkudPaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol, grantedPlayer) {
 	var colToCheck = endRowCol.col + 1;
 
 	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile() 
@@ -1459,14 +1500,14 @@ SkudPaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol, surroundin
 
 	if (colToCheck <= 16) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundingLionTurtleTile)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), surroundingLionTurtleTile);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, grantedPlayer)) {
+			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), grantedPlayer);
 			return harmony;
 		}
 	}
 };
 
-SkudPaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol, surroundingLionTurtleTile) {
+SkudPaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol, grantedPlayer) {
 	var rowToCheck = endRowCol.row - 1;
 
 	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
@@ -1476,14 +1517,14 @@ SkudPaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol, surroundingLi
 
 	if (rowToCheck >= 0) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundingLionTurtleTile)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), surroundingLionTurtleTile);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, grantedPlayer)) {
+			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), grantedPlayer);
 			return harmony;
 		}
 	}
 };
 
-SkudPaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol, surroundingLionTurtleTile) {
+SkudPaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol, grantedPlayer) {
 	var rowToCheck = endRowCol.row + 1;
 
 	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
@@ -1493,8 +1534,8 @@ SkudPaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol, surrounding
 
 	if (rowToCheck <= 16) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundingLionTurtleTile)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), surroundingLionTurtleTile);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, grantedPlayer)) {
+			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), grantedPlayer);
 			return harmony;
 		}
 	}
