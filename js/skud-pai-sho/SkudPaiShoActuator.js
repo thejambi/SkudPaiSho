@@ -151,10 +151,13 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint) {
 			srcValue += "hlowe/";
 		}
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
-		
-		if (boardPoint.tile.inHarmony) {
-			theDiv.classList.add(boardPoint.tile.ownerName + "harmony");
+
+		if (boardPoint.tile.harmonyOwners) {
+			for (var i = 0; i < boardPoint.tile.harmonyOwners.length; i++) {
+				theDiv.classList.add(boardPoint.tile.harmonyOwners[i] + "harmony");
+			}
 		}
+		
 		if (boardPoint.tile.drained || boardPoint.tile.trapped) {
 			theDiv.classList.add("drained");
 		}

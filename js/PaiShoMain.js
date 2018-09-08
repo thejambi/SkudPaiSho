@@ -1504,8 +1504,6 @@ function setGameController(gameTypeId, keepGameOptions) {
 
 var jumpToGameCallback = function jumpToGameCallback(results) {
 	if (results) {
-		clearGameWatchInterval();
-
 		populateMyGamesList(results);
 		
 		var myGame = myGamesList[0];
@@ -1556,6 +1554,7 @@ function jumpToGame(gameIdChosen) {
 	if (!onlinePlayEnabled) {
 		return;
 	}
+	clearGameWatchInterval();
 	onlinePlayEngine.getGameInfo(getUserId(), gameIdChosen, jumpToGameCallback);
 }
 
@@ -2490,7 +2489,7 @@ function getGameOptionsMessageHtml(options) {
 	var msg = "<br /><br />";
 
 	for (var i = 0; i < options.length; i++) {
-		if (!ggOptions.includes(options[i])) {
+		if (!gameOptionEnabled(options[i])) {
 			msg += "<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>&bull;&nbsp;Add game option: " + options[i] + "</span><br />";
 		}
 	}
@@ -2499,7 +2498,7 @@ function getGameOptionsMessageHtml(options) {
 };
 
 function showBadMoveModal() {
-	showModal("Uh Oh", "A move went wrong somewhere. This game may be corrupt due to players not both using latest updates. The app is not be compatible with new features.<br /><br />Please let your opponent know that you saw this message. You may want to resign this game and try again.");
+	showModal("Uh Oh", "A move went wrong somewhere. If you see this each time you look at this game, then this game may be corrupt due to players not both using latest updates. The app is not be compatible with new features.<br /><br />Please let your opponent know that you saw this message. You may want to resign this game and try again.");
 }
 
 

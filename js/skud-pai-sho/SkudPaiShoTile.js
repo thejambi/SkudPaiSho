@@ -79,13 +79,10 @@ SkudPaiShoTile.prototype.getImageName = function() {
 };
 
 SkudPaiShoTile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTurtle) {
-	if (!surroundsLionTurtle) {
 		if (!(this.type === BASIC_FLOWER || this.code === 'L')
 			|| !(otherTile.type === BASIC_FLOWER || otherTile.code === 'L')) {
-			// debug("One of the tiles must be Basic Flower to form Harmony");
 			return false;
 		}
-	}
 
 	if ((this.code === 'L' && otherTile.type !== BASIC_FLOWER)
 		|| (otherTile.code === 'L' && this.type !== BASIC_FLOWER)) {
@@ -93,7 +90,6 @@ SkudPaiShoTile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTur
 	}
 
 	if (this.drained || otherTile.drained) {
-		// debug("Drained tiles cannot form Harmony.");
 		return false;
 	}
 
@@ -105,21 +101,16 @@ SkudPaiShoTile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTur
 
 	// For normal Harmonies, tiles must belong to same player
 	if (!surroundsLionTurtle && otherTile.ownerName !== this.ownerName) {
-		// debug("Tiles drained or have different owners - NO Harmony");
 		return false;
 	}
 
 	// Same color and number difference of 1
-	if (this.basicColorCode === otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 1) {
+	if (this.basicColorCode === otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 1 || surroundsLionTurtle) {
 		return true;
 		// if not that, check different color and number difference of 2?
-	} else if (this.basicColorCode !== otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 2) {
+	} else if (this.basicColorCode !== otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 2 || surroundsLionTurtle) {
 		return true;
 	}
-
-	// if (this.type !== otherTile.type) {
-	// 	return true;
-	// }
 
 	if (superHarmonies && this.basicValue !== otherTile.basicValue) {
 		return true;

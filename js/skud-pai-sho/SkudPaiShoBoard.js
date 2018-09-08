@@ -726,19 +726,18 @@ SkudPaiShoBoard.prototype.placePond = function(tile, notationPoint, ignoreCheck)
 
 SkudPaiShoBoard.prototype.canPlaceLionTurtle = function(boardPoint, tile) {
 	return !boardPoint.hasTile() 
-		&& !boardPoint.isType(GATE)
-		&& !this.pointSurroundsPointSurroundingLionTurtle(boardPoint);
+		&& !boardPoint.isType(GATE);
 };
 
-SkudPaiShoBoard.prototype.pointSurroundsPointSurroundingLionTurtle = function(boardPoint) {
-	var rowCols = this.getSurroundingRowAndCols(boardPoint);
-	for (var i = 0; i < rowCols.length; i++) {
-		if (this.getSurroundingLionTurtleTile(rowCols[i])) {
-			return true;
-		}
-	}
-	return false;
-}
+// SkudPaiShoBoard.prototype.pointSurroundsPointSurroundingLionTurtle = function(boardPoint) {
+// 	var rowCols = this.getSurroundingRowAndCols(boardPoint);
+// 	for (var i = 0; i < rowCols.length; i++) {
+// 		if (this.getSurroundingLionTurtleTile(rowCols[i])) {
+// 			return true;
+// 		}
+// 	}
+// 	return false;
+// }
 
 SkudPaiShoBoard.prototype.placeLionTurtle = function(tile, notationPoint, ignoreCheck) {
 	var rowAndCol = notationPoint.rowAndColumn;
@@ -1321,9 +1320,10 @@ SkudPaiShoBoard.prototype.markSpacesBetweenHarmonies = function() {
 			}
 			for (var col = firstCol + 1; col < lastCol; col++) {
 				self.cells[row][col].betweenHarmony = true;
-				if (harmony.ownerName === GUEST) {
+				if (harmony.hasOwner(GUEST)) {
 					self.cells[row][col].betweenHarmonyGuest = true;
-				} else if (harmony.ownerName === HOST) {
+				}
+				if (harmony.hasOwner(HOST)) {
 					self.cells[row][col].betweenHarmonyHost = true;
 				}
 			}
@@ -1338,9 +1338,10 @@ SkudPaiShoBoard.prototype.markSpacesBetweenHarmonies = function() {
 			}
 			for (var row = firstRow + 1; row < lastRow; row++) {
 				self.cells[row][col].betweenHarmony = true;
-				if (harmony.ownerName === GUEST) {
+				if (harmony.hasOwner(GUEST)) {
 					self.cells[row][col].betweenHarmonyGuest = true;
-				} else if (harmony.ownerName === HOST) {
+				}
+				if (harmony.hasOwner(HOST)) {
 					self.cells[row][col].betweenHarmonyHost = true;
 				}
 			}
@@ -1359,11 +1360,33 @@ SkudPaiShoBoard.prototype.analyzeHarmonies = function() {
 			var boardPoint = this.cells[row][col];
 			if (boardPoint.hasTile()) {
 				// Check for harmonies!
-				var tileHarmonies = this.getTileHarmonies(boardPoint.tile, new RowAndColumn(row, col));
+				var tileHarmonies = this.getTileHarmonies(boardPoint);
 				// Add harmonies
 				this.harmonyManager.addHarmonies(tileHarmonies);
 
-				boardPoint.tile.inHarmony = tileHarmonies.length > 0;
+				boardPoint.tile.harmonyOwners = [];
+
+				for (var i = 0; i < tileHarmonies.length; i++) {
+					for (var j = 0; j < tileHarmonies[i].owners.length; j++) {
+						var harmonyOwnerName = tileHarmonies[i].owners[j].ownerName;
+						var harmonyTile1 = tileHarmonies[i].tile1;
+						var harmonyTile2 = tileHarmonies[i].tile2;
+
+						if (!harmonyTile1.harmonyOwners) {
+							harmonyTile1.harmonyOwners = [];
+						}
+						if (!harmonyTile2.harmonyOwners) {
+							harmonyTile2.harmonyOwners = [];
+						}
+
+						if (!harmonyTile1.harmonyOwners.includes(harmonyOwnerName)) {
+							harmonyTile1.harmonyOwners.push(harmonyOwnerName);
+						}
+						if (!harmonyTile2.harmonyOwners.includes(harmonyOwnerName)) {
+							harmonyTile2.harmonyOwners.push(harmonyOwnerName);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -1384,87 +1407,48 @@ SkudPaiShoBoard.prototype.analyzeHarmonies = function() {
 	}
 };
 
-SkudPaiShoBoard.prototype.getSurroundingLionTurtleTile = function(boardPoint) {
-	var surroundingLionTurtleTile = null;
+SkudPaiShoBoard.prototype.getSurroundingLionTurtleTiles = function(boardPoint) {
+	var surroundingLionTurtleTiles = [];
 	var rowCols = this.getSurroundingRowAndCols(boardPoint);
 	for (var i = 0; i < rowCols.length; i++) {
 		var surroundingPoint = this.cells[rowCols[i].row][rowCols[i].col];
 		if (surroundingPoint.hasTile() && surroundingPoint.tile.accentType === LION_TURTLE) {
-			surroundingLionTurtleTile = surroundingPoint.tile;
-			return surroundingLionTurtleTile;
+			surroundingLionTurtleTiles.push(surroundingPoint.tile);
 		}
 	}
+	return surroundingLionTurtleTiles;
 };
 
-SkudPaiShoBoard.prototype.getSurroundingLionTurtleGrantedPlayer = function(boardPoint) {
-	var surroundingLionTurtleTile = null;
-	var surroundingLionTurtlePoint = null;
-	var rowCols = this.getSurroundingRowAndCols(boardPoint);
-	for (var i = 0; i < rowCols.length; i++) {
-		var surroundingPoint = this.cells[rowCols[i].row][rowCols[i].col];
-		if (surroundingPoint.hasTile() && surroundingPoint.tile.accentType === LION_TURTLE) {
-			surroundingLionTurtleTile = surroundingPoint.tile;
-			surroundingLionTurtlePoint = surroundingPoint;
-			break;
-		}
-	}
-
-	if (!surroundingLionTurtleTile) {
-		return null;
-	}
-
-	var hostCount = 0;
-	var guestCount = 0;
-	rowCols = this.getSurroundingRowAndCols(surroundingLionTurtlePoint);
-	for (var i = 0; i < rowCols.length; i++) {
-		var surroundingPoint = this.cells[rowCols[i].row][rowCols[i].col];
-		if (surroundingPoint.hasTile() && surroundingPoint.tile.ownerName === HOST) {
-			hostCount++;
-		} else if (surroundingPoint.hasTile() && surroundingPoint.tile.ownerName === GUEST) {
-			guestCount++;
-		}
-	}
-
-	var ownerName = surroundingLionTurtleTile.ownerName;
-	if (hostCount > guestCount) {
-		ownerName = HOST;
-	} else if (guestCount > hostCount) {
-		ownerName = GUEST;
-	}
-	return {
-		ownerName: ownerName,
-		ownerCode: getPlayerCodeFromName(ownerName)
-	}
-};
-
-SkudPaiShoBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
+SkudPaiShoBoard.prototype.getTileHarmonies = function(boardPoint) {
+	var tile = boardPoint.tile;
+	var rowAndCol = boardPoint;
 	var tileHarmonies = [];
 
 	if (this.cells[rowAndCol.row][rowAndCol.col].isType(GATE)) {
 		return tileHarmonies;
 	}
 
-	var grantedPlayer = this.getSurroundingLionTurtleGrantedPlayer(rowAndCol);
+	var surroundingLionTurtleTiles = this.getSurroundingLionTurtleTiles(rowAndCol);
 
 	if (!this.rowBlockedByRock(rowAndCol.row)) {
-		var leftHarmony = this.getHarmonyLeft(tile, rowAndCol, grantedPlayer);
+		var leftHarmony = this.getHarmonyLeft(tile, rowAndCol, surroundingLionTurtleTiles);
 		if (leftHarmony) {
 			tileHarmonies.push(leftHarmony);
 		}
 
-		var rightHarmony = this.getHarmonyRight(tile, rowAndCol, grantedPlayer);
+		var rightHarmony = this.getHarmonyRight(tile, rowAndCol, surroundingLionTurtleTiles);
 		if (rightHarmony) {
 			tileHarmonies.push(rightHarmony);
 		}
 	}
 
 	if (!this.columnBlockedByRock(rowAndCol.col)) {
-		var upHarmony = this.getHarmonyUp(tile, rowAndCol, grantedPlayer);
+		var upHarmony = this.getHarmonyUp(tile, rowAndCol, surroundingLionTurtleTiles);
 		if (upHarmony) {
 			tileHarmonies.push(upHarmony);
 		}
 
-		var downHarmony = this.getHarmonyDown(tile, rowAndCol, grantedPlayer);
+		var downHarmony = this.getHarmonyDown(tile, rowAndCol, surroundingLionTurtleTiles);
 		if (downHarmony) {
 			tileHarmonies.push(downHarmony);
 		}
@@ -1473,7 +1457,7 @@ SkudPaiShoBoard.prototype.getTileHarmonies = function(tile, rowAndCol) {
 	return tileHarmonies;
 };
 
-SkudPaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol, grantedPlayer) {
+SkudPaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol, surroundingLionTurtleTiles) {
 	var colToCheck = endRowCol.col - 1;
 
 	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile() 
@@ -1483,14 +1467,19 @@ SkudPaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol, grantedPlay
 
 	if (colToCheck >= 0) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, grantedPlayer)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), grantedPlayer);
+
+		var newSurroundingLionTurtles = this.getSurroundingLionTurtleTiles(checkPoint);
+		newSurroundingLionTurtles = newSurroundingLionTurtles.concat(surroundingLionTurtleTiles);
+		var surroundsLionTurtle = newSurroundingLionTurtles.length > 0;
+
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundsLionTurtle)) {
+			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), newSurroundingLionTurtles);
 			return harmony;
 		}
 	}
 };
 
-SkudPaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol, grantedPlayer) {
+SkudPaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol, surroundingLionTurtleTiles) {
 	var colToCheck = endRowCol.col + 1;
 
 	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile() 
@@ -1500,14 +1489,19 @@ SkudPaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol, grantedPla
 
 	if (colToCheck <= 16) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, grantedPlayer)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), grantedPlayer);
+
+		var newSurroundingLionTurtles = this.getSurroundingLionTurtleTiles(checkPoint);
+		newSurroundingLionTurtles = newSurroundingLionTurtles.concat(surroundingLionTurtleTiles);
+		var surroundsLionTurtle = newSurroundingLionTurtles.length > 0;
+
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundsLionTurtle)) {
+			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), newSurroundingLionTurtles);
 			return harmony;
 		}
 	}
 };
 
-SkudPaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol, grantedPlayer) {
+SkudPaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol, surroundingLionTurtleTiles) {
 	var rowToCheck = endRowCol.row - 1;
 
 	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
@@ -1517,14 +1511,19 @@ SkudPaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol, grantedPlayer
 
 	if (rowToCheck >= 0) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, grantedPlayer)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), grantedPlayer);
+
+		var newSurroundingLionTurtles = this.getSurroundingLionTurtleTiles(checkPoint);
+		newSurroundingLionTurtles = newSurroundingLionTurtles.concat(surroundingLionTurtleTiles);
+		var surroundsLionTurtle = newSurroundingLionTurtles.length > 0;
+
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundsLionTurtle)) {
+			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), newSurroundingLionTurtles);
 			return harmony;
 		}
 	}
 };
 
-SkudPaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol, grantedPlayer) {
+SkudPaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol, surroundingLionTurtleTiles) {
 	var rowToCheck = endRowCol.row + 1;
 
 	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
@@ -1534,8 +1533,13 @@ SkudPaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol, grantedPlay
 
 	if (rowToCheck <= 16) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, grantedPlayer)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), grantedPlayer);
+
+		var newSurroundingLionTurtles = this.getSurroundingLionTurtleTiles(checkPoint);
+		newSurroundingLionTurtles = newSurroundingLionTurtles.concat(surroundingLionTurtleTiles);
+		var surroundsLionTurtle = newSurroundingLionTurtles.length > 0;
+
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundsLionTurtle)) {
+			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), newSurroundingLionTurtles);
 			return harmony;
 		}
 	}
@@ -1779,18 +1783,6 @@ SkudPaiShoBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 		row.forEach(function(boardPoint) {
 			var valid = false;
 
-			// if (tile.accentType === ROCK && self.canPlaceRock(boardPoint)) {
-			// 	valid = true;
-			// } else if (tile.accentType === WHEEL && self.canPlaceWheel(boardPoint)) {
-			// 	valid = true;
-			// } else if (tile.accentType === KNOTWEED && self.canPlaceKnotweed(boardPoint)) {
-			// 	valid = true;
-			// } else if (tile.accentType === BOAT && self.canPlaceBoat(boardPoint, tile)) {
-			// 	valid = true;
-			// } else if (tile.accentType === BAMBOO && self.canPlaceBamboo(boardPoint, tile)) {
-			// 	valid = true;
-			// }
-			
 			if (
 				(tile.accentType === ROCK && self.canPlaceRock(boardPoint))
 				|| (tile.accentType === WHEEL && self.canPlaceWheel(boardPoint))

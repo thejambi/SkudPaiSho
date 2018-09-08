@@ -378,6 +378,9 @@ figure > div {
   /*box-shadow: 0px 0px 8px 4px #ff8100;*/
   box-shadow: 0px 0px 8px 4px #6CC;
 }
+.HOSTharmony.GUESTharmony {
+  box-shadow: 0px 0px 8px 4px #77A2E6;
+}
 
 
 .betweenHarmony {

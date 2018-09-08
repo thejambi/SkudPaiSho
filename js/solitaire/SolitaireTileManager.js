@@ -18,11 +18,11 @@ SolitaireTileManager.prototype.loadSolitaireSet = function(ownerCode, doubleTile
 	var tiles = [];
 
 	var tileMultiplier = 1;
-	if (ggOptions.includes(OPTION_DOUBLE_TILES)) {
+	if (gameOptionEnabled(OPTION_DOUBLE_TILES)) {
 		tileMultiplier = 2;
 		tiles.push(new SolitaireTile('L', ownerCode));
 	}
-	if (ggOptions.includes(OPTION_INSANE_TILES)) {
+	if (gameOptionEnabled(OPTION_INSANE_TILES)) {
 		tileMultiplier = 4;
 	}
 

@@ -10,7 +10,7 @@ VagabondTileManager.prototype.loadTileSet = function(ownerCode) {
 
 	this.addTiles(tiles, ownerCode);
 
-	if (ggOptions.includes(OPTION_DOUBLE_TILES)) {
+	if (gameOptionEnabled(OPTION_DOUBLE_TILES)) {
 		this.addTiles(tiles, ownerCode);
 	}
 

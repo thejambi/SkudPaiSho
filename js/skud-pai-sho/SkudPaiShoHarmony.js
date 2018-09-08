@@ -1,39 +1,55 @@
 /* Skud Pai Sho Harmony */
 
-function SkudPaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn, ownerCodeOverrideTile) {
+function SkudPaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn, affectingLionTurtleTiles) {
 	this.tile1 = tile1;
-	this.tile1Pos = tile1RowAndColumn;
+	this.tile1Pos = new RowAndColumn(tile1RowAndColumn.row, tile1RowAndColumn.col);
 	this.tile2 = tile2;
-	this.tile2Pos = tile2RowAndColumn;
+	this.tile2Pos = new RowAndColumn(tile2RowAndColumn.row, tile2RowAndColumn.col);
+	this.owners = [];
 
-	if (ownerCodeOverrideTile) {
-		this.ownerCode = ownerCodeOverrideTile.ownerCode;
-		this.ownerName = ownerCodeOverrideTile.ownerName;
+	var overrideOwner = affectingLionTurtleTiles.length > 0 && tile1.ownerCode !== tile2.ownerCode;
+
+	if (overrideOwner) {
+		for (var i = 0; i < affectingLionTurtleTiles.length; i++) {
+			this.addOwner(affectingLionTurtleTiles[i].ownerCode,
+				affectingLionTurtleTiles[i].ownerName);
+		}
 	} else {
 		if (this.tile1.type === BASIC_FLOWER) {
-			this.ownerCode = this.tile1.ownerCode;
-			this.ownerName = this.tile1.ownerName;
+			this.addOwner(this.tile1.ownerCode, this.tile1.ownerName);
 		} else if (this.tile2.type === BASIC_FLOWER) {
-			this.ownerCode = this.tile2.ownerCode;
-			this.ownerName = this.tile2.ownerName;
+			this.addOwner(this.tile2.ownerCode, this.tile2.ownerName);
 		} else {
 			debug("ERROR: HARMONY REQUIRES A BASIC FLOWER TILE");
 		}
 	}
 
-	if (ownerCodeOverrideTile) {
+	if (overrideOwner) {
 		this.overwriteOtherHarmonyEntries = true;
 	}
 }
 
-SkudPaiShoHarmony.prototype.equals = function(otherHarmony) {
-	// if (this.ownerName === otherHarmony.ownerName && this.ownerCode === otherHarmony.ownerCode) {
-		if (this.tile1 === otherHarmony.tile1 || this.tile1 === otherHarmony.tile2) {
-			if (this.tile2 === otherHarmony.tile1 || this.tile2 === otherHarmony.tile2) {
-				return true;
-			}
+SkudPaiShoHarmony.prototype.addOwner = function(ownerCode, ownerName) {
+	this.owners.push({
+		ownerCode: ownerCode,
+		ownerName: ownerName
+	});
+};
+
+SkudPaiShoHarmony.prototype.hasOwner = function(ownerName) {
+	for (var i = 0; i < this.owners.length; i++) {
+		if (this.owners[i].ownerName === ownerName) {
+			return true;
 		}
-	// }
+	}
+};
+
+SkudPaiShoHarmony.prototype.equals = function(otherHarmony) {
+	if (this.tile1 === otherHarmony.tile1 || this.tile1 === otherHarmony.tile2) {
+		if (this.tile2 === otherHarmony.tile1 || this.tile2 === otherHarmony.tile2) {
+			return true;
+		}
+	}
 	return false;
 };
 
@@ -75,7 +91,7 @@ SkudPaiShoHarmony.prototype.getPosThatIsNotThisOne = function(pos) {
 };
 
 SkudPaiShoHarmony.prototype.getString = function() {
-	return this.ownerName + " (" + this.tile1Pos.notationPointString + ")-(" + this.tile2Pos.notationPointString + ")";
+	return this.owners + " (" + this.tile1Pos.notationPointString + ")-(" + this.tile2Pos.notationPointString + ")";
 };
 
 SkudPaiShoHarmony.prototype.getDirectionForTile = function(tile) {
@@ -202,7 +218,7 @@ SkudPaiShoHarmonyManager.prototype.clearList = function() {
 SkudPaiShoHarmonyManager.prototype.numHarmoniesForPlayer = function(player) {
 	var count = 0;
 	for (var i = 0; i < this.harmonies.length; i++) {
-		if (this.harmonies[i].ownerName === player) {
+		if (this.harmonies[i].hasOwner(player)) {
 			count++;
 		}
 	}
@@ -223,7 +239,7 @@ SkudPaiShoHarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
 SkudPaiShoHarmonyManager.prototype.getNumCrossingCenterForPlayer = function(player) {
 	var count = 0;
 	for (var i = 0; i < this.harmonies.length; i++) {
-		if (this.harmonies[i].ownerName === player) {
+		if (this.harmonies[i].hasOwner(player)) {
 			if (this.harmonies[i].crossesCenter()) {
 				count++;
 			}
@@ -239,8 +255,7 @@ SkudPaiShoHarmonyManager.prototype.ringLengthForPlayer = function(player) {
 	for (var i = 0; i < rings.length; i++) {
 		var ring = rings[i];
 		var h = ring.pop();	// LOL
-		var playerName = h.ownerName;
-		if (playerName === player) {
+		if (h.hasOwner(player)) {
 			var veryNice = true;
 			if (veryNice && ring.length > longest) {
 				longest = ring.length;
@@ -271,7 +286,7 @@ SkudPaiShoHarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies
 	for (var i = 0; i < this.harmonies.length; i++) {
 
 		// Does it belong to player?
-		if (this.harmonies[i].ownerName === player) {
+		if (this.harmonies[i].hasOwner(player)) {
 
 			// Does it exist in old set of harmonies?
 			var exists = false;
@@ -392,7 +407,27 @@ SkudPaiShoHarmonyManager.prototype.verifyHarmonyRing = function(ring) {
 	var shapePoints = [];
 
 	var h = ring.pop();	// LOL
-	var playerName = h.ownerName;
+	// playerName is the player that's an owner on all rings
+	var allHaveHost = true;
+	var allHaveGuest = true;
+	for (var i = 0; i < ring.length; i++) {
+		if (!ring[i].hasOwner(HOST)) {
+			allHaveHost = false;
+		}
+		if (!ring[i].hasOwner(GUEST)) {
+			allHaveGuest = false;
+		}
+	}
+
+	var playerNames = "";
+	if (allHaveHost && allHaveGuest) {
+		playerNames = "Host and Guest";
+	} else if (allHaveHost) {
+		playerNames = HOST;
+	} else if (allHaveGuest) {
+		playerNames = GUEST;
+	}
+
 	shapePoints.push(new NotationPoint(h.tile1Pos.notationPointString).toArr());
 	shapePoints.push(new NotationPoint(h.tile2Pos.notationPointString).toArr());
 
@@ -437,7 +472,7 @@ SkudPaiShoHarmonyManager.prototype.verifyHarmonyRing = function(ring) {
 
 	if (this.isCenterInsideShape(shapePoints)) {
 		// debug("WINNER");
-		return playerName;
+		return playerNames;
 	} else {
 		return false;
 	}

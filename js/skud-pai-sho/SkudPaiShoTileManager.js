@@ -28,7 +28,7 @@ SkudPaiShoTileManager.prototype.loadSkudSet = function(ownerCode) {
 		tiles.push(new SkudPaiShoTile('K', ownerCode));
 		tiles.push(new SkudPaiShoTile('B', ownerCode));
 		
-		if (ggOptions.includes(OPTION_ACCENT_TILE_EXPANSION_2018)) {
+		if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
 			tiles.push(new SkudPaiShoTile('P', ownerCode));
 			tiles.push(new SkudPaiShoTile('M', ownerCode));
 			tiles.push(new SkudPaiShoTile('T', ownerCode));
@@ -89,7 +89,7 @@ SkudPaiShoTileManager.prototype.loadOneOfEach = function(ownerCode) {
 	tiles.push(new SkudPaiShoTile('K', ownerCode));
 	tiles.push(new SkudPaiShoTile('B', ownerCode));
 
-	if (ggOptions.includes(OPTION_ACCENT_TILE_EXPANSION_2018)) {
+	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
 		tiles.push(new SkudPaiShoTile('P', ownerCode));
 		tiles.push(new SkudPaiShoTile('M', ownerCode));
 		tiles.push(new SkudPaiShoTile('T', ownerCode));
