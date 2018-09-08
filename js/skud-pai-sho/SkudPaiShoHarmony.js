@@ -30,10 +30,12 @@ function SkudPaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn, a
 }
 
 SkudPaiShoHarmony.prototype.addOwner = function(ownerCode, ownerName) {
-	this.owners.push({
-		ownerCode: ownerCode,
-		ownerName: ownerName
-	});
+	if (!this.hasOwner(ownerName)) {
+		this.owners.push({
+			ownerCode: ownerCode,
+			ownerName: ownerName
+		});
+	}
 };
 
 SkudPaiShoHarmony.prototype.hasOwner = function(ownerName) {

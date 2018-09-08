@@ -200,6 +200,12 @@ SkudPaiShoTile.getTileName = function(tileCode) {
 			name = "Orchid";
 		} else if (tileCode === 'L') {
 			name = "White Lotus";
+		} else if (tileCode === 'P') {
+			name = "Pond";
+		} else if (tileCode === 'M') {
+			name = "Bamboo";
+		} else if (tileCode === 'T') {
+			name = "Lion Turtle";
 		}
 	}
 
