@@ -100,7 +100,14 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 
 		msg += getGameOptionsMessageHtml([OPTION_DOUBLE_ACCENT_TILES, OPTION_ANCIENT_OASIS_EXPANSION]);
 	} else if (this.gameNotation.moves.length === 1) {
-		msg += "Select 4 Accent Tiles to play with, then Plant a Basic Flower Tile.";
+		if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
+			msg += "Select ALL Accent Tiles to play with,";
+		} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
+			msg += "Select 8 Accent Tiles to play with,";
+		} else {
+			msg += "Select 4 Accent Tiles to play with,";
+		}
+		msg += " then Plant a Basic Flower Tile."
 	} else if (this.gameNotation.moves.length === 2) {
 		msg += "Plant a Basic Flower Tile.";
 	} else if (this.gameNotation.moves.length === 4) {
@@ -517,14 +524,17 @@ SkudPaiShoController.prototype.getTileMessage = function(tileDiv) {
 			}
 		} else if (tileCode === 'M') {
 			heading = "Accent Tile: Bamboo";
+			message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
 			message.push("When played, return each surrounding tile to owner's hand");
 			message.push("Tiles surrounding Bamboo cannot be captured");
 		} else if (tileCode === 'P') {
 			heading = "Accent Tile: Pond";
+			message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
 			message.push("Flower Tiles may be Planted on points surrounding a Pond");
 			message.push("(Tiles are Blooming after being Planted)");
 		} else if (tileCode === 'T') {
 			heading = "Accent Tile: Lion Turtle";
+			message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
 			message.push("Flower tiles surrounding a Lion Turtle form Harmony with all Basic Flower Tiles of either player");
 			message.push("The owner of the Lion Turtle owns the Harmonies that include both players' tiles");
 			message.push("(Overlap with other Lion Turtle tiles can combine this effect, so Harmonies can potentially belong to both players)");
