@@ -119,7 +119,8 @@ OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, o
             username: loginToken.username,
             userEmail: loginToken.userEmail, 
             deviceId: loginToken.deviceId,
-            options: optionsString
+            options: optionsString,
+            isWeb: 1
         },
         function(data, status){
             if (status === 'success') {
@@ -136,7 +137,8 @@ OnlinePlayEngine.prototype.joinGameSeek = function(gameId, loginToken, callback)
             userId: loginToken.userId,
             username: loginToken.username,
             userEmail: loginToken.userEmail, 
-            deviceId: loginToken.deviceId
+            deviceId: loginToken.deviceId,
+            isWeb: 1
         },
         function(data, status){
             if (status === 'success') {
@@ -217,7 +219,7 @@ OnlinePlayEngine.prototype.getPreviouslyActiveGameId = function(loginToken, game
 };
 
 OnlinePlayEngine.prototype.getGameInfo = function(userId, gameId, callback) {
-    $.get("getGameInfo.php?userId="+userId+"&gameId="+gameId, 
+    $.get("getGameInfo.php?userId="+userId+"&gameId="+gameId+"&isWeb=1", 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
