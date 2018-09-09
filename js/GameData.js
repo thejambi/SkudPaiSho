@@ -86,6 +86,15 @@ var WHITE_LOTUS = "White Lotus";
 var ORCHID = "Orchid";
 
 
+function arrayIncludesAll(array1, array2) {
+  for (var i = 0; i < array2.length; i++) {
+    if (!array1.includes(array2[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function copyArray(arr) {
 	var copyArr = [];
 	for (var i = 0; i < arr.length; i++) {

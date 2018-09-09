@@ -98,7 +98,7 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 			}
 		}
 
-		msg += getGameOptionsMessageHtml([OPTION_DOUBLE_ACCENT_TILES, OPTION_ANCIENT_OASIS_EXPANSION]);
+		msg += getGameOptionsMessageHtml(GameType.SkudPaiSho.gameOptions);
 	} else if (this.gameNotation.moves.length === 1) {
 		if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
 			msg += "Select ALL Accent Tiles to play with,";

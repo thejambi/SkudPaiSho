@@ -88,10 +88,7 @@ CoopSolitaireController.prototype.getDefaultHelpMessageText = function() {
 CoopSolitaireController.prototype.getAdditionalMessage = function() {
 	var msg = "";
 	if (this.gameNotation.moves.length === 0) {
-		msg += getGameOptionsMessageHtml([
-			OPTION_DOUBLE_TILES, 
-			OPTION_INSANE_TILES
-		]);
+		msg += getGameOptionsMessageHtml(GameType.CoopSolitaire.gameOptions);
 	}
 	if (!this.theGame.getWinner()) {
 		var playerName = this.getCurrentPlayer();

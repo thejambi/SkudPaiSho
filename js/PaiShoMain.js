@@ -1422,14 +1422,65 @@ function forgetCurrentGameInfo() {
 }
 
 var GameType = {
-	SkudPaiSho:{id:1, desc:"Skud Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/skud-pai-sho/"}, 
-	VagabondPaiSho:{id:2, desc:"Vagabond Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/vagabond-pai-sho/"}, 
-	SolitairePaiSho:{id:4, desc:"Solitaire Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/solitaire-pai-sho/"}, 
-	CapturePaiSho:{id:3, desc:"Capture Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/capture-pai-sho/"},
-	StreetPaiSho:{id:5, desc:"Street Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/street-pai-sho/"},
-	CoopSolitaire:{id:6, desc:"Cooperative Solitaire", rulesUrl:"https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/"},
-	Playground:{id:7, desc:"Pai Sho Playground", rulesUrl:"https://skudpaisho.com/site/games/pai-sho-playground/"},
-	OvergrowthPaiSho:{id:8, desc:"Overgrowth Pai Sho", rulesUrl:"https://skudpaisho.com/site/games/overgrowth-pai-sho/"}
+	SkudPaiSho: {
+		id: 1,
+		desc: "Skud Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/", 
+		gameOptions: [
+			OPTION_DOUBLE_ACCENT_TILES, 
+			OPTION_ANCIENT_OASIS_EXPANSION
+		]
+	},
+	VagabondPaiSho: {
+		id: 2,
+		desc: "Vagabond Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/vagabond-pai-sho/", 
+		gameOptions: [
+			OPTION_DOUBLE_TILES
+		]
+	},
+	SolitairePaiSho: {
+		id: 4,
+		desc: "Solitaire Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/", 
+		gameOptions: [
+			OPTION_DOUBLE_TILES, 
+			OPTION_INSANE_TILES
+		]
+	},
+	CapturePaiSho: {
+		id: 3,
+		desc: "Capture Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/capture-pai-sho/", 
+		gameOptions: []
+	},
+	StreetPaiSho: {
+		id: 5,
+		desc: "Street Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/street-pai-sho/", 
+		gameOptions: []
+	},
+	CoopSolitaire: {
+		id: 6,
+		desc: "Cooperative Solitaire",
+		rulesUrl: "https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/", 
+		gameOptions: [
+			OPTION_DOUBLE_TILES, 
+			OPTION_INSANE_TILES
+		]
+	},
+	Playground: {
+		id: 7,
+		desc: "Pai Sho Playground",
+		rulesUrl: "https://skudpaisho.com/site/games/pai-sho-playground/", 
+		gameOptions: []
+	},
+	OvergrowthPaiSho: {
+		id: 8,
+		desc: "Overgrowth Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/overgrowth-pai-sho/", 
+		gameOptions: []
+	}
 };
 function getGameControllerForGameType(gameTypeId) {
 	var controller;
@@ -1809,7 +1860,14 @@ var getCurrentGamesForUserNewCallback = function getCurrentGamesForUserNewCallba
 };
 
 function gameTypeIdSupported(id) {
-	return getGameControllerForGameType(id) !== undefined;
+	var gameTypeIdFound = false;
+	Object.keys(GameType).forEach(function(key,index) {
+		if (GameType[key].id === id) {
+			gameTypeIdFound = true;
+			return true;
+		}
+	});
+	return gameTypeIdFound;
 }
 
 var selectedGameSeek;
@@ -1822,9 +1880,13 @@ function acceptGameSeekClicked(gameIdChosen) {
 		}
 	}
 
-	if (gameSeek && gameTypeIdSupported(gameSeek.gameTypeId)) {
+	if (gameSeek 
+		&& gameTypeIdSupported(gameSeek.gameTypeId) 
+		&& gameOptionsSupportedForGameSeek(gameSeek)) {
 		selectedGameSeek = gameSeek;
 		onlinePlayEngine.getCurrentGamesForUserNew(getLoginToken(), getCurrentGamesForUserNewCallback);
+	} else {
+		showModal("Cannot Join Game", "This game is using new features that your version of The Garden Gate does not support.");
 	}
 }
 
@@ -1834,6 +1896,18 @@ function tryRealTimeClicked() {
 	initialVerifyLogin();
 	rerunAll();
 	closeModal();
+}
+
+function gameOptionsSupportedForGameSeek(gameSeek) {
+	var gameOptionsSupported = false;
+	Object.keys(GameType).forEach(function(key,index) {
+		var gameType = GameType[key];
+		if (gameType.id === gameSeek.gameTypeId) {
+			gameOptionsSupported = arrayIncludesAll(gameType.gameOptions, gameSeek.gameOptions);
+			return gameOptionsSupported;
+		}
+	});
+	return gameOptionsSupported;
 }
 
 var getGameSeeksCallback = function getGameSeeksCallback(results) {
