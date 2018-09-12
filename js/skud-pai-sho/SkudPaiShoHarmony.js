@@ -293,7 +293,8 @@ SkudPaiShoHarmonyManager.prototype.hasNewHarmony = function(player, oldHarmonies
 			// Does it exist in old set of harmonies?
 			var exists = false;
 			for (var j = 0; j < oldHarmonies.length; j++) {
-				if (this.harmonies[i].equals(oldHarmonies[j])) {
+				if (this.harmonies[i].equals(oldHarmonies[j])
+					&& oldHarmonies[j].hasOwner(player)) {
 					// Existing Harmony
 					exists = true;
 				}
@@ -408,7 +409,6 @@ SkudPaiShoHarmonyManager.prototype.verifyHarmonyRing = function(ring) {
 	// We have to go through the harmonies and create an array of the points of the 'shape' that the harmony ring makes
 	var shapePoints = [];
 
-	var h = ring.pop();	// LOL
 	// playerName is the player that's an owner on all rings
 	var allHaveHost = true;
 	var allHaveGuest = true;
@@ -429,6 +429,8 @@ SkudPaiShoHarmonyManager.prototype.verifyHarmonyRing = function(ring) {
 	} else if (allHaveGuest) {
 		playerNames = GUEST;
 	}
+
+	var h = ring.pop();	// LOL
 
 	shapePoints.push(new NotationPoint(h.tile1Pos.notationPointString).toArr());
 	shapePoints.push(new NotationPoint(h.tile2Pos.notationPointString).toArr());
