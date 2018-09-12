@@ -1640,50 +1640,50 @@ function getLoginToken() {
 }
 
 var showPastGamesCallback = function showPastGamesCallback(results) {
-			var message = "No completed games.";
-			if (results) {
-				message = "";
+	var message = "No completed games.";
+	if (results) {
+		message = "";
 
-				var showAll = showAllCompletedGamesInList;
-				var countOfGamesShown = 0;
-				
-				populateMyGamesList(results);
+		var showAll = showAllCompletedGamesInList;
+		var countOfGamesShown = 0;
 
-				var gameTypeHeading = "";
-				for (var index in myGamesList) {
-					var myGame = myGamesList[index];
+		populateMyGamesList(results);
 
-					if (myGame.gameTypeDesc !== gameTypeHeading) {
-						if (gameTypeHeading !== "") {
-							message += "<br />";
-						}
-						gameTypeHeading = myGame.gameTypeDesc;
-						message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
-					}
+		var gameTypeHeading = "";
+		for (var index in myGamesList) {
+			var myGame = myGamesList[index];
 
-					var gId = parseInt(myGame.gameId);
-					var userIsHost = usernameEquals(myGame.hostUsername);
-					var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
-
-					var gameDisplayTitle = myGame.hostUsername;
-					gameDisplayTitle += " vs. ";
-					gameDisplayTitle += myGame.guestUsername;
-					
-					message += "<div class='clickableText' onclick='jumpToGame(" + gId + ");'>" + gameDisplayTitle + "</div>";
-					
-					countOfGamesShown++;
-					if (!showAll && countOfGamesShown > 20) {
-						break;
-					}
+			if (myGame.gameTypeDesc !== gameTypeHeading) {
+				if (gameTypeHeading !== "") {
+					message += "<br />";
 				}
+				gameTypeHeading = myGame.gameTypeDesc;
+				message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
 			}
 
-			if (!showAll) {
-				message += "<br /><div class='clickableText' onclick='showAllCompletedGames();'>Show all</div>";
-			}
+			var gId = parseInt(myGame.gameId);
+			var userIsHost = usernameEquals(myGame.hostUsername);
+			var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
 
-			showModal("Completed Games", message);
-		};
+			var gameDisplayTitle = myGame.hostUsername;
+			gameDisplayTitle += " vs. ";
+			gameDisplayTitle += myGame.guestUsername;
+
+			message += "<div class='clickableText' onclick='jumpToGame(" + gId + ");'>" + gameDisplayTitle + "</div>";
+
+			countOfGamesShown++;
+			if (!showAll && countOfGamesShown > 20) {
+				break;
+			}
+		}
+	}
+
+	if (!showAll) {
+		message += "<br /><div class='clickableText' onclick='showAllCompletedGames();'>Show all</div>";
+	}
+
+	showModal("Completed Games", message);
+};
 
 var showAllCompletedGamesInList = false;
 function showPastGamesClicked() {

@@ -10,7 +10,7 @@ function StreetGameManager(actuator, ignoreActuate, isCopy) {
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
 
-	this.winnerTurnWaitCount = -1;
+	this.previousTurnBoardWinners = [];
 }
 
 // Set up the game
@@ -37,14 +37,13 @@ StreetGameManager.prototype.actuate = function () {
 StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
 	debug("Running Move: " + move.fullMoveText);
 
-	var errorFound = false;
+	this.previousTurnBoardWinners = this.board.winners;
 
 	if (move.moveType === PLANTING) {
 		// // Check if valid plant
 		if (!this.board.pointIsOpenGate(move.endPoint)) {
 			// invalid
 			debug("Invalid planting point: " + move.endPoint.pointText);
-			errorFound = true;
 			return false;
 		}
 		// Just placing tile on board
@@ -91,7 +90,6 @@ StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
 				break;
 			default: 
 				debug("Unknown board setup code.");
-				errorFound = true;
 		}
 
 		var self = this;
@@ -119,10 +117,6 @@ StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
 				this.endGameWinners.push(HOST);
 			}
 		}
-	}
-
-	if (this.board.winners.length === 1) {
-		this.winnerTurnWaitCount++;
 	}
 };
 
@@ -198,10 +192,12 @@ StreetGameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playe
 };
 
 StreetGameManager.prototype.getWinner = function() {
-	if (this.board.winners.length === 1 && this.winnerTurnWaitCount > 0) {
-		return this.board.winners[0];
-	} else if (this.board.winners.length > 1) {
+	if (this.board.winners.length === 2 && this.previousTurnBoardWinners.length === 2) {
 		return "BOTH players";
+	} else if (this.board.winners.includes(HOST) && this.previousTurnBoardWinners.includes(HOST)) {
+		return HOST;
+	} else if (this.board.winners.includes(GUEST) && this.previousTurnBoardWinners.includes(GUEST)) {
+		return GUEST;
 	} else if (this.endGameWinners.length === 1) {
 		return this.endGameWinners[0];
 	} else if (this.endGameWinners.length > 1) {
