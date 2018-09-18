@@ -525,7 +525,8 @@ SkudPaiShoController.prototype.getTileMessage = function(tileDiv) {
 		} else if (tileCode === 'M') {
 			heading = "Accent Tile: Bamboo";
 			message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
-			message.push("When played, return each surrounding tile to owner's hand");
+			// message.push("When played, return each surrounding tile to owner's hand");
+			message.push("If played on a point surrounded by tiles belonging to both players, return each surrounding tile to owner's hand when played");
 			message.push("Tiles surrounding Bamboo cannot be captured");
 		} else if (tileCode === 'P') {
 			heading = "Accent Tile: Pond";

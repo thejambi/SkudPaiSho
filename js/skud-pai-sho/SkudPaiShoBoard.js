@@ -693,14 +693,30 @@ SkudPaiShoBoard.prototype.placeBamboo = function(tile, notationPoint, ignoreChec
 	boardPoint.putTile(tile);
 
 	var rowCols = this.getSurroundingRowAndCols(rowAndCol);
-	// Return each tile to hand
+
+	var surroundsHostTile = false;
+	var sourroundsGuestTile = false;
 	for (var i = 0; i < rowCols.length; i++) {
 		var bp = this.cells[rowCols[i].row][rowCols[i].col];
 		if (bp.hasTile()) {
-			// Put it back
-			var removedTile = bp.removeTile();
-			if (tileManager) {
-				tileManager.putTileBack(removedTile);
+			if (bp.tile.ownerName === HOST) {
+				surroundsHostTile = true;
+			} else if (bp.tile.ownerName === GUEST) {
+				sourroundsGuestTile = true;
+			}
+		}
+	}
+
+	// Return each tile to hand if surrounds both player's tiles
+	if (surroundsHostTile && sourroundsGuestTile) {
+		for (var i = 0; i < rowCols.length; i++) {
+			var bp = this.cells[rowCols[i].row][rowCols[i].col];
+			if (bp.hasTile()) {
+				// Put it back
+				var removedTile = bp.removeTile();
+				if (tileManager) {
+					tileManager.putTileBack(removedTile);
+				}
 			}
 		}
 	}
