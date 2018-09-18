@@ -10,7 +10,7 @@ function StreetGameManager(actuator, ignoreActuate, isCopy) {
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
 
-	this.previousTurnBoardWinners = [];
+	this.potentialWinners = [];
 }
 
 // Set up the game
@@ -36,8 +36,6 @@ StreetGameManager.prototype.actuate = function () {
 
 StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
 	debug("Running Move: " + move.fullMoveText);
-
-	this.previousTurnBoardWinners = this.board.winners;
 
 	if (move.moveType === PLANTING) {
 		// // Check if valid plant
@@ -106,6 +104,7 @@ StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	this.endGameWinners = [];
+	this.potentialWinners = [];
 	if (this.board.winners.length === 0) {
 		// If no harmony set winners, check for player out of tiles
 		var playerOutOfTiles = this.board.aPlayerIsOutOfTilesWithoutOpenGate();
@@ -116,6 +115,10 @@ StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
 			} else {
 				this.endGameWinners.push(HOST);
 			}
+		}
+	} else if (this.board.winners.length > 0) {
+		for (var i = 0; i < this.board.winners.length; i++) {
+			this.potentialWinners.push(this.board.winners[i]);
 		}
 	}
 };
@@ -192,21 +195,15 @@ StreetGameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playe
 };
 
 StreetGameManager.prototype.getWinner = function() {
-	if (this.board.winners.length === 2 && this.previousTurnBoardWinners.length === 2) {
-		return "BOTH players";
-	} else if (this.board.winners.includes(HOST) && this.previousTurnBoardWinners.includes(HOST)) {
+	if (this.potentialWinners.includes(HOST) && getCurrentPlayer() === HOST) {
 		return HOST;
-	} else if (this.board.winners.includes(GUEST) && this.previousTurnBoardWinners.includes(GUEST)) {
+	} else if (this.potentialWinners.includes(GUEST) && getCurrentPlayer() === GUEST) {
 		return GUEST;
-	} else if (this.endGameWinners.length === 1) {
-		return this.endGameWinners[0];
-	} else if (this.endGameWinners.length > 1) {
-		return "BOTH players";
 	}
 };
 
 StreetGameManager.prototype.getWinReason = function() {
-	if (this.board.winners.length === 1) {
+	if (this.potentialWinners.length > 0) {
 		return " achieved Harmony across all midlines and won the game!";
 	} else if (this.endGameWinners.length === 1) {
 		return " won the game by eliminating opponent's tiles.";

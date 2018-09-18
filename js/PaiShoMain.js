@@ -720,10 +720,8 @@ function refreshMessage() {
 	}
 	message += getAdditionalMessage();
 
-	// getGameMessageElement().innerHTML = "Current Player: " + getCurrentPlayer() + getAdditionalMessage();
 	getGameMessageElement().innerHTML = message;
 
-	//if (playingOnlineGame() && !myTurn() && !gameController.theGame.getWinner()) {
 	if (playingOnlineGame() && !myTurn()) {
 		showResetMoveMessage();
 	}
@@ -2488,10 +2486,6 @@ function continueTutorial() {
 
 	tutorialInProgress = false;
 }
-
-/* Internet connection checking */
-// window.addEventListener('online',  updateIndicator);
-// window.addEventListener('offline', updateIndicator);
 
 function iOSShake() {
 	// If undo move is allowed, ask user if they wanna
