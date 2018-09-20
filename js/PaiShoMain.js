@@ -1477,7 +1477,9 @@ var GameType = {
 		id: 8,
 		desc: "Overgrowth Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/overgrowth-pai-sho/", 
-		gameOptions: []
+		gameOptions: [
+			OPTION_FULL_TILES
+		]
 	}
 };
 function getGameControllerForGameType(gameTypeId) {

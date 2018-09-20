@@ -87,6 +87,9 @@ OvergrowthController.prototype.getDefaultHelpMessageText = function() {
 
 OvergrowthController.prototype.getAdditionalMessage = function() {
 	var msg = "";
+	if (this.gameNotation.moves.length === 0) {
+		msg += getGameOptionsMessageHtml(GameType.OvergrowthPaiSho.gameOptions);
+	}
 	if (!this.theGame.getWinner()) {
 		msg += "<br /><strong>" + this.theGame.getScoreSummary() + "</strong>";
 	}

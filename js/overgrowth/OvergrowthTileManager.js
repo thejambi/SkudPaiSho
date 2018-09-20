@@ -11,30 +11,30 @@ function OvergrowthTileManager(forActuating) {
 }
 
 OvergrowthTileManager.prototype.loadTileSet = function(ownerCode) {
-	return this.loadSolitaireSet(ownerCode, false, true);
+	return this.loadPlayerTileSet(ownerCode, false, true);
 };
 
-OvergrowthTileManager.prototype.loadSolitaireSet = function(ownerCode, doubleTiles, includeAccentTiles) {
+OvergrowthTileManager.prototype.loadPlayerTileSet = function(ownerCode, doubleTiles, includeAccentTiles) {
 	var tiles = [];
 
-	// Double amount of tiles if doubleTiles enabled
-	var multiplier = 1;
-	if (doubleTiles) {
-		multiplier = 2;
+	var numAccentTiles = 1;
+	var numBasicFlowerTiles = 2;
+
+	if (gameOptionEnabled(OPTION_FULL_TILES)) {
+		numAccentTiles = 2;
+		numBasicFlowerTiles = 3;
 	}
 
-	if (includeAccentTiles) {
-		// 2 of each accent tile
-		for (var i = 0; i < 2 * multiplier; i++) {
-			tiles.push(new OvergrowthTile('R', ownerCode));
-			tiles.push(new OvergrowthTile('W', ownerCode));
-			tiles.push(new OvergrowthTile('K', ownerCode));
-			tiles.push(new OvergrowthTile('B', ownerCode));
-		}
+	// Accent Tiles
+	for (var i = 0; i < numAccentTiles; i++) {
+		tiles.push(new OvergrowthTile('R', ownerCode));
+		tiles.push(new OvergrowthTile('W', ownerCode));
+		tiles.push(new OvergrowthTile('K', ownerCode));
+		tiles.push(new OvergrowthTile('B', ownerCode));
 	}
 
-	// 3 of each basic flower
-	for (var i = 0; i < 3 * multiplier; i++) {
+	// Basic flower tiles
+	for (var i = 0; i < numBasicFlowerTiles; i++) {
 		tiles.push(new OvergrowthTile("R3", ownerCode));
 		tiles.push(new OvergrowthTile("R4", ownerCode));
 		tiles.push(new OvergrowthTile("R5", ownerCode));
@@ -43,16 +43,9 @@ OvergrowthTileManager.prototype.loadSolitaireSet = function(ownerCode, doubleTil
 		tiles.push(new OvergrowthTile("W5", ownerCode));
 	}
 
-	// 1 of each special flower
-	for (var i = 0; i < 1 * multiplier; i++) {
-		tiles.push(new OvergrowthTile('L', ownerCode));
-		tiles.push(new OvergrowthTile('O', ownerCode));
-	}
-
-	// 1 extra White Lotus so White Lotus Gambit is possible
-	if (doubleTiles) {
-		tiles.push(new OvergrowthTile('L', ownerCode));
-	}
+	// Special flower tiles
+	tiles.push(new OvergrowthTile('L', ownerCode));
+	tiles.push(new OvergrowthTile('O', ownerCode));
 
 	return tiles;
 };

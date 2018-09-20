@@ -707,6 +707,10 @@ SkudPaiShoBoard.prototype.placeBamboo = function(tile, notationPoint, ignoreChec
 		}
 	}
 
+	// These lines cause to work like old way:
+	surroundsHostTile = true;
+	sourroundsGuestTile = true;
+
 	// Return each tile to hand if surrounds both player's tiles
 	if (surroundsHostTile && sourroundsGuestTile) {
 		for (var i = 0; i < rowCols.length; i++) {
