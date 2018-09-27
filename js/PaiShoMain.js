@@ -2081,7 +2081,7 @@ var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(resul
 
 function resetGlobalChats() {
 	// Clear all global chats..
-	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! This global chat will show the latest messages sent to it for anyone signed in. Say hi and see if anyone else is online :)<br />Better yet, for any questions and other talk about the games here, join The Garden Gate <a href='https://discord.gg/dStDZx7' target='_blank'>Discord server</a>.<hr />";
+	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! This global chat will show the latest messages sent to it for anyone signed in.<br />To get involved in the community or ask questions, join The Garden Gate <a href='https://discord.gg/dStDZx7' target='_blank'>Discord server</a> or <a href='https://forum.skudpaisho.com/' target='_blank'>The Garden Gate Forum</a>.<hr />";
 }
 
 function fetchInitialGlobalChats() {

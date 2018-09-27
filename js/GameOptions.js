@@ -8,6 +8,8 @@ var OPTION_ANCIENT_OASIS_EXPANSION = "Ancient Oasis Expansion";
 
 var OPTION_FULL_TILES = "Full tile set";
 
+var CLASSIC_RULES = "Classic Rules";
+
 function gameOptionEnabled(optionName) {
 	if (ggOptions.includes(optionName)) {
 		return true;
