@@ -48,12 +48,10 @@ OvergrowthGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	this.endGameWinners = [];
-	if (this.board.winners.length === 0) {
-		// For Solitaire: end game when all tiles have been played
-		var noTilesLeft = this.tileManager.noMoreTilesLeft();
-		if (noTilesLeft) {
-			this.endGameWinners.push(this.board.harmonyManager.getWinningPlayer());
-		}
+	// For Solitaire: end game when all tiles have been played
+	var noTilesLeft = this.tileManager.noMoreTilesLeft();
+	if (noTilesLeft) {
+		this.endGameWinners.push(this.board.harmonyManager.getWinningPlayer());
 	}
 
 	return bonusAllowed;
@@ -148,7 +146,11 @@ OvergrowthGameManager.prototype.getWinReason = function() {
 };
 
 OvergrowthGameManager.prototype.getScoreSummary = function() {
-	return "<br />" + this.board.harmonyManager.getScoreSummaryText();
+	var tilesLeft = this.tileManager.guestTiles.length;
+	return "<br />"
+		+ this.board.harmonyManager.getScoreSummaryText()
+		+ "<br />"
+		+ tilesLeft + " tiles remaining.";
 };
 
 OvergrowthGameManager.prototype.getWinResultTypeCode = function() {

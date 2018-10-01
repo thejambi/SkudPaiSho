@@ -10,6 +10,8 @@ var OPTION_FULL_TILES = "Full tile set";
 
 var CLASSIC_RULES = "Classic Rules";
 
+var FULL_POINTS_SCORING = "Full points scoring";
+
 function gameOptionEnabled(optionName) {
 	if (ggOptions.includes(optionName)) {
 		return true;

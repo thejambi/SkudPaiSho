@@ -1478,7 +1478,8 @@ var GameType = {
 		desc: "Overgrowth Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/overgrowth-pai-sho/", 
 		gameOptions: [
-			OPTION_FULL_TILES
+			OPTION_FULL_TILES,
+			FULL_POINTS_SCORING
 		]
 	}
 };
@@ -2571,9 +2572,9 @@ function showBadMoveModal() {
 	showModal("Uh Oh", "A move went wrong somewhere. If you see this each time you look at this game, then this game may be corrupt due to players not both using latest updates. The app is not be compatible with new features.<br /><br />Please let your opponent know that you saw this message. You may want to resign this game and try again.");
 }
 
-
-
-
+function viewTournamentsClicked() {
+	showModal("Tournaments", "Coming soon! This is where you will be able to view upcoming and in progress tournaments.");
+}
 
 
 

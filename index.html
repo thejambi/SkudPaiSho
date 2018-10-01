@@ -62,10 +62,19 @@
         <span id='myGamesNumberMyTurn'></span>
       </div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameSeeksClicked();'>
-        <i class="fa fa-plug" aria-hidden="true"></i> Join a game</div>
-      <hr />
-      <div class='sidenavSectionHeader'>New Game</div>
-      <div id="sidenavNewGameSection"></div>
+        <i class="fa fa-plug" aria-hidden="true"></i> Join a game
+      </div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='newGameClicked();'>
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> New game
+      </div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='viewTournamentsClicked();'>
+        <i class="fa fa-trophy" aria-hidden="true"></i> Tournaments
+      </div>
+      <div class='gone'>
+        <hr />
+        <div class='sidenavSectionHeader'>New Game</div>
+        <div id="sidenavNewGameSection"></div>
+      </div>
       <hr />
       <div class='sidenavSectionHeader'>Current Game</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleReplayControls();'>Toggle replay controls</div>
@@ -303,114 +312,8 @@
   <script type="text/javascript" src="js/jquery.min.js"></script>
   <script src="js/lz-string.min.js"></script>
 
-  <!-- Comment out all these when using minified -->
-    <!-- <script type="text/javascript" src="js/jquery.validate.min.js"></script>
-    <script type="text/javascript" src="js/jquery.form.js"></script>
-    <script type="text/javascript" src="js/contact.js"></script>
-
-    <script src="js/GameData.js"></script>
-    <script src="js/GameOptions.js"></script>
-    <script src="js/CommonNotationObjects.js"></script>
-    <script src="js/LocalStorage.js"></script>
-    <script src="js/ActuatorHelp.js"></script>
-    <script src="js/pai-sho-common/PaiShoBoardHelp.js"></script>
-    <script src="js/pai-sho-common/PaiShoPlayerHelp.js"></script>
-    
-
-    <script src="js/ai/SkudAIv1.js"></script>
-
-
-    <script src="js/OnlinePlayEngine.js"></script>
-    <script src="js/OnlinePlayEngineIOS.js"></script>
-
-
-    <script src="js/AppCaller.js"></script>
-
-
-    <script src="js/skud-pai-sho/SkudPaiShoController.js"></script>
-    <script src="js/skud-pai-sho/SkudPaiShoActuator.js"></script>
-    <script src="js/skud-pai-sho/SkudPaiShoHarmony.js"></script>
-    <script src="js/skud-pai-sho/SkudPaiShoGameManager.js"></script>
-    <script src="js/skud-pai-sho/SkudPaiShoBoardPoint.js"></script>
-    <script src="js/skud-pai-sho/SkudPaiShoBoard.js"></script>
-    <script src="js/skud-pai-sho/SkudPaiShoGameNotation.js"></script>
-    <script src="js/skud-pai-sho/SkudPaiShoTile.js"></script>
-    <script src="js/skud-pai-sho/SkudPaiShoTileManager.js"></script>
-
-    <script src="js/vagabond/VagabondController.js"></script>
-    <script src="js/vagabond/VagabondActuator.js"></script>
-    <script src="js/vagabond/VagabondBoard.js"></script>
-    <script src="js/vagabond/VagabondBoardPoint.js"></script>
-    <script src="js/vagabond/VagabondGameManager.js"></script>
-    <script src="js/vagabond/VagabondGameNotation.js"></script>
-    <script src="js/vagabond/VagabondTile.js"></script>
-    <script src="js/vagabond/VagabondTileManager.js"></script>
-
-    <script src="js/solitaire/SolitaireController.js"></script>
-    <script src="js/solitaire/SolitaireActuator.js"></script>
-    <script src="js/solitaire/SolitaireHarmony.js"></script>
-    <script src="js/solitaire/SolitaireGameManager.js"></script>
-    <script src="js/solitaire/SolitaireBoardPoint.js"></script>
-    <script src="js/solitaire/SolitaireBoard.js"></script>
-    <script src="js/solitaire/SolitaireGameNotation.js"></script>
-    <script src="js/solitaire/SolitaireTile.js"></script>
-    <script src="js/solitaire/SolitaireTileManager.js"></script>
-
-    <script src="js/cooperative-solitaire/CoopSolitaireController.js"></script>
-    <script src="js/cooperative-solitaire/CoopSolitaireActuator.js"></script>
-    <script src="js/cooperative-solitaire/CoopSolitaireHarmony.js"></script>
-    <script src="js/cooperative-solitaire/CoopSolitaireGameManager.js"></script>
-    <script src="js/cooperative-solitaire/CoopSolitaireBoardPoint.js"></script>
-    <script src="js/cooperative-solitaire/CoopSolitaireBoard.js"></script>
-    <script src="js/cooperative-solitaire/CoopSolitaireGameNotation.js"></script>
-    <script src="js/cooperative-solitaire/CoopSolitaireTile.js"></script>
-    <script src="js/cooperative-solitaire/CoopSolitaireTileManager.js"></script>
-
-    <script src="js/capture/CaptureController.js"></script>
-    <script src="js/capture/CaptureActuator.js"></script>
-    <script src="js/capture/CaptureBoard.js"></script>
-    <script src="js/capture/CaptureBoardPoint.js"></script>
-    <script src="js/capture/CaptureGameManager.js"></script>
-    <script src="js/capture/CaptureGameNotation.js"></script>
-    <script src="js/capture/CaptureTile.js"></script>
-    <script src="js/capture/CaptureTileManager.js"></script>
-
-    <script src="js/street/StreetController.js"></script>
-    <script src="js/street/StreetActuator.js"></script>
-    <script src="js/street/StreetHarmony.js"></script>
-    <script src="js/street/StreetGameManager.js"></script>
-    <script src="js/street/StreetBoardPoint.js"></script>
-    <script src="js/street/StreetBoard.js"></script>
-    <script src="js/street/StreetGameNotation.js"></script>
-    <script src="js/street/StreetTile.js"></script>
-    <script src="js/street/StreetTileManager.js"></script>
-
-    <script src="js/playground/PlaygroundController.js"></script>
-    <script src="js/playground/PlaygroundActuator.js"></script>
-    <script src="js/playground/PlaygroundHarmony.js"></script>
-    <script src="js/playground/PlaygroundGameManager.js"></script>
-    <script src="js/playground/PlaygroundBoardPoint.js"></script>
-    <script src="js/playground/PlaygroundBoard.js"></script>
-    <script src="js/playground/PlaygroundGameNotation.js"></script>
-    <script src="js/playground/PlaygroundTile.js"></script>
-    <script src="js/playground/PlaygroundTileManager.js"></script>
-
-    <script src="js/overgrowth/OvergrowthController.js"></script>
-    <script src="js/overgrowth/OvergrowthActuator.js"></script>
-    <script src="js/overgrowth/OvergrowthHarmony.js"></script>
-    <script src="js/overgrowth/OvergrowthGameManager.js"></script>
-    <script src="js/overgrowth/OvergrowthBoardPoint.js"></script>
-    <script src="js/overgrowth/OvergrowthBoard.js"></script>
-    <script src="js/overgrowth/OvergrowthGameNotation.js"></script>
-    <script src="js/overgrowth/OvergrowthTile.js"></script>
-    <script src="js/overgrowth/OvergrowthTileManager.js"></script>
-
-
-    <script src="js/PaiShoMain.js"></script> -->
-  <!-- End of all those -->
-
   <!-- Compressed -->
-  <script src="js/psmin_20180927-121833.js"></script>
+  <script src="js/psmin_20180930-213047.js"></script>
 </body>
 
 </html>

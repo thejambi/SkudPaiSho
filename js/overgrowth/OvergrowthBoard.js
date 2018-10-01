@@ -11,7 +11,6 @@ function OvergrowthBoard() {
 
 	this.rockRowAndCols = [];
 	this.playedWhiteLotusTiles = [];
-	this.winners = [];
 }
 
 OvergrowthBoard.prototype.brandNew = function () {

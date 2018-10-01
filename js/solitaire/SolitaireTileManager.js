@@ -17,6 +17,9 @@ SolitaireTileManager.prototype.loadTileSet = function(ownerCode) {
 SolitaireTileManager.prototype.loadSolitaireSet = function(ownerCode, doubleTiles, includeAccentTiles) {
 	var tiles = [];
 
+	var numAccentTiles = 2;
+	var numBasicFlowerTiles = 3;
+
 	var tileMultiplier = 1;
 	if (gameOptionEnabled(OPTION_DOUBLE_TILES)) {
 		tileMultiplier = 2;
@@ -26,19 +29,26 @@ SolitaireTileManager.prototype.loadSolitaireSet = function(ownerCode, doubleTile
 		tileMultiplier = 4;
 	}
 
-	for (var i = 0; i < tileMultiplier; i++) {
+	// Accent Tiles
+	for (var i = 0; i < numAccentTiles * tileMultiplier; i++) {
 		tiles.push(new SolitaireTile('R', ownerCode));
 		tiles.push(new SolitaireTile('W', ownerCode));
 		tiles.push(new SolitaireTile('K', ownerCode));
 		tiles.push(new SolitaireTile('B', ownerCode));
+	}
 
+	// Basic flower tiles
+	for (var i = 0; i < numBasicFlowerTiles * tileMultiplier; i++) {
 		tiles.push(new SolitaireTile("R3", ownerCode));
 		tiles.push(new SolitaireTile("R4", ownerCode));
 		tiles.push(new SolitaireTile("R5", ownerCode));
 		tiles.push(new SolitaireTile("W3", ownerCode));
 		tiles.push(new SolitaireTile("W4", ownerCode));
 		tiles.push(new SolitaireTile("W5", ownerCode));
+	}
 
+	// Special flower tiles
+	for (var i = 0; i < tileMultiplier; i++) {
 		tiles.push(new SolitaireTile('L', ownerCode));
 		tiles.push(new SolitaireTile('O', ownerCode));
 	}

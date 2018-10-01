@@ -217,10 +217,20 @@ OvergrowthHarmonyManager.prototype.clearList = function() {
 };
 
 OvergrowthHarmonyManager.prototype.getWinningPlayer = function() {
-	if (this.numHarmonies() > this.numClashes()) {
-		return HOST;
-	} else if (this.numClashes() > this.numHarmonies()) {
-		return GUEST;
+	if (gameOptionEnabled(FULL_POINTS_SCORING)) {
+		var harmonyPoints = this.getHarmonyPoints(this.harmonies);
+		var clashPoints = this.getHarmonyPoints(this.clashes);
+		if (harmonyPoints > clashPoints) {
+			return HOST;
+		} else if (clashPoints > harmonyPoints) {
+			return GUEST;
+		}
+	} else {
+		if (this.numHarmonies() > this.numClashes()) {
+			return HOST;
+		} else if (this.numClashes() > this.numHarmonies()) {
+			return GUEST;
+		}
 	}
 };
 
