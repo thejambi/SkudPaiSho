@@ -49,7 +49,8 @@ OnlinePlayEngine.prototype.sendVerificationCode = function(username, userEmail, 
     $.post("sendVerificationCode.php",
         {
             username: username,
-            toEmail: userEmail
+            toEmail: userEmail,
+            isWeb: 1
         },
         function(data, status){
             callback(data.trim());

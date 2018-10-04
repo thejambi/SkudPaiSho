@@ -1291,7 +1291,6 @@ var userInfoExistsCallback = function userInfoExistsCallback(data) {
 }
 
 function sendVerificationCodeClicked() {
-	debug("Send verification code clicked");
 	emailBeingVerified = document.getElementById("userEmailInput").value.trim().toLowerCase();
 	usernameBeingVerified = document.getElementById("usernameInput").value.trim();
 
@@ -2572,9 +2571,106 @@ function showBadMoveModal() {
 	showModal("Uh Oh", "A move went wrong somewhere. If you see this each time you look at this game, then this game may be corrupt due to players not both using latest updates. The app is not be compatible with new features.<br /><br />Please let your opponent know that you saw this message. You may want to resign this game and try again.");
 }
 
-function viewTournamentsClicked() {
-	showModal("Tournaments", "Coming soon! This is where you will be able to view upcoming and in progress tournaments.");
+
+/* Tournament functions */
+
+function getViewTournamentsModalHtml() {
+	var html = "<div id='tourneyList>";
+	// html += "Loading&nbsp;<i class='fa fa-circle-o-notch fa-spin fa-fw'></i>&nbsp;";
+	html += "Coming soon! This is where you will be able to view upcoming and in progress tournaments. Join The Garden Gate Discord to get updates and get involved.";
+	html += "</div>";
+
+	return html;
 }
+
+// function buildTournamentsList(results) {
+// 	var resultRows = results.split('\n');
+// 	myGamesList = [];
+// 	for (var index in resultRows) {
+// 		var row = resultRows[index].split('|||');
+// 		var myGame = {
+// 			gameId:parseInt(row[0]), 
+// 			gameTypeId:parseInt(row[1]), 
+// 			gameTypeDesc:row[2], 
+// 			hostUsername:row[3], 
+// 			hostOnline:parseInt(row[4]), 
+// 			guestUsername:row[5], 
+// 			guestOnline:parseInt(row[6]), 
+// 			isUserTurn:parseInt(row[7]),
+// 			gameOptions:parseGameOptions(row[8])
+// 		};
+// 		myGamesList.push(myGame);
+// 	}
+// }
+
+// var showTournamentsCallback = function showTournamentsCallback(results) {
+// 	var message = "No current tournaments.";
+// 	if (results) {
+// 		message = "";
+		
+// 		var tourneyList = buildTournamentsList(results);
+
+// 		// TODOOOOO TODO
+// 		TODO
+
+// 		var tourneyHeading = "";
+// 		for (var index in tourneyList) {
+// 			var tourney = tourneyList[index];
+
+// 			if (tourney.type !== tourneyHeading) {
+// 				if (tourneyHeading !== "") {
+// 					message += "<br />";
+// 				}
+// 				tourneyHeading = myGame.gameTypeDesc;
+// 				message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+// 			}
+
+// 			var gId = parseInt(myGame.gameId);
+// 			var userIsHost = usernameEquals(myGame.hostUsername);
+// 			var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+
+// 			var gameDisplayTitle = "";
+
+// 			if (!userIsHost && !usernameEquals(opponentUsername)) {
+// 				if (myGame.hostOnline) {
+// 					gameDisplayTitle += userOnlineIcon;
+// 				} else {
+// 					gameDisplayTitle += userOfflineIcon;
+// 				}
+// 			}
+// 			gameDisplayTitle += myGame.hostUsername;
+// 			gameDisplayTitle += " vs. ";
+// 			if (userIsHost && !usernameEquals(opponentUsername)) {
+// 				if (myGame.guestOnline) {
+// 					gameDisplayTitle += userOnlineIcon;
+// 				} else {
+// 					gameDisplayTitle += userOfflineIcon;
+// 				}
+// 			}
+// 			gameDisplayTitle += myGame.guestUsername;
+// 			if (myGame.isUserTurn) {
+// 				gameDisplayTitle += " (Your turn)";
+// 			}
+			
+// 			// message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\"," + myGame.gameTypeId + ");'>" + gameDisplayTitle + "</div>";
+// 			message += "<div class='clickableText' onclick='jumpToGame(" + gId + ");'>" + gameDisplayTitle + "</div>";
+// 			for (var i = 0; i < myGame.gameOptions.length; i++) {
+// 				message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + myGame.gameOptions[i] + "</em></div>"
+// 			}
+// 		}
+// 	}
+// 	message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
+// 	message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
+// 	// message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
+// 	showModal("Active Games", message);
+// };
+
+function viewTournamentsClicked() {
+	showModal("Tournaments", getViewTournamentsModalHtml());
+
+	// onlinePlayEngine.getCurrentTournaments(getLoginToken(), showTournamentsCallback);
+}
+
 
 
 
