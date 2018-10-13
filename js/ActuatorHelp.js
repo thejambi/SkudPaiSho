@@ -32,6 +32,19 @@ function removeChildren(myNode) {
 	}
 }
 
+function createBoardPointDiv(boardPoint) {
+	var theDiv = document.createElement("div");
+
+	theDiv.classList.add("point");
+
+	var notationPointString = new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString;
+
+	theDiv.setAttribute("name", notationPointString);
+	theDiv.setAttribute("title", "(" + notationPointString + ")");
+
+	return theDiv;
+}
+
 function setupPaiShoBoard(gameContainer,
 	hostTilesContainerDivs,
 	guestTilesContainerDivs,

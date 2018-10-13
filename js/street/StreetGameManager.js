@@ -53,9 +53,10 @@ StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
 		/* If the tile moved captured a tile that had a captured tile, 
 		 * the bottom-most tile gets put back in tile pile. 
 		 */
-		if (tileMoved.capturedTile && tileMoved.capturedTile.capturedTile) {
-			this.tileManager.putTileBack(tileMoved.capturedTile.capturedTile);
-		}
+		// Skipping putting tile back
+		// if (tileMoved.capturedTile && tileMoved.capturedTile.capturedTile) {
+		// 	this.tileManager.putTileBack(tileMoved.capturedTile.capturedTile);
+		// }
 	} else if (INITIAL_SETUP) {
 		// Place tiles on board according to board setup code
 		

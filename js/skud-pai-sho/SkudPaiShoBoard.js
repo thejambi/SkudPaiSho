@@ -694,25 +694,26 @@ SkudPaiShoBoard.prototype.placeBamboo = function(tile, notationPoint, ignoreChec
 
 	var rowCols = this.getSurroundingRowAndCols(rowAndCol);
 
-	var surroundsHostTile = false;
-	var sourroundsGuestTile = false;
+	var surroundsOwnersFlowerTile = false;
+	var surroundsGrowingFlower = false;
 	for (var i = 0; i < rowCols.length; i++) {
 		var bp = this.cells[rowCols[i].row][rowCols[i].col];
-		if (bp.hasTile()) {
-			if (bp.tile.ownerName === HOST) {
-				surroundsHostTile = true;
-			} else if (bp.tile.ownerName === GUEST) {
-				sourroundsGuestTile = true;
-			}
+		if (!bp.isType(GATE)
+			&& bp.hasTile()
+			&& bp.tile.ownerName === tile.ownerName
+			&& bp.tile.type !== ACCENT_TILE) {
+				surroundsOwnersFlowerTile = true;
+		} else if (bp.isType(GATE) && bp.hasTile()) {
+			surroundsGrowingFlower = true;
 		}
 	}
 
-	// These lines cause to work like old way:
-	surroundsHostTile = true;
-	sourroundsGuestTile = true;
+	// Setting these will make it work the old way
+	// surroundsOwnersFlowerTile = true;
+	// surroundsGrowingFlower = false;
 
-	// Return each tile to hand if surrounds both player's tiles
-	if (surroundsHostTile && sourroundsGuestTile) {
+	// Return each tile to hand if surrounds Owner's Blooming Flower Tile and no Growing Flowers
+	if (surroundsOwnersFlowerTile && !surroundsGrowingFlower) {
 		for (var i = 0; i < rowCols.length; i++) {
 			var bp = this.cells[rowCols[i].row][rowCols[i].col];
 			if (bp.hasTile()) {

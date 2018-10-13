@@ -2574,103 +2574,134 @@ function showBadMoveModal() {
 
 /* Tournament functions */
 
-function getViewTournamentsModalHtml() {
-	var html = "<div id='tourneyList>";
-	// html += "Loading&nbsp;<i class='fa fa-circle-o-notch fa-spin fa-fw'></i>&nbsp;";
-	html += "Coming soon! This is where you will be able to view upcoming and in progress tournaments. Join The Garden Gate Discord to get updates and get involved.";
-	html += "</div>";
-
+function getLoadingModalText() {
+	var html = "Loading&nbsp;<i class='fa fa-circle-o-notch fa-spin fa-fw'></i>&nbsp;";
 	return html;
 }
 
-// function buildTournamentsList(results) {
-// 	var resultRows = results.split('\n');
-// 	myGamesList = [];
-// 	for (var index in resultRows) {
-// 		var row = resultRows[index].split('|||');
-// 		var myGame = {
-// 			gameId:parseInt(row[0]), 
-// 			gameTypeId:parseInt(row[1]), 
-// 			gameTypeDesc:row[2], 
-// 			hostUsername:row[3], 
-// 			hostOnline:parseInt(row[4]), 
-// 			guestUsername:row[5], 
-// 			guestOnline:parseInt(row[6]), 
-// 			isUserTurn:parseInt(row[7]),
-// 			gameOptions:parseGameOptions(row[8])
-// 		};
-// 		myGamesList.push(myGame);
-// 	}
-// }
+var showTournamentsCallback = function showTournamentsCallback(results) {
+	var message = "No current tournaments.";
+	if (results) {
+		message = "";
 
-// var showTournamentsCallback = function showTournamentsCallback(results) {
-// 	var message = "No current tournaments.";
-// 	if (results) {
-// 		message = "";
-		
-// 		var tourneyList = buildTournamentsList(results);
+		var tourneyData = {};
+		var tourneyList = [];
+		var isTournamentManager = false;
+		var completedTournamentsExist = false;
+		try {
+			tourneyData = JSON.parse(results);
+			tourneyList = tourneyData.tournamentList;
+			isTournamentManager = tourneyData.isTournamentManager;
+		} catch (error) {
+			debug("Error parsing tournament data");
+			closeModal();
+			showModal("Tournaments", "Error getting tournament data.");
+		}
 
-// 		// TODOOOOO TODO
-// 		TODO
+		debug(tourneyList);
 
-// 		var tourneyHeading = "";
-// 		for (var index in tourneyList) {
-// 			var tourney = tourneyList[index];
+		var tourneyHeading = "";
+		for (var index in tourneyList) {
+			var tourney = tourneyList[index];
 
-// 			if (tourney.type !== tourneyHeading) {
-// 				if (tourneyHeading !== "") {
-// 					message += "<br />";
-// 				}
-// 				tourneyHeading = myGame.gameTypeDesc;
-// 				message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
-// 			}
+			if (tourney.status !== tourneyHeading) {
+				if (tourneyHeading !== "") {
+					message += "<br />";
+				}
+				tourneyHeading = tourney.status;
+				if (tourneyHeading !== 'Completed') {
+					message += "<div class='modalContentHeading'>" + tourneyHeading + "</div>";
+				} else {
+					completedTournamentsExist = true;
+				}
+			}
 
-// 			var gId = parseInt(myGame.gameId);
-// 			var userIsHost = usernameEquals(myGame.hostUsername);
-// 			var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+			message += "<div class='clickableText' onclick='viewTournamentInfo(" + tourney.id + ");'>" + tourney.name + "</div>";
+			message += "<br />";
+		}
 
-// 			var gameDisplayTitle = "";
+		if (completedTournamentsExist) {
+			message += "<br /><br /><div class='clickableText' onclick='showPastTournamentsClicked();'>Show completed tournaments</div>";
+		}
+		if (isTournamentManager) {
+			message += "<br /><br /><div class='clickableText' onclick='manageTournamentsClicked();'>Manage Tournaments</div>";
+		}
 
-// 			if (!userIsHost && !usernameEquals(opponentUsername)) {
-// 				if (myGame.hostOnline) {
-// 					gameDisplayTitle += userOnlineIcon;
-// 				} else {
-// 					gameDisplayTitle += userOfflineIcon;
-// 				}
-// 			}
-// 			gameDisplayTitle += myGame.hostUsername;
-// 			gameDisplayTitle += " vs. ";
-// 			if (userIsHost && !usernameEquals(opponentUsername)) {
-// 				if (myGame.guestOnline) {
-// 					gameDisplayTitle += userOnlineIcon;
-// 				} else {
-// 					gameDisplayTitle += userOfflineIcon;
-// 				}
-// 			}
-// 			gameDisplayTitle += myGame.guestUsername;
-// 			if (myGame.isUserTurn) {
-// 				gameDisplayTitle += " (Your turn)";
-// 			}
-			
-// 			// message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\"," + myGame.gameTypeId + ");'>" + gameDisplayTitle + "</div>";
-// 			message += "<div class='clickableText' onclick='jumpToGame(" + gId + ");'>" + gameDisplayTitle + "</div>";
-// 			for (var i = 0; i < myGame.gameOptions.length; i++) {
-// 				message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + myGame.gameOptions[i] + "</em></div>"
-// 			}
-// 		}
-// 	}
-// 	message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
-// 	message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
-// 	// message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
-// 	showModal("Active Games", message);
-// };
+	}
+
+	showModal("Tournaments", message);
+};
 
 function viewTournamentsClicked() {
-	showModal("Tournaments", getViewTournamentsModalHtml());
+	// showModal("Tournaments", getLoadingModalText());
+	showModal("Tournaments", "Tournaments are coming soon! Join the Discord and Forums to get involved!");
 
 	// onlinePlayEngine.getCurrentTournaments(getLoginToken(), showTournamentsCallback);
+	// viewTournamentInfo();
 }
 
+var showTournamentInfoCallback = function showTournamentInfoCallback(results) {
+	var message = "No tournament info found.";
+	var modalTitle = "Tournament Details";
+	if (results || true) {
+		message = "";
+
+		// var tournamentInfo = {};
+		// try {
+		// 	tournamentInfo = JSON.parse(results);
+		// } catch (error) {
+		// 	debug("Error parsing tournament info");
+		// 	closeModal();
+		// 	showModal("Tournaments", "Error getting tournament info.");
+		// }
+		var tournamentInfo = {
+			id: 999,
+			name: 'Hard-Coded Tournament',
+			status: 'Upcoming',
+			details: 'This is a hard-coded test tournament object',
+			forumUrl: 'https://forum.skudpaisho.com/showthread.php?tid=30',
+			currentPlayers: ['SkudPaiSho']
+		}
+
+		debug(tournamentInfo);
+
+		modalTitle = tournamentInfo.name;
+
+		message += "<div class='modalContentHeading'>" + tournamentInfo.status + " Tournament" + "</div>";
+
+		if (tournamentInfo.details) {
+			message += "<br />";
+			message += tournamentInfo.details;
+		}
+
+		if (tournamentInfo.forumUrl) {
+			message += "<br /><br />";
+			message += "<a href='" + tournamentInfo.forumUrl + "' target='_blank' class='clickableText'>Full details <i class='fa fa-external-link'></i></a>";
+		}
+
+		if (tournamentInfo.currentPlayers
+			&& tournamentInfo.currentPlayers !== null
+			&& tournamentInfo.currentPlayers.length > 0) {
+			message += "<br /><br /><div class='modalContentHeading'>Players currently signed up:</div>";
+			for (var i = 0; i < tournamentInfo.currentPlayers.length; i++) {
+				message += "<br />" + tournamentInfo.currentPlayers[i];
+			}
+		}
+
+		if (tournamentInfo.signUpAvailable) {
+			message += "<br /><br /><div class='clickableText' onclick='signUpForTournament(" + tournamentInfo.id + ");'>Sign up for tournament</div>";
+		}
+	}
+
+	showModal(modalTitle, message);
+};
+
+function viewTournamentInfo(tournamentId) {
+	showModal("Tournament Details", getLoadingModalText());
+
+	// onlinePlayEngine.getTournamentInfo(tournamentId, showTournamentInfoCallback);
+	showTournamentInfoCallback();
+}
 
 
 

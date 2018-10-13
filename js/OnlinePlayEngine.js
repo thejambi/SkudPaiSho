@@ -428,3 +428,24 @@ OnlinePlayEngine.prototype.addUserPreferenceValue = function(loginToken, prefTyp
     );
 };
 
+/* Tournaments */
+
+OnlinePlayEngine.prototype.getCurrentTournaments = function(loginToken, callback) { 
+    $.get("getCurrentTournaments.php?u="+loginToken.userId, 
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.getTournamentInfo = function(tournamentId, callback) {
+    $.get("getTournamentInfo.php?t="+tournamentId, 
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};

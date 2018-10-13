@@ -105,11 +105,7 @@ CaptureActuator.prototype.addTile = function(tile, mainContainer) {
 CaptureActuator.prototype.addBoardPoint = function(boardPoint) {
 	var self = this;
 
-	var theDiv = document.createElement("div");
-
-	theDiv.classList.add("point");
-
-	theDiv.setAttribute("name", new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
+	var theDiv = createBoardPointDiv(boardPoint);
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
