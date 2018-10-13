@@ -73,11 +73,6 @@ VagabondGameManager.prototype.revealDeployPoints = function(player, tileCode, ig
 	}
 };
 
-VagabondGameManager.prototype.revealPossiblePlacementPoints = function(tile) {
-	this.board.revealPossiblePlacementPoints(tile);
-	this.actuate();
-};
-
 VagabondGameManager.prototype.getWinner = function() {
 	if (this.board.winners.length === 1) {
 		return this.board.winners[0];

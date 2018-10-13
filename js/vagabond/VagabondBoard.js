@@ -348,7 +348,7 @@ VagabondBoard.prototype.newRow = function(numColumns, points) {
 	return cells;
 };
 
-VagabondBoard.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
+VagabondBoard.prototype.placeTile = function(tile, notationPoint) {
 	this.putTileOnPoint(tile, notationPoint);
 
 	if (tile.code === 'L') {
@@ -928,7 +928,7 @@ VagabondBoard.prototype.setDeployPointsPossibleMoves = function(player, tileCode
 			for (var row = 0; row < this.cells.length; row++) {
 				for (var col = 0; col < this.cells[row].length; col++) {
 					var bp = this.cells[row][col];
-					if (!bp.hasTile()) {
+					if (!bp.isType(GATE) && !bp.hasTile()) {
 						if (Math.abs(fireLilyPoint.row - bp.row) + Math.abs(fireLilyPoint.col - bp.col) <= 5) {
 							// Point within Fire Lily range
 							bp.addType(POSSIBLE_MOVE);
@@ -963,29 +963,6 @@ VagabondBoard.prototype.setGuestGateOpen = function() {
 	if (this.cells[row][col].isOpenGate()) {
 		this.cells[row][col].addType(POSSIBLE_MOVE);
 	}
-};
-
-VagabondBoard.prototype.revealPossiblePlacementPoints = function(tile) {
-	var self = this;
-	this.cells.forEach(function(row) {
-		row.forEach(function(boardPoint) {
-			var valid = false;
-
-			if (tile.accentType === ROCK && self.canPlaceRock(boardPoint)) {
-				valid = true;
-			} else if (tile.accentType === WHEEL && self.canPlaceWheel(boardPoint)) {
-				valid = true;
-			} else if (tile.accentType === KNOTWEED && self.canPlaceKnotweed(boardPoint)) {
-				valid = true;
-			} else if (tile.accentType === BOAT && self.canPlaceBoat(boardPoint, tile)) {
-				valid = true;
-			}
-
-			if (valid) {
-				boardPoint.addType(POSSIBLE_MOVE);
-			}
-		});
-	});
 };
 
 // VagabondBoard.prototype.getCopy = function() {
