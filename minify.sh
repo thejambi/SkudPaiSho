@@ -13,5 +13,6 @@ echo With: $filepath
 uglifyjs js/*.js js/*/*.js -o $filepath
 
 sed -i -e "s@$previouspath@$filepath@g" index.html
+cp index.html test.html
 
 echo Done

@@ -204,11 +204,13 @@ VagabondController.prototype.getTheMessage = function(tile, ownerName) {
 		message.push("Can move 1 space");
 	} else if (tileCode === 'S') {
 		heading = "Sky Bison";
-		message.push("Deployed on the point inside of the small red triangles in the corners of the board");
-		message.push("Can move up to six spaces, turning any number of times");
-		message.push("Cannot move if a Chrysanthemum tile is adjacent to it");
+		// message.push("Deployed on the point inside of the small red triangles in the corners of the board");
+		message.push("Deployed on the Temples - the points inside of the small red triangles in the corners of the board");
+		message.push("Can move up to six spaces, turning any number of times, but cannot move into an opponent's Sky Bison's territorial zone");
+		message.push("Cannot move through or off of a space that is adjacent to an opponent's Chrysanthemum tile");
 		message.push("Can capture other tiles");
-		message.push("A Sky Bison has a territorial zone the size of the area the tile can move within. No other Sky Bison is allowed in this zone once the Sky Bison has moved out of its starting position.");
+		// message.push("A Sky Bison has a territorial zone the size of the area the tile can move within. No other Sky Bison is allowed in this zone once the Sky Bison has moved out of its starting position.");
+		message.push("After the Sky Bison has moved out of its temple and is not trapped by a Chrysanthemum, it creates a territorial zone 6 spaces around it");
 	} else if (tileCode === 'B') {
 		heading = "Badgermole";
 		message.push("Can move only one space in any direction OR move directly adjacent to a Flower Tile if that Flower Tile is in the Badgermole's \"line of sight\" (meaning, the tiles lie on the same line with no other tiles in between)");
