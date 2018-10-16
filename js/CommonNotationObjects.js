@@ -13,6 +13,12 @@ var MOVE = "Move";
 var INITIAL_SETUP = "Initial Setup";
 // -----------------------------
 
+var DRAW_OFFER = "≈";
+var DRAW_REFUSE = "≠";
+var DRAW_ACCEPT = "=";
+
+// ---------
+
 function RowAndColumn(row, col) {
 	this.row = row;
 	this.col = col;

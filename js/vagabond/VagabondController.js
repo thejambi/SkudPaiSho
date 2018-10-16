@@ -69,12 +69,71 @@ VagabondController.prototype.getAdditionalMessage = function() {
 		}
 
 		msg += getGameOptionsMessageHtml(GameType.VagabondPaiSho.gameOptions);
+	} else if (myTurn()) {
+		if (this.notationBuilder.offerDraw) {
+			msg += "<br />Your opponent will be able to accept or reject your draw offer once you make your move. Or, you may <span class='skipBonus' onclick='gameController.removeDrawOffer();'>remove your draw offer</span> from this move.";
+		} else {
+			msg += "<br /><span class='skipBonus' onclick='gameController.offerDraw();'>Offer Draw</span><br />";
+		}
+	}
+	if (this.gameNotation.lastMoveHasDrawOffer() && this.promptToAcceptDraw) {
+		msg += "<br />Are you sure you want to accept the draw offer and end the game?<br />";
+		msg += "<span class='skipBonus' onclick='gameController.confirmAcceptDraw();'>Yes, accept draw and end the game</span>";
+		msg += "<br /><br />";
+	} else if (this.gameNotation.lastMoveHasDrawOffer()
+		&& (!myTurn() || !playingOnlineGame())) {
+		msg += "<br />Your opponent is offering a draw. You may <span class='skipBonus' onclick='gameController.acceptDraw();'>Accept Draw</span> or make a move to refuse the draw offer.<br />";
 	}
 
 	return msg;
 };
 
+VagabondController.prototype.gameHasEndedInDraw = function() {
+	return this.theGame.gameHasEndedInDraw;
+};
+
+VagabondController.prototype.acceptDraw = function() {
+	if (myTurn()) {
+		this.promptToAcceptDraw = true;
+		refreshMessage();
+	}
+};
+
+VagabondController.prototype.confirmAcceptDraw = function() {
+	if (myTurn()) {
+		this.resetNotationBuilder();
+		this.notationBuilder.moveType = DRAW_ACCEPT;
+
+		var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+		this.theGame.runNotationMove(move);
+		// Move all set. Add it to the notation!
+		this.gameNotation.addMove(move);
+
+		if (playingOnlineGame()) {
+			callSubmitMove();
+		} else {
+			finalizeMove();
+		}
+	}
+};
+
+VagabondController.prototype.offerDraw = function() {
+	if (myTurn()) {
+		this.notationBuilder.offerDraw = true;
+		refreshMessage();
+	}
+};
+
+VagabondController.prototype.removeDrawOffer = function() {
+	if (myTurn()) {
+		this.notationBuilder.offerDraw = false;
+		refreshMessage();
+	}
+};
+
 VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
+	this.promptToAcceptDraw = false;
+
 	if (this.theGame.board.winners.length > 0 && this.notationBuilder.status !== READY_FOR_BONUS) {
 		return;
 	}
@@ -119,6 +178,8 @@ VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 }
 
 VagabondController.prototype.pointClicked = function(htmlPoint) {
+	this.promptToAcceptDraw = false;
+
 	if (this.theGame.board.winners.length > 0) {
 		return;
 	}

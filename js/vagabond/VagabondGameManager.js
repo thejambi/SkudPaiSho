@@ -41,6 +41,10 @@ VagabondGameManager.prototype.runNotationMove = function(move, withActuate) {
 		this.board.moveTile(move.player, move.startPoint, move.endPoint);
 	}
 
+	if (move.moveType === DRAW_ACCEPT) {
+		this.gameHasEndedInDraw = true;
+	}
+
 	if (withActuate) {
 		this.actuate();
 	}
@@ -85,15 +89,9 @@ VagabondGameManager.prototype.getWinReason = function() {
 
 VagabondGameManager.prototype.getWinResultTypeCode = function() {
 	if (this.board.winners.length === 1) {
-		return 1;	// Harmony Ring is 1
-	} else if (this.endGameWinners.length === 1) {
-		if (this.tileManager.getPlayerWithMoreAccentTiles()) {
-			return 2;	// More Accent Tiles remaining
-		} else {
-			return 3;	// Most Harmonies
-		}
-	} else if (this.endGameWinners.length > 1) {
-		return 4;	// Tie
+		return 1;	// Standard win is 1
+	} else if (this.gameHasEndedInDraw) {
+		return 4;	// Tie/Draw is 4
 	}
 };
 

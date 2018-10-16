@@ -845,6 +845,11 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
 			}
 		}
+	} else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
+		if (playingOnlineGame()) {
+			onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
+		}
+		messageText += "Game has ended in a draw.";
 	} else {
 		if (!playingOnlineGame()) {
 			messageText += "Current Player: " + getCurrentPlayer() + "<br />";
@@ -2702,8 +2707,5 @@ function viewTournamentInfo(tournamentId) {
 	// onlinePlayEngine.getTournamentInfo(tournamentId, showTournamentInfoCallback);
 	showTournamentInfoCallback();
 }
-
-
-
 
 

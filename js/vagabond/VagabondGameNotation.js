@@ -36,6 +36,8 @@ VagabondNotationMove.prototype.analyzeMove = function() {
 	var char0 = moveText.charAt(0);
 	if (char0 === '(') {
 		this.moveType = MOVE;
+	} else if (char0 === DRAW_ACCEPT) {	// If move is accepting a draw
+		this.moveType = DRAW_ACCEPT;
 	} else {
 		this.moveType = DEPLOY;
 	}
@@ -50,7 +52,7 @@ VagabondNotationMove.prototype.analyzeMove = function() {
 			this.valid = false;
 		}
 
-		if (moveText.endsWith(')')) {
+		if (moveText.endsWith(')') || moveText.endsWith(')' + DRAW_OFFER)) {
 			this.endPoint = new NotationPoint(moveText.substring(moveText.indexOf('(')+1, moveText.indexOf(')')));
 		} else {
 			this.valid = false;
@@ -63,6 +65,8 @@ VagabondNotationMove.prototype.analyzeMove = function() {
 
 		this.endPoint = new NotationPoint(parts[1].substring(0, parts[1].indexOf(')')));
 	}
+
+	this.offerDraw = moveText.endsWith(DRAW_OFFER);
 };
 
 VagabondNotationMove.prototype.isValidNotation = function() {
@@ -99,6 +103,12 @@ VagabondNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 		notationLine += "(" + this.startPoint.pointText + ")-(" + this.endPoint.pointText + ")";
 	} else if (this.moveType === DEPLOY) {
 		notationLine += this.tileType + "(" + this.endPoint.pointText + ")";
+	} else if (this.moveType === DRAW_ACCEPT) {
+		notationLine += DRAW_ACCEPT;
+	}
+
+	if (this.offerDraw) {
+		notationLine += DRAW_OFFER;
 	}
 	
 	return new VagabondNotationMove(notationLine);
@@ -245,6 +255,10 @@ VagabondGameNotation.prototype.getLastMoveNumber = function() {
 	return this.moves[this.moves.length - 1].moveNum;
 };
 
+VagabondGameNotation.prototype.lastMoveHasDrawOffer = function() {
+	return this.moves[this.moves.length - 1] 
+		&& this.moves[this.moves.length - 1].offerDraw;
+};
 
 
 
