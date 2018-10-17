@@ -13,9 +13,9 @@ var MOVE = "Move";
 var INITIAL_SETUP = "Initial Setup";
 // -----------------------------
 
-var DRAW_OFFER = "≈";
-var DRAW_REFUSE = "≠";
-var DRAW_ACCEPT = "=";
+var DRAW_OFFER = "~~"; //"≈";
+var DRAW_REFUSE = "=/="; //"≠";
+var DRAW_ACCEPT = "==";
 
 // ---------
 

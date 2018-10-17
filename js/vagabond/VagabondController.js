@@ -75,14 +75,14 @@ VagabondController.prototype.getAdditionalMessage = function() {
 		} else {
 			msg += "<br /><span class='skipBonus' onclick='gameController.offerDraw();'>Offer Draw</span><br />";
 		}
-	}
-	if (this.gameNotation.lastMoveHasDrawOffer() && this.promptToAcceptDraw) {
-		msg += "<br />Are you sure you want to accept the draw offer and end the game?<br />";
-		msg += "<span class='skipBonus' onclick='gameController.confirmAcceptDraw();'>Yes, accept draw and end the game</span>";
-		msg += "<br /><br />";
-	} else if (this.gameNotation.lastMoveHasDrawOffer()
-		&& (!myTurn() || !playingOnlineGame())) {
-		msg += "<br />Your opponent is offering a draw. You may <span class='skipBonus' onclick='gameController.acceptDraw();'>Accept Draw</span> or make a move to refuse the draw offer.<br />";
+
+		if (this.gameNotation.lastMoveHasDrawOffer() && this.promptToAcceptDraw) {
+			msg += "<br />Are you sure you want to accept the draw offer and end the game?<br />";
+			msg += "<span class='skipBonus' onclick='gameController.confirmAcceptDraw();'>Yes, accept draw and end the game</span>";
+			msg += "<br /><br />";
+		} else if (this.gameNotation.lastMoveHasDrawOffer()) {
+			msg += "<br />Your opponent is offering a draw. You may <span class='skipBonus' onclick='gameController.acceptDraw();'>Accept Draw</span> or make a move to refuse the draw offer.<br />";
+		}
 	}
 
 	return msg;
@@ -134,7 +134,7 @@ VagabondController.prototype.removeDrawOffer = function() {
 VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 	this.promptToAcceptDraw = false;
 
-	if (this.theGame.board.winners.length > 0 && this.notationBuilder.status !== READY_FOR_BONUS) {
+	if (this.theGame.hasEnded() && this.notationBuilder.status !== READY_FOR_BONUS) {
 		return;
 	}
 	if (!myTurn()) {
@@ -180,7 +180,7 @@ VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 VagabondController.prototype.pointClicked = function(htmlPoint) {
 	this.promptToAcceptDraw = false;
 
-	if (this.theGame.board.winners.length > 0) {
+	if (this.theGame.hasEnded()) {
 		return;
 	}
 	if (!myTurn()) {

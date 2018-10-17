@@ -689,6 +689,8 @@ function getAdditionalMessage() {
 	if (gameController.theGame.getWinner()) {
 		// There is a winner!
 		msg += " <strong>" + gameController.theGame.getWinner() + gameController.theGame.getWinReason() + "</strong>";
+	} else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
+		msg += "Game has ended in a draw.";
 	}
 
 	if (msg === "<br />") {

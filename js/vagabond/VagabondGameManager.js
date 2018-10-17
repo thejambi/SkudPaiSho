@@ -50,6 +50,10 @@ VagabondGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 };
 
+VagabondGameManager.prototype.hasEnded = function() {
+	return this.getWinResultTypeCode() > 0;
+};
+
 VagabondGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
 	if (!boardPoint.hasTile()) {
 		return;
