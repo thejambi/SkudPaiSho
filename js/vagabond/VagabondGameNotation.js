@@ -36,7 +36,7 @@ VagabondNotationMove.prototype.analyzeMove = function() {
 	var char0 = moveText.charAt(0);
 	if (char0 === '(') {
 		this.moveType = MOVE;
-	} else if (char0 === DRAW_ACCEPT) {	// If move is accepting a draw
+	} else if (moveText.startsWith(DRAW_ACCEPT)) {	// If move is accepting a draw
 		this.moveType = DRAW_ACCEPT;
 	} else {
 		this.moveType = DEPLOY;

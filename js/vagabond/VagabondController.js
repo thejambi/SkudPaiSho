@@ -20,7 +20,14 @@ VagabondController.prototype.resetGameManager = function() {
 };
 
 VagabondController.prototype.resetNotationBuilder = function() {
+	var offerDraw = false;
+	if (this.notationBuilder) {
+		offerDraw = this.notationBuilder.offerDraw;
+	}
 	this.notationBuilder = new VagabondNotationBuilder();
+	if (offerDraw) {
+		this.notationBuilder.offerDraw = true;
+	}
 };
 
 VagabondController.prototype.resetGameNotation = function() {
@@ -44,6 +51,7 @@ VagabondController.prototype.callActuate = function() {
 };
 
 VagabondController.prototype.resetMove = function() {
+	this.notationBuilder.offerDraw = false;
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// Remove last move
 		this.gameNotation.removeLastMove();
@@ -69,19 +77,21 @@ VagabondController.prototype.getAdditionalMessage = function() {
 		}
 
 		msg += getGameOptionsMessageHtml(GameType.VagabondPaiSho.gameOptions);
-	} else if (myTurn()) {
-		if (this.notationBuilder.offerDraw) {
-			msg += "<br />Your opponent will be able to accept or reject your draw offer once you make your move. Or, you may <span class='skipBonus' onclick='gameController.removeDrawOffer();'>remove your draw offer</span> from this move.";
-		} else {
-			msg += "<br /><span class='skipBonus' onclick='gameController.offerDraw();'>Offer Draw</span><br />";
-		}
-
+	} else if (!this.theGame.hasEnded() && myTurn()) {
 		if (this.gameNotation.lastMoveHasDrawOffer() && this.promptToAcceptDraw) {
 			msg += "<br />Are you sure you want to accept the draw offer and end the game?<br />";
 			msg += "<span class='skipBonus' onclick='gameController.confirmAcceptDraw();'>Yes, accept draw and end the game</span>";
 			msg += "<br /><br />";
 		} else if (this.gameNotation.lastMoveHasDrawOffer()) {
 			msg += "<br />Your opponent is offering a draw. You may <span class='skipBonus' onclick='gameController.acceptDraw();'>Accept Draw</span> or make a move to refuse the draw offer.<br />";
+		} else if (this.notationBuilder.offerDraw) {
+			msg += "<br />Your opponent will be able to accept or reject your draw offer once you make your move. Or, you may <span class='skipBonus' onclick='gameController.removeDrawOffer();'>remove your draw offer</span> from this move.";
+		} else {
+			msg += "<br /><span class='skipBonus' onclick='gameController.offerDraw();'>Offer Draw</span><br />";
+		}
+	} else if (!myTurn()) {
+		if (this.gameNotation.lastMoveHasDrawOffer()) {
+			msg += "<br />A draw has been offered.<br />";
 		}
 	}
 
