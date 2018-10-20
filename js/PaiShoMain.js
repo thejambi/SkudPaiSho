@@ -4,7 +4,7 @@ var QueryString = function () {
   var query_string = {};
   var query = window.location.search.substring(1);
 
-  if (query.length > 0) {
+  if (query.length > 0 && !(query.includes("appType="))) {
   	// Decompress first
   	query = LZString.decompressFromEncodedURIComponent(query);
   }
@@ -155,7 +155,7 @@ window.requestAnimationFrame(function () {
 		onlinePlayEnabled = false;
 	}
 
-	if (ios || runningOnAndroid) {
+	if (ios || runningOnAndroid || QueryString.appType === 'ios') {
 		url = "https://skudpaisho.com/";
 		sandboxUrl = url;
 	}
@@ -178,6 +178,10 @@ window.requestAnimationFrame(function () {
 	} else if (runningOnAndroid) {
 		onlinePlayEngine = new OnlinePlayEngineIOS();
 		// appCaller = new AndroidCaller();// keeping dummy for now
+	}
+
+	if (QueryString.appType === 'ios') {
+		appCaller = new IOSCaller();
 	}
 
 	var localUserEmail = localStorage.getItem(localEmailKey);
@@ -1213,7 +1217,7 @@ function sandboxFromMove() {
 }
 
 function openLink(linkUrl) {
-	if (ios) {
+	if (ios || QueryString.appType === 'ios') {
 		webkit.messageHandlers.callbackHandler.postMessage(
             '{"linkUrl":"' + linkUrl + '"}'
         );
@@ -1223,6 +1227,10 @@ function openLink(linkUrl) {
 }
 
 /* Modal */
+function callFailed() {
+	showModal("", "Unable to load.");
+}
+
 function showModal(headingHTMLText, modalMessageHTMLText) {
 	// Make sure sidenav is closed
 	closeNav();
@@ -1767,6 +1775,7 @@ var showMyGamesCallback = function showMyGamesCallback(results) {
 };
 
 function showMyGames() {
+	showModal("Active Games", getLoadingModalText());
 	onlinePlayEngine.getCurrentGamesForUserNew(getLoginToken(), showMyGamesCallback);
 }
 
@@ -1986,6 +1995,7 @@ function viewGameSeeksClicked() {
 	if (!window.navigator.onLine) {
 		showCurrentlyOfflineModal();
 	} else if (onlinePlayEnabled && userIsLoggedIn()) {
+		showModal("Join a game", getLoadingModalText());
 		onlinePlayEngine.getGameSeeks(getGameSeeksCallback);
 	} else if (onlinePlayEnabled) {
 		showModal("Join a game", "<span class='skipBonus' onclick='loginClicked();'>Sign in</span> to play real-time games with others online. When you are signed in, this is where you can join games against other players.");
@@ -2509,7 +2519,7 @@ function iOSShake() {
 
 function saveDeviceTokenIfNeeded() {
 	var deviceToken = localStorage.getItem(deviceTokenKey);
-	if (ios && deviceToken && userIsLoggedIn()) {
+	if ((ios || QueryString.appType === 'ios') && deviceToken && userIsLoggedIn()) {
 		onlinePlayEngine.addUserPreferenceValue(getLoginToken(), 3, deviceToken, emptyCallback);
 	}
 }
@@ -2640,34 +2650,23 @@ var showTournamentsCallback = function showTournamentsCallback(results) {
 };
 
 function viewTournamentsClicked() {
-	// showModal("Tournaments", getLoadingModalText());
-	showModal("Tournaments", "Tournaments are coming soon! Join the Discord and Forums to get involved!");
-
+	showModal("Tournaments", "Tournaments are coming soon! Join the Discord and Forums to get involved!");//getLoadingModalText());
 	// onlinePlayEngine.getCurrentTournaments(getLoginToken(), showTournamentsCallback);
-	// viewTournamentInfo();
 }
 
 var showTournamentInfoCallback = function showTournamentInfoCallback(results) {
 	var message = "No tournament info found.";
 	var modalTitle = "Tournament Details";
-	if (results || true) {
+	if (results) {
 		message = "";
 
-		// var tournamentInfo = {};
-		// try {
-		// 	tournamentInfo = JSON.parse(results);
-		// } catch (error) {
-		// 	debug("Error parsing tournament info");
-		// 	closeModal();
-		// 	showModal("Tournaments", "Error getting tournament info.");
-		// }
-		var tournamentInfo = {
-			id: 999,
-			name: 'Hard-Coded Tournament',
-			status: 'Upcoming',
-			details: 'This is a hard-coded test tournament object',
-			forumUrl: 'https://forum.skudpaisho.com/showthread.php?tid=30',
-			currentPlayers: ['SkudPaiSho']
+		var tournamentInfo = {};
+		try {
+			tournamentInfo = JSON.parse(results);
+		} catch (error) {
+			debug("Error parsing tournament info");
+			closeModal();
+			showModal("Tournaments", "Error getting tournament info.");
 		}
 
 		debug(tournamentInfo);
@@ -2691,7 +2690,8 @@ var showTournamentInfoCallback = function showTournamentInfoCallback(results) {
 			&& tournamentInfo.currentPlayers.length > 0) {
 			message += "<br /><br /><div class='modalContentHeading'>Players currently signed up:</div>";
 			for (var i = 0; i < tournamentInfo.currentPlayers.length; i++) {
-				message += "<br />" + tournamentInfo.currentPlayers[i];
+				message += "<br />" + tournamentInfo.currentPlayers[i].username;
+				// message += " (" + tournamentInfo.currentPlayers[i].playerStatus + ")";
 			}
 		}
 
@@ -2705,9 +2705,72 @@ var showTournamentInfoCallback = function showTournamentInfoCallback(results) {
 
 function viewTournamentInfo(tournamentId) {
 	showModal("Tournament Details", getLoadingModalText());
-
-	// onlinePlayEngine.getTournamentInfo(tournamentId, showTournamentInfoCallback);
-	showTournamentInfoCallback();
+	onlinePlayEngine.getTournamentInfo(tournamentId, showTournamentInfoCallback);
 }
+
+var showManageTournamentsCallback = function showManageTournamentsCallback(results) {
+	var message = "No tournament info found.";
+	var modalTitle = "Manage Tournaments";
+	if (results || true) {
+		message = "";
+
+		var resultData = {};
+		// try {
+		// 	resultData = JSON.parse(results);
+		// } catch (error) {
+		// 	debug("Error parsing info");
+		// 	closeModal();
+		// 	showModal(modalTitle, "Error getting tournament info.");
+		// }
+
+		resultData = {
+			currentTournaments: []
+		};
+
+		debug(resultData);
+
+		message += "<div class='modalContentHeading'>Your Current Tournaments</div>";
+
+		if (resultData.currentTournaments 
+			&& resultData.currentTournaments.length > 0) {
+			for (var i = 0; i < resultData.currentTournaments.length; i++) {
+				var tournament = tournamentInfo.currentTournaments[i];
+				message += "<div class='clickableText' onclick='manageTournamentClicked(" + tournament.id + ");'>" + tournament.name + "</div>";
+			}
+		} else {
+			message += "<em>None</em>";
+		}
+
+		message += "<br /><br />";
+		message += "<div class='clickableText' onclick='createNewTournamentClicked();'>Create new tournament</div>";
+
+		// if (tournamentInfo.forumUrl) {
+		// 	message += "<br /><br />";
+		// 	message += "<a href='" + tournamentInfo.forumUrl + "' target='_blank' class='clickableText'>Full details <i class='fa fa-external-link'></i></a>";
+		// }
+
+		// if (tournamentInfo.currentPlayers
+		// 	&& tournamentInfo.currentPlayers !== null
+		// 	&& tournamentInfo.currentPlayers.length > 0) {
+		// 	message += "<br /><br /><div class='modalContentHeading'>Players currently signed up:</div>";
+		// 	for (var i = 0; i < tournamentInfo.currentPlayers.length; i++) {
+		// 		message += "<br />" + tournamentInfo.currentPlayers[i].username;
+		// 	}
+		// }
+
+		// if (tournamentInfo.signUpAvailable) {
+		// 	message += "<br /><br /><div class='clickableText' onclick='signUpForTournament(" + tournamentInfo.id + ");'>Sign up for tournament</div>";
+		// }
+	}
+
+	showModal(modalTitle, message);
+};
+
+function manageTournamentsClicked() {
+	showModal("Manage Tournaments", getLoadingModalText());
+	// onlinePlayEngine.getManageTournamentsInfo(getLoginToken(), showManageTournamentsCallback);
+	showManageTournamentsCallback();
+}
+
 
 

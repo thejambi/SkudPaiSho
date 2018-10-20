@@ -154,6 +154,8 @@ OnlinePlayEngine.prototype.getGameSeeks = function(callback) {
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
+            } else {
+                callFailed();
             }
         }
     );
@@ -180,6 +182,8 @@ OnlinePlayEngine.prototype.getCurrentGamesForUserNew = function(loginToken, call
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
+            } else {
+                callFailed();
             }
         }
     );
@@ -435,6 +439,8 @@ OnlinePlayEngine.prototype.getCurrentTournaments = function(loginToken, callback
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
+            } else {
+                callFailed();
             }
         }
     );
@@ -445,6 +451,26 @@ OnlinePlayEngine.prototype.getTournamentInfo = function(tournamentId, callback) 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
+            } else {
+                callFailed();
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.getManageTournamentsInfo = function(loginToken, callback) {
+    $.post("getManageTournamentsInfo.php",
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId
+        },
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            } else {
+                callFailed();
             }
         }
     );

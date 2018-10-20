@@ -53,7 +53,7 @@ function shouldRedirectIfNotHttps() {
 
 function debug(str) {
     if (debugOn) {
-      if (ios) {
+      if (ios || QueryString.appType === 'ios') {
         try {
           webkit.messageHandlers.callbackHandler.postMessage(
               "{debugMessage:" + str + "}"
