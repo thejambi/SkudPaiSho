@@ -775,6 +775,7 @@ var finalizeMove = function(ignoreNoEmail) {
 
 function showSubmitMoveForm(url) {
 	// Move has completed, so need to send to "current player"
+	/* Commenting out - 20181022
 	var toEmail = getCurrentPlayerEmail();
 	
 	var fromEmail = getUserEmail();
@@ -785,6 +786,7 @@ function showSubmitMoveForm(url) {
 	$('#toEmail').attr("value", toEmail);
 	$('#message').attr("value", bodyMessage);
 	$('#contactform').removeClass('gone');
+	*/
 }
 
 function getNoUserEmailMessage() {
@@ -929,7 +931,7 @@ function resetMove() {
 	gameController.resetMove();
 
 	rerunAll();
-	$('#contactform').addClass('gone');
+	// $('#contactform').addClass('gone');
 }
 
 function myTurn() {
@@ -2650,8 +2652,20 @@ var showTournamentsCallback = function showTournamentsCallback(results) {
 };
 
 function viewTournamentsClicked() {
-	showModal("Tournaments", "Tournaments are coming soon! Join the Discord and Forums to get involved!");//getLoadingModalText());
-	// onlinePlayEngine.getCurrentTournaments(getLoginToken(), showTournamentsCallback);
+	// showModal("Tournaments", "Tournaments are coming soon! Join the Discord and Forums to get involved!");
+	showModal("Tournaments", getLoadingModalText());
+	onlinePlayEngine.getCurrentTournaments(getLoginToken(), showTournamentsCallback);
+}
+
+function signUpForTournament(tournamentId, tournamentName) {
+	var message = "<div class='modalContentHeading'>Tournament: " + tournamentName + "</div>";
+	message += "<br /><div>Sign up to participate in this tournament?</div>";
+
+	message += "<br /><span class='clickableText' onclick='submitTournamentSignup(" + tournamentId + ");'>Yes - Sign up!</span>";
+	message += "<br /><br /><span class='clickableText' onclick='viewTournamentInfo(" + tournamentId + ");'>Cancel</span>";
+
+	// message = "Coming soon!";
+	showModal("Tournament Sign Up", message);
 }
 
 var showTournamentInfoCallback = function showTournamentInfoCallback(results) {
@@ -2685,18 +2699,20 @@ var showTournamentInfoCallback = function showTournamentInfoCallback(results) {
 			message += "<a href='" + tournamentInfo.forumUrl + "' target='_blank' class='clickableText'>Full details <i class='fa fa-external-link'></i></a>";
 		}
 
-		if (tournamentInfo.currentPlayers
-			&& tournamentInfo.currentPlayers !== null
-			&& tournamentInfo.currentPlayers.length > 0) {
+		var playerIsSignedUp = false;
+		if (tournamentInfo.currentPlayers.length > 0) {
 			message += "<br /><br /><div class='modalContentHeading'>Players currently signed up:</div>";
 			for (var i = 0; i < tournamentInfo.currentPlayers.length; i++) {
 				message += "<br />" + tournamentInfo.currentPlayers[i].username;
 				// message += " (" + tournamentInfo.currentPlayers[i].playerStatus + ")";
+				if (tournamentInfo.currentPlayers[i].username === getUsername()) {
+					playerIsSignedUp = true;
+				}
 			}
 		}
 
-		if (tournamentInfo.signUpAvailable) {
-			message += "<br /><br /><div class='clickableText' onclick='signUpForTournament(" + tournamentInfo.id + ");'>Sign up for tournament</div>";
+		if (tournamentInfo.signupAvailable && !playerIsSignedUp) {
+			message += "<br /><br /><div class='clickableText' onclick='signUpForTournament(" + tournamentInfo.id + ",\"" + tournamentInfo.name + "\");'>Sign up for tournament</div>";
 		}
 	}
 
