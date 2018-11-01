@@ -1,12 +1,15 @@
 #!/bin/bash
 
-previouspath=$(ls js/psmin*)
+# previouspath=$(ls js/psmin*)
+previouspath=$(ls psmin*)
 echo Replacing: $previouspath
 
-rm js/psmin*.js
+# rm js/psmin*.js
+rm psmin*.js
 
 timestamp=$(date "+%Y%m%d-%H%M%S")
-filepath="js/psmin_$timestamp.js"
+# filepath="js/psmin_$timestamp.js"
+filepath="psmin_$timestamp.js"
 # echo $timestamp
 echo With: $filepath
 
