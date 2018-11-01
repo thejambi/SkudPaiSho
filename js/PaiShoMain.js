@@ -2711,8 +2711,10 @@ var showTournamentInfoCallback = function showTournamentInfoCallback(results) {
 			}
 		}
 
-		if (tournamentInfo.signupAvailable && !playerIsSignedUp) {
+		if (userIsLoggedIn() && tournamentInfo.signupAvailable && !playerIsSignedUp) {
 			message += "<br /><br /><div class='clickableText' onclick='signUpForTournament(" + tournamentInfo.id + ",\"" + tournamentInfo.name + "\");'>Sign up for tournament</div>";
+		} else if (!userIsLoggedIn()) {
+			message += "<br /><br />Sign in and start playing to participate in tournaments.";
 		}
 	}
 
@@ -2724,33 +2726,62 @@ function viewTournamentInfo(tournamentId) {
 	onlinePlayEngine.getTournamentInfo(tournamentId, showTournamentInfoCallback);
 }
 
+function submitCreateTournament() {
+	var name = htmlEscape(document.getElementById('createTournamentName').value);
+	var forumUrl = htmlEscape(document.getElementById('createTournamentForumUrl').value);
+	var details = htmlEscape(document.getElementById('createTournamentDetails').value);
+	
+	onlinePlayEngine.createTournament(getLoginToken(), name, forumUrl, details, manageTournamentsClicked);
+}
+
+function createNewTournamentClicked() {
+	var message = "<div>Name:<br /><input type='text' id='createTournamentName' /></div>";
+	message += "<br /><div>Forum URL:<br /><input type='text' id='createTournamentForumUrl' /></div>";
+	message += "<br /><div>Details:<br /><textarea id='createTournamentDetails'></textarea></div>";
+
+	message += "<br /><div class='clickableText' onclick='submitCreateTournament();'>Create Tournament</div>";
+	message += "<br /><div class='clickableText' onclick='manageTournamentsClicked();'>Cancel</div>";
+
+	showModal("Create Tournament", message);
+}
+
+var showManageTournamentCallback = function showManageTournamentCallback(results) {
+
+};
+
+function manageTournamentClicked(tournamentId) {
+	showModal("Manage Tournament", getLoadingModalText());
+	onlinePlayEngine.getManageTournamentInfo(tournamentId, showManageTournamentCallback);
+} 
+
 var showManageTournamentsCallback = function showManageTournamentsCallback(results) {
 	var message = "No tournament info found.";
 	var modalTitle = "Manage Tournaments";
-	if (results || true) {
+	if (results) {
 		message = "";
 
 		var resultData = {};
-		// try {
-		// 	resultData = JSON.parse(results);
-		// } catch (error) {
-		// 	debug("Error parsing info");
-		// 	closeModal();
-		// 	showModal(modalTitle, "Error getting tournament info.");
-		// }
+		try {
+			resultData = JSON.parse(results);
+		} catch (error) {
+			debug("Error parsing info");
+			closeModal();
+			showModal(modalTitle, "Error getting tournament info.");
+		}
 
-		resultData = {
-			currentTournaments: []
-		};
+		// resultData = {
+		// 	isTournamentManager: true,
+		// 	tournaments: []
+		// };
 
 		debug(resultData);
 
-		message += "<div class='modalContentHeading'>Your Current Tournaments</div>";
+		message += "<div class='modalContentHeading'>Your Tournaments</div>";
 
-		if (resultData.currentTournaments 
-			&& resultData.currentTournaments.length > 0) {
-			for (var i = 0; i < resultData.currentTournaments.length; i++) {
-				var tournament = tournamentInfo.currentTournaments[i];
+		if (resultData.tournaments 
+			&& resultData.tournaments.length > 0) {
+			for (var i = 0; i < resultData.tournaments.length; i++) {
+				var tournament = resultData.tournaments[i];
 				message += "<div class='clickableText' onclick='manageTournamentClicked(" + tournament.id + ");'>" + tournament.name + "</div>";
 			}
 		} else {
@@ -2784,9 +2815,16 @@ var showManageTournamentsCallback = function showManageTournamentsCallback(resul
 
 function manageTournamentsClicked() {
 	showModal("Manage Tournaments", getLoadingModalText());
-	// onlinePlayEngine.getManageTournamentsInfo(getLoginToken(), showManageTournamentsCallback);
-	showManageTournamentsCallback();
+	onlinePlayEngine.getManageTournamentsInfo(getLoginToken(), showManageTournamentsCallback);
 }
 
+var signingUpForTournamentId = 0;
+var submitTournamentSignupCallback = function submitTournamentSignupCallback(results) {
+	viewTournamentInfo(signingUpForTournamentId);
+};
 
-
+function submitTournamentSignup(tournamentId) {
+	showModal("Tournament Signup", getLoadingModalText());
+	signingUpForTournamentId = tournamentId;
+	onlinePlayEngine.submitTournamentSignup(getLoginToken(), tournamentId, submitTournamentSignupCallback);
+}

@@ -8,6 +8,14 @@ OnlinePlayEngine.prototype.testOnlinePlay = function() {
 	this.getGameTypeDesc(1, emptyCallback);
 };
 
+OnlinePlayEngine.callCallback = function(data, status, callback) {
+    if (status === 'success') {
+        callback(data.trim());
+    } else {
+        callFailed();
+    }
+};
+
 /* Calls callback with userId values that match username or emailAddress. */
 OnlinePlayEngine.prototype.isUserInfoAvailable = function(username, emailAddress, callback) {
     $.get("isUserInfoAvailable.php?u=" + username + "&e=" + emailAddress, 
@@ -437,11 +445,7 @@ OnlinePlayEngine.prototype.addUserPreferenceValue = function(loginToken, prefTyp
 OnlinePlayEngine.prototype.getCurrentTournaments = function(loginToken, callback) { 
     $.get("getCurrentTournaments.php?u="+loginToken.userId, 
         function(data, status){
-            if (status === 'success') {
-                callback(data.trim());
-            } else {
-                callFailed();
-            }
+            OnlinePlayEngine.callCallback(data, status, callback);
         }
     );
 };
@@ -449,11 +453,7 @@ OnlinePlayEngine.prototype.getCurrentTournaments = function(loginToken, callback
 OnlinePlayEngine.prototype.getTournamentInfo = function(tournamentId, callback) {
     $.get("getTournamentInfo.php?t="+tournamentId, 
         function(data, status){
-            if (status === 'success') {
-                callback(data.trim());
-            } else {
-                callFailed();
-            }
+            OnlinePlayEngine.callCallback(data, status, callback);
         }
     );
 };
@@ -467,11 +467,40 @@ OnlinePlayEngine.prototype.getManageTournamentsInfo = function(loginToken, callb
             deviceId: loginToken.deviceId
         },
         function(data, status){
-            if (status === 'success') {
-                callback(data.trim());
-            } else {
-                callFailed();
-            }
+            OnlinePlayEngine.callCallback(data, status, callback);
         }
     );
 };
+
+OnlinePlayEngine.prototype.submitTournamentSignup = function(loginToken, tournamentId, callback) {
+    $.post("submitTournamentSignup.php",
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId,
+            tournamentId: tournamentId
+        },
+        function(data, status){
+            OnlinePlayEngine.callCallback(data, status, callback);
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.createTournament = function(loginToken, name, forumUrl, details, callback) {
+    $.post("createTournament.php",
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId,
+            name: name,
+            forumUrl: forumUrl,
+            details: details,
+        },
+        function(data, status){
+            OnlinePlayEngine.callCallback(data, status, callback);
+        }
+    );
+};
+
