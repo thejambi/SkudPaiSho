@@ -1,16 +1,12 @@
 #!/bin/bash
 
-# previouspath=$(ls js/psmin*)
 previouspath=$(ls psmin*)
 echo Replacing: $previouspath
 
-# rm js/psmin*.js
 rm psmin*.js
 
 timestamp=$(date "+%Y%m%d-%H%M%S")
-# filepath="js/psmin_$timestamp.js"
 filepath="psmin_$timestamp.js"
-# echo $timestamp
 echo With: $filepath
 
 uglifyjs js/*.js js/*/*.js -o $filepath
