@@ -72,7 +72,7 @@ var metadata = new Object();
 var replayIntervalLength = 1500;
 
 /* Online Play variables */
-var onlinePlayEngine;
+var onlinePlayEngine = new OnlinePlayEngine();
 var appCaller;
 
 var gameId = -1;
@@ -169,16 +169,16 @@ window.requestAnimationFrame(function () {
 		showReplayControls();
 	}
 
-	onlinePlayEngine = new OnlinePlayEngine();
+	// onlinePlayEngine = new OnlinePlayEngine();
 	appCaller = new DummyAppCaller();
 
-	if (ios) {
-		onlinePlayEngine = new OnlinePlayEngineIOS();
-		appCaller = new IOSCaller();
-	} else if (runningOnAndroid) {
-		onlinePlayEngine = new OnlinePlayEngineIOS();
-		// appCaller = new AndroidCaller();// keeping dummy for now
-	}
+	// if (ios) {
+	// 	onlinePlayEngine = new OnlinePlayEngineIOS();
+	// 	appCaller = new IOSCaller();
+	// } else if (runningOnAndroid) {
+	// 	onlinePlayEngine = new OnlinePlayEngineIOS();
+	// 	// appCaller = new AndroidCaller();// keeping dummy for now
+	// }
 
 	if (QueryString.appType === 'ios') {
 		appCaller = new IOSCaller();
@@ -1877,6 +1877,17 @@ var getCurrentGamesForUserNewCallback = function getCurrentGamesForUserNewCallba
 	}
 };
 
+function getGameTypeEntryFromId(id) {
+	var gameTypeEntry = null;
+	Object.keys(GameType).forEach(function(key,index) {
+		if (GameType[key].id === id) {
+			gameTypeEntry = GameType[key];
+			return GameType[key];
+		}
+	});
+	return gameTypeEntry;
+}
+
 function gameTypeIdSupported(id) {
 	var gameTypeIdFound = false;
 	Object.keys(GameType).forEach(function(key,index) {
@@ -2026,7 +2037,9 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 var tempGameTypeId;
 function createGameIfThatIsOk(gameTypeId) {
 	tempGameTypeId = gameTypeId;
-	if (userIsLoggedIn() && window.navigator.onLine) {
+	if (playingOnlineGame()) {
+		callSubmitMove();
+	} else if (userIsLoggedIn() && window.navigator.onLine) {
 		onlinePlayEngine.getCurrentGameSeeksHostedByUser(getUserId(), gameTypeId, getCurrentGameSeeksHostedByUserCallback);
 	} else {
 		finalizeMove();
@@ -2246,7 +2259,7 @@ document.getElementById('globalChatMessageInput').onkeypress = function(e){
 };
 
 function htmlEscape(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 }
 
 function openTab(evt, tabIdName) {
@@ -2593,9 +2606,18 @@ function showBadMoveModal() {
 
 /* Tournament functions */
 
+var tournamentToManage = 0;
+
 function getLoadingModalText() {
 	var html = "Loading&nbsp;<i class='fa fa-circle-o-notch fa-spin fa-fw'></i>&nbsp;";
 	return html;
+}
+
+function showPastTournamentsClicked() {
+	var completeTournamentElements = document.getElementsByClassName("completeTournament");
+	for (var i = 0; i < completeTournamentElements.length; i++) {
+		completeTournamentElements[i].classList.remove("gone");
+	}
 }
 
 var showTournamentsCallback = function showTournamentsCallback(results) {
@@ -2619,24 +2641,33 @@ var showTournamentsCallback = function showTournamentsCallback(results) {
 
 		debug(tourneyList);
 
+		var first = true;
 		var tourneyHeading = "";
 		for (var index in tourneyList) {
 			var tourney = tourneyList[index];
 
-			if (tourney.status !== tourneyHeading) {
-				if (tourneyHeading !== "") {
-					message += "<br />";
-				}
-				tourneyHeading = tourney.status;
-				if (tourneyHeading !== 'Completed') {
+			if (tourney.status !== "Canceled") {
+				if (tourney.status !== tourneyHeading) {
+					tourneyHeading = tourney.status;
+					if (tourneyHeading === 'Completed') {
+						message += "<div class='completeTournament gone'>";
+					}
+					if (first) {
+						first = false;
+					} else {
+						message += "<br />";
+					}
 					message += "<div class='modalContentHeading'>" + tourneyHeading + "</div>";
-				} else {
-					completedTournamentsExist = true;
+					if (tourneyHeading === 'Completed') {
+						completedTournamentsExist = true;
+					}
+				}
+
+				message += "<div class='clickableText' onclick='viewTournamentInfo(" + tourney.id + ");'>" + tourney.name + "</div>";
+				if (tourneyHeading === 'Completed') {
+					message += "</div>";
 				}
 			}
-
-			message += "<div class='clickableText' onclick='viewTournamentInfo(" + tourney.id + ");'>" + tourney.name + "</div>";
-			message += "<br />";
 		}
 
 		if (completedTournamentsExist) {
@@ -2704,15 +2735,39 @@ var showTournamentInfoCallback = function showTournamentInfoCallback(results) {
 			message += "<br /><br /><div class='modalContentHeading'>Players currently signed up:</div>";
 			for (var i = 0; i < tournamentInfo.currentPlayers.length; i++) {
 				message += "<br />" + tournamentInfo.currentPlayers[i].username;
-				// message += " (" + tournamentInfo.currentPlayers[i].playerStatus + ")";
 				if (tournamentInfo.currentPlayers[i].username === getUsername()) {
 					playerIsSignedUp = true;
 				}
 			}
 		}
 
+		message += "<br />";
+
+		if (tournamentInfo.rounds && tournamentInfo.rounds.length > 0) {
+			for (var i = 0; i < tournamentInfo.rounds.length; i++) {
+				var round = tournamentInfo.rounds[i];
+				var roundName = htmlEscape(round.name);
+				message += "<br /><div>" + roundName + "</div>";
+				/* Display all games for round */
+				var gamesFoundForRound = false;
+				for (var j = 0; j < tournamentInfo.games.length; j++) {
+					var game = tournamentInfo.games[j];
+					if (game.roundId === round.id) {
+						message += "<div class='clickableText' onclick='matchGameClicked(" + game.gameId + ")'>" + htmlEscape(game.gameType) + ": " + game.hostUsername + " vs " + game.guestUsername + "</div>";
+						gamesFoundForRound = true;
+					}
+				}
+
+				if (!gamesFoundForRound) {
+					message += "<div><em>No games</em></div>"
+				}
+			}
+		} else {
+			message += "<br /><em>No rounds</em>";
+		}
+
 		if (userIsLoggedIn() && tournamentInfo.signupAvailable && !playerIsSignedUp) {
-			message += "<br /><br /><div class='clickableText' onclick='signUpForTournament(" + tournamentInfo.id + ",\"" + tournamentInfo.name + "\");'>Sign up for tournament</div>";
+			message += "<br /><br /><div class='clickableText' onclick='signUpForTournament(" + tournamentInfo.id + ",\"" + htmlEscape(tournamentInfo.name) + "\");'>Sign up for tournament</div>";
 		} else if (!userIsLoggedIn()) {
 			message += "<br /><br />Sign in and start playing to participate in tournaments.";
 		}
@@ -2735,9 +2790,10 @@ function submitCreateTournament() {
 }
 
 function createNewTournamentClicked() {
-	var message = "<div>Name:<br /><input type='text' id='createTournamentName' /></div>";
+	var message = "<div>Please create a thread in the Tournaments section of the forum with details about your tournament. Put the url of your tournament thread in the Forum URL field. <br /><br />Put a short summary in the Details field that will help players understand what kind of tournament this will be.</div>";
+	message += "<br /><div>Name:<br /><input type='text' id='createTournamentName' /></div>";
 	message += "<br /><div>Forum URL:<br /><input type='text' id='createTournamentForumUrl' /></div>";
-	message += "<br /><div>Details:<br /><textarea id='createTournamentDetails'></textarea></div>";
+	message += "<br /><div>1-line Summary:<br /><textarea id='createTournamentDetails'></textarea></div>";
 
 	message += "<br /><div class='clickableText' onclick='submitCreateTournament();'>Create Tournament</div>";
 	message += "<br /><div class='clickableText' onclick='manageTournamentsClicked();'>Cancel</div>";
@@ -2745,14 +2801,194 @@ function createNewTournamentClicked() {
 	showModal("Create Tournament", message);
 }
 
-var showManageTournamentCallback = function showManageTournamentCallback(results) {
+var goToManageTournamentCallback = function goToManageTournamentCallback(results) {
+	manageTournamentClicked(tournamentToManage);
+};
 
+function createNewRound(tournamentId) {
+	var roundName = document.getElementById('newRoundName').value;
+	onlinePlayEngine.createNewRound(getLoginToken(), tournamentId, roundName, "", goToManageTournamentCallback);
+}
+
+function changeTournamentPlayerStatus(tournamentId, usernameToChange, newTournamentPlayerStatusId) {
+	onlinePlayEngine.changeTournamentPlayerStatus(getLoginToken(), tournamentId, usernameToChange, newTournamentPlayerStatusId, goToManageTournamentCallback);
+}
+
+var manageTournamentActionData = {};
+
+function roundClicked(id, name) {
+	manageTournamentActionData.newMatchData.roundId = id;
+	manageTournamentActionData.newMatchData.roundName = name;
+	roundDisplay = document.getElementById('newTournamentMatchRound');
+	if (roundDisplay) {
+		roundDisplay.innerText = name;
+	}
+}
+
+function playerNameClicked(id, username) {
+	var nameDisplay;
+	if (manageTournamentActionData.newMatchData.hostId > 0
+		&& (!manageTournamentActionData.newMatchData.guestId
+			|| manageTournamentActionData.newMatchData.guestId <= 0)) {
+		manageTournamentActionData.newMatchData.guestId = id;
+		manageTournamentActionData.newMatchData.guestUsername = username;
+		nameDisplay = document.getElementById('newTournamentMatchGuest');
+	} else {
+		manageTournamentActionData.newMatchData.hostId = id;
+		manageTournamentActionData.newMatchData.hostUsername = username;
+		nameDisplay = document.getElementById('newTournamentMatchHost');
+		manageTournamentActionData.newMatchData.guestId = 0;
+		manageTournamentActionData.newMatchData.guestUsername = null;
+		document.getElementById('newTournamentMatchGuest').innerText = '';
+	}
+	
+	if (nameDisplay) {
+		nameDisplay.innerText = username;
+	}
+}
+
+function createNewTournamentMatch() {
+	var roundId = manageTournamentActionData.newMatchData.roundId;
+	var gameTypeId = currentGameData.gameTypeId;
+	var hostUsername = manageTournamentActionData.newMatchData.hostUsername;
+	var guestUsername = manageTournamentActionData.newMatchData.guestUsername;
+	var options = JSON.stringify(ggOptions);
+
+	onlinePlayEngine.createTournamentRoundMatch(
+		getLoginToken(), 
+		roundId, 
+		gameTypeId, 
+		hostUsername, 
+		guestUsername, 
+		options, 
+		goToManageTournamentCallback
+	);
+}
+
+function matchGameClicked(gameId) {
+	jumpToGame(gameId);
+}
+
+function changeTournamentStatus(tournamentId, newTournamentStatusId) {
+	onlinePlayEngine.changeTournamentStatus(
+		getLoginToken(),
+		tournamentId,
+		newTournamentStatusId,
+		goToManageTournamentCallback
+	);
+}
+
+var showManageTournamentCallback = function showManageTournamentCallback(results) {
+	var message = "No tournment info found."
+	var modalTitle = "Manage Tournament";
+	if (results) {
+		message = "";
+
+		var resultData = {};
+		try {
+			resultData = JSON.parse(results);
+		} catch (error) {
+			debug("Error parsing info");
+			closeModal();
+			showModal(modalTitle, "Error getting tournament info.");
+		}
+
+		manageTournamentActionData.newMatchData = {};
+
+		debug(results);
+		debug(resultData);
+
+		message += "<div class='modalContentHeading'>" + resultData.name + "</div>";
+		message += "<div>" + resultData.details + "</div>";
+
+		message += "<br /><div>Status: " + resultData.status + "</div>";
+		/* Defaults for these if statusId is 1 */
+		var nextStatusId = 2;
+		var nextStatusActionText = "Begin Tournament";
+		if (resultData.statusId === 2) {
+			nextStatusId = 3;
+			nextStatusActionText = "Complete Tournament";
+		} else if (resultData.statusId === 3) {
+			nextStatusId = 4;
+			nextStatusActionText = "Cancel Tournament";
+		} else if (resultData.statusId === 4) {
+			nextStatusId = 1;
+			nextStatusActionText = "Restore Tournament to Upcoming";
+		}
+		message += "<div class='clickableText' onclick='changeTournamentStatus(" + resultData.id + "," + nextStatusId + ")'>" + nextStatusActionText + "</div>";
+
+		if (resultData.rounds && resultData.rounds.length > 0) {
+			for (var i = 0; i < resultData.rounds.length; i++) {
+				var round = resultData.rounds[i];
+				var roundName = htmlEscape(round.name);
+				message += "<br /><div class='clickableText' onclick='roundClicked(" + round.id + ",\"" + roundName + "\")'>" + roundName + "</div>";
+				/* Display all games for round */
+				for (var j = 0; j < resultData.games.length; j++) {
+					var game = resultData.games[j];
+					if (game.roundId === round.id) {
+						message += "<div class='clickableText' onclick='matchGameClicked(" + game.gameId + ")'>" + htmlEscape(game.gameType) + ":" + game.hostUsername + " vs " + game.guestUsername + "</div>";
+					}
+				}
+			}
+		} else {
+			message += "<br /><em>No rounds</em>";
+		}
+		message += "<br /><div class='modalContentHeading'>New Round</div>";
+		message += "<div>Name:<br /><input type='text' id='newRoundName' /></div>";
+		message += "<div class='clickableText' onclick='createNewRound(" + resultData.id + ");'>Create Round</div>";
+
+		/* Players */
+		if (resultData.players && resultData.players.length > 1) {
+			var playerStatusId = 0;
+			var statusChangeLinkText = "";
+			for (var i = 0; i < resultData.players.length; i++) {
+				var player = resultData.players[i];
+				if (player.statusId !== playerStatusId) {
+					message += "<br /><div>&nbsp;&nbsp;" + player.status + "</div>";
+					playerStatusId = player.statusId;
+					if (playerStatusId === 1
+						|| playerStatusId === 5) {
+						statusChangeLinkText = "approve";
+						changeStatusIdTo = 2;
+					} else if (playerStatusId === 2) {
+						statusChangeLinkText = "eliminate";
+						changeStatusIdTo = 3;
+					} else {
+						statusChangeLinkText = "disqualify";
+						changeStatusIdTo = 5;
+					}
+				}
+				playerUsername = htmlEscape(player.username);
+				message += "<div><span";
+				if (playerStatusId !== 5) {
+					message += " class='clickableText' onclick=playerNameClicked(" + player.userId + ",\"" + playerUsername + "\")";
+				}
+				message += ">" + playerUsername + "</span>&nbsp;(<span class='clickableText' onclick='changeTournamentPlayerStatus(" + resultData.id + ",\"" + playerUsername + "\"," + changeStatusIdTo + ")'>" + statusChangeLinkText + "</span>)</div>";
+			}
+		}
+
+		/* Create new game section */
+		message += "<br /><div class='modalContentHeading'>New Match</div>";
+		message += "To create a new match, click the Round and players to apply.<br />Game will share the same type and options as the game you currently have open.";
+		message += "<br /><em>Round:</em> <span id='newTournamentMatchRound'></span>";
+		message += "<br /><em>Host:</em> <span id='newTournamentMatchHost'></span>";
+		message += "<br /><em>Guest:</em> <span id='newTournamentMatchGuest'></span>";
+		var currentGameTypeEntry = getGameTypeEntryFromId(currentGameData.gameTypeId);
+		message += "<br /><em>Game:</em> " + htmlEscape(currentGameTypeEntry.desc);
+		message += "<br /><em>Options:</em> " + JSON.stringify(ggOptions);
+		message += "<div class='clickableText' onclick='createNewTournamentMatch();'>Create Match</div>";
+
+		message += "<br /><br />";
+	}
+
+	showModal(modalTitle, message);
 };
 
 function manageTournamentClicked(tournamentId) {
 	showModal("Manage Tournament", getLoadingModalText());
-	onlinePlayEngine.getManageTournamentInfo(tournamentId, showManageTournamentCallback);
-} 
+	tournamentToManage = tournamentId;
+	onlinePlayEngine.getManageTournamentInfo(getLoginToken(), tournamentId, showManageTournamentCallback);
+}
 
 var showManageTournamentsCallback = function showManageTournamentsCallback(results) {
 	var message = "No tournament info found.";
@@ -2768,11 +3004,6 @@ var showManageTournamentsCallback = function showManageTournamentsCallback(resul
 			closeModal();
 			showModal(modalTitle, "Error getting tournament info.");
 		}
-
-		// resultData = {
-		// 	isTournamentManager: true,
-		// 	tournaments: []
-		// };
 
 		debug(resultData);
 
@@ -2790,24 +3021,6 @@ var showManageTournamentsCallback = function showManageTournamentsCallback(resul
 
 		message += "<br /><br />";
 		message += "<div class='clickableText' onclick='createNewTournamentClicked();'>Create new tournament</div>";
-
-		// if (tournamentInfo.forumUrl) {
-		// 	message += "<br /><br />";
-		// 	message += "<a href='" + tournamentInfo.forumUrl + "' target='_blank' class='clickableText'>Full details <i class='fa fa-external-link'></i></a>";
-		// }
-
-		// if (tournamentInfo.currentPlayers
-		// 	&& tournamentInfo.currentPlayers !== null
-		// 	&& tournamentInfo.currentPlayers.length > 0) {
-		// 	message += "<br /><br /><div class='modalContentHeading'>Players currently signed up:</div>";
-		// 	for (var i = 0; i < tournamentInfo.currentPlayers.length; i++) {
-		// 		message += "<br />" + tournamentInfo.currentPlayers[i].username;
-		// 	}
-		// }
-
-		// if (tournamentInfo.signUpAvailable) {
-		// 	message += "<br /><br /><div class='clickableText' onclick='signUpForTournament(" + tournamentInfo.id + ");'>Sign up for tournament</div>";
-		// }
 	}
 
 	showModal(modalTitle, message);

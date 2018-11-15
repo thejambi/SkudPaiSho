@@ -472,6 +472,21 @@ OnlinePlayEngine.prototype.getManageTournamentsInfo = function(loginToken, callb
     );
 };
 
+OnlinePlayEngine.prototype.getManageTournamentInfo = function(loginToken, tournamentId, callback) {
+    $.post("getManageTournamentInfo.php",
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId,
+            tournamentId: tournamentId
+        },
+        function(data, status){
+            OnlinePlayEngine.callCallback(data, status, callback);
+        }
+    );
+};
+
 OnlinePlayEngine.prototype.submitTournamentSignup = function(loginToken, tournamentId, callback) {
     $.post("submitTournamentSignup.php",
         {
@@ -496,7 +511,78 @@ OnlinePlayEngine.prototype.createTournament = function(loginToken, name, forumUr
             deviceId: loginToken.deviceId,
             name: name,
             forumUrl: forumUrl,
-            details: details,
+            details: details
+        },
+        function(data, status){
+            OnlinePlayEngine.callCallback(data, status, callback);
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.createNewRound = function(loginToken, tournamentId, roundName, roundDetails, callback) {
+    $.post("createNewRound.php",
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId,
+            tournamentId: tournamentId,
+            roundName: roundName,
+            roundDetails: roundDetails
+        },
+        function(data, status){
+            OnlinePlayEngine.callCallback(data, status, callback);
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.changeTournamentPlayerStatus = function(loginToken, tournamentId, usernameToChange, newTournamentPlayerStatusId, callback) {
+    $.post("tournamentManagementFunctions.php",
+        {
+            function: "changeTournamentPlayerStatus",
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId,
+            tournamentId: tournamentId,
+            usernameToChange: usernameToChange,
+            newTournamentPlayerStatusId: newTournamentPlayerStatusId
+        },
+        function(data, status){
+            OnlinePlayEngine.callCallback(data, status, callback);
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.changeTournamentStatus = function(loginToken, tournamentId, newTournamentStatusId, callback) {
+    $.post("tournamentManagementFunctions.php",
+        {
+            function: "changeTournamentStatus",
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId,
+            tournamentId: tournamentId,
+            newTournamentStatusId: newTournamentStatusId
+        },
+        function(data, status){
+            OnlinePlayEngine.callCallback(data, status, callback);
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.createTournamentRoundMatch = function(loginToken, roundId, gameTypeId, hostUsername, guestUsername, options, callback) {
+    $.post("createTournamentRoundMatch.php",
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId,
+            roundId: roundId,
+            gameTypeId: gameTypeId,
+            hostUsername: hostUsername,
+            guestUsername: guestUsername,
+            options: options
         },
         function(data, status){
             OnlinePlayEngine.callCallback(data, status, callback);
