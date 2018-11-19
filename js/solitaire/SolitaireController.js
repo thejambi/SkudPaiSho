@@ -97,6 +97,10 @@ SolitaireController.prototype.getAdditionalMessage = function() {
 };
 
 SolitaireController.prototype.unplayedTileClicked = function(tileDiv) {
+	if (!myTurn()) {
+		return;
+	}
+
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
 		return;

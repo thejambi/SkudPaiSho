@@ -12,8 +12,11 @@ var CLASSIC_RULES = "Classic Rules";
 
 var FULL_POINTS_SCORING = "Full points scoring";
 
+/* Blooms */
+var FOUR_SIDED_BOARD = "Four-sided board";
+var SHORTER_GAME = "Shorter game";
+// var TWELVE_SIDED_BOARD = "Twelve-sided board";	// Nah, that's crazy!
+
 function gameOptionEnabled(optionName) {
-	if (ggOptions.includes(optionName)) {
-		return true;
-	}
+	return ggOptions.includes(optionName);
 }

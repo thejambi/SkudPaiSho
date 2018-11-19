@@ -99,14 +99,6 @@ CaptureController.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
-CaptureController.prototype.getExtraHarmonyBonusHelpText = function() {
-	return "";
-};
-
-CaptureController.prototype.showHarmonyBonusMessage = function() {
-	// 
-};
-
 CaptureController.prototype.unplayedTileClicked = function(tileDiv) {
 	/* Tiles are all on the board for Capture Pai Sho */
 };
@@ -182,16 +174,6 @@ CaptureController.prototype.pointClicked = function(htmlPoint) {
 			this.theGame.hidePossibleMovePoints();
 			this.resetNotationBuilder();
 		}
-	}
-};
-
-CaptureController.prototype.skipHarmonyBonus = function() {
-	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-	this.gameNotation.addMove(move);
-	if (playingOnlineGame()) {
-		callSubmitMove();
-	} else {
-		finalizeMove();
 	}
 };
 

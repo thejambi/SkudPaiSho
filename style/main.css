@@ -188,7 +188,7 @@ div.tab .alertTab, div.tab .alertTab.active {
   bottom: 0;
   width: 100%;
   text-align: center;
-  z-index: 3;
+  z-index: 103;
   background-color: #444;
 }
 
@@ -412,8 +412,11 @@ figure > div {
 .tilePileContainer div div {
   display: inline;
   float: left;
-  width: 34px;
   margin-top: 8px;
+}
+
+.tilePileContainer.PaiSho div div {
+  width: 34px;
 }
 
 .streetTileContainer {
@@ -493,7 +496,7 @@ input[type=submit] {
   background-color: #444;
   color: #faf8ef;
   font-size: 14px;
-  z-index: 2;
+  z-index: 103;
 }
 
 .header h1 {
@@ -539,7 +542,7 @@ input[type=submit] {
 .modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
-    z-index: 99; /* Sit on top */
+    z-index: 199; /* Sit on top */
     padding-top: 100px; /* Location of the box */
     left: 0;
     top: 0;
@@ -608,7 +611,7 @@ input[type=submit] {
     height: 100%;
     width: 0;
     position: fixed;
-    z-index: 4;
+    z-index: 104;
     top: 0;
     left: 0;
     background-color: #222;
@@ -781,7 +784,144 @@ input[type=submit] {
     }
 }
 
-/* -------------------------- */
+
+
+
+
+/************ Blooms ************/
+.bloomsBoard {
+  margin-bottom: 60px;
+}
+
+.blooms12sidedBoard {
+  width: 1500px;
+  margin: -190px 0 0 -416px;
+  transform: scale(0.45);
+}
+
+.hexRow {
+  clear: both;
+}
+
+.hexRowIndented {
+  padding-left: 26px;
+}
+
+.hexagon, 
+.hexagonNoShow {
+  position: relative;
+  width: 48px;
+  height: 28.87px;
+  /* background-color: #b9b9b9; */
+  /* background-color: #c2bfc4; */
+  /* background-color: #cfcdd0; */
+  background-color: #E4D9D0;
+  margin: 14.43px 2px 2px 2px;
+  float: left;
+}
+
+.hexagonNoShow {
+  visibility: hidden;
+}
+
+.hexagonScore {
+  /* background-color: #eee; */
+  background-color: #9d9b9b;
+}
+
+.hexScoreHost {
+  background-color: #f9c851;
+  transform: scale(0.8);
+}
+.hexScoreGuest {
+  background-color: #3b3b39;
+  transform: scale(0.8);
+}
+.hexScoreHost.hexScoreGuest {
+  background-color: #9a8245;
+}
+
+.bloomsH1 {
+  background-color: #f9c851;
+}
+.bloomsH2 {
+  background-color: #c15f64;
+}
+.bloomsG1 {
+  /* background-color: #9cc0b8; */
+  background-color: #8fb6ad;
+}
+.bloomsG2 {
+  background-color: #3b3b39;
+}
+.scoreMix {
+  background-color: #9a8245;
+}
+
+.bloomsTileContainer {
+  transform: scale(0.9);
+}
+.bloomsSelectedTile {
+  transform: scale(1.2);
+  z-index: 3;
+}
+
+.hexagonShadow,
+.hexagon:hover:not(.hexagonScore):hover {
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  /* background-color: #64c7cc; */
+  z-index: 4;
+  transform: scale(1.12);
+}
+
+.bloomsRevealEffect {
+  transform: scale(1.075);
+  z-index: 5;
+}
+
+.hexagon:before,
+.hexagon:after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  width: 35.36px;
+  height: 35.36px;
+  -webkit-transform: scaleY(0.5774) rotate(-45deg);
+  -ms-transform: scaleY(0.5774) rotate(-45deg);
+  transform: scaleY(0.5774) rotate(-45deg);
+  background-color: inherit;
+  left: 7.3223px;
+}
+
+.hexagonShadow:before,
+.hexagonShadow:after {
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+
+.hexagon:before {
+  top: -17.6777px;
+}
+
+.hexagon:after {
+  bottom: -17.6777px;
+}
+
+/*cover up extra shadows*/
+.hexagon span {
+  display: block;
+  position: absolute;
+  top:0px;
+  left: 0;
+  width:50px;
+  height:28.8675px;
+  z-index: 2;
+  background: inherit;
+}
+
+
+
+
+/* ------------ MEDIA -------------- */
 
 @media only screen and (max-width: 1198px) {
   .helpContainer {
@@ -847,6 +987,10 @@ input[type=submit] {
     margin-top: 4px;
   }
 
+  .tilePileContainer div div.bloomsTileContainer {
+    margin-top: 12px;
+  }
+
   #send {
     font-size: large;
     margin-top: 0;
@@ -878,7 +1022,7 @@ input[type=submit] {
       width: 95%;
     }
 
-    .tilePileContainer div div {
+    .tilePileContainer.PaiSho div div {
       width: 5.5555vw;
     }
 
@@ -917,7 +1061,7 @@ input[type=submit] {
     box-shadow: 0px 0px 7px 3px #87f;
     background-color: #87f;
   }
-  .bhHost.bhGuest {
+   .bhHost.bhGuest {
     box-shadow: 0px 0px 7px 3px #77A2E6;
     background-color: #77A2E6;
   }
@@ -926,7 +1070,62 @@ input[type=submit] {
     display: none;
   }
 
+  
+  /* Blooms - vw units override */
+.bloomsBoard {
+  margin-bottom: 10.49vw;
+  width: 100vw;
+  transform: scale(0.9);
 }
+
+.blooms12sidedBoard {
+  transform: scale(0.3);
+}
+
+.hexRowIndented {
+  padding-left: 0px;
+  padding-left: 4.54545vw;
+}
+
+.hexagon, 
+.hexagonNoShow {
+  width: 8.4912vw;
+  height: 5.047vw;
+  margin: 2.523vw 0.3vw 0.3vw 0.3vw;
+}
+
+.hexagonShadow,
+.hexagon:hover:not(.hexagonScore):hover {
+  box-shadow: 0 0 3.497vw rgba(0,0,0,0.6);
+}
+
+.hexagon:before,
+.hexagon:after {
+  width: 6.1818vw;
+  height: 6.1818vw;
+  left: 1.28vw;
+}
+
+.hexagonShadow:before,
+.hexagonShadow:after {
+  box-shadow: 0 0 3.497vw rgba(0,0,0,0.6);
+}
+
+.hexagon:before {
+  top: -3.091vw;
+}
+
+.hexagon:after {
+  bottom: -3.091vw;
+}
+
+.hexagon span {
+  width: 8.7412vw;
+  height: 5.047vw;
+}
+
+
+
 
 @media only screen and (max-width: 450px) {
   .sideNavOpen {
@@ -987,8 +1186,10 @@ input[type=submit] {
     }
 
     .tilePileContainer div div {
-      width: 17px;
       margin-top: 2px;
+    }
+    .tilePileContainer.PaiSho div div {
+      width: 17px;
     }
 
     .point {

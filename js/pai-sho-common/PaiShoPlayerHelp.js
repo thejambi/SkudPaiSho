@@ -18,3 +18,11 @@ function getPlayerNameFromCode(playerCode) {
 		return GUEST;
 	}
 }
+
+function getOpponentName(playerName) {
+	if (playerName === HOST) {
+		return GUEST;
+	} else {
+		return HOST;
+	}
+}

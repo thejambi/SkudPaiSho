@@ -81,6 +81,7 @@ function setupPaiShoBoard(gameContainer,
 	var hostTilesContainer = createDivWithClass("hostTilesContainer");
 	var guestTilesContainer = createDivWithClass("guestTilesContainer");
 	var tilePileContainer = createDivWithClass("tilePileContainer");
+	tilePileContainer.classList.add("PaiSho");
 	var gameMessage2 = createDivWithClass("gameMessage2");
 
 	hostTilesContainer.innerHTML = hostTilesContainerDivs;

@@ -728,7 +728,7 @@ function refreshMessage() {
 
 	getGameMessageElement().innerHTML = message;
 
-	if (playingOnlineGame() && !myTurn()) {
+	if (playingOnlineGame() && (!myTurn()) || gameController.isSolitaire()) {
 		showResetMoveMessage();
 	}
 }
@@ -1497,7 +1497,16 @@ var GameType = {
 			OPTION_FULL_TILES,
 			FULL_POINTS_SCORING
 		]
-	}
+	}//,
+	// Blooms: {
+	// 	id: 9,
+	// 	desc: "Blooms",
+	// 	rulesUrl: "https://www.nickbentley.games/blooms-rules/",
+	// 	gameOptions: [
+	// 		FOUR_SIDED_BOARD,
+	// 		SHORTER_GAME
+	// 	]
+	// }
 };
 function getGameControllerForGameType(gameTypeId) {
 	var controller;
@@ -1528,6 +1537,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.OvergrowthPaiSho.id:
 			controller = new OvergrowthController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Blooms.id:
+			controller = new BloomsController(gameContainerDiv, isMobile);
 			break;
 	    default:
 			debug("Game Controller unavailable.");
@@ -2419,18 +2431,24 @@ function resignGameCallback() {
 	}
 }
 
+function iAmPlayerInCurrentOnlineGame() {
+	return usernameEquals(currentGameData.hostUsername) || usernameEquals(currentGameData.guestUsername);
+}
+
 function resignGame() {
 	// TODO eventually make it so if guest never made a move, then player only "leaves" game instead of updating the game result, so it returns to being an available game seek.
 	if (gameController.guestNeverMoved && gameController.guestNeverMoved()) {
 		// Guest never moved, only leave game. TODO
 	}// else {....}
 	
-	onlinePlayEngine.updateGameWinInfo(gameId, getOnlineGameOpponentUsername(), 8, getLoginToken(), resignGameCallback);
+	if (iAmPlayerInCurrentOnlineGame()) {
+		onlinePlayEngine.updateGameWinInfo(gameId, getOnlineGameOpponentUsername(), 8, getLoginToken(), resignGameCallback);
+	}
 }
 
 function resignGameClicked() {
 	var message = "";
-	if (playingOnlineGame() && !gameController.theGame.getWinner()) {
+	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !gameController.theGame.getWinner()) {
 		message = "<div>Are you sure you want to resign this game?</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal(); resignGame();'>Yes - resign game</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
@@ -2566,6 +2584,16 @@ function addOptionFromInput() {
 }
 
 function promptAddOption() {
+	GameType["Blooms"] = {
+		id: 9,
+		desc: "Blooms",
+		rulesUrl: "https://www.nickbentley.games/blooms-rules/",
+		gameOptions: [
+			FOUR_SIDED_BOARD,
+			SHORTER_GAME
+		]
+	};
+
 	var message = "<br /><input type='text' id='optionAddInput' name='optionAddInput' />";
 	message += "<br /><div class='clickableText' onclick='addOptionFromInput()'>Add</div>";
 	
