@@ -239,7 +239,22 @@ window.requestAnimationFrame(function () {
 	if (!QueryString.game && (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn())) {
 		showWelcomeTutorial();
 	}
+
+	if (usernameIsOneOf(['SkudPaiSho','Zach','NickB'])) {
+		activateBlooms();
+	}
 });
+
+function usernameIsOneOf(theseNames) {
+	if (theseNames && theseNames.length) {
+		for (var i = 0; i < theseNames.length; i++) {
+			if (getUsername() === theseNames[i]) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
 
 function showReplayControls() {
 	if (window.navigator.onLine) {
@@ -2591,7 +2606,7 @@ function addOptionFromInput() {
 	closeModal();
 }
 
-function promptAddOption() {
+function activateBlooms() {
 	GameType["Blooms"] = {
 		id: 9,
 		desc: "Blooms",
@@ -2601,6 +2616,10 @@ function promptAddOption() {
 			SHORTER_GAME
 		]
 	};
+}
+
+function promptAddOption() {
+	activateBlooms();
 
 	var message = "<br /><input type='text' id='optionAddInput' name='optionAddInput' />";
 	message += "<br /><div class='clickableText' onclick='addOptionFromInput()'>Add</div>";

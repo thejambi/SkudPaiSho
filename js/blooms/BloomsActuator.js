@@ -1,6 +1,6 @@
 
 /* Create boardContainer, hostTilesContainer, and guestTilesContainer */
-function BloomsActuator(gameContainer, isMobile) {
+function BloomsActuator(gameContainer, isMobile, hostTilesContainerDivs, guestTilesContainerDivs) {
 	this.gameContainer = gameContainer;
 	this.isMobile = isMobile;
 
@@ -24,8 +24,8 @@ function BloomsActuator(gameContainer, isMobile) {
 	var tilePileContainer = createDivWithClass("tilePileContainer");
 	var gameMessage2 = createDivWithClass("gameMessage2");
 
-	var hostTilesContainerDivs = BloomsController.getHostTilesContainerDivs();
-	var guestTilesContainerDivs = BloomsController.getGuestTilesContainerDivs();
+	var hostTilesContainerDivs = hostTilesContainerDivs;
+	var guestTilesContainerDivs = guestTilesContainerDivs;
 	hostTilesContainer.innerHTML = hostTilesContainerDivs;
 	guestTilesContainer.innerHTML = guestTilesContainerDivs;
 
@@ -97,12 +97,16 @@ BloomsActuator.prototype.buildRowDiv = function(rowNum) {
 BloomsActuator.prototype.addBoardPoint = function(rowDiv, boardPoint) {
 	var theDiv = this.createBoardPointDiv(boardPoint);
 
+	if (!this.isMobile) {
+		theDiv.classList.add("desktop");
+	}
+
 	if (boardPoint.types.includes(BloomsBoardPoint.Types.nonPlayable)) {
 		theDiv.classList.add("hexagonNoShow");
 	} else {
 		theDiv.classList.add("hexagon");
 
-		if (this.mobile) {
+		if (this.isMobile) {
 			theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
 		} else {
 			theDiv.setAttribute("onclick", "pointClicked(this);");

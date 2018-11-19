@@ -1,10 +1,18 @@
 
 function BloomsController(gameContainer, isMobile) {
-	this.actuator = new BloomsActuator(gameContainer, isMobile);
+	if (!isMobile) {
+		this.additionalTilePileClass = "desktop";
+	} else {
+		this.additionalTilePileClass = "";
+	}
+
+	this.actuator = new BloomsActuator(gameContainer, isMobile, this.getHostTilesContainerDivs(), this.getGuestTilesContainerDivs());
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
 	this.resetGameNotation();
+
+	// this.debugMessage = "";
 }
 
 BloomsController.prototype.getGameTypeId = function() {
@@ -38,13 +46,13 @@ BloomsController.prototype.getNewGameNotation = function() {
 };
 
 /* Required by Main */
-BloomsController.getHostTilesContainerDivs = function() {
-	return "<div class='bloomsTileContainer'><div class='hexagon bloomsTilePileTile bloomsH1' name='H1' onclick='gameController.unplayedTileClicked(this)'><span></span></div><div class='hexagon bloomsTilePileTile bloomsH2' name='H2' onclick='gameController.unplayedTileClicked(this)'><span></span></div></div>";
+BloomsController.prototype.getHostTilesContainerDivs = function() {
+	return "<div class='bloomsTileContainer'><div class='hexagon bloomsTilePileTile bloomsH1 " + this.additionalTilePileClass + "' name='H1' onclick='gameController.unplayedTileClicked(this)'><span></span></div><div class='hexagon bloomsTilePileTile bloomsH2 " + this.additionalTilePileClass + "' name='H2' onclick='gameController.unplayedTileClicked(this)'><span></span></div></div>";
 };
 
 /* Required by Main */
-BloomsController.getGuestTilesContainerDivs = function() {
-	return "<div class='bloomsTileContainer'><div class='hexagon bloomsTilePileTile bloomsG1' name='G1' onclick='gameController.unplayedTileClicked(this)'><span></span></div><div class='hexagon bloomsTilePileTile bloomsG2' name='G2' onclick='gameController.unplayedTileClicked(this)'><span></span></div></div>";
+BloomsController.prototype.getGuestTilesContainerDivs = function() {
+	return "<div class='bloomsTileContainer'><div class='hexagon bloomsTilePileTile bloomsG1 " + this.additionalTilePileClass + "' name='G1' onclick='gameController.unplayedTileClicked(this)'><span></span></div><div class='hexagon bloomsTilePileTile bloomsG2 " + this.additionalTilePileClass + "' name='G2' onclick='gameController.unplayedTileClicked(this)'><span></span></div></div>";
 };
 
 /* Required by Main */
@@ -59,6 +67,7 @@ BloomsController.prototype.resetMove = function() {
 
 /* Required by Main */
 BloomsController.prototype.getDefaultHelpMessageText = function() {
+	// return "<h4>Blooms</h4><br /><p>" + this.debugMessage + "</p>";
 	return "<h4>Blooms</h4>";
 };
 
@@ -102,11 +111,16 @@ BloomsController.prototype.unplayedTileClicked = function(tilePileContainerDiv) 
 		return;
 	}
 
+	// this.debugMessage = "Unplayed tile clicked<br />";
+
 	if (tileName !== this.notationBuilder.piece1) {
 		this.notationBuilder.selectedPiece = tileName;
 		tilePileContainerDiv.classList.add('bloomsSelectedTile');
 		this.selectedTilePileContainerDiv = tilePileContainerDiv;
 	}
+
+	// this.debugMessage = this.notationBuilder.selectedPiece + "<br />";
+	// clearMessage();
 };
 
 /* Required by Main Actuator creates anything that calls pointClicked in Main. Actuator could call something like this directly instead. */
@@ -149,6 +163,8 @@ BloomsController.prototype.pointClicked = function(htmlPoint) {
 			refreshMessage();
 		}
 	}
+	
+	this.notationBuilder.selectedPiece = null;
 };
 
 /* Called by Main if showTileMessage used in Actuator */

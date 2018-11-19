@@ -45,7 +45,7 @@ BloomsNotationMove.prototype.analyzeMove = function() {
 };
 
 BloomsNotationMove.prototype.isValidNotation = function() {
-	return this.valid;
+	return this.piece1 !== this.piece2;
 };
 
 BloomsNotationMove.prototype.equals = function(otherMove) {

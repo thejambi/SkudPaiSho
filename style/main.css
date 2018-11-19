@@ -867,7 +867,7 @@ input[type=submit] {
 }
 
 .hexagonShadow,
-.hexagon:hover:not(.hexagonScore):hover {
+.desktop.hexagon:hover:not(.hexagonScore):hover {
   box-shadow: 0 0 20px rgba(0,0,0,0.6);
   /* background-color: #64c7cc; */
   z-index: 4;
@@ -1095,7 +1095,7 @@ input[type=submit] {
 }
 
 .hexagonShadow,
-.hexagon:hover:not(.hexagonScore):hover {
+.desktop.hexagon:hover:not(.hexagonScore):hover {
   box-shadow: 0 0 3.497vw rgba(0,0,0,0.6);
 }
 

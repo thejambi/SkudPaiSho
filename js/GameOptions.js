@@ -13,7 +13,7 @@ var CLASSIC_RULES = "Classic Rules";
 var FULL_POINTS_SCORING = "Full points scoring";
 
 /* Blooms */
-var FOUR_SIDED_BOARD = "Four-sided board";
+var FOUR_SIDED_BOARD = "Board size: 4 per side";
 var SHORTER_GAME = "Shorter game";
 // var TWELVE_SIDED_BOARD = "Twelve-sided board";	// Nah, that's crazy!
 

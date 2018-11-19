@@ -59,9 +59,9 @@ BloomsGameManager.prototype.hasEnded = function() {
 
 /* Required by Main */
 BloomsGameManager.prototype.getWinner = function() {
-	if (this.hostScore > this.board.scoreNeededToWin) {
+	if (this.hostScore >= this.board.scoreNeededToWin) {
 		return HOST;
-	} else if (this.guestScore > this.board.scoreNeededToWin) {
+	} else if (this.guestScore >= this.board.scoreNeededToWin) {
 		return GUEST;
 	}
 };
@@ -86,5 +86,7 @@ BloomsGameManager.prototype.getCopy = function() {
 
 BloomsGameManager.prototype.pointIsOpen = function(npText) {
 	var rowAndCol = BloomsBoardPoint.notationPointStringMap[npText];
-	return !this.board.cells[rowAndCol.row][rowAndCol.col].hasTile();
+	return rowAndCol 
+		&& !this.board.cells[rowAndCol.row][rowAndCol.col].hasTile()
+		&& this.board.cells[rowAndCol.row][rowAndCol.col].types.includes(BloomsBoardPoint.Types.normal);
 };
