@@ -75,6 +75,11 @@ SolitaireController.prototype.resetMove = function() {
 	if (this.drawnTile) {
 		this.drawnTile.selectedFromPile = false;
 		this.theGame.tileManager.putTileBack(this.drawnTile);
+	} else {
+		var lastMove = this.gameNotation.moves[this.gameNotation.moves.length - 1];
+		var tile = new SolitaireTile(lastMove.plantedFlowerType, hostPlayerCode);
+		this.theGame.tileManager.putTileBack(tile);
+		this.lastDrawnTile = tile;
 	}
 
 	this.drawnTile = this.lastDrawnTile;

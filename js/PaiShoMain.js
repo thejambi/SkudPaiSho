@@ -728,7 +728,7 @@ function refreshMessage() {
 
 	getGameMessageElement().innerHTML = message;
 
-	if (playingOnlineGame() && (!myTurn()) || gameController.isSolitaire()) {
+	if (playingOnlineGame() && !myTurn() || gameController.isSolitaire()) {
 		showResetMoveMessage();
 	}
 }
@@ -853,11 +853,19 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
 			}
 		}
+
+		if (gameController.isSolitaire) {
+			messageText += getResetMoveText();
+		}
 	} else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
 		if (playingOnlineGame()) {
 			onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
 		}
 		messageText += "Game has ended in a draw.";
+
+		if (gameController.isSolitaire) {
+			messageText += getResetMoveText();
+		}
 	} else {
 		if (!playingOnlineGame()) {
 			messageText += "Current Player: " + getCurrentPlayer() + "<br />";
