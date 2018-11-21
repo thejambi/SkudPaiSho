@@ -155,7 +155,7 @@ window.requestAnimationFrame(function () {
 		onlinePlayEnabled = false;
 	}
 
-	if (ios || runningOnAndroid || QueryString.appType === 'ios') {
+	if (ios || runningOnAndroid || QueryString.appType === 'ios' || QueryString.appType === 'android') {
 		url = "https://skudpaisho.com/";
 		sandboxUrl = url;
 	}
@@ -240,7 +240,7 @@ window.requestAnimationFrame(function () {
 		showWelcomeTutorial();
 	}
 
-	if (usernameIsOneOf(['SkudPaiSho','Zach','NickB'])) {
+	if (usernameIsOneOf(['SkudPaiSho','Zach','NickB','abacadaren'])) {
 		activateBlooms();
 	}
 });

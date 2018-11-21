@@ -62,7 +62,17 @@ BloomsController.prototype.callActuate = function() {
 
 /* Required by Main */
 BloomsController.prototype.resetMove = function() {
-	this.notationBuilderHelp.resetMove(this.notationBuilder);
+	if (this.notationBuilder.piece1 && this.notationBuilder.deployPoint1) {
+		// Restore first piece, then just rerun
+	} else {
+		// Remove last move
+		this.gameNotation.removeLastMove();
+	}
+
+	this.clearSelectedTileEffects();
+	this.restoreTilePileContainerDivs();
+
+	rerunAll();
 };
 
 /* Required by Main */
@@ -82,6 +92,7 @@ BloomsController.prototype.getAdditionalMessage = function() {
 
 	if (this.notationBuilder.selectedPiece) {
 		msg += "<br />Place second piece or <span class='clickableText' onclick='gameController.skipSecondPiece();'>skip</span>";
+		msg += getResetMoveText();
 	}
 
 	return msg;
