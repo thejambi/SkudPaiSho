@@ -77,8 +77,18 @@ BloomsController.prototype.resetMove = function() {
 
 /* Required by Main */
 BloomsController.prototype.getDefaultHelpMessageText = function() {
-	// return "<h4>Blooms</h4><br /><p>" + this.debugMessage + "</p>";
-	return "<h4>Blooms</h4>";
+	return "<h4>Blooms</h4>"
+	+ "<p><em>A game by <a href='https://www.nickbentley.games/blooms-rules/'>Nick Bentley</a>.</em> Blooms is a territory game that's a bit like the classical game Go, but shorter, easier to learn, and more colorful.</p>"
+	+ "<h4>Definitions:</h4>"
+	+ "<p><em><strong>Bloom:</strong></em> A <em>bloom</em> is an entire group of connected stones on the board of the same color. A single stone (unconnected to others of the same color) is also a bloom.</p>"
+	+ "<p><em><strong>Fenced:</strong></em> A bloom is <em>fenced</em> when there are no empty spaces adjacent to any of the bloom's stones.</p>"
+	+ "<h4>Gameplay</h4>"
+	+ "<ol>"
+	+ "<li>Each player owns 2 colors of stones. To start, the Host places 1 stone of either of his or her colors on any empty space.</li>"
+	+ "<li>From then on, starting with the Guest, the players take turns. On your turn, you must place 1 or 2 stones onto any empty spaces. If you place 2, they must be different colors. Then, all fenced enemy blooms are captured.</li>"
+	+ "<li>The first player to have captured the set target number of stones wins. <em>(This is represented by the length of the score-track. Your score-keeping stone starts at your side of the board, and the goal is to advance to your opponent's side of the board. Choose the &quot;shorter game&quot; option when starting a new game to play with less captures needed.)</em></li>"
+	+ "</ol>"
+	+ "<p>Read the official rules and more about the game <a href='https://www.nickbentley.games/blooms-rules/'>here</a>.</p>";
 };
 
 /* Required by Main */
@@ -136,6 +146,12 @@ BloomsController.prototype.unplayedTileClicked = function(tilePileContainerDiv) 
 
 /* Required by Main Actuator creates anything that calls pointClicked in Main. Actuator could call something like this directly instead. */
 BloomsController.prototype.pointClicked = function(htmlPoint) {
+	// Fake hover effect
+	if (this.actuator.isMobile) {
+		htmlPoint.classList.add("hexagonHover");
+		setTimeout(function() { htmlPoint.classList.remove("hexagonHover") }, 400);
+	}
+
 	if (this.theGame.hasEnded()) {
 		return;
 	}
@@ -214,7 +230,7 @@ BloomsController.prototype.getCurrentPlayer = function() {
 
 /* Required by Main */
 BloomsController.prototype.cleanup = function() {
-	// 
+	// Nothing to do
 };
 
 /* Required by Main */

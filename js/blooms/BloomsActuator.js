@@ -95,9 +95,21 @@ BloomsActuator.prototype.buildRowDiv = function(rowNum) {
 };
 
 BloomsActuator.prototype.addBoardPoint = function(rowDiv, boardPoint) {
-	var theDiv = this.createBoardPointDiv(boardPoint);
+	// var theDiv = this.createBoardPointDiv(boardPoint);
+	var theDiv = document.createElement("div");
 
-	if (!this.isMobile) {
+	if (boardPoint.types.includes(BloomsBoardPoint.Types.normal)) {
+		var notationPointString = boardPoint.getNotationPointString();
+		theDiv.setAttribute("name", notationPointString);
+		theDiv.setAttribute("title", notationPointString);
+	}
+
+	var theSpan = document.createElement("span");
+	theDiv.appendChild(theSpan);
+
+	if (this.isMobile) {
+		theDiv.classList.add("mobile");
+	} else {
 		theDiv.classList.add("desktop");
 	}
 
@@ -106,12 +118,14 @@ BloomsActuator.prototype.addBoardPoint = function(rowDiv, boardPoint) {
 	} else {
 		theDiv.classList.add("hexagon");
 
-		if (this.isMobile) {
-			theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
-		} else {
-			theDiv.setAttribute("onclick", "pointClicked(this);");
-			theDiv.setAttribute("onmouseover", "showPointMessage(this); gameController.revealBloom(" + boardPoint.bloomId + ");");
-			theDiv.setAttribute("onmouseout", "clearMessage();");
+		if (boardPoint.types.includes(BloomsBoardPoint.Types.normal)) {
+			if (this.isMobile) {
+				theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
+			} else {
+				theDiv.setAttribute("onclick", "pointClicked(this);");
+				theDiv.setAttribute("onmouseover", "showPointMessage(this); gameController.revealBloom(" + boardPoint.bloomId + ");");
+				theDiv.setAttribute("onmouseout", "clearMessage();");
+			}
 		}
 
 		if (boardPoint.hasTile()) {
@@ -121,7 +135,6 @@ BloomsActuator.prototype.addBoardPoint = function(rowDiv, boardPoint) {
 			}
 		}
 	}
-
 
 	/* Show Score */
 	var scoreNeededToWin = gameController.theGame.board.scoreNeededToWin;
@@ -148,12 +161,12 @@ BloomsActuator.prototype.addBoardPoint = function(rowDiv, boardPoint) {
 			theDiv.classList.add("hexScoreGuest");
 		}
 	}
-	
 
+	/* Add div to row */
 	rowDiv.appendChild(theDiv);
 };
 
-BloomsActuator.prototype.createBoardPointDiv = function(boardPoint) {
+/*BloomsActuator.prototype.createBoardPointDiv = function(boardPoint) {
 	var theDiv = document.createElement("div");
 
 	if (boardPoint.types.includes(BloomsBoardPoint.Types.normal)) {
@@ -166,5 +179,5 @@ BloomsActuator.prototype.createBoardPointDiv = function(boardPoint) {
 	theDiv.appendChild(theSpan);
 
 	return theDiv;
-};
+};*/
 
