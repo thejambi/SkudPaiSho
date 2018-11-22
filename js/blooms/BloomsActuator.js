@@ -120,7 +120,7 @@ BloomsActuator.prototype.addBoardPoint = function(rowDiv, boardPoint) {
 
 		if (boardPoint.types.includes(BloomsBoardPoint.Types.normal)) {
 			if (this.isMobile) {
-				theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
+				theDiv.setAttribute("onclick", "gameController.pointClicked(this," + boardPoint.bloomId + "); showPointMessage(this);");
 			} else {
 				theDiv.setAttribute("onclick", "pointClicked(this);");
 				theDiv.setAttribute("onmouseover", "showPointMessage(this); gameController.revealBloom(" + boardPoint.bloomId + ");");

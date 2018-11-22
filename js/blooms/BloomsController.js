@@ -78,17 +78,17 @@ BloomsController.prototype.resetMove = function() {
 /* Required by Main */
 BloomsController.prototype.getDefaultHelpMessageText = function() {
 	return "<h4>Blooms</h4>"
-	+ "<p><em>A game by <a href='https://www.nickbentley.games/blooms-rules/'>Nick Bentley</a>.</em> Blooms is a territory game that's a bit like the classical game Go, but shorter, easier to learn, and more colorful.</p>"
-	+ "<h4>Definitions:</h4>"
+	+ "<p><em>A game by <a href='https://www.nickbentley.games/blooms-rules/' target='_blank'>Nick Bentley</a>.</em> Blooms is a territory game that's a bit like the classical game Go, but shorter, easier to learn, and more colorful.</p>"
+	+ "<h4>Definitions</h4>"
 	+ "<p><em><strong>Bloom:</strong></em> A <em>bloom</em> is an entire group of connected stones on the board of the same color. A single stone (unconnected to others of the same color) is also a bloom.</p>"
 	+ "<p><em><strong>Fenced:</strong></em> A bloom is <em>fenced</em> when there are no empty spaces adjacent to any of the bloom's stones.</p>"
 	+ "<h4>Gameplay</h4>"
 	+ "<ol>"
 	+ "<li>Each player owns 2 colors of stones. To start, the Host places 1 stone of either of his or her colors on any empty space.</li>"
 	+ "<li>From then on, starting with the Guest, the players take turns. On your turn, you must place 1 or 2 stones onto any empty spaces. If you place 2, they must be different colors. Then, all fenced enemy blooms are captured.</li>"
-	+ "<li>The first player to have captured the set target number of stones wins. <em>(This is represented by the length of the score-track. Your score-keeping stone starts at your side of the board, and the goal is to advance to your opponent's side of the board. Choose the &quot;shorter game&quot; option when starting a new game to play with less captures needed.)</em></li>"
+	+ "<li>The first player to have captured the set target number of stones and advancing your score-keeping stone all the way around the scoring track, wins.</li>"
 	+ "</ol>"
-	+ "<p>Read the official rules and more about the game <a href='https://www.nickbentley.games/blooms-rules/'>here</a>.</p>";
+	+ "<p>Read the official rules and more about the game <a href='https://www.nickbentley.games/blooms-rules/' target='_blank'>here</a>.</p>";
 };
 
 /* Required by Main */
@@ -96,12 +96,12 @@ BloomsController.prototype.getAdditionalMessage = function() {
 	var msg = "";
 
 	if (this.gameNotation.moves.length === 0) {
-		msg += "To begin a game, the Host places one piece.";
+		msg += "To begin a game, the Host places one stone.";
 		msg += getGameOptionsMessageHtml(GameType.Blooms.gameOptions);
 	}
 
 	if (this.notationBuilder.selectedPiece) {
-		msg += "<br />Place second piece or <span class='clickableText' onclick='gameController.skipSecondPiece();'>skip</span>";
+		msg += "<br />Place second stone or <span class='clickableText' onclick='gameController.skipSecondPiece();'>skip</span>";
 		msg += getResetMoveText();
 	}
 
@@ -145,53 +145,61 @@ BloomsController.prototype.unplayedTileClicked = function(tilePileContainerDiv) 
 };
 
 /* Required by Main Actuator creates anything that calls pointClicked in Main. Actuator could call something like this directly instead. */
-BloomsController.prototype.pointClicked = function(htmlPoint) {
-	// Fake hover effect
-	if (this.actuator.isMobile) {
-		htmlPoint.classList.add("hexagonHover");
-		setTimeout(function() { htmlPoint.classList.remove("hexagonHover") }, 400);
-	}
-
-	if (this.theGame.hasEnded()) {
-		return;
-	}
-	if (!myTurn()) {
-		return;
-	}
-	if (currentMoveIndex !== this.gameNotation.moves.length) {
-		debug("Can only interact if all moves are played.");
-		return;
-	}
-
-	if (!this.notationBuilder.selectedPiece) {
-		return;
-	}
-
-	this.clearSelectedTileEffects();
-
+BloomsController.prototype.pointClicked = function(htmlPoint, bloomId) {
 	var npText = htmlPoint.getAttribute("name"); // like 'f5'
 
 	if (this.theGame.pointIsOpen(npText)) {
-		this.notationBuilder.setDeployPoint(npText);
-
-		// This can be removed since half-actuate works now, but it doesn't hurt
-		htmlPoint.classList.add("blooms" + this.notationBuilder.selectedPiece);
-		
-		if (this.notationBuilder.moveComplete() || this.gameNotation.moves.length === 0) {
-			this.completeMove();
-		} else {
-			// Half-move actuate
-			// Get move and run it, but don't add to gameNotation
-			if (this.selectedTilePileContainerDiv) {
-				this.selectedTilePileContainerDiv.classList.add('hexagonNoShow');
-			}
-			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-			this.theGame.runNotationMove(move, true, true);
-			refreshMessage();
+		/* Fake hover effect */
+		if (this.actuator.isMobile) {
+			htmlPoint.classList.add("hexagonHover");
+			setTimeout(function() { htmlPoint.classList.remove("hexagonHover") }, 400);
 		}
-	}
+		
+		if (this.theGame.hasEnded()) {
+			return;
+		}
+		if (!myTurn()) {
+			return;
+		}
+		if (currentMoveIndex !== this.gameNotation.moves.length) {
+			debug("Can only interact if all moves are played.");
+			return;
+		}
 	
-	this.notationBuilder.selectedPiece = null;
+		if (!this.notationBuilder.selectedPiece) {
+			return;
+		}
+	
+		this.clearSelectedTileEffects();
+	
+		var npText = htmlPoint.getAttribute("name"); // like 'f5'
+	
+		if (this.theGame.pointIsOpen(npText)) {
+			this.notationBuilder.setDeployPoint(npText);
+	
+			// This can be removed since half-actuate works now, but it doesn't hurt
+			htmlPoint.classList.add("blooms" + this.notationBuilder.selectedPiece);
+			
+			if (this.notationBuilder.moveComplete() || this.gameNotation.moves.length === 0) {
+				this.completeMove();
+			} else {
+				// Half-move actuate
+				// Get move and run it, but don't add to gameNotation
+				if (this.selectedTilePileContainerDiv) {
+					this.selectedTilePileContainerDiv.classList.add('hexagonNoShow');
+				}
+				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+				this.theGame.runNotationMove(move, true, true);
+				refreshMessage();
+			}
+		}
+		
+		this.notationBuilder.selectedPiece = null;
+	} else {
+		this.revealBloom(bloomId);
+	}
+
+	
 };
 
 /* Called by Main if showTileMessage used in Actuator */
@@ -258,6 +266,11 @@ BloomsController.prototype.restoreTilePileContainerDivs = function() {
 };
 
 BloomsController.prototype.revealBloom = function(bloomId) {
+	var needActuate = this.revealBloomInBoardState(bloomId);
+	this.actuateToRevealBloom(needActuate);
+};
+
+BloomsController.prototype.revealBloomInBoardState = function(bloomId) {
 	var prevRevealedBloomId = this.revealedBloomId;
 
 	this.revealedBloomId = bloomId;
@@ -274,8 +287,20 @@ BloomsController.prototype.revealBloom = function(bloomId) {
 		this.theGame.board.markBloomRevealed(bloomId);
 	}
 
+	return needActuate || this.actuator.isMobile;
+};
+
+BloomsController.prototype.actuateToRevealBloom = function(needActuate) {
 	if (needActuate) {
 		this.callActuate();
+
+		if (this.actuator.isMobile) {
+			var self = this;
+			setTimeout(function() {
+				self.theGame.board.clearRevealedBloom();
+				self.callActuate();
+			}, 400);
+		}
 	}
 };
 
