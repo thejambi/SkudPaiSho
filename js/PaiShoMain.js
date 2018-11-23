@@ -107,6 +107,9 @@ window.requestAnimationFrame(function () {
 	defaultEmailMessageText = document.querySelector(".footer").innerHTML;
 
 	if (QueryString.gameType) {
+		if (QueryString.gameType === '9') {
+			activateBlooms();
+		}
 		clearOptions();
 		if (QueryString.gameOptions) {
 			var optionsArray = parseGameOptions(QueryString.gameOptions);
@@ -240,7 +243,7 @@ window.requestAnimationFrame(function () {
 		showWelcomeTutorial();
 	}
 
-	if (usernameIsOneOf(['SkudPaiSho','Zach','NickB','abacadaren'])) {
+	if (usernameIsOneOf(['SkudPaiSho','NickB','abacadaren'])) {
 		activateBlooms();
 	}
 });
@@ -1561,8 +1564,11 @@ function getGameControllerForGameType(gameTypeId) {
 		case GameType.OvergrowthPaiSho.id:
 			controller = new OvergrowthController(gameContainerDiv, isMobile);
 			break;
-		case GameType.Blooms.id:
-			controller = new BloomsController(gameContainerDiv, isMobile);
+		//case GameType.Blooms.id:
+		case 9:
+			if (GameType.Blooms || QueryString.gameType === '9') {
+				controller = new BloomsController(gameContainerDiv, isMobile);
+			}
 			break;
 	    default:
 			debug("Game Controller unavailable.");
@@ -1592,8 +1598,7 @@ function setGameController(gameTypeId, keepGameOptions) {
 		debug("Defaulting to use Vagabond Pai Sho.");
 		showModal("Cannot Load Game", "This game is unavailable. Try Vagabond Pai Sho instead :)<br /><br />To know why the selected game is unavailable, ask in The Garden Gate Discord. Perhaps you have selected a new game that is coming soon!");
 		successResult = false;
-	}
-	if (gameController.completeSetup) {
+	} else if (gameController.completeSetup) {
 		gameController.completeSetup();
 	}
 
