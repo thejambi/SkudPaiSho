@@ -124,7 +124,13 @@ BloomsActuator.prototype.addBoardPoint = function(rowDiv, boardPoint) {
 			} else {
 				theDiv.setAttribute("onclick", "pointClicked(this);");
 				theDiv.setAttribute("onmouseover", "showPointMessage(this); gameController.revealBloom(" + boardPoint.bloomId + ");");
-				theDiv.setAttribute("onmouseout", "clearMessage();");
+				
+				var onmouseoutText = "clearMessage()";
+				if (boardPoint.hasTile()) {
+					onmouseoutText += ";gameController.clearRevealedBloom()";
+				}
+				onmouseoutText += ";";
+				theDiv.setAttribute("onmouseout", onmouseoutText);
 			}
 		}
 

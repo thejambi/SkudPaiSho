@@ -266,18 +266,13 @@ BloomsController.prototype.restoreTilePileContainerDivs = function() {
 };
 
 BloomsController.prototype.revealBloom = function(bloomId) {
-	var needActuate = this.revealBloomInBoardState(bloomId);
-	this.actuateToRevealBloom(needActuate);
+	this.revealBloomInBoardState(bloomId);
+	this.actuateToRevealBloom();
 };
 
 BloomsController.prototype.revealBloomInBoardState = function(bloomId) {
 	var prevRevealedBloomId = this.revealedBloomId;
-
 	this.revealedBloomId = bloomId;
-
-	var needActuate = prevRevealedBloomId !== bloomId
-		&& prevRevealedBloomId >= 0 
-		&& bloomId >= 0;
 	
 	if (prevRevealedBloomId >= 0) {
 		this.theGame.board.clearRevealedBloom();
@@ -286,22 +281,22 @@ BloomsController.prototype.revealBloomInBoardState = function(bloomId) {
 	if (bloomId >= 0) {
 		this.theGame.board.markBloomRevealed(bloomId);
 	}
-
-	return needActuate || this.actuator.isMobile;
 };
 
-BloomsController.prototype.actuateToRevealBloom = function(needActuate) {
-	if (needActuate) {
-		this.callActuate();
+BloomsController.prototype.actuateToRevealBloom = function() {
+	this.callActuate();
 
-		if (this.actuator.isMobile) {
-			var self = this;
-			setTimeout(function() {
-				self.theGame.board.clearRevealedBloom();
-				self.callActuate();
-			}, 400);
-		}
+	if (this.actuator.isMobile) {
+		var self = this;
+		setTimeout(function() {
+			self.clearRevealedBloom();
+		}, 400);
 	}
+};
+
+BloomsController.prototype.clearRevealedBloom = function() {
+	this.theGame.board.clearRevealedBloom();
+	this.callActuate();
 };
 
 BloomsController.prototype.skipSecondPiece = function() {

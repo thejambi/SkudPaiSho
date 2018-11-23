@@ -2621,20 +2621,25 @@ function activateBlooms() {
 function promptAddOption() {
 	activateBlooms();
 
-	var message = "<br /><input type='text' id='optionAddInput' name='optionAddInput' />";
-	message += "<br /><div class='clickableText' onclick='addOptionFromInput()'>Add</div>";
+	var message = "";
+	if (usernameIsOneOf(['SkudPaiSho'])) {
+		message = "<br /><input type='text' id='optionAddInput' name='optionAddInput' />";
+		message += "<br /><div class='clickableText' onclick='addOptionFromInput()'>Add</div>";
 	
-	if (ggOptions.length > 0) {
-		message += "<br />";
-		for (var i = 0; i < ggOptions.length; i++) {
-			message += "<div>";
-			message += ggOptions[i];
-			message += "</div>";
+		if (ggOptions.length > 0) {
+			message += "<br />";
+			for (var i = 0; i < ggOptions.length; i++) {
+				message += "<div>";
+				message += ggOptions[i];
+				message += "</div>";
+			}
+			message += "<br /><div class='clickableText' onclick='clearOptions()'>Clear Options</div>";
 		}
-		message += "<br /><div class='clickableText' onclick='clearOptions()'>Clear Options</div>";
 	}
+	
+	message += "<em>Blooms</em> has been activated.";
 
-	showModal("Add Option", message);
+	showModal("Secrets", message);
 }
 
 function addGameOption(option) {
