@@ -108,7 +108,7 @@ BloomsController.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
-/* Using my owne version of this, called directly instead of from Main */
+/* Using my own version of this, called directly instead of from Main */
 BloomsController.prototype.unplayedTileClicked = function(tilePileContainerDiv) {
 	this.clearSelectedTileEffects();
 
@@ -195,7 +195,7 @@ BloomsController.prototype.pointClicked = function(htmlPoint, bloomId) {
 		}
 		
 		this.notationBuilder.selectedPiece = null;
-	} else {
+	} else if (this.actuator.isMobile) {
 		this.revealBloom(bloomId);
 	}
 
@@ -266,13 +266,17 @@ BloomsController.prototype.restoreTilePileContainerDivs = function() {
 };
 
 BloomsController.prototype.revealBloom = function(bloomId) {
-	this.revealBloomInBoardState(bloomId);
-	this.actuateToRevealBloom();
+	if (this.revealBloomInBoardState(bloomId)) {
+		this.actuateToRevealBloom();
+	}
 };
 
 BloomsController.prototype.revealBloomInBoardState = function(bloomId) {
 	var prevRevealedBloomId = this.revealedBloomId;
+
 	this.revealedBloomId = bloomId;
+
+	var needActuate = prevRevealedBloomId !== bloomId && bloomId >= 0;
 	
 	if (prevRevealedBloomId >= 0) {
 		this.theGame.board.clearRevealedBloom();
@@ -281,6 +285,8 @@ BloomsController.prototype.revealBloomInBoardState = function(bloomId) {
 	if (bloomId >= 0) {
 		this.theGame.board.markBloomRevealed(bloomId);
 	}
+
+	return needActuate || this.actuator.isMobile;
 };
 
 BloomsController.prototype.actuateToRevealBloom = function() {
@@ -294,7 +300,14 @@ BloomsController.prototype.actuateToRevealBloom = function() {
 	}
 };
 
+BloomsController.prototype.clearRevealedBloomId = function(bloomId) {
+	if (bloomId >= 0 && bloomId === this.revealedBloomId) {
+		this.clearRevealedBloom(); 
+	}
+};
+
 BloomsController.prototype.clearRevealedBloom = function() {
+	this.revealedBloomId = -1;
 	this.theGame.board.clearRevealedBloom();
 	this.callActuate();
 };

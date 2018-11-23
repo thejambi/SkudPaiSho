@@ -127,7 +127,7 @@ BloomsActuator.prototype.addBoardPoint = function(rowDiv, boardPoint) {
 				
 				var onmouseoutText = "clearMessage()";
 				if (boardPoint.hasTile()) {
-					onmouseoutText += ";gameController.clearRevealedBloom()";
+					onmouseoutText += ";gameController.clearRevealedBloomId(" + boardPoint.bloomId + ")";
 				}
 				onmouseoutText += ";";
 				theDiv.setAttribute("onmouseout", onmouseoutText);
