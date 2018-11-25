@@ -1297,7 +1297,7 @@ function closeModal() {
 }
 
 function callSubmitMove() {
-	onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), submitMoveCallback);
+	onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback);
 }
 
 var sendVerificationCodeCallback = function sendVerificationCodeCallback(response) {
