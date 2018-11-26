@@ -107,9 +107,6 @@ window.requestAnimationFrame(function () {
 	defaultEmailMessageText = document.querySelector(".footer").innerHTML;
 
 	if (QueryString.gameType) {
-		if (QueryString.gameType === '9') {
-			activateBlooms();
-		}
 		clearOptions();
 		if (QueryString.gameOptions) {
 			var optionsArray = parseGameOptions(QueryString.gameOptions);
@@ -241,10 +238,6 @@ window.requestAnimationFrame(function () {
 
 	if (!QueryString.game && (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn())) {
 		showWelcomeTutorial();
-	}
-
-	if (usernameIsOneOf(['SkudPaiSho','NickB','abacadaren'])) {
-		activateBlooms();
 	}
 });
 
@@ -1523,16 +1516,16 @@ var GameType = {
 			OPTION_FULL_TILES,
 			FULL_POINTS_SCORING
 		]
-	}//,
-	// Blooms: {
-	// 	id: 9,
-	// 	desc: "Blooms",
-	// 	rulesUrl: "https://www.nickbentley.games/blooms-rules/",
-	// 	gameOptions: [
-	// 		FOUR_SIDED_BOARD,
-	// 		SHORTER_GAME
-	// 	]
-	// }
+	},
+	Blooms: {
+		id: 9,
+		desc: "Blooms",
+		rulesUrl: "https://www.nickbentley.games/blooms-rules/",
+		gameOptions: [
+			FOUR_SIDED_BOARD,
+			SHORTER_GAME
+		]
+	}
 };
 function getGameControllerForGameType(gameTypeId) {
 	var controller;
@@ -2434,8 +2427,8 @@ function closeNav() {
 }
 
 function aboutClicked() {
-	var message = "<div><em>The Garden Gate</em> is a place to play various fan-made <em>Pai Sho</em> games. A Pai Sho game is a game played on a board for the fictional game of Pai Sho as seen in Avatar: The Last Airbender. <a href='https://skudpaisho.com/site/' target='_blank'>Learn more</a>.</div>";
-	message += "<hr /><div> Modern tile designs by Hector Lowe<br /> ©2017 | Used with permission<br /> <a href='http://hector-lowe.com/' target='_blank'>www.hector-lowe.com</a> </div> <div class='license'><a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'><img alt='Creative Commons License' style='border-width:0' src='https://i.creativecommons.org/l/by-nc/3.0/us/88x31.png' /></a>&nbsp;All other content of this work is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'>Creative Commons Attribution-NonCommercial 3.0 United States License</a>.</div> <br /> <div><span class='skipBonus' onclick='showPrivacyPolicy();'>Privacy policy</span></div>";
+	var message = "<div><em>The Garden Gate</em> is a place to play various fan-made <em>Pai Sho</em> games and other games, too. A Pai Sho game is a game played on a board for the fictional game of Pai Sho as seen in Avatar: The Last Airbender. <a href='https://skudpaisho.com/site/' target='_blank'>Learn more</a>.</div>";
+	message += "<hr /><div> Modern Skud Pai Sho tile designs by Hector Lowe<br /> ©2017 | Used with permission<br /> <a href='http://hector-lowe.com/' target='_blank'>www.hector-lowe.com</a> </div> <div class='license'><a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'><img alt='Creative Commons License' style='border-width:0' src='https://i.creativecommons.org/l/by-nc/3.0/us/88x31.png' /></a>&nbsp;All other content of this work is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'>Creative Commons Attribution-NonCommercial 3.0 United States License</a>.</div> <br /> <div><span class='skipBonus' onclick='showPrivacyPolicy();'>Privacy policy</span></div>";
 	showModal("About", message);
 }
 
@@ -2550,7 +2543,7 @@ function continueTutorial() {
 
 	if (tutContent) {
 		var div1 = document.createElement("div");
-		div1.innerHTML = "<p>Welcome to <em>The Garden Gate</em>, a place to play a variety of Pai Sho games against other players online.</p>";
+		div1.innerHTML = "<p>Welcome to <em>The Garden Gate</em>, a place to play a variety of Pai Sho games and more against other players online.</p>";
 		div1.innerHTML += "<p>You can sign in (or sign up) by entering your username and verifying your email address.</p>";
 		div1.innerHTML += "<p>Use options in the side menu (select the <strong class='stretchText'>&nbsp;&#8801&nbsp;</strong> at the top left) to create a new game, join games set up by other players, or to view any of your games that are in progress. You can have any number of online games in progress at once.</p>";
 		div1.innerHTML += "<p>Also in the side menu you can find links to the rules for all of the games you can play here.</p>";
@@ -2611,21 +2604,7 @@ function addOptionFromInput() {
 	closeModal();
 }
 
-function activateBlooms() {
-	GameType["Blooms"] = {
-		id: 9,
-		desc: "Blooms",
-		rulesUrl: "https://www.nickbentley.games/blooms-rules/",
-		gameOptions: [
-			FOUR_SIDED_BOARD,
-			SHORTER_GAME
-		]
-	};
-}
-
 function promptAddOption() {
-	activateBlooms();
-
 	var message = "";
 	if (usernameIsOneOf(['SkudPaiSho'])) {
 		message = "<br /><input type='text' id='optionAddInput' name='optionAddInput' />";
@@ -2640,11 +2619,9 @@ function promptAddOption() {
 			}
 			message += "<br /><div class='clickableText' onclick='clearOptions()'>Clear Options</div>";
 		}
-	}
-	
-	message += "<em>Blooms</em> has been activated.";
 
-	showModal("Secrets", message);
+		showModal("Secrets", message);
+	}
 }
 
 function addGameOption(option) {
