@@ -91,6 +91,8 @@ PlaygroundActuator.prototype.addTile = function(tile, mainContainer) {
 	var srcValue = "images/";
 	if (useHLoweTiles) {
 		srcValue += "hlowe/";
+	} else if (useVescucciiSkudTiles) {
+		srcValue += "vescuccii/";
 	}
 	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
@@ -145,6 +147,8 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint) {
 		var srcValue = "images/";
 		if (useHLoweTiles) {
 			srcValue += "hlowe/";
+		} else if (useVescucciiSkudTiles) {
+			srcValue += "vescuccii/";
 		}
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 		

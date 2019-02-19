@@ -124,15 +124,13 @@ window.requestAnimationFrame(function () {
 		useHLoweTiles = true;
 	} else if (localStorage.getItem(tileDesignTypeKey) === "hlowe") {
 		useHLoweTiles = true;
+		useVescucciiSkudTiles = false;
+	} else if (localStorage.getItem(tileDesignTypeKey) === "vescuccii") {
+		useHLoweTiles = false;
+		useVescucciiSkudTiles = true;	
 	} else {
 		useHLoweTiles = false;
-	}
-
-	try {
-		useDeLionTiles = false;
-	} catch (err) {
-		/* Completely reload */
-		location.reload(true);
+		useVescucciiSkudTiles = false;
 	}
 
 	if (!localStorage.getItem(vagabondTileDesignTypeKey)) {
@@ -502,18 +500,29 @@ function startWatchingGameRealTime() {
 /* Skud Pai Sho Tile Design Switches */
 function setUseHLoweTiles() {
 	localStorage.setItem(tileDesignTypeKey, "hlowe");
+	useVescucciiSkudTiles = false;
 	useHLoweTiles = true;
+	gameController.callActuate();
+}
+
+function setUseVescucciiSkudTiles() {
+	localStorage.setItem(tileDesignTypeKey, "vescuccii");
+	useHLoweTiles = false;
+	useVescucciiSkudTiles = true;
 	gameController.callActuate();
 }
 
 function setUseStandardTiles() {
 	localStorage.setItem(tileDesignTypeKey, "standard");
 	useHLoweTiles = false;
+	useVescucciiSkudTiles = false;
 	gameController.callActuate();
 }
 
 function toggleTileDesigns() {
 	if (useHLoweTiles) {
+		setUseVescucciiSkudTiles();
+	} else if (useVescucciiSkudTiles) {
 		setUseStandardTiles();
 	} else {
 		setUseHLoweTiles();
@@ -1076,7 +1085,7 @@ function setMessage(msg) {
 }
 
 function getAltTilesOptionText() {
-	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between standard and modern tile designs for Skud Pai Sho.</p>";
+	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescuccii tile designs for Skud Pai Sho.</p>";
 }
 
 function getAltVagabondTilesOptionText() {
@@ -1296,7 +1305,8 @@ function callSubmitMove() {
 var sendVerificationCodeCallback = function sendVerificationCodeCallback(response) {
 	var message;
 	if (response.includes('has been sent')) {
-        message = "Verification code sent to " + emailBeingVerified + ". Be sure to check your spam or junk mail for the email.";
+		message = "Verification code sent to " + emailBeingVerified + ". Be sure to check your spam or junk mail for the email.";
+		message += "<br />Didn't get the email? Check your spam again. If it isn't there, try a different email address. Some email services reject the verification email."
     } else {
         message = "Failed to send verification code, please try again. Join the Discord for help, or try another email address.";
     }
