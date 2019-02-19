@@ -34,6 +34,13 @@ var gameController;
 
 var localEmailKey = "localUserEmail";
 var tileDesignTypeKey = "tileDesignTypeKey";
+var tileDesignTypeValues = {
+	hlowe: "hlowe",
+	vescucci: "vescucci",
+	standard: "standard",
+	pixelsho: "pixelsho"
+}
+
 var vagabondTileDesignTypeKey = "vagabondTileDesignTypeKey";
 
 var usernameKey = "usernameKey";
@@ -121,17 +128,18 @@ window.requestAnimationFrame(function () {
 
 	/* Tile Design Preferences */
 	if (!localStorage.getItem(tileDesignTypeKey)) {
-		useHLoweTiles = true;
-	} else if (localStorage.getItem(tileDesignTypeKey) === "hlowe") {
-		useHLoweTiles = true;
-		useVescucciiSkudTiles = false;
-	} else if (localStorage.getItem(tileDesignTypeKey) === "vescuccii") {
-		useHLoweTiles = false;
-		useVescucciiSkudTiles = true;	
+		skudTilesKey = tileDesignTypeValues.hlowe;
 	} else {
-		useHLoweTiles = false;
-		useVescucciiSkudTiles = false;
+		skudTilesKey = localStorage.getItem(tileDesignTypeKey);
 	}
+	/*
+	else if (localStorage.getItem(tileDesignTypeKey) === tileDesignTypeValues.hlowe) {
+		skudTilesKey = tileDesignTypeValues.hlowe;
+	} else if (localStorage.getItem(tileDesignTypeKey) === tileDesignTypeValues.vescucci) {
+		skudTilesKey = tileDesignTypeValues.vescucci;
+	} else {
+		skudTilesKey = tileDesignTypeValues.standard;
+	} */
 
 	if (!localStorage.getItem(vagabondTileDesignTypeKey)) {
 		useDeLionTiles = true;
@@ -498,35 +506,23 @@ function startWatchingGameRealTime() {
 }
 
 /* Skud Pai Sho Tile Design Switches */
-function setUseHLoweTiles() {
-	localStorage.setItem(tileDesignTypeKey, "hlowe");
-	useVescucciiSkudTiles = false;
-	useHLoweTiles = true;
-	gameController.callActuate();
-}
-
-function setUseVescucciiSkudTiles() {
-	localStorage.setItem(tileDesignTypeKey, "vescuccii");
-	useHLoweTiles = false;
-	useVescucciiSkudTiles = true;
-	gameController.callActuate();
-}
-
-function setUseStandardTiles() {
-	localStorage.setItem(tileDesignTypeKey, "standard");
-	useHLoweTiles = false;
-	useVescucciiSkudTiles = false;
+function setSkudTilesOption(newSkudTilesKey) {
+	localStorage.setItem(tileDesignTypeKey, newSkudTilesKey);
+	skudTilesKey = newSkudTilesKey;
 	gameController.callActuate();
 }
 
 function toggleTileDesigns() {
-	if (useHLoweTiles) {
-		setUseVescucciiSkudTiles();
-	} else if (useVescucciiSkudTiles) {
-		setUseStandardTiles();
-	} else {
-		setUseHLoweTiles();
+	var newSkudTilesKey = tileDesignTypeValues.hlowe;
+	switch (skudTilesKey) {
+		case tileDesignTypeValues.hlowe:
+			newSkudTilesKey = tileDesignTypeValues.vescucci;
+			break;
+		case tileDesignTypeValues.vescucci:
+			newSkudTilesKey = tileDesignTypeValues.standard;
+			break;
 	}
+	setSkudTilesOption(newSkudTilesKey);
 }
 /* --- */
 
@@ -1085,7 +1081,7 @@ function setMessage(msg) {
 }
 
 function getAltTilesOptionText() {
-	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescuccii tile designs for Skud Pai Sho.</p>";
+	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.</p>";
 }
 
 function getAltVagabondTilesOptionText() {

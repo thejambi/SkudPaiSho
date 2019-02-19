@@ -115,3 +115,8 @@ function setupPaiShoBoard(gameContainer,
 		guestTilesContainer: guestTilesContainer
 	}
 }
+
+function getSkudTilesSrcPath() {
+	var srcValue = "images/" + skudTilesKey + "/";
+	return srcValue;
+}

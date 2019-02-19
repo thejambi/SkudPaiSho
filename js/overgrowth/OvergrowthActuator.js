@@ -84,12 +84,7 @@ OvergrowthActuator.prototype.addTile = function(tile, mainContainer) {
 
 	var theImg = document.createElement("img");
 	
-	var srcValue = "images/";
-	if (useHLoweTiles) {
-		srcValue += "hlowe/";
-	} else if (useVescucciiSkudTiles) {
-		srcValue += "vescuccii/";
-	}
+	var srcValue = getSkudTilesSrcPath();
 	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
 
@@ -140,12 +135,7 @@ OvergrowthActuator.prototype.addBoardPoint = function(boardPoint) {
 		
 		var theImg = document.createElement("img");
 
-		var srcValue = "images/";
-		if (useHLoweTiles) {
-			srcValue += "hlowe/";
-		} else if (useVescucciiSkudTiles) {
-			srcValue += "vescuccii/";
-		}
+		var srcValue = getSkudTilesSrcPath();
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 		
 		if (boardPoint.tile.inHarmony) {
