@@ -2709,8 +2709,9 @@ var showTournamentsCallback = function showTournamentsCallback(results) {
 					if (tourneyHeading === 'Completed') {
 						completedTournamentsExist = true;
 					}
+				} else if (tourneyHeading === 'Completed') {
+					message += "<div class='completeTournament gone'>";
 				}
-
 				message += "<div class='clickableText' onclick='viewTournamentInfo(" + tourney.id + ");'>" + tourney.name + "</div>";
 				if (tourneyHeading === 'Completed') {
 					message += "</div>";
