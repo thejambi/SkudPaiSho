@@ -242,6 +242,9 @@ div.tab .alertTab, div.tab .alertTab.active {
   margin-right: 1px;
   margin-bottom: 4px;
 }
+body.darkMode .replayButton {
+  background-color: inherit;
+}
 
 .replayButton:active {
   background-color: #bbb;
