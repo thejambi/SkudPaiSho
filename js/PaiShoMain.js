@@ -36,6 +36,8 @@ var localEmailKey = "localUserEmail";
 var tileDesignTypeKey = "tileDesignTypeKey";
 var tileDesignTypeValues = {
 	hlowe: "hlowe",
+	hlowenew: "hlowenew",
+	hlowemono: "hlowemono",
 	vescucci: "vescucci",
 	standard: "standard",
 	pixelsho: "pixelsho"
@@ -523,6 +525,12 @@ function toggleTileDesigns() {
 	var newSkudTilesKey = tileDesignTypeValues.hlowe;
 	switch (skudTilesKey) {
 		case tileDesignTypeValues.hlowe:
+			newSkudTilesKey = tileDesignTypeValues.hlowenew;
+			break;
+			case tileDesignTypeValues.hlowenew:
+			newSkudTilesKey = tileDesignTypeValues.hlowemono;
+			break;
+			case tileDesignTypeValues.hlowemono:
 			newSkudTilesKey = tileDesignTypeValues.vescucci;
 			break;
 		case tileDesignTypeValues.vescucci:
