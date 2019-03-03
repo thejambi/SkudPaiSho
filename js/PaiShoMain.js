@@ -128,9 +128,9 @@ window.requestAnimationFrame(function () {
 
 	/* Tile Design Preferences */
 	if (!localStorage.getItem(tileDesignTypeKey)) {
-		skudTilesKey = tileDesignTypeValues.hlowe;
+		setSkudTilesOption(tileDesignTypeValues.hlowe);
 	} else {
-		skudTilesKey = localStorage.getItem(tileDesignTypeKey);
+		setSkudTilesOption(localStorage.getItem(tileDesignTypeKey));
 	}
 	/*
 	else if (localStorage.getItem(tileDesignTypeKey) === tileDesignTypeValues.hlowe) {
@@ -507,8 +507,10 @@ function startWatchingGameRealTime() {
 
 /* Skud Pai Sho Tile Design Switches */
 function setSkudTilesOption(newSkudTilesKey) {
+	gameContainerDiv.classList.remove(skudTilesKey);
 	localStorage.setItem(tileDesignTypeKey, newSkudTilesKey);
 	skudTilesKey = newSkudTilesKey;
+	gameContainerDiv.classList.add(skudTilesKey);
 	gameController.callActuate();
 }
 
