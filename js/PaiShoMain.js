@@ -111,6 +111,11 @@ window.requestAnimationFrame(function () {
 
 	localStorage = new LocalStorage().storage;
 
+	/* Dark Mode Preferences */
+	if (localStorage.getItem("darkMode")) {
+		toggleDarkMode();
+	}
+
 	defaultEmailMessageText = document.querySelector(".footer").innerHTML;
 
 	if (QueryString.gameType) {
@@ -3102,8 +3107,10 @@ function toggleDarkMode() {
 	if (root.classList.contains(DARK_MODE_CLASS)) {
 		root.classList.remove(DARK_MODE_CLASS);
 		document.body.classList.remove(DARK_MODE_CLASS);
+		localStorage.removeItem("darkMode");
 	} else {
 		root.classList.add(DARK_MODE_CLASS);
 		document.body.classList.add(DARK_MODE_CLASS);
+		localStorage.setItem("darkMode", "true");
 	}
 }
