@@ -11,9 +11,14 @@ html, body {
   color: #776e65;
   font-family: "San Francisco", "Helvetica Neue", Arial, sans-serif;
   font-size: 15px;
+  transition: 0.5s;
 
   /* Android bottom padding */
   /*padding-bottom: 250px;*/
+}
+html.darkMode, body.darkMode {
+  background: #3b3b39;
+  color: #cac8bf;
 }
 
 #mainWrapper {
@@ -64,7 +69,11 @@ a {
   color: #776e65;
   font-weight: bold;
   text-decoration: underline;
-  cursor: pointer; }
+  cursor: pointer;
+}
+body.darkMode a {
+  color: #cac8bf;
+}
 
 strong.important {
   text-transform: uppercase; }
@@ -274,6 +283,9 @@ div.tab .alertTab, div.tab .alertTab.active {
   padding: 0; /* reset */
   padding-bottom: 100%;
   border: none;
+}
+body.darkMode .bg-svg {
+  background-image: url(board_darkmode.svg);
 }
 figure > div {
   margin: 1em auto;
@@ -567,6 +579,9 @@ input[type=submit] {
     -webkit-animation-duration: 0.2s;
     animation-name: animatetop;
     animation-duration: 0.2s;*/
+}
+body.darkMode .modal-content {
+  background-color: #1b1b19;
 }
 
 /* The Close Button */
@@ -920,6 +935,12 @@ input[type=submit] {
 }
 
 
+/* --- General Dark Mode Styles --- */
+body.darkMode input,
+body.darkMode textarea {
+  background: #1b1b19;
+  color: #faf8ef;
+}
 
 
 /* ------------ MEDIA -------------- */
@@ -1218,5 +1239,3 @@ input[type=submit] {
     }
 
 }
-
-

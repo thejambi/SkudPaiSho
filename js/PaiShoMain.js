@@ -519,6 +519,9 @@ function toggleTileDesigns() {
 			newSkudTilesKey = tileDesignTypeValues.vescucci;
 			break;
 		case tileDesignTypeValues.vescucci:
+			newSkudTilesKey = tileDesignTypeValues.pixelsho;
+			break;
+		case tileDesignTypeValues.pixelsho:
 			newSkudTilesKey = tileDesignTypeValues.standard;
 			break;
 	}
@@ -3089,4 +3092,16 @@ function submitTournamentSignup(tournamentId) {
 	showModal("Tournament Signup", getLoadingModalText());
 	signingUpForTournamentId = tournamentId;
 	onlinePlayEngine.submitTournamentSignup(getLoginToken(), tournamentId, submitTournamentSignupCallback);
+}
+
+var DARK_MODE_CLASS = "darkMode";
+function toggleDarkMode() {
+	var root = document.getElementsByTagName('html')[0];
+	if (root.classList.contains(DARK_MODE_CLASS)) {
+		root.classList.remove(DARK_MODE_CLASS);
+		document.body.classList.remove(DARK_MODE_CLASS);
+	} else {
+		root.classList.add(DARK_MODE_CLASS);
+		document.body.classList.add(DARK_MODE_CLASS);
+	}
 }
