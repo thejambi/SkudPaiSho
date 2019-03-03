@@ -513,6 +513,9 @@ input[type=submit] {
   font-size: 14px;
   z-index: 103;
 }
+body.darkMode .header {
+  border-bottom: 1px solid #2c2c2c;
+}
 
 .header h1 {
   margin: 0;
