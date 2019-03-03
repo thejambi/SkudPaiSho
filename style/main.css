@@ -855,6 +855,9 @@ body.darkMode .modal-content {
   background-color: #3b3b39;
   transform: scale(0.8);
 }
+body.darkMode .hexScoreGuest {
+  background-color: #000;
+}
 .hexScoreHost.hexScoreGuest {
   background-color: #9a8245;
 }
@@ -871,6 +874,9 @@ body.darkMode .modal-content {
 }
 .bloomsG2 {
   background-color: #3b3b39;
+}
+body.darkMode .bloomsG2 {
+  background-color: #000;
 }
 .scoreMix {
   background-color: #9a8245;
