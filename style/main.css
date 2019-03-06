@@ -611,6 +611,10 @@ body.darkMode .modal-content {
     text-decoration: none;
     cursor: pointer;
 }
+body.darkMode .myMainModalClose:hover,
+body.darkMode .myMainModalClose:focus {
+  color: #502;
+}
 
 #modalHeading {
   font-size: 18px;

@@ -762,7 +762,8 @@ function refreshMessage() {
 
 	getGameMessageElement().innerHTML = message;
 
-	if (playingOnlineGame() && !myTurn() || gameController.isSolitaire()) {
+	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn()) 
+			|| gameController.isSolitaire()) {
 		showResetMoveMessage();
 	}
 }
