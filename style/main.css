@@ -200,6 +200,9 @@ div.tab .alertTab, div.tab .alertTab.active {
   z-index: 103;
   background-color: #444;
 }
+body.darkMode #replayControls {
+  border-top: 1px solid #2c2c2c;
+}
 
 #replayControls .center {
   margin-left: auto;
