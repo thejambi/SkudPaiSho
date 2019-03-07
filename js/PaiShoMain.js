@@ -137,7 +137,11 @@ window.requestAnimationFrame(function () {
 	if (!localStorage.getItem(tileDesignTypeKey)) {
 		setSkudTilesOption(tileDesignTypeValues.hlowe);
 	} else {
-		setSkudTilesOption(localStorage.getItem(tileDesignTypeKey));
+		if (localStorage.getItem(tileDesignTypeKey) === tileDesignTypeValues.hlowenew) {
+			setSkudTilesOption(tileDesignTypeValues.hlowe);
+		} else {
+			setSkudTilesOption(localStorage.getItem(tileDesignTypeKey));
+		}
 	}
 	/*
 	else if (localStorage.getItem(tileDesignTypeKey) === tileDesignTypeValues.hlowe) {
@@ -182,16 +186,7 @@ window.requestAnimationFrame(function () {
 		showReplayControls();
 	}
 
-	// onlinePlayEngine = new OnlinePlayEngine();
 	appCaller = new DummyAppCaller();
-
-	// if (ios) {
-	// 	onlinePlayEngine = new OnlinePlayEngineIOS();
-	// 	appCaller = new IOSCaller();
-	// } else if (runningOnAndroid) {
-	// 	onlinePlayEngine = new OnlinePlayEngineIOS();
-	// 	// appCaller = new AndroidCaller();// keeping dummy for now
-	// }
 
 	if (QueryString.appType === 'ios') {
 		appCaller = new IOSCaller();
@@ -525,12 +520,9 @@ function toggleTileDesigns() {
 	var newSkudTilesKey = tileDesignTypeValues.hlowe;
 	switch (skudTilesKey) {
 		case tileDesignTypeValues.hlowe:
-			newSkudTilesKey = tileDesignTypeValues.hlowenew;
-			break;
-			case tileDesignTypeValues.hlowenew:
 			newSkudTilesKey = tileDesignTypeValues.hlowemono;
 			break;
-			case tileDesignTypeValues.hlowemono:
+		case tileDesignTypeValues.hlowemono:
 			newSkudTilesKey = tileDesignTypeValues.vescucci;
 			break;
 		case tileDesignTypeValues.vescucci:
