@@ -135,10 +135,10 @@ window.requestAnimationFrame(function () {
 
 	/* Tile Design Preferences */
 	if (!localStorage.getItem(tileDesignTypeKey)) {
-		setSkudTilesOption(tileDesignTypeValues.hlowe);
+		setSkudTilesOption(tileDesignTypeValues.hlowenew);
 	} else {
-		if (localStorage.getItem(tileDesignTypeKey) === tileDesignTypeValues.hlowenew) {
-			setSkudTilesOption(tileDesignTypeValues.hlowe);
+		if (localStorage.getItem(tileDesignTypeKey) === tileDesignTypeValues.hlowe) {
+			setSkudTilesOption(tileDesignTypeValues.hlowenew);
 		} else {
 			setSkudTilesOption(localStorage.getItem(tileDesignTypeKey));
 		}
@@ -517,9 +517,9 @@ function setSkudTilesOption(newSkudTilesKey) {
 }
 
 function toggleTileDesigns() {
-	var newSkudTilesKey = tileDesignTypeValues.hlowe;
+	var newSkudTilesKey = tileDesignTypeValues.hlowenew;
 	switch (skudTilesKey) {
-		case tileDesignTypeValues.hlowe:
+		case tileDesignTypeValues.hlowenew:
 			newSkudTilesKey = tileDesignTypeValues.hlowemono;
 			break;
 		case tileDesignTypeValues.hlowemono:
