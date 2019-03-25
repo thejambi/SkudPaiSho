@@ -40,7 +40,8 @@ var tileDesignTypeValues = {
 	hlowemono: "hlowemono",
 	vescucci: "vescucci",
 	standard: "standard",
-	pixelsho: "pixelsho"
+	pixelsho: "pixelsho",
+	pixelsho2: "pixelsho2"
 }
 
 var vagabondTileDesignTypeKey = "vagabondTileDesignTypeKey";
@@ -529,6 +530,9 @@ function toggleTileDesigns() {
 			newSkudTilesKey = tileDesignTypeValues.pixelsho;
 			break;
 		case tileDesignTypeValues.pixelsho:
+			newSkudTilesKey = tileDesignTypeValues.pixelsho2
+			break;
+		case tileDesignTypeValues.pixelsho2:
 			newSkudTilesKey = tileDesignTypeValues.standard;
 			break;
 	}
