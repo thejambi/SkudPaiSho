@@ -299,6 +299,9 @@ body.darkMode .bg-svg {
 .game-container.pixelsho2 .bg-svg {
   background-image: url(pixelshoboard2.png);
 }
+.game-container.vescucci .bg-svg {
+  background-image: url(vescucciboard.png);
+}
 
 figure > div {
   margin: 1em auto;
