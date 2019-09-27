@@ -159,12 +159,23 @@ window.requestAnimationFrame(function () {
 	localStorage = new LocalStorage().storage;
 
 	/* Dark Mode Preferences (dark mode now default) */
-	if (!localStorage.getItem("darkMode")) {
-		localStorage.setItem("darkMode", "true");
+	if (!localStorage.getItem("data-theme")) {
+		/* to always have dark as default instead of system preferences
+		var dataTheme = "dark";
+		*/
+		var dataTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? "dark" : "light";
+
+		// check for old theme system.
+		if (localStorage.getItem("darkMode")) {
+			dataTheme = localStorage.getItem("darkMode") === "true" ? "dark" : "light";
+			// remove old local storage variable (no longer needed).
+			localStorage.removeItem("darkMode");
+		}
+
+		localStorage.setItem("data-theme", dataTheme);
 	}
-	if (localStorage.getItem("darkMode") === "false") {
-		toggleDarkMode();
-	}
+
+	applyDataTheme();
 
 	defaultEmailMessageText = document.querySelector(".footer").innerHTML;
 
@@ -3261,16 +3272,14 @@ function submitTournamentSignup(tournamentId) {
 
 var DARK_MODE_CLASS = "darkMode";
 function toggleDarkMode() {
-	var root = document.getElementsByTagName('html')[0];
-	if (root.classList.contains(DARK_MODE_CLASS)) {
-		root.classList.remove(DARK_MODE_CLASS);
-		document.body.classList.remove(DARK_MODE_CLASS);
-		localStorage.setItem("darkMode", "false");
-	} else {
-		root.classList.add(DARK_MODE_CLASS);
-		document.body.classList.add(DARK_MODE_CLASS);
-		localStorage.setItem("darkMode", "true");
-	}
+	var currentTheme = localStorage.getItem("data-theme") || "dark";
+	localStorage.setItem("data-theme", currentTheme === "dark" ? "light" : "dark");
+	applyDataTheme();
+}
+
+function applyDataTheme() {
+	var currentTheme = localStorage.getItem("data-theme") || "dark";
+	document.body.setAttribute("data-theme", currentTheme);
 }
 
 /* Game Controller classes should call these for user's preferences */
