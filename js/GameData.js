@@ -39,9 +39,6 @@ var runningOnAndroid = false;
 var onlinePlayEnabled = false;
 /* */
 
-/* peekAtOpponentMoves: Allow display of opponent piece movement */
-var peekAtOpponentMoves = false;
-
 /* --- */
 
 
@@ -57,7 +54,8 @@ function shouldRedirectIfNotHttps() {
 
 function debug(str) {
     if (debugOn
-      && (getUsername() === 'SkudPaiSho' || getUsername() === 'Zach')) {
+      && (getUsername() === 'SkudPaiSho' || getUsername() === 'Zach')
+      ) {
       if (ios || QueryString.appType === 'ios') {
         try {
           webkit.messageHandlers.callbackHandler.postMessage(

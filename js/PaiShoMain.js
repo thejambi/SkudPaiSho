@@ -48,11 +48,11 @@ var tileDesignTypeValues = {
 function getTileDesignTypeDisplayName(tileDesignTypeKey) {
 	switch (tileDesignTypeKey) {
 		case tileDesignTypeValues.hlowe:
-			return "Lowe Tiles";
+			return "Modern Tiles v1";
 		case tileDesignTypeValues.hlowenew:
-			return "Lowe Tiles";
+			return "Modern Tiles";
 		case tileDesignTypeValues.hlowemono:
-			return "Lowe Monochrome Tiles";
+			return "Modern Monochrome Tiles";
 		case tileDesignTypeValues.vescucci:
 			return "Vescucci Tiles";
 		case tileDesignTypeValues.standard:
@@ -1061,9 +1061,9 @@ var submitMoveCallback = function submitMoveCallback() {
 };
 
 function clearMessage() {
-	if (!defaultHelpMessageText) {
+	// if (!defaultHelpMessageText) {	// Load help message every time
 		defaultHelpMessageText = gameController.getDefaultHelpMessageText();
-	}
+	// }
 	document.getElementById("helpTextContent").innerHTML = defaultHelpMessageText;
 
 	var message = getTournamentText() 
@@ -1613,18 +1613,18 @@ function getGameControllerForGameType(gameTypeId) {
 		case GameType.CoopSolitaire.id:
 			controller = new CoopSolitaireController(gameContainerDiv, isMobile);
 			break;
-		case GameType.Playground.id:
-			controller = new PlaygroundController(gameContainerDiv, isMobile);
-			break;
+		// case GameType.Playground.id:
+		// 	controller = new PlaygroundController(gameContainerDiv, isMobile);
+		// 	break;
 		case GameType.OvergrowthPaiSho.id:
 			controller = new OvergrowthController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Blooms.id:
 			controller = new BloomsController(gameContainerDiv, isMobile);
 			break;
-		case GameType.Trifle.id:
-			controller = new TrifleController(gameContainerDiv, isMobile);
-			break;
+		// case GameType.Trifle.id:
+		// 	controller = new TrifleController(gameContainerDiv, isMobile);
+		// 	break;
 	    default:
 			debug("Game Controller unavailable.");
 	}
@@ -1653,7 +1653,8 @@ function setGameController(gameTypeId, keepGameOptions) {
 		debug("Defaulting to use Vagabond Pai Sho.");
 		showModal("Cannot Load Game", "This game is unavailable. Try Vagabond Pai Sho instead :)<br /><br />To know why the selected game is unavailable, ask in The Garden Gate Discord. Perhaps you have selected a new game that is coming soon!");
 		successResult = false;
-	} else if (gameController.completeSetup) {
+	}
+	if (gameController.completeSetup) {
 		gameController.completeSetup();
 	}
 
@@ -3160,3 +3161,23 @@ function toggleDarkMode() {
 		localStorage.setItem("darkMode", "true");
 	}
 }
+
+/* Game Controller classes should call these for user's preferences */
+function getUserGamePrefKeyName(preferenceKey) {
+	return "GameType" + gameController.getGameTypeId() + preferenceKey;
+}
+function getUserGamePreference(preferenceKey) {
+	if (gameController && gameController.getGameTypeId) {
+		debug(gameController.getGameTypeId());
+		var keyName = getUserGamePrefKeyName(preferenceKey);
+		return localStorage.getItem(keyName);
+	}
+	debug("whops");
+}
+function setUserGamePreference(preferenceKey, value) {
+	if (gameController && gameController.getGameTypeId) {
+		var keyName = getUserGamePrefKeyName(preferenceKey);
+		localStorage.setItem(keyName, value);
+	}
+}
+

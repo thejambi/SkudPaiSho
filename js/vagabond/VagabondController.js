@@ -15,6 +15,14 @@ VagabondController.prototype.getGameTypeId = function() {
 	return GameType.VagabondPaiSho.id;
 };
 
+VagabondController.prototype.completeSetup = function() {
+	/* peekAtOpponentMoves: Allow display of opponent piece movement */
+	this.peekAtOpponentMovesPrefKey = "PeekAtOpponentMoves";
+	this.peekAtOpponentMoves = getUserGamePreference(this.peekAtOpponentMovesPrefKey) === "true";
+	debug("Peeky?: " + this.peekAtOpponentMoves);
+	debug("!this.peek...: " + !this.peekAtOpponentMoves);
+};
+
 VagabondController.prototype.resetGameManager = function() {
 	this.theGame = new VagabondGameManager(this.actuator);
 };
@@ -28,6 +36,8 @@ VagabondController.prototype.resetNotationBuilder = function() {
 	if (offerDraw) {
 		this.notationBuilder.offerDraw = true;
 	}
+
+	this.checkingOutOpponentTile = false;
 };
 
 VagabondController.prototype.resetGameNotation = function() {
@@ -63,7 +73,22 @@ VagabondController.prototype.resetMove = function() {
 };
 
 VagabondController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Vagabond Pai Sho</h4> <p> <p>Vagabond Pai Sho is the Pai Sho variant seen in the fanfiction story <a href='https://skudpaisho.com/site/more/fanfiction-recommendations/' target='_blank'>Gambler and Vagabond (download here)</a>.</p> <p><strong>You win</strong> if you capture your opponent's White Lotus tile.</p> <p><strong>On a turn</strong>, you may either deploy a tile or move a tile.</p> <p><strong>You can't capture Flower tiles</strong> until your White Lotus has been deployed.<br /> <strong>You can't capture Non-Flower tiles</strong> until both players' White Lotus tiles have been deployed.</p> <p><strong>Hover</strong> over any tile to see how it works.</p> </p> <p>Select tiles to learn more or <a href='https://skudpaisho.com/site/games/vagabond-pai-sho/' target='_blank'>view the rules</a>.</p>";
+	var helpText = "<h4>Vagabond Pai Sho</h4> <p> <p>Vagabond Pai Sho is the Pai Sho variant seen in the fanfiction story <a href='https://skudpaisho.com/site/more/fanfiction-recommendations/' target='_blank'>Gambler and Vagabond (download here)</a>.</p> <p><strong>You win</strong> if you capture your opponent's White Lotus tile.</p> <p><strong>On a turn</strong>, you may either deploy a tile or move a tile.</p> <p><strong>You can't capture Flower tiles</strong> until your White Lotus has been deployed.<br /> <strong>You can't capture Non-Flower tiles</strong> until both players' White Lotus tiles have been deployed.</p> <p><strong>Hover</strong> over any tile to see how it works.</p> </p> <p>Select tiles to learn more or <a href='https://skudpaisho.com/site/games/vagabond-pai-sho/' target='_blank'>view the rules</a>.</p>";
+	helpText += "<p><em>Preferences:</em><br />Opponent move and replay peeking is ";
+	if (this.peekAtOpponentMoves) {
+		helpText += "enabled";
+	} else {
+		helpText += "disabled";
+	}
+	var theOnClick = "gameController.togglePeekAtOpponentMoves()";
+	helpText += ". <span class='skipBonus' onclick='" + theOnClick + "'>Toggle</span>";
+	return helpText;
+};
+
+VagabondController.prototype.togglePeekAtOpponentMoves = function() {
+	this.peekAtOpponentMoves = !this.peekAtOpponentMoves;
+	setUserGamePreference(this.peekAtOpponentMovesPrefKey, this.peekAtOpponentMoves);
+	clearMessage();
 };
 
 VagabondController.prototype.getAdditionalMessage = function() {
@@ -147,10 +172,10 @@ VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 	if (this.theGame.hasEnded() && this.notationBuilder.status !== READY_FOR_BONUS) {
 		return;
 	}
-	if (!myTurn()) {
+	if (!myTurn() && !this.peekAtOpponentMoves) {
 		return;
 	}
-	if (currentMoveIndex !== this.gameNotation.moves.length) {
+	if (currentMoveIndex !== this.gameNotation.moves.length && !this.peekAtOpponentMoves) {
 		debug("Can only interact if all moves are played.");
 		return;
 	}
@@ -168,8 +193,11 @@ VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 	var tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
 
 	if (tile.ownerName !== getCurrentPlayer()) {
-		// debug("That's not your tile!");
-		return;
+		// Hey, that's not your tile!
+		this.checkingOutOpponentTile = true;
+		if (!this.peekAtOpponentMoves) {
+			return;
+		}
 	}
 
 	if (this.notationBuilder.status === BRAND_NEW) {
@@ -180,7 +208,8 @@ VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.tileType = tileCode;
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
-		this.theGame.revealDeployPoints(getCurrentPlayer(), tileCode);
+		// this.theGame.revealDeployPoints(getCurrentPlayer(), tileCode); // Old
+		this.theGame.revealDeployPoints(tile.ownerName, tileCode); // New
 	} else {
 		this.theGame.hidePossibleMovePoints();
 		this.resetNotationBuilder();
@@ -193,10 +222,10 @@ VagabondController.prototype.pointClicked = function(htmlPoint) {
 	if (this.theGame.hasEnded()) {
 		return;
 	}
-	if (!myTurn()) {
+	if (!myTurn() && !this.peekAtOpponentMoves) {
 		return;
 	}
-	if (currentMoveIndex !== this.gameNotation.moves.length) {
+	if (currentMoveIndex !== this.gameNotation.moves.length && !this.peekAtOpponentMoves) {
 		debug("Can only interact if all moves are played.");
 		return;
 	}
@@ -211,7 +240,10 @@ VagabondController.prototype.pointClicked = function(htmlPoint) {
 		if (boardPoint.hasTile()) {
 			if (boardPoint.tile.ownerName !== getCurrentPlayer()) {
 				debug("That's not your tile!");
-				return;
+				this.checkingOutOpponentTile = true;
+				if (!this.peekAtOpponentMoves) {
+					return;
+				}
 			}
 
 			if (!boardPoint.tile.canMove()) {
@@ -229,21 +261,26 @@ VagabondController.prototype.pointClicked = function(htmlPoint) {
 			// They're trying to move there! And they can! Exciting!
 			// Need the notation!
 			this.theGame.hidePossibleMovePoints();
-			this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
-			
-			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-			this.theGame.runNotationMove(move);
 
-			// Move all set. Add it to the notation!
-			this.gameNotation.addMove(move);
-			if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-				createGameIfThatIsOk(GameType.VagabondPaiSho.id);
-			} else {
-				if (playingOnlineGame()) {
-					callSubmitMove();
+			if (!this.checkingOutOpponentTile && !isInReplay) {
+				this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
+				
+				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+				this.theGame.runNotationMove(move);
+
+				// Move all set. Add it to the notation!
+				this.gameNotation.addMove(move);
+				if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
+					createGameIfThatIsOk(GameType.VagabondPaiSho.id);
 				} else {
-					finalizeMove();
+					if (playingOnlineGame()) {
+						callSubmitMove();
+					} else {
+						finalizeMove();
+					}
 				}
+			} else {
+				this.resetNotationBuilder();
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
@@ -360,7 +397,8 @@ VagabondController.prototype.getAiList = function() {
 }
 
 VagabondController.prototype.getCurrentPlayer = function() {
-	if (this.gameNotation.moves.length % 2 === 0) {
+	// if (this.gameNotation.moves.length % 2 === 0) {
+	if (currentMoveIndex % 2 === 0) {	// To get right player during replay...
 		return HOST;
 	} else {
 		return GUEST;
