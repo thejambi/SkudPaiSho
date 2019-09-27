@@ -14,11 +14,12 @@ var QueryString = function () {
   	vars = query.split("&amp;");
   }
   for (var i=0;i<vars.length;i++) {
-  	var pair = vars[i].split("=");
-        // If first entry with this name
-        if (typeof query_string[pair[0]] === "undefined") {
-        	query_string[pair[0]] = decodeURIComponent(pair[1]);
-        // If second entry with this name
+	//   var pair = vars[i].split("="); // Old
+	var pair = vars[i].split(/=(.+)/); // New (will only split into key/value, not on '=' in value)
+	// If first entry with this name
+	if (typeof query_string[pair[0]] === "undefined") {
+		query_string[pair[0]] = decodeURIComponent(pair[1]);
+	// If second entry with this name
     } else if (typeof query_string[pair[0]] === "string") {
     	var arr = [ query_string[pair[0]],decodeURIComponent(pair[1]) ];
     	query_string[pair[0]] = arr;
@@ -42,6 +43,27 @@ var tileDesignTypeValues = {
 	standard: "standard",
 	pixelsho: "pixelsho",
 	pixelsho2: "pixelsho2"
+}
+
+function getTileDesignTypeDisplayName(tileDesignTypeKey) {
+	switch (tileDesignTypeKey) {
+		case tileDesignTypeValues.hlowe:
+			return "Lowe Tiles";
+		case tileDesignTypeValues.hlowenew:
+			return "Lowe Tiles";
+		case tileDesignTypeValues.hlowemono:
+			return "Lowe Monochrome Tiles";
+		case tileDesignTypeValues.vescucci:
+			return "Vescucci Tiles";
+		case tileDesignTypeValues.standard:
+			return "Pai Sho Project Tiles";
+		case tileDesignTypeValues.pixelsho:
+			return "Pixel Sho v1 Tiles";
+		case tileDesignTypeValues.pixelsho2:
+			return "Pixel Sho v2 Tiles";
+		default:
+			return tileDesignTypeKey;
+	}
 }
 
 var vagabondTileDesignTypeKey = "vagabondTileDesignTypeKey";
@@ -91,6 +113,7 @@ var gameWatchIntervalValue;
 var currentGameOpponentUsername;
 var currentGameData = new Object();
 var currentMoveIndex = 0;
+var isInReplay = false;
 var interval = 0;
 
 var emailBeingVerified = "";
@@ -515,6 +538,7 @@ function setSkudTilesOption(newSkudTilesKey) {
 	skudTilesKey = newSkudTilesKey;
 	gameContainerDiv.classList.add(skudTilesKey);
 	gameController.callActuate();
+	clearMessage(); // Refresh Help tab text
 }
 
 function toggleTileDesigns() {
@@ -537,6 +561,10 @@ function toggleTileDesigns() {
 			break;
 	}
 	setSkudTilesOption(newSkudTilesKey);
+}
+
+function getSelectedTileDesignTypeDisplayName() {
+	return getTileDesignTypeDisplayName(skudTilesKey);
 }
 /* --- */
 
@@ -646,16 +674,22 @@ function rewindAllMoves() {
 function playNextMove(withActuate) {
 	if (currentMoveIndex >= gameController.gameNotation.moves.length) {
 		// no more moves to run
+		isInReplay = false;
 		refreshMessage();
 		return false;
 	} else {
+		isInReplay = true;
 		gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate);
 		currentMoveIndex++;
+		if (withActuate) {
+			refreshMessage();	// Adding this so it updates during replay... Is this the right spot?
+		}
 		return true;
 	}
 }
 
 function playPrevMove() {
+	isInReplay = true;
 	pauseRun();
 
 	var moveToPlayTo = currentMoveIndex - 1;
@@ -1096,7 +1130,7 @@ function setMessage(msg) {
 }
 
 function getAltTilesOptionText() {
-	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.</p>";
+	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.<br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "</p>";
 }
 
 function getAltVagabondTilesOptionText() {
@@ -1493,15 +1527,6 @@ var GameType = {
 			OPTION_DOUBLE_TILES
 		]
 	},
-	SolitairePaiSho: {
-		id: 4,
-		desc: "Solitaire Pai Sho",
-		rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/", 
-		gameOptions: [
-			OPTION_DOUBLE_TILES, 
-			OPTION_INSANE_TILES
-		]
-	},
 	CapturePaiSho: {
 		id: 3,
 		desc: "Capture Pai Sho",
@@ -1514,6 +1539,15 @@ var GameType = {
 		rulesUrl: "https://skudpaisho.com/site/games/street-pai-sho/", 
 		gameOptions: []
 	},
+	SolitairePaiSho: {
+		id: 4,
+		desc: "Solitaire Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/", 
+		gameOptions: [
+			OPTION_DOUBLE_TILES, 
+			OPTION_INSANE_TILES
+		]
+	},
 	CoopSolitaire: {
 		id: 6,
 		desc: "Cooperative Solitaire",
@@ -1522,12 +1556,6 @@ var GameType = {
 			OPTION_DOUBLE_TILES, 
 			OPTION_INSANE_TILES
 		]
-	},
-	Playground: {
-		id: 7,
-		desc: "Pai Sho Playground",
-		rulesUrl: "https://skudpaisho.com/site/games/pai-sho-playground/", 
-		gameOptions: []
 	},
 	OvergrowthPaiSho: {
 		id: 8,
@@ -1538,6 +1566,12 @@ var GameType = {
 			FULL_POINTS_SCORING
 		]
 	},
+	// Playground: {
+	// 	id: 7,
+	// 	desc: "Pai Sho Playground",
+	// 	rulesUrl: "https://skudpaisho.com/site/games/pai-sho-playground/", 
+	// 	gameOptions: []
+	// },
 	Blooms: {
 		id: 9,
 		desc: "Blooms",
@@ -1547,6 +1581,13 @@ var GameType = {
 			SHORTER_GAME
 		]
 	}
+	// ,
+	// Trifle: {
+	// 	id: 10,
+	// 	desc: "Pai and Sho's Trifle",
+	// 	rulesUrl: "https://skudpaisho.com/site/games/pai-shos-trifle/",
+	// 	gameOptions: []
+	// }
 };
 function getGameControllerForGameType(gameTypeId) {
 	var controller;
@@ -1578,11 +1619,11 @@ function getGameControllerForGameType(gameTypeId) {
 		case GameType.OvergrowthPaiSho.id:
 			controller = new OvergrowthController(gameContainerDiv, isMobile);
 			break;
-		//case GameType.Blooms.id:
-		case 9:
-			if (GameType.Blooms || QueryString.gameType === '9') {
-				controller = new BloomsController(gameContainerDiv, isMobile);
-			}
+		case GameType.Blooms.id:
+			controller = new BloomsController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Trifle.id:
+			controller = new TrifleController(gameContainerDiv, isMobile);
 			break;
 	    default:
 			debug("Game Controller unavailable.");

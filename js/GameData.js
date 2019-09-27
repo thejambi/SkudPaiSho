@@ -39,6 +39,9 @@ var runningOnAndroid = false;
 var onlinePlayEnabled = false;
 /* */
 
+/* peekAtOpponentMoves: Allow display of opponent piece movement */
+var peekAtOpponentMoves = false;
+
 /* --- */
 
 
