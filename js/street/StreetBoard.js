@@ -7,6 +7,8 @@ function StreetBoard() {
 	this.harmonyManager = new StreetHarmonyManager();
 
 	this.winners = [];
+	this.ableToReachPointsChecked = [];
+	this.debugCount = 0;
 }
 
 StreetBoard.prototype.brandNew = function () {
@@ -388,7 +390,7 @@ StreetBoard.prototype.moveTile = function(player, notationPointStart, notationPo
 	var boardPointStart = this.cells[startRowCol.row][startRowCol.col];
 	var boardPointEnd = this.cells[endRowCol.row][endRowCol.col];
 
-	if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)) {
+	if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd, false)) {
 		debug("Bad move bears");
 		showBadMoveModal();
 		return false;
@@ -425,7 +427,7 @@ StreetBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 	}
 };
 
-StreetBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
+StreetBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd, markPossibleAsGo) {
 	// start point must have a tile
 	if (!boardPointStart.hasTile()) {
 		return false;
@@ -467,7 +469,7 @@ StreetBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boa
 		return false;
 	} else {
 		// Move may be possible. But there may be tiles in the way...
-		if (!this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves, player)) {
+		if (!this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves, player, markPossibleAsGo)) {
 			// debug("Tiles are in the way, so you can't reach that spot.");
 			return false;
 		}
@@ -477,18 +479,31 @@ StreetBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boa
 	return true;
 };
 
-StreetBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves, playerMoving) {
+StreetBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves, playerMoving, markPossibleAsGo) {
   // Recursion!
-  return this.pathFound(boardPointStart, boardPointEnd, numMoves, playerMoving);
+  var ableToReach = this.pathFound(boardPointStart, boardPointEnd, numMoves, playerMoving, markPossibleAsGo);
+  
+  return ableToReach;
 };
 
-StreetBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves, playerMoving) {
+StreetBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMoves, playerMoving, markPossibleAsGo, travelDirection) {
   if (!boardPointStart || !boardPointEnd) {
     return false; // start or end point not given
   }
 
+  this.debugCount++;
+
   if (boardPointStart.isType(NON_PLAYABLE) || boardPointEnd.isType(NON_PLAYABLE)) {
   	return false;	// Paths must be through playable points
+  }
+
+  if (markPossibleAsGo) {
+	if (!boardPointStart.hasTile()) {
+		boardPointStart.addType(POSSIBLE_MOVE);
+	}
+	  if (boardPointEnd.isType(POSSIBLE_MOVE)) {
+		  return true;
+	  }
   }
 
   if (boardPointStart.row === boardPointEnd.row && boardPointStart.col === boardPointEnd.col) {
@@ -505,41 +520,49 @@ StreetBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, numMo
     return true; // Yay! Only 1 space away (and remember, numMoves is more than 0)
   }
 
-  // Check moving UP
-  var nextRow = boardPointStart.row - 1;
-  if (nextRow >= 0) {
-    var nextPoint = this.cells[nextRow][boardPointStart.col];
-    if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving)) {
-      return true; // Yay!
-    }
-  }
+	if (travelDirection !== "DOWN") {
+		// Check moving UP
+		var nextRow = boardPointStart.row - 1;
+		if (nextRow >= 0) {
+			var nextPoint = this.cells[nextRow][boardPointStart.col];
+			if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving, markPossibleAsGo, "UP")) {
+			return true; // Yay!
+			}
+		}
+	}
 
-  // Check moving DOWN
-  nextRow = boardPointStart.row + 1;
-  if (nextRow < 17) {
-    var nextPoint = this.cells[nextRow][boardPointStart.col];
-    if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving)) {
-      return true; // Yay!
-    }
-  }
+	if (travelDirection !== "UP") {
+		// Check moving DOWN
+		nextRow = boardPointStart.row + 1;
+		if (nextRow < 17) {
+			var nextPoint = this.cells[nextRow][boardPointStart.col];
+			if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving, markPossibleAsGo, "DOWN")) {
+			return true; // Yay!
+			}
+		}
+	}
 
-  // Check moving LEFT
-  var nextCol = boardPointStart.col - 1;
-  if (nextCol >= 0) {
-    var nextPoint = this.cells[boardPointStart.row][nextCol];
-    if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving)) {
-      return true; // Yay!
-    }
-  }
+	if (travelDirection !== "RIGHT") {
+		// Check moving LEFT
+		var nextCol = boardPointStart.col - 1;
+		if (nextCol >= 0) {
+			var nextPoint = this.cells[boardPointStart.row][nextCol];
+			if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving, markPossibleAsGo, "LEFT")) {
+			return true; // Yay!
+			}
+		}
+	}
 
-  // Check moving RIGHT
-  nextCol = boardPointStart.col + 1;
-  if (nextCol < 17) {
-    var nextPoint = this.cells[boardPointStart.row][nextCol];
-    if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving)) {
-      return true; // Yay!
-    }
-  }
+	if (travelDirection !== "LEFT") {
+		// Check moving RIGHT
+		nextCol = boardPointStart.col + 1;
+		if (nextCol < 17) {
+			var nextPoint = this.cells[boardPointStart.row][nextCol];
+			if (!nextPoint.hasEnemyTile(playerMoving) && this.pathFound(nextPoint, boardPointEnd, numMoves - 1, playerMoving, markPossibleAsGo, "RIGHT")) {
+			return true; // Yay!
+			}
+		}
+	}
 };
 
 StreetBoard.prototype.markSpacesBetweenHarmonies = function() {
@@ -759,11 +782,14 @@ StreetBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
 	var player = boardPointStart.tile.ownerName;
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
-			if (this.canMoveTileToPoint(player, boardPointStart, this.cells[row][col])) {
+			if (!this.cells[row][col].isType(POSSIBLE_MOVE)
+				&& this.canMoveTileToPoint(player, boardPointStart, this.cells[row][col], true)) {
 				this.cells[row][col].addType(POSSIBLE_MOVE);
 			}
 		}
 	}
+	debug(Number(this.debugCount).toLocaleString() + " movement checks");
+  	this.debugCount = 0;
 };
 
 StreetBoard.prototype.removePossibleMovePoints = function() {
