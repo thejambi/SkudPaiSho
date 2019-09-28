@@ -37,7 +37,7 @@ VagabondController.prototype.resetNotationBuilder = function() {
 		this.notationBuilder.offerDraw = true;
 	}
 
-	this.checkingOutOpponentTile = false;
+	this.checkingOutOpponentTileOrNotMyTurn = false;
 };
 
 VagabondController.prototype.resetGameNotation = function() {
@@ -192,9 +192,9 @@ VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 
 	var tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
 
-	if (tile.ownerName !== getCurrentPlayer()) {
+	if (tile.ownerName !== getCurrentPlayer() || !myTurn()) {
 		// Hey, that's not your tile!
-		this.checkingOutOpponentTile = true;
+		this.checkingOutOpponentTileOrNotMyTurn = true;
 		if (!this.peekAtOpponentMoves) {
 			return;
 		}
@@ -238,9 +238,9 @@ VagabondController.prototype.pointClicked = function(htmlPoint) {
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
-			if (boardPoint.tile.ownerName !== getCurrentPlayer()) {
+			if (boardPoint.tile.ownerName !== getCurrentPlayer() || !myTurn()) {
 				debug("That's not your tile!");
-				this.checkingOutOpponentTile = true;
+				this.checkingOutOpponentTileOrNotMyTurn = true;
 				if (!this.peekAtOpponentMoves) {
 					return;
 				}
@@ -257,12 +257,12 @@ VagabondController.prototype.pointClicked = function(htmlPoint) {
 			this.theGame.revealPossibleMovePoints(boardPoint);
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
-		if (boardPoint.isType(POSSIBLE_MOVE)) {
+		if (boardPoint.isType(POSSIBLE_MOVE) && myTurn()) {
 			// They're trying to move there! And they can! Exciting!
 			// Need the notation!
 			this.theGame.hidePossibleMovePoints();
 
-			if (!this.checkingOutOpponentTile && !isInReplay) {
+			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
 				this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 				
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);

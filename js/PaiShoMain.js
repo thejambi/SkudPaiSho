@@ -1577,8 +1577,9 @@ var GameType = {
 		desc: "Blooms",
 		rulesUrl: "https://www.nickbentley.games/blooms-rules/",
 		gameOptions: [
+			SHORTER_GAME,
 			FOUR_SIDED_BOARD,
-			SHORTER_GAME
+			SIX_SIDED_BOARD
 		]
 	}
 	// ,

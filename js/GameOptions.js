@@ -15,7 +15,7 @@ var FULL_POINTS_SCORING = "Full points scoring";
 /* Blooms */
 var FOUR_SIDED_BOARD = "Board size: 4 per side";
 var SHORTER_GAME = "Shorter game";
-// var TWELVE_SIDED_BOARD = "Twelve-sided board";	// Nah, that's crazy!
+var SIX_SIDED_BOARD = "Board size: 6 per side";
 
 function gameOptionEnabled(optionName) {
 	return ggOptions.includes(optionName);

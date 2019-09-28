@@ -198,8 +198,6 @@ BloomsController.prototype.pointClicked = function(htmlPoint, bloomId) {
 	} else if (this.actuator.isMobile) {
 		this.revealBloom(bloomId);
 	}
-
-	
 };
 
 /* Called by Main if showTileMessage used in Actuator */
@@ -224,6 +222,7 @@ BloomsController.prototype.startAiGame = function(finalizeMove) {
 
 /* Required by Main */
 BloomsController.prototype.getAiList = function() {
+	// return [new BloomsRandomAIv1()];
 	return [];
 };
 
@@ -334,3 +333,29 @@ BloomsController.prototype.completeMove = function() {
 	}
 };
 
+BloomsController.prototype.playRandomMove = function() {
+	if (myTurn()) {
+		var playerName = this.getCurrentPlayer();
+
+		var tilePile1 = document.getElementsByName("H1")[0];
+		var tilePile2 = document.getElementsByName("H2")[0];
+		if (playerName === GUEST) {
+			tilePile1 = document.getElementsByName("G1")[0];
+			tilePile2 = document.getElementsByName("G2")[0];
+		}
+
+		// Click pile 1, then click open point
+		tilePile1.click();
+		var openPoint = this.theGame.board.getRandomOpenPoint();
+		var pointName = openPoint.getNotationPointString();
+		var pointElement = document.getElementsByName(pointName)[0];
+		pointElement.click();
+
+		// Click pile 2, then click open point
+		tilePile2.click();
+		openPoint = this.theGame.board.getRandomOpenPoint();
+		pointName = openPoint.getNotationPointString();
+		pointElement = document.getElementsByName(pointName)[0];
+		pointElement.click();
+	}
+};

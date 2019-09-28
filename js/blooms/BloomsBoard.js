@@ -3,6 +3,8 @@ function BloomsBoard() {
 	this.edgeLength = 5;
 	if (gameOptionEnabled(FOUR_SIDED_BOARD)) {
 		this.edgeLength = 4;
+	} else if (gameOptionEnabled(SIX_SIDED_BOARD)) {
+		this.edgeLength = 6;
 	}
 
 	this.scoreTracks = [];
@@ -355,4 +357,18 @@ BloomsBoard.prototype.markBloomRevealed = function(bloomId) {
 			bloom[i].showRevealEffect = true;
 		}
 	}
+};
+
+BloomsBoard.prototype.getRandomOpenPoint = function() {
+	var openPoints = [];
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var bp = this.cells[row][col];
+			if (bp.types.includes(BloomsBoardPoint.Types.normal) && !bp.hasTile()) {
+				openPoints.push(bp);
+			}
+		}
+	}
+	var randomIndex = Math.floor(Math.random() * openPoints.length);
+	return openPoints[randomIndex];
 };
