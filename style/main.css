@@ -833,8 +833,14 @@ body.darkMode .myMainModalClose:focus {
 
 .blooms6perSide {
   width: 710px;
-  margin: 0 0 0 -60px;
+  margin: -25px 0 0 -60px;
   transform: scale(0.9);
+}
+
+.blooms8perSide {
+  width: 910px;
+  margin: -80px 0 0 -162px;
+  transform: scale(0.68);
 }
 
 .blooms12sidedBoard {
@@ -1139,6 +1145,12 @@ body.darkMode textarea {
   width: 125vw;
   margin: 0 0 0 -14vw;
   transform: scale(0.85);
+}
+
+.blooms8perSide {
+  width: 160vw;
+  margin: -20vw 0 0 -31vw;
+  transform: scale(0.65);
 }
 
 .blooms12sidedBoard {
