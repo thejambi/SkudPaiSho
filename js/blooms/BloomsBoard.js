@@ -5,6 +5,8 @@ function BloomsBoard() {
 		this.edgeLength = 4;
 	} else if (gameOptionEnabled(SIX_SIDED_BOARD)) {
 		this.edgeLength = 6;
+	} else if (gameOptionEnabled(EIGHT_SIDED_BOARD)) {
+		this.edgeLength = 8;
 	}
 
 	this.scoreTracks = [];
@@ -60,7 +62,8 @@ BloomsBoard.prototype.brandNew = function() {
 	}
 
 	for (var row = 0; row < cells.length; row++) {
-		var firstCol = (this.edgeLength - 3) - Math.floor(row / 2);
+		var mysteriousValue = Math.floor(this.edgeLength / 2) + 1;
+		var firstCol = (this.edgeLength - mysteriousValue) - Math.floor(row / 2);
 		
 		var firstScoreTrackOfRow = true;
 

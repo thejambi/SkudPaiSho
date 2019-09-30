@@ -10,6 +10,8 @@ function BloomsActuator(gameContainer, isMobile, hostTilesContainerDivs, guestTi
 
 	if (gameOptionEnabled(SIX_SIDED_BOARD)) {
 		boardContainer.classList.add("blooms6perSide");
+	} else if (gameOptionEnabled(EIGHT_SIDED_BOARD)) {
+		boardContainer.classList.add("blooms8perSide");
 	}
 
 	var hostTilesContainer = createDivWithClass("hostTilesContainer");

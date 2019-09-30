@@ -359,3 +359,9 @@ BloomsController.prototype.playRandomMove = function() {
 		pointElement.click();
 	}
 };
+
+BloomsController.prototype.playABunchOfRandomMoves = function(howMany) {
+	for (var i = 0; i < howMany; i++) {
+		this.playRandomMove();
+	}
+};
