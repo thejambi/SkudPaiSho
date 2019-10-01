@@ -212,18 +212,29 @@ BloomsController.prototype.getPointMessage = function(htmlPoint) {
 
 /* Required by Main (maybe only if getAiList has contents) */
 BloomsController.prototype.playAiTurn = function(finalizeMove) {
-	// 
+	if (this.theGame.getWinner()) {
+		return;
+	}
+	var theAi = activeAi;
+	// if (activeAi2) {
+	// 	if (activeAi2.player === getCurrentPlayer()) {
+	// 		theAi = activeAi2;
+	// 	}
+	// }
+	if (theAi) {
+		this.playRandomMove();
+	}
 };
 
 /* Required by Main (maybe only if getAiList has contents) */
 BloomsController.prototype.startAiGame = function(finalizeMove) {
-	// 
+	this.playAiTurn(finalizeMove);
 };
 
 /* Required by Main */
 BloomsController.prototype.getAiList = function() {
-	// return [new BloomsRandomAIv1()];
-	return [];
+	return [new BloomsRandomAIv1()];
+	// return [];
 };
 
 /* Required by Main */
