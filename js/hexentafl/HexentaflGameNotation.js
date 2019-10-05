@@ -18,11 +18,11 @@ HexentaflNotationMove.prototype.analyzeMove = function() {
 	this.moveNum = parseInt(moveNumAndPlayer.slice(0, -1));
     this.playerCode = moveNumAndPlayer.charAt(moveNumAndPlayer.length - 1);
 
-    // Get player (Guest or Host)
-	if (this.playerCode === 'G') {
-		this.player = GUEST;
-	} else if (this.playerCode === 'H') {
-		this.player = HOST;
+    // Get player (Attackers or Defenders)
+	if (this.playerCode === 'A') {
+		this.player = HexentaflVars.ATTACKERS_PLAYER;
+	} else if (this.playerCode === 'D') {
+		this.player = HexentaflVars.DEFENDERS_PLAYER;
 	}
 
 	var moveText = parts[1];
@@ -71,7 +71,11 @@ function HexentaflNotationBuilder() {
 }
 
 HexentaflNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
-	var notationLine = moveNum + player.charAt(0) + ".";
+	var playerChar = "A";
+	if (player === HexentaflVars.DEFENDERS_PLAYER) {
+		playerChar = "D";
+	}
+	var notationLine = moveNum + playerChar + ".";
 	if (this.isKingMove) {
 		notationLine += "K";
 	}
@@ -163,6 +167,15 @@ HexentaflGameNotation.prototype.loadMoves = function() {
 
 	var self = this;
 	var lastPlayer = GUEST;
+	var firstMove = new HexentaflNotationMove(lines[0]);
+	if (firstMove.player === GUEST) {
+		newAttacker = HexentaflVars.DEFENDERS_PLAYER;
+		newDefender = HexentaflVars.ATTACKERS_PLAYER;
+		HexentaflVars = {
+			DEFENDERS_PLAYER: newDefender,
+			ATTACKERS_PLAYER: newAttacker
+		};
+	}
 	lines.forEach(function(line) {
 		var move = new HexentaflNotationMove(line);
 		if (move.isValidNotation() && move.player !== lastPlayer) {

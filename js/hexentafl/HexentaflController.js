@@ -1,5 +1,11 @@
+var HexentaflVars = {};
 
 function HexentaflController(gameContainer, isMobile) {
+	HexentaflVars = {
+		DEFENDERS_PLAYER: HOST,
+		ATTACKERS_PLAYER: GUEST
+	}
+
 	if (!isMobile) {
 		this.additionalTilePileClass = "desktop";
 	} else {
@@ -7,8 +13,8 @@ function HexentaflController(gameContainer, isMobile) {
 	}
 
 	/* Board setup code determines initial tile placement pattern on the board. */
-	this.hostBoardSetupCode = 1;
-	this.guestBoardSetupCode = 1;
+	this.attackersBoardSetupCode = 1;
+	this.defendersBoardSetupCode = 1;
 
 	this.actuator = new HexentaflActuator(gameContainer, isMobile, this.getHostTilesContainerDivs(), this.getGuestTilesContainerDivs());
 
@@ -23,9 +29,14 @@ HexentaflController.prototype.getGameTypeId = function() {
 
 /* Not required, but called from Main */
 HexentaflController.prototype.completeSetup = function() {
-	// Create initial board setup
-	this.addSetupForPlayerCode('H', this.hostBoardSetupCode);
-	this.addSetupForPlayerCode('G', this.guestBoardSetupCode);
+	// Create initial board setup for Host and then Guest, but who are they?
+	if (HOST === HexentaflVars.DEFENDERS_PLAYER) {
+		this.addSetupForPlayerCode('D', this.defendersBoardSetupCode);
+		this.addSetupForPlayerCode('A', this.attackersBoardSetupCode);
+	} else {
+		this.addSetupForPlayerCode('A', this.attackersBoardSetupCode);
+		this.addSetupForPlayerCode('D', this.defendersBoardSetupCode);
+	}
 
 	// Finish with actuate
 	rerunAll();
@@ -90,7 +101,7 @@ HexentaflController.prototype.resetMove = function() {
 
 /* Required by Main */
 HexentaflController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Hexentafl</h4>"
+	return "<h4>heXentafl</h4>"
 	+ "<p><em>A Hnefatafl-inspired game played on a hex grid.</em></p>"
 	+ "<p>Read the rules and more about the game <a href='https://nxsgame.wordpress.com/2019/09/26/hexentafl/' target='_blank'>here</a>.</p>";
 };
@@ -168,7 +179,7 @@ HexentaflController.prototype.pointClicked = function(htmlPoint) {
 };
 
 HexentaflController.prototype.tileBelongsToCurrentPlayer = function(tileCode) {
-	if (this.getCurrentPlayer() === HOST) {
+	if (this.getCurrentPlayer() === HexentaflVars.DEFENDERS_PLAYER) {
 		return tileCode === "D" || tileCode === "K";
 	} else {
 		return tileCode === "A";

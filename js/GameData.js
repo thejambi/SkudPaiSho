@@ -27,7 +27,7 @@ var skudTilesKey = "standard";
 
 var useDeLionTiles = false;
 
-var debugOn = true;
+var debugOn = false;
 
 /* Set to true if building for iOS, else set to false */
 var ios = false;
@@ -54,7 +54,7 @@ function shouldRedirectIfNotHttps() {
 
 function debug(str) {
     if (debugOn
-      && (getUsername() === 'SkudPaiSho' || getUsername() === 'Zach')
+      || (getUsername() === 'SkudPaiSho' || getUsername() === 'Zach')
       ) {
       if (ios || QueryString.appType === 'ios') {
         try {

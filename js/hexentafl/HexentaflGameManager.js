@@ -30,11 +30,11 @@ HexentaflGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 	if (move.moveType === INITIAL_SETUP) {
 		/* Initial board setup */
-		if (move.player === HOST) {
+		if (move.playerCode === "D") {
 			var defendersPoints = [];
 			var kingPoint = "";
 
-			// TODO check board size? No, have different codes for different sizes.
+			// TODO have different codes for different board sizes.
 			switch (move.boardSetupCode) {
 				case "1":
 					defendersPoints.push("d3");
@@ -43,7 +43,7 @@ HexentaflGameManager.prototype.runNotationMove = function(move, withActuate) {
 					kingPoint = "d4";
 					break;
 				default:
-					debug("Unknown board setup code for HOST.");
+					debug("Unknown board setup code for " + HexentaflVars.DEFENDERS_PLAYER);
 			}
 
 			this.board.placeKing(kingPoint);
@@ -54,10 +54,8 @@ HexentaflGameManager.prototype.runNotationMove = function(move, withActuate) {
 					self.board.placeDefender(pointName);
 				}
 			);
-		} else if (move.player === GUEST) {
+		} else if (move.playerCode === "A") {
 			var attackersPoints = [];
-			var defendersPoints = [];
-			var kingPoint = "";
 
 			switch (move.boardSetupCode) {
 				case "1":
@@ -69,7 +67,7 @@ HexentaflGameManager.prototype.runNotationMove = function(move, withActuate) {
 					attackersPoints.push("g7");
 					break;
 				default:
-					debug("Unknown board setup code for GUEST.");
+					debug("Unknown board setup code for " + HexentaflVars.ATTACKERS_PLAYER);
 			}
 
 			var self = this;
@@ -114,19 +112,19 @@ HexentaflGameManager.prototype.hasEnded = function() {
 /* Required by Main */
 HexentaflGameManager.prototype.getWinner = function() {
 	if (this.board.kingCaptured) {
-		return GUEST;
+		return HexentaflVars.ATTACKERS_PLAYER;
 	}
 	if (this.board.kingOnCorner) {
-		return HOST;
+		return HexentaflVars.DEFENDERS_PLAYER;
 	}
 };
 
 /* Required by Main */
 HexentaflGameManager.prototype.getWinReason = function() {
-	if (this.getWinner() === HOST) {
-		return " escorted the King to safety!";
-	} else if (this.getWinner() === GUEST) {
-		return " stormed the castle and captured the King!";
+	if (this.getWinner() === HexentaflVars.DEFENDERS_PLAYER) {
+		return " wins! They escorted the King to safety!";
+	} else if (this.getWinner() === HexentaflVars.ATTACKERS_PLAYER) {
+		return " wins! They stormed the castle and captured the King!";
 	}
 };
 

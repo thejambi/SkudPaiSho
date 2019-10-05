@@ -1591,7 +1591,7 @@ var GameType = {
 	// }
 	Hexentafl: {
 		id: 11,
-		desc: "Hexentafl",
+		desc: "heXentafl",
 		rulesUrl: "https://nxsgame.wordpress.com/2019/09/26/hexentafl/",
 		gameOptions: [
 			// FIVE_SIDED_BOARD	// TODO get option to work
