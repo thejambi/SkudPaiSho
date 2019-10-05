@@ -825,7 +825,6 @@ body.darkMode .myMainModalClose:focus {
 
 
 
-
 /************ Blooms ************/
 .bloomsBoard {
   margin-bottom: 60px;
@@ -833,7 +832,7 @@ body.darkMode .myMainModalClose:focus {
 
 .blooms6perSide {
   width: 710px;
-  margin: -25px 0 0 -60px;
+  margin: -20px 0 0 -60px;
   transform: scale(0.9);
 }
 
@@ -868,6 +867,7 @@ body.darkMode .myMainModalClose:focus {
   background-color: #E4D9D0;
   margin: 14.43px 2px 2px 2px;
   float: left;
+  text-align: center;
 }
 
 .hexagonNoShow {
@@ -890,7 +890,8 @@ body.darkMode .myMainModalClose:focus {
 body.darkMode .hexScoreGuest {
   background-color: #000;
 }
-.hexScoreHost.hexScoreGuest {
+.hexScoreHost.hexScoreGuest,
+body.darkMode .hexScoreHost.hexScoreGuest {
   background-color: #9a8245;
 }
 
@@ -923,9 +924,13 @@ body.darkMode .bloomsG2 {
 }
 
 .hexagonShadow,
-.desktop.hexagon:hover:not(.hexagonScore):hover,
+.desktop.hexagon:hover:not(.hexagonScore):not(.possibleMove):hover,
 .mobile.hexagonHover {
   box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+.hexagonShadow,
+.desktop.hexagon:hover:not(.hexagonScore):hover,
+.mobile.hexagonHover {
   /* background-color: #64c7cc; */
   z-index: 4;
   transform: scale(1.12);
@@ -973,6 +978,52 @@ body.darkMode .bloomsG2 {
   height:28.8675px;
   z-index: 2;
   background: inherit;
+}
+
+
+/* Hexentafl */
+.hexentaflBoard {
+  width: 450px;
+  height: 330px;
+  margin: 110px auto 0 auto;
+  transform: scale(1.2);
+}
+.hexentaflBoardRotate {
+  transform: rotate(90deg);
+  z-index:0;
+}
+
+.hexagon.possibleMove {
+  z-index: 999;
+  box-shadow: 0px 0px 6px 2px #84D;
+  transform: scale(0.8);
+}
+
+.hexagon.corner,
+.hexagon.throne {
+  background-color: #cabaca;
+}
+
+/* .hexentafl___ {
+  background-color: #f9c851;
+} */
+.hexentaflA {
+  background-color: #c15f64;
+}
+.hexentaflK {
+  /* background-color: #9cc0b8; */
+  background-color: #8fb6ad;
+}
+.hexentaflD {
+  background-color: #3b3b39;
+}
+body.darkMode .hexentaflD {
+  background-color: #000;
+}
+
+.hexentaflKingText {
+  transform: rotate(270deg);
+  color: black;
 }
 
 
@@ -1133,7 +1184,14 @@ body.darkMode textarea {
     display: none;
   }
 
-  
+
+  /* Hexentafl - vw units override */
+.hexentaflBoard {
+  margin: 17vw auto 10vw auto;
+  width: 73vw;
+  height: 52vw;
+}
+
   /* Blooms - vw units override */
 .bloomsBoard {
   margin-bottom: 10.49vw;
@@ -1170,7 +1228,7 @@ body.darkMode textarea {
 }
 
 .hexagonShadow,
-.desktop.hexagon:hover:not(.hexagonScore):hover,
+.desktop.hexagon:hover:not(.hexagonScore):not(.possibleMove):hover,
 .mobile.hexagonHover {
   box-shadow: 0 0 3.497vw rgba(0,0,0,0.6);
 }

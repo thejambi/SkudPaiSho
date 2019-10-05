@@ -11,8 +11,7 @@ function CaptureGameManager(actuator, ignoreActuate, isCopy) {
 }
 
 // Set up the game
-CaptureGameManager.prototype.setup = function (ignoreActuate) {
-
+CaptureGameManager.prototype.setup = function(ignoreActuate) {
 	this.board = new CaptureBoard();
 
 	// Update the actuator
@@ -22,7 +21,7 @@ CaptureGameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-CaptureGameManager.prototype.actuate = function () {
+CaptureGameManager.prototype.actuate = function() {
 	if (this.isCopy) {
 		return;
 	}

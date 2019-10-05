@@ -153,6 +153,12 @@ window.requestAnimationFrame(function () {
 			}
 		}
 		setGameController(parseInt(QueryString.gameType), true);
+
+		gameController.setGameNotation(QueryString.game);
+
+		if (gameController.gameNotation.moves.length > 1) {
+			showReplayControls();
+		}
 	} else {
 		closeGame();
 	}
@@ -201,14 +207,8 @@ window.requestAnimationFrame(function () {
 		sandboxUrl = url;
 	}
 
-	gameController.setGameNotation(QueryString.game);
-
 	hostEmail = QueryString.host;
 	guestEmail = QueryString.guest;
-
-	if (gameController.gameNotation.moves.length > 1) {
-		showReplayControls();
-	}
 
 	appCaller = new DummyAppCaller();
 
@@ -1581,7 +1581,7 @@ var GameType = {
 			FOUR_SIDED_BOARD,
 			SIX_SIDED_BOARD
 		]
-	}
+	},
 	// ,
 	// Trifle: {
 	// 	id: 10,
@@ -1589,6 +1589,14 @@ var GameType = {
 	// 	rulesUrl: "https://skudpaisho.com/site/games/pai-shos-trifle/",
 	// 	gameOptions: []
 	// }
+	Hexentafl: {
+		id: 11,
+		desc: "Hexentafl",
+		rulesUrl: "https://nxsgame.wordpress.com/2019/09/26/hexentafl/",
+		gameOptions: [
+			// FIVE_SIDED_BOARD	// TODO get option to work
+		]
+	}
 };
 function getGameControllerForGameType(gameTypeId) {
 	var controller;
@@ -1626,6 +1634,9 @@ function getGameControllerForGameType(gameTypeId) {
 		// case GameType.Trifle.id:
 		// 	controller = new TrifleController(gameContainerDiv, isMobile);
 		// 	break;
+		case GameType.Hexentafl.id:
+			controller = new HexentaflController(gameContainerDiv, isMobile);
+			break;
 	    default:
 			debug("Game Controller unavailable.");
 	}
