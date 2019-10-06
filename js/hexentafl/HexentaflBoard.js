@@ -104,11 +104,10 @@ HexentaflBoard.prototype.putTileOnPoint = function(tile, notationPointString) {
 
 HexentaflBoard.prototype.getBoardPointFromNotationPoint = function(notationPointString) {
 	var rowAndCol = HexentaflBoardPoint.notationPointStringMap[notationPointString];
-	if (!rowAndCol) {
-        debug(notationPointString);
+	if (rowAndCol) {
+		point = this.cells[rowAndCol.row][rowAndCol.col];
+		return point;
     }
-	point = this.cells[rowAndCol.row][rowAndCol.col];
-	return point;
 };
 
 HexentaflBoard.prototype.moveTile = function(notationPointStart, notationPointEnd) {
@@ -350,7 +349,8 @@ HexentaflBoard.prototype.getAdjacentPoints = function(bp, direction) {
 };
 
 HexentaflBoard.prototype.rowAndColIsValid = function(rowAndCol) {
-	return rowAndCol.row < this.cells.length
+	return rowAndCol
+			&& rowAndCol.row < this.cells.length
 			&& rowAndCol.row >= 0
 			&& rowAndCol.col < this.cells[rowAndCol.row].length
 			&& rowAndCol.col >= 0;
