@@ -163,7 +163,7 @@ HexentaflController.prototype.pointClicked = function(htmlPoint) {
 			// Move all set. Add it to the notation!
 			this.gameNotation.addMove(move);
 			if (onlinePlayEnabled && this.gameNotation.moves.length === 3) {	// 3 will be first move after setup
-				createGameIfThatIsOk(this.getGameTypeId);
+				createGameIfThatIsOk(this.getGameTypeId());
 			} else {
 				if (playingOnlineGame()) {
 					callSubmitMove();
@@ -233,22 +233,5 @@ HexentaflController.prototype.isSolitaire = function() {
 /* Required by Main */
 HexentaflController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
-};
-
-HexentaflController.prototype.completeMove = function() {
-	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-	this.theGame.runNotationMove(move);
-
-	// Move all set. Add it to the notation!
-	this.gameNotation.addMove(move);
-	if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-		createGameIfThatIsOk(this.getGameTypeId());
-	} else {
-		if (playingOnlineGame()) {
-			callSubmitMove();
-		} else {
-			finalizeMove();
-		}
-	}
 };
 
