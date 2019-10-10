@@ -1,4 +1,13 @@
 
+var HexentaflDirections = {
+	UP_RIGHT: 1,
+	DOWN_RIGHT: 2,
+	DOWN: 3,
+	UP: 4,
+	UP_LEFT: 5,
+	DOWN_LEFT: 6
+}
+
 function HexentaflBoard() {
 	this.edgeLength = 4;
 	if (gameOptionEnabled(FIVE_SIDED_BOARD)) {
@@ -11,25 +20,31 @@ function HexentaflBoard() {
 }
 
 HexentaflBoard.prototype.markSpecialBoardPoints = function() {
-	var thronePoint = null;
-	var cornerPoints = [];
+	this.thronePoint = null;
+	this.cornerPoints = [];
 	if (this.edgeLength === 4) {
-		thronePoint = "d4";
-		cornerPoints.push("a1");
-		cornerPoints.push("d1");
-		cornerPoints.push("a4");
-		cornerPoints.push("g4");
-		cornerPoints.push("d7");
-		cornerPoints.push("g7");
+		this.thronePoint = "d4";
+		this.cornerPoints.push("a1");
+		this.cornerPoints.push("d1");
+		this.cornerPoints.push("a4");
+		this.cornerPoints.push("g4");
+		this.cornerPoints.push("d7");
+		this.cornerPoints.push("g7");
 	} else if (this.edgeLength === 5) {
-		// todo
+		this.thronePoint = "e5";
+		this.cornerPoints.push("a1");
+		this.cornerPoints.push("e1");
+		this.cornerPoints.push("a5");
+		this.cornerPoints.push("i5");
+		this.cornerPoints.push("e9");
+		this.cornerPoints.push("i9");
 	}
 
-	if (thronePoint) {
-		this.getBoardPointFromNotationPoint(thronePoint).addType(HexentaflBoardPoint.Types.throne);
+	if (this.thronePoint) {
+		this.getBoardPointFromNotationPoint(this.thronePoint).addType(HexentaflBoardPoint.Types.throne);
 	}
-	for (var i = 0; i < cornerPoints.length; i++) {
-		this.getBoardPointFromNotationPoint(cornerPoints[i]).addType(HexentaflBoardPoint.Types.corner);
+	for (var i = 0; i < this.cornerPoints.length; i++) {
+		this.getBoardPointFromNotationPoint(this.cornerPoints[i]).addType(HexentaflBoardPoint.Types.corner);
 	}
 };
 
@@ -289,7 +304,12 @@ HexentaflBoard.prototype.markEmptyAdjacentPointsAsPlayableInDirection = function
 	}
 };
 
-HexentaflBoard.prototype.getAdjacentPoints = function(bp, direction) {
+HexentaflBoard.prototype.getAdjacentNotationPointsFromNotationPoint = function(notationPointString, direction) {
+	var bp = this.getBoardPointFromNotationPoint(notationPointString);
+	return this.getAdjacentNotationPoints(bp, direction);
+};
+
+HexentaflBoard.prototype.getAdjacentNotationPoints = function(bp, direction) {
 	var row = bp.notationRowNum;
 	var col = bp.notationColNum;
 
@@ -300,41 +320,47 @@ HexentaflBoard.prototype.getAdjacentPoints = function(bp, direction) {
 	/* Direction numbers are important, 
 	 * used for capturing King on Throne (1,3,5 and 2,4,6).
 	 */
-	if (direction === 1 || !direction) {
+	if (direction === HexentaflDirections.UP_RIGHT || !direction) {
 		nextPoint.setNotationRow(row + 1)
 		nextPoint.setNotationCol(col);
 		notationPoints.push(nextPoint.getNotationPointString());
 	}
-	if (direction === 2 || !direction) {
+	if (direction === HexentaflDirections.DOWN_RIGHT || !direction) {
 		nextPoint = new HexentaflBoardPoint();
 		nextPoint.setNotationRow(row + 1);
 		nextPoint.setNotationCol(col + 1);
 		notationPoints.push(nextPoint.getNotationPointString());
 	}
-	if (direction === 3 || !direction) {
+	if (direction === HexentaflDirections.DOWN || !direction) {
 		nextPoint = new HexentaflBoardPoint();
 		nextPoint.setNotationRow(row);
 		nextPoint.setNotationCol(col + 1);
 		notationPoints.push(nextPoint.getNotationPointString());
 	}
-	if (direction === 4 || !direction) {
+	if (direction === HexentaflDirections.UP || !direction) {
 		nextPoint = new HexentaflBoardPoint();
 		nextPoint.setNotationRow(row);
 		nextPoint.setNotationCol(col - 1);
 		notationPoints.push(nextPoint.getNotationPointString());
 	}
-	if (direction === 5 || !direction) {
+	if (direction === HexentaflDirections.UP_LEFT || !direction) {
 		nextPoint = new HexentaflBoardPoint();
 		nextPoint.setNotationRow(row - 1);
 		nextPoint.setNotationCol(col - 1);
 		notationPoints.push(nextPoint.getNotationPointString());
 	}
-	if (direction === 6 || !direction) {
+	if (direction === HexentaflDirections.DOWN_LEFT || !direction) {
 		nextPoint = new HexentaflBoardPoint();
 		nextPoint.setNotationRow(row - 1);
 		nextPoint.setNotationCol(col);
 		notationPoints.push(nextPoint.getNotationPointString());
 	}
+
+	return notationPoints;
+};
+
+HexentaflBoard.prototype.getAdjacentPoints = function(bp, direction) {
+	var notationPoints = this.getAdjacentNotationPoints(bp, direction);
 
 	var points = [];
 

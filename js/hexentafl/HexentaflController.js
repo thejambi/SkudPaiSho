@@ -6,6 +6,13 @@ function HexentaflController(gameContainer, isMobile) {
 		ATTACKERS_PLAYER: GUEST
 	}
 
+	if (gameOptionEnabled(OPTION_ATTACKERS_MOVE_FIRST)) {
+		HexentaflVars = {
+			ATTACKERS_PLAYER: HOST,
+			DEFENDERS_PLAYER: GUEST
+		}
+	}
+
 	if (!isMobile) {
 		this.additionalTilePileClass = "desktop";
 	} else {
@@ -15,6 +22,11 @@ function HexentaflController(gameContainer, isMobile) {
 	/* Board setup code determines initial tile placement pattern on the board. */
 	this.attackersBoardSetupCode = 1;
 	this.defendersBoardSetupCode = 1;
+
+	if (gameOptionEnabled(FIVE_SIDED_BOARD)) {
+		this.attackersBoardSetupCode = 2;
+		this.defendersBoardSetupCode = 2;
+	}
 
 	this.actuator = new HexentaflActuator(gameContainer, isMobile, this.getHostTilesContainerDivs(), this.getGuestTilesContainerDivs());
 
@@ -103,12 +115,17 @@ HexentaflController.prototype.resetMove = function() {
 HexentaflController.prototype.getDefaultHelpMessageText = function() {
 	return "<h4>heXentafl</h4>"
 	+ "<p><em>A Hnefatafl-inspired game played on a hex grid.</em></p>"
+	+ "<p>The Attackers begin in the corners and win by capturing the King.</p>"
+	+ "<p>The King and Defenders begin in the center and win by escorting the King to a corner space.</p>"
 	+ "<p>Read the rules and more about the game <a href='https://nxsgame.wordpress.com/2019/09/26/hexentafl/' target='_blank'>here</a>.</p>";
 };
 
 /* Required by Main */
 HexentaflController.prototype.getAdditionalMessage = function() {
 	var msg = "";
+	if (this.gameNotation.moves.length <= 2) {
+		msg += getGameOptionsMessageHtml(GameType.Hexentafl.gameOptions);
+	}
 	return msg;
 };
 

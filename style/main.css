@@ -992,6 +992,12 @@ body.darkMode .bloomsG2 {
   transform: rotate(90deg);
   z-index:0;
 }
+.hexentafl5perSide {
+  width: 470px;
+  height: 460px;
+  margin: 110px auto 0 110px;
+  transform: scale(1.2);
+}
 
 .hexagon.possibleMove {
   z-index: 999;
@@ -1187,9 +1193,14 @@ body.darkMode textarea {
 
   /* Hexentafl - vw units override */
 .hexentaflBoard {
-  margin: 17vw auto 10vw auto;
+  margin: 17vw auto 10vw 18vw;
   width: 73vw;
   height: 52vw;
+}
+.hexentafl5perSide {
+  margin: 19vw auto 10vw 13vw;
+  width: 82vw;
+  height: 71vw;
 }
 
   /* Blooms - vw units override */

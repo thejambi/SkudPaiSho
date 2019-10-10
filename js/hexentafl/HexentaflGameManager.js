@@ -34,13 +34,17 @@ HexentaflGameManager.prototype.runNotationMove = function(move, withActuate) {
 			var defendersPoints = [];
 			var kingPoint = "";
 
-			// TODO have different codes for different board sizes.
+			// Different codes for different board sizes.
 			switch (move.boardSetupCode) {
-				case "1":
-					defendersPoints.push("d3");
-					defendersPoints.push("e5");
-					defendersPoints.push("c4");
-					kingPoint = "d4";
+				case "1":	// Default 4perSide
+					kingPoint = this.board.thronePoint; //"d4";
+					defendersPoints = this.board.getAdjacentNotationPointsFromNotationPoint(kingPoint,HexentaflDirections.UP);
+					defendersPoints = defendersPoints.concat(this.board.getAdjacentNotationPointsFromNotationPoint(kingPoint,HexentaflDirections.DOWN_LEFT));
+					defendersPoints = defendersPoints.concat(this.board.getAdjacentNotationPointsFromNotationPoint(kingPoint,HexentaflDirections.DOWN_RIGHT));
+					break;
+				case "2":	// Default 5perSide
+					kingPoint = this.board.thronePoint;
+					var defendersPoints = this.board.getAdjacentNotationPointsFromNotationPoint(kingPoint);
 					break;
 				default:
 					debug("Unknown board setup code for " + HexentaflVars.DEFENDERS_PLAYER);
@@ -58,13 +62,11 @@ HexentaflGameManager.prototype.runNotationMove = function(move, withActuate) {
 			var attackersPoints = [];
 
 			switch (move.boardSetupCode) {
-				case "1":
-					attackersPoints.push("a1");
-					attackersPoints.push("d1");
-					attackersPoints.push("a4");
-					attackersPoints.push("g4");
-					attackersPoints.push("d7");
-					attackersPoints.push("g7");
+				case "1":	// Default 4perSide
+					attackersPoints = this.board.cornerPoints;
+					break;
+				case "2":	// Default 5perSide
+					attackersPoints = this.board.cornerPoints;
 					break;
 				default:
 					debug("Unknown board setup code for " + HexentaflVars.ATTACKERS_PLAYER);

@@ -1594,7 +1594,7 @@ var GameType = {
 		desc: "heXentafl",
 		rulesUrl: "https://nxsgame.wordpress.com/2019/09/26/hexentafl/",
 		gameOptions: [
-			// FIVE_SIDED_BOARD	// TODO get option to work
+			OPTION_ATTACKERS_MOVE_FIRST //,FIVE_SIDED_BOARD
 		]
 	}
 };

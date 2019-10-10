@@ -7,6 +7,11 @@ function HexentaflActuator(gameContainer, isMobile, hostTilesContainerDivs, gues
 	removeChildren(gameContainer);
 
 	var boardContainer = createDivWithClass("hexentaflBoard");
+
+	if (gameOptionEnabled(FIVE_SIDED_BOARD)) {
+		boardContainer.classList.add("hexentafl5perSide");
+	}
+
 	var boardContainerWithRotate = createDivWithClass("hexentaflBoardRotate");
 	boardContainer.appendChild(boardContainerWithRotate);
 
