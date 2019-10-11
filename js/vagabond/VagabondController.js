@@ -322,7 +322,7 @@ VagabondController.prototype.getTheMessage = function(tile, ownerName) {
 	} else if (tileCode === 'B') {
 		heading = "Badgermole";
 		message.push("Can move only one space in any direction OR move directly adjacent to a Flower Tile if that Flower Tile is in the Badgermole's \"line of sight\" (meaning, the tiles lie on the same line with no other tiles in between)");
-		message.push("Flower Tiles adjacent to a Badgermole are protected from capture");
+		message.push("Flower Tiles adjacent to a friendly Badgermole are protected from capture");
 	} else if (tileCode === 'W') {
 		heading = "Wheel";
 		message.push("Can move any number of spaces forwards, backwards, left, or right across the spaces of the board as opposed to diagonally on the lines");
@@ -385,15 +385,36 @@ VagabondController.prototype.getPointMessage = function(htmlPoint) {
 }
 
 VagabondController.prototype.playAiTurn = function(finalizeMove) {
-	// 
+	if (this.theGame.getWinner()) {
+		return;
+	}
+	var theAi = activeAi;
+	if (activeAi2) {
+		if (activeAi2.player === getCurrentPlayer()) {
+			theAi = activeAi2;
+		}
+	}
+
+	var playerMoveNum = this.gameNotation.getPlayerMoveNum();
+
+	var self = this;
+	setTimeout(function() {
+		var move = theAi.getMove(self.theGame.getCopy(), playerMoveNum);
+		if (!move) {
+			debug("No move given...");
+			return;
+		}
+		self.gameNotation.addMove(move);
+		finalizeMove();
+	}, 10);
 };
 
 VagabondController.prototype.startAiGame = function(finalizeMove) {
-	// 
+	this.playAiTurn(finalizeMove);
 };
 
 VagabondController.prototype.getAiList = function() {
-	return [];
+	return [new VagabondRandomAIv1()];
 }
 
 VagabondController.prototype.getCurrentPlayer = function() {

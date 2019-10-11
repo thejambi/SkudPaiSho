@@ -928,7 +928,7 @@ VagabondBoard.prototype.setDeployPointsPossibleMoves = function(player, tileCode
 			for (var row = 0; row < this.cells.length; row++) {
 				for (var col = 0; col < this.cells[row].length; col++) {
 					var bp = this.cells[row][col];
-					if (!bp.isType(GATE) && !bp.hasTile()) {
+					if (!bp.isType(GATE) && !bp.isType(NON_PLAYABLE) && !bp.hasTile()) {
 						if (Math.abs(fireLilyPoint.row - bp.row) + Math.abs(fireLilyPoint.col - bp.col) <= 5) {
 							// Point within Fire Lily range
 							bp.addType(POSSIBLE_MOVE);
@@ -944,7 +944,7 @@ VagabondBoard.prototype.setDeployPointsPossibleMoves = function(player, tileCode
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
-			if (!bp.hasTile()) {
+			if (!bp.hasTile() && !bp.isType(NON_PLAYABLE)) {
 				if (tileCode === 'S') {
 					if (bp.isType(GATE)) {
 						bp.addType(POSSIBLE_MOVE);
@@ -965,31 +965,18 @@ VagabondBoard.prototype.setGuestGateOpen = function() {
 	}
 };
 
-// VagabondBoard.prototype.getCopy = function() {
-// 	var copyBoard = new Board();
+VagabondBoard.prototype.getCopy = function() {
+	var copyBoard = new VagabondBoard();
 
-// 	/*
-// 	this.cells = this.brandNew();
+	copyBoard.cells = copyArray(this.cells);
 
-// 	this.rockRowAndCols = [];	// call refreshRockRowAndCo...
-// 	this.playedWhiteLotusTiles = [];
-// 	this.winners = [];	// call analyzeHarmon...
-// 	*/
+	copyBoard.winners = copyArray(this.winners);
 
-// 	// cells
-// 	for (var row = 0; row < this.cells.length; row++) {
-// 		for (var col = 0; col < this.cells[row].length; col++) {
-// 			copyBoard.cells[row][col] = this.cells[row][col].getCopy();
-// 		}
-// 	}
-
-// 	// playedWhiteLotusTiles
-// 	for (var i = 0; i < this.playedWhiteLotusTiles.length; i++) {
-// 		copyBoard.playedWhiteLotusTiles.push(this.playedWhiteLotusTiles[i].getCopy());
-// 	}
+	copyBoard.hlPlayed = this.hlPlayed;
+	copyBoard.glPlayed = this.glPlayed;
 	
-// 	return copyBoard;
-// };
+	return copyBoard;
+};
 
 
 

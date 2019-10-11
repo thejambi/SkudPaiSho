@@ -101,7 +101,13 @@ function arrayIncludesAll(array1, array2) {
 function copyArray(arr) {
 	var copyArr = [];
 	for (var i = 0; i < arr.length; i++) {
-		copyArr.push(arr[i].getCopy());
+    if (arr[i] instanceof Array) {
+      copyArr.push(copyArray(arr[i]));
+    } else if (arr[i].getCopy) {
+      copyArr.push(arr[i].getCopy());
+    } else {
+      copyArr.push(arr[i]);
+    }
 	}
 	return copyArr;
 }
@@ -117,6 +123,14 @@ function shuffleArray(array) {
     temp = array[i]
     array[i] = array[j]
     array[j] = temp
+  }
+}
+
+function getRandomFromArray(array) {
+  if (array && array.length) {
+    var randomIndex = Math.floor(Math.random() * array.length);
+    var randomEntry = array.splice(randomIndex, 1)[0];
+    return randomEntry;
   }
 }
 

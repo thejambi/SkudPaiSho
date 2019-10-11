@@ -283,16 +283,9 @@ SkudPaiShoTileManager.prototype.getCopy = function() {
 	var copy = new SkudPaiShoTileManager();
 
 	// copy this.hostTiles and this.guestTiles
-	copy.hostTiles = this.copyArr(this.hostTiles);
-	copy.guestTiles = this.copyArr(this.guestTiles);
+	copy.hostTiles = copyArray(this.hostTiles);
+	copy.guestTiles = copyArray(this.guestTiles);
 	
 	return copy;
 };
 
-SkudPaiShoTileManager.prototype.copyArr = function(arr) {
-	var copyArr = [];
-	for (var i = 0; i < arr.length; i++) {
-		copyArr.push(arr[i].getCopy());
-	}
-	return copyArr;
-};

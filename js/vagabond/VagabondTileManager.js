@@ -119,6 +119,8 @@ VagabondTileManager.prototype.getCopy = function() {
 	var copy = new VagabondTileManager();
 
 	// copy this.hostTiles and this.guestTiles
+	copy.hostTiles = copyArray(this.hostTiles);
+	copy.guestTiles = copyArray(this.guestTiles);
 	
 	return copy;
 };

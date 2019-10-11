@@ -90,7 +90,7 @@ OvergrowthTileManager.prototype.getCopy = function() {
 	var copy = new OvergrowthTileManager();
 
 	copy.hostTiles = copyArray(this.hostTiles);
-	copy.guestTiles = this.copyArr(this.guestTiles);
+	copy.guestTiles = copyArray(this.guestTiles);
 	
 	return copy;
 };

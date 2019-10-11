@@ -1,19 +1,5 @@
 // Vababond Board Point
 
-var NON_PLAYABLE = "Non-Playable";
-var NEUTRAL = "Neutral";
-var RED = "Red";
-var WHITE = "White";
-var GATE = "Gate";
-
-var POSSIBLE_MOVE = "Possible Move";
-var OPEN_GATE = "OPEN GATE";
-
-var thinDot = "·";
-var thickDot = "•";
-var whiteDot = "◦";
-var gateDot = "⟡";
-
 function VagabondBoardPoint() {
 	this.types = [];
 	this.row = -1;
@@ -33,43 +19,6 @@ VagabondBoardPoint.prototype.removeType = function(type) {
 		}
 	}
 };
-
-// VagabondBoardPoint.prototype.getConsoleDisplay = function() {
-// 	if (this.tile) {
-// 		return this.tile.getConsoleDisplay();
-// 	} else {
-// 		var consoleDisplay = thinDot;
-
-// 		if (this.types.includes(NON_PLAYABLE)) {
-// 			consoleDisplay = " ";
-// 		}
-
-// 		var str = "";
-
-// 		if (this.types.includes(RED)) {
-// 			str = "R";
-// 			consoleDisplay = thickDot;
-// 		}
-// 		if (this.types.includes(WHITE)) {
-// 			str += "W";
-// 			consoleDisplay = whiteDot;
-// 		}
-// 		if (this.types.includes(NEUTRAL)) {
-// 			str += "N";
-// 		}
-
-// 		if (this.types.includes(GATE)) {
-// 			str = "G";
-// 			consoleDisplay = gateDot;
-// 		}
-
-// 		if (str.length > 1) {
-// 			consoleDisplay = "+";
-// 		}
-
-// 		return consoleDisplay;
-// 	}
-// };
 
 VagabondBoardPoint.prototype.putTile = function(tile) {
 	this.tile = tile;
@@ -154,17 +103,11 @@ VagabondBoardPoint.prototype.betweenPlayerHarmony = function(player) {
 VagabondBoardPoint.prototype.getCopy = function() {
 	var copy = new VagabondBoardPoint();
 
-	// this.types
-	for (var i = 0; i < this.types.length; i++) {
-		copy.types.push(this.types[i]);
-	}
+	copy.types = copyArray(this.types);
 
-	// this.row
 	copy.row = this.row;
-	// this.col
 	copy.col = this.col;
 
-	// tile
 	if (this.hasTile()) {
 		copy.tile = this.tile.getCopy();
 	}

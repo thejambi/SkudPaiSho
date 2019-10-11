@@ -12,6 +12,10 @@ SkudAIv1.prototype.getName = function() {
 	return "Skud Pai Sho automatic opponent";
 };
 
+SkudAIv1.prototype.getMessage = function() {
+	return "Playing against the computer can help you learn how the game works. You should be able to beat the computer easily once you understand the game.";
+};
+
 SkudAIv1.prototype.setPlayer = function(playerName) {
 	this.player = playerName;
 };

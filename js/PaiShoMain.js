@@ -895,8 +895,8 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 	} else if ((activeAi && getCurrentPlayer() === activeAi.player) || (activeAi2 && getCurrentPlayer() === activeAi2.player)) {
 		//messageText += "<span class='skipBonus' onclick='playAiTurn();'>Submit move to AI</span>";
 		messageText += "<em>THINKING...</em>";
-	} else if (activeAi) {
-		messageText += "Playing against the computer can help you learn how the game works. You should be able to beat the computer easily once you understand the game.";
+	} else if (activeAi && activeAi.getMessage) {
+		messageText += activeAi.getMessage();
 	}
 
 	if (gameController.theGame.getWinner()) {
