@@ -38,7 +38,7 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 	if (move.moveNum === 0 && move.accentTiles) {
 		var self = this;
-		var allAccentCodes = ['R','W','K','B','M','P','T','R','W','K','B','M','P','T'];
+		var allAccentCodes = ['R','W','K','B','R','W','K','B','M','P','T'];
 		move.accentTiles.forEach(function(tileCode) {
 			var i = allAccentCodes.indexOf(tileCode);
 			if (i >= 0) {

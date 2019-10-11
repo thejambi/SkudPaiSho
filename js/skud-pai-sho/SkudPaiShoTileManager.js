@@ -8,6 +8,10 @@ function SkudPaiShoTileManager(forActuating) {
 	}
 	this.hostTiles = this.loadTileSet('H');
 	this.guestTiles = this.loadTileSet('G');
+
+	/* Used to have 2 of each Ancient Oasis tile available, but now just one.
+	This is to support old games if someone chose two of something. */
+	this.additionalAncientOasisCount = 0;
 }
 
 SkudPaiShoTileManager.prototype.loadTileSet = function(ownerCode) {
@@ -27,12 +31,13 @@ SkudPaiShoTileManager.prototype.loadSkudSet = function(ownerCode) {
 		tiles.push(new SkudPaiShoTile('W', ownerCode));
 		tiles.push(new SkudPaiShoTile('K', ownerCode));
 		tiles.push(new SkudPaiShoTile('B', ownerCode));
-		
-		if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
-			tiles.push(new SkudPaiShoTile('P', ownerCode));
-			tiles.push(new SkudPaiShoTile('M', ownerCode));
-			tiles.push(new SkudPaiShoTile('T', ownerCode));
-		}
+	}
+
+	/* 1 of each Ancient Oasis Accent Tile if expansion enabled */
+	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
+		tiles.push(new SkudPaiShoTile('P', ownerCode));
+		tiles.push(new SkudPaiShoTile('M', ownerCode));
+		tiles.push(new SkudPaiShoTile('T', ownerCode));
 	}
 
 	tiles.forEach(function(tile) {
@@ -125,6 +130,14 @@ SkudPaiShoTileManager.prototype.grabTile = function(player, tileCode) {
 
 	if (!tile) {
 		debug("NONE OF THAT TILE FOUND");
+		/* Secretly allow 3 additional Ancient Oasis tiles to be selected */
+		if (this.additionalAncientOasisCount < 3) {
+			var oasisTileCodes = ['M','P','T'];
+			if (oasisTileCodes.includes(tileCode)) {
+				this.additionalAncientOasisCount++;
+				tile = new SkudPaiShoTile(tileCode, getPlayerCodeFromName(player));
+			}
+		}
 	}
 
 	return tile;
