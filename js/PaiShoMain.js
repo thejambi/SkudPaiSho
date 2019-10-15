@@ -1597,6 +1597,9 @@ var GameType = {
 			OPTION_ATTACKERS_MOVE_FIRST,
 			FIVE_SIDED_BOARD,
 			KING_MOVES_LIKE_PAWNS
+		],
+		secretGameOptions: [
+			MORE_ATTACKERS
 		]
 	}
 };
@@ -2041,8 +2044,12 @@ function gameOptionsSupportedForGameSeek(gameSeek) {
 	var gameOptionsSupported = false;
 	Object.keys(GameType).forEach(function(key,index) {
 		var gameType = GameType[key];
-		if (gameType.id === gameSeek.gameTypeId) {
-			gameOptionsSupported = arrayIncludesAll(gameType.gameOptions, gameSeek.gameOptions);
+		if (gameType.id === gameSeek.gameTypeId && gameType.gameOptions) {
+			var allSupportedGameOptions = gameType.gameOptions;
+			if (gameType.secretGameOptions) {
+				allSupportedGameOptions = allSupportedGameOptions.concat(gameType.secretGameOptions);
+			}
+			gameOptionsSupported = arrayIncludesAll(allSupportedGameOptions, gameSeek.gameOptions);
 			return gameOptionsSupported;
 		}
 	});
