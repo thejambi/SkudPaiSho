@@ -302,6 +302,9 @@ body.darkMode .bg-svg {
 .game-container.vescucci .bg-svg {
   background-image: url(vescucciboard.png);
 }
+.game-container.xiangqi .bg-svg {
+  background-image: url(xiangqiboard.svg);
+}
 
 figure > div {
   margin: 1em auto;

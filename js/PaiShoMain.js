@@ -42,7 +42,8 @@ var tileDesignTypeValues = {
 	vescucci: "vescucci",
 	standard: "standard",
 	pixelsho: "pixelsho",
-	pixelsho2: "pixelsho2"
+	pixelsho2: "pixelsho2",
+	xiangqi: "xiangqi"
 }
 
 function getTileDesignTypeDisplayName(tileDesignTypeKey) {
@@ -61,6 +62,8 @@ function getTileDesignTypeDisplayName(tileDesignTypeKey) {
 			return "Pixel Sho v1 Tiles";
 		case tileDesignTypeValues.pixelsho2:
 			return "Pixel Sho v2 Tiles";
+		case tileDesignTypeValues.xiangqi:
+			return "Xiangqi Style";
 		default:
 			return tileDesignTypeKey;
 	}
@@ -173,14 +176,6 @@ window.requestAnimationFrame(function () {
 			setSkudTilesOption(localStorage.getItem(tileDesignTypeKey));
 		}
 	}
-	/*
-	else if (localStorage.getItem(tileDesignTypeKey) === tileDesignTypeValues.hlowe) {
-		skudTilesKey = tileDesignTypeValues.hlowe;
-	} else if (localStorage.getItem(tileDesignTypeKey) === tileDesignTypeValues.vescucci) {
-		skudTilesKey = tileDesignTypeValues.vescucci;
-	} else {
-		skudTilesKey = tileDesignTypeValues.standard;
-	} */
 
 	if (!localStorage.getItem(vagabondTileDesignTypeKey)) {
 		useDeLionTiles = true;
@@ -557,6 +552,9 @@ function toggleTileDesigns() {
 			newSkudTilesKey = tileDesignTypeValues.pixelsho2
 			break;
 		case tileDesignTypeValues.pixelsho2:
+			newSkudTilesKey = tileDesignTypeValues.xiangqi;
+			break;
+		case tileDesignTypeValues.xiangqi:
 			newSkudTilesKey = tileDesignTypeValues.standard;
 			break;
 	}
