@@ -64,6 +64,11 @@ HexentaflGameManager.prototype.runNotationMove = function(move, withActuate) {
 			switch (move.boardSetupCode) {
 				case "1":	// Default 4perSide
 					attackersPoints = this.board.cornerPoints;
+					if (gameOptionEnabled(MORE_ATTACKERS)) {
+						attackersPoints.push("f4");
+						attackersPoints.push("d6");
+						attackersPoints.push("b2");
+					}
 					break;
 				case "2":	// Default 5perSide
 					attackersPoints = this.board.cornerPoints;
@@ -78,6 +83,22 @@ HexentaflGameManager.prototype.runNotationMove = function(move, withActuate) {
 						}
 					}
 					attackersPoints = attackersPoints.concat(otherAttackers);
+					if (gameOptionEnabled(MORE_ATTACKERS)) {
+						var removeThesePoints = ["e8","h5","b2"];
+						for (var r = 0; r < removeThesePoints.length; r++) {
+							var pointToRemove = removeThesePoints[r];
+							var index = attackersPoints.indexOf(pointToRemove);
+							if (index >= 0) {
+								attackersPoints.splice(index, 1);
+							}
+						}
+						attackersPoints.push("h4");
+						attackersPoints.push("i6");
+						attackersPoints.push("b1");
+						attackersPoints.push("a2");
+						attackersPoints.push("d8");
+						attackersPoints.push("f9");
+					}
 					break;
 				default:
 					debug("Unknown board setup code for " + HexentaflVars.ATTACKERS_PLAYER);
