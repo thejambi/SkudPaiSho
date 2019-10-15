@@ -257,15 +257,26 @@ HexentaflBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
 	if (!boardPointStart.hasTile()) {
 		return;
 	}
-	if (boardPointStart.tile === "K") {
-		// For King piece, only mark directly adjacent spaces
-		this.markEmptyAdjacentPointsAsPlayableForKing(boardPointStart);
-	} else if (boardPointStart.tile === "D" || boardPointStart.tile === "A") {
-		// Start at start, and add all adjacent spaces unless edge of board or tile
-		for (var direction = 1; direction <= 6; direction++) {
-			this.markEmptyAdjacentPointsAsPlayableInDirection(boardPointStart, direction);
+	for (var direction = 1; direction <= 6; direction++) {
+		this.markEmptyAdjacentPointsAsPlayableInDirection(
+			boardPointStart.tile,
+			boardPointStart, 
+			direction, 
+			this.decideMoveDistance(boardPointStart.tile));
+	}
+};
+
+HexentaflBoard.prototype.decideMoveDistance = function(tileCode) {
+	if (tileCode === "K") {
+		if (gameOptionEnabled(FIVE_SIDED_BOARD)) {
+			if (!gameOptionEnabled(KING_MOVES_LIKE_PAWNS)) {
+				return 2;
+			}	// If enabled, fall through King if
+		} else {
+			return 1;
 		}
 	}
+	return this.edgeLength*2;
 };
 
 HexentaflBoard.prototype.removePossibleMovePoints = function() {
@@ -276,30 +287,20 @@ HexentaflBoard.prototype.removePossibleMovePoints = function() {
 	});
 };
 
-HexentaflBoard.prototype.markEmptyAdjacentPointsAsPlayableForKing = function(boardPointStart) {
-	var adjacents = this.getAdjacentPoints(boardPointStart);
-	for (var i = 0; i < adjacents.length; i++) {
-		var adjacentPoint = adjacents[i];
-		if (adjacentPoint.types.includes(HexentaflBoardPoint.Types.normal)
-				&& !adjacentPoint.hasTile()
-				&& !adjacentPoint.types.includes(POSSIBLE_MOVE)) {
-			adjacentPoint.addType(POSSIBLE_MOVE);
-		}
-	}
-};
-
-HexentaflBoard.prototype.markEmptyAdjacentPointsAsPlayableInDirection = function(boardPointStart, direction) {
+HexentaflBoard.prototype.markEmptyAdjacentPointsAsPlayableInDirection = function(movingTile, boardPointStart, direction, distance) {
 	var adjacents = this.getAdjacentPoints(boardPointStart, direction);
 	for (var i = 0; i < adjacents.length; i++) {
 		var adjacentPoint = adjacents[i];
 		if (adjacentPoint.types.includes(HexentaflBoardPoint.Types.normal)
 				&& !adjacentPoint.hasTile()
 				&& !adjacentPoint.types.includes(POSSIBLE_MOVE)) {
-			if (!adjacentPoint.types.includes(HexentaflBoardPoint.Types.throne)) {
-				/* Pieces may pass through throne but not occupy it */
+			if (!adjacentPoint.types.includes(HexentaflBoardPoint.Types.throne) || movingTile === "K") {
+				/* Pieces besides the King may pass through throne but not occupy it */
 				adjacentPoint.addType(POSSIBLE_MOVE);
 			}
-			this.markEmptyAdjacentPointsAsPlayableInDirection(adjacentPoint, direction);
+			if (distance > 1) {
+				this.markEmptyAdjacentPointsAsPlayableInDirection(movingTile, adjacentPoint, direction, distance - 1);
+			}
 		}
 	}
 };
@@ -372,6 +373,18 @@ HexentaflBoard.prototype.getAdjacentPoints = function(bp, direction) {
 	}
 
 	return points;
+};
+
+HexentaflBoard.prototype.getValidAdjacentPoints = function(bp, direction) {
+	var points = this.getAdjacentPoints(bp, direction);
+	var validPoints = [];
+	for (var i = 0; i < points.length; i++) {
+		var point = points[i];
+		if (point.types.includes(HexentaflBoardPoint.Types.normal)) {
+			validPoints.push(point);
+		}
+	}
+	return validPoints;
 };
 
 HexentaflBoard.prototype.rowAndColIsValid = function(rowAndCol) {

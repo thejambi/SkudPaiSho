@@ -21,6 +21,7 @@ var EIGHT_SIDED_BOARD = "Board size: 8 per side";
 /* Hexentafl */
 var FIVE_SIDED_BOARD = "Board size: 5 per side";
 var OPTION_ATTACKERS_MOVE_FIRST = "Host plays as attackers";
+var KING_MOVES_LIKE_PAWNS = "King moves like pawns";
 
 function gameOptionEnabled(optionName) {
 	return ggOptions.includes(optionName);

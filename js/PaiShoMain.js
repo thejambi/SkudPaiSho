@@ -1594,7 +1594,9 @@ var GameType = {
 		desc: "heXentafl",
 		rulesUrl: "https://nxsgame.wordpress.com/2019/09/26/hexentafl/",
 		gameOptions: [
-			OPTION_ATTACKERS_MOVE_FIRST //,FIVE_SIDED_BOARD
+			OPTION_ATTACKERS_MOVE_FIRST,
+			FIVE_SIDED_BOARD,
+			KING_MOVES_LIKE_PAWNS
 		]
 	}
 };
@@ -2709,7 +2711,10 @@ function getGameOptionsMessageHtml(options) {
 
 	for (var i = 0; i < options.length; i++) {
 		if (!gameOptionEnabled(options[i])) {
-			msg += "<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>&bull;&nbsp;Add game option: " + options[i] + "</span><br />";
+			if (!gameController.optionOkToShow
+					|| (gameController.optionOkToShow && gameController.optionOkToShow(options[i]))) {
+				msg += "<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>&bull;&nbsp;Add game option: " + options[i] + "</span><br />";
+			}
 		}
 	}
 

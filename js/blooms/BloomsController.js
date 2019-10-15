@@ -376,3 +376,15 @@ BloomsController.prototype.playABunchOfRandomMoves = function(howMany) {
 		this.playRandomMove();
 	}
 };
+
+/* Called by Main, not required */
+BloomsController.prototype.optionOkToShow = function(option) {
+	if (option === FOUR_SIDED_BOARD) {
+		return !gameOptionEnabled(SIX_SIDED_BOARD);
+	} else if (option === SIX_SIDED_BOARD) {
+		return !gameOptionEnabled(FOUR_SIDED_BOARD);
+	} else {
+		return true;
+	}
+};
+

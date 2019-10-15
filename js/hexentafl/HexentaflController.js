@@ -252,3 +252,11 @@ HexentaflController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 };
 
+/* Called by Main, not required */
+HexentaflController.prototype.optionOkToShow = function(option) {
+	if (option === KING_MOVES_LIKE_PAWNS) {
+		return gameOptionEnabled(FIVE_SIDED_BOARD);
+	} else {
+		return true;
+	}
+};

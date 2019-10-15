@@ -67,6 +67,17 @@ HexentaflGameManager.prototype.runNotationMove = function(move, withActuate) {
 					break;
 				case "2":	// Default 5perSide
 					attackersPoints = this.board.cornerPoints;
+					var otherAttackers = [];
+					for (var i = 0; i < attackersPoints.length; i++) {
+						attackerPoint = attackersPoints[i];
+						var adjacentPoints = this.board.getAdjacentPoints(this.board.getBoardPointFromNotationPoint(attackerPoint));
+						for (var j = 0; j < adjacentPoints.length; j++) {
+							if (this.board.getValidAdjacentPoints(adjacentPoints[j]).length >= 6) {
+								otherAttackers.push(adjacentPoints[j].getNotationPointString());
+							}
+						}
+					}
+					attackersPoints = attackersPoints.concat(otherAttackers);
 					break;
 				default:
 					debug("Unknown board setup code for " + HexentaflVars.ATTACKERS_PLAYER);
