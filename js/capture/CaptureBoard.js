@@ -878,7 +878,31 @@ CaptureBoard.prototype.playerCanStillCapture = function(playerTiles, opponentTil
 	return canCaptureSomething;
 };
 
+CaptureBoard.prototype.getTilesPlayerCanCapture = function(playerTiles, opponentTiles) {
+	// For each player tile, check how many opponent's tiles can be captured
+	var capturesPossible = [];
+
+	playerTiles.forEach(
+		function(playerTile) {
+			opponentTiles.forEach(
+				function(opponentTile) {
+					if (!capturesPossible.includes(opponentTile) 
+							&& playerTile.canCapture(opponentTile)) {
+						capturesPossible.push(opponentTile);
+					}
+				}
+			);
+		}
+	);
+
+	return capturesPossible;
+};
+
 CaptureBoard.prototype.checkForEndOfGame = function() {
+	if (this.winners.length > 0) {
+		return;
+	}
+
 	// Check each player's tiles remaining on the board. All gone? No more captures possible?
 	var hostTiles = this.getPlayerTilesOnBoard(HOST);
 	var guestTiles = this.getPlayerTilesOnBoard(GUEST);
@@ -901,6 +925,24 @@ CaptureBoard.prototype.checkForEndOfGame = function() {
 			}
 		} else {
 			// Host or Guest can still capture
+			// Count how many tiles each player can capture
+			var tilesHostCanCapture = this.getTilesPlayerCanCapture(hostTiles, guestTiles);
+			var tilesGuestCanCapture = this.getTilesPlayerCanCapture(guestTiles, hostTiles);
+
+			var minHostTilesLeft = hostTiles.length - tilesGuestCanCapture.length;
+			var minGuestTilesLeft = guestTiles.length - tilesHostCanCapture.length;
+
+			/* If a player is guaranteed to have (minTilesLeft) more tiles than other player 
+			 * can possibly ever have (max, or, tiles.length), that player wins
+			 */
+			// Does Host fit this condition?
+			if (minHostTilesLeft > guestTiles.length) {
+				this.winners.push(HOST);
+			}
+			// Guest?
+			if (minGuestTilesLeft > hostTiles.length) {
+				this.winners.push(GUEST);
+			}
 		}
 	}
 };
