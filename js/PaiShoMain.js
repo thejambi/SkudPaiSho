@@ -34,6 +34,7 @@ var QueryString = function () {
 var gameController;
 
 var localEmailKey = "localUserEmail";
+
 var tileDesignTypeKey = "tileDesignTypeKey";
 var tileDesignTypeValues = {
 	hlowe: "hlowe",
@@ -45,6 +46,12 @@ var tileDesignTypeValues = {
 	pixelsho2: "pixelsho2",
 	xiangqi: "xiangqi"
 }
+
+var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
+var paiShoBoardDesignTypeValues = {
+	default: "default",
+	mayfair: "mayfair"
+};
 
 function getTileDesignTypeDisplayName(tileDesignTypeKey) {
 	switch (tileDesignTypeKey) {
@@ -524,6 +531,30 @@ function startWatchingGameRealTime() {
 	gameWatchIntervalValue = setInterval(function() {
 		gameWatchPulse();
 	}, REAL_TIME_GAME_WATCH_INTERVAL);
+}
+
+/* Pai Sho Board Switches */
+function setPaiShoBoardOption(newPaiShoBoardKey) {
+	var oldClassName = paiShoBoardKey + "Board";
+	gameContainerDiv.classList.remove(oldClassName);
+	localStorage.setItem(paiShoBoardDesignTypeKey, newPaiShoBoardKey);
+	paiShoBoardKey = newPaiShoBoardKey;
+	var newClassName = paiShoBoardKey + "Board";
+	gameContainerDiv.classList.add(newClassName);
+	clearMessage(); // Refresh Help tab text
+}
+
+function togglePaiShoBoardDesigns() {
+	var newPaiShoBoardKey = paiShoBoardDesignTypeValues.default;
+	switch (paiShoBoardKey) {
+		case paiShoBoardDesignTypeValues.default:
+			newPaiShoBoardKey = paiShoBoardDesignTypeValues.mayfair;
+			break;
+		case paiShoBoardDesignTypeValues.mayfair:
+			newPaiShoBoardKey = paiShoBoardDesignTypeValues.default;
+			break;
+	}
+	setPaiShoBoardOption(newPaiShoBoardKey);
 }
 
 /* Skud Pai Sho Tile Design Switches */
@@ -1128,7 +1159,8 @@ function setMessage(msg) {
 }
 
 function getAltTilesOptionText() {
-	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.<br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "</p>";
+	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.<br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "</p>"
+		+ "<p><span class='skipBonus' onclick='togglePaiShoBoardDesigns();'>Click here</span> to switch between board designs for Pai Sho.</p>";	// TODO: add: <br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "
 }
 
 function getAltVagabondTilesOptionText() {
