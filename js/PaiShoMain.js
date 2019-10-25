@@ -52,7 +52,8 @@ var paiShoBoardDesignTypeValues = {
 	default: "default",
 	mayfair: "mayfair",
 	vescucci: "vescucci",
-	xiangqi: "xiangqi"
+	xiangqi: "xiangqi",
+	pixelsho: "pixelsho"
 };
 
 function getTileDesignTypeDisplayName(tileDesignTypeKey) {
@@ -565,6 +566,9 @@ function togglePaiShoBoardDesigns() {
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.xiangqi;
 			break;
 		case paiShoBoardDesignTypeValues.xiangqi:
+			newPaiShoBoardKey = paiShoBoardDesignTypeValues.pixelsho;
+			break;
+		case paiShoBoardDesignTypeValues.pixelsho:
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.default;
 			break;
 	}

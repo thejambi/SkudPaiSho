@@ -299,16 +299,23 @@ body.darkMode .bg-svg {
 .game-container.pixelsho2 .bg-svg {
   background-image: url(pixelshoboard2.png);
 }
-.game-container.vescucci .bg-svg,
-.game-container.vescucciBoard .bg-svg {
+.game-container.vescucci .bg-svg {
   background-image: url(vescucciboard.png);
 }
-.game-container.xiangqi .bg-svg,
-.game-container.xiangqiBoard .bg-svg {
+.game-container.xiangqi .bg-svg {
   background-image: url(xiangqiboard.svg);
 }
 .game-container.mayfairBoard .bg-svg {
   background-image: url(board_mayfair.png);
+}
+.game-container.vescucciBoard .bg-svg {
+  background-image: url(vescucciboard.png);
+}
+.game-container.xiangqiBoard .bg-svg {
+  background-image: url(xiangqiboard.svg);
+}
+.game-container.pixelshoBoard .bg-svg {
+  background-image: url(pixelshoboard.png);
 }
 
 figure > div {
