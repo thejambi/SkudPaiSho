@@ -50,7 +50,9 @@ var tileDesignTypeValues = {
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
 var paiShoBoardDesignTypeValues = {
 	default: "default",
-	mayfair: "mayfair"
+	mayfair: "mayfair",
+	vescucci: "vescucci",
+	xiangqi: "xiangqi"
 };
 
 function getTileDesignTypeDisplayName(tileDesignTypeKey) {
@@ -182,6 +184,12 @@ window.requestAnimationFrame(function () {
 		} else {
 			setSkudTilesOption(localStorage.getItem(tileDesignTypeKey));
 		}
+	}
+
+	if (localStorage.getItem(paiShoBoardDesignTypeKey)) {
+		setPaiShoBoardOption(localStorage.getItem(paiShoBoardDesignTypeKey));
+	} else {
+		setPaiShoBoardOption(paiShoBoardDesignTypeValues.mayfair);
 	}
 
 	if (!localStorage.getItem(vagabondTileDesignTypeKey)) {
@@ -551,6 +559,12 @@ function togglePaiShoBoardDesigns() {
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.mayfair;
 			break;
 		case paiShoBoardDesignTypeValues.mayfair:
+			newPaiShoBoardKey = paiShoBoardDesignTypeValues.vescucci;
+			break;
+		case paiShoBoardDesignTypeValues.vescucci:
+			newPaiShoBoardKey = paiShoBoardDesignTypeValues.xiangqi;
+			break;
+		case paiShoBoardDesignTypeValues.xiangqi:
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.default;
 			break;
 	}
