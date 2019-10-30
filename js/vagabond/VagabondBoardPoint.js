@@ -91,15 +91,6 @@ VagabondBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	return false;
 };
 
-VagabondBoardPoint.prototype.betweenPlayerHarmony = function(player) {
-	if (player === GUEST) {
-		return this.betweenHarmonyGuest;
-	} else if (player === HOST) {
-		return this.betweenHarmonyHost;
-	}
-	return false;
-};
-
 VagabondBoardPoint.prototype.getCopy = function() {
 	var copy = new VagabondBoardPoint();
 

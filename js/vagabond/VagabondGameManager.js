@@ -1,6 +1,7 @@
 // Vagabond Game Manager
 
 function VagabondGameManager(actuator, ignoreActuate, isCopy) {
+	this.gameLogText = '';
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;
@@ -27,6 +28,7 @@ VagabondGameManager.prototype.actuate = function () {
 		return;
 	}
 	this.actuator.actuate(this.board, this.tileManager);
+	setGameLogText(this.gameLogText);
 };
 
 VagabondGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -35,10 +37,13 @@ VagabondGameManager.prototype.runNotationMove = function(move, withActuate) {
 	if (move.moveType === DEPLOY) {
 		// Just placing tile on board
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
-
 		this.board.placeTile(tile, move.endPoint);
+
+		this.buildDeployGameLogText(move, tile);
 	} else if (move.moveType === MOVE) {
-		this.board.moveTile(move.player, move.startPoint, move.endPoint);
+		var moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint);
+
+		this.buildMoveGameLogText(move, moveDetails);
 	}
 
 	if (move.moveType === DRAW_ACCEPT) {
@@ -47,6 +52,16 @@ VagabondGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 	if (withActuate) {
 		this.actuate();
+	}
+};
+
+VagabondGameManager.prototype.buildDeployGameLogText = function(move, tile) {
+	this.gameLogText = move.player + ' placed ' + VagabondTile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
+};
+VagabondGameManager.prototype.buildMoveGameLogText = function(move, moveDetails) {
+	this.gameLogText = move.player + ' moved ' + VagabondTile.getTileName(moveDetails.movedTile.code) + ' from ' + move.startPoint.pointText + ' to ' + move.endPoint.pointText;
+	if (moveDetails.capturedTile) {
+		this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ' + VagabondTile.getTileName(moveDetails.capturedTile.code);
 	}
 };
 

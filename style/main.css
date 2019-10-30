@@ -212,6 +212,13 @@ body.darkMode #replayControls {
   padding: 4px;
 }
 
+#replayControls .gameLogText {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  width: 95%;
+}
+
 .replayControlsCloseButton {
   color: #aaa;
   float: right;

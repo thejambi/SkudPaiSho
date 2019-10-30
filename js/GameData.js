@@ -71,6 +71,10 @@ function debug(str) {
     }
 }
 
+function masterDebug(str) {
+  console.log(str);
+}
+
 // Tile Types
 
 var BASIC_FLOWER = "Basic Flower";

@@ -1,6 +1,14 @@
 // Tile
 
-var tileId = 1;
+var VagabondTileCodes = {
+	SkyBison: 'S',
+	Badgermole: 'B',
+	Wheel: 'W',
+	Chrysanthemum: 'C',
+	FireLily: 'F',
+	Dragon: 'D',
+	Lotus: 'L'
+}
 
 function VagabondTile(code, ownerCode) {
 	this.code = code;

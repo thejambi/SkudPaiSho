@@ -120,14 +120,6 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 		theDiv.classList.add("vagabondPointRotate");
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
-		} else if (boardPoint.betweenHarmony) {
-			theDiv.classList.add("betweenHarmony");
-			if (boardPoint.betweenHarmonyHost) {
-				theDiv.classList.add("bhHost");
-			}
-			if (boardPoint.betweenHarmonyGuest) {
-				theDiv.classList.add("bhGuest");
-			}
 		}
 		
 		if (this.mobile) {
@@ -171,7 +163,6 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 };
 
 VagabondActuator.prototype.printBoard = function(board) {
-
 	debug("");
 	var rowNum = 0;
 	board.cells.forEach(function (row) {

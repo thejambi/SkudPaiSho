@@ -3253,3 +3253,6 @@ function setUserGamePreference(preferenceKey, value) {
 	}
 }
 
+function setGameLogText(text) {
+	document.getElementById('gameLogText').innerText = text;
+}

@@ -457,9 +457,18 @@ VagabondBoard.prototype.moveTile = function(player, notationPointStart, notation
 		this.winners.push(tile.ownerName);
 	}
 
+	var capturedTile = boardPointEnd.tile;
+
 	boardPointEnd.putTile(tile);
 
 	this.setPointFlags();
+
+	return {
+		movedTile: tile,
+		startPoint: boardPointStart,
+		endPoint: boardPointEnd,
+		capturedTile: capturedTile
+	}
 };
 
 VagabondBoard.prototype.setPointFlags = function() {
