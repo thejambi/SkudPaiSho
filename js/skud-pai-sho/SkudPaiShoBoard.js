@@ -855,6 +855,7 @@ SkudPaiShoBoard.prototype.moveTile = function(player, notationPointStart, notati
 	}
 
 	var tile = boardPointStart.removeTile();
+	var capturedTile = boardPointEnd.tile;
 
 	if (!tile) {
 		debug("Error: No tile to move!");
@@ -871,7 +872,13 @@ SkudPaiShoBoard.prototype.moveTile = function(player, notationPointStart, notati
 	this.flagAllTrappedAndDrainedTiles();
 
 	// Check for harmonies
-	return this.hasNewHarmony(player, tile, startRowCol, endRowCol);
+	var newHarmony = this.hasNewHarmony(player, tile, startRowCol, endRowCol);
+
+	return {
+		bonusAllowed: newHarmony,
+		movedTile: tile,
+		capturedTile: capturedTile
+	}
 };
 
 SkudPaiShoBoard.prototype.flagAllTrappedAndDrainedTiles = function() {

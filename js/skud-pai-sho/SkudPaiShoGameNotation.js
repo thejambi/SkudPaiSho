@@ -24,6 +24,7 @@ SkudPaiShoNotationMove.prototype.analyzeMove = function() {
 	}
 
 	var moveText = parts[1];
+	this.moveTextOnly = moveText;
 
 	// If no move text, ignore and move on to next
 	if (!moveText) {

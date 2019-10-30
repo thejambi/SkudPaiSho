@@ -1,6 +1,7 @@
 // Skud Pai Sho Game Manager
 
 function SkudPaiShoGameManager(actuator, ignoreActuate, isCopy) {
+	this.gameLogText = '';
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;
@@ -13,7 +14,6 @@ function SkudPaiShoGameManager(actuator, ignoreActuate, isCopy) {
 
 // Set up the game
 SkudPaiShoGameManager.prototype.setup = function (ignoreActuate) {
-
 	this.board = new SkudPaiShoBoard();
 
 	// Update the actuator
@@ -28,6 +28,7 @@ SkudPaiShoGameManager.prototype.actuate = function () {
 		return;
 	}
 	this.actuator.actuate(this.board, this.tileManager);
+	setGameLogText(this.gameLogText);
 };
 
 SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -49,6 +50,8 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
 			self.tileManager.grabTile(move.player, tileCode);
 		});
 		self.tileManager.unselectTiles(move.player);
+
+		this.buildChooseAccentTileGameLogText(move);
 	} else if (move.moveNum === 1) {
 		this.tileManager.unselectTiles(GUEST);
 		this.tileManager.unselectTiles(HOST);
@@ -66,20 +69,25 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
 		var tile = this.tileManager.grabTile(move.player, move.plantedFlowerType);
 
 		this.board.placeTile(tile, move.endPoint, this.tileManager);
-	} else if (move.moveType === ARRANGING) {
-		bonusAllowed = this.board.moveTile(move.player, move.startPoint, move.endPoint);
 
-		if (bonusAllowed && move.hasHarmonyBonus()) {
+		this.buildPlantingGameLogText(move, tile);
+	} else if (move.moveType === ARRANGING) {
+		moveResults = this.board.moveTile(move.player, move.startPoint, move.endPoint);
+		bonusAllowed = moveResults.bonusAllowed;
+
+		if (moveResults.bonusAllowed && move.hasHarmonyBonus()) {
 			var tile = this.tileManager.grabTile(move.player, move.bonusTileCode);
 			if (move.boatBonusPoint) {
 				this.board.placeTile(tile, move.bonusEndPoint, this.tileManager, move.boatBonusPoint);
 			} else {
 				this.board.placeTile(tile, move.bonusEndPoint, this.tileManager);
 			}
-		} else if (!bonusAllowed && move.hasHarmonyBonus()) {
+		} else if (!moveResults.bonusAllowed && move.hasHarmonyBonus()) {
 			debug("BONUS NOT ALLOWED so I won't give it to you!");
 			errorFound = true;
 		}
+
+		this.buildArrangingGameLogText(move, moveResults);
 	}
 
 	if (withActuate) {
@@ -113,6 +121,22 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	return bonusAllowed;
+};
+
+SkudPaiShoGameManager.prototype.buildChooseAccentTileGameLogText = function(move) {
+	this.gameLogText = move.player + ' chose Accent Tiles ' + move.accentTiles;
+};
+SkudPaiShoGameManager.prototype.buildPlantingGameLogText = function(move, tile) {
+	this.gameLogText = move.player + ' Planted ' + tile.getName() + ' at ' + move.endPoint.pointText;
+};
+SkudPaiShoGameManager.prototype.buildArrangingGameLogText = function(move, moveResults) {
+	this.gameLogText = move.player + ' moved ' + moveResults.movedTile.getName() + ' ' + move.moveTextOnly;
+	if (moveResults.capturedTile) {
+		this.gameLogText += ' to capture ' + getOpponentName(move.player) + '\'s ' + moveResults.capturedTile.getName();
+	}
+	if (moveResults.bonusAllowed && move.hasHarmonyBonus()) {
+		this.gameLogText += ' and use ' + SkudPaiShoTile.getTileName(move.bonusTileCode) + ' on Harmony Bonus';
+	}
 };
 
 SkudPaiShoGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
