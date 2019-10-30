@@ -213,10 +213,8 @@ body.darkMode #replayControls {
 }
 
 #replayControls .gameLogText {
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  width: 95%;
+  width: 38%;
+  float: left;
 }
 
 .replayControlsCloseButton {
@@ -1106,6 +1104,14 @@ body.darkMode textarea {
 
   .footer {
     /*border-top: 1px solid #776e65;*/
+  }
+
+  /* Show gameLogText above replay controls */
+  #replayControls .gameLogText {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 95%;
   }
 }
 
