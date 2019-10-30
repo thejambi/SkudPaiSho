@@ -135,7 +135,7 @@ SkudPaiShoGameManager.prototype.buildArrangingGameLogText = function(move, moveR
 		this.gameLogText += ' to capture ' + getOpponentName(move.player) + '\'s ' + moveResults.capturedTile.getName();
 	}
 	if (moveResults.bonusAllowed && move.hasHarmonyBonus()) {
-		this.gameLogText += ' and use ' + SkudPaiShoTile.getTileName(move.bonusTileCode) + ' on Harmony Bonus';
+		this.gameLogText += ' and used ' + SkudPaiShoTile.getTileName(move.bonusTileCode) + ' on Harmony Bonus';
 	}
 };
 
