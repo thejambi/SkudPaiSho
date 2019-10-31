@@ -110,7 +110,7 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 		msg += " then Plant a Basic Flower Tile."
 	} else if (this.gameNotation.moves.length === 2) {
 		msg += "Plant a Basic Flower Tile.";
-	} else if (this.gameNotation.moves.length === 4) {
+	} else if (!gameOptionEnabled(OPTION_INFORMAL_START) && this.gameNotation.moves.length === 4) {
 		msg += "Now, make the first move of the game.";
 	}
 
@@ -321,7 +321,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 			var bonusAllowed = this.theGame.runNotationMove(move);
 
-			if (this.gameNotation.moves.length === 2) {
+			if (!gameOptionEnabled(OPTION_INFORMAL_START) && this.gameNotation.moves.length === 2) {
 				// Host auto-copies Guest's first Plant
 				this.gameNotation.addMove(move);
 				var hostMoveBuilder = this.notationBuilder.getFirstMoveForHost(this.notationBuilder.plantedFlowerType);

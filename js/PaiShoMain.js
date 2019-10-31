@@ -279,7 +279,7 @@ window.requestAnimationFrame(function () {
 	// Open default help/chat tab
 	document.getElementById("defaultOpenTab").click();
 
-	if (!QueryString.game && (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn())) {
+	if (!debugOn && !QueryString.game && (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn())) {
 		showWelcomeTutorial();
 	}
 });
@@ -1563,6 +1563,7 @@ var GameType = {
 		desc: "Skud Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/", 
 		gameOptions: [
+			OPTION_INFORMAL_START,
 			OPTION_DOUBLE_ACCENT_TILES, 
 			OPTION_ANCIENT_OASIS_EXPANSION
 		]
@@ -1636,7 +1637,7 @@ var GameType = {
 	// 	desc: "Pai and Sho's Trifle",
 	// 	rulesUrl: "https://skudpaisho.com/site/games/pai-shos-trifle/",
 	// 	gameOptions: []
-	// }
+	// },
 	Hexentafl: {
 		id: 11,
 		desc: "heXentafl",
@@ -2334,7 +2335,11 @@ function randomIntFromInterval(min, max) {
 }
 
 function closeGame() {
-	setGameController(randomIntFromInterval(1,2));
+	if (debugOn) {
+		setGameController(GameType.SkudPaiSho.id);
+	} else {
+		setGameController(randomIntFromInterval(1,2));
+	}
 }
 
 function getSidenavNewGameEntryForGameType(gameType) {

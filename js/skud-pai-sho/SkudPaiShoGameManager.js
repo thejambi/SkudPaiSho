@@ -159,7 +159,7 @@ SkudPaiShoGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate)
 };
 
 SkudPaiShoGameManager.prototype.revealOpenGates = function(player, tile, moveNum, ignoreActuate) {
-	if (moveNum === 2) {
+	if (!gameOptionEnabled(OPTION_INFORMAL_START) && moveNum === 2) {
 		// guest selecting first tile
 		this.board.setGuestGateOpen();
 	} else {
