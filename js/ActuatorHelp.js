@@ -117,6 +117,6 @@ function setupPaiShoBoard(gameContainer,
 }
 
 function getSkudTilesSrcPath() {
-	var srcValue = "images/" + skudTilesKey + "/";
+	var srcValue = "images/SkudPaiSho/" + skudTilesKey + "/";
 	return srcValue;
 }
