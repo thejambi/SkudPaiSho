@@ -34,6 +34,7 @@ html.darkMode, body.darkMode {
   margin-bottom: 40px;
 	text-align: left;
   max-width: 612px;
+  min-height: 200px;
 }
 
 .heading:after {
