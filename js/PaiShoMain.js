@@ -1697,6 +1697,7 @@ function getGameControllerForGameType(gameTypeId) {
 	return controller;
 }
 function setGameController(gameTypeId, keepGameOptions) {
+	setGameLogText('');
 	var successResult = true;
 	// Previous game controller cleanup
 	if (gameController) {
@@ -3254,5 +3255,9 @@ function setUserGamePreference(preferenceKey, value) {
 }
 
 function setGameLogText(text) {
-	document.getElementById('gameLogText').innerText = text;
+	var newText = '';
+	if (text) {
+		newText = text;
+	}
+	document.getElementById('gameLogText').innerText = newText;
 }
