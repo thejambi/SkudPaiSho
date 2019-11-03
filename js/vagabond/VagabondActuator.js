@@ -88,7 +88,7 @@ VagabondActuator.prototype.addTile = function(tile, mainContainer) {
 
 	var theImg = document.createElement("img");
 
-	var srcValue = "vagabond/images/";
+	var srcValue = "images/Vagabond/";
 	if (useDeLionTiles) {
 		srcValue += "delion/";
 	}
@@ -136,7 +136,7 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 		
 		var theImg = document.createElement("img");
 
-		var srcValue = "vagabond/images/";
+		var srcValue = "images/Vagabond/";
 		if (useDeLionTiles) {
 			srcValue += "delion/";
 		}
