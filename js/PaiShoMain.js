@@ -728,6 +728,9 @@ function playNextMove(withActuate) {
 		isInReplay = true;
 		gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate);
 		currentMoveIndex++;
+		if (currentMoveIndex >= gameController.gameNotation.moves.length) {
+			isInReplay = false;
+		}
 		if (withActuate) {
 			refreshMessage();	// Adding this so it updates during replay... Is this the right spot?
 		}
@@ -2335,11 +2338,11 @@ function randomIntFromInterval(min, max) {
 }
 
 function closeGame() {
-	if (debugOn) {
-		setGameController(GameType.SkudPaiSho.id);
-	} else {
+	// if (debugOn) {
+	// 	setGameController(GameType.Trifle.id);
+	// } else {
 		setGameController(randomIntFromInterval(1,2));
-	}
+	// }
 }
 
 function getSidenavNewGameEntryForGameType(gameType) {
