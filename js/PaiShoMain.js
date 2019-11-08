@@ -1635,12 +1635,12 @@ var GameType = {
 		]
 	},
 	// ,
-	// Trifle: {
-	// 	id: 10,
-	// 	desc: "Pai and Sho's Trifle",
-	// 	rulesUrl: "https://skudpaisho.com/site/games/pai-shos-trifle/",
-	// 	gameOptions: []
-	// },
+	Trifle: {
+		id: 10,
+		desc: "Pai and Sho's Trifle",
+		rulesUrl: "https://skudpaisho.com/site/games/pai-shos-trifle/",
+		gameOptions: []
+	},
 	Hexentafl: {
 		id: 11,
 		desc: "heXentafl",
@@ -1688,9 +1688,9 @@ function getGameControllerForGameType(gameTypeId) {
 		case GameType.Blooms.id:
 			controller = new BloomsController(gameContainerDiv, isMobile);
 			break;
-		// case GameType.Trifle.id:
-		// 	controller = new TrifleController(gameContainerDiv, isMobile);
-		// 	break;
+		case GameType.Trifle.id:
+			controller = new TrifleController(gameContainerDiv, isMobile);
+			break;
 		case GameType.Hexentafl.id:
 			controller = new HexentaflController(gameContainerDiv, isMobile);
 			break;
@@ -2338,11 +2338,11 @@ function randomIntFromInterval(min, max) {
 }
 
 function closeGame() {
-	// if (debugOn) {
-	// 	setGameController(GameType.Trifle.id);
-	// } else {
+	if (debugOn) {
+		setGameController(GameType.Trifle.id);
+	} else {
 		setGameController(randomIntFromInterval(1,2));
-	// }
+	}
 }
 
 function getSidenavNewGameEntryForGameType(gameType) {

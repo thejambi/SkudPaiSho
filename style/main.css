@@ -1126,6 +1126,7 @@ body.darkMode textarea {
 
   .hostTilesContainer, .guestTilesContainer {
     margin-left: 9.3vw;
+    width: 37%;
   }
 
   .tilePileContainer div {

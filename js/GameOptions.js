@@ -25,6 +25,7 @@ var OPTION_ATTACKERS_MOVE_FIRST = "Host plays as attackers";
 var KING_MOVES_LIKE_PAWNS = "King moves like pawns";
 var MORE_ATTACKERS = "More Attackers!";
 
+
 function gameOptionEnabled(optionName) {
 	return ggOptions.includes(optionName);
 }

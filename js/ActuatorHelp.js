@@ -59,8 +59,6 @@ function setupPaiShoBoard(gameContainer,
 	removeChildren(gameContainer);
 
 	var boardContainer = createDivWithClass("pointContainer");
-	var hostTilesContainer = createDivWithClass("hostTilesContainer");
-	var guestTilesContainer = createDivWithClass("guestTilesContainer");
 
 	var bcontainer = createDivWithClass("board-container");
 	var svgContainer = createDivWithClass("svgContainer");
@@ -79,7 +77,9 @@ function setupPaiShoBoard(gameContainer,
 	var response = createDivWithId("response");
 	var gameMessage = createDivWithClass("gameMessage");
 	var hostTilesContainer = createDivWithClass("hostTilesContainer");
+	hostTilesContainer.id = "hostTilesContainer";
 	var guestTilesContainer = createDivWithClass("guestTilesContainer");
+	guestTilesContainer.id = "guestTilesContainer";
 	var tilePileContainer = createDivWithClass("tilePileContainer");
 	tilePileContainer.classList.add("PaiSho");
 	var gameMessage2 = createDivWithClass("gameMessage2");
