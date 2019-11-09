@@ -937,11 +937,10 @@ TrifleBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
 };
 
 TrifleBoard.prototype.setPossibleMovesForMovement = function(movementInfo, boardPointStart) {
-	var isImmobilized = this.tileMovementIsImmobilized(movementInfo, boardPointStart);
+	var isImmobilized = this.tileMovementIsImmobilized(boardPointStart.tile, movementInfo, boardPointStart);
 	if (!isImmobilized) {
 		if (movementInfo.type === MovementType.standard) {
 			/* Standard movement, moving and turning as you go */
-			// this.setPossibleStandardMovementPoints(boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance);
 			this.setPossibleMovementPoints(TrifleBoard.standardMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, boardPointStart, movementInfo.distance);
 		} else if (movementInfo.type === MovementType.diagonal) {
 			/* Diagonal movement, jumping across the lines up/down/left/right as looking at the board */
@@ -957,15 +956,15 @@ TrifleBoard.diagonalMovementFunction = function(board, originPoint, boardPointAl
 	return board.getAdjacentDiagonalPoints(boardPointAlongTheWay, originPoint);
 };
 
-TrifleBoard.prototype.setPossibleMovementPoints = function(nextPossibleMovementPointsFunction, tile, movementInfo, originPoint, boardPointStart, distanceRemaining) {
+TrifleBoard.prototype.setPossibleMovementPoints = function(nextPossibleMovementPointsFunction, tile, movementInfo, originPoint, recentPoint, distanceRemaining) {
 	if (distanceRemaining === 0) {
 		return;	// Complete
 	}
 
 	var self = this;
-	nextPossibleMovementPointsFunction(self, originPoint, boardPointStart).forEach(function(adjacentPoint) {
+	nextPossibleMovementPointsFunction(self, originPoint, recentPoint).forEach(function(adjacentPoint) {
 		if (!self.canMoveHereMoreEfficientlyAlready(adjacentPoint, distanceRemaining)) {
-			if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint)) {
+			if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint)) {
 				adjacentPoint.addType(POSSIBLE_MOVE);
 				adjacentPoint.standardMoveDistanceRemaining = distanceRemaining;
 				self.setPossibleMovementPoints(nextPossibleMovementPointsFunction, 
@@ -979,14 +978,14 @@ TrifleBoard.prototype.setPossibleMovementPoints = function(nextPossibleMovementP
 	});
 };
 
-TrifleBoard.prototype.tileMovementIsImmobilized = function(movementInfo, boardPointStart) {
+TrifleBoard.prototype.tileMovementIsImmobilized = function(tile, movementInfo, boardPointStart) {
 	var isImmobilized = false;
-	if (movementInfo.restrictions) {
+	if (tile && movementInfo.restrictions) {
 		var self = this;
 		movementInfo.restrictions.forEach(function(movementRestriction) {
 			if (movementRestriction.type === MovementRestriction.immobilizedByOpponentTileZones) {
 				movementRestriction.affectingTiles.forEach(function(affectingTileCode) {
-					isImmobilized = self.pointIsInOpponentTileZone(boardPointStart, boardPointStart.tile.ownerName, affectingTileCode);
+					isImmobilized = self.pointIsInOpponentTileZone(boardPointStart, tile.ownerName, affectingTileCode);
 				});
 			}
 		});
@@ -1024,32 +1023,16 @@ TrifleBoard.prototype.getTilePoints = function(tileCode, ownerName) {
 	return points;
 };
 
-TrifleBoard.prototype.setPossibleStandardMovementPoints = function(tile, movementInfo, boardPointStart, distanceRemaining) {
-	if (distanceRemaining === 0) {
-		return;	// Complete
-	}
-
-	var self = this;
-	this.getAdjacentPoints(boardPointStart).forEach(function(adjacentPoint) {
-		if (!self.canMoveHereMoreEfficientlyAlready(adjacentPoint, distanceRemaining)) {
-			if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint)) {
-				adjacentPoint.addType(POSSIBLE_MOVE);
-				adjacentPoint.standardMoveDistanceRemaining = distanceRemaining;
-				self.setPossibleStandardMovementPoints(tile, movementInfo, adjacentPoint, distanceRemaining - 1);
-			}
-		}
-	});
-};
-
 TrifleBoard.prototype.canMoveHereMoreEfficientlyAlready = function(boardPoint, distanceRemaining) {
 	return boardPoint.isType(POSSIBLE_MOVE)
 		&& boardPoint.standardMoveDistanceRemaining > distanceRemaining;
 };
 
-TrifleBoard.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targetPoint) {
+TrifleBoard.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targetPoint, fromPoint) {
 	var tileInfo = TrifleTiles[tile.code];
 	return !targetPoint.hasTile()
-		&& !this.tileZonedOutOfSpace(tile, movementInfo, targetPoint);
+		&& !this.tileZonedOutOfSpace(tile, movementInfo, targetPoint)
+		&& !this.tileMovementIsImmobilized(tile, movementInfo, fromPoint);
 };
 
 TrifleBoard.prototype.tileZonedOutOfSpace = function(tile, movementInfo, targetPoint) {
