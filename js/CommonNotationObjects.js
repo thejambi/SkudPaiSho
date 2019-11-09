@@ -10,6 +10,8 @@ var ARRANGING = "Arranging";
 var DEPLOY = "Deploy";
 var MOVE = "Move";
 
+var TEAM_SELECTION = "Team Selection";
+
 var INITIAL_SETUP = "Initial Setup";
 // -----------------------------
 

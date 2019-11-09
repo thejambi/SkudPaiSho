@@ -26,7 +26,8 @@ var MovementType = {
 
 var MovementRestriction = {
 	restrictedByOpponentTileZones: "restrictedByOpponentTileZones",
-	immobilizedByAdjacentOpponentTile: "immobilizedByAdjacentOpponentTile"
+	immobilizedByAdjacentOpponentTile: "immobilizedByAdjacentOpponentTile",
+	immobilizedByOpponentTileZones: "immobilizedByOpponentTileZones"
 };
 
 var MovementAbility = {
@@ -53,12 +54,12 @@ TrifleTileManager.defineTrifleTiles = function() {
 	/**
 	 TrifleTiles[TrifleTileCodes.TEMPLATE] = {
 	 * 	types: [TileType.?]
-	 * 	captureTypes: [ CaptureType.?, ... ],
 	 * 	deployTypes: [ DeployType.?, ... ],
 	 * 	movements: [
 	 * 		{
 	 * 			type: MovementType.?,
 	 * 			distance: *number value*,
+	 * 			captureTypes: [CaptureType.?, ...],
 	 * 			restrictions: [
 	 * 				{
 	 * 					type: MovementRestriction.?,
@@ -80,7 +81,6 @@ TrifleTileManager.defineTrifleTiles = function() {
 	/* Vagabond Tiles */
 	TrifleTiles[TrifleTileCodes.Lotus] = {
 		types: [TileType.banner, TileType.flower],
-		captureTypes: [ CaptureType.none ],
 		deployTypes: [ DeployType.anywhere ],
 		movements: [
 			{
@@ -92,19 +92,19 @@ TrifleTileManager.defineTrifleTiles = function() {
 
 	TrifleTiles[TrifleTileCodes.SkyBison] = {
 		types: [TileType.animal],
-		captureTypes: [ CaptureType.all ],
 		deployTypes: [ DeployType.temple ],
 		movements: [
 			{
 				type: MovementType.standard,
 				distance: 6,
+				captureTypes: [ CaptureType.all ],
 				restrictions: [
 					{
 						type: MovementRestriction.restrictedByOpponentTileZones,
 						affectingTiles: [ TrifleTileCodes.SkyBison ]
 					},
 					{
-						type: MovementRestriction.immobilizedByAdjacentOpponentTile,
+						type: MovementRestriction.immobilizedByOpponentTileZones,
 						affectingTiles: [ TrifleTileCodes.Chrysanthemum ]
 					}
 				]
@@ -113,14 +113,20 @@ TrifleTileManager.defineTrifleTiles = function() {
 		territorialZoneSize: 6
 	};
 
+	TrifleTiles[TrifleTileCodes.Chrysanthemum] = {
+		types: [TileType.flower],
+		deployTypes: [DeployType.anywhere],
+		territorialZoneSize: 1
+	};
+
 	TrifleTiles[TrifleTileCodes.Wheel] = {
 		types: [TileType.other],
-		captureTypes: [ CaptureType.all ],
 		deployTypes: [ DeployType.anywhere ],
 		movements: [
 			{
 				type: MovementType.diagonal,
-				distance: 99
+				distance: 99,
+				captureTypes: [ CaptureType.all ]
 			}
 		]
 	};
@@ -129,7 +135,6 @@ TrifleTileManager.defineTrifleTiles = function() {
 	/* Air Tiles */
 	TrifleTiles[TrifleTileCodes.AirBanner] = {
 		types: [TileType.banner],
-		captureTypes: [ CaptureType.none ],
 		deployTypes: [ DeployType.anywhere ],
 		movements: [
 			{
@@ -141,7 +146,6 @@ TrifleTileManager.defineTrifleTiles = function() {
 
 	TrifleTiles[TrifleTileCodes.FlyingLemur] = {
 		types: [TileType.animal],
-		captureTypes: [ CaptureType.none ],
 		deployTypes: [ DeployType.anywhere ],
 		movements: [
 			{
@@ -159,12 +163,12 @@ TrifleTileManager.defineTrifleTiles = function() {
 
 	TrifleTiles[TrifleTileCodes.RingTailedLemur] = {
 		types: [TileType.animal],
-		captureTypes: [ CaptureType.all ],
 		deployTypes: [ DeployType.temple ],
 		movements: [
 			{
 				type: MovementType.standard,
 				distance: 5,
+				captureTypes: [ CaptureType.all ],
 				specialAbilities: [
 					{
 						type: MovementAbility.jumpOver
@@ -175,42 +179,14 @@ TrifleTileManager.defineTrifleTiles = function() {
 	};
 
 
+	TrifleTiles[TrifleTileCodes.MessengerHawk] = {
+		types: [TileType.animal],
+		deployTypes: [DeployType.anywhere, DeployType.temple],
+		movements: [{ type: MovementType.anywhere }]
+	};
+
+
 };
-
-// TrifleTileManager.prototype.loadTileSet = function(ownerCode) {
-// 	var tiles = [];
-
-// 	this.addTiles(tiles, ownerCode);
-
-// 	if (gameOptionEnabled(OPTION_DOUBLE_TILES)) {
-// 		this.addTiles(tiles, ownerCode);
-// 	}
-
-// 	// Only ever 1 Lotus tile
-// 	tiles.push(new TrifleTile('L', ownerCode));
-
-// 	return tiles;
-// };
-
-// TrifleTileManager.prototype.addTiles = function(tiles, ownerCode) {
-// 	// 2 of each of these tiles
-// 	var twoOfTheseTiles = [
-// 		TrifleTileCodes.SkyBison,
-// 		TrifleTileCodes.Badgermole,
-// 		TrifleTileCodes.Wheel,
-// 		TrifleTileCodes.Chrysanthemum
-// 	];
-// 	for (var i = 0; i < twoOfTheseTiles.length; i++) {
-// 		tiles.push(new TrifleTile(twoOfTheseTiles[i], ownerCode));
-// 		tiles.push(new TrifleTile(twoOfTheseTiles[i], ownerCode));
-// 	}
-
-// 	// 1 of each of these tiles
-// 	tiles.push(new TrifleTile(TrifleTileCodes.FireLily, ownerCode));
-// 	tiles.push(new TrifleTile(TrifleTileCodes.Dragon, ownerCode));
-
-// 	tiles.push(new TrifleTile(TrifleTileCodes.MessengerHawk, ownerCode));
-// };
 
 TrifleTileManager.prototype.grabTile = function(player, tileCode) {
 	var tilePile = this.hostTiles;

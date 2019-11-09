@@ -1,4 +1,6 @@
 
+var paiShoBoardMaxRowOrCol = 16;
+
 function PaiShoBoardHelper(boardPointClass, size) {
 	this.boardPointClass = boardPointClass;
 	this.size = size;
