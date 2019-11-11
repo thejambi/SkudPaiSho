@@ -5,6 +5,7 @@ var NEUTRAL = "Neutral";
 var RED = "Red";
 var WHITE = "White";
 var GATE = "Gate";
+var TEMPLE = GATE;
 
 var POSSIBLE_MOVE = "Possible Move";
 var OPEN_GATE = "OPEN GATE";

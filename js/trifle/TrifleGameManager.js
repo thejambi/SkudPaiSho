@@ -1,6 +1,7 @@
 // Trifle Game Manager
 
 function TrifleGameManager(actuator, ignoreActuate, isCopy) {
+	this.gameLogText = '';
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;
@@ -27,6 +28,7 @@ TrifleGameManager.prototype.actuate = function () {
 		return;
 	}
 	this.actuator.actuate(this.board, this.tileManager);
+	setGameLogText(this.gameLogText);
 };
 
 TrifleGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -38,17 +40,33 @@ TrifleGameManager.prototype.runNotationMove = function(move, withActuate) {
 			var tile = new TrifleTile(tileCode, move.playerCode);
 			self.tileManager.addToTeamIfOk(tile);
 		});
+		this.buildTeamSelectionGameLogText(move);
 	} else if (move.moveType === DEPLOY) {
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
 		this.board.placeTile(tile, move.endPoint);
+		this.buildDeployGameLogText(move, tile);
 	} else if (move.moveType === MOVE) {
-		this.board.moveTile(move.player, move.startPoint, move.endPoint);
+		var moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint);
+		this.buildMoveGameLogText(move, moveDetails);
 	} else if (move.moveType === DRAW_ACCEPT) {
 		this.gameHasEndedInDraw = true;
 	}
 
 	if (withActuate) {
 		this.actuate();
+	}
+};
+
+TrifleGameManager.prototype.buildTeamSelectionGameLogText = function(move) {
+	this.gameLogText = move.player + "'s team: " + move.teamTileCodes;
+};
+TrifleGameManager.prototype.buildDeployGameLogText = function(move, tile) {
+	this.gameLogText = move.player + ' placed ' + TrifleTile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
+};
+TrifleGameManager.prototype.buildMoveGameLogText = function(move, moveDetails) {
+	this.gameLogText = move.player + ' moved ' + TrifleTile.getTileName(moveDetails.movedTile.code) + ' from ' + move.startPoint.pointText + ' to ' + move.endPoint.pointText;
+	if (moveDetails.capturedTile) {
+		this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ' + TrifleTile.getTileName(moveDetails.capturedTile.code);
 	}
 };
 
@@ -111,7 +129,7 @@ TrifleGameManager.prototype.getWinner = function() {
 };
 
 TrifleGameManager.prototype.getWinReason = function() {
-	return " has captured the White Lotus and won the game!";
+	return " has captured the opponent's Banner Tile and won the game!";
 };
 
 TrifleGameManager.prototype.getWinResultTypeCode = function() {
