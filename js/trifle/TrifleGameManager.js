@@ -91,6 +91,11 @@ TrifleGameManager.prototype.addTileToTeam = function(tile) {
 	return this.tileManager.playerTeamIsFull(tile.ownerName);
 };
 
+TrifleGameManager.prototype.removeTileFromTeam = function(tile) {
+	this.tileManager.removeTileFromTeam(tile);
+	this.actuate();
+};
+
 TrifleGameManager.prototype.hasEnded = function() {
 	return this.getWinResultTypeCode() > 0;
 };

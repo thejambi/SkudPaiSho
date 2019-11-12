@@ -166,9 +166,9 @@ TrifleController.prototype.unplayedTileClicked = function(tileDiv) {
 	}
 
 	if (this.theGame.playersAreSelectingTeams()) {
+		var selectedTile = new TrifleTile(tileCode, playerCode);
 		if (tileDiv.classList.contains("selectedFromPile")) {
 			debug("You picked one for the team!");
-			var selectedTile = new TrifleTile(tileCode, playerCode);
 			var teamIsNowFull = this.theGame.addTileToTeam(selectedTile);
 			if (teamIsNowFull) {
 				debug("Gotta build notation");
@@ -179,6 +179,7 @@ TrifleController.prototype.unplayedTileClicked = function(tileDiv) {
 		} else {
 			// Need to remove from team instead
 			debug("You are removing one from your team :(");
+			this.theGame.removeTileFromTeam(selectedTile);
 		}
 	} else if (this.notationBuilder.status === BRAND_NEW) {
 		debug("Yes, begin deploying!");
@@ -234,21 +235,6 @@ TrifleController.prototype.pointClicked = function(htmlPoint) {
 
 			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
 				this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
-				
-				// var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-				// this.theGame.runNotationMove(move);
-
-				// // Move all set. Add it to the notation!
-				// this.gameNotation.addMove(move);
-				// if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-				// 	createGameIfThatIsOk(GameType.Trifle.id);
-				// } else {
-				// 	if (playingOnlineGame()) {
-				// 		callSubmitMove();
-				// 	} else {
-				// 		finalizeMove();
-				// 	}
-				// }
 				this.completeMove();
 			}
 		} else {

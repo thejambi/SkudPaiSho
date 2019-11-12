@@ -146,6 +146,14 @@ TrifleTileManager.prototype.addToTeamIfOk = function(tile) {
 	return addOk;
 };
 
+TrifleTileManager.prototype.removeTileFromTeam = function(tile) {
+	if (this.countOfThisTileInTeam(tile.code, tile.ownerName) > 0) {
+		var playerTeam = this.getPlayerTeam(tile.ownerName);
+		playerTeam.splice(playerTeam.indexOf(tile), 1);
+		this.grabTile(tile.ownerName, tile.code);
+	}
+};
+
 TrifleTileManager.prototype.countOfThisTileInTeam = function(tileCode, ownerName) {
 	var count = 0;
 	var ownerTeam = this.getPlayerTeam(ownerName);

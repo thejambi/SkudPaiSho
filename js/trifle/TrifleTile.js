@@ -8,10 +8,10 @@ var TrifleTileCodes = {
 	FireLily: 'F',
 	Dragon: 'D',
 	Lotus: 'L',
-	MessengerHawk: 'MH',
-	AirBanner: 'AB',
-	FlyingLemur: 'FLL',
-	RingTailedLemur: 'RTL'
+	MessengerHawk: 'MH' //,
+	// AirBanner: 'AB',
+	// FlyingLemur: 'FLL',
+	// RingTailedLemur: 'RTL'
 };
 
 function TrifleTile(code, ownerCode) {

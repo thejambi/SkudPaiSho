@@ -12,10 +12,16 @@ var DeployType = {
 	temple: "temple"
 };
 
+var SpecialDeployType = {
+	withinFriendlyTileZone: "withinFriendlyTileZone"
+};
+
 var MovementType = {
 	standard: "standard",
 	diagonal: "diagonal",
-	jumpAlongLineOfSight: "jumpAlongLineOfSight"
+	jumpAlongLineOfSight: "jumpAlongLineOfSight",
+	withinFriendlyTileZone: "withinFriendlyTileZone",
+	anywhere: "anywhere"
 };
 
 var MovementRestriction = {
@@ -187,7 +193,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		territorialZone: {
 			size: 1,
 			abilities: [
-				{	// TODO
+				{
 					type: ZoneAbility.protectFriendlyTilesFromCapture,
 					targetTileTypes: [TileType.flower, TileType.banner]
 				}
@@ -195,58 +201,92 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		}
 	};
 
+	TrifleTiles[TrifleTileCodes.FireLily] = {
+		types: [TileType.flower],
+		deployTypes: [DeployType.anywhere],
+		territorialZone: {
+			size: 5
+		}
+	};
+
+	TrifleTiles[TrifleTileCodes.Dragon] = {
+		types: [TileType.animal],
+		specialDeployTypes: [
+			{
+				type: SpecialDeployType.withinFriendlyTileZone,
+				targetTileCodes: [TrifleTileCodes.FireLily]
+			}
+		],
+		movements: [
+			{
+				type: MovementType.withinFriendlyTileZone,
+				targetTileCodes: [TrifleTileCodes.FireLily],
+				captureTypes: [CaptureType.all]
+			}
+		]
+	};
+
 
 	/* Air Tiles */
-	TrifleTiles[TrifleTileCodes.AirBanner] = {
-		types: [TileType.banner],
-		deployTypes: [ DeployType.anywhere ],
-		movements: [
-			{
-				type: MovementType.standard,
-				distance: 1
-			}
-		]
-	};
+	// TrifleTiles[TrifleTileCodes.AirBanner] = {
+	// 	types: [TileType.banner],
+	// 	deployTypes: [ DeployType.anywhere ],
+	// 	movements: [
+	// 		{
+	// 			type: MovementType.standard,
+	// 			distance: 1
+	// 		}
+	// 	]
+	// };
 
-	TrifleTiles[TrifleTileCodes.FlyingLemur] = {
-		types: [TileType.animal],
-		deployTypes: [ DeployType.anywhere ],
-		movements: [
-			{
-				type: MovementType.standard,
-				distance: 3,
-				abilities: [
-					{
-						type: MovementAbility.carry,
-						targetTileTypes: [ TileType.flower ]
-					}
-				]
-			}
-		]
-	};
+	// TrifleTiles[TrifleTileCodes.FlyingLemur] = {
+	// 	types: [TileType.animal],
+	// 	deployTypes: [ DeployType.anywhere ],
+	// 	movements: [
+	// 		{
+	// 			type: MovementType.standard,
+	// 			distance: 3,
+	// 			abilities: [
+	// 				{
+	// 					type: MovementAbility.carry,
+	// 					targetTileTypes: [ TileType.flower ]
+	// 				}
+	// 			]
+	// 		}
+	// 	]
+	// };
 
-	TrifleTiles[TrifleTileCodes.RingTailedLemur] = {
-		types: [TileType.animal],
-		deployTypes: [ DeployType.temple ],
-		movements: [
-			{
-				type: MovementType.standard,
-				distance: 5,
-				captureTypes: [ CaptureType.all ],
-				abilities: [
-					{
-						type: MovementAbility.jumpOver
-					}
-				]
-			}
-		]
-	};
+	// TrifleTiles[TrifleTileCodes.RingTailedLemur] = {
+	// 	types: [TileType.animal],
+	// 	deployTypes: [ DeployType.temple ],
+	// 	movements: [
+	// 		{
+	// 			type: MovementType.standard,
+	// 			distance: 5,
+	// 			captureTypes: [ CaptureType.all ],
+	// 			abilities: [
+	// 				{
+	// 					type: MovementAbility.jumpOver
+	// 				}
+	// 			]
+	// 		}
+	// 	]
+	// };
 
 
 	TrifleTiles[TrifleTileCodes.MessengerHawk] = {
 		types: [TileType.animal],
 		deployTypes: [DeployType.anywhere, DeployType.temple],
-		movements: [{ type: MovementType.anywhere }]
+		movements: [
+			{
+				type: MovementType.anywhere,
+			},
+			{
+				type: MovementType.standard,
+				distance: 1,
+				captureTypes: [CaptureType.all]
+			}
+		]
 	};
 
 

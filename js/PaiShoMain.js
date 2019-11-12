@@ -2133,24 +2133,29 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 		var gameTypeHeading = "";
 		for (var index in gameSeekList) {
 			var gameSeek = gameSeekList[index];
-			
-			var hostOnlineOrNotIconText = userOfflineIcon;
-			if (gameSeek.hostOnline) {
-				hostOnlineOrNotIconText = userOnlineIcon;
-			}
 
-			if (gameSeek.gameTypeDesc !== gameTypeHeading) {
-				if (gameTypeHeading !== "") {
-					message += "<br />";
+			if (gameSeek.gameId !== GameType.Trifle.id
+				|| (gameSeek.gameId === GameType.Trifle.id && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron']))
+			) {
+			
+				var hostOnlineOrNotIconText = userOfflineIcon;
+				if (gameSeek.hostOnline) {
+					hostOnlineOrNotIconText = userOnlineIcon;
 				}
-				gameTypeHeading = gameSeek.gameTypeDesc;
-				message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+
+				if (gameSeek.gameTypeDesc !== gameTypeHeading) {
+					if (gameTypeHeading !== "") {
+						message += "<br />";
+					}
+					gameTypeHeading = gameSeek.gameTypeDesc;
+					message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+				}
+				message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
+				for (var i = 0; i < gameSeek.gameOptions.length; i++) {
+					message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + gameSeek.gameOptions[i] + "</em></div>"
+				}
+				message += "</div>";
 			}
-			message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
-			for (var i = 0; i < gameSeek.gameOptions.length; i++) {
-				message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + gameSeek.gameOptions[i] + "</em></div>"
-			}
-			message += "</div>";
 		}
 	}
 	showModal("Join a game", message);
@@ -2350,7 +2355,12 @@ function getSidenavNewGameEntryForGameType(gameType) {
 }
 
 function getNewGameEntryForGameType(gameType) {
-	return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
+	if (gameType !== GameType.Trifle
+		|| (gameType === GameType.Trifle && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron']))
+		) {
+		return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
+	}
+	return "";
 }
 
 function newGameClicked() {
