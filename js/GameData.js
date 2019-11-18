@@ -28,7 +28,7 @@ var paiShoBoardKey = "default";
 
 var useDeLionTiles = false;
 
-var debugOn = false;
+var debugOn = true;
 
 /* Set to true if building for iOS, else set to false */
 var ios = false;
@@ -185,6 +185,22 @@ if (!Array.prototype.includes) {
       k++;
     }
     return false;
+  };
+}
+
+if (!Array.prototype.includesOneOf) {
+  Array.prototype.includesOneOf = function(targetElements) {
+    var found = false;
+    if (targetElements && targetElements.length) {
+      var self = this;
+      targetElements.forEach(function(targetElement) {
+        if (self.includes(targetElement)) {
+          found = true;
+          return true;
+        }
+      });
+    }
+    return found;
   };
 }
 
