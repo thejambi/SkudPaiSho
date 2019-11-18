@@ -64,7 +64,7 @@ TrifleController.prototype.resetMove = function() {
 };
 
 TrifleController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Trifle Pai Sho</h4> <p> <p>Trifle Pai Sho is the Pai Sho variant seen in the fanfiction story <a href='https://skudpaisho.com/site/more/fanfiction-recommendations/' target='_blank'>Gambler and Trifle (download here)</a>.</p> <p><strong>You win</strong> if you capture your opponent's White Lotus tile.</p> <p><strong>On a turn</strong>, you may either deploy a tile or move a tile.</p> <p><strong>You can't capture Flower tiles</strong> until your White Lotus has been deployed.<br /> <strong>You can't capture Non-Flower tiles</strong> until both players' White Lotus tiles have been deployed.</p> <p><strong>Hover</strong> over any tile to see how it works.</p> </p> <p>Select tiles to learn more or <a href='https://skudpaisho.com/site/games/Trifle-pai-sho/' target='_blank'>view the rules</a>.</p>";
+	return "<h4>Trifle Pai Sho</h4> <p> <p>Trifle Pai Sho is inspired by Vagabond Pai Sho, the Pai Sho variant seen in the fanfiction story <a href='https://skudpaisho.com/site/more/fanfiction-recommendations/' target='_blank'>Gambler and Trifle (download here)</a>.</p> <p><strong>You win</strong> if you capture your opponent's Banner tile.</p> <p><strong>On a turn</strong>, you may either deploy a tile or move a tile.</p> <p><strong>You can't capture Flower/Banner tiles</strong> until your Banner has been deployed.<br /> <strong>You can't capture Non-Flower/Banner tiles</strong> until both players' Banner tiles have been deployed.</p> <p><strong>Hover</strong> over any tile to see how it works.</p> </p> <p>Select tiles to learn more or <a href='https://skudpaisho.com/site/games/trifle-pai-sho/' target='_blank'>view the rules</a>.</p>";
 };
 
 TrifleController.prototype.getAdditionalMessage = function() {
@@ -72,9 +72,9 @@ TrifleController.prototype.getAdditionalMessage = function() {
 	
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
+			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by choosing your team. <br />";
 		} else {
-			msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move.";
+			msg += "Sign in to enable online gameplay. Or, start playing a local game by choosing your team.";
 		}
 
 		msg += getGameOptionsMessageHtml(GameType.Trifle.gameOptions);
@@ -161,7 +161,7 @@ TrifleController.prototype.unplayedTileClicked = function(tileDiv) {
 
 	var tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
 
-	if (tile && tile.ownerName !== getCurrentPlayer()) {
+	if ((tile && tile.ownerName !== getCurrentPlayer()) || !myTurn()) {
 		this.checkingOutOpponentTileOrNotMyTurn = true;
 	}
 
@@ -212,13 +212,9 @@ TrifleController.prototype.pointClicked = function(htmlPoint) {
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
-			if (boardPoint.tile.ownerName !== getCurrentPlayer()) {
+			if (boardPoint.tile.ownerName !== getCurrentPlayer() || !myTurn()) {
 				debug("That's not your tile!");
 				this.checkingOutOpponentTileOrNotMyTurn = true;
-			}
-
-			if (!boardPoint.tile.canMove()) {
-				return;
 			}
 
 			this.notationBuilder.status = WAITING_FOR_ENDPOINT;

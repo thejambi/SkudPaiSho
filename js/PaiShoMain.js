@@ -2134,8 +2134,8 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 		for (var index in gameSeekList) {
 			var gameSeek = gameSeekList[index];
 
-			if (gameSeek.gameId !== GameType.Trifle.id
-				|| (gameSeek.gameId === GameType.Trifle.id && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron']))
+			if (gameSeek.gameTypeId !== GameType.Trifle.id
+				|| (gameSeek.gameTypeId === GameType.Trifle.id && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci']))
 			) {
 			
 				var hostOnlineOrNotIconText = userOfflineIcon;
@@ -2356,7 +2356,7 @@ function getSidenavNewGameEntryForGameType(gameType) {
 
 function getNewGameEntryForGameType(gameType) {
 	if (gameType !== GameType.Trifle
-		|| (gameType === GameType.Trifle && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron']))
+		|| (gameType === GameType.Trifle && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci']))
 		) {
 		return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
 	}

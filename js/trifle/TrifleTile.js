@@ -1,19 +1,5 @@
 // Tile
 
-var TrifleTileCodes = {
-	SkyBison: 'S',
-	Badgermole: 'B',
-	Wheel: 'W',
-	Chrysanthemum: 'C',
-	FireLily: 'F',
-	Dragon: 'D',
-	Lotus: 'L',
-	MessengerHawk: 'MH' //,
-	// AirBanner: 'AB',
-	// FlyingLemur: 'FLL',
-	// RingTailedLemur: 'RTL'
-};
-
 function TrifleTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
