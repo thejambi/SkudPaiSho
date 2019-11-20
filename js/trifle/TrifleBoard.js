@@ -612,6 +612,94 @@ TrifleBoard.prototype.getAdjacentDiagonalPointsPotentialPossibleMoves = function
 	return diagonalPoints;
 };
 
+TrifleBoard.prototype.calculateSlopeBetweenPoints = function(p1, p2) {
+	var rise = p2.row - p1.row;
+	var run = p2.col - p1.col;
+	var slope = run === 0 ? 0 : rise / run;
+	return slope;
+};
+
+TrifleBoard.prototype.getNextPointsForJumpShapeMovement = function(movementInfo, originPoint, pointAlongTheWay, mustPreserveDirection) {
+	var pointsStartingWithRowStep = [];
+	var pointsStartingWithColStep = [];
+	var finalPoints = [];
+	var slope = this.calculateSlopeBetweenPoints(originPoint, pointAlongTheWay);
+	if (movementInfo.shape && movementInfo.shape.length > 0) {
+		/* `shape` should only ever have two numbers, but this will work for any number of numbers. */
+		for (var stepNum = 0; stepNum < movementInfo.shape.length; stepNum++) {
+			var stepDistance = movementInfo.shape[stepNum];
+			if (stepNum === 0) {
+				pointsStartingWithRowStep = this.getPointsWithMoveStepAppliedToRow([pointAlongTheWay], stepDistance);
+				pointsStartingWithColStep = this.getPointsWithMoveStepAppliedToCol([pointAlongTheWay], stepDistance);
+			} else if (stepNum % 2 === 1) {	/* odd: 1,3,5... */
+				pointsStartingWithRowStep = this.getPointsWithMoveStepAppliedToCol(pointsStartingWithRowStep, stepDistance);
+				pointsStartingWithColStep = this.getPointsWithMoveStepAppliedToRow(pointsStartingWithColStep, stepDistance);
+			} else if (stepNum % 2 === 0) {	/* even: 2,4,6... */
+				pointsStartingWithRowStep = this.getPointsWithMoveStepAppliedToRow(pointsStartingWithRowStep, stepDistance);
+				pointsStartingWithColStep = this.getPointsWithMoveStepAppliedToCol(pointsStartingWithColStep, stepDistance);
+			}
+		}
+
+		var possibleNextPoints = pointsStartingWithRowStep.concat(pointsStartingWithColStep);
+		var self = this;
+		var reallyMustPreserveDirection = mustPreserveDirection && slope !== 0;
+		possibleNextPoints.forEach(function(point) {
+			if (!point.isType(NON_PLAYABLE) && !point.isType(POSSIBLE_MOVE)
+					&& (!reallyMustPreserveDirection || self.calculateSlopeBetweenPoints(pointAlongTheWay, point) === slope)) {
+				finalPoints.push(point);
+			}
+		});
+	}
+
+	return finalPoints;
+};
+TrifleBoard.prototype.getPointsWithMoveStepAppliedToRow = function(startPoints, stepDistance) {
+	var nextPoints = [];
+	if (startPoints && startPoints.length) {
+		var self = this;
+		startPoints.forEach(function(boardPointStart) {
+			var nextRow1 = boardPointStart.row + stepDistance;
+			if (nextRow1 <= paiShoBoardMaxRowOrCol) {
+				var possibleNextPoint = self.cells[nextRow1][boardPointStart.col];
+				if (!possibleNextPoint.isType(NON_PLAYABLE)) {
+					nextPoints.push(possibleNextPoint);
+				}
+			}
+			var nextRow2 = boardPointStart.row - stepDistance;
+			if (nextRow2 >= 0) {
+				var possibleNextPoint = self.cells[nextRow2][boardPointStart.col];
+				if (!possibleNextPoint.isType(NON_PLAYABLE)) {
+					nextPoints.push(possibleNextPoint);
+				}
+			}
+		});
+	}
+	return nextPoints;
+};
+TrifleBoard.prototype.getPointsWithMoveStepAppliedToCol = function(startPoints, stepDistance) {
+	var nextPoints = [];
+	if (startPoints && startPoints.length) {
+		var self = this;
+		startPoints.forEach(function(boardPointStart) {
+			var nextCol1 = boardPointStart.col + stepDistance;
+			if (nextCol1 <= paiShoBoardMaxRowOrCol) {
+				var possibleNextPoint = self.cells[boardPointStart.row][nextCol1];
+				if (!possibleNextPoint.isType(NON_PLAYABLE)) {
+					nextPoints.push(possibleNextPoint);
+				}
+			}
+			var nextCol2 = boardPointStart.col - stepDistance;
+			if (nextCol2 >= 0) {
+				var possibleNextPoint = self.cells[boardPointStart.row][nextCol2];
+				if (!possibleNextPoint.isType(NON_PLAYABLE)) {
+					nextPoints.push(possibleNextPoint);
+				}
+			}
+		});
+	}
+	return nextPoints;
+};
+
 TrifleBoard.prototype.getPointsNextToTilesInLineOfSight = function(movementInfo, originPoint) {
 	var jumpPoints = [];
 	if (movementInfo.type === MovementType.jumpAlongLineOfSight && movementInfo.targetTileTypes) {
@@ -1207,7 +1295,7 @@ TrifleBoard.prototype.setPossibleMovesForMovement = function(movementInfo, board
 		} else if (movementInfo.type === MovementType.anywhere) {
 			this.setMovePointsAnywhere(boardPointStart, movementInfo);
 		} else if (movementInfo.type === MovementType.jumpShape) {
-			// this.setPossibleMovementPoints(TrifleBoard.shapeMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, boardPointStart, movementInfo.distance);
+			this.setPossibleMovementPointsFromMovePoints([boardPointStart], TrifleBoard.jumpShapeMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance);
 		}
 	}
 	debug("Movement Point Checks: " + this.movementPointChecks);
@@ -1222,38 +1310,42 @@ TrifleBoard.diagonalMovementFunction = function(board, originPoint, boardPointAl
 TrifleBoard.jumpAlongLineOfSightMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo) {
 	return board.getPointsNextToTilesInLineOfSight(movementInfo, originPoint);
 };
-TrifleBoard.prototype.setPossibleMovementPoints = function(nextPossibleMovementPointsFunction, tile, movementInfo, originPoint, recentPoint, distanceRemaining) {
+TrifleBoard.jumpShapeMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo) {
+	var mustPreserveDirection = TrifleTileInfo.movementMustPreserveDirection(movementInfo);
+	return board.getNextPointsForJumpShapeMovement(movementInfo, originPoint, boardPointAlongTheWay, mustPreserveDirection);
+};
+/* TrifleBoard.prototype.setPossibleMovementPoints = function(nextPossibleMovementPointsFunction, tile, movementInfo, originPoint, recentPoint, distanceRemaining) {
 	if (distanceRemaining === 0) {
 		return;	// Complete
 	}
 	var self = this;
 	var nextPossiblePoints = nextPossibleMovementPointsFunction(self, originPoint, recentPoint, movementInfo);
-	/* nextPossiblePoints.forEach(function(adjacentPoint) {
-		self.movementPointChecks++;
-		if (!self.canMoveHereMoreEfficientlyAlready(adjacentPoint, distanceRemaining)) {
-			var canMoveThroughPoint = self.tileCanMoveThroughPoint(tile, movementInfo, adjacentPoint, recentPoint);
-			if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint)) {
-				adjacentPoint.addType(POSSIBLE_MOVE);
-				adjacentPoint.standardMoveDistanceRemaining = distanceRemaining;
-				if (!adjacentPoint.hasTile() || canMoveThroughPoint) {
-					self.setPossibleMovementPoints(nextPossibleMovementPointsFunction, 
-							tile, 
-							movementInfo, 
-							originPoint,
-							adjacentPoint, 
-							distanceRemaining - 1);
-				}
-			} else if (canMoveThroughPoint) {
-				adjacentPoint.standardMoveDistanceRemaining = distanceRemaining;
-				self.setPossibleMovementPoints(nextPossibleMovementPointsFunction, 
-						tile, 
-						movementInfo, 
-						originPoint,
-						adjacentPoint, 
-						distanceRemaining - 1);
-			}
-		}
-	}); */
+	// nextPossiblePoints.forEach(function(adjacentPoint) {
+	// 	self.movementPointChecks++;
+	// 	if (!self.canMoveHereMoreEfficientlyAlready(adjacentPoint, distanceRemaining)) {
+	// 		var canMoveThroughPoint = self.tileCanMoveThroughPoint(tile, movementInfo, adjacentPoint, recentPoint);
+	// 		if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint)) {
+	// 			adjacentPoint.addType(POSSIBLE_MOVE);
+	// 			adjacentPoint.standardMoveDistanceRemaining = distanceRemaining;
+	// 			if (!adjacentPoint.hasTile() || canMoveThroughPoint) {
+	// 				self.setPossibleMovementPoints(nextPossibleMovementPointsFunction, 
+	// 						tile, 
+	// 						movementInfo, 
+	// 						originPoint,
+	// 						adjacentPoint, 
+	// 						distanceRemaining - 1);
+	// 			}
+	// 		} else if (canMoveThroughPoint) {
+	// 			adjacentPoint.standardMoveDistanceRemaining = distanceRemaining;
+	// 			self.setPossibleMovementPoints(nextPossibleMovementPointsFunction, 
+	// 					tile, 
+	// 					movementInfo, 
+	// 					originPoint,
+	// 					adjacentPoint, 
+	// 					distanceRemaining - 1);
+	// 		}
+	// 	}
+	// });
 
 	originPoint.standardMoveDistanceRemaining = distanceRemaining;
 
@@ -1278,7 +1370,7 @@ TrifleBoard.prototype.setPossibleMovementPoints = function(nextPossibleMovementP
 		movementInfo, 
 		originPoint,
 		distanceRemaining - 1);
-};
+}; */
 
 TrifleBoard.prototype.setPossibleMovementPointsFromMovePoints = function(movePoints, nextPossibleMovementPointsFunction, tile, movementInfo, originPoint, distanceRemaining) {
 	if (distanceRemaining === 0
@@ -1335,7 +1427,7 @@ TrifleBoard.prototype.setBonusMovementPossibleMoves = function(bonusMovementInfo
 		possibleMovePoints.push(originPoint);
 		var self = this;
 		possibleMovePoints.forEach(function(boardPoint) {
-			self.setPossibleMovementPoints(bonusMovementInfo.movementFunction, originPoint.tile, bonusMovementInfo, boardPoint, boardPoint, bonusMovementInfo.distance);
+			self.setPossibleMovementPointsFromMovePoints([boardPoint], bonusMovementInfo.movementFunction, originPoint.tile, bonusMovementInfo, boardPoint, bonusMovementInfo.distance);
 		});
 	}
 };

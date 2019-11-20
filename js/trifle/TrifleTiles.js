@@ -19,7 +19,8 @@ var TileType = {
 	animal: "animal",
 	flower: "flower",
 	fruit: "fruit",
-	other: "other"
+	other: "other",
+	traveler: "traveler"
 };
 
 var DeployType = {
@@ -43,7 +44,8 @@ var MovementType = {
 var MovementRestriction = {
 	restrictedByOpponentTileZones: "restrictedByOpponentTileZones",
 	// immobilizedByAdjacentOpponentTile: "immobilizedByAdjacentOpponentTile",
-	immobilizedByOpponentTileZones: "immobilizedByOpponentTileZones"
+	immobilizedByOpponentTileZones: "immobilizedByOpponentTileZones",
+	mustPreserveDirection: "mustPreserveDirection"
 };
 
 var MovementAbility = {
@@ -197,13 +199,18 @@ TrifleTileInfo.defineTrifleTiles = function() {
 	};
 
 	TrifleTiles[TrifleTileCodes.Wheel] = { /* Done */
-		types: [TileType.other],
+		types: [TileType.traveler],
 		deployTypes: [ DeployType.anywhere ],
 		movements: [
 			{
 				type: MovementType.diagonal,
 				distance: 15,
-				captureTypes: [ CaptureType.all ]
+				captureTypes: [ CaptureType.all ],
+				restrictions: [
+					{
+						type: MovementRestriction.mustPreserveDirection
+					}
+				]
 			}
 		]
 	};
@@ -272,7 +279,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 			{
 				type: TileAbility.increaseFriendlyTileMovementDistance,
 				amount: 1,
-				targetTileTypes: [TileType.flower]
+				targetTileTypes: [TileType.flower, TileType.traveler]
 			}
 		]
 	};
@@ -317,13 +324,16 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		movements: [
 			{
 				type: MovementType.jumpShape,
-				shapes: [
-					{ distance: 2 },
-					{ distance: 1 }
-				],
+				shape: [1, 2],
+				distance: 99,
 				abilities: [
 					{
 						type: MovementAbility.jumpOver
+					}
+				],
+				restrictions: [
+					{
+						type: MovementRestriction.mustPreserveDirection
 					}
 				]
 			}
