@@ -11,7 +11,8 @@ var TrifleTileCodes = {
 	AirBanner: 'AB',
 	FlyingLemur: 'FLL',
 	RingTailedLemur: 'RTL',
-	HermitCrab: 'HCR'
+	HermitCrab: 'HCR',
+	AirGlider: 'AGL'
 };
 
 var TileType = {
@@ -38,7 +39,8 @@ var MovementType = {
 	jumpAlongLineOfSight: "jumpAlongLineOfSight",
 	withinFriendlyTileZone: "withinFriendlyTileZone",
 	anywhere: "anywhere",
-	jumpShape: "jumpShape"
+	jumpShape: "jumpShape",
+	travelShape: "travelShape"
 };
 
 var MovementRestriction = {
@@ -52,6 +54,14 @@ var MovementAbility = {
 	carry: "carry",
 	jumpOver: "jumpOver"
 };
+
+var MoveDirection = {
+	any: "any",	/* Any direction starts movement */
+	straight: "straight",
+	turn: "turn",
+	left: "left",
+	right: "right"
+}
 
 var CaptureType = {
 	none: "none",
@@ -168,6 +178,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 				captureTypes: [ CaptureType.all ],
 				restrictions: [
 					{
+						/* TODO Should this be an ability of the Bison zone, rather than a restriction on its movement? */
 						type: MovementRestriction.restrictedByOpponentTileZones,
 						affectingTiles: [ TrifleTileCodes.SkyBison ]
 					}
@@ -349,6 +360,45 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		movements: [
 			{
 				type: MovementType.anywhere,
+			}
+		]
+	};
+
+
+	/* Example: Tile can move far without capturing, but a small distance with capturing
+	TrifleTiles[TrifleTileCodes.LargeMovementNoCaptureSmallMovementDoes] = {
+		types: [TileType.animal],
+		deployTypes: [DeployType.anywhere, DeployType.temple],
+		movements: [
+			{
+				title: "LargeMovement",
+				type: MovementType.standard,
+				distance: 9
+			},
+			{
+				title: "SmallMovement",
+				type: MovementType.standard,
+				distance: 3,
+				captureTypes: [CaptureType.all]
+			}
+		]
+	}; */
+
+	/* My tile idea */
+	TrifleTiles[TrifleTileCodes.AirGlider] = {
+		types: [TileType.traveler],
+		deployTypes: [DeployType.temple],
+		movements: [
+			{
+				type: MovementType.travelShape,
+				shape: [
+					MoveDirection.any,
+					MoveDirection.turn,
+					MoveDirection.straight,
+					MoveDirection.straight,
+					MoveDirection.straight
+				],
+				captureTypes: [CaptureType.all]
 			}
 		]
 	};
