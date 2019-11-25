@@ -103,6 +103,19 @@ function arrayIncludesAll(array1, array2) {
   return true;
 }
 
+function arrayIncludesOneOf(arr, targetElements) {
+  var found = false;
+  if (targetElements && targetElements.length) {
+    targetElements.forEach(function(targetElement) {
+      if (arr.includes(targetElement)) {
+        found = true;
+        return true;
+      }
+    });
+  }
+  return found;
+}
+
 function copyArray(arr) {
 	var copyArr = [];
 	for (var i = 0; i < arr.length; i++) {
@@ -185,22 +198,6 @@ if (!Array.prototype.includes) {
       k++;
     }
     return false;
-  };
-}
-
-if (!Array.prototype.includesOneOf) {
-  Array.prototype.includesOneOf = function(targetElements) {
-    var found = false;
-    if (targetElements && targetElements.length) {
-      var self = this;
-      targetElements.forEach(function(targetElement) {
-        if (self.includes(targetElement)) {
-          found = true;
-          return true;
-        }
-      });
-    }
-    return found;
   };
 }
 

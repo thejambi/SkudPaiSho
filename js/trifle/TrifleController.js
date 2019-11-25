@@ -232,6 +232,8 @@ TrifleController.prototype.pointClicked = function(htmlPoint) {
 			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
 				this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 				this.completeMove();
+			} else {
+				this.resetNotationBuilder();
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();

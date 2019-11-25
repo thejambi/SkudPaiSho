@@ -118,7 +118,9 @@ TrifleActuator.prototype.addTeamTile = function(tile, player, isForTeamSelection
 
 	if (isForTeamSelection) {
 		theDiv.classList.add("selectedFromPile");
-		// theDiv.classList.add("drained");
+	} else if (tile.selectedFromPile) {
+		theDiv.classList.add("selectedFromPile");
+		theDiv.classList.add("drained");
 	}
 
 	var theImg = document.createElement("img");

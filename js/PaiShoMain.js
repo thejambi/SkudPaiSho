@@ -151,7 +151,9 @@ window.requestAnimationFrame(function () {
 	localStorage = new LocalStorage().storage;
 
 	/* Dark Mode Preferences */
-	if (localStorage.getItem("darkMode")) {
+	if (localStorage.getItem("darkMode")
+			|| (!localStorage.getItem("darkMode") 
+				&& window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
 		toggleDarkMode();
 	}
 
@@ -1689,7 +1691,9 @@ function getGameControllerForGameType(gameTypeId) {
 			controller = new BloomsController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Trifle.id:
-			controller = new TrifleController(gameContainerDiv, isMobile);
+			if (usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci'])) {
+				controller = new TrifleController(gameContainerDiv, isMobile);
+			}
 			break;
 		case GameType.Hexentafl.id:
 			controller = new HexentaflController(gameContainerDiv, isMobile);
