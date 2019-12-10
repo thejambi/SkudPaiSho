@@ -65,8 +65,17 @@ TrifleGameManager.prototype.buildDeployGameLogText = function(move, tile) {
 };
 TrifleGameManager.prototype.buildMoveGameLogText = function(move, moveDetails) {
 	this.gameLogText = move.player + ' moved ' + TrifleTile.getTileName(moveDetails.movedTile.code) + ' from ' + move.startPoint.pointText + ' to ' + move.endPoint.pointText;
-	if (moveDetails.capturedTile) {
-		this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ' + TrifleTile.getTileName(moveDetails.capturedTile.code);
+	if (moveDetails.capturedTiles && moveDetails.capturedTiles.length > 0) {
+		this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ';// + TrifleTile.getTileName(moveDetails.capturedTile.code);
+		var first = true;
+		moveDetails.capturedTiles.forEach(function(capturedTile) {
+			if (!first) {
+				this.gameLogText += ',';
+			} else {
+				first = false;
+			}
+			this.gameLogText += TrifleTile.getTileName(capturedTile.code);
+		});
 	}
 };
 

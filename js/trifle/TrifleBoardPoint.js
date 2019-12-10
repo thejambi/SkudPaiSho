@@ -21,6 +21,7 @@ function TrifleBoardPoint() {
 	this.col = -1;
 	this.possibleMoveTypes = [];
 	this.moveDistanceRemaining = {};
+	this.possibleMovementPaths = [];
 }
 
 TrifleBoardPoint.prototype.addType = function(type) {
@@ -102,6 +103,17 @@ TrifleBoardPoint.prototype.isPossibleForMovementType = function(movementInfo) {
 TrifleBoardPoint.prototype.clearPossibleMovementTypes = function() {
 	this.possibleMoveTypes = [];
 	this.moveDistanceRemaining = {};
+};
+TrifleBoardPoint.prototype.clearPossibleMovementPaths = function() {
+	this.possibleMovementPaths = [];
+};
+TrifleBoardPoint.prototype.addPossibleMovementPath = function(movementPath) {
+	this.possibleMovementPaths.push(movementPath);
+};
+TrifleBoardPoint.prototype.getOnlyPossibleMovementPath = function() {
+	if (this.possibleMovementPaths && this.possibleMovementPaths.length === 1) {
+		return this.possibleMovementPaths[0];
+	}
 };
 TrifleBoardPoint.prototype.setMoveDistanceRemaining = function(movementInfo, distanceRemaining) {
 	var movementType = TrifleBoardPoint.getMovementType(movementInfo);

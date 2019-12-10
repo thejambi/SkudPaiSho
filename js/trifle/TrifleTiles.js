@@ -1,21 +1,25 @@
 
 var TrifleTileCodes = {
-	SkyBison: 'S',
-	Badgermole: 'B',
-	Wheel: 'W',
-	Chrysanthemum: 'C',
-	FireLily: 'F',
-	Dragon: 'D',
-	Lotus: 'L',
-	MessengerHawk: 'MH',
-	AirBanner: 'AB',
-	FlyingLemur: 'FLL',
-	RingTailedLemur: 'RTL',
-	HermitCrab: 'HCR',
-	Firefly: 'FF',
-	Dandelion: 'DL',
-	Edelweiss: 'EDW',
-	AirGlider: 'AGL'
+	SkyBison: 'SkyBison',
+	Badgermole: 'Badgermole',
+	Wheel: 'Wheel',
+	Chrysanthemum: 'Chrysanthemum',
+	FireLily: 'FireLily',
+	Dragon: 'Dragon',
+	Lotus: 'Lotus',
+	MessengerHawk: 'MessengerHawk',
+	AirBanner: 'AirBanner',
+	FlyingLemur: 'FlyingLemur',
+	RingTailedLemur: 'RingTailedLemur',
+	HermitCrab: 'HermitCrab',
+	Firefly: 'Firefly',
+	Dandelion: 'Dandelion',
+	Edelweiss: 'Edelweiss',
+	WaterBanner: 'WaterBanner',
+	TitanArum: 'TitanArum',
+	EarthBanner: 'EarthBanner',
+	SaberToothMooseLion: 'SaberToothMooseLion',
+	AirGlider: 'AirGlider'
 };
 
 var TileType = {
@@ -56,7 +60,8 @@ var MovementRestriction = {
 
 var MovementAbility = {
 	carry: "carry",
-	jumpOver: "jumpOver"
+	jumpOver: "jumpOver",
+	chargeCapture: "chargeCapture"
 };
 
 var MoveDirection = {
@@ -94,7 +99,7 @@ var AbilityTrigger = {
 	onCapture: "onCapture"
 };
 
-TileTeam = {
+var TileTeam = {
 	friendly: "friendly",
 	enemy: "enemy"
 };
@@ -158,6 +163,27 @@ TrifleTileInfo.tileHasDrawOpponentTilesInLineOfSightAbility = function(tileInfo)
 
 TrifleTileInfo.tileCanBeCapturedByFriendlyTiles = function(tileInfo) {
 	return TrifleTileInfo.tileHasBoardPresenceAbility(tileInfo, BoardPresenceAbility.canBeCapturedByFriendlyTiles);
+};
+
+TrifleTileInfo.tileHasOnlyOneMovement = function(tileInfo) {
+	return tileInfo && tileInfo.movements && tileInfo.movements.length === 1;
+};
+
+TrifleTileInfo.tileHasMovementAbility = function(tileInfo, targetMovementAbilityType) {
+	var tileHasMovementAbility = false;
+	if (tileInfo && tileInfo.movements) {
+		tileInfo.movements.forEach(function(movementInfo) {
+			if (movementInfo.abilities) {
+				movementInfo.abilities.forEach(function(movementAbilityInfo) {
+					if (movementAbilityInfo.type === targetMovementAbilityType) {
+						tileHasMovementAbility = true;
+						return true;
+					}
+				});
+			}
+		});
+	}
+	return tileHasMovementAbility;
 };
 
 TrifleTileInfo.defineTrifleTiles = function() {
@@ -373,7 +399,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 
 	TrifleTiles[TrifleTileCodes.HermitCrab] = { /* Done */
 		types: [TileType.animal],
-		deployTypes: [DeployType.temple],
+		deployTypes: [DeployType.anywhere],
 		movements: [
 			{
 				type: MovementType.jumpShape,
@@ -409,7 +435,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	TrifleTiles[TrifleTileCodes.Dandelion] = {
+	/* TODO TrifleTiles[TrifleTileCodes.Dandelion] = {
 		types: [TileType.flower],
 		deployTypes: [DeployType.adjacentToTemple],
 		abilities: [
@@ -423,7 +449,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 				location: SpawnLocation.adjacent
 			}
 		]
-	};
+	}; */
 
 	TrifleTiles[TrifleTileCodes.Edelweiss] = {
 		types: [TileType.flower],
@@ -432,16 +458,84 @@ TrifleTileInfo.defineTrifleTiles = function() {
 			size: 4,
 			abilities: [
 				{
-					type: ZoneAbility.removesTileAbilities,	// TODO
+					type: ZoneAbility.removesTileAbilities, // TODO testing, etc
 					targetTeams: [TileTeam.friendly, TileTeam.enemy]
 				}
 			]
 		}
 	};
 
+	TrifleTiles[TrifleTileCodes.WaterBanner] = {	/* Done */
+		types: [TileType.banner],
+		deployTypes: [ DeployType.anywhere ],
+		movements: [
+			{
+				type: MovementType.standard,
+				distance: 2
+			}
+		]
+	};
+
+	TrifleTiles[TrifleTileCodes.TitanArum] = {
+		types: [TileType.flower],
+		deployTypes: [ DeployType.anywhere ],
+		movements: [
+			{
+				type: MovementType.standard,
+				distance: 2
+			}
+		]//,
+		// abilities: [
+		// 	{
+		// 		type: 
+		// 	}
+		// ]
+	};
+
+	/* Earth */
+
+	TrifleTiles[TrifleTileCodes.EarthBanner] = {	/* Done, Must Test */
+		type: [TileType.banner],
+		deployTypes: [DeployType.anywhere],
+		territorialZone: {
+			size: 1,
+			abilities: [
+				{
+					type: ZoneAbility.protectFriendlyTilesFromCapture,
+					targetTileTypes: [TileType.flower]
+				}
+			]
+		}
+	};
+
+	TrifleTiles[TrifleTileCodes.SaberToothMooseLion] = {	/* DONE */
+		types: [TileType.animal],
+		deployTypes: [DeployType.anywhere],
+		movements: [
+			{
+				type: MovementType.travelShape,
+				shape: [
+					MoveDirection.any,
+					MoveDirection.straight,
+					MoveDirection.straight
+				],
+				captureTypes: [CaptureType.all],
+				restrictions: [
+					{
+						type: MovementRestriction.mustPreserveDirection
+					}
+				],
+				abilities: [
+					{
+						type: MovementAbility.chargeCapture
+					}
+				]
+			}
+		]
+	};
 
 
-	TrifleTiles[TrifleTileCodes.MessengerHawk] = {
+	TrifleTiles[TrifleTileCodes.MessengerHawk] = {	/* DONE */
 		types: [TileType.animal],
 		deployTypes: [DeployType.anywhere, DeployType.temple],
 		movements: [
