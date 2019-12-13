@@ -53,7 +53,8 @@ var paiShoBoardDesignTypeValues = {
 	mayfair: "mayfair",
 	vescucci: "vescucci",
 	xiangqi: "xiangqi",
-	pixelsho: "pixelsho"
+	pixelsho: "pixelsho",
+	skudShop: "skudShop"
 };
 
 function getTileDesignTypeDisplayName(tileDesignTypeKey) {
@@ -571,6 +572,9 @@ function togglePaiShoBoardDesigns() {
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.pixelsho;
 			break;
 		case paiShoBoardDesignTypeValues.pixelsho:
+			newPaiShoBoardKey = paiShoBoardDesignTypeValues.skudShop;
+			break;
+		case paiShoBoardDesignTypeValues.skudShop:
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.default;
 			break;
 	}
@@ -2347,11 +2351,11 @@ function randomIntFromInterval(min, max) {
 }
 
 function closeGame() {
-	if (debugOn) {
-		setGameController(GameType.Trifle.id);
-	} else {
+	// if (debugOn) {
+	// 	setGameController(GameType.Trifle.id);
+	// } else {
 		setGameController(randomIntFromInterval(1,2));
-	}
+	// }
 }
 
 function getSidenavNewGameEntryForGameType(gameType) {

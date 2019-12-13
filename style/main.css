@@ -323,6 +323,9 @@ body.darkMode .bg-svg {
 .game-container.pixelshoBoard .bg-svg {
   background-image: url(pixelshoboard.png);
 }
+.game-container.skudShopBoard .bg-svg {
+  background-image: url(SkudBoard.png);
+}
 
 figure > div {
   margin: 1em auto;
