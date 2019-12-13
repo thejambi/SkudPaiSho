@@ -80,6 +80,13 @@ function getTileDesignTypeDisplayName(tileDesignTypeKey) {
 	}
 }
 
+function getBoardDesignTypeDisplayName(boardDesignTypeKey) {
+	switch(boardDesignTypeKey) {
+		default:
+			return boardDesignTypeKey;
+	}
+}
+
 var vagabondTileDesignTypeKey = "vagabondTileDesignTypeKey";
 
 var usernameKey = "usernameKey";
@@ -563,6 +570,9 @@ function togglePaiShoBoardDesigns() {
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.mayfair;
 			break;
 		case paiShoBoardDesignTypeValues.mayfair:
+			newPaiShoBoardKey = paiShoBoardDesignTypeValues.skudShop;
+			break;
+		case paiShoBoardDesignTypeValues.skudShop:
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.vescucci;
 			break;
 		case paiShoBoardDesignTypeValues.vescucci:
@@ -572,9 +582,6 @@ function togglePaiShoBoardDesigns() {
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.pixelsho;
 			break;
 		case paiShoBoardDesignTypeValues.pixelsho:
-			newPaiShoBoardKey = paiShoBoardDesignTypeValues.skudShop;
-			break;
-		case paiShoBoardDesignTypeValues.skudShop:
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.default;
 			break;
 	}
@@ -618,6 +625,9 @@ function toggleTileDesigns() {
 
 function getSelectedTileDesignTypeDisplayName() {
 	return getTileDesignTypeDisplayName(skudTilesKey);
+}
+function getSelectedBoardDesignTypeDisplayName() {
+	return getBoardDesignTypeDisplayName(paiShoBoardKey);
 }
 /* --- */
 
@@ -1187,7 +1197,7 @@ function setMessage(msg) {
 
 function getAltTilesOptionText() {
 	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.<br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "</p>"
-		+ "<p><span class='skipBonus' onclick='togglePaiShoBoardDesigns();'>Click here</span> to switch between board designs for Pai Sho.</p>";	// TODO: add: <br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "
+		+ "<p><span class='skipBonus' onclick='togglePaiShoBoardDesigns();'>Click here</span> to switch between board designs for Pai Sho.<br />Currently selected: " + getSelectedBoardDesignTypeDisplayName() + "</p>";
 }
 
 function getAltVagabondTilesOptionText() {
