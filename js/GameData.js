@@ -28,7 +28,7 @@ var paiShoBoardKey = "default";
 
 var useDeLionTiles = false;
 
-var debugOn = true;
+var debugOn = false;
 
 /* Set to true if building for iOS, else set to false */
 var ios = false;
