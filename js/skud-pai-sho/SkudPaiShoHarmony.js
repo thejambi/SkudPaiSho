@@ -325,24 +325,46 @@ SkudPaiShoHarmonyManager.prototype.getHarmonyChains = function() {
 		var targetTile = hx.tile1;
 		var targetTilePos = hx.tile1Pos;
 
-		var ringFound = this.lookForRing(startTile, targetTile, chain);
+		var foundRings = this.lookForRings(startTile, targetTile, chain);
 		
+		if (foundRings && foundRings.length > 0) {
+			foundRings.forEach(function(ringThatWasFound) {
+				var ringExists = false;
+				rings.forEach(function(ring) {	
+					if (self.ringsMatch(ring, ringThatWasFound)) {
+						ringExists = true;
+					}
+				});
+				if (!ringExists) {
+					rings.push(ringThatWasFound);
+				}
+			});
+		}
+	}
+
+	if (rings.length > 0) {
+		debug("Rings Found:");
+		debug(rings);
+	}
+
+	return rings;
+
+	/* Previously: 
+	var ringFound = this.lookForRing(startTile, targetTile, chain);
 		if (ringFound[0]) {
 			var ringExists = false;
-			
 			rings.forEach(function(ring) {
 				if (self.ringsMatch(ring, ringFound[1])) {
 					ringExists = true;
 				}
 			});
-
 			if (!ringExists) {
 				rings.push(ringFound[1]);
 			}
 		}
 	}
-
 	return rings;
+	 */
 };
 
 SkudPaiShoHarmonyManager.prototype.harmonyRingExists = function() {
@@ -594,6 +616,33 @@ SkudPaiShoHarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
 	});
 
 	return h1Matches;
+};
+
+SkudPaiShoHarmonyManager.prototype.lookForRings = function(t1, tx, originalChain) {
+	var rings = [];
+	var keepLookingAtTheseHarmonies = [];
+	for (var i = 0; i < this.harmonies.length; i++) {	// Any complete rings?
+		currentChain = originalChain.slice();
+		var hx = this.harmonies[i];
+		if (hx.containsTile(t1) && hx.notAnyOfThese(currentChain)) {
+			currentChain.push(hx);
+			if (hx.containsTile(tx)) {	// Complete ring found
+				rings.push(currentChain);
+			} else {
+				keepLookingAtTheseHarmonies.push(hx);
+			}
+		}
+	}
+	for (var i = 0; i < this.harmonies.length; i++) {
+		currentChain = originalChain.slice();
+		var hx = this.harmonies[i];
+		if (keepLookingAtTheseHarmonies.includes(hx)) {
+			currentChain.push(hx);
+			var newStartTile = hx.getTileThatIsNotThisOne(t1);
+			rings = rings.concat(this.lookForRings(newStartTile, tx, currentChain));
+		}
+	}
+	return rings;
 };
 
 SkudPaiShoHarmonyManager.prototype.lookForRing = function(t1, tx, chain) {
