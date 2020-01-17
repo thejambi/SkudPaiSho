@@ -53,7 +53,8 @@ var paiShoBoardDesignTypeValues = {
 	mayfair: "mayfair",
 	vescucci: "vescucci",
 	xiangqi: "xiangqi",
-	pixelsho: "pixelsho"
+	pixelsho: "pixelsho",
+	skudShop: "skudShop"
 };
 
 function getTileDesignTypeDisplayName(tileDesignTypeKey) {
@@ -76,6 +77,13 @@ function getTileDesignTypeDisplayName(tileDesignTypeKey) {
 			return "Xiangqi Style";
 		default:
 			return tileDesignTypeKey;
+	}
+}
+
+function getBoardDesignTypeDisplayName(boardDesignTypeKey) {
+	switch(boardDesignTypeKey) {
+		default:
+			return boardDesignTypeKey;
 	}
 }
 
@@ -151,7 +159,9 @@ window.requestAnimationFrame(function () {
 	localStorage = new LocalStorage().storage;
 
 	/* Dark Mode Preferences */
-	if (localStorage.getItem("darkMode")) {
+	if (localStorage.getItem("darkMode")
+			|| (!localStorage.getItem("darkMode") 
+				&& window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
 		toggleDarkMode();
 	}
 
@@ -560,6 +570,9 @@ function togglePaiShoBoardDesigns() {
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.mayfair;
 			break;
 		case paiShoBoardDesignTypeValues.mayfair:
+			newPaiShoBoardKey = paiShoBoardDesignTypeValues.skudShop;
+			break;
+		case paiShoBoardDesignTypeValues.skudShop:
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.vescucci;
 			break;
 		case paiShoBoardDesignTypeValues.vescucci:
@@ -612,6 +625,9 @@ function toggleTileDesigns() {
 
 function getSelectedTileDesignTypeDisplayName() {
 	return getTileDesignTypeDisplayName(skudTilesKey);
+}
+function getSelectedBoardDesignTypeDisplayName() {
+	return getBoardDesignTypeDisplayName(paiShoBoardKey);
 }
 /* --- */
 
@@ -1181,7 +1197,7 @@ function setMessage(msg) {
 
 function getAltTilesOptionText() {
 	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.<br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "</p>"
-		+ "<p><span class='skipBonus' onclick='togglePaiShoBoardDesigns();'>Click here</span> to switch between board designs for Pai Sho.</p>";	// TODO: add: <br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "
+		+ "<p><span class='skipBonus' onclick='togglePaiShoBoardDesigns();'>Click here</span> to switch between board designs for Pai Sho.<br />Currently selected: " + getSelectedBoardDesignTypeDisplayName() + "</p>";
 }
 
 function getAltVagabondTilesOptionText() {
@@ -1635,12 +1651,12 @@ var GameType = {
 		]
 	},
 	// ,
-	// Trifle: {
-	// 	id: 10,
-	// 	desc: "Pai and Sho's Trifle",
-	// 	rulesUrl: "https://skudpaisho.com/site/games/pai-shos-trifle/",
-	// 	gameOptions: []
-	// },
+	Trifle: {
+		id: 10,
+		desc: "Pai and Sho's Trifle",
+		rulesUrl: "https://skudpaisho.com/site/games/pai-shos-trifle/",
+		gameOptions: []
+	},
 	Hexentafl: {
 		id: 11,
 		desc: "heXentafl",
@@ -1688,9 +1704,11 @@ function getGameControllerForGameType(gameTypeId) {
 		case GameType.Blooms.id:
 			controller = new BloomsController(gameContainerDiv, isMobile);
 			break;
-		// case GameType.Trifle.id:
-		// 	controller = new TrifleController(gameContainerDiv, isMobile);
-		// 	break;
+		case GameType.Trifle.id:
+			if (usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci'])) {
+				controller = new TrifleController(gameContainerDiv, isMobile);
+			}
+			break;
 		case GameType.Hexentafl.id:
 			controller = new HexentaflController(gameContainerDiv, isMobile);
 			break;
@@ -2133,24 +2151,29 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 		var gameTypeHeading = "";
 		for (var index in gameSeekList) {
 			var gameSeek = gameSeekList[index];
-			
-			var hostOnlineOrNotIconText = userOfflineIcon;
-			if (gameSeek.hostOnline) {
-				hostOnlineOrNotIconText = userOnlineIcon;
-			}
 
-			if (gameSeek.gameTypeDesc !== gameTypeHeading) {
-				if (gameTypeHeading !== "") {
-					message += "<br />";
+			if (gameSeek.gameTypeId !== GameType.Trifle.id
+				|| (gameSeek.gameTypeId === GameType.Trifle.id && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci']))
+			) {
+			
+				var hostOnlineOrNotIconText = userOfflineIcon;
+				if (gameSeek.hostOnline) {
+					hostOnlineOrNotIconText = userOnlineIcon;
 				}
-				gameTypeHeading = gameSeek.gameTypeDesc;
-				message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+
+				if (gameSeek.gameTypeDesc !== gameTypeHeading) {
+					if (gameTypeHeading !== "") {
+						message += "<br />";
+					}
+					gameTypeHeading = gameSeek.gameTypeDesc;
+					message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+				}
+				message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
+				for (var i = 0; i < gameSeek.gameOptions.length; i++) {
+					message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + gameSeek.gameOptions[i] + "</em></div>"
+				}
+				message += "</div>";
 			}
-			message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
-			for (var i = 0; i < gameSeek.gameOptions.length; i++) {
-				message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + gameSeek.gameOptions[i] + "</em></div>"
-			}
-			message += "</div>";
 		}
 	}
 	showModal("Join a game", message);
@@ -2350,7 +2373,12 @@ function getSidenavNewGameEntryForGameType(gameType) {
 }
 
 function getNewGameEntryForGameType(gameType) {
-	return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
+	if (gameType !== GameType.Trifle
+		|| (gameType === GameType.Trifle && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci']))
+		) {
+		return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
+	}
+	return "";
 }
 
 function newGameClicked() {
