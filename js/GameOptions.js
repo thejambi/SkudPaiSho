@@ -6,6 +6,7 @@ var OPTION_ALL_ACCENT_TILES = "All Accent Tiles";
 var OPTION_DOUBLE_ACCENT_TILES = "Double (8) Accent Tiles";
 var OPTION_ANCIENT_OASIS_EXPANSION = "Ancient Oasis Expansion";
 var OPTION_INFORMAL_START = "Informal Start";
+var NO_HARMONY_VISUAL_AIDS = "No Harmony Visual Aids";
 
 var OPTION_FULL_TILES = "Full tile set";
 

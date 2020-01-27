@@ -115,7 +115,7 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint) {
 		theDiv.classList.add("activePoint");
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
-		} else if (boardPoint.betweenHarmony) {
+		} else if (boardPoint.betweenHarmony && !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
 			theDiv.classList.add("betweenHarmony");
 			if (boardPoint.betweenHarmonyHost) {
 				theDiv.classList.add("bhHost");
@@ -142,7 +142,7 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint) {
 		var srcValue = getSkudTilesSrcPath();
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 
-		if (boardPoint.tile.harmonyOwners) {
+		if (boardPoint.tile.harmonyOwners && !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
 			for (var i = 0; i < boardPoint.tile.harmonyOwners.length; i++) {
 				theDiv.classList.add(boardPoint.tile.harmonyOwners[i] + "harmony");
 			}
