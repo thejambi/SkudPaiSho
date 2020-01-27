@@ -158,10 +158,11 @@ window.requestAnimationFrame(function () {
 
 	localStorage = new LocalStorage().storage;
 
-	/* Dark Mode Preferences */
-	if (localStorage.getItem("darkMode")
-			|| (!localStorage.getItem("darkMode") 
-				&& window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+	/* Dark Mode Preferences (dark mode now default) */
+	if (!localStorage.getItem("darkMode")) {
+		localStorage.setItem("darkMode", "true");
+	}
+	if (localStorage.getItem("darkMode") === "false") {
 		toggleDarkMode();
 	}
 
@@ -1584,7 +1585,8 @@ var GameType = {
 		gameOptions: [
 			OPTION_INFORMAL_START,
 			OPTION_DOUBLE_ACCENT_TILES, 
-			OPTION_ANCIENT_OASIS_EXPANSION
+			OPTION_ANCIENT_OASIS_EXPANSION,
+			NO_HARMONY_VISUAL_AIDS
 		]
 	},
 	VagabondPaiSho: {
@@ -3263,7 +3265,7 @@ function toggleDarkMode() {
 	if (root.classList.contains(DARK_MODE_CLASS)) {
 		root.classList.remove(DARK_MODE_CLASS);
 		document.body.classList.remove(DARK_MODE_CLASS);
-		localStorage.removeItem("darkMode");
+		localStorage.setItem("darkMode", "false");
 	} else {
 		root.classList.add(DARK_MODE_CLASS);
 		document.body.classList.add(DARK_MODE_CLASS);
