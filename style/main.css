@@ -1077,6 +1077,12 @@ body.darkMode textarea {
   }
 }
 
+@media only screen and (min-width: 576px) {
+  .footer {
+    display: none;
+  }
+}
+
 @media only screen and (max-width: 1090px) {
   /* Show message under board */
   .tilePileContainer {
