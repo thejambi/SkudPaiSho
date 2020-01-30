@@ -3270,7 +3270,6 @@ function submitTournamentSignup(tournamentId) {
 	onlinePlayEngine.submitTournamentSignup(getLoginToken(), tournamentId, submitTournamentSignupCallback);
 }
 
-var DARK_MODE_CLASS = "darkMode";
 function toggleDarkMode() {
 	var currentTheme = localStorage.getItem("data-theme") || "dark";
 	localStorage.setItem("data-theme", currentTheme === "dark" ? "light" : "dark");

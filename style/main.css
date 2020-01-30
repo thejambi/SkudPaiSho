@@ -82,10 +82,9 @@ html, body {
 	clear: both;
 	padding-top: 10px;
 	margin-top: 10px;
-  margin-bottom: 40px;
 	text-align: left;
   max-width: 612px;
-  min-height: 200px;
+  min-height: 40px;
 }
 
 .heading:after {
