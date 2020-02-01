@@ -61,10 +61,16 @@ div {
 html, body {
   margin: 0;
   padding: 0;
-  background: var(--body-background-color);
-  color: var(--color);
   font-family: "San Francisco", "Helvetica Neue", Arial, sans-serif;
   font-size: 15px;
+
+  /* Android bottom padding */
+  /*padding-bottom: 250px;*/
+}
+
+body {
+  background: var(--body-background-color);
+  color: var(--color);
   transition: background-color 0.5s, color 0.5s;
 
   /* Android bottom padding */
@@ -74,7 +80,7 @@ html, body {
 #mainWrapper {
   max-width: 1198px;
   min-width: 306px;
-  height: calc(100vh - 32px);
+  min-height: calc(100vh - 32px);
   margin: 32px auto 0 auto;
 }
 
