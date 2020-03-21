@@ -160,10 +160,10 @@ window.requestAnimationFrame(function () {
 
 	/* Dark Mode Preferences (dark mode now default) */
 	if (!localStorage.getItem("data-theme")) {
-		/* to always have dark as default instead of system preferences
+		/* to always have dark as default instead of system preferences */
 		var dataTheme = "dark";
-		*/
-		var dataTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? "dark" : "light";
+		/* to set based on preference */
+		// var dataTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? "dark" : "light";
 
 		// check for old theme system.
 		if (localStorage.getItem("darkMode")) {
