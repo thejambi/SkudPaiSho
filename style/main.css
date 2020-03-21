@@ -90,7 +90,7 @@ body {
 	margin-top: 10px;
 	text-align: left;
   max-width: 612px;
-  min-height: 40px;
+  min-height: 100px;
 }
 
 .heading:after {
