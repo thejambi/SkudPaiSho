@@ -1718,7 +1718,7 @@ function getGameControllerForGameType(gameTypeId) {
 			controller = new BloomsController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Trifle.id:
-			if (usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci'])) {
+			if (debugOn || usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci'])) {
 				controller = new TrifleController(gameContainerDiv, isMobile);
 			}
 			break;
@@ -2165,7 +2165,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 		for (var index in gameSeekList) {
 			var gameSeek = gameSeekList[index];
 
-			if (gameSeek.gameTypeId !== GameType.Trifle.id
+			if (debugOn || gameSeek.gameTypeId !== GameType.Trifle.id
 				|| (gameSeek.gameTypeId === GameType.Trifle.id && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci']))
 			) {
 			
@@ -2374,11 +2374,11 @@ function randomIntFromInterval(min, max) {
 }
 
 function closeGame() {
-	// if (debugOn) {
-	// 	setGameController(GameType.Trifle.id);
-	// } else {
+	if (debugOn) {
+		setGameController(GameType.Trifle.id);
+	} else {
 		setGameController(randomIntFromInterval(1,2));
-	// }
+	}
 }
 
 function getSidenavNewGameEntryForGameType(gameType) {
@@ -2386,7 +2386,7 @@ function getSidenavNewGameEntryForGameType(gameType) {
 }
 
 function getNewGameEntryForGameType(gameType) {
-	if (gameType !== GameType.Trifle
+	if (debugOn || gameType !== GameType.Trifle
 		|| (gameType === GameType.Trifle && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci']))
 		) {
 		return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
