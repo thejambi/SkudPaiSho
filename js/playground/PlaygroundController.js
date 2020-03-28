@@ -86,20 +86,6 @@ PlaygroundController.prototype.passTurn = function() {
 	rerunAll();
 }
 
-PlaygroundController.prototype.getExtraHarmonyBonusHelpText = function() {
-	if (!limitedGatesRule) {
-		if (this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
-			return " <br />You can choose an Accent Tile, Special Flower Tile, or, since you have less than two Growing Flowers, a Basic Flower Tile.";
-		}
-		return " <br />You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have two or more Growing Flowers.";
-	} else {
-		if (this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
-			return " <br />You can choose an Accent Tile or, since you have no Growing Flowers, a Basic or Special Flower Tile.";
-		}
-		return " <br />You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have at least one Growing Flower.";
-	}
-};
-
 PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
 	if (this.theGame.getWinner()) {
 		return;

@@ -17,20 +17,24 @@ PlaygroundTileManager.prototype.loadTileSet = function(ownerCode) {
 PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	var tiles = [];
 
-	tiles.push(new PlaygroundTile('R', ownerCode));
-	tiles.push(new PlaygroundTile('W', ownerCode));
-	tiles.push(new PlaygroundTile('K', ownerCode));
-	tiles.push(new PlaygroundTile('B', ownerCode));
+	// Skud Pai Sho tiles
+	tiles.push(new PlaygroundTile('Skud_R', ownerCode));
+	tiles.push(new PlaygroundTile('Skud_W', ownerCode));
+	tiles.push(new PlaygroundTile('Skud_K', ownerCode));
+	tiles.push(new PlaygroundTile('Skud_B', ownerCode));
 
-	tiles.push(new PlaygroundTile("R3", ownerCode));
-	tiles.push(new PlaygroundTile("R4", ownerCode));
-	tiles.push(new PlaygroundTile("R5", ownerCode));
-	tiles.push(new PlaygroundTile("W3", ownerCode));
-	tiles.push(new PlaygroundTile("W4", ownerCode));
-	tiles.push(new PlaygroundTile("W5", ownerCode));
+	tiles.push(new PlaygroundTile("Skud_R3", ownerCode));
+	tiles.push(new PlaygroundTile("Skud_R4", ownerCode));
+	tiles.push(new PlaygroundTile("Skud_R5", ownerCode));
+	tiles.push(new PlaygroundTile("Skud_W3", ownerCode));
+	tiles.push(new PlaygroundTile("Skud_W4", ownerCode));
+	tiles.push(new PlaygroundTile("Skud_W5", ownerCode));
 
-	tiles.push(new PlaygroundTile('L', ownerCode));
-	tiles.push(new PlaygroundTile('O', ownerCode));
+	tiles.push(new PlaygroundTile('Skud_L', ownerCode));
+	tiles.push(new PlaygroundTile('Skud_O', ownerCode));
+
+	// Vagabond tiles
+	
 
 	return tiles;
 };
