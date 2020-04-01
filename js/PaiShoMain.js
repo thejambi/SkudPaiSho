@@ -383,6 +383,8 @@ function verifyLogin() {
 	}
 }
 
+var previousCountOfGamesWhereUserTurn = 0;
+
 function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 	var text = "Sign In";
 	var numMovesText = "";
@@ -399,6 +401,11 @@ function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 	}
 	document.getElementById('accountHeaderLinkText').innerText = text;
 	document.getElementById('myGamesNumberMyTurn').innerText = numMovesText;
+
+	if (countOfGamesWhereUserTurn > previousCountOfGamesWhereUserTurn) {
+		notifyThisMessage("The Garden Gate: It's your turn!");
+	}
+	previousCountOfGamesWhereUserTurn = countOfGamesWhereUserTurn;
 }
 
 var getGameNotationCallback = function getGameNotationCallback(newGameNotation) {
@@ -2018,6 +2025,7 @@ function accountHeaderClicked() {
 	} else {
 		loginClicked();
 	}
+	requestNotificationPermission();
 }
 
 function loginClicked() {
@@ -3307,3 +3315,51 @@ function setGameLogText(text) {
 	}
 	document.getElementById('gameLogText').innerText = newText;
 }
+
+
+
+
+
+
+/* Notifications work */
+function requestNotificationPermission() {
+	if (Notification.permission !== "denied") {
+		Notification.requestPermission().then(function (permission) {
+			// If the user accepts, let's create a notification
+			if (permission === "granted") {
+				var notification = new Notification(message);
+			}
+		});
+	}
+}
+
+function notifyMe() {
+	notifyThisMessage("It's your turn, bub");
+}
+
+function notifyThisMessage(message) {
+	// Let's check if the browser supports notifications
+	// if (!("Notification" in window)) {
+	//   alert("This browser does not support desktop notification");
+	// } else.....
+  
+	// Let's check whether notification permissions have already been granted
+	if (!document.hasFocus() && Notification.permission === "granted") {
+	  // If it's okay let's create a notification
+	  var notification = new Notification(message);
+	}
+  
+	// Otherwise, we need to ask the user for permission
+	// else if (Notification.permission !== "denied") {
+	//   Notification.requestPermission().then(function (permission) {
+	// 	// If the user accepts, let's create a notification
+	// 	if (permission === "granted") {
+	// 	  var notification = new Notification(message);
+	// 	}
+	//   });
+	// }
+  
+	// At last, if the user has denied notifications, and you 
+	// want to be respectful there is no need to bother them any more.
+  }
+
