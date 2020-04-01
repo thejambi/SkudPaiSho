@@ -3323,8 +3323,7 @@ function setGameLogText(text) {
 
 /* Notifications work */
 function requestNotificationPermission() {
-	if (!document.hasFocus() 
-			&& Notification.permission !== "denied") {
+	if (Notification.permission !== "denied") {
 		Notification.requestPermission().then(function (permission) {
 			// If the user accepts, let's create a notification
 			if (permission === "granted") {
@@ -3345,7 +3344,7 @@ function notifyThisMessage(message) {
 	// } else.....
   
 	// Let's check whether notification permissions have already been granted
-	if (Notification.permission === "granted") {
+	if (!document.hasFocus() && Notification.permission === "granted") {
 	  // If it's okay let's create a notification
 	  var notification = new Notification(message);
 	}
