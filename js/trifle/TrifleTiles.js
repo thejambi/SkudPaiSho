@@ -358,7 +358,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 			{
 				type: BoardPresenceAbility.increaseFriendlyTileMovementDistance,
 				amount: 1,
-				targetTileTypes: [TileType.flower, TileType.traveler]
+				targetTileTypes: [TileType.flower]
 			}
 		]
 	};
