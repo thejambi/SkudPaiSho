@@ -34,6 +34,8 @@ TrifleGameManager.prototype.actuate = function () {
 TrifleGameManager.prototype.runNotationMove = function(move, withActuate) {
 	debug("Running Move: " + move.fullMoveText);
 
+	this.board.tickDurationAbilities();
+
 	if (move.moveType === TEAM_SELECTION) {
 		var self = this;
 		move.teamTileCodes.forEach(function(tileCode){

@@ -6,6 +6,7 @@ function TrifleBoard() {
 
 	this.winners = [];
 	this.tilePresenceAbilities = [];
+	this.activeDurationAbilities = [];
 
 	this.hostBannerPlayed = false;
 	this.guestBannerPlayed = false;
@@ -1026,6 +1027,9 @@ TrifleBoard.prototype.moveTile = function(player, notationPointStart, notationPo
 	this.setPointFlags();
 
 	/* Process abilities after moving a tile */
+	if (capturedTiles.length > 0) {
+		this.applyWhenCapturingTrigger(tile, tileInfo, boardPointEnd, capturedTiles);
+	}
 	this.applyZoneAbilityToTile(boardPointEnd);
 	this.applyBoardScanAbilities();
 
@@ -1035,6 +1039,21 @@ TrifleBoard.prototype.moveTile = function(player, notationPointStart, notationPo
 		endPoint: boardPointEnd,
 		capturedTiles: capturedTiles
 	}
+};
+
+TrifleBoard.prototype.applyWhenCapturingTrigger = function(tile, tileInfo, boardPointOfTile, capturedTiles) {
+	var triggeredAbilities = TrifleTileInfo.getAbilitiesWithAbilityTrigger(tileInfo, AbilityTrigger.whenCapturing);
+	
+	var self = this;
+	triggeredAbilities.forEach(function(triggeredAbility) {
+		// Verify any other trigger criteria here...
+
+		debug("When capturing trigger.. triggered");
+		
+		if (triggeredAbility.duration && triggeredAbility.duration > 0) {
+			self.activateAbility(tile, triggeredAbility);
+		}
+	});
 };
 
 TrifleBoard.prototype.setPointFlags = function() {
@@ -1883,6 +1902,33 @@ TrifleBoard.prototype.setGuestGateOpen = function() {
 	var col = 8;
 	if (this.cells[row][col].isOpenGate()) {
 		this.cells[row][col].addType(POSSIBLE_MOVE);
+	}
+};
+
+TrifleBoard.prototype.activateAbility = function(tile, abilityInfo) {
+	if (abilityInfo.duration && abilityInfo.duration > 0) {
+		abilityInfo.active = true;
+		abilityInfo.remainingDuration = abilityInfo.duration;
+		this.activeDurationAbilities.push({
+			tile: tile,
+			ability: abilityInfo
+		});
+		debug("Activated ability!");
+		debug(abilityInfo);
+	}
+};
+
+TrifleBoard.prototype.tickDurationAbilities = function() {
+	for (var i = this.activeDurationAbilities.length - 1; i >= 0; i--) {
+		var durationAbilityDetails = this.activeDurationAbilities[i];
+		var durationAbilityInfo = durationAbilityDetails.ability;
+		durationAbilityInfo.remainingDuration -= 0.5;
+		if (durationAbilityInfo.remainingDuration <= 0) {
+			durationAbilityInfo.active = false;
+			this.activeDurationAbilities.splice(i, 1);
+			debug("Ability deactivated!");
+			debug(durationAbilityInfo);
+		}
 	}
 };
 

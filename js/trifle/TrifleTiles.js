@@ -16,6 +16,7 @@ var TrifleTileCodes = {
 	Dandelion: 'Dandelion',
 	Edelweiss: 'Edelweiss',
 	WaterBanner: 'WaterBanner',
+	PolarBearDog: 'PolarBearDog',
 	TitanArum: 'TitanArum',
 	EarthBanner: 'EarthBanner',
 	SaberToothMooseLion: 'SaberToothMooseLion',
@@ -29,6 +30,10 @@ var TileType = {
 	fruit: "fruit",
 	other: "other",
 	traveler: "traveler"
+};
+
+var TileCategory = {
+	allTileTypes: "allTileTypes"
 };
 
 var DeployType = {
@@ -86,9 +91,10 @@ var ZoneAbility = {
 
 var BoardPresenceAbility = {
 	increaseFriendlyTileMovementDistance: "increaseFriendlyTileMovementDistance",
-	spawnAdditionalCopies: "spawnAdditionalCopies",	// TODO,
+	// spawnAdditionalCopies: "spawnAdditionalCopies",	// TODO,
 	canBeCapturedByFriendlyTiles: "canBeCapturedByFriendlyTiles",
-	drawOpponentTilesInLineOfSight: "drawOpponentTilesInLineOfSight"
+	drawOpponentTilesInLineOfSight: "drawOpponentTilesInLineOfSight",
+	captureProtection: "captureProtection"
 }
 
 var SpawnLocation = {
@@ -96,7 +102,8 @@ var SpawnLocation = {
 };
 
 var AbilityTrigger = {
-	onCapture: "onCapture"
+	whenCaptured: "whenCaptured",
+	whenCapturing: "whenCapturing"
 };
 
 var TileTeam = {
@@ -177,13 +184,38 @@ TrifleTileInfo.tileHasMovementAbility = function(tileInfo, targetMovementAbility
 				movementInfo.abilities.forEach(function(movementAbilityInfo) {
 					if (movementAbilityInfo.type === targetMovementAbilityType) {
 						tileHasMovementAbility = true;
-						return true;
+						return;	// Escape .forEach
 					}
 				});
 			}
 		});
 	}
 	return tileHasMovementAbility;
+};
+
+TrifleTileInfo.tileHasAbilityTrigger = function(tileInfo, abilityTrigger) {
+	var tileHasAbilityTrigger = false;
+	if (tileInfo && tileInfo.abilities) {
+		tileInfo.abilities.forEach(function(abilityInfo) {
+			if (abilityInfo.triggeringAction === abilityTrigger) {
+				tileHasAbilityTrigger = true;
+				return;	// Escape .forEach
+			}
+		});
+	}
+	return tileHasAbilityTrigger;
+};
+
+TrifleTileInfo.getAbilitiesWithAbilityTrigger = function(tileInfo, abilityTrigger) {
+	var abilitiesWithTrigger = [];
+	if (tileInfo && tileInfo.abilities) {
+		tileInfo.abilities.forEach(function(abilityInfo) {
+			if (abilityInfo.triggeringAction === abilityTrigger) {
+				abilitiesWithTrigger.push(abilityInfo);
+			}
+		});
+	}
+	return abilitiesWithTrigger;
 };
 
 TrifleTileInfo.defineTrifleTiles = function() {
@@ -405,6 +437,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 				type: MovementType.jumpShape,
 				shape: [1, 2],
 				distance: 99,
+				captureTypes: [ CaptureType.all ],
 				abilities: [
 					{
 						type: MovementAbility.jumpOver
@@ -444,7 +477,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 			},
 			{
 				type: BoardPresenceAbility.spawnAdditionalCopies,
-				triggered: AbilityTrigger.onCapture,
+				triggeringAction: : AbilityTrigger.whenCaptured,
 				amount: 2,
 				location: SpawnLocation.adjacent
 			}
@@ -472,6 +505,29 @@ TrifleTileInfo.defineTrifleTiles = function() {
 			{
 				type: MovementType.standard,
 				distance: 2
+			}
+		]
+	};
+
+	TrifleTiles[TrifleTileCodes.PolarBearDog] = {
+		types: [TileType.animal],
+		deployTypes: [DeployType.anywhere],
+		movements: [
+			{
+				type: MovementType.standard,
+				distance: 4,
+				captureTypes: [ CaptureType.all ]
+			}
+		],
+		abilities: [
+			{
+				type: BoardPresenceAbility.captureProtection,
+				triggeringAction: AbilityTrigger.whenCapturing,
+				// triggerTargetTileType: [TileType.flower],	// For example - ability could trigger when capturing a Flower
+				duration: 1,
+				tileTypesProtectedFrom: [TileCategory.allTileTypes]
+				// tileTypesProtectedFrom: [TileType.traveler]
+				// tilesProtectedFrom: [TrifleTileCodes.Dragon]
 			}
 		]
 	};
