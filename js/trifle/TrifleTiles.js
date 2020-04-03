@@ -523,11 +523,11 @@ TrifleTileInfo.defineTrifleTiles = function() {
 			{
 				type: BoardPresenceAbility.captureProtection,
 				triggeringAction: AbilityTrigger.whenCapturing,
-				// triggerTargetTileType: [TileType.flower],	// For example - ability could trigger when capturing a Flower
+				// triggerTargetTileType: [TileType.flower],	// Idea: For example - ability could trigger when capturing a Flower
 				duration: 1,
 				tileTypesProtectedFrom: [TileCategory.allTileTypes]
 				// tileTypesProtectedFrom: [TileType.traveler]
-				// tilesProtectedFrom: [TrifleTileCodes.Dragon]
+				// tilesProtectedFrom: [TrifleTileCodes.Wheel, TrifleTileCodes.Dragon]
 			}
 		]
 	};

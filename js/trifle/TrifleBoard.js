@@ -1563,7 +1563,34 @@ TrifleBoard.prototype.targetPointIsEmptyOrCanBeCaptured = function(tile, movemen
 
 TrifleBoard.prototype.targetPointHasTileTileThatCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint) {
 	return targetPoint.hasTile() 
-		&& this.tileCanCapture(tile, movementInfo, fromPoint, targetPoint);
+		&& this.tileCanCapture(tile, movementInfo, fromPoint, targetPoint)
+		&& !this.tileHasActiveCaptureProtectionFromCapturingTile(targetPoint.tile, tile);
+};
+
+TrifleBoard.prototype.tileHasActiveCaptureProtectionFromCapturingTile = function(tile, capturingTile) {
+	var tileHasActiveCaptureProtection = false;
+	this.activeDurationAbilities.forEach(function(durationAbilityEntry) {
+		debug("Active Duration Ability: ");
+		debug(durationAbilityEntry);
+		if (durationAbilityEntry.tile === tile) {
+			debug("Yes, for this tile");
+			var capturingTileInfo = TrifleTiles[capturingTile.code];
+			if (
+				(durationAbilityEntry.ability.tileTypesProtectedFrom
+				&& arrayIncludesOneOf(durationAbilityEntry.ability.tileTypesProtectedFrom, capturingTileInfo.types))
+				||
+				(durationAbilityEntry.ability.tileTypesProtectedFrom
+					&& durationAbilityEntry.ability.tileTypesProtectedFrom.includes(TileCategory.allTileTypes))
+				||
+				(durationAbilityEntry.ability.tilesProtectedFrom
+				&& durationAbilityEntry.ability.tilesProtectedFrom.includes(capturingTile.code))
+			) {
+				tileHasActiveCaptureProtection = true;
+				return;
+			}
+		}
+	});
+	return tileHasActiveCaptureProtection;
 };
 
 TrifleBoard.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, targetPoint) {
