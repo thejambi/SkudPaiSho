@@ -523,7 +523,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 			{
 				type: BoardPresenceAbility.captureProtection,
 				triggeringAction: AbilityTrigger.whenCapturing,
-				// triggerTargetTileType: [TileType.flower],	// Idea: For example - ability could trigger when capturing a Flower
+				// triggerTargetTileType: [TileType.flower],	// Idea: For example - ability could trigger when capturing a Flower - It'd be better to create a Trigger object that contains all the trigger info
 				duration: 1,
 				tileTypesProtectedFrom: [TileCategory.allTileTypes]
 				// tileTypesProtectedFrom: [TileType.traveler]
