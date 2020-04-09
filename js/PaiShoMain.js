@@ -3363,3 +3363,19 @@ function notifyThisMessage(message) {
 	// want to be respectful there is no need to bother them any more.
   }
 
+/* Keyboard shortcuts */
+
+document.onkeyup = function (e) {
+	debug(e.which || e.keyCode);
+	if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 67) {
+		/* Ctrl + Alt + C */
+		closeGame();
+	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 83) {
+		/* Ctrl + Alt + S */
+		sandboxFromMove();
+	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 82) {
+		/* Ctrl + Alt + R */
+		toggleReplayControls();
+	}
+};
+
