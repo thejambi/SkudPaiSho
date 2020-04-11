@@ -17,6 +17,7 @@ var TrifleTileCodes = {
 	Edelweiss: 'Edelweiss',
 	WaterBanner: 'WaterBanner',
 	PolarBearDog: 'PolarBearDog',
+	BuffaloYak: 'BuffaloYak',
 	TitanArum: 'TitanArum',
 	EarthBanner: 'EarthBanner',
 	SaberToothMooseLion: 'SaberToothMooseLion',
@@ -86,7 +87,7 @@ var ZoneAbility = {
 	canceledWhenInTemple: "canceledWhenInTemple",
 	protectFriendlyTilesFromCapture: "protectFriendlyTilesFromCapture",
 	immobilizesOpponentTiles: "immobilizesOpponentTiles",
-	removesTileAbilities: "removesTileAbilities"	// TODO
+	removesTileAbilities: "removesTileAbilities"	// TODO // TODO testing, etc
 }
 
 var BoardPresenceAbility = {
@@ -491,8 +492,9 @@ TrifleTileInfo.defineTrifleTiles = function() {
 			size: 4,
 			abilities: [
 				{
-					type: ZoneAbility.removesTileAbilities, // TODO testing, etc
-					targetTeams: [TileTeam.friendly, TileTeam.enemy]
+					type: ZoneAbility.removesTileAbilities,
+					targetTeams: [TileTeam.friendly, TileTeam.enemy],
+					targetTileTypes: [TileCategory.allTileTypes]
 				}
 			]
 		}
@@ -530,6 +532,28 @@ TrifleTileInfo.defineTrifleTiles = function() {
 				// tilesProtectedFrom: [TrifleTileCodes.Wheel, TrifleTileCodes.Dragon]
 			}
 		]
+	};
+
+	TrifleTiles[TrifleTileCodes.BuffaloYak] = {
+		types: [TileType.animal],
+		deployTypes: [DeployType.anywhere],
+		movements: [
+			{
+				type: MovementType.standard,
+				distance: 2,
+				captureTypes: [CaptureType.all]
+			}
+		],
+		territorialZone: {
+			size: 2,
+			abilities: [
+				{
+					type: ZoneAbility.removesTileAbilities,
+					targetTeams: [TileTeam.friendly, TileTeam.enemy],
+					targetTileTypes: [TileType.flower]
+				}
+			]
+		}
 	};
 
 	TrifleTiles[TrifleTileCodes.TitanArum] = {
