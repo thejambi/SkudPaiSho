@@ -392,6 +392,10 @@ TrifleBoard.prototype.abilityIsActive = function(boardPoint, tile, tileInfo, abi
 	/* Abilities defalt to active unless disabled */
 	var abilityIsActive = true;
 
+	/* What are the ways an ability can be disabled?
+
+	 */
+
 	var self = this;
 	this.forEachBoardPointWithTile(function(checkBoardPoint) {
 		var checkTileInfo = TrifleTiles[checkBoardPoint.tile.code];
@@ -409,10 +413,14 @@ TrifleBoard.prototype.abilityIsActive = function(boardPoint, tile, tileInfo, abi
 						|| (zoneAbilityInfo.targetTeams.includes(TileTeam.enemy)
 							&& tile.ownerCode !== checkBoardPoint.tile.ownerCode)
 					) && (
+						arrayIncludesOneOf(zoneAbilityInfo.targetTileTypes, tileInfo.types)
+						|| zoneAbilityInfo.targetTileTypes.includes(TileCategory.allTileTypes)
+					) && (
 						self.pointTileZoneContainsPoint(checkBoardPoint, boardPoint)
 					)
 				) {
 					abilityIsActive = false;
+					debug("Ability disabled for tile: " + tile.code + " by tile: " + checkBoardPoint.tile.code);
 				}
 			});
 		}
