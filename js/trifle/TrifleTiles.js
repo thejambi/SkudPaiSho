@@ -87,7 +87,8 @@ var ZoneAbility = {
 	canceledWhenInTemple: "canceledWhenInTemple",
 	protectFriendlyTilesFromCapture: "protectFriendlyTilesFromCapture",
 	immobilizesOpponentTiles: "immobilizesOpponentTiles",
-	removesTileAbilities: "removesTileAbilities"	// TODO // TODO testing, etc
+	removesTileAbilities: "removesTileAbilities",	// TODO // TODO testing, etc
+	restrictMovementWithinZone: "restrictMovementWithinZone"
 }
 
 var BoardPresenceAbility = {
@@ -276,14 +277,14 @@ TrifleTileInfo.defineTrifleTiles = function() {
 			{
 				type: MovementType.standard,
 				distance: 6,
-				captureTypes: [ CaptureType.all ],
-				restrictions: [
+				captureTypes: [ CaptureType.all ]
+				/* restrictions: [
 					{
-						/* TODO Should this be an ability of the Bison zone, rather than a restriction on its movement? */
+						// This is now an ability of the Bison zone, rather than a restriction on its movement
 						type: MovementRestriction.restrictedByOpponentTileZones,
 						affectingTiles: [ TrifleTileCodes.SkyBison ]
 					}
-				]
+				] */
 			}
 		],
 		territorialZone: {
@@ -291,6 +292,11 @@ TrifleTileInfo.defineTrifleTiles = function() {
 			abilities: [
 				{
 					type: ZoneAbility.canceledWhenInTemple
+				},
+				{
+					type: ZoneAbility.restrictMovementWithinZone,
+					targetTeams: [ TileTeam.enemy ],
+					targetTileCodes: [ TrifleTileCodes.SkyBison ]
 				}
 			]
 		}

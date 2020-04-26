@@ -1467,7 +1467,9 @@ TrifleBoard.prototype.tileMovementIsImmobilizedByZoneAbility = function(tileBein
 		var zoneInfo = TrifleTileInfo.getTerritorialZone(TrifleTiles[boardPoint.tile.code]);
 		if (zoneInfo && zoneInfo.abilities) {
 			zoneInfo.abilities.forEach(function(zoneAbility) {
-				if (self.tileMovementIsImmobilizedByTileZoneAbility(zoneAbility, boardPoint, tileBeingMoved, tileBeingMovedInfo, boardPointStart)) {
+				if (
+					self.tileMovementIsImmobilizedByTileZoneAbility(zoneAbility, boardPoint, tileBeingMoved, tileBeingMovedInfo, boardPointStart)
+					) {
 					isImmobilized = true;
 				}
 			});
@@ -1478,9 +1480,12 @@ TrifleBoard.prototype.tileMovementIsImmobilizedByZoneAbility = function(tileBein
 
 TrifleBoard.prototype.tileMovementIsImmobilizedByTileZoneAbility = function(zoneAbility, tilePoint, tileBeingMoved, tileBeingMovedInfo, movementStartPoint) {
 	var isImmobilized = false;
-	if (zoneAbility.type === ZoneAbility.immobilizesOpponentTiles
-			&& tilePoint.tile.ownerName !== tileBeingMovedInfo.ownerName
-			&& this.pointTileZoneContainsPoint(tilePoint, movementStartPoint)) {
+	if (
+		zoneAbility.type === ZoneAbility.immobilizesOpponentTiles
+		&& tilePoint.tile.ownerName !== tileBeingMovedInfo.ownerName
+		&& this.pointTileZoneContainsPoint(tilePoint, movementStartPoint)
+		&& this.abilityIsActive(tilePoint, tilePoint.tile, TrifleTiles[tilePoint.tile.code], zoneAbility)
+		) {
 		if (zoneAbility.targetTileCodes) {
 			if (zoneAbility.targetTileCodes.includes(tileBeingMoved.code)) {
 				isImmobilized = true;
@@ -1655,6 +1660,60 @@ TrifleBoard.prototype.movementInfoHasAbility = function(movementInfo, movementAb
 };
 
 TrifleBoard.prototype.tileZonedOutOfSpace = function(tile, movementInfo, targetPoint) {
+	var isZonedOut = this.tileZonedOutOfSpaceByMovementRestriction(tile, movementInfo, targetPoint);
+	
+	isZonedOut = isZonedOut || this.tileZonedOutofSpaceByZoneAbility(tile, targetPoint);
+
+	return isZonedOut;
+};
+
+TrifleBoard.prototype.tileZonedOutofSpaceByZoneAbility = function(tile, targetPoint) {
+	var isZonedOut = false;
+
+	var self = this;
+
+	this.forEachBoardPointWithTile(function(checkBoardPoint) {
+		var checkTileInfo = TrifleTiles[checkBoardPoint.tile.code];
+
+		/* Check tile zones that can restrict movement to targetPoint */
+		var zoneInfo = TrifleTileInfo.getTerritorialZone(checkTileInfo);
+		if (zoneInfo && zoneInfo.abilities) {
+			zoneInfo.abilities.forEach(function(zoneAbilityInfo) {
+				if (
+					(
+						zoneAbilityInfo.type === ZoneAbility.restrictMovementWithinZone
+					) && (
+						(zoneAbilityInfo.targetTeams.includes(TileTeam.friendly)
+							&& tile.ownerCode === checkBoardPoint.tile.ownerCode)
+						|| (zoneAbilityInfo.targetTeams.includes(TileTeam.enemy)
+							&& tile.ownerCode !== checkBoardPoint.tile.ownerCode)
+					) && (
+						(
+							zoneAbilityInfo.targetTileTypes 
+							&& (
+								arrayIncludesOneOf(zoneAbilityInfo.targetTileTypes, tileInfo.types)
+								|| zoneAbilityInfo.targetTileTypes.includes(TileCategory.allTileTypes)
+							)
+						)
+						|| (
+							zoneAbilityInfo.targetTileCodes 
+							&& zoneAbilityInfo.targetTileCodes.includes(tile.code)
+						)
+					) && (
+						self.pointTileZoneContainsPoint(checkBoardPoint, targetPoint)
+					)
+				) {
+					isZonedOut = true;
+					debug("Zoned out! For tile: " + tile.code + " by tile: " + checkBoardPoint.tile.code);
+				}
+			});
+		}
+	});
+
+	return isZonedOut;
+};
+
+TrifleBoard.prototype.tileZonedOutOfSpaceByMovementRestriction = function(tile, movementInfo, targetPoint) {
 	var isZonedOut = false;
 	if (movementInfo.restrictions && movementInfo.restrictions.length > 0) {
 		var self = this;
