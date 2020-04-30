@@ -30,6 +30,8 @@ var useDeLionTiles = false;
 
 var debugOn = false;
 
+var trifleOn = false;
+
 /* Set to true if building for iOS, else set to false */
 var ios = false;
 
@@ -54,9 +56,7 @@ function shouldRedirectIfNotHttps() {
 
 
 function debug(str) {
-    if (debugOn
-      || (getUsername() === 'SkudPaiSho' || getUsername() === 'Zach')
-      ) {
+    if (debugOn) {
       if (ios || QueryString.appType === 'ios') {
         try {
           webkit.messageHandlers.callbackHandler.postMessage(

@@ -1725,8 +1725,10 @@ function getGameControllerForGameType(gameTypeId) {
 			controller = new BloomsController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Trifle.id:
-			if (debugOn || usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci'])) {
+			if (trifleOn || usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci'])) {
 				controller = new TrifleController(gameContainerDiv, isMobile);
+			} else {
+				closeGame();
 			}
 			break;
 		case GameType.Hexentafl.id:
@@ -2173,7 +2175,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 		for (var index in gameSeekList) {
 			var gameSeek = gameSeekList[index];
 
-			if (debugOn || gameSeek.gameTypeId !== GameType.Trifle.id
+			if (gameSeek.gameTypeId !== GameType.Trifle.id
 				|| (gameSeek.gameTypeId === GameType.Trifle.id && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci']))
 			) {
 			
@@ -2231,10 +2233,22 @@ function viewGameSeeksClicked() {
 	}
 }
 
+var yesCreateGame = function yesCreateGame(gameTypeId) {
+	onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), getLoginToken(), createGameCallback);
+};
+
 var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHostedByUserCallback(results) {
 	var gameTypeId = tempGameTypeId;
 	if (!results) {
-		onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), getLoginToken(), createGameCallback);
+		// If a solitaire game, automatically create game, as it'll be automatically joined.
+		if (gameController.isSolitaire()) {
+			yesCreateGame(gameTypeId);
+		} else {
+			var message = "<div>Do you want to create a game for others to join?</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal(); yesCreateGame(" + gameTypeId + ");'>Yes - create game</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - cancel</div>";
+			showModal("Create game?", message);
+		}
 	} else {
 		finalizeMove();
 		var message = "";
@@ -2382,7 +2396,7 @@ function randomIntFromInterval(min, max) {
 }
 
 function closeGame() {
-	if (debugOn) {
+	if (trifleOn) {
 		setGameController(GameType.Trifle.id);
 	} else {
 		setGameController(randomIntFromInterval(1,2));
@@ -2394,7 +2408,7 @@ function getSidenavNewGameEntryForGameType(gameType) {
 }
 
 function getNewGameEntryForGameType(gameType) {
-	if (debugOn || gameType !== GameType.Trifle
+	if (trifleOn || gameType !== GameType.Trifle
 		|| (gameType === GameType.Trifle && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci']))
 		) {
 		return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
@@ -3327,7 +3341,7 @@ function requestNotificationPermission() {
 		Notification.requestPermission().then(function (permission) {
 			// If the user accepts, let's create a notification
 			if (permission === "granted") {
-				var notification = new Notification(message);
+				debug("Notifications granted");
 			}
 		});
 	}
