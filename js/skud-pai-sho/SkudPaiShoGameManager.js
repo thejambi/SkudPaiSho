@@ -248,7 +248,7 @@ SkudPaiShoGameManager.prototype.getWinResultTypeCode = function() {
 		} else {
 			return 3;	// Most Harmonies
 		}
-	} else if (this.endGameWinners.length > 1) {
+	} else if (this.endGameWinners.length > 1 || this.board.winners.length > 1) {
 		return 4;	// Tie
 	}
 };
