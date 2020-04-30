@@ -413,8 +413,17 @@ TrifleBoard.prototype.abilityIsActive = function(boardPoint, tile, tileInfo, abi
 						|| (zoneAbilityInfo.targetTeams.includes(TileTeam.enemy)
 							&& tile.ownerCode !== checkBoardPoint.tile.ownerCode)
 					) && (
-						arrayIncludesOneOf(zoneAbilityInfo.targetTileTypes, tileInfo.types)
-						|| zoneAbilityInfo.targetTileTypes.includes(TileCategory.allTileTypes)
+						(
+							zoneAbilityInfo.targetTileTypes 
+							&& (
+								arrayIncludesOneOf(zoneAbilityInfo.targetTileTypes, tileInfo.types)
+								|| zoneAbilityInfo.targetTileTypes.includes(TileCategory.allTileTypes)
+							)
+						)
+						|| (
+							zoneAbilityInfo.targetTileCodes 
+							&& zoneAbilityInfo.targetTileCodes.includes(tile.code)
+						)
 					) && (
 						self.pointTileZoneContainsPoint(checkBoardPoint, boardPoint)
 					)
@@ -1348,7 +1357,14 @@ TrifleBoard.prototype.setPossibleMovementPointsFromMovePoints = function(movePoi
 			self.movementPointChecks++;
 			if (!self.canMoveHereMoreEfficientlyAlready(adjacentPoint, distanceRemaining, movementInfo)) {
 				adjacentPoint.setMoveDistanceRemaining(movementInfo, distanceRemaining);
+				
 				var canMoveThroughPoint = self.tileCanMoveThroughPoint(tile, movementInfo, adjacentPoint, recentPoint);
+				
+				/* If cannot move through point, then the distance remaining is 0, none! */
+				if (!canMoveThroughPoint) {
+					adjacentPoint.setMoveDistanceRemaining(movementInfo, 0);
+				}
+				
 				if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint)) {
 					var movementOk = self.setPointAsPossibleMovement(adjacentPoint, tile, originPoint);
 					if (movementOk) {
@@ -1482,7 +1498,7 @@ TrifleBoard.prototype.tileMovementIsImmobilizedByTileZoneAbility = function(zone
 	var isImmobilized = false;
 	if (
 		zoneAbility.type === ZoneAbility.immobilizesOpponentTiles
-		&& tilePoint.tile.ownerName !== tileBeingMovedInfo.ownerName
+		&& tilePoint.tile.ownerName !== tileBeingMoved.ownerName
 		&& this.pointTileZoneContainsPoint(tilePoint, movementStartPoint)
 		&& this.abilityIsActive(tilePoint, tilePoint.tile, TrifleTiles[tilePoint.tile.code], zoneAbility)
 		) {
@@ -1679,6 +1695,7 @@ TrifleBoard.prototype.tileZonedOutofSpaceByZoneAbility = function(tile, targetPo
 		var zoneInfo = TrifleTileInfo.getTerritorialZone(checkTileInfo);
 		if (zoneInfo && zoneInfo.abilities) {
 			zoneInfo.abilities.forEach(function(zoneAbilityInfo) {
+				var abilityIsActive = self.abilityIsActive(checkBoardPoint, checkBoardPoint.tile, checkTileInfo, zoneAbilityInfo);
 				if (
 					(
 						zoneAbilityInfo.type === ZoneAbility.restrictMovementWithinZone
@@ -1701,6 +1718,8 @@ TrifleBoard.prototype.tileZonedOutofSpaceByZoneAbility = function(tile, targetPo
 						)
 					) && (
 						self.pointTileZoneContainsPoint(checkBoardPoint, targetPoint)
+					) && (
+						abilityIsActive
 					)
 				) {
 					isZonedOut = true;

@@ -311,6 +311,11 @@ TrifleTileInfo.defineTrifleTiles = function() {
 				{
 					type: ZoneAbility.immobilizesOpponentTiles,
 					targetTileCodes: [TrifleTileCodes.SkyBison]
+				},
+				{
+					type: ZoneAbility.removesTileAbilities,
+					targetTeams: [TileTeam.enemy],
+					targetTileCodes: [TrifleTileCodes.SkyBison]
 				}
 			]
 		}

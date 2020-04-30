@@ -22,8 +22,6 @@ SkudAIv1.prototype.setPlayer = function(playerName) {
 
 /* parameters will be copies of the real thing, so you can't mess up the real game. */
 SkudAIv1.prototype.getMove = function(game, moveNum) {
-	debugOn = false;
-
 	this.moveNum = moveNum;
 
 	var moves = this.getPossibleMoves(game, this.player);
@@ -51,8 +49,6 @@ SkudAIv1.prototype.getMove = function(game, moveNum) {
 			goodScores = scores;
 		}
 	}
-
-	debugOn = true;
 
 	if (goodMove) {
 		// debug("Score: " + goodScore);
