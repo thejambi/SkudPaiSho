@@ -222,7 +222,7 @@ SkudPaiShoGameManager.prototype.getWinner = function() {
 		return "BOTH players";
 	} else if (this.endGameWinners.length === 1) {
 		return this.endGameWinners[0];
-	} else if (this.endGameWinners.length > 1) {
+	} else if (this.endGameWinners.length > 1 || this.board.winners.length > 1) {
 		return "BOTH players";
 	}
 };
