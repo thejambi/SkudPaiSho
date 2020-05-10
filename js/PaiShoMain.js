@@ -54,7 +54,8 @@ var paiShoBoardDesignTypeValues = {
 	vescucci: "vescucci",
 	xiangqi: "xiangqi",
 	pixelsho: "pixelsho",
-	skudShop: "skudShop"
+	skudShop: "skudShop",
+	remix: "remix"
 };
 
 function getTileDesignTypeDisplayName(tileDesignTypeKey) {
@@ -601,8 +602,13 @@ function togglePaiShoBoardDesigns() {
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.pixelsho;
 			break;
 		case paiShoBoardDesignTypeValues.pixelsho:
+			newPaiShoBoardKey = paiShoBoardDesignTypeValues.remix;
+			break;
+		case paiShoBoardDesignTypeValues.remix:
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.default;
 			break;
+		default:
+			newPaiShoBoardKey = paiShoBoardDesignTypeValues.default;
 	}
 	setPaiShoBoardOption(newPaiShoBoardKey);
 }

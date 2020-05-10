@@ -350,3 +350,6 @@ test.html
 *.html.bu
 images/Trifle/work
 js/vagabond/ai/VagabondRandomAIv2.js
+style/board_backup.svg
+style/pai_sho_board_remix_20200509_1.svg
+style/pai_sho_board_remix_20200509_2.svg

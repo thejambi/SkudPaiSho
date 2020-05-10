@@ -369,6 +369,9 @@ div.tab .alertTab, div.tab .alertTab.active {
 .game-container.skudShopBoard .bg-svg {
   background-image: url(SkudBoard.png);
 }
+.game-container.remixBoard .bg-svg {
+  background-image: url(pai_sho_board_remix.svg);
+}
 
 figure > div {
   margin: 1em auto;
