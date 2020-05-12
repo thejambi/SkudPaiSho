@@ -84,6 +84,8 @@ function getTileDesignTypeDisplayName(tileDesignTypeKey) {
 
 function getBoardDesignTypeDisplayName(boardDesignTypeKey) {
 	switch(boardDesignTypeKey) {
+		case paiShoBoardDesignTypeValues.air:
+			return "Air by Monk_Gyatso";
 		default:
 			return boardDesignTypeKey;
 	}
