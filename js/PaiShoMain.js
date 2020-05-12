@@ -55,7 +55,8 @@ var paiShoBoardDesignTypeValues = {
 	xiangqi: "xiangqi",
 	pixelsho: "pixelsho",
 	skudShop: "skudShop",
-	remix: "remix"
+	remix: "remix",
+	air: "air"
 };
 
 function getTileDesignTypeDisplayName(tileDesignTypeKey) {
@@ -605,6 +606,9 @@ function togglePaiShoBoardDesigns() {
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.remix;
 			break;
 		case paiShoBoardDesignTypeValues.remix:
+			newPaiShoBoardKey = paiShoBoardDesignTypeValues.air;
+			break;
+		case paiShoBoardDesignTypeValues.air:
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.default;
 			break;
 		default:
