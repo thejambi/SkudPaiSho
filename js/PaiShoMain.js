@@ -57,7 +57,8 @@ var paiShoBoardDesignTypeValues = {
 	skudShop: "skudShop",
 	remix: "remix",
 	air: "air",
-	earth: "earth"
+	earth: "earth",
+	fire: "fire"
 };
 
 function getTileDesignTypeDisplayName(tileDesignTypeKey) {
@@ -89,6 +90,8 @@ function getBoardDesignTypeDisplayName(boardDesignTypeKey) {
 			return "Air by Monk_Gyatso";
 		case paiShoBoardDesignTypeValues.earth:
 			return "Earth by BoomerangGuy";
+		case paiShoBoardDesignTypeValues.fire:
+			return "Fire by BoomerangGuy";
 		default:
 			return boardDesignTypeKey;
 	}
@@ -617,6 +620,9 @@ function togglePaiShoBoardDesigns() {
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.earth;
 			break;
 		case paiShoBoardDesignTypeValues.earth:
+			newPaiShoBoardKey = paiShoBoardDesignTypeValues.fire;
+			break;
+		case paiShoBoardDesignTypeValues.fire:
 			newPaiShoBoardKey = paiShoBoardDesignTypeValues.default;
 			break;
 		default:
