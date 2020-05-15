@@ -14,6 +14,8 @@ function OvergrowthController(gameContainer, isMobile) {
 	this.lastDrawnTile = null; // Save for Undo
 
 	this.drawRandomTile();
+
+	this.isPaiShoGame = true;
 }
 
 OvergrowthController.prototype.getGameTypeId = function() {

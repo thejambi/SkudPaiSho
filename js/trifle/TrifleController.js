@@ -9,6 +9,8 @@ function TrifleController(gameContainer, isMobile) {
 
 	this.hostAccentTiles = [];
 	this.guestAccentTiles = [];
+
+	this.isPaiShoGame = true;
 }
 
 TrifleController.prototype.getGameTypeId = function() {

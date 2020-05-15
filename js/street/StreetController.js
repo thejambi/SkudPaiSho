@@ -13,6 +13,8 @@ function StreetController(gameContainer, isMobile) {
 
 	this.hostAccentTiles = [];
 	this.guestAccentTiles = [];
+
+	this.isPaiShoGame = true;
 }
 
 StreetController.prototype.getGameTypeId = function() {

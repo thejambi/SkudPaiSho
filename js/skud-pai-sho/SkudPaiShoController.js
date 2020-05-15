@@ -9,6 +9,8 @@ function SkudPaiShoController(gameContainer, isMobile) {
 
 	this.hostAccentTiles = [];
 	this.guestAccentTiles = [];
+
+	this.isPaiShoGame = true;
 }
 
 SkudPaiShoController.prototype.getGameTypeId = function() {

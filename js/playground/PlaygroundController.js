@@ -13,6 +13,8 @@ function PlaygroundController(gameContainer, isMobile) {
 	showReplayControls();
 
 	this.currentPlayingPlayer = HOST;
+
+	this.isPaiShoGame = true;
 }
 
 PlaygroundController.prototype.getGameTypeId = function() {

@@ -14,6 +14,8 @@ function CoopSolitaireController(gameContainer, isMobile) {
 	this.lastDrawnTile = null; // Save for Undo
 
 	this.drawRandomTile();
+
+	this.isPaiShoGame = true;
 }
 
 CoopSolitaireController.prototype.getGameTypeId = function() {

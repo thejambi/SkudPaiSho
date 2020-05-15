@@ -9,6 +9,8 @@ function CaptureController(gameContainer, isMobile) {
 
 	this.hostAccentTiles = [];
 	this.guestAccentTiles = [];
+
+	this.isPaiShoGame = true;
 }
 
 CaptureController.prototype.completeSetup = function() {

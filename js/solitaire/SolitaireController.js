@@ -14,6 +14,8 @@ function SolitaireController(gameContainer, isMobile) {
 	this.lastDrawnTile = null; // Save for Undo
 
 	this.drawRandomTile();
+
+	this.isPaiShoGame = true;
 }
 
 SolitaireController.prototype.getGameTypeId = function() {

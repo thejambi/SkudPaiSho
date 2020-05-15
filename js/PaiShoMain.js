@@ -56,10 +56,57 @@ var paiShoBoardDesignTypeValues = {
 	pixelsho: "pixelsho",
 	skudShop: "skudShop",
 	remix: "remix",
-	air: "air",
+	water: "water",
 	earth: "earth",
-	fire: "fire"
+	fire: "fire",
+	air: "air"
 };
+var paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
+
+function buildPaiShoBoardDesignDropdownDiv() {
+	var containerDiv = document.createElement("div");
+
+	var theDropdown = document.createElement("select");
+	theDropdown.id = paiShoBoardDesignDropdownId;
+
+	var label = document.createElement("label");
+	label.for = paiShoBoardDesignDropdownId;
+	label.innerText = "Pai Sho Board Design:";
+
+	Object.keys(paiShoBoardDesignTypeValues).forEach(function(key,index) {
+		var option = document.createElement("option");
+		option.value = key;
+		option.innerText = getBoardDesignTypeDisplayName(key);
+
+		if (key === localStorage.getItem(paiShoBoardDesignTypeKey)) {
+			option.selected = true;
+		}
+
+		theDropdown.appendChild(option);
+	});
+	
+	theDropdown.onchange = function() {
+		setPaiShoBoardOption(this.value);
+	};
+
+	containerDiv.appendChild(label);
+	containerDiv.appendChild(theDropdown);
+
+	return containerDiv;
+}
+
+function buildPaiShoSettingsDiv() {
+	var settingsDiv = document.createElement("div");
+
+	var heading = document.createElement("h4");
+	heading.innerText = "Pai Sho Game Preferences:";
+
+	settingsDiv.appendChild(heading);
+	settingsDiv.appendChild(buildPaiShoBoardDesignDropdownDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	return settingsDiv;
+}
 
 function getTileDesignTypeDisplayName(tileDesignTypeKey) {
 	switch (tileDesignTypeKey) {
@@ -88,6 +135,8 @@ function getBoardDesignTypeDisplayName(boardDesignTypeKey) {
 	switch(boardDesignTypeKey) {
 		case paiShoBoardDesignTypeValues.air:
 			return "Air by Monk_Gyatso";
+		case paiShoBoardDesignTypeValues.water:
+			return "Water by Monk_Gyatso";
 		case paiShoBoardDesignTypeValues.earth:
 			return "Earth by BoomerangGuy";
 		case paiShoBoardDesignTypeValues.fire:
@@ -1185,6 +1234,11 @@ function clearMessage() {
 	}
 
 	document.getElementById("helpTextContent").innerHTML = message;
+
+	if (gameController.isPaiShoGame) {
+		var helpTabContentDiv = document.getElementById("helpTextContent");
+		helpTabContentDiv.appendChild(buildPaiShoSettingsDiv());
+	}
 }
 
 function haveUserEmail() {
