@@ -88,10 +88,7 @@ VagabondActuator.prototype.addTile = function(tile, mainContainer) {
 
 	var theImg = document.createElement("img");
 
-	var srcValue = "images/Vagabond/";
-	if (useDeLionTiles) {
-		srcValue += "delion/";
-	}
+	var srcValue = this.getTileImageSourceDir();
 
 	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
@@ -136,10 +133,7 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 		
 		var theImg = document.createElement("img");
 
-		var srcValue = "images/Vagabond/";
-		if (useDeLionTiles) {
-			srcValue += "delion/";
-		}
+		var srcValue = this.getTileImageSourceDir();
 
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 		
@@ -160,6 +154,10 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 		theBr.classList.add("clear");
 		this.boardContainer.appendChild(theBr);
 	}
+};
+
+VagabondActuator.prototype.getTileImageSourceDir = function() {
+	return "images/Vagabond/" + localStorage.getItem("vagabondTileDesignTypeKey") + "/";
 };
 
 VagabondActuator.prototype.printBoard = function(board) {

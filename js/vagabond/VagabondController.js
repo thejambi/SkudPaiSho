@@ -1,6 +1,12 @@
 /* Vagabond Pai Sho specific UI interaction logic */
 
 function VagabondController(gameContainer, isMobile) {
+	/* Set default preferences */
+	if (!localStorage.getItem(vagabondTileDesignTypeKey) 
+			|| !VagabondController.tileDesignTypeValues[localStorage.getItem(vagabondTileDesignTypeKey)]) {
+		localStorage.setItem(vagabondTileDesignTypeKey, "delion");
+	}
+
 	this.actuator = new VagabondActuator(gameContainer, isMobile);
 
 	this.resetGameManager();
@@ -76,14 +82,6 @@ VagabondController.prototype.resetMove = function() {
 
 VagabondController.prototype.getDefaultHelpMessageText = function() {
 	var helpText = "<h4>Vagabond Pai Sho</h4> <p> <p>Vagabond Pai Sho is the Pai Sho variant seen in the fanfiction story <a href='https://skudpaisho.com/site/more/fanfiction-recommendations/' target='_blank'>Gambler and Vagabond (download here)</a>.</p> <p><strong>You win</strong> if you capture your opponent's White Lotus tile.</p> <p><strong>On a turn</strong>, you may either deploy a tile or move a tile.</p> <p><strong>You can't capture Flower tiles</strong> until your White Lotus has been deployed.<br /> <strong>You can't capture Non-Flower tiles</strong> until both players' White Lotus tiles have been deployed.</p> <p><strong>Hover</strong> over any tile to see how it works.</p> </p> <p>Select tiles to learn more or <a href='https://skudpaisho.com/site/games/vagabond-pai-sho/' target='_blank'>view the rules</a>.</p>";
-	helpText += "<p><h4>Vagabond Preferences:</h4>Opponent move and replay peeking is ";
-	if (this.peekAtOpponentMoves) {
-		helpText += "enabled";
-	} else {
-		helpText += "disabled";
-	}
-	var theOnClick = "gameController.togglePeekAtOpponentMoves()";
-	helpText += ". <span class='skipBonus' onclick='" + theOnClick + "'>Toggle</span>";
 	return helpText;
 };
 
@@ -440,3 +438,56 @@ VagabondController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 };
 
+VagabondController.prototype.getAdditionalHelpTabDiv = function() {
+	var settingsDiv = document.createElement("div");
+
+	var heading = document.createElement("h4");
+	heading.innerText = "Vagabond Pai Sho Preferences:";
+
+	var movePeekingDiv = document.createElement("div");
+	var movePeekingText = "Opponent move and replay peeking is ";
+	if (this.peekAtOpponentMoves) {
+		movePeekingText += "enabled";
+	} else {
+		movePeekingText += "disabled";
+	}
+	movePeekingText += ". ";
+
+	movePeekingDiv.innerText = movePeekingText;
+
+	var movePeekingToggleSpan = document.createElement("span");
+	movePeekingToggleSpan.innerText = "Toggle";
+	movePeekingToggleSpan.classList.add("skipBonus");
+	movePeekingToggleSpan.onclick = function() {
+		gameController.togglePeekAtOpponentMoves();
+	};
+
+	movePeekingDiv.appendChild(movePeekingToggleSpan);
+
+
+	settingsDiv.appendChild(heading);
+	settingsDiv.appendChild(this.buildTileDesignDropdownDiv());
+	settingsDiv.appendChild(movePeekingDiv);
+
+	settingsDiv.appendChild(document.createElement("br"));
+	return settingsDiv;
+};
+
+VagabondController.tileDesignTypeValues = {
+	delion: "The Garden Gate Designs",
+	classic: "Classic",
+	water: "Water themed Garden Gate Designs"
+};
+
+VagabondController.prototype.buildTileDesignDropdownDiv = function() {
+	return buildDropdownDiv("vagabondPaiShoTileDesignDropdown", "Tile Designs:", VagabondController.tileDesignTypeValues,
+							localStorage.getItem(vagabondTileDesignTypeKey),
+							function() {
+								gameController.setTileDesignsPreference(this.value);
+							});
+};
+
+VagabondController.prototype.setTileDesignsPreference = function(tileDesignKey) {
+	localStorage.setItem(vagabondTileDesignTypeKey, tileDesignKey);
+	this.callActuate();
+};

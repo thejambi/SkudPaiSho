@@ -697,3 +697,24 @@ SkudPaiShoController.prototype.isSolitaire = function() {
 SkudPaiShoController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 };
+
+SkudPaiShoController.prototype.getAdditionalHelpTabDiv = function() {
+	var settingsDiv = document.createElement("div");
+
+	var heading = document.createElement("h4");
+	heading.innerText = "Skud Pai Sho Preferences:";
+
+	settingsDiv.appendChild(heading);
+	settingsDiv.appendChild(this.buildTileDesignDropdownDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	return settingsDiv;
+};
+
+SkudPaiShoController.prototype.buildTileDesignDropdownDiv = function() {
+	return buildDropdownDiv("skudPaiShoTileDesignDropdown", "Tile Designs:", tileDesignTypeValues,
+							localStorage.getItem(tileDesignTypeKey),
+							function() {
+								setSkudTilesOption(this.value);
+							});
+};

@@ -37,62 +37,70 @@ var localEmailKey = "localUserEmail";
 
 var tileDesignTypeKey = "tileDesignTypeKey";
 var tileDesignTypeValues = {
-	hlowe: "hlowe",
-	hlowenew: "hlowenew",
-	hlowemono: "hlowemono",
-	vescucci: "vescucci",
-	standard: "standard",
-	pixelsho: "pixelsho",
-	pixelsho2: "pixelsho2",
-	xiangqi: "xiangqi"
-}
+	// hlowe: "Modern Tiles v1", //"hlowe",
+	hlowenew: "Modern Tiles", //"hlowenew",
+	hlowemono: "Modern Monochrome Tiles", //"hlowemono",
+	vescucci: "Vescucci Tiles", //"vescucci",
+	standard: "Pai Sho Project Tiles", //"standard",
+	pixelsho: "Pixel Sho v1 Tiles", //"pixelsho",
+	pixelsho2: "Pixel Sho v2 Tiles", //"pixelsho2",
+	xiangqi: "Xiangqi Style", //"xiangqi"
+	water: "Water themed Vescucci Tiles"
+};
 
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
 var paiShoBoardDesignTypeValues = {
-	default: "default",
-	mayfair: "mayfair",
-	vescucci: "vescucci",
-	xiangqi: "xiangqi",
-	pixelsho: "pixelsho",
-	skudShop: "skudShop",
-	remix: "remix",
-	water: "water",
-	earth: "earth",
-	fire: "fire",
-	air: "air"
+	default: "Default",
+	mayfair: "Mayfair Filter",
+	skudShop: "The Garden Gate Shop",
+	vescucci: "Vescucci Style",
+	xiangqi: "Xiangqi-Style Tile Colors",
+	pixelsho: "Pixel-Sho",
+	remix: "Remix",
+	water: "Water by Monk_Gyatso",
+	earth: "Earth by BoomerangGuy",
+	fire: "Fire by BoomerangGuy",
+	air: "Air by Monk_Gyatso"
 };
+
 var paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
 
-function buildPaiShoBoardDesignDropdownDiv() {
+function buildDropdownDiv(dropdownId, labelText, valuesObject, selectedObjectKey, onchangeFunction) {
 	var containerDiv = document.createElement("div");
 
 	var theDropdown = document.createElement("select");
-	theDropdown.id = paiShoBoardDesignDropdownId;
+	theDropdown.id = dropdownId;
 
 	var label = document.createElement("label");
-	label.for = paiShoBoardDesignDropdownId;
-	label.innerText = "Pai Sho Board Design:";
+	label.for = dropdownId;
+	label.innerText = labelText;
 
-	Object.keys(paiShoBoardDesignTypeValues).forEach(function(key,index) {
+	Object.keys(valuesObject).forEach(function(key,index) {
 		var option = document.createElement("option");
 		option.value = key;
-		option.innerText = getBoardDesignTypeDisplayName(key);
+		option.innerText = valuesObject[key];
 
-		if (key === localStorage.getItem(paiShoBoardDesignTypeKey)) {
+		if (key === selectedObjectKey) {
 			option.selected = true;
 		}
 
 		theDropdown.appendChild(option);
 	});
 	
-	theDropdown.onchange = function() {
-		setPaiShoBoardOption(this.value);
-	};
+	theDropdown.onchange = onchangeFunction;
 
 	containerDiv.appendChild(label);
 	containerDiv.appendChild(theDropdown);
 
 	return containerDiv;
+}
+
+function buildPaiShoBoardDesignDropdownDiv() {
+	return buildDropdownDiv(paiShoBoardDesignDropdownId, "Pai Sho Board Design:", paiShoBoardDesignTypeValues,
+							localStorage.getItem(paiShoBoardDesignTypeKey),
+							function() {
+								setPaiShoBoardOption(this.value);
+							});
 }
 
 function buildPaiShoSettingsDiv() {
@@ -106,44 +114,6 @@ function buildPaiShoSettingsDiv() {
 
 	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
-}
-
-function getTileDesignTypeDisplayName(tileDesignTypeKey) {
-	switch (tileDesignTypeKey) {
-		case tileDesignTypeValues.hlowe:
-			return "Modern Tiles v1";
-		case tileDesignTypeValues.hlowenew:
-			return "Modern Tiles";
-		case tileDesignTypeValues.hlowemono:
-			return "Modern Monochrome Tiles";
-		case tileDesignTypeValues.vescucci:
-			return "Vescucci Tiles";
-		case tileDesignTypeValues.standard:
-			return "Pai Sho Project Tiles";
-		case tileDesignTypeValues.pixelsho:
-			return "Pixel Sho v1 Tiles";
-		case tileDesignTypeValues.pixelsho2:
-			return "Pixel Sho v2 Tiles";
-		case tileDesignTypeValues.xiangqi:
-			return "Xiangqi Style";
-		default:
-			return tileDesignTypeKey;
-	}
-}
-
-function getBoardDesignTypeDisplayName(boardDesignTypeKey) {
-	switch(boardDesignTypeKey) {
-		case paiShoBoardDesignTypeValues.air:
-			return "Air by Monk_Gyatso";
-		case paiShoBoardDesignTypeValues.water:
-			return "Water by Monk_Gyatso";
-		case paiShoBoardDesignTypeValues.earth:
-			return "Earth by BoomerangGuy";
-		case paiShoBoardDesignTypeValues.fire:
-			return "Fire by BoomerangGuy";
-		default:
-			return boardDesignTypeKey;
-	}
 }
 
 var vagabondTileDesignTypeKey = "vagabondTileDesignTypeKey";
@@ -259,10 +229,10 @@ window.requestAnimationFrame(function () {
 
 	/* Tile Design Preferences */
 	if (!localStorage.getItem(tileDesignTypeKey)) {
-		setSkudTilesOption(tileDesignTypeValues.hlowenew);
+		setSkudTilesOption("hlowenew");
 	} else {
 		if (localStorage.getItem(tileDesignTypeKey) === tileDesignTypeValues.hlowe) {
-			setSkudTilesOption(tileDesignTypeValues.hlowenew);
+			setSkudTilesOption("hlowenew");
 		} else {
 			setSkudTilesOption(localStorage.getItem(tileDesignTypeKey));
 		}
@@ -271,16 +241,9 @@ window.requestAnimationFrame(function () {
 	if (localStorage.getItem(paiShoBoardDesignTypeKey)) {
 		setPaiShoBoardOption(localStorage.getItem(paiShoBoardDesignTypeKey));
 	} else {
-		setPaiShoBoardOption(paiShoBoardDesignTypeValues.mayfair);
+		setPaiShoBoardOption("mayfair");
 	}
 
-	if (!localStorage.getItem(vagabondTileDesignTypeKey)) {
-		useDeLionTiles = true;
-	} else if (localStorage.getItem(vagabondTileDesignTypeKey) === "delion") {
-		useDeLionTiles = true;
-	} else {
-		useDeLionTiles = false;
-	}
 	/* --- */
 
 	url = window.location.href.split('?')[0];
@@ -641,45 +604,6 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
 	clearMessage(); // Refresh Help tab text
 }
 
-function togglePaiShoBoardDesigns() {
-	var newPaiShoBoardKey = paiShoBoardDesignTypeValues.default;
-	switch (paiShoBoardKey) {
-		case paiShoBoardDesignTypeValues.default:
-			newPaiShoBoardKey = paiShoBoardDesignTypeValues.mayfair;
-			break;
-		case paiShoBoardDesignTypeValues.mayfair:
-			newPaiShoBoardKey = paiShoBoardDesignTypeValues.skudShop;
-			break;
-		case paiShoBoardDesignTypeValues.skudShop:
-			newPaiShoBoardKey = paiShoBoardDesignTypeValues.vescucci;
-			break;
-		case paiShoBoardDesignTypeValues.vescucci:
-			newPaiShoBoardKey = paiShoBoardDesignTypeValues.xiangqi;
-			break;
-		case paiShoBoardDesignTypeValues.xiangqi:
-			newPaiShoBoardKey = paiShoBoardDesignTypeValues.pixelsho;
-			break;
-		case paiShoBoardDesignTypeValues.pixelsho:
-			newPaiShoBoardKey = paiShoBoardDesignTypeValues.remix;
-			break;
-		case paiShoBoardDesignTypeValues.remix:
-			newPaiShoBoardKey = paiShoBoardDesignTypeValues.air;
-			break;
-		case paiShoBoardDesignTypeValues.air:
-			newPaiShoBoardKey = paiShoBoardDesignTypeValues.earth;
-			break;
-		case paiShoBoardDesignTypeValues.earth:
-			newPaiShoBoardKey = paiShoBoardDesignTypeValues.fire;
-			break;
-		case paiShoBoardDesignTypeValues.fire:
-			newPaiShoBoardKey = paiShoBoardDesignTypeValues.default;
-			break;
-		default:
-			newPaiShoBoardKey = paiShoBoardDesignTypeValues.default;
-	}
-	setPaiShoBoardOption(newPaiShoBoardKey);
-}
-
 /* Skud Pai Sho Tile Design Switches */
 function setSkudTilesOption(newSkudTilesKey) {
 	gameContainerDiv.classList.remove(skudTilesKey);
@@ -690,59 +614,13 @@ function setSkudTilesOption(newSkudTilesKey) {
 	clearMessage(); // Refresh Help tab text
 }
 
-function toggleTileDesigns() {
-	var newSkudTilesKey = tileDesignTypeValues.hlowenew;
-	switch (skudTilesKey) {
-		case tileDesignTypeValues.hlowenew:
-			newSkudTilesKey = tileDesignTypeValues.hlowemono;
-			break;
-		case tileDesignTypeValues.hlowemono:
-			newSkudTilesKey = tileDesignTypeValues.vescucci;
-			break;
-		case tileDesignTypeValues.vescucci:
-			newSkudTilesKey = tileDesignTypeValues.pixelsho;
-			break;
-		case tileDesignTypeValues.pixelsho:
-			newSkudTilesKey = tileDesignTypeValues.pixelsho2
-			break;
-		case tileDesignTypeValues.pixelsho2:
-			newSkudTilesKey = tileDesignTypeValues.xiangqi;
-			break;
-		case tileDesignTypeValues.xiangqi:
-			newSkudTilesKey = tileDesignTypeValues.standard;
-			break;
-	}
-	setSkudTilesOption(newSkudTilesKey);
-}
-
 function getSelectedTileDesignTypeDisplayName() {
-	return getTileDesignTypeDisplayName(skudTilesKey);
+	return tileDesignTypeValues[localStorage.getItem(tileDesignTypeKey)];
 }
 function getSelectedBoardDesignTypeDisplayName() {
-	return getBoardDesignTypeDisplayName(paiShoBoardKey);
-}
-/* --- */
-
-/* Vagabond Tile Design Switches */
-function setUseDeLionVagabondTiles() {
-	localStorage.setItem(vagabondTileDesignTypeKey, "delion");
-	useDeLionTiles = true;
-	gameController.callActuate();
+	return paiShoBoardDesignTypeValues[localStorage.getItem(paiShoBoardDesignTypeKey)];
 }
 
-function setUseStandardVagabondTiles() {
-	localStorage.setItem(vagabondTileDesignTypeKey, "standard");
-	useDeLionTiles = false;
-	gameController.callActuate();
-}
-
-function toggleVagabondTileDesigns() {
-	if (useDeLionTiles) {
-		setUseStandardVagabondTiles();
-	} else {
-		setUseDeLionVagabondTiles();
-	}
-}
 /* --- */
 
 function promptEmail() {
@@ -806,7 +684,6 @@ function signOut(reallySignOut) {
 		guestEmail = null;
 	}
 
-	// document.title = "Skud Pai Sho";
 	document.title = "The Garden Gate";
 
 	localStorage.removeItem(localEmailKey);
@@ -1219,24 +1096,24 @@ var submitMoveCallback = function submitMoveCallback() {
 };
 
 function clearMessage() {
+	var helpTabContentDiv = document.getElementById("helpTextContent");
+
 	// if (!defaultHelpMessageText) {	// Load help message every time
 		defaultHelpMessageText = gameController.getDefaultHelpMessageText();
 	// }
-	document.getElementById("helpTextContent").innerHTML = defaultHelpMessageText;
+	helpTabContentDiv.innerHTML = defaultHelpMessageText;
 
 	var message = getTournamentText() 
-		+ document.getElementById("helpTextContent").innerHTML;
+		+ helpTabContentDiv.innerHTML;
 
-	if (gameController.getGameTypeId && gameController.getGameTypeId() === GameType.SkudPaiSho.id) {
-		message += getAltTilesOptionText();
-	} else if (gameController.getGameTypeId && gameController.getGameTypeId() === GameType.VagabondPaiSho.id) {
-		message += getAltVagabondTilesOptionText();
+	helpTabContentDiv.innerHTML = message;
+
+	if (gameController.getAdditionalHelpTabDiv) {
+		var additionalDiv = gameController.getAdditionalHelpTabDiv();
+		helpTabContentDiv.appendChild(additionalDiv);
 	}
 
-	document.getElementById("helpTextContent").innerHTML = message;
-
 	if (gameController.isPaiShoGame) {
-		var helpTabContentDiv = document.getElementById("helpTextContent");
 		helpTabContentDiv.appendChild(buildPaiShoSettingsDiv());
 	}
 }
@@ -1293,8 +1170,7 @@ function setMessage(msg) {
 }
 
 function getAltTilesOptionText() {
-	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.<br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "</p>"
-		+ "<p><span class='skipBonus' onclick='togglePaiShoBoardDesigns();'>Click here</span> to switch between board designs for Pai Sho.<br />Currently selected: " + getSelectedBoardDesignTypeDisplayName() + "</p>";
+	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.<br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "</p>";
 }
 
 function getAltVagabondTilesOptionText() {
