@@ -326,6 +326,10 @@ window.requestAnimationFrame(function () {
 	if (!debugOn && !QueryString.game && (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn())) {
 		showWelcomeTutorial();
 	}
+
+	if (QueryString.watchGame) {
+		jumpToGame(QueryString.watchGame);
+	}
 });
 
 function usernameIsOneOf(theseNames) {
@@ -2200,7 +2204,7 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 		} else {
 			var message = "<div>Do you want to create a game for others to join?</div>";
 			message += "<br /><div class='clickableText' onclick='closeModal(); yesCreateGame(" + gameTypeId + ");'>Yes - create game</div>";
-			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - cancel</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
 			showModal("Create game?", message);
 		}
 	} else {
@@ -2505,10 +2509,22 @@ function showGameReplayLink() {
 
 		debug("GameReplayLinkUrl: " + linkUrl);
 		var message = "Here is the <a href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.";
-		showModal("Game Replay Link", message);
+		if (playingOnlineGame()) {
+			message += "<br /><br />";
+			message += "Here is the <a href=\"" + buildSpectateUrl() + "\" target='_blank'>spectate link</a> others can use to watch the game live and participate in the Game Chat.";
+		}
+		showModal("Game Links", message);
 	// } else {
 	// 	showModal("About Game Replay", "Click this link when viewing an online game to get a sharable game replay link.");
 	// }
+}
+
+function buildSpectateUrl() {
+	if (gameId > 0) {
+		linkUrl = LZString.compressToEncodedURIComponent("watchGame=" + gameId);
+		linkUrl = sandboxUrl + "?" + linkUrl;
+		return linkUrl;
+	}
 }
 
 function openGameReplay() {
