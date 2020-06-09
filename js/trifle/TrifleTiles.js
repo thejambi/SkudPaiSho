@@ -19,9 +19,13 @@ var TrifleTileCodes = {
 	PolarBearDog: 'PolarBearDog',
 	BuffaloYak: 'BuffaloYak',
 	TitanArum: 'TitanArum',
+	LilyPad: 'LilyPad',
+	Lupine: 'Lupine',
 	EarthBanner: 'EarthBanner',
 	SaberToothMooseLion: 'SaberToothMooseLion',
-	AirGlider: 'AirGlider'
+	AirGlider: 'AirGlider',
+	Shirshu: 'Shirshu',
+	BoarQPine: 'BoarQPine'
 };
 
 var TileType = {
@@ -34,7 +38,8 @@ var TileType = {
 };
 
 var TileCategory = {
-	allTileTypes: "allTileTypes"
+	allTileTypes: "allTileTypes",
+	landingTile: "landingTile"
 };
 
 var DeployType = {
@@ -87,8 +92,10 @@ var ZoneAbility = {
 	canceledWhenInTemple: "canceledWhenInTemple",
 	protectFriendlyTilesFromCapture: "protectFriendlyTilesFromCapture",
 	immobilizesOpponentTiles: "immobilizesOpponentTiles",
+	immobilizesTiles: "immobilizesTiles",
 	removesTileAbilities: "removesTileAbilities",	// TODO // TODO testing, etc
-	restrictMovementWithinZone: "restrictMovementWithinZone"
+	restrictMovementWithinZone: "restrictMovementWithinZone",
+	captureLandingTiles: "captureLandingTiles"
 }
 
 var BoardPresenceAbility = {
@@ -103,9 +110,14 @@ var SpawnLocation = {
 	adjacent: "adjacent"
 };
 
+var Ability = {
+	captureTiles: "captureTiles"
+};
+
 var AbilityTrigger = {
 	whenCaptured: "whenCaptured",
-	whenCapturing: "whenCapturing"
+	whenCapturing: "whenCapturing",
+	whenTileLandsInZone: "whenTileLandsInZone"
 };
 
 var TileTeam = {
@@ -212,6 +224,18 @@ TrifleTileInfo.getAbilitiesWithAbilityTrigger = function(tileInfo, abilityTrigge
 	var abilitiesWithTrigger = [];
 	if (tileInfo && tileInfo.abilities) {
 		tileInfo.abilities.forEach(function(abilityInfo) {
+			if (abilityInfo.triggeringAction === abilityTrigger) {
+				abilitiesWithTrigger.push(abilityInfo);
+			}
+		});
+	}
+	return abilitiesWithTrigger;
+};
+
+TrifleTileInfo.getZoneAbilitiesWithAbilityTrigger = function(tileInfo, abilityTrigger) {
+	var abilitiesWithTrigger = [];
+	if (tileInfo && tileInfo.territorialZone && tileInfo.territorialZone.abilities) {
+		tileInfo.territorialZone.abilities.forEach(function(abilityInfo) {
 			if (abilityInfo.triggeringAction === abilityTrigger) {
 				abilitiesWithTrigger.push(abilityInfo);
 			}
@@ -400,9 +424,9 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		],
 		abilities: [
 			{
-				type: BoardPresenceAbility.increaseFriendlyTileMovementDistance,
-				amount: 1,
-				targetTileTypes: [TileType.flower]
+				type: ZoneAbility.grantBonusTileMovement,
+				// amount: 1,
+				// targetTileTypes: [TileType.flower]
 			}
 		]
 	};
@@ -570,17 +594,45 @@ TrifleTileInfo.defineTrifleTiles = function() {
 	TrifleTiles[TrifleTileCodes.TitanArum] = {
 		types: [TileType.flower],
 		deployTypes: [ DeployType.anywhere ],
-		movements: [
-			{
-				type: MovementType.standard,
-				distance: 2
-			}
-		]//,
-		// abilities: [
-		// 	{
-		// 		type: 
-		// 	}
-		// ]
+		territorialZone: {
+			size: 2,
+			abilities: [
+				{
+					type: ZoneAbility.restrictMovementWithinZone,
+					targetTeams: [ TileTeam.friendly, TileTeam.enemy ],
+					targetTileTypes: [ TileType.animal, TileType.traveler, TileType.banner ]
+				}
+			]
+		}
+	};
+
+	TrifleTiles[TrifleTileCodes.LilyPad] = {
+		types: [TileType.flower],
+		deployTypes: [ DeployType.anywhere ],
+		territorialZone: {
+			size: 1,
+			abilities: [
+				{
+					type: ZoneAbility.restrictMovementWithinZone,
+					targetTeams: [ TileTeam.enemy ],
+					targetTileTypes: [ TileCategory.allTileTypes ]
+				}
+			]
+		}
+	};
+
+	TrifleTiles[TrifleTileCodes.Lupine] = {
+		types: [TileType.flower],
+		deployTypes: [ DeployType.anywhere ],
+		territorialZone: {
+			size: 3,
+			abilities: [
+				{
+					type: BoardPresenceAbility.increaseFriendlyTileMovementDistance
+					// targetTeams
+				}
+			]
+		}
 	};
 
 	/* Earth */
@@ -623,6 +675,51 @@ TrifleTileInfo.defineTrifleTiles = function() {
 				]
 			}
 		]
+	};
+
+	TrifleTiles[TrifleTileCodes.Shirshu] = {
+		types: [TileType.animal],
+		deployTypes: [DeployType.anywhere],
+		movements: [
+			{
+				type: MovementType.standard,
+				distance: 2
+			},
+			{
+				type: MovementType.jumpAlongLineOfSight,
+				targetTileTypes: [TileType.animal, TileType.traveler]
+			}
+		],
+		territorialZone: {
+			size: 1,
+			abilities: [
+				{
+					type: ZoneAbility.immobilizesTiles,
+					targetTeams: [TileTeam.enemy]
+				}
+			]
+		}
+	};
+
+	TrifleTiles[TrifleTileCodes.BoarQPine] = {
+		types: [TileType.animal],
+		deployTypes: [DeployType.anywhere],
+		movements: [
+			{
+				type: MovementType.standard,
+				distance: 1
+			}
+		],
+		territorialZone: {
+			size: 1,
+			abilities: [
+				{
+					type: Ability.captureTiles,
+					triggeringAction: AbilityTrigger.whenTileLandsInZone,
+					targetTileTypes: [TileCategory.landingTile]
+				}
+			]
+		}
 	};
 
 
