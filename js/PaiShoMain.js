@@ -374,6 +374,7 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 					// Cannot verify user login, forget all current stuff.
 					forgetCurrentGameInfo();
 					forgetOnlinePlayInfo();
+					showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
 				}
 			};
 
@@ -395,6 +396,7 @@ var verifyLoginCallback = function verifyLoginCallback(response) {
 					// Cannot verify user login, forget all current stuff.
 					forgetCurrentGameInfo();
 					forgetOnlinePlayInfo();
+					showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
 				}
 			};
 
@@ -1350,7 +1352,7 @@ function callFailed() {
 	showModal("", "Unable to load.");
 }
 
-function showModal(headingHTMLText, modalMessageHTMLText) {
+function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX) {
 	// Make sure sidenav is closed
 	closeNav();
 
@@ -1374,9 +1376,13 @@ function showModal(headingHTMLText, modalMessageHTMLText) {
 	    closeModal();
 	};
 
+	if (tutorialInProgress) {
+		onlyCloseByClickingX = true;
+	}
+
 	// When the user clicks anywhere outside of the modal, close it
 	window.onclick = function(event) {
-	    if (event.target == modal && !tutorialInProgress) {
+	    if (event.target == modal && !onlyCloseByClickingX) {
 	        closeModal();
 	    }
 	};
