@@ -2311,7 +2311,7 @@ var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(resul
 
 function resetGlobalChats() {
 	// Clear all global chats..
-	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! This global chat will show the latest messages sent to it for anyone signed in.<br />To get involved in the community or ask questions, join The Garden Gate <a href='https://discord.gg/dStDZx7' target='_blank'>Discord server</a>.<hr />";
+	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/dStDZx7' target='_blank'>Discord server</a>.<hr />";
 }
 
 function fetchInitialGlobalChats() {
@@ -2332,14 +2332,14 @@ function fetchInitialGlobalChats() {
 function logOnlineStatusPulse() {
 	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 	verifyLogin();
-	fetchGlobalChats();
+	// fetchGlobalChats();
 }
 
 var LOG_ONLINE_STATUS_INTERVAL = 5000;
 function startLoggingOnlineStatus() {
 	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 
-	fetchInitialGlobalChats();
+	// fetchInitialGlobalChats();
 
 	clearLogOnlineStatusInterval();
 
@@ -2462,12 +2462,12 @@ var sendGlobalChat = function() {
 	}
 }
 
-document.getElementById('globalChatMessageInput').onkeypress = function(e){
+/* document.getElementById('globalChatMessageInput').onkeypress = function(e){
      var code = (e.keyCode ? e.keyCode : e.which);
       if(code == 13) {
         sendGlobalChat();
       }
-};
+}; */
 
 function htmlEscape(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
