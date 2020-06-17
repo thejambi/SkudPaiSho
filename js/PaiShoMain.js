@@ -372,9 +372,11 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 					appCaller.alertAppLoaded();
 				} else {
 					// Cannot verify user login, forget all current stuff.
+					if (getUsername()) {
+						showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
+					}
 					forgetCurrentGameInfo();
 					forgetOnlinePlayInfo();
-					showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
 				}
 			};
 
@@ -394,9 +396,11 @@ var verifyLoginCallback = function verifyLoginCallback(response) {
 					// ok
 				} else {
 					// Cannot verify user login, forget all current stuff.
+					if (getUsername()) {
+						showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
+					}
 					forgetCurrentGameInfo();
 					forgetOnlinePlayInfo();
-					showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
 				}
 			};
 
@@ -665,6 +669,8 @@ forgetOnlinePlayInfo = function() {
 	localStorage.removeItem(userIdKey);
 	localStorage.removeItem(usernameKey);
 	localStorage.removeItem(userEmailKey);
+
+	clearLogOnlineStatusInterval();
 }
 
 function showSignOutModal() {
@@ -2335,14 +2341,18 @@ function startLoggingOnlineStatus() {
 
 	fetchInitialGlobalChats();
 
-	if (logOnlineStatusIntervalValue) {
-		clearInterval(logOnlineStatusIntervalValue);
-		logOnlineStatusIntervalValue = null;
-	}
+	clearLogOnlineStatusInterval();
 
 	logOnlineStatusIntervalValue = setInterval(function() {
 		logOnlineStatusPulse();
 	}, LOG_ONLINE_STATUS_INTERVAL);
+}
+
+function clearLogOnlineStatusInterval() {
+	if (logOnlineStatusIntervalValue) {
+		clearInterval(logOnlineStatusIntervalValue);
+		logOnlineStatusIntervalValue = null;
+	}
 }
 
 function setSidenavNewGameSection() {
