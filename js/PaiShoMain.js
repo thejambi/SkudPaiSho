@@ -60,7 +60,8 @@ var paiShoBoardDesignTypeValues = {
 	water: "Water by Monk_Gyatso",
 	earth: "Earth by BoomerangGuy",
 	fire: "Fire by BoomerangGuy",
-	air: "Air by Monk_Gyatso"
+	air: "Air by Monk_Gyatso",
+	nick: "Nick style by BoomerangGuy"
 };
 
 var paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
@@ -96,10 +97,6 @@ function buildDropdownDiv(dropdownId, labelText, valuesObject, selectedObjectKey
 }
 
 function buildPaiShoBoardDesignDropdownDiv() {
-	if (debugOn || usernameIsOneOf(['SkudPaiSho'])) {
-		paiShoBoardDesignTypeValues["nick"] = "Nick offset-lines board";
-	}
-
 	return buildDropdownDiv(paiShoBoardDesignDropdownId, "Pai Sho Board Design:", paiShoBoardDesignTypeValues,
 							localStorage.getItem(paiShoBoardDesignTypeKey),
 							function() {
