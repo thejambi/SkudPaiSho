@@ -96,6 +96,10 @@ function buildDropdownDiv(dropdownId, labelText, valuesObject, selectedObjectKey
 }
 
 function buildPaiShoBoardDesignDropdownDiv() {
+	if (debugOn || usernameIsOneOf(['SkudPaiSho'])) {
+		paiShoBoardDesignTypeValues["nick"] = "Nick offset-lines board";
+	}
+
 	return buildDropdownDiv(paiShoBoardDesignDropdownId, "Pai Sho Board Design:", paiShoBoardDesignTypeValues,
 							localStorage.getItem(paiShoBoardDesignTypeKey),
 							function() {
