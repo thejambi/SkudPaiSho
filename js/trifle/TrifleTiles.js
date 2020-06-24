@@ -9,7 +9,7 @@ var TrifleTileCodes = {
 	Lotus: 'Lotus',
 	MessengerHawk: 'MessengerHawk',
 	AirBanner: 'AirBanner',
-	FlyingLemur: 'FlyingLemur',
+	// FlyingLemur: 'FlyingLemur',
 	RingTailedLemur: 'RingTailedLemur',
 	HermitCrab: 'HermitCrab',
 	Firefly: 'Firefly',
@@ -431,7 +431,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	TrifleTiles[TrifleTileCodes.FlyingLemur] = {
+	/* TrifleTiles[TrifleTileCodes.FlyingLemur] = {
 		types: [TileType.animal],
 		deployTypes: [ DeployType.anywhere ],
 		movements: [
@@ -446,7 +446,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 				]
 			}
 		]
-	};
+	}; */
 
 	TrifleTiles[TrifleTileCodes.RingTailedLemur] = { /* Done */
 		types: [TileType.animal],
