@@ -374,7 +374,8 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 				} else {
 					// Cannot verify user login, forget all current stuff.
 					if (getUsername()) {
-						showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
+						// showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
+						showModal("Signed Out", "Sorry you were unexpectedly signed out :( <br /><br />Please sign in again to keep playing.");
 					}
 					forgetCurrentGameInfo();
 					forgetOnlinePlayInfo();
@@ -398,7 +399,8 @@ var verifyLoginCallback = function verifyLoginCallback(response) {
 				} else {
 					// Cannot verify user login, forget all current stuff.
 					if (getUsername()) {
-						showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
+						// showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
+						showModal("Signed Out", "Sorry you were unexpectedly signed out :( <br /><br />Please sign in again to keep playing.");
 					}
 					forgetCurrentGameInfo();
 					forgetOnlinePlayInfo();
