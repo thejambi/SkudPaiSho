@@ -26,6 +26,9 @@ var OPTION_ATTACKERS_MOVE_FIRST = "Host plays as attackers";
 var KING_MOVES_LIKE_PAWNS = "King moves like pawns";
 var MORE_ATTACKERS = "More Attackers!";
 
+/* Street Pai Sho */
+var FORMAL_WIN_CONDITION = "Formal win condition";
+
 
 function gameOptionEnabled(optionName) {
 	return ggOptions.includes(optionName);

@@ -196,10 +196,18 @@ StreetGameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playe
 };
 
 StreetGameManager.prototype.getWinner = function() {
-	if (this.potentialWinners.includes(HOST) && getCurrentPlayer() === HOST) {
-		return HOST;
-	} else if (this.potentialWinners.includes(GUEST) && getCurrentPlayer() === GUEST) {
-		return GUEST;
+	if (gameOptionEnabled(FORMAL_WIN_CONDITION)) {
+		if (this.potentialWinners.includes(HOST) && getCurrentPlayer() === HOST) {
+			return HOST;
+		} else if (this.potentialWinners.includes(GUEST) && getCurrentPlayer() === GUEST) {
+			return GUEST;
+		}
+	} else {
+		if (this.potentialWinners.length > 1) {
+			return "TIE";
+		} else if (this.potentialWinners.length == 1) {
+			return this.potentialWinners[0];
+		}
 	}
 };
 

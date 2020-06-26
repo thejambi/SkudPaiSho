@@ -459,10 +459,10 @@ StreetBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boa
 	// If endpoint is too far away, that is wrong.
 	var numMoves = boardPointStart.tile.getMoveDistance();
 
-	if (!gameOptionEnabled(CLASSIC_RULES)) {
+	/* if (!gameOptionEnabled(CLASSIC_RULES)) {
 		var bonusMoves = boardPointStart.tile.capturedTile ? 1 : 0;
 		numMoves += bonusMoves;
-	}
+	} */
 	
 	if (Math.abs(boardPointStart.row - boardPointEnd.row) + Math.abs(boardPointStart.col - boardPointEnd.col) > numMoves) {
 		// end point is too far away, can't move that far

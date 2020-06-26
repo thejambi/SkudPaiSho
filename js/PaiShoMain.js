@@ -1598,7 +1598,9 @@ var GameType = {
 		id: 5,
 		desc: "Street Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/street-pai-sho/", 
-		gameOptions: []
+		gameOptions: [
+			FORMAL_WIN_CONDITION
+		]
 	},
 	SolitairePaiSho: {
 		id: 4,

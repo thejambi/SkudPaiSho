@@ -86,6 +86,8 @@ StreetController.prototype.getDefaultHelpMessageText = function() {
 
 StreetController.prototype.getAdditionalMessage = function() {
 	var msg = "";
+
+	msg += getGameOptionsMessageHtml(GameType.StreetPaiSho.gameOptions);
 	
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
