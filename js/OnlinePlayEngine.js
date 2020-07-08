@@ -119,7 +119,7 @@ OnlinePlayEngine.prototype.logOnlineStatus = function(loginToken, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, optionsString, loginToken, callback) {
+OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, optionsString, isPrivateIndicator, loginToken, callback) {
     $.post("createGame.php",
         {
             t: gameTypeId, 
@@ -129,6 +129,7 @@ OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, o
             userEmail: loginToken.userEmail, 
             deviceId: loginToken.deviceId,
             options: optionsString,
+            isPrivateIndicator: isPrivateIndicator,
             isWeb: 1
         },
         function(data, status){

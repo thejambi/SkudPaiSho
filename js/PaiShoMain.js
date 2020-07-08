@@ -331,6 +331,11 @@ window.requestAnimationFrame(function () {
 	if (QueryString.watchGame) {
 		jumpToGame(QueryString.watchGame);
 	}
+
+	if (QueryString.joinPrivateGame) {
+		jumpToGame(QueryString.joinPrivateGame);
+		askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
+	}
 });
 
 function usernameIsOneOf(theseNames) {
@@ -1099,6 +1104,39 @@ var createGameCallback = function createGameCallback(newGameId) {
 	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game if you'd like.<br /><br />If anyone joins this game, it will show up in your list of games when you click My Games.");
 };
 
+var createPrivateGameCallback = function createPrivateGameCallback(newGameId) {
+	finalizeMove();
+	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
+
+	// If a solitaire game, automatically join game.
+	if (gameController.isSolitaire()) {
+		completeJoinGameSeek({gameId:newGameId});
+	}
+
+	var inviteLinkUrl = createInviteLinkUrl(newGameId);
+	
+	showModal("Game Created!", "You just created a private game. Send <a href='" + inviteLinkUrl + "'>this invite link</a> to a friend so they can join. <br /><br />When a player joins this game, it will show up in your list of games when you click My Games.", true);
+};
+
+function createInviteLinkUrl(newGameId) {
+	linkUrl = LZString.compressToEncodedURIComponent("joinPrivateGame=" + newGameId + "&hostUserName=" + getUsername());
+	linkUrl = sandboxUrl + "?" + linkUrl;
+	return linkUrl;
+}
+
+function askToJoinPrivateGame(privateGameId, hostUserName) {
+	var message = "Do you want to join this game hosted by " + hostUserName + "?";
+	message += "<br /><br />";
+	message += "<div class='clickableText' onclick='closeModal(); yesJoinPrivateGame(" + privateGameId + ");'>Yes - join game</div>";
+	message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+	
+	showModal("Join Private Game?", message, true);
+}
+
+function yesJoinPrivateGame(privateGameId) {
+	completeJoinGameSeek({gameId:privateGameId});
+}
+
 var submitMoveCallback = function submitMoveCallback() {
 	debug("Inside submitMoveCallback");
 	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
@@ -1729,8 +1767,6 @@ function setGameController(gameTypeId, keepGameOptions) {
 
 	// Forget current game info
 	forgetCurrentGameInfo();
-
-	closeModal();
 	
 	gameController = getGameControllerForGameType(gameTypeId);
 	if (!gameController) {
@@ -1794,7 +1830,6 @@ var jumpToGameCallback = function jumpToGameCallback(results) {
 		guestEmail = myGame.guestUsername;
 		
 		startWatchingGameRealTime();
-		closeModal();
 		updateFooter();
 	}
 };
@@ -1867,7 +1902,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 			gameDisplayTitle += " vs. ";
 			gameDisplayTitle += myGame.guestUsername;
 
-			message += "<div class='clickableText' onclick='jumpToGame(" + gId + ");'>" + gameDisplayTitle + "</div>";
+			message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
 
 			countOfGamesShown++;
 			if (!showAll && countOfGamesShown > 20) {
@@ -1945,7 +1980,7 @@ var showMyGamesCallback = function showMyGamesCallback(results) {
 			}
 			
 			// message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\"," + myGame.gameTypeId + ");'>" + gameDisplayTitle + "</div>";
-			message += "<div class='clickableText' onclick='jumpToGame(" + gId + ");'>" + gameDisplayTitle + "</div>";
+			message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
 			for (var i = 0; i < myGame.gameOptions.length; i++) {
 				message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + myGame.gameOptions[i] + "</em></div>"
 			}
@@ -2019,6 +2054,7 @@ var completeJoinGameSeekCallback = function completeJoinGameSeekCallback(gameJoi
 	var gameSeek = selectedGameSeek;
 	if (gameJoined) {
 		jumpToGame(gameSeek.gameId);
+		closeModal();
 	}
 };
 
@@ -2208,8 +2244,13 @@ function viewGameSeeksClicked() {
 	}
 }
 
+/* Creating a public game */
 var yesCreateGame = function yesCreateGame(gameTypeId) {
-	onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), getLoginToken(), createGameCallback);
+	onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), '', getLoginToken(), createGameCallback);
+};
+
+var yesCreatePrivateGame = function yesCreatePrivateGame(gameTypeId) {
+	onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), 'Y', getLoginToken(), createPrivateGameCallback);
 };
 
 var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHostedByUserCallback(results) {
@@ -2221,6 +2262,7 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 		} else {
 			var message = "<div>Do you want to create a game for others to join?</div>";
 			message += "<br /><div class='clickableText' onclick='closeModal(); yesCreateGame(" + gameTypeId + ");'>Yes - create game</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal(); yesCreatePrivateGame(" + gameTypeId + ");'>Yes - create a private game with a friend</div>";
 			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
 			showModal("Create game?", message);
 		}
@@ -2228,12 +2270,15 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 		finalizeMove();
 		var message = "";
 		if (userIsLoggedIn()) {
-			message = "You already have a game that is waiting for an opponent.";
+			message = "<div>You already have a public game waiting for an opponent. Do you want to create a private game for others to join?</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal(); yesCreatePrivateGame(" + gameTypeId + ");'>Yes - create a private game with a friend</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
+			showModal("Create game?", message);
 		} else {
 			message = "You are not signed in. ";
+			message += "<br /><br />You can still play the game locally, but it will not be saved online.";
+			showModal("Game Not Created", message);
 		}
-		message += "<br /><br />You can still play the game locally, but it will not be saved online.";
-		showModal("Game Not Created", message);
 	}
 };
 
@@ -2383,14 +2428,14 @@ function closeGame() {
 }
 
 function getSidenavNewGameEntryForGameType(gameType) {
-	return "<div class='sidenavEntry'><span class='sidenavLink skipBonus' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink sidenavLink'>Rules</a></div>";
+	return "<div class='sidenavEntry'><span class='sidenavLink skipBonus' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink sidenavLink'>Rules</a></div>";
 }
 
 function getNewGameEntryForGameType(gameType) {
 	if (trifleOn || gameType !== GameType.Trifle
 		|| (gameType === GameType.Trifle && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci']))
 		) {
-		return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + ");'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
+		return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
 	}
 	return "";
 }
@@ -2598,7 +2643,9 @@ function dismissChatAlert() {
 function goai() {
 	if (gameController.getAiList().length > 1) {
 		setAiIndex(0);
-		setAiIndex(1);
+		setTimeout(function() {
+			setAiIndex(1);
+		}, 2000);
 	}
 }
 
@@ -2791,7 +2838,6 @@ function addOption(option) {
 
 function clearOptions() {
 	ggOptions = [];
-	closeModal();
 }
 
 function addOptionFromInput() {
@@ -3108,6 +3154,7 @@ function createNewTournamentMatch() {
 
 function matchGameClicked(gameId) {
 	jumpToGame(gameId);
+	closeModal();
 }
 
 function changeTournamentStatus(tournamentId, newTournamentStatusId) {
