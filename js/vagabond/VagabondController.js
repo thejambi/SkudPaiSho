@@ -477,7 +477,8 @@ VagabondController.tileDesignTypeValues = {
 	delion: "The Garden Gate Designs",
 	classic: "Classic",
 	water: "Water themed Garden Gate Designs",
-	fire: "Fire themed Garden Gate Designs"
+	fire: "Fire themed Garden Gate Designs",
+	canon: "Canon colors Garden Gate Designs"
 };
 
 VagabondController.prototype.buildTileDesignDropdownDiv = function() {
