@@ -47,6 +47,10 @@ OvergrowthTileManager.prototype.loadPlayerTileSet = function(ownerCode, doubleTi
 	tiles.push(new OvergrowthTile('L', ownerCode));
 	tiles.push(new OvergrowthTile('O', ownerCode));
 
+	if (ownerCode === hostPlayerCode && gameOptionEnabled(OPTION_FULL_TILES)) {
+		tiles.push(new OvergrowthTile('R3', ownerCode)); /* The White Lotus opens wide to those who know her secrets. Iroh places a Rose tile in the middle of the board. */
+	}
+
 	return tiles;
 };
 

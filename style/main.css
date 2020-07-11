@@ -199,10 +199,10 @@ div.tab .alertTab, div.tab .alertTab.active {
 }
 .chatMessagesDisplay {
     /*background-color: #00FFFF;*/
-    max-height: 460px;
+    min-height: 410px;
+    max-height: 410px;
     overflow-y: scroll;
     overflow-x: hidden;
-    min-height: 460px;
 }
 .chatMessageInput {
   width: 70%;
