@@ -387,6 +387,9 @@ div.tab .alertTab, div.tab .alertTab.active {
 .game-container.nickBoard .bg-svg {
   background-image: url(board_nick.png);
 }
+.game-container.owlBoard .bg-svg {
+  background-image: url(board_owl.png);
+}
 
 figure > div {
   margin: 1em auto;
