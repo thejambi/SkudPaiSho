@@ -563,7 +563,7 @@ SkudPaiShoHarmonyManager.prototype.isPointInsideShape_alternate = function(notat
 };
 
 /* Working function */
-SkudPaiShoHarmonyManager.prototype.isCenterInsideShape = function(shapePoints) {
+SkudPaiShoHarmonyManager.prototype.isCenterInsideShapeOld = function(shapePoints) {
 	var x = 0;
 	var y = 0;
 	var inside = false;
@@ -591,6 +591,40 @@ SkudPaiShoHarmonyManager.prototype.isCenterInsideShape = function(shapePoints) {
 	}
 
 	return inside;
+};
+
+/* Based on Winding Number algorithm https://gist.github.com/thejambi/6ae53b6ab2636c8aff367195efeb4f44 */
+SkudPaiShoHarmonyManager.prototype.isCenterInsideShape = function(vs) {
+	var x = 0;
+	var y = 0;
+
+    var wn = 0;
+
+    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+      var xi = parseFloat(vs[i][0]), yi = parseFloat(vs[i][1]);
+      var xj = parseFloat(vs[j][0]), yj = parseFloat(vs[j][1]);
+
+      if (yj <= y) {
+        if (yi > y) {
+          if (this.isLeft([xj, yj], [xi, yi], [x,y]) > 0) {
+            wn++;
+          }
+        }
+      } else {
+        if (yi <= y) {
+          if (this.isLeft([xj, yj], [xi, yi], [x, y]) < 0) {
+            wn--;
+          }
+        }
+      }
+    }
+
+    return wn != 0;
+};
+SkudPaiShoHarmonyManager.prototype.isLeft = function(P0, P1, P2) {
+    var res = ( (P1[0] - P0[0]) * (P2[1] - P0[1])
+            - (P2[0] -  P0[0]) * (P1[1] - P0[1]) );
+    return res;
 };
 
 
