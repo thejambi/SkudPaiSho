@@ -95,15 +95,14 @@ StreetController.prototype.getDefaultHelpMessageText = function() {
 
 StreetController.prototype.getAdditionalMessage = function() {
 	var msg = "";
-
-	msg += getGameOptionsMessageHtml(GameType.StreetPaiSho.gameOptions);
 	
-	if (this.gameNotation.moves.length === 0) {
-		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
+	if (this.gameNotation.moves.length <= 2) {
+		if (onlinePlayEnabled && gameId <= 0 && userIsLoggedIn()) {
 			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
 		} else {
 			msg += "Make the first move.";
 		}
+		msg += getGameOptionsMessageHtml(GameType.StreetPaiSho.gameOptions);
 	}
 
 	return msg;
