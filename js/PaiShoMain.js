@@ -1639,7 +1639,8 @@ var GameType = {
 		desc: "Street Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/street-pai-sho/", 
 		gameOptions: [
-			FORMAL_WIN_CONDITION
+			FORMAL_WIN_CONDITION,
+			BOARD_SETUP_2
 		]
 	},
 	SolitairePaiSho: {

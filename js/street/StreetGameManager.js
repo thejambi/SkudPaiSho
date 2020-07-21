@@ -87,6 +87,29 @@ StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
 					pointList.push(new NotationPoint("7,0"));
 				}
 				break;
+			case "2":
+				if (move.player === HOST) {
+					// North side of board
+					pointList.push(new NotationPoint("0,3"));
+					pointList.push(new NotationPoint("-6,5"));
+					pointList.push(new NotationPoint("-4,3"));
+					pointList.push(new NotationPoint("-2,5"));
+					pointList.push(new NotationPoint("0,7"));
+					pointList.push(new NotationPoint("2,5"));
+					pointList.push(new NotationPoint("4,3"));
+					pointList.push(new NotationPoint("6,5"));
+				} else if (move.player === GUEST) {
+					// South side of board
+					pointList.push(new NotationPoint("-6,-5"));
+					pointList.push(new NotationPoint("-4,-3"));
+					pointList.push(new NotationPoint("-2,-5"));
+					pointList.push(new NotationPoint("0,-7"));
+					pointList.push(new NotationPoint("2,-5"));
+					pointList.push(new NotationPoint("4,-3"));
+					pointList.push(new NotationPoint("6,-5"));
+					pointList.push(new NotationPoint("0,-3"));
+				}
+				break;
 			default: 
 				debug("Unknown board setup code.");
 		}

@@ -4,8 +4,7 @@ function StreetController(gameContainer, isMobile) {
 	this.actuator = new StreetActuator(gameContainer, isMobile);
 
 	/* Board setup code determines initial tile placement pattern on the board. */
-	this.hostBoardSetupCode = 1;
-	this.guestBoardSetupCode = 1;
+	this.initializeBoardSetupCodes();
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -16,6 +15,16 @@ function StreetController(gameContainer, isMobile) {
 
 	this.isPaiShoGame = true;
 }
+
+StreetController.prototype.initializeBoardSetupCodes = function() {
+	if (gameOptionEnabled(BOARD_SETUP_2)) {
+		this.hostBoardSetupCode = 2;
+		this.guestBoardSetupCode = 2;
+	} else {
+		this.hostBoardSetupCode = 1;
+		this.guestBoardSetupCode = 1;
+	}
+};
 
 StreetController.prototype.getGameTypeId = function() {
 	return GameType.StreetPaiSho.id;
