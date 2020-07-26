@@ -604,14 +604,14 @@ SkudPaiShoHarmonyManager.prototype.isCenterInsideShape = function(vs) {
       var xi = parseFloat(vs[i][0]), yi = parseFloat(vs[i][1]);
       var xj = parseFloat(vs[j][0]), yj = parseFloat(vs[j][1]);
 
-      if (yj <= y) {
+      if (yj < y) {	// Original had <= y
         if (yi > y) {
           if (this.isLeft([xj, yj], [xi, yi], [x,y]) > 0) {
             wn++;
           }
         }
       } else {
-        if (yi <= y) {
+        if (yi < y) { // Original had <= y
           if (this.isLeft([xj, yj], [xi, yi], [x, y]) < 0) {
             wn--;
           }
