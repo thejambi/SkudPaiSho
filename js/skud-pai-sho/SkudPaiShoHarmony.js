@@ -598,17 +598,24 @@ SkudPaiShoHarmonyManager.prototype.isCenterInsideShape = function(vs) {
 	var x = 0;
 	var y = 0;
 
-    var wn = 0;
+	var wn = 0;
+	var crossesCenterCount = 0;
+	var crossesCenterAllowed = 0;
 
     for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+		if (i === 7) {
+			crossesCenterAllowed++;
+		}
+
       var xi = parseFloat(vs[i][0]), yi = parseFloat(vs[i][1]);
 	  var xj = parseFloat(vs[j][0]), yj = parseFloat(vs[j][1]);
 	  
 	  // If on the line, doesn't count...
 		if ((xi === 0 && xj === 0 && yi * yj < 0)
 		|| (yi === 0 && yj === 0 && xi * xj < 0)) {
-		debug("Crosses center, cannot count");
-		return false;
+		// debug("Crosses center, cannot count");	// Consider allowing a maximum number of "crossing center" harmonies depending on number of harmonies in chain. 4? None allowed. How many can allow for one?
+		// return false;
+		crossesCenterCount++;
 	}
 
       if (yj <= y) {
@@ -626,7 +633,7 @@ SkudPaiShoHarmonyManager.prototype.isCenterInsideShape = function(vs) {
       }
     }
 
-    return wn != 0;
+    return wn != 0 && crossesCenterCount <= crossesCenterAllowed;
 };
 SkudPaiShoHarmonyManager.prototype.isLeft = function(P0, P1, P2) {
     var res = ( (P1[0] - P0[0]) * (P2[1] - P0[1])
