@@ -13,6 +13,17 @@ function TrifleController(gameContainer, isMobile) {
 	this.isPaiShoGame = true;
 }
 
+TrifleController.userIsTrifleDeveloper = function() {
+	return usernameIsOneOf(
+		[
+			'SkudPaiSho',
+			'abacadaren',
+			'Korron',
+			'vescucci',
+			'geebung02'
+		]);
+};
+
 TrifleController.prototype.getGameTypeId = function() {
 	return GameType.Trifle.id;
 };

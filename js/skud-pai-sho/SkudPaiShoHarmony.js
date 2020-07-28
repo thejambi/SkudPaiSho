@@ -602,16 +602,23 @@ SkudPaiShoHarmonyManager.prototype.isCenterInsideShape = function(vs) {
 
     for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
       var xi = parseFloat(vs[i][0]), yi = parseFloat(vs[i][1]);
-      var xj = parseFloat(vs[j][0]), yj = parseFloat(vs[j][1]);
+	  var xj = parseFloat(vs[j][0]), yj = parseFloat(vs[j][1]);
+	  
+	  // If on the line, doesn't count...
+		if ((xi === 0 && xj === 0 && yi * yj < 0)
+		|| (yi === 0 && yj === 0 && xi * xj < 0)) {
+		debug("Crosses center, cannot count");
+		return false;
+	}
 
-      if (yj < y) {	// Original had <= y
+      if (yj <= y) {
         if (yi > y) {
           if (this.isLeft([xj, yj], [xi, yi], [x,y]) > 0) {
             wn++;
           }
         }
       } else {
-        if (yi < y) { // Original had <= y
+        if (yi <= y) {
           if (this.isLeft([xj, yj], [xi, yi], [x, y]) < 0) {
             wn--;
           }

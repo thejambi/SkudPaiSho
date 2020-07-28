@@ -63,7 +63,8 @@ var paiShoBoardDesignTypeValues = {
 	air: "Air by Monk_Gyatso",
 	nick: "Nick style by BoomerangGuy",
 	owl: "Order of the White Lotus by Geebung",
-	metal: "Metal Bender style by ohreaganoe"
+	metal: "Metal Bender style by ohreaganoe"//,
+	// whitethread: "White Thread by tree"
 };
 
 var paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
@@ -1741,7 +1742,7 @@ function getGameControllerForGameType(gameTypeId) {
 			controller = new BloomsController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Trifle.id:
-			if (trifleOn || usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci'])) {
+			if (trifleOn || TrifleController.userIsTrifleDeveloper()) {
 				controller = new TrifleController(gameContainerDiv, isMobile);
 			} else {
 				closeGame();
@@ -2190,7 +2191,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 			var gameSeek = gameSeekList[index];
 
 			if (gameSeek.gameTypeId !== GameType.Trifle.id
-				|| (gameSeek.gameTypeId === GameType.Trifle.id && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci']))
+				|| (gameSeek.gameTypeId === GameType.Trifle.id && TrifleController.userIsTrifleDeveloper())
 			) {
 			
 				var hostOnlineOrNotIconText = userOfflineIcon;
@@ -2436,7 +2437,7 @@ function getSidenavNewGameEntryForGameType(gameType) {
 
 function getNewGameEntryForGameType(gameType) {
 	if (trifleOn || gameType !== GameType.Trifle
-		|| (gameType === GameType.Trifle && usernameIsOneOf(['SkudPaiSho','abacadaren','Korron','vescucci']))
+		|| (gameType === GameType.Trifle && TrifleController.userIsTrifleDeveloper())
 		) {
 		return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
 	}

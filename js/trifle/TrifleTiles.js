@@ -70,7 +70,7 @@ var MovementRestriction = {
 };
 
 var MovementAbility = {
-	carry: "carry",
+	// carry: "carry", // For future
 	jumpOver: "jumpOver",
 	chargeCapture: "chargeCapture"
 };
@@ -89,13 +89,13 @@ var CaptureType = {
 };
 
 var ZoneAbility = {
-	canceledWhenInTemple: "canceledWhenInTemple",
-	protectFriendlyTilesFromCapture: "protectFriendlyTilesFromCapture",
-	immobilizesOpponentTiles: "immobilizesOpponentTiles",
+	canceledWhenInTemple: "canceledWhenInTemple", // Note: Too specific, how to split up to *dynamicize*?
+	protectFriendlyTilesFromCapture: "protectFriendlyTilesFromCapture", // Too specific, can be ProtectTilesFromCapture and have a target tiles metadata
+	immobilizesOpponentTiles: "immobilizesOpponentTiles", // Outdated, replaced by ImmobilizesTiles
 	immobilizesTiles: "immobilizesTiles",
 	removesTileAbilities: "removesTileAbilities",	// TODO // TODO testing, etc
 	restrictMovementWithinZone: "restrictMovementWithinZone",
-	captureLandingTiles: "captureLandingTiles"
+	captureLandingTiles: "captureLandingTiles" // unused?
 }
 
 var BoardPresenceAbility = {
