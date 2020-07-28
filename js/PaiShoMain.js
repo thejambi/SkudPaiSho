@@ -63,8 +63,8 @@ var paiShoBoardDesignTypeValues = {
 	air: "Air by Monk_Gyatso",
 	nick: "Nick style by BoomerangGuy",
 	owl: "Order of the White Lotus by Geebung",
-	metal: "Metal Bender style by ohreaganoe"//,
-	// whitethread: "White Thread by tree"
+	metal: "Metal Bender style by ohreaganoe",
+	whitethread: "White Thread by tree"
 };
 
 var paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
