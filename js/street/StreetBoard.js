@@ -402,6 +402,11 @@ StreetBoard.prototype.moveTile = function(player, notationPointStart, notationPo
 		debug("Error: No tile to move!");
 	}
 
+	if (gameOptionEnabled(RELEASE_CAPTIVE_TILES) && tile.capturedTile) {
+		var captiveTile = tile.releaseCapturedTile();
+		boardPointStart.putTile(captiveTile);
+	}
+
 	var error = boardPointEnd.putTile(tile);
 
 	if (error) {

@@ -23,6 +23,9 @@ StreetTile.prototype.getImageName = function() {
 };
 
 StreetTile.prototype.getMoveDistance = function() {
+	if (this.capturedTile) {
+		return 5;
+	}
 	return 3;
 };
 

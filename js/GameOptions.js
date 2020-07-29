@@ -29,6 +29,7 @@ var MORE_ATTACKERS = "More Attackers!";
 /* Street Pai Sho */
 var FORMAL_WIN_CONDITION = "Formal win condition";
 var BOARD_SETUP_2 = "Board Setup 2";
+var RELEASE_CAPTIVE_TILES = "Release Captive Tiles";
 
 
 function gameOptionEnabled(optionName) {
