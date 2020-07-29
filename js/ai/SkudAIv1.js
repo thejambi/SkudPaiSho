@@ -484,11 +484,9 @@ SkudAIv1.prototype.getNumHamoniesCrossingCenter = function(game, player) {
 };
 
 SkudAIv1.prototype.ensurePlant = function(move, game, player) {
-	if (move.moveType !== ARRANGING) {
-		return;
-	}
-
-	if (move.bonusTileCode) {
+	if (move.moveType !== ARRANGING
+		|| move.bonusTileCode
+		|| !game.board.playerHasNoGrowingFlowers(this.player)) {
 		return;
 	}
 
