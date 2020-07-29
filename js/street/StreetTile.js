@@ -24,9 +24,20 @@ StreetTile.prototype.getImageName = function() {
 
 StreetTile.prototype.getMoveDistance = function() {
 	if (this.capturedTile) {
-		return 5;
+		if (gameOptionEnabled(BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES)) {
+			return 3 + this.getNumCaptivesInStack();
+		} else if (gameOptionEnabled(BONUS_MOVEMENT_5)) {
+			return 5;
+		}
 	}
 	return 3;
+};
+
+StreetTile.prototype.getNumCaptivesInStack = function() {
+	if (this.capturedTile) {
+		return this.capturedTile.getNumCaptivesInStack() + 1;
+	};
+	return 0;
 };
 
 StreetTile.prototype.formsHarmonyWith = function(otherTile) {

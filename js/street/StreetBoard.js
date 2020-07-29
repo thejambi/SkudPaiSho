@@ -427,7 +427,7 @@ StreetBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 		return false;	// Cannot capture own tile
 	}
 
-	if (!tile.capturedTile) {
+	if (!tile.capturedTile || gameOptionEnabled(RELEASE_CAPTIVE_TILES)) {
 		return true;
 	}
 };

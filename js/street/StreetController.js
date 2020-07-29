@@ -311,6 +311,7 @@ StreetController.prototype.getPointMessage = function(htmlPoint) {
 	var message = [];
 	if (boardPoint.hasTile()) {
 		heading = boardPoint.tile.getName();
+		message.push("Number of captives: " + boardPoint.tile.getNumCaptivesInStack());
 		// Specific tile message
 		/**
 		Rose
