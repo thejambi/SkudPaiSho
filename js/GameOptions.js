@@ -31,7 +31,7 @@ var FORMAL_WIN_CONDITION = "Formal win condition";
 var BOARD_SETUP_2 = "Board Setup 2";
 var RELEASE_CAPTIVE_TILES = "Release Captive Tiles";
 var BONUS_MOVEMENT_5 = "Bonus Movement With Captive (5)";
-var BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES = "Bonus Movement Per Captive";
+var BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES = "Bonus Movement (+1) Per Captive";
 
 
 function gameOptionEnabled(optionName) {
