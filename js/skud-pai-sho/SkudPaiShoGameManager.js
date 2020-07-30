@@ -236,6 +236,8 @@ SkudPaiShoGameManager.prototype.getWinReason = function() {
 		} else {
 			return " won the game with the most Harmonies.";
 		}
+	} else if (this.board.winners.length === 2) {
+		return " formed Harmony Rings for a tie!";
 	}
 };
 
