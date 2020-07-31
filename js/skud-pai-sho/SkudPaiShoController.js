@@ -100,7 +100,9 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 			}
 		}
 
-		msg += getGameOptionsMessageHtml(GameType.SkudPaiSho.gameOptions);
+		if (!playingOnlineGame()) {
+			msg += getGameOptionsMessageHtml(GameType.SkudPaiSho.gameOptions);
+		}
 	} else if (this.gameNotation.moves.length === 1) {
 		if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
 			msg += "Select ALL Accent Tiles to play with,";

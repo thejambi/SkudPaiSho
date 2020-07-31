@@ -28,7 +28,7 @@ var paiShoBoardKey = "default";
 
 var debugOn = false;
 
-var trifleOn = true;
+var trifleOn = false;
 
 /* Set to true if building for iOS, else set to false */
 var ios = false;
