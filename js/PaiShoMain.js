@@ -3047,7 +3047,48 @@ var showTournamentInfoCallback = function showTournamentInfoCallback(results) {
 				for (var j = 0; j < tournamentInfo.games.length; j++) {
 					var game = tournamentInfo.games[j];
 					if (game.roundId === round.id) {
-						message += "<div class='clickableText' onclick='matchGameClicked(" + game.gameId + ")'>" + htmlEscape(game.gameType) + ": " + game.hostUsername + " vs " + game.guestUsername + "</div>";
+						message += "<div class='clickableText' onclick='matchGameClicked(" + game.gameId + ")'>" + htmlEscape(game.gameType) + ": ";
+						
+						if (!game.gameWinnerUsername
+								&& game.lastPlayedUsername 
+								&& game.lastPlayedUsername !== game.hostUsername) {
+							message += "<em>";
+						}
+						if (game.gameWinnerUsername && game.gameWinnerUsername === game.hostUsername) {
+							message += "[";
+						}
+						message += game.hostUsername;
+						if (game.gameWinnerUsername && game.gameWinnerUsername === game.hostUsername) {
+							message += "]";
+						}
+						if (!game.gameWinnerUsername
+								&& game.lastPlayedUsername 
+								&& game.lastPlayedUsername !== game.hostUsername) {
+							message += "</em>";
+						}
+
+						message += " vs ";
+
+						if (!game.gameWinnerUsername
+								&& game.lastPlayedUsername 
+								&& game.lastPlayedUsername !== game.guestUsername) {
+							message += "<em>";
+						}
+						if (game.gameWinnerUsername && game.gameWinnerUsername === game.guestUsername) {
+							message += "[";
+						}
+						message += game.guestUsername;
+						if (game.gameWinnerUsername && game.gameWinnerUsername === game.guestUsername) {
+							message += "]";
+						}
+						if (!game.gameWinnerUsername
+								&& game.lastPlayedUsername 
+								&& game.lastPlayedUsername !== game.guestUsername) {
+							message += "</em>";
+						}
+
+						message += "</div>";
+
 						gamesFoundForRound = true;
 					}
 				}
