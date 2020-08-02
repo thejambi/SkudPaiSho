@@ -618,6 +618,12 @@ SkudPaiShoHarmonyManager.prototype.isCenterInsideShape = function(vs) {
 		crossesCenterCount++;
 	}
 
+	// If one of the points is 0,0 that won't count...
+	if ((xi === 0 && yi === 0) || (xj === 0 && yj === 0)) {
+		debug("On center point, cannot count");
+		return false;
+	}
+
       if (yj <= y) {
         if (yi > y) {
           if (this.isLeft([xj, yj], [xi, yi], [x,y]) > 0) {
