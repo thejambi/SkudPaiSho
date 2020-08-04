@@ -41,6 +41,7 @@ var tileDesignTypeValues = {
 	hlowenew: "Modern Tiles", //"hlowenew",
 	hlowemono: "Modern Monochrome Tiles", //"hlowemono",
 	vescucci: "Vescucci Tiles", //"vescucci",
+	vescuccicolored: "Vescucci Colored",
 	standard: "Pai Sho Project Tiles", //"standard",
 	pixelsho: "Pixel Sho v1 Tiles", //"pixelsho",
 	pixelsho2: "Pixel Sho v2 Tiles", //"pixelsho2",
