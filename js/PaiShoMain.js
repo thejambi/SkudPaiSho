@@ -548,7 +548,8 @@ var getNewChatMessagesCallback = function getNewChatMessagesCallback(results) {
 
 		for (var index in chatMessageList) {
 			var chatMessage = chatMessageList[index];
-			newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+			var chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
+			newChatMessagesHtml += "<div class='chatMessage'><em>" + chatMsgTimestamp + "</em> <strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
 			
 			// The most recent message will determine whether to alert
 			if (!usernameEquals(chatMessage.username)) {
@@ -576,6 +577,17 @@ var getNewChatMessagesCallback = function getNewChatMessagesCallback(results) {
 		}
 	}
 };
+
+function getTimestampString(timestampStr) {
+	var dte = new Date(timestampStr);
+
+	var fullDateStr = dte.toString();
+	fullDateStr = fullDateStr.substring(0,fullDateStr.indexOf("GMT")) + "GMT-0400 (Eastern Daylight Time)";
+
+	dte = new Date(fullDateStr);
+
+	return dte.toLocaleString();
+}
 
 function gameWatchPulse() {
 	onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
@@ -1961,11 +1973,11 @@ var showMyGamesCallback = function showMyGamesCallback(results) {
 
 			var gId = parseInt(myGame.gameId);
 			var userIsHost = usernameEquals(myGame.hostUsername);
-			var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+			var userIsGuest = usernameEquals(myGame.guestUsername);
 
 			var gameDisplayTitle = "";
 
-			if (!userIsHost && !usernameEquals(opponentUsername)) {
+			if (!userIsHost) {
 				if (myGame.hostOnline) {
 					gameDisplayTitle += userOnlineIcon;
 				} else {
@@ -1974,7 +1986,7 @@ var showMyGamesCallback = function showMyGamesCallback(results) {
 			}
 			gameDisplayTitle += myGame.hostUsername;
 			gameDisplayTitle += " vs. ";
-			if (userIsHost && !usernameEquals(opponentUsername)) {
+			if (!userIsGuest) {
 				if (myGame.guestOnline) {
 					gameDisplayTitle += userOnlineIcon;
 				} else {
