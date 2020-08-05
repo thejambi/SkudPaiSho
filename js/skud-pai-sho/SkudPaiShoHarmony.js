@@ -238,6 +238,17 @@ SkudPaiShoHarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
 	}
 };
 
+SkudPaiShoHarmonyManager.prototype.getPlayerWithMostHarmoniesCrossingMidlines = function() {
+	var hostCount = this.getNumCrossingCenterForPlayer(HOST);
+	var guestCount = this.getNumCrossingCenterForPlayer(GUEST);
+
+	if (guestCount > hostCount) {
+		return GUEST;
+	} else if (hostCount > guestCount) {
+		return HOST;
+	}
+};
+
 SkudPaiShoHarmonyManager.prototype.getNumCrossingCenterForPlayer = function(player) {
 	var count = 0;
 	for (var i = 0; i < this.harmonies.length; i++) {

@@ -106,8 +106,10 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
 				debug("Player has more Accent Tiles: " + playerMoreAccentTiles)
 				this.endGameWinners.push(playerMoreAccentTiles);
 			} else {
-				// Calculate player with most Harmonies
-				var playerWithmostHarmonies = this.board.harmonyManager.getPlayerWithMostHarmonies();
+				// (Previously, on Skud Pai Sho...) Calculate player with most Harmonies
+				// var playerWithmostHarmonies = this.board.harmonyManager.getPlayerWithMostHarmonies();
+				// Calculate player with most Harmonies crossing midlines
+				var playerWithmostHarmonies = this.board.harmonyManager.getPlayerWithMostHarmoniesCrossingMidlines();
 				if (playerWithmostHarmonies) {
 					this.endGameWinners.push(playerWithmostHarmonies);
 					debug("Most Harmonies winner: " + playerWithmostHarmonies);
@@ -238,6 +240,8 @@ SkudPaiShoGameManager.prototype.getWinReason = function() {
 		}
 	} else if (this.board.winners.length === 2) {
 		return " formed Harmony Rings for a tie!";
+	} else if (this.board.endGameWinners.length === 2) {
+		return " tied with the same number of Harmonies!"
 	}
 };
 
