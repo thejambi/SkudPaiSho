@@ -41,12 +41,13 @@ var tileDesignTypeValues = {
 	hlowenew: "Modern Tiles", //"hlowenew",
 	hlowemono: "Modern Monochrome Tiles", //"hlowemono",
 	vescucci: "Vescucci Tiles", //"vescucci",
-	vescuccicolored: "Vescucci Colored",
 	standard: "Pai Sho Project Tiles", //"standard",
 	pixelsho: "Pixel Sho v1 Tiles", //"pixelsho",
 	pixelsho2: "Pixel Sho v2 Tiles", //"pixelsho2",
 	xiangqi: "Xiangqi Style", //"xiangqi"
-	water: "Water themed Vescucci Tiles"
+	water: "Water themed Vescucci Tiles",
+	vescuccicolored: "Vescucci Colored",
+	vescuccicolored2: "Vescucci Colored 2"
 };
 
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
