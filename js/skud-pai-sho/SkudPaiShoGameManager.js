@@ -236,7 +236,7 @@ SkudPaiShoGameManager.prototype.getWinReason = function() {
 		if (this.tileManager.getPlayerWithMoreAccentTiles()) {
 			return " won the game with more Accent Tiles left.";
 		} else {
-			return " won the game with the most Harmonies.";
+			return " won the game with the most Harmonies crossing the midlines.";
 		}
 	} else if (this.board.winners.length === 2) {
 		return " formed Harmony Rings for a tie!";
