@@ -1656,7 +1656,7 @@ var GameType = {
 		rulesUrl: "https://skudpaisho.com/site/games/street-pai-sho/", 
 		gameOptions: [
 			FORMAL_WIN_CONDITION,
-			BOARD_SETUP_2,
+			ORIGINAL_BOARD_SETUP,
 			RELEASE_CAPTIVE_TILES,
 			BONUS_MOVEMENT_5,
 			BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES

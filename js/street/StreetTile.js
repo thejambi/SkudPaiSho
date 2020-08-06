@@ -14,6 +14,8 @@ function StreetTile(ownerCode) {
 	this.selectedFromPile = false;
 }
 
+StreetTile.baseMoveDistance = 4;
+
 StreetTile.prototype.getConsoleDisplay = function() {
 	return this.ownerCode + "" + this.code;
 };
@@ -25,12 +27,12 @@ StreetTile.prototype.getImageName = function() {
 StreetTile.prototype.getMoveDistance = function() {
 	if (this.capturedTile) {
 		if (gameOptionEnabled(BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES)) {
-			return 3 + this.getNumCaptivesInStack();
+			return StreetTile.baseMoveDistance + this.getNumCaptivesInStack();
 		} else if (gameOptionEnabled(BONUS_MOVEMENT_5)) {
 			return 5;
 		}
 	}
-	return 3;
+	return StreetTile.baseMoveDistance;
 };
 
 StreetTile.prototype.getNumCaptivesInStack = function() {

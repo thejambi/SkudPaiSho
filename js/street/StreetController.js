@@ -17,12 +17,12 @@ function StreetController(gameContainer, isMobile) {
 }
 
 StreetController.prototype.initializeBoardSetupCodes = function() {
-	if (gameOptionEnabled(BOARD_SETUP_2)) {
-		this.hostBoardSetupCode = 2;
-		this.guestBoardSetupCode = 2;
-	} else {
+	if (gameOptionEnabled(ORIGINAL_BOARD_SETUP)) {
 		this.hostBoardSetupCode = 1;
 		this.guestBoardSetupCode = 1;
+	} else {
+		this.hostBoardSetupCode = 2;
+		this.guestBoardSetupCode = 2;
 	}
 };
 
