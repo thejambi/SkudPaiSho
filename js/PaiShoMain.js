@@ -780,7 +780,11 @@ function playPrevMove() {
 	currentMoveIndex = 0;
 
 	while (currentMoveIndex < moveToPlayTo) {
-		playNextMove(true);
+		playNextMove();
+	}
+
+	if (soundManager.prevMoveSoundsAreEnabled()) {
+		soundManager.playSound("tileLand");
 	}
 
 	refreshMessage();

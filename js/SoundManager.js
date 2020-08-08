@@ -112,6 +112,10 @@ SoundManager.prototype.nextMoveSoundsAreEnabled = function() {
 	return !this.storageManager.getSoundOff();
 };
 
+SoundManager.prototype.prevMoveSoundsAreEnabled = function() {
+	return !this.storageManager.getSoundOff();
+};
+
 SoundManager.prototype.rerunAllSoundsAreEnabled = function() {
 	return !this.storageManager.getSoundOff();
 };
