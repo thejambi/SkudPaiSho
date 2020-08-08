@@ -399,6 +399,9 @@ div.tab .alertTab, div.tab .alertTab.active {
 .game-container.avatarstateBoard .bg-svg {
   background-image: url(board_avatarstate.png);
 }
+.game-container.blowtorchBoard .bg-svg {
+  background-image: url(board_blowtorch.png);
+}
 
 figure > div {
   margin: 1em auto;
