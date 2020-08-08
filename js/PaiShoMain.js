@@ -186,6 +186,7 @@ var logOnlineStatusIntervalValue;
 var userTurnCountInterval;
 
 var gameContainerDiv = document.getElementById("game-container");
+var soundManager;
 /* --- */
 
 window.requestAnimationFrame(function () {
@@ -194,6 +195,8 @@ window.requestAnimationFrame(function () {
 	/* ----------------------- */
 
 	localStorage = new LocalStorage().storage;
+
+	soundManager = new SoundManager();
 
 	/* Dark Mode Preferences (dark mode now default) */
 	if (!localStorage.getItem("data-theme")) {
@@ -459,7 +462,7 @@ var getGameNotationCallback = function getGameNotationCallback(newGameNotation) 
 	if (gameWatchIntervalValue && newGameNotation !== lastKnownGameNotation) {
 		// gameController.gameNotation.setNotationText(newGameNotation);
 		gameController.setGameNotation(decodeURIComponent(newGameNotation));
-		rerunAll();
+		rerunAll(true);
 		lastKnownGameNotation = newGameNotation;
 		showReplayControls();	// TODO Put this somewhere better where it's called less often.
 	}
@@ -750,6 +753,9 @@ function playNextMove(withActuate) {
 		return false;
 	} else {
 		isInReplay = true;
+		if (withActuate && soundManager.nextMoveSoundsAreEnabled()) {
+			soundManager.playSound("tileLand");
+		}
 		gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate);
 		currentMoveIndex++;
 		if (currentMoveIndex >= gameController.gameNotation.moves.length) {
@@ -872,7 +878,7 @@ function refreshMessage() {
 	}
 }
 
-function rerunAll() {
+function rerunAll(soundOkToPlay) {
 	gameController.resetGameManager();
 	gameController.resetNotationBuilder();
 
@@ -880,11 +886,14 @@ function rerunAll() {
 
 	playAllMoves();
 
+	if (soundOkToPlay && soundManager.rerunAllSoundsAreEnabled()) {
+		soundManager.playSound("tileLand");
+	}
 	refreshMessage();
 }
 
 var finalizeMove = function(ignoreNoEmail) {
-	rerunAll();
+	rerunAll(true);
 
 	// Only build url if not onlinePlay
 	if (!playingOnlineGame()) {
@@ -3495,3 +3504,7 @@ document.onkeyup = function (e) {
 	}
 };
 
+/* Sound */
+function toggleSoundOn() {
+	soundManager.toggleSoundOn();
+}

@@ -330,7 +330,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 				this.gameNotation.addMove(move);
 				var hostMoveBuilder = this.notationBuilder.getFirstMoveForHost(this.notationBuilder.plantedFlowerType);
 				this.gameNotation.addMove(this.gameNotation.getNotationMoveFromBuilder(hostMoveBuilder));
-				rerunAll();
+				rerunAll(true);
 				// No finalize move because it's still Guest's turn
 				showResetMoveMessage();
 			} else if (!bonusAllowed) {
