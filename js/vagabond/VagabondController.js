@@ -112,7 +112,7 @@ VagabondController.prototype.getAdditionalMessage = function() {
 		} else if (this.notationBuilder.offerDraw) {
 			msg += "<br />Your opponent will be able to accept or reject your draw offer once you make your move. Or, you may <span class='skipBonus' onclick='gameController.removeDrawOffer();'>remove your draw offer</span> from this move.";
 		} else {
-			msg += "<br /><span class='skipBonus' onclick='gameController.offerDraw();'>Offer Draw</span><br />";
+			msg += "<br /><span class='skipBonus' onclick='gameController.offerDraw();'>Offer Draw</span><br /><span class='skipBonus' onclick='resignGameClicked();'>Resign Game</span>";
 		}
 	} else if (!myTurn()) {
 		if (this.gameNotation.lastMoveHasDrawOffer()) {
