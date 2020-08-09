@@ -2722,7 +2722,7 @@ function getOnlineGameOpponentUsername() {
 	return opponentUsername;
 }
 
-function resignGameCallback() {
+function quitOnlineGameCallback() {
 	if (currentGameData) {
 		setGameController(currentGameData.gameTypeId);
 	} else {
@@ -2734,14 +2734,14 @@ function iAmPlayerInCurrentOnlineGame() {
 	return usernameEquals(currentGameData.hostUsername) || usernameEquals(currentGameData.guestUsername);
 }
 
-function resignGame() {
+function quitOnlineGame() {
 	// TODO eventually make it so if guest never made a move, then player only "leaves" game instead of updating the game result, so it returns to being an available game seek.
 	if (gameController.guestNeverMoved && gameController.guestNeverMoved()) {
 		// Guest never moved, only leave game. TODO
 	}// else {....}
 	
 	if (iAmPlayerInCurrentOnlineGame()) {
-		onlinePlayEngine.updateGameWinInfo(gameId, getOnlineGameOpponentUsername(), 8, getLoginToken(), resignGameCallback);
+		onlinePlayEngine.updateGameWinInfo(gameId, getOnlineGameOpponentUsername(), 8, getLoginToken(), quitOnlineGameCallback);
 	}
 }
 
@@ -2749,7 +2749,7 @@ function quitOnlineGameClicked() {
 	var message = "";
 	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !gameController.theGame.getWinner()) {
 		message = "<div>Are you sure you want to quit and end this online game? The game will end and move to your Completed Games list.</div>";
-		message += "<br /><div class='clickableText' onclick='closeModal(); resignGame();'>Yes - quit current game</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal(); quitOnlineGame();'>Yes - quit current game</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
 	} else {
 		message = "When playing an unfinished online game, this is where you can quit or leave a game if you wish to do so.";
@@ -2922,7 +2922,7 @@ function getGameOptionsMessageHtml(options) {
 };
 
 function showBadMoveModal() {
-	showModal("Uh Oh", "A move went wrong somewhere. If you see this each time you look at this game, then this game may be corrupt due to players not both using latest updates. The app is not be compatible with new features.<br /><br />Please let your opponent know that you saw this message. You may want to resign this game and try again.");
+	showModal("Uh Oh", "A move went wrong somewhere. If you see this each time you look at this game, then this game may be corrupt due to players not both using latest updates. The app is not be compatible with new features.<br /><br />Please let your opponent know that you saw this message. You may want to quit this game and try again.");
 }
 
 
