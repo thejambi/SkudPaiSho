@@ -2741,7 +2741,7 @@ function quitOnlineGame() {
 	}// else {....}
 	
 	if (iAmPlayerInCurrentOnlineGame()) {
-		onlinePlayEngine.updateGameWinInfo(gameId, getOnlineGameOpponentUsername(), 8, getLoginToken(), quitOnlineGameCallback);
+		onlinePlayEngine.updateGameWinInfoAsTie(gameId, 8, getLoginToken(), quitOnlineGameCallback);
 	}
 }
 
