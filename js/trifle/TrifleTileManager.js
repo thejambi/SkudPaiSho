@@ -4,7 +4,7 @@ var STANDARD = "Standard";
 var RESTRICTED_BY_OPPONENT_TILE_ZONE = "Restricted by opponent tile zone";
 
 function TrifleTileManager() {
-	TrifleTileInfo.defineTrifleTiles();
+	TrifleTileInfo.initializeTrifleData();
 	this.hostTeam = [];
 	this.guestTeam = [];
 	this.hostTiles = [];

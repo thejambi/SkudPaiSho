@@ -373,9 +373,8 @@ TrifleBoard.prototype.placeTile = function(tile, notationPoint) {
 		this.applyZoneAbilityToTile(boardPoint);
 	}
 
-	this.applyWhenLandsTriggers(tile, tileInfo, boardPoint, []);
-
 	this.applyBoardScanAbilities();
+	this.applyWhenLandsTriggers(tile, tileInfo, boardPoint, []);
 };
 
 TrifleBoard.prototype.setTilePresenceAbilitiesForPlayer = function(boardPoint, playerName, tileInfo) {
@@ -396,8 +395,7 @@ TrifleBoard.prototype.abilityIsActive = function(boardPoint, tile, tileInfo, abi
 	/* Abilities defalt to active unless disabled */
 	var abilityIsActive = true;
 
-	/* What are the ways an ability can be disabled?
-
+	/* What are the ways an ability can be disabled/activated?
 	 */
 
 	var self = this;
@@ -409,9 +407,8 @@ TrifleBoard.prototype.abilityIsActive = function(boardPoint, tile, tileInfo, abi
 		if (zoneInfo && zoneInfo.abilities) {
 			zoneInfo.abilities.forEach(function(zoneAbilityInfo) {
 				if (
-					(
-						zoneAbilityInfo.type === ZoneAbility.removesTileAbilities
-					) && (
+					zoneAbilityInfo.type === ZoneAbility.removesTileAbilities
+					&& (
 						(zoneAbilityInfo.targetTeams.includes(TileTeam.friendly)
 							&& tile.ownerCode === checkBoardPoint.tile.ownerCode)
 						|| (zoneAbilityInfo.targetTeams.includes(TileTeam.enemy)
@@ -428,16 +425,26 @@ TrifleBoard.prototype.abilityIsActive = function(boardPoint, tile, tileInfo, abi
 							zoneAbilityInfo.targetTileCodes 
 							&& zoneAbilityInfo.targetTileCodes.includes(tile.code)
 						)
-					) && (
-						self.pointTileZoneContainsPoint(checkBoardPoint, boardPoint)
-					)
+					) && self.pointTileZoneContainsPoint(checkBoardPoint, boardPoint)
 				) {
 					abilityIsActive = false;
 					debug("Ability disabled for tile: " + tile.code + " by tile: " + checkBoardPoint.tile.code);
 				}
 			});
 		}
+
+		/* Check RemoveEffects abilities - Moving check to a "isEffectActive" method */
+		// abilityIsActive = abilityIsActive && !self.effectIsDisabledByRemoveEffectsAbility(boardPoint, tile, tileInfo, abilityInfo, checkBoardPoint, checkTileInfo);
 	});
+
+	if (abilityInfo.triggeringBoardState) {
+		abilityIsActive = false;	// Defaults to inactive unless activated by triggering board state, which we'll check.... now.
+		switch (abilityInfo.triggeringBoardState) {
+
+		}
+	}
+
+
 	return abilityIsActive;
 };
 
@@ -472,12 +479,7 @@ TrifleBoard.prototype.applyBoardScanAbilities = function() {
 	this.forEachBoardPointWithTile(function(boardPoint) {
 		var tileInfo = TrifleTiles[boardPoint.tile.code];
 		self.setTilePresenceAbilitiesForPlayer(boardPoint, boardPoint.tile.ownerName, tileInfo);
-	});
-
-	this.forEachBoardPoint(function(boardPoint) {
-		if (boardPoint.hasTile()) {
-			self.applyZoneProtectionAbilityForBoardPoint(boardPoint);
-		}
+		self.applyZoneProtectionAbilityForBoardPoint(boardPoint);
 	});
 };
 
@@ -503,13 +505,90 @@ TrifleBoard.prototype.applyProtectFriendlyTilesFromCaptureAbility = function(boa
 				if (TrifleTileInfo.tileIsOneOfTheseTypes(targetTileInfo, zoneAbility.targetTileTypes)) {
 					var distanceAway = self.getDistanceBetweenPoints(boardPoint, targetPoint);
 					if (distanceAway <= zoneInfo.size) {
-						targetPoint.tile.protected = true;
-						debug("I protected tile: " + targetPoint.tile);
+						if (self.isEffectActive(targetPoint, targetTileInfo, boardPoint, zoneAbility)) {
+							targetPoint.tile.protected = true;
+							debug("I protected tile: " + targetPoint.tile);
+						}
 					}
 				}
 			}
 		});
 	}
+};
+
+TrifleBoard.prototype.isEffectActive = function(targetPoint, targetTileInfo, boardPointOfTileGrantingEffect, abilityGrantingEffect) {
+	/* Effects defalt to active unless disabled */
+	var effectIsActive = true;
+
+	var self = this;
+	this.forEachBoardPointWithTile(function(checkBoardPoint) {
+		var checkTile = checkBoardPoint.tile;
+		var checkTileInfo = TrifleTiles[checkBoardPoint.tile.code];
+
+		/* Check tile zones that can disable effects */
+		/* var zoneInfo = TrifleTileInfo.getTerritorialZone(checkTileInfo);
+		if (zoneInfo && zoneInfo.abilities) {
+			zoneInfo.abilities.forEach(function(zoneAbilityInfo) {
+				if (
+					zoneAbilityInfo.type === ZoneAbility.removesTileAbilities
+					&& (
+						(zoneAbilityInfo.targetTeams.includes(TileTeam.friendly)
+							&& tile.ownerCode === checkBoardPoint.tile.ownerCode)
+						|| (zoneAbilityInfo.targetTeams.includes(TileTeam.enemy)
+							&& tile.ownerCode !== checkBoardPoint.tile.ownerCode)
+					) && (
+						(
+							zoneAbilityInfo.targetTileTypes 
+							&& (
+								arrayIncludesOneOf(zoneAbilityInfo.targetTileTypes, tileInfo.types)
+								|| zoneAbilityInfo.targetTileTypes.includes(TileCategory.allTileTypes)
+							)
+						)
+						|| (
+							zoneAbilityInfo.targetTileCodes 
+							&& zoneAbilityInfo.targetTileCodes.includes(tile.code)
+						)
+					) && self.pointTileZoneContainsPoint(checkBoardPoint, boardPoint)
+				) {
+					effectIsActive = false;
+					debug("Ability disabled for tile: " + tile.code + " by tile: " + checkBoardPoint.tile.code);
+				}
+			});
+		} */
+
+		/* Check RemoveEffects abilities */
+		effectIsActive = effectIsActive && !self.effectIsDisabledByRemoveEffectsAbility(targetPoint, targetTileInfo, boardPointOfTileGrantingEffect, abilityGrantingEffect, checkBoardPoint, checkTileInfo);
+	});
+
+	// if (abilityInfo.triggeringBoardState) {
+	// 	effectIsActive = false;	// Defaults to inactive unless activated by triggering board state, which we'll check.... now.
+	// 	switch (abilityInfo.triggeringBoardState) {
+	// 	}
+	// }
+
+	return effectIsActive;
+};
+
+TrifleBoard.prototype.effectIsDisabledByRemoveEffectsAbility = function(targetPoint, targetTileInfo, boardPointOfTileGrantingEffect, abilityGrantingEffect, checkBoardPoint, checkTileInfo) {
+	var effectIsDisabled = false;
+	var self = this;
+	if (checkTileInfo.abilities && checkTileInfo.abilities.length > 0) {
+		checkTileInfo.abilities.forEach(function(checkAbilityInfo) {
+			if (checkAbilityInfo.type === Ability.removeEffects) {
+				if (checkAbilityInfo.targetEffectTypes
+						&& arrayIncludesOneOf(checkAbilityInfo.targetEffectTypes, AbilityTypes[abilityGrantingEffect.type])) {
+					if (checkAbilityInfo.triggeringBoardState && checkAbilityInfo.triggeringBoardState === AbilityTrigger.whileTileInLineOfSight) {
+						if (self.targetPointIsInLineOfSightOfThesePoints(targetPoint, [checkBoardPoint])) {
+							effectIsDisabled = true;
+							debug(checkBoardPoint.tile.code + " has disabled effect granted by " + boardPointOfTileGrantingEffect.tile.code);
+						}
+					}
+				}
+			}
+		});
+	}
+
+	return effectIsDisabled;
 };
 
 TrifleBoard.prototype.getDistanceBetweenPoints = function(bp1, bp2) {

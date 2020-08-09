@@ -16,6 +16,7 @@ var TrifleTileCodes = {
 	Dandelion: 'Dandelion',
 	Edelweiss: 'Edelweiss',
 	WaterBanner: 'WaterBanner',
+	SnowLeopard: "SnowLeopard",
 	PolarBearDog: 'PolarBearDog',
 	BuffaloYak: 'BuffaloYak',
 	TitanArum: 'TitanArum',
@@ -111,19 +112,33 @@ var SpawnLocation = {
 };
 
 var Ability = {
-	captureTiles: "captureTiles"
+	captureTiles: "captureTiles",
+	removeEffects: "removeEffects"
+};
+
+var AbilityType = {
+	protection: "protection"
 };
 
 var AbilityTrigger = {
 	whenCaptured: "whenCaptured",
 	whenCapturing: "whenCapturing",
-	whenTileLandsInZone: "whenTileLandsInZone"
+	whenTileLandsInZone: "whenTileLandsInZone",
+	whileTileInLineOfSight: "whileTileInLineOfSight"
 };
 
 var TileTeam = {
 	friendly: "friendly",
 	enemy: "enemy"
 };
+
+var AbilitiesForType = {};
+	// protection: [
+	// 		ZoneAbility.protectFriendlyTilesFromCapture,
+	// 		BoardPresenceAbility.captureProtection
+	// 	]
+	// }
+var AbilityTypes = {};
 
 var TrifleTiles = {};
 
@@ -242,6 +257,33 @@ TrifleTileInfo.getZoneAbilitiesWithAbilityTrigger = function(tileInfo, abilityTr
 		});
 	}
 	return abilitiesWithTrigger;
+};
+
+TrifleTileInfo.initializeTrifleData = function() {
+	TrifleTileInfo.defineAbilitiesForAbilityTypes();
+	TrifleTileInfo.defineAbilityTypes();
+	TrifleTileInfo.defineTrifleTiles();
+};
+
+TrifleTileInfo.defineAbilitiesForAbilityTypes = function () {
+	AbilitiesForType = {};
+
+	AbilitiesForType[AbilityType.protection] = [
+		ZoneAbility.protectFriendlyTilesFromCapture,
+		BoardPresenceAbility.captureProtection
+	];
+};
+
+TrifleTileInfo.defineAbilityTypes = function () {
+	AbilityTypes = {};
+
+	AbilityTypes[ZoneAbility.protectFriendlyTilesFromCapture] = [
+		AbilityType.protection
+	];
+
+	AbilityTypes[BoardPresenceAbility.captureProtection] = [
+		AbilityType.protection
+	];
 };
 
 TrifleTileInfo.defineTrifleTiles = function() {
@@ -542,6 +584,26 @@ TrifleTileInfo.defineTrifleTiles = function() {
 			{
 				type: MovementType.standard,
 				distance: 2
+			}
+		]
+	};
+
+	TrifleTiles[TrifleTileCodes.SnowLeopard] = {
+		types: [TileType.animal],
+		deployTypes: [DeployType.anywhere],
+		movements: [
+			{
+				type: MovementType.standard,
+				distance: 3,
+				captureTypes: [ CaptureType.all ]
+			}
+		],
+		abilities: [
+			{
+				type: Ability.removeEffects,
+				triggeringBoardState: AbilityTrigger.whileTileInLineOfSight,
+				targetEffectTypes: [AbilityType.protection],
+				targetTileTypes: [TileCategory.allTileTypes]
 			}
 		]
 	};
