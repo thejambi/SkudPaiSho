@@ -4,6 +4,8 @@ Skud Pai Sho is the most accessible, playable, and complete ruleset for Pai Sho.
 
 # Local Development
 
+I recommend using [VSCode](https://code.visualstudio.com/) or a similar editor to work in.
+
 This npm package is needed:
 `npm install uglify-js -g`
 
