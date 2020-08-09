@@ -2745,17 +2745,17 @@ function resignGame() {
 	}
 }
 
-function resignGameClicked() {
+function quitOnlineGameClicked() {
 	var message = "";
 	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !gameController.theGame.getWinner()) {
-		message = "<div>Are you sure you want to resign this game?</div>";
-		message += "<br /><div class='clickableText' onclick='closeModal(); resignGame();'>Yes - resign game</div>";
+		message = "<div>Are you sure you want to quit and end this online game? The game will end and move to your Completed Games list.</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal(); resignGame();'>Yes - quit current game</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
 	} else {
-		message = "When playing an unfinished online game, this is where you can resign or leave a game if you wish to do so.";
+		message = "When playing an unfinished online game, this is where you can quit or leave a game if you wish to do so.";
 	}
 	
-	showModal("Resign Game", message);
+	showModal("Quit Current Online Game", message);
 }
 
 var tutorialInProgress = false;
