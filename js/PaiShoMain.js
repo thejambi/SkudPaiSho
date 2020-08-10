@@ -1892,7 +1892,9 @@ function populateMyGamesList(results) {
 			guestUsername:row[5], 
 			guestOnline:parseInt(row[6]), 
 			isUserTurn:parseInt(row[7]),
-			gameOptions:parseGameOptions(row[8])
+			gameOptions:parseGameOptions(row[8]),
+			winnerUsername:row[9],
+			resultId:parseInt(row[10])
 		};
 		myGamesList.push(myGame);
 	}
@@ -1922,27 +1924,29 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 		for (var index in myGamesList) {
 			var myGame = myGamesList[index];
 
-			if (myGame.gameTypeDesc !== gameTypeHeading) {
-				if (gameTypeHeading !== "") {
-					message += "<br />";
+			if (myGame.resultId !== 8) { /* Skip showing games that were Quit */
+				if (myGame.gameTypeDesc !== gameTypeHeading) {
+					if (gameTypeHeading !== "") {
+						message += "<br />";
+					}
+					gameTypeHeading = myGame.gameTypeDesc;
+					message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
 				}
-				gameTypeHeading = myGame.gameTypeDesc;
-				message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
-			}
 
-			var gId = parseInt(myGame.gameId);
-			var userIsHost = usernameEquals(myGame.hostUsername);
-			var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+				var gId = parseInt(myGame.gameId);
+				var userIsHost = usernameEquals(myGame.hostUsername);
+				var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
 
-			var gameDisplayTitle = myGame.hostUsername;
-			gameDisplayTitle += " vs. ";
-			gameDisplayTitle += myGame.guestUsername;
+				var gameDisplayTitle = myGame.hostUsername;
+				gameDisplayTitle += " vs. ";
+				gameDisplayTitle += myGame.guestUsername;
 
-			message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
+				message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
 
-			countOfGamesShown++;
-			if (!showAll && countOfGamesShown > 20) {
-				break;
+				countOfGamesShown++;
+				if (!showAll && countOfGamesShown > 20) {
+					break;
+				}
 			}
 		}
 	}
@@ -2748,7 +2752,7 @@ function quitOnlineGame() {
 function quitOnlineGameClicked() {
 	var message = "";
 	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !gameController.theGame.getWinner()) {
-		message = "<div>Are you sure you want to quit and end this online game? The game will end and move to your Completed Games list.</div>";
+		message = "<div>Are you sure you want to quit and end this online game? The game will end and will NOT appear in your Completed Games list.</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal(); quitOnlineGame();'>Yes - quit current game</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
 	} else {
@@ -3493,7 +3497,6 @@ function notifyThisMessage(message) {
   }
 
 /* Keyboard shortcuts */
-
 document.onkeyup = function (e) {
 	debug(e.which || e.keyCode);
 	if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 67) {
@@ -3505,7 +3508,13 @@ document.onkeyup = function (e) {
 	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 82) {
 		/* Ctrl + Alt + R */
 		toggleReplayControls();
-	}
+	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 39) {
+		/* Ctrl + Alt + -> */
+		playNextMove(true);
+	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 37) {
+		/* Ctrl + Alt + <- */
+		playPrevMove(true);
+	} 
 };
 
 /* Sound */

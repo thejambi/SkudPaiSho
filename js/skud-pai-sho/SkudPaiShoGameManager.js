@@ -126,13 +126,16 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
 };
 
 SkudPaiShoGameManager.prototype.buildChooseAccentTileGameLogText = function(move) {
-	this.gameLogText = move.player + ' chose Accent Tiles ' + move.accentTiles;
+	this.gameLogText = move.moveNum + move.playerCode + '. ' 
+		+ move.player + ' chose Accent Tiles ' + move.accentTiles;
 };
 SkudPaiShoGameManager.prototype.buildPlantingGameLogText = function(move, tile) {
-	this.gameLogText = move.player + ' Planted ' + tile.getName() + ' at ' + move.endPoint.pointText;
+	this.gameLogText = move.moveNum + move.playerCode + '. ' 
+		+ move.player + ' Planted ' + tile.getName() + ' at ' + move.endPoint.pointText;
 };
 SkudPaiShoGameManager.prototype.buildArrangingGameLogText = function(move, moveResults) {
-	this.gameLogText = move.player + ' moved ' + moveResults.movedTile.getName() + ' ' + move.moveTextOnly;
+	this.gameLogText = move.moveNum + move.playerCode + '. ' 
+		+ move.player + ' moved ' + moveResults.movedTile.getName() + ' ' + move.moveTextOnly;
 	if (moveResults.capturedTile) {
 		this.gameLogText += ' to capture ' + getOpponentName(move.player) + '\'s ' + moveResults.capturedTile.getName();
 	}
