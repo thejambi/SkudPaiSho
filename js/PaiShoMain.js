@@ -27,7 +27,7 @@ var QueryString = function () {
     } else {
     	query_string[pair[0]].push(decodeURIComponent(pair[1]));
     }
-  } 
+  }
   return query_string;
 }();
 
@@ -94,7 +94,7 @@ function buildDropdownDiv(dropdownId, labelText, valuesObject, selectedObjectKey
 
 		theDropdown.appendChild(option);
 	});
-	
+
 	theDropdown.onchange = onchangeFunction;
 
 	containerDiv.appendChild(label);
@@ -159,7 +159,9 @@ var activeAi;
 var activeAi2;
 var sandboxUrl;
 var metadata = new Object();
-var replayIntervalLength = 1500;
+var replayIntervalLength = 2100;
+var pieceAnimationLength = 1000;// Note that this must be changed in the `.point img` `transition` property as well(main.css)
+var piecePlaceAnimation = 1;// 0 = None, they just appear, 1 = 
 
 /* Online Play variables */
 var onlinePlayEngine = new OnlinePlayEngine();
@@ -399,10 +401,10 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 
 function initialVerifyLogin() {
 	if (onlinePlayEnabled) {
-		onlinePlayEngine.verifyLogin(getUserId(), 
-			getUsername(), 
-			getUserEmail(), 
-			getDeviceId(), 
+		onlinePlayEngine.verifyLogin(getUserId(),
+			getUsername(),
+			getUserEmail(),
+			getDeviceId(),
 			initialVerifyLoginCallback
 		);
 	}
@@ -424,10 +426,10 @@ var verifyLoginCallback = function verifyLoginCallback(response) {
 
 function verifyLogin() {
 	if (onlinePlayEnabled) {
-		onlinePlayEngine.verifyLogin(getUserId(), 
-			getUsername(), 
-			getUserEmail(), 
-			getDeviceId(), 
+		onlinePlayEngine.verifyLogin(getUserId(),
+			getUsername(),
+			getUserEmail(),
+			getDeviceId(),
 			verifyLoginCallback
 		);
 	}
@@ -523,7 +525,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 	title += " vs. ";
 	title += guestUsernameTag;
 	title += "</span>";
-	
+
 	setResponseText(title);
 }
 
@@ -543,8 +545,8 @@ var getNewChatMessagesCallback = function getNewChatMessagesCallback(results) {
 		for (var index in resultRows) {
 			var row = resultRows[index].split('|||');
 			var chatMessage = {
-				timestamp:row[0], 
-				username:row[1], 
+				timestamp:row[0],
+				username:row[1],
 				message:row[2]
 			};
 			chatMessageList.push(chatMessage);
@@ -557,7 +559,7 @@ var getNewChatMessagesCallback = function getNewChatMessagesCallback(results) {
 			var chatMessage = chatMessageList[index];
 			var chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
 			newChatMessagesHtml += "<div class='chatMessage'><em>" + chatMsgTimestamp + "</em> <strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
-			
+
 			// The most recent message will determine whether to alert
 			if (!usernameEquals(chatMessage.username)) {
 				// Set chat tab color to alert new messages if newest message is not from user
@@ -570,7 +572,7 @@ var getNewChatMessagesCallback = function getNewChatMessagesCallback(results) {
 		if (alertNewMessages) {
 			document.getElementById('chatTab').classList.add('alertTab');
 		}
-		
+
 		/* Prepare to add chat content and keep scrolled to bottom */
 		var chatMessagesDisplay = document.getElementById('chatMessagesDisplay');
 		// allow 1px inaccuracy by adding 1
@@ -598,7 +600,7 @@ function getTimestampString(timestampStr) {
 
 function gameWatchPulse() {
 	onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
-	
+
 	onlinePlayEngine.checkIfUserOnline(currentGameOpponentUsername, checkIfUserOnlineCallback);
 
 	onlinePlayEngine.getNewChatMessages(gameId, lastChatTimestamp, getNewChatMessagesCallback);
@@ -620,7 +622,7 @@ function startWatchingGameRealTime() {
 	lastChatTimestamp = '1970-01-01 00:00:00';
 
 	/* Setup chat heading message with link to previously active game */
-	// TODO 
+	// TODO
 	// onlinePlayEngine
 
 	// First pulse
@@ -792,10 +794,11 @@ function playPrevMove() {
 
 function playAllMoves() {
 	pauseRun();
-	while (playNextMove(false)) {
-		// Nothing!
+	while (currentMoveIndex < gameController.gameNotation.moves.length - 1) {
+		playNextMove(false);
 	}
-	gameController.callActuate();
+  playNextMove(true);
+	// gameController.callActuate();
 }
 
 function playPause() {
@@ -855,7 +858,7 @@ function getAdditionalMessage() {
 function getGameMessageElement() {
 	var gameMessage = document.querySelector(".gameMessage");
 	var gameMessage2 = document.querySelector(".gameMessage2");
-	
+
 	if (gameController.showGameMessageUnderneath) {
 		gameMessage.innerHTML = "";
 		return gameMessage2;
@@ -876,7 +879,7 @@ function refreshMessage() {
 
 	getGameMessageElement().innerHTML = message;
 
-	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn()) 
+	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn())
 			|| gameController.isSolitaire()) {
 		showResetMoveMessage();
 	}
@@ -909,7 +912,7 @@ var finalizeMove = function(ignoreNoEmail) {
 			linkUrl += "guest=" + guestEmail + "&";
 		}
 		linkUrl += "game=" + gameController.gameNotation.notationTextForUrl();
-		
+
 		if (ggOptions.length > 0) {
 			linkUrl += "&gameOptions=" + JSON.stringify(ggOptions);
 		}
@@ -929,7 +932,7 @@ function showSubmitMoveForm(url) {
 	// Move has completed, so need to send to "current player"
 	/* Commenting out - 20181022
 	var toEmail = getCurrentPlayerEmail();
-	
+
 	var fromEmail = getUserEmail();
 
 	var bodyMessage = getEmailBody(url);
@@ -1064,8 +1067,8 @@ function getOpponentPlayerEmail() {
 
 function getEmailBody(url) {
 	var bodyMessage = "I just made move #" + gameController.gameNotation.getLastMoveNumber() + " in a game of Pai Sho! Click here to open our game: " + url;
-	
-	bodyMessage += "[BR][BR]---- Full Details: ----[BR]Move: " + gameController.gameNotation.getLastMoveText() 
+
+	bodyMessage += "[BR][BR]---- Full Details: ----[BR]Move: " + gameController.gameNotation.getLastMoveText()
 		+ "[BR][BR]Game Notation: [BR]" + gameController.gameNotation.getNotationForEmail();
 
 	return bodyMessage;
@@ -1098,12 +1101,12 @@ function myTurn() {
 	var userEmail = localStorage.getItem(localEmailKey);
 	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
 		if (getCurrentPlayer() === HOST) {
-			return !hostEmail 
-				|| (localStorage.getItem(localEmailKey) === hostEmail 
+			return !hostEmail
+				|| (localStorage.getItem(localEmailKey) === hostEmail
 					|| (currentGameData.hostUsername && usernameEquals(currentGameData.hostUsername)));
 		} else {
-			return !guestEmail 
-				|| (localStorage.getItem(localEmailKey) === guestEmail 
+			return !guestEmail
+				|| (localStorage.getItem(localEmailKey) === guestEmail
 					|| (currentGameData.guestUsername && usernameEquals(currentGameData.guestUsername)));
 		}
 	} else {
@@ -1132,7 +1135,7 @@ var createGameCallback = function createGameCallback(newGameId) {
 	if (gameController.isSolitaire()) {
 		completeJoinGameSeek({gameId:newGameId});
 	}
-	
+
 	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game if you'd like.<br /><br />If anyone joins this game, it will show up in your list of games when you click My Games.");
 };
 
@@ -1146,7 +1149,7 @@ var createPrivateGameCallback = function createPrivateGameCallback(newGameId) {
 	}
 
 	var inviteLinkUrl = createInviteLinkUrl(newGameId);
-	
+
 	showModal("Game Created!", "You just created a private game. Send <a href='" + inviteLinkUrl + "'>this invite link</a> to a friend so they can join. <br /><br />When a player joins this game, it will show up in your list of games when you click My Games.", true);
 };
 
@@ -1161,7 +1164,7 @@ function askToJoinPrivateGame(privateGameId, hostUserName) {
 	message += "<br /><br />";
 	message += "<div class='clickableText' onclick='closeModal(); yesJoinPrivateGame(" + privateGameId + ");'>Yes - join game</div>";
 	message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
-	
+
 	showModal("Join Private Game?", message, true);
 }
 
@@ -1188,7 +1191,7 @@ function clearMessage() {
 	// }
 	helpTabContentDiv.innerHTML = defaultHelpMessageText;
 
-	var message = getTournamentText() 
+	var message = getTournamentText()
 		+ helpTabContentDiv.innerHTML;
 
 	helpTabContentDiv.innerHTML = message;
@@ -1370,7 +1373,7 @@ function getLink(forSandbox) {
 	}
 
 	linkUrl += "game=" + notation.notationTextForUrl();
-	
+
 	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
 	linkUrl = sandboxUrl + "?" + linkUrl;
@@ -1447,7 +1450,7 @@ function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX) 
 	var modalMessage = document.getElementById('modalMessage');
 	modalMessage.innerHTML = modalMessageHTMLText;
 
-	// When the user clicks the button, open the modal 
+	// When the user clicks the button, open the modal
 	modal.style.display = "block";
 
 	// When the user clicks on <span> (x), close the modal
@@ -1602,9 +1605,9 @@ function getDeviceId() {
 }
 
 function userIsLoggedIn() {
-	return getUserId() 
-		&& getUsername() 
-		&& getUserEmail() 
+	return getUserId()
+		&& getUsername()
+		&& getUserEmail()
 		&& getDeviceId();
 }
 
@@ -1634,7 +1637,7 @@ function forgetCurrentGameInfo() {
 	updateFooter();
 
 	document.getElementById('chatMessagesDisplay').innerHTML = "";
-	
+
 	updateCurrentGameTitle();
 }
 
@@ -1642,10 +1645,10 @@ var GameType = {
 	SkudPaiSho: {
 		id: 1,
 		desc: "Skud Pai Sho",
-		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/", 
+		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/",
 		gameOptions: [
 			OPTION_INFORMAL_START,
-			OPTION_DOUBLE_ACCENT_TILES, 
+			OPTION_DOUBLE_ACCENT_TILES,
 			OPTION_ANCIENT_OASIS_EXPANSION,
 			NO_HARMONY_VISUAL_AIDS
 		]
@@ -1653,7 +1656,7 @@ var GameType = {
 	VagabondPaiSho: {
 		id: 2,
 		desc: "Vagabond Pai Sho",
-		rulesUrl: "https://skudpaisho.com/site/games/vagabond-pai-sho/", 
+		rulesUrl: "https://skudpaisho.com/site/games/vagabond-pai-sho/",
 		gameOptions: [
 			OPTION_DOUBLE_TILES
 		]
@@ -1661,13 +1664,13 @@ var GameType = {
 	CapturePaiSho: {
 		id: 3,
 		desc: "Capture Pai Sho",
-		rulesUrl: "https://skudpaisho.com/site/games/capture-pai-sho/", 
+		rulesUrl: "https://skudpaisho.com/site/games/capture-pai-sho/",
 		gameOptions: []
 	},
 	StreetPaiSho: {
 		id: 5,
 		desc: "Street Pai Sho",
-		rulesUrl: "https://skudpaisho.com/site/games/street-pai-sho/", 
+		rulesUrl: "https://skudpaisho.com/site/games/street-pai-sho/",
 		gameOptions: [
 			FORMAL_WIN_CONDITION,
 			ORIGINAL_BOARD_SETUP,
@@ -1679,25 +1682,25 @@ var GameType = {
 	SolitairePaiSho: {
 		id: 4,
 		desc: "Solitaire Pai Sho",
-		rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/", 
+		rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/",
 		gameOptions: [
-			OPTION_DOUBLE_TILES, 
+			OPTION_DOUBLE_TILES,
 			OPTION_INSANE_TILES
 		]
 	},
 	CoopSolitaire: {
 		id: 6,
 		desc: "Cooperative Solitaire",
-		rulesUrl: "https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/", 
+		rulesUrl: "https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/",
 		gameOptions: [
-			OPTION_DOUBLE_TILES, 
+			OPTION_DOUBLE_TILES,
 			OPTION_INSANE_TILES
 		]
 	},
 	OvergrowthPaiSho: {
 		id: 8,
 		desc: "Overgrowth Pai Sho",
-		rulesUrl: "https://skudpaisho.com/site/games/overgrowth-pai-sho/", 
+		rulesUrl: "https://skudpaisho.com/site/games/overgrowth-pai-sho/",
 		gameOptions: [
 			OPTION_FULL_TILES,
 			FULL_POINTS_SCORING
@@ -1706,7 +1709,7 @@ var GameType = {
 	// Playground: {
 	// 	id: 7,
 	// 	desc: "Pai Sho Playground",
-	// 	rulesUrl: "https://skudpaisho.com/site/games/pai-sho-playground/", 
+	// 	rulesUrl: "https://skudpaisho.com/site/games/pai-sho-playground/",
 	// 	gameOptions: []
 	// },
 	Blooms: {
@@ -1803,7 +1806,7 @@ function setGameController(gameTypeId, keepGameOptions) {
 
 	// Forget current game info
 	forgetCurrentGameInfo();
-	
+
 	gameController = getGameControllerForGameType(gameTypeId);
 	if (!gameController) {
 		gameController = getGameControllerForGameType(GameType.VagabondPaiSho.id);
@@ -1826,9 +1829,9 @@ function setGameController(gameTypeId, keepGameOptions) {
 var jumpToGameCallback = function jumpToGameCallback(results) {
 	if (results) {
 		populateMyGamesList(results);
-		
+
 		var myGame = myGamesList[0];
-		
+
 		clearOptions();
 		if (myGame.gameOptions) {
 			for (var i = 0; i < myGame.gameOptions.length; i++) {
@@ -1844,27 +1847,27 @@ var jumpToGameCallback = function jumpToGameCallback(results) {
 		// Is user even playing this game? This could be used to "watch" games
 		var userIsPlaying = usernameEquals(myGame.hostUsername) ||
 		usernameEquals(myGame.guestUsername);
-		
+
 		gameId = myGame.gameId;
 		currentGameOpponentUsername = null;
 		var opponentUsername;
-		
+
 		if (userIsPlaying) {
 			if (usernameEquals(myGame.hostUsername)) {
 				opponentUsername = myGame.guestUsername;
 			} else {
 				opponentUsername = myGame.hostUsername;
 			}
-			
+
 			currentGameOpponentUsername = opponentUsername;
 		}
-		
+
 		currentGameData.hostUsername = myGame.hostUsername;
 		currentGameData.guestUsername = myGame.guestUsername;
-		
+
 		hostEmail = myGame.hostUsername;
 		guestEmail = myGame.guestUsername;
-		
+
 		startWatchingGameRealTime();
 		updateFooter();
 	}
@@ -1884,13 +1887,13 @@ function populateMyGamesList(results) {
 	for (var index in resultRows) {
 		var row = resultRows[index].split('|||');
 		var myGame = {
-			gameId:parseInt(row[0]), 
-			gameTypeId:parseInt(row[1]), 
-			gameTypeDesc:row[2], 
-			hostUsername:row[3], 
-			hostOnline:parseInt(row[4]), 
-			guestUsername:row[5], 
-			guestOnline:parseInt(row[6]), 
+			gameId:parseInt(row[0]),
+			gameTypeId:parseInt(row[1]),
+			gameTypeDesc:row[2],
+			hostUsername:row[3],
+			hostOnline:parseInt(row[4]),
+			guestUsername:row[5],
+			guestOnline:parseInt(row[6]),
 			isUserTurn:parseInt(row[7]),
 			gameOptions:parseGameOptions(row[8]),
 			winnerUsername:row[9],
@@ -1903,9 +1906,9 @@ function populateMyGamesList(results) {
 function getLoginToken() {
 	// debug("Using login token");
 	return {
-		userId: getUserId(), 
-		username: getUsername(), 
-		userEmail: getUserEmail(), 
+		userId: getUserId(),
+		username: getUsername(),
+		userEmail: getUserEmail(),
 		deviceId: getDeviceId()
 	}
 }
@@ -1977,7 +1980,7 @@ var showMyGamesCallback = function showMyGamesCallback(results) {
 	var message = "No active games.";
 	if (results) {
 		message = "";
-		
+
 		populateMyGamesList(results);
 
 		var gameTypeHeading = "";
@@ -2018,7 +2021,7 @@ var showMyGamesCallback = function showMyGamesCallback(results) {
 			if (myGame.isUserTurn) {
 				gameDisplayTitle += " (Your turn)";
 			}
-			
+
 			// message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\"," + myGame.gameTypeId + ");'>" + gameDisplayTitle + "</div>";
 			message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
 			for (var i = 0; i < myGame.gameOptions.length; i++) {
@@ -2086,7 +2089,7 @@ function loginClicked() {
 	if (userIsLoggedIn()) {
 		msg += "<div><br /><br />You are currently signed in as " + getUsername() + "</div>";
 	}
-	
+
 	showModal("Sign In", msg);
 }
 
@@ -2106,7 +2109,7 @@ function completeJoinGameSeek(gameSeek) {
 var getCurrentGamesForUserNewCallback = function getCurrentGamesForUserNewCallback(results) {
 	var gameSeek = selectedGameSeek;
 	if (results) {
-		
+
 		populateMyGamesList(results);
 
 		var gameExistsWithOpponent = false;
@@ -2167,8 +2170,8 @@ function acceptGameSeekClicked(gameIdChosen) {
 		}
 	}
 
-	if (gameSeek 
-		&& gameTypeIdSupported(gameSeek.gameTypeId) 
+	if (gameSeek
+		&& gameTypeIdSupported(gameSeek.gameTypeId)
 		&& gameOptionsSupportedForGameSeek(gameSeek)) {
 		selectedGameSeek = gameSeek;
 		onlinePlayEngine.getCurrentGamesForUserNew(getLoginToken(), getCurrentGamesForUserNewCallback);
@@ -2212,11 +2215,11 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 		for (var index in resultRows) {
 			var row = resultRows[index].split('|||');
 			var gameSeek = {
-				gameId:parseInt(row[0]), 
-				gameTypeId:parseInt(row[1]), 
-				gameTypeDesc:row[2], 
-				hostId:row[3], 
-				hostUsername:row[4], 
+				gameId:parseInt(row[0]),
+				gameTypeId:parseInt(row[1]),
+				gameTypeDesc:row[2],
+				hostId:row[3],
+				hostUsername:row[4],
 				hostOnline:parseInt(row[5]),
 				gameOptions:parseGameOptions(row[6])
 			};
@@ -2229,7 +2232,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 			if (gameSeek.gameTypeId !== GameType.Trifle.id
 				|| (gameSeek.gameTypeId === GameType.Trifle.id && TrifleController.userIsTrifleDeveloper())
 			) {
-			
+
 				var hostOnlineOrNotIconText = userOfflineIcon;
 				if (gameSeek.hostOnline) {
 					hostOnlineOrNotIconText = userOnlineIcon;
@@ -2353,8 +2356,8 @@ function handleNewGlobalChatMessages(results) {
 	for (var index in resultRows) {
 		var row = resultRows[index].split('|||');
 		var chatMessage = {
-			timestamp:row[0], 
-			username:row[1], 
+			timestamp:row[0],
+			username:row[1],
 			message:row[2]
 		};
 		chatMessageList.push(chatMessage);
@@ -2367,7 +2370,7 @@ function handleNewGlobalChatMessages(results) {
 			var chatMessage = chatMessageList[index];
 			newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
 		}
-		
+
 		/* Prepare to add chat content and keep scrolled to bottom */
 		var chatMessagesDisplay = document.getElementById('globalChatMessagesDisplay');
 		// allow 1px inaccuracy by adding 1
@@ -2447,7 +2450,7 @@ function clearLogOnlineStatusInterval() {
 
 function setSidenavNewGameSection() {
 	var message = "";
-	
+
 	Object.keys(GameType).forEach(function(key,index) {
 		message += getSidenavNewGameEntryForGameType(GameType[key]);
 	});
@@ -2482,7 +2485,7 @@ function getNewGameEntryForGameType(gameType) {
 
 function newGameClicked() {
 	var message = "";
-	
+
 	Object.keys(GameType).forEach(function(key,index) {
 		message += getNewGameEntryForGameType(GameType[key]);
 	});
@@ -2596,7 +2599,7 @@ function showGameReplayLink() {
 		rerunAll();
 
 		var linkUrl = "";
-		
+
 		if (currentGameData && currentGameData.gameTypeId) {
 			linkUrl += "gameType=" + currentGameData.gameTypeId + "&";
 		}
@@ -2608,7 +2611,7 @@ function showGameReplayLink() {
 		if (ggOptions.length > 0) {
 			linkUrl += "&gameOptions=" + JSON.stringify(ggOptions);
 		}
-		
+
 		linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
 		linkUrl = sandboxUrl + "?" + linkUrl;
@@ -2642,7 +2645,7 @@ function openGameReplay() {
 		rerunAll();
 
 		var linkUrl = "";
-		
+
 		if (currentGameData && currentGameData.gameTypeId) {
 			linkUrl += "gameType=" + currentGameData.gameTypeId + "&";
 		}
@@ -2654,7 +2657,7 @@ function openGameReplay() {
 		if (ggOptions.length > 0) {
 			linkUrl += "&gameOptions=" + JSON.stringify(ggOptions);
 		}
-		
+
 		linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
 
 		linkUrl = sandboxUrl + "?" + linkUrl;
@@ -2743,7 +2746,7 @@ function quitOnlineGame() {
 	if (gameController.guestNeverMoved && gameController.guestNeverMoved()) {
 		// Guest never moved, only leave game. TODO
 	}// else {....}
-	
+
 	if (iAmPlayerInCurrentOnlineGame()) {
 		onlinePlayEngine.updateGameWinInfoAsTie(gameId, 8, getLoginToken(), quitOnlineGameCallback);
 	}
@@ -2758,7 +2761,7 @@ function quitOnlineGameClicked() {
 	} else {
 		message = "When playing an unfinished online game, this is where you can quit or leave a game if you wish to do so.";
 	}
-	
+
 	showModal("Quit Current Online Game", message);
 }
 
@@ -2890,7 +2893,7 @@ function promptAddOption() {
 	if (usernameIsOneOf(['SkudPaiSho'])) {
 		message = "<br /><input type='text' id='optionAddInput' name='optionAddInput' />";
 		message += "<br /><div class='clickableText' onclick='addOptionFromInput()'>Add</div>";
-	
+
 		if (ggOptions.length > 0) {
 			message += "<br />";
 			for (var i = 0; i < ggOptions.length; i++) {
@@ -3081,9 +3084,9 @@ var showTournamentInfoCallback = function showTournamentInfoCallback(results) {
 					var game = tournamentInfo.games[j];
 					if (game.roundId === round.id) {
 						message += "<div class='clickableText' onclick='matchGameClicked(" + game.gameId + ")'>" + htmlEscape(game.gameType) + ": ";
-						
+
 						if (!game.gameWinnerUsername
-								&& game.lastPlayedUsername 
+								&& game.lastPlayedUsername
 								&& game.lastPlayedUsername !== game.hostUsername) {
 							message += "<em>";
 						}
@@ -3095,7 +3098,7 @@ var showTournamentInfoCallback = function showTournamentInfoCallback(results) {
 							message += "]";
 						}
 						if (!game.gameWinnerUsername
-								&& game.lastPlayedUsername 
+								&& game.lastPlayedUsername
 								&& game.lastPlayedUsername !== game.hostUsername) {
 							message += "</em>";
 						}
@@ -3103,7 +3106,7 @@ var showTournamentInfoCallback = function showTournamentInfoCallback(results) {
 						message += " vs ";
 
 						if (!game.gameWinnerUsername
-								&& game.lastPlayedUsername 
+								&& game.lastPlayedUsername
 								&& game.lastPlayedUsername !== game.guestUsername) {
 							message += "<em>";
 						}
@@ -3115,7 +3118,7 @@ var showTournamentInfoCallback = function showTournamentInfoCallback(results) {
 							message += "]";
 						}
 						if (!game.gameWinnerUsername
-								&& game.lastPlayedUsername 
+								&& game.lastPlayedUsername
 								&& game.lastPlayedUsername !== game.guestUsername) {
 							message += "</em>";
 						}
@@ -3153,7 +3156,7 @@ function submitCreateTournament() {
 	var name = htmlEscape(document.getElementById('createTournamentName').value);
 	var forumUrl = htmlEscape(document.getElementById('createTournamentForumUrl').value);
 	var details = htmlEscape(document.getElementById('createTournamentDetails').value);
-	
+
 	onlinePlayEngine.createTournament(getLoginToken(), name, forumUrl, details, manageTournamentsClicked);
 }
 
@@ -3209,7 +3212,7 @@ function playerNameClicked(id, username) {
 		manageTournamentActionData.newMatchData.guestUsername = null;
 		document.getElementById('newTournamentMatchGuest').innerText = '';
 	}
-	
+
 	if (nameDisplay) {
 		nameDisplay.innerText = username;
 	}
@@ -3223,12 +3226,12 @@ function createNewTournamentMatch() {
 	var options = JSON.stringify(ggOptions);
 
 	onlinePlayEngine.createTournamentRoundMatch(
-		getLoginToken(), 
-		roundId, 
-		gameTypeId, 
-		hostUsername, 
-		guestUsername, 
-		options, 
+		getLoginToken(),
+		roundId,
+		gameTypeId,
+		hostUsername,
+		guestUsername,
+		options,
 		goToManageTournamentCallback
 	);
 }
@@ -3378,7 +3381,7 @@ var showManageTournamentsCallback = function showManageTournamentsCallback(resul
 
 		message += "<div class='modalContentHeading'>Your Tournaments</div>";
 
-		if (resultData.tournaments 
+		if (resultData.tournaments
 			&& resultData.tournaments.length > 0) {
 			for (var i = 0; i < resultData.tournaments.length; i++) {
 				var tournament = resultData.tournaments[i];
@@ -3475,13 +3478,13 @@ function notifyThisMessage(message) {
 	// if (!("Notification" in window)) {
 	//   alert("This browser does not support desktop notification");
 	// } else.....
-  
+
 	// Let's check whether notification permissions have already been granted
 	if (!document.hasFocus() && Notification.permission === "granted") {
 	  // If it's okay let's create a notification
 	  var notification = new Notification(message);
 	}
-  
+
 	// Otherwise, we need to ask the user for permission
 	// else if (Notification.permission !== "denied") {
 	//   Notification.requestPermission().then(function (permission) {
@@ -3491,8 +3494,8 @@ function notifyThisMessage(message) {
 	// 	}
 	//   });
 	// }
-  
-	// At last, if the user has denied notifications, and you 
+
+	// At last, if the user has denied notifications, and you
 	// want to be respectful there is no need to bother them any more.
   }
 
@@ -3514,7 +3517,7 @@ document.onkeyup = function (e) {
 	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 37) {
 		/* Ctrl + Alt + <- */
 		playPrevMove(true);
-	} 
+	}
 };
 
 /* Sound */
