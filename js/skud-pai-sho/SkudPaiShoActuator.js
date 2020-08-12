@@ -240,11 +240,12 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 			}
 		}
 
-		if (drainedOnThisTurn) {
-			setTimeout(function() {
-				theDiv.classList.add("drained");
-			}, pieceAnimationLength);
-		} else if (boardPoint.tile.drained || boardPoint.tile.trapped) {
+		if (boardPoint.tile.drained || boardPoint.tile.trapped) {
+			if (drainedOnThisTurn) {
+				setTimeout(function() {
+					theDiv.classList.add("drained");
+				}, pieceAnimationLength);
+			}
 			theDiv.classList.add("drained");
 		}
 
