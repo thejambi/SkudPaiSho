@@ -23,16 +23,16 @@ SkudPaiShoGameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-SkudPaiShoGameManager.prototype.actuate = function () {
+SkudPaiShoGameManager.prototype.actuate = function (moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager);
+	this.actuator.actuate(this.board, this.tileManager, moveToAnimate);
 	setGameLogText(this.gameLogText);
 };
 
 SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
-	debug("Running Move: " + move.fullMoveText);
+	debug("Running Move(" + (withActuate ? "" : "Not ") + "Actuated): " + move.fullMoveText);
 
 	var errorFound = false;
 	var bonusAllowed = false;
@@ -91,7 +91,7 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	if (withActuate) {
-		this.actuate();
+		this.actuate(move);
 	}
 
 	this.endGameWinners = [];
@@ -126,15 +126,15 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
 };
 
 SkudPaiShoGameManager.prototype.buildChooseAccentTileGameLogText = function(move) {
-	this.gameLogText = move.moveNum + move.playerCode + '. ' 
+	this.gameLogText = move.moveNum + move.playerCode + '. '
 		+ move.player + ' chose Accent Tiles ' + move.accentTiles;
 };
 SkudPaiShoGameManager.prototype.buildPlantingGameLogText = function(move, tile) {
-	this.gameLogText = move.moveNum + move.playerCode + '. ' 
+	this.gameLogText = move.moveNum + move.playerCode + '. '
 		+ move.player + ' Planted ' + tile.getName() + ' at ' + move.endPoint.pointText;
 };
 SkudPaiShoGameManager.prototype.buildArrangingGameLogText = function(move, moveResults) {
-	this.gameLogText = move.moveNum + move.playerCode + '. ' 
+	this.gameLogText = move.moveNum + move.playerCode + '. '
 		+ move.player + ' moved ' + moveResults.movedTile.getName() + ' ' + move.moveTextOnly;
 	if (moveResults.capturedTile) {
 		this.gameLogText += ' to capture ' + getOpponentName(move.player) + '\'s ' + moveResults.capturedTile.getName();
@@ -149,17 +149,17 @@ SkudPaiShoGameManager.prototype.revealPossibleMovePoints = function(boardPoint, 
 		return;
 	}
 	this.board.setPossibleMovePoints(boardPoint);
-	
+
 	if (!ignoreActuate) {
 		this.actuate();
 	}
 };
 
-SkudPaiShoGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
+SkudPaiShoGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate, moveToAnimate) {
 	this.board.removePossibleMovePoints();
 	this.tileManager.removeSelectedTileFlags();
 	if (!ignoreActuate) {
-		this.actuate();
+		this.actuate(moveToAnimate);
 	}
 };
 
@@ -170,7 +170,7 @@ SkudPaiShoGameManager.prototype.revealOpenGates = function(player, tile, moveNum
 	} else {
 		this.board.setOpenGatePossibleMoves(player, tile);
 	}
-	
+
 	if (!ignoreActuate) {
 		this.actuate();
 	}
