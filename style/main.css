@@ -15,7 +15,7 @@
   --input-background: #1b1b19;
   --input-color: #faf8ef;
 }
- 
+
 [data-theme="dark"] {
   --body-background-color: #3b3b39;
   --color: #cac8bf;
@@ -73,6 +73,7 @@ body {
   color: var(--color);
   transition: background-color 0.5s, color 0.5s;
 
+  -webkit-backface-visibility: hidden;/* To fix antialiasing errors: https://stackoverflow.com/questions/6492027/css-transform-jagged-edges-in-chrome */
   /* Android bottom padding */
   /*padding-bottom: 250px;*/
 }
@@ -135,7 +136,7 @@ hr {
   border: none;
   border-bottom: 1px solid #d8d4d0;
   margin-top: 12px;
-  margin-bottom: 12px; 
+  margin-bottom: 12px;
 }
 
 
@@ -474,11 +475,14 @@ figure > div {
 }
 
 .hasCapturedTile {
-  box-shadow: 0px 3px 0px 1px #333; 
+  box-shadow: 0px 3px 0px 1px #333;
 }
 
 .point img {
   width: 100%;
+  position: relative;
+  transition: left 1s ease-out, right 1s ease-out, top 1s ease-out, bottom 1s ease-out, transform 0.5s ease-in, opacity 0.5s;
+  outline: 1px solid transparent;/* To fix antialiasing errors: https://stackoverflow.com/questions/6492027/css-transform-jagged-edges-in-chrome */
 }
 
 .drained {
@@ -723,7 +727,7 @@ input[type=submit] {
 
 /* Add Animation */
 @-webkit-keyframes animatetop {
-    from {top: -300px; opacity: 0} 
+    from {top: -300px; opacity: 0}
     to {top: 0; opacity: 1}
 }
 
@@ -817,7 +821,7 @@ input[type=submit] {
   -ms-transform:scale(2,1.4); /* IE 9 */
   -o-transform:scale(2,1.4); /* Opera */
   transform:scale(2,1.4); /* W3C */
-  
+
   padding-right: 2px;
 }
 
@@ -947,7 +951,7 @@ input[type=submit] {
   padding-left: 26px;
 }
 
-.hexagon, 
+.hexagon,
 .hexagonNoShow {
   position: relative;
   width: 48px;
@@ -1327,7 +1331,7 @@ textarea {
   padding-left: 4.54545vw;
 }
 
-.hexagon, 
+.hexagon,
 .hexagonNoShow {
   width: 8.4912vw;
   height: 5.047vw;
@@ -1421,7 +1425,7 @@ textarea {
     .pointContainer {
       padding: 8.5px;
     }
-    
+
     .tilePileContainer div {
       margin-top: 2px;
     }
