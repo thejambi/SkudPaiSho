@@ -23,15 +23,15 @@ SkudPaiShoGameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-SkudPaiShoGameManager.prototype.actuate = function (moveToAnimate) {
+SkudPaiShoGameManager.prototype.actuate = function (moveToAnimate, moveAnimationBeginStep) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, moveToAnimate);
+	this.actuator.actuate(this.board, this.tileManager, moveToAnimate, moveAnimationBeginStep);
 	setGameLogText(this.gameLogText);
 };
 
-SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
+SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep) {
 	debug("Running Move(" + (withActuate ? "" : "Not ") + "Actuated): " + move.fullMoveText);
 
 	var errorFound = false;
@@ -91,7 +91,7 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	if (withActuate) {
-		this.actuate(move);
+		this.actuate(move, moveAnimationBeginStep);
 	}
 
 	this.endGameWinners = [];
