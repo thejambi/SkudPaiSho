@@ -31,6 +31,10 @@ function SoundManager() {
 	this.soundPath = "https://skudpaisho.com/sounds/";
 }
 
+SoundManager.sounds = {
+	tileLand: "tileLand2"
+};
+
 SoundManager.prototype.playFileData = function (fileData) {
 	if (this.context) {
 		this.playFileDataWebAudio(fileData);
