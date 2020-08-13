@@ -367,7 +367,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 				if (playingOnlineGame()) {
 					callSubmitMove();
 				} else {
-					finalizeMove();
+					finalizeMove(1);
 				}
 			}
 		} else {
@@ -386,7 +386,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 			if (playingOnlineGame()) {
 				callSubmitMove();
 			} else {
-				finalizeMove();
+				finalizeMove(1);	// TODO: Add the begin step num to `callSubmitMove` calls
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
@@ -404,7 +404,7 @@ SkudPaiShoController.prototype.skipHarmonyBonus = function() {
 		if (playingOnlineGame()) {
 			callSubmitMove();
 		} else {
-			finalizeMove();
+			finalizeMove(1);
 		}
 	}
 };
