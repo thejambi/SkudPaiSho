@@ -754,7 +754,7 @@ function playNextMove(withActuate) {
 	} else {
 		isInReplay = true;
 		if (withActuate && soundManager.nextMoveSoundsAreEnabled()) {
-			soundManager.playSound("tileLand");
+			soundManager.playSound(SoundManager.sounds.tileLand);
 		}
 		gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate);
 		currentMoveIndex++;
@@ -784,7 +784,7 @@ function playPrevMove() {
 	}
 
 	if (soundManager.prevMoveSoundsAreEnabled()) {
-		soundManager.playSound("tileLand");
+		soundManager.playSound(SoundManager.sounds.tileLand);
 	}
 
 	refreshMessage();
@@ -891,7 +891,7 @@ function rerunAll(soundOkToPlay) {
 	playAllMoves();
 
 	if (soundOkToPlay && soundManager.rerunAllSoundsAreEnabled()) {
-		soundManager.playSound("tileLand");
+		soundManager.playSound(SoundManager.sounds.tileLand);
 	}
 	refreshMessage();
 }
@@ -1814,6 +1814,8 @@ function setGameController(gameTypeId, keepGameOptions) {
 	if (gameController.completeSetup) {
 		gameController.completeSetup();
 	}
+
+	isInReplay = false;
 
 	// New game stuff:
 	currentGameData.gameTypeId = gameTypeId;
