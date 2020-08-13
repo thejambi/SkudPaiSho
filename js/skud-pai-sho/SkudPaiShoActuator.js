@@ -1,10 +1,10 @@
 // Actuator
 
-function SkudPaiShoActuator(gameContainer, isMobile) {
+function SkudPaiShoActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
-	this.animationOn = true;
+	this.animationOn = enableAnimations;
 
 	var containers = setupPaiShoBoard(
 		this.gameContainer,
@@ -17,6 +17,10 @@ function SkudPaiShoActuator(gameContainer, isMobile) {
 	this.hostTilesContainer = containers.hostTilesContainer;
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
+
+SkudPaiShoActuator.prototype.setAnimationOn = function(isOn) {
+	this.animationOn = isOn;
+};
 
 SkudPaiShoActuator.prototype.actuate = function(board, tileManager, moveToAnimate, moveAnimationBeginStep) {
 	var self = this;
