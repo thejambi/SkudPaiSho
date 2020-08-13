@@ -75,6 +75,8 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate, mo
 		moveResults = this.board.moveTile(move.player, move.startPoint, move.endPoint);
 		bonusAllowed = moveResults.bonusAllowed;
 
+		move.capturedTile = moveResults.capturedTile;
+
 		if (moveResults.bonusAllowed && move.hasHarmonyBonus()) {
 			var tile = this.tileManager.grabTile(move.player, move.bonusTileCode);
 			move.accentTileUsed = tile;

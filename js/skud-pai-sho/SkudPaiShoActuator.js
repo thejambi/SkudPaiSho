@@ -150,7 +150,6 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 
 	if (!boardPoint.hasTile() && moveToAnimate && moveToAnimate.bonusTileCode === "B" && !moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.bonusEndPoint, boardPoint.col, boardPoint.row)) {
 		// No tile here, but can animate the Boat removing the Accent Tile
-
 		var theImg = document.createElement("img");
 		var drainedOnThisTurn = false;
 
@@ -191,6 +190,22 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		}
 
 		theDiv.appendChild(theImg);
+
+		/* If capturing, preserve tile being captured on board during animation */
+		if (moveToAnimate && moveToAnimate.capturedTile
+				&& isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
+			var theImgCaptured = document.createElement("img");
+			theImgCaptured.src = srcValue + moveToAnimate.capturedTile.getImageName() + ".png";
+			theImgCaptured.classList.add("underneath");
+			theDiv.appendChild(theImgCaptured);
+
+			/* After animation, hide captured tile */
+			setTimeout(function() {
+				requestAnimationFrame(function() {
+					theImgCaptured.style.visibility = "hidden";
+				});
+			}, pieceAnimationLength);
+		}
 	}
 
 	this.boardContainer.appendChild(theDiv);

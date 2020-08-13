@@ -465,6 +465,7 @@ figure > div {
   height: 34px;
   display: inline;
   float: left;
+  position: relative;
 }
 .activePoint:hover {
   box-shadow: 0px 0px 24px 2px #054;
@@ -483,9 +484,18 @@ figure > div {
   position: relative;
   transition: left 1s ease-out, right 1s ease-out, top 1s ease-out, bottom 1s ease-out, transform 0.5s ease-in, opacity 0.5s;
   outline: 1px solid transparent;/* To fix antialiasing errors: https://stackoverflow.com/questions/6492027/css-transform-jagged-edges-in-chrome */
+  z-index: 2;
 }
 .point img.noTransition {
   transition: none;
+}
+.point img.underneath {
+  width: inherit;
+  position: absolute;
+  transition: none;
+  z-index: 1;
+  top: 0;
+  left: 0;
 }
 
 .drained {
