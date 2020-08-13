@@ -255,19 +255,31 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		drainedOnThisTurn = true;
 	}
 
-	theImg.style.left = ((x - ox) * 34) + "px";
-	theImg.style.top = ((y - oy) * 34) + "px";
+	var pointSizeMultiplierX = 34;
+	var pointSizeMultiplierY = pointSizeMultiplierX;
+	var unitString = "px";
+
+	/* For small screen size using dynamic vw units */
+	if (window.innerWidth <= 612) {
+		pointSizeMultiplierX = 5.5555;
+		pointSizeMultiplierY = 5.611;
+		unitString = "vw";
+	}
+
+	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
 	if (placedOnAccent) {
 		theImg.style.visibility = "hidden";
 		if (piecePlaceAnimation === 1) {
 			theImg.style.transform = "scale(2)";
 		}
 	}
-	ax = ((ax - ox) * 34);
-	ay = ((ay - oy) * 34);
+	
+	ax = ((ax - ox) * pointSizeMultiplierX);
+	ay = ((ay - oy) * pointSizeMultiplierY);
 	requestAnimationFrame(function() {
-		theImg.style.left = ax+"px";
-		theImg.style.top = ay+"px";
+		theImg.style.left = ax+unitString;
+		theImg.style.top = ay+unitString;
 	});
 	setTimeout(function() {
 		requestAnimationFrame(function() {
