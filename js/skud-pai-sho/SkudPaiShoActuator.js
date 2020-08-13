@@ -230,6 +230,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 			if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
 				x = moveToAnimate.startPoint.rowAndColumn.col;
 				y = moveToAnimate.startPoint.rowAndColumn.row;
+				theImg.style.transform = "scale(1.4)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
 			} else if (moveToAnimate.isOrchidMove) {
 				var dx = x - moveToAnimate.endPoint.rowAndColumn.col;
 				var dy = y - moveToAnimate.endPoint.rowAndColumn.row;
@@ -280,6 +281,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	requestAnimationFrame(function() {
 		theImg.style.left = ax+unitString;
 		theImg.style.top = ay+unitString;
+		theImg.style.transform = "scale(1)";	// Size back to normal after "picked up" scale
 	});
 	setTimeout(function() {
 		requestAnimationFrame(function() {
