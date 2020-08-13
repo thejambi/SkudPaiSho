@@ -230,7 +230,8 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 			if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
 				x = moveToAnimate.startPoint.rowAndColumn.col;
 				y = moveToAnimate.startPoint.rowAndColumn.row;
-				theImg.style.transform = "scale(1.4)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
+				theImg.style.transform = "scale(1.2)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
+				theImg.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
 			} else if (moveToAnimate.isOrchidMove) {
 				var dx = x - moveToAnimate.endPoint.rowAndColumn.col;
 				var dy = y - moveToAnimate.endPoint.rowAndColumn.row;
@@ -281,14 +282,14 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	requestAnimationFrame(function() {
 		theImg.style.left = ax+unitString;
 		theImg.style.top = ay+unitString;
-		theImg.style.transform = "scale(1)";	// Size back to normal after "picked up" scale
+		// theImg.style.transform = "scale(1)";	// This will size back to normal while moving after "picked up" scale
 	});
 	setTimeout(function() {
 		requestAnimationFrame(function() {
 			theImg.style.left = "0px";
 			theImg.style.top = "0px";
 			theImg.style.visibility = "visible";
-			theImg.style.transform = "scale(1)";
+			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
 		});
 	}, moveAnimationBeginStep === 0 ? pieceAnimationLength : 10);
 };
