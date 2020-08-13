@@ -747,6 +747,11 @@ var QueryString = function () {
 	  refreshMessage();
   }
   
+  /**
+   * moveAnimationBeginStep is the number of the step in the move to begin animation at. This could vary by game.
+   * For example, in Skud Pai Sho, there can be multi-step moves when a Harmony Bonus is included. 
+   * So when animating beginning at the Harmony Bonus step, the initial Arranging piece of the move will not be animated.
+   */
   function playNextMove(withActuate, moveAnimationBeginStep) {
 	  if (currentMoveIndex >= gameController.gameNotation.moves.length) {
 		  // no more moves to run
