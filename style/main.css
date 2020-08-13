@@ -484,6 +484,9 @@ figure > div {
   transition: left 1s ease-out, right 1s ease-out, top 1s ease-out, bottom 1s ease-out, transform 0.5s ease-in, opacity 0.5s;
   outline: 1px solid transparent;/* To fix antialiasing errors: https://stackoverflow.com/questions/6492027/css-transform-jagged-edges-in-chrome */
 }
+.point img.noTransition {
+  transition: none;
+}
 
 .drained {
   opacity: 0.6;

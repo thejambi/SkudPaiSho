@@ -148,7 +148,19 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		}
 	}
 
-	if (boardPoint.hasTile()) {
+	if (!boardPoint.hasTile() && moveToAnimate && moveToAnimate.bonusTileCode === "B" && !moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.bonusEndPoint, boardPoint.col, boardPoint.row)) {
+		// No tile here, but can animate the Boat removing the Accent Tile
+
+		var theImg = document.createElement("img");
+		var drainedOnThisTurn = false;
+
+		if (moveToAnimate) {
+			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep,
+				theImg,
+				drainedOnThisTurn);
+		}
+		theDiv.appendChild(theImg);
+	} else if (boardPoint.hasTile()) {
 		theDiv.classList.add("hasTile");
 
 		var theImg = document.createElement("img");
@@ -196,12 +208,18 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		return;
 	}
 	
-	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y, placedOnAccent = false;
+	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y, placedOnAccent = false, boatRemovingAccent = false;
 
 	if (moveToAnimate.hasHarmonyBonus()) {
 		debug(moveToAnimate.bonusTileCode);
 		if (isSamePoint(moveToAnimate.bonusEndPoint, ox, oy)) {// Placed on bonus turn
 			placedOnAccent = true;
+
+			if (moveToAnimate.bonusTileCode === "B" && !moveToAnimate.boatBonusPoint && moveToAnimate.tileRemovedWithBoat && isSamePoint(moveToAnimate.bonusEndPoint, ox, oy)) {// Placement of Boat to remove Accent Tile
+				var srcValue = getSkudTilesSrcPath();
+				theImg.src = srcValue + moveToAnimate.tileRemovedWithBoat.getImageName() + ".png";
+				boatRemovingAccent = true;
+			}
 		} else if (moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.boatBonusPoint, x, y)) {// Moved by boat
 			x = moveToAnimate.bonusEndPoint.rowAndColumn.col;
 			y = moveToAnimate.bonusEndPoint.rowAndColumn.row;
@@ -226,7 +244,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	var ax = x, ay = y;
 
 	if (moveAnimationBeginStep === 0) {
-		if (moveToAnimate.moveType === ARRANGING && boardPoint.tile.type !== ACCENT_TILE) {
+		if (moveToAnimate.moveType === ARRANGING && boardPoint.tile && boardPoint.tile.type !== ACCENT_TILE) {
 			if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
 				x = moveToAnimate.startPoint.rowAndColumn.col;
 				y = moveToAnimate.startPoint.rowAndColumn.row;
@@ -253,7 +271,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		}
 	}
 
-	if ((x !== ox || y !== oy) && (boardPoint.tile.drained || boardPoint.tile.trapped)) {
+	if ((x !== ox || y !== oy) && boardPoint.tile && (boardPoint.tile.drained || boardPoint.tile.trapped)) {
 		drainedOnThisTurn = true;
 	}
 
@@ -270,7 +288,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 
 	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
 	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
-	if (placedOnAccent) {
+	if (placedOnAccent && !boatRemovingAccent) {
 		theImg.style.visibility = "hidden";
 		if (piecePlaceAnimation === 1) {
 			theImg.style.transform = "scale(2)";
@@ -290,6 +308,22 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 			theImg.style.top = "0px";
 			theImg.style.visibility = "visible";
 			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
+			
+			if (boatRemovingAccent) {
+				/* Change image to Boat being played */
+				theImg.classList.add("noTransition");
+				theImg.src = srcValue + moveToAnimate.accentTileUsed.getImageName() + ".png";
+				theImg.style.transform = "scale(2)";
+
+				requestAnimationFrame(function() {
+					/* Animate (scale 0 to shrink into disappearing) */
+					theImg.classList.remove("noTransition");
+					theImg.style.transform = "scale(0)";
+					/* setTimeout(function() {
+						theImg.style.visibility = "hidden";
+					}, pieceAnimationLength); */	// If want to hide the img after transform, perhaps if going with some other animation
+				});
+			}
 		});
 	}, moveAnimationBeginStep === 0 ? pieceAnimationLength : 10);
 };

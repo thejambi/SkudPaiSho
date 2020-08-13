@@ -77,10 +77,14 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate, mo
 
 		if (moveResults.bonusAllowed && move.hasHarmonyBonus()) {
 			var tile = this.tileManager.grabTile(move.player, move.bonusTileCode);
+			move.accentTileUsed = tile;
 			if (move.boatBonusPoint) {
 				this.board.placeTile(tile, move.bonusEndPoint, this.tileManager, move.boatBonusPoint);
 			} else {
-				this.board.placeTile(tile, move.bonusEndPoint, this.tileManager);
+				placeTileResult = this.board.placeTile(tile, move.bonusEndPoint, this.tileManager);
+				if (placeTileResult && placeTileResult.tileRemovedWithBoat) {
+					move.tileRemovedWithBoat = placeTileResult.tileRemovedWithBoat;
+				}
 			}
 		} else if (!moveResults.bonusAllowed && move.hasHarmonyBonus()) {
 			debug("BONUS NOT ALLOWED so I won't give it to you!");
