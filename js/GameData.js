@@ -21,12 +21,12 @@ var sameStart = true;  // Host starts with same tile, not clashing tile.
 var oneGrowingFlower = false;
 
 var limitedGatesRule = true; // Cannot Plant Basic Flower on Harmony Bonus if already controlling one or more Gates
-var specialFlowerLimitedRule = false; // NOT UI READY, DO NOT SET TO TRUE. Cannot Plant Special Flower on Harmony Bonus if not able to Plant Basic Flower either. 
+var specialFlowerLimitedRule = false; // NOT UI READY, DO NOT SET TO TRUE. Cannot Plant Special Flower on Harmony Bonus if not able to Plant Basic Flower either.
 
 var skudTilesKey = "standard";
 var paiShoBoardKey = "default";
 
-var debugOn = false;
+var debugOn = !false;
 
 var trifleOn = false;
 
@@ -64,9 +64,15 @@ function debug(str) {
             console.log('error');
         }
       }
-      
+
       console.log(str);
     }
+}
+
+function debugStackTrace() {
+  if (debugOn) {
+    console.trace();
+  }
 }
 
 function masterDebug(str) {
@@ -157,7 +163,7 @@ if (!String.prototype.includes) {
     if (typeof start !== 'number') {
       start = 0;
     }
-    
+
     if (start + search.length > this.length) {
       return false;
     } else {
@@ -229,7 +235,7 @@ Array.prototype.equals = function (array) {
     if (!array)
         return false;
 
-    // compare lengths - can save a lot of time 
+    // compare lengths - can save a lot of time
     if (this.length != array.length)
         return false;
 
@@ -238,15 +244,14 @@ Array.prototype.equals = function (array) {
         if (this[i] instanceof Array && array[i] instanceof Array) {
             // recurse into the nested arrays
             if (!this[i].equals(array[i]))
-                return false;       
-        }           
-        else if (this[i] != array[i]) { 
+                return false;
+        }
+        else if (this[i] != array[i]) {
             // Warning - two different object instances will never be equal: {x:20} != {x:20}
-            return false;   
-        }           
-    }       
+            return false;
+        }
+    }
     return true;
 }
 // Hide method from for-in loops
 Object.defineProperty(Array.prototype, "equals", {enumerable: false});
-
