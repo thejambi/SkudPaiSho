@@ -1,32 +1,39 @@
 // Vagabond Actuator
 
-function VagabondActuator(gameContainer, isMobile) {
+function VagabondActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
+	this.animationOn = enableAnimations || true;// TODO: remove "|| true," set up local storage
+
 	var containers = setupPaiShoBoard(
-		this.gameContainer, 
+		this.gameContainer,
 		VagabondController.getHostTilesContainerDivs(),
-		VagabondController.getGuestTilesContainerDivs(), 
+		VagabondController.getGuestTilesContainerDivs(),
 		true
 	);
 
 	this.boardContainer = containers.boardContainer;
+	this.boardContainer.style.position = "relative";
 	this.hostTilesContainer = containers.hostTilesContainer;
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-VagabondActuator.prototype.actuate = function(board, tileManager) {
-	var self = this;
+VagabondActuator.prototype.setAnimationOn = function(isOn) {
+	this.animationOn = isOn;
+};
 
+VagabondActuator.prototype.actuate = function(board, tileManager, moveToAnimate) {
+	var self = this;
+	debug(moveToAnimate);
 	// self.printBoard(board);
 
 	window.requestAnimationFrame(function () {
-		self.htmlify(board, tileManager);
+		self.htmlify(board, tileManager, moveToAnimate);
 	});
 };
 
-VagabondActuator.prototype.htmlify = function(board, tileManager) {
+VagabondActuator.prototype.htmlify = function(board, tileManager, moveToAnimate) {
 	this.clearContainer(this.boardContainer);
 
 	var self = this;
@@ -34,7 +41,7 @@ VagabondActuator.prototype.htmlify = function(board, tileManager) {
 	board.cells.forEach(function(column) {
 		column.forEach(function(cell) {
 			if (cell) {
-				self.addBoardPoint(cell);
+				self.addBoardPoint(cell, moveToAnimate);
 			}
 		});
 	});
@@ -107,7 +114,7 @@ VagabondActuator.prototype.addTile = function(tile, mainContainer) {
 	container.appendChild(theDiv);
 };
 
-VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
+VagabondActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 	var self = this;
 
 	var theDiv = createBoardPointDiv(boardPoint);
@@ -118,7 +125,7 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 		}
-		
+
 		if (this.mobile) {
 			theDiv.setAttribute("onclick", "pointClicked(this); showPointMessage(this);");
 		} else {
@@ -130,21 +137,33 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 
 	if (boardPoint.hasTile()) {
 		theDiv.classList.add("hasTile");
-		
+
 		var theImg = document.createElement("img");
+
+		if (moveToAnimate) {
+			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg);
+		}
 
 		var srcValue = this.getTileImageSourceDir();
 
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
-		
-		if (boardPoint.tile.inHarmony) {
-			theDiv.classList.add(boardPoint.tile.ownerName + "harmony");
-		}
-		if (boardPoint.tile.drained || boardPoint.tile.trapped) {
-			theDiv.classList.add("drained");
-		}
-		
+
 		theDiv.appendChild(theImg);
+
+		if (this.animationOn && moveToAnimate && moveToAnimate.capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
+			debug("Captured " + moveToAnimate.capturedTile.code);
+			var theImgCaptured = document.createElement("img");
+			theImgCaptured.src = srcValue + moveToAnimate.capturedTile.getImageName() + ".png";
+			theImgCaptured.classList.add("underneath");
+			theDiv.appendChild(theImgCaptured);
+
+			/* After animation, hide captured tile */
+			setTimeout(function() {
+				requestAnimationFrame(function() {
+					theImgCaptured.style.visibility = "hidden";
+				});
+			}, pieceAnimationLength);
+		}
 	}
 
 	this.boardContainer.appendChild(theDiv);
@@ -155,6 +174,56 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint) {
 		this.boardContainer.appendChild(theBr);
 	}
 };
+
+VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg) {
+	debug("Animating? "+this.animationOn);
+	if (!this.animationOn) return;
+
+	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y;
+
+	if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
+		if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
+			x = moveToAnimate.startPoint.rowAndColumn.col;
+			y = moveToAnimate.startPoint.rowAndColumn.row;
+			theImg.style.transform = "scale(1.2)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
+			theImg.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
+		}
+	} else if (moveToAnimate.moveType === DEPLOY) {
+		if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
+			if (piecePlaceAnimation === 1) {
+				theImg.style.transform = "scale(2)";
+				requestAnimationFrame(function() {
+					theImg.style.transform = "scale(1)";
+				});
+			}
+		}
+	}
+
+
+	var pointSizeMultiplierX = 34;
+	var pointSizeMultiplierY = pointSizeMultiplierX;
+	var unitString = "px";
+
+	/* For small screen size using dynamic vw units */
+	if (window.innerWidth <= 612) {
+		pointSizeMultiplierX = 5.5555;
+		pointSizeMultiplierY = 5.611;
+		unitString = "vw";
+	}
+
+	/*theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;*/
+	var left = (x - ox);
+	var top = (y - oy);
+	theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
+	theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
+
+	requestAnimationFrame(function() {
+		theImg.style.left = "0px";
+		theImg.style.top = "0px";
+		theImg.style.transform = "scale(1)";	// This will size back to normal after moving
+	});
+}
 
 VagabondActuator.prototype.getTileImageSourceDir = function() {
 	return "images/Vagabond/" + localStorage.getItem("vagabondTileDesignTypeKey") + "/";
@@ -174,11 +243,10 @@ VagabondActuator.prototype.printBoard = function(board) {
 			if (str.length < 2) {
 				rowStr = rowStr + " ";
 			}
-			
+
 		});
 		debug(rowStr);
 		rowNum++;
 	});
 	debug("");
 };
-

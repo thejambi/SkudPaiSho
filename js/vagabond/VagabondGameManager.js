@@ -23,11 +23,11 @@ VagabondGameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-VagabondGameManager.prototype.actuate = function () {
+VagabondGameManager.prototype.actuate = function (moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager);
+	this.actuator.actuate(this.board, this.tileManager, moveToAnimate);
 	setGameLogText(this.gameLogText);
 };
 
@@ -43,6 +43,8 @@ VagabondGameManager.prototype.runNotationMove = function(move, withActuate) {
 	} else if (move.moveType === MOVE) {
 		var moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint);
 
+		move.capturedTile = moveDetails.capturedTile;
+
 		this.buildMoveGameLogText(move, moveDetails);
 	}
 
@@ -51,7 +53,7 @@ VagabondGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	if (withActuate) {
-		this.actuate();
+		this.actuate(move);
 	}
 };
 
@@ -74,7 +76,7 @@ VagabondGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ig
 		return;
 	}
 	this.board.setPossibleMovePoints(boardPoint);
-	
+
 	if (!ignoreActuate) {
 		this.actuate();
 	}
@@ -90,7 +92,7 @@ VagabondGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 
 VagabondGameManager.prototype.revealDeployPoints = function(player, tileCode, ignoreActuate) {
 	this.board.setDeployPointsPossibleMoves(player, tileCode);
-	
+
 	if (!ignoreActuate) {
 		this.actuate();
 	}
