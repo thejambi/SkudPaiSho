@@ -1,7 +1,7 @@
 /* Skud Pai Sho specific UI interaction logic */
 
 function SkudPaiShoController(gameContainer, isMobile) {
-	this.actuator = new SkudPaiShoActuator(gameContainer, isMobile);
+	this.actuator = new SkudPaiShoActuator(gameContainer, isMobile, this.isAnimationsEnabled());
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -12,6 +12,8 @@ function SkudPaiShoController(gameContainer, isMobile) {
 
 	this.isPaiShoGame = true;
 }
+
+SkudPaiShoController.animationsEnabledKey = "SkudPaiShoAnimationsEnabled";
 
 SkudPaiShoController.prototype.getGameTypeId = function() {
 	return GameType.SkudPaiSho.id;
@@ -80,7 +82,7 @@ SkudPaiShoController.prototype.getDefaultHelpMessageText = function() {
 
 SkudPaiShoController.prototype.getAdditionalMessage = function() {
 	var msg = "";
-	
+
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
 			if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
@@ -212,7 +214,7 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 			}
 		} else {
 			this.guestAccentTiles.push(tileCode);
-			
+
 			if (this.guestAccentTiles.length === accentTilesNeededToStart || (simpleCanonRules && this.guestAccentTiles.length === 2)) {
 				var move = new SkudPaiShoNotationMove("0G." + this.guestAccentTiles.join());
 				this.gameNotation.addMove(move);
@@ -254,14 +256,14 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 		} else if (tile.type === ACCENT_TILE) {
 			this.theGame.revealPossiblePlacementPoints(tile);
 		} else if (tile.type === SPECIAL_FLOWER) {
-			if (!specialFlowerLimitedRule 
+			if (!specialFlowerLimitedRule
 				|| (specialFlowerLimitedRule && this.theGame.playerCanBonusPlant(getCurrentPlayer()))) {
 				this.theGame.revealSpecialFlowerPlacementPoints(getCurrentPlayer(), tile);
 			}
 		}
 	} else {
 		this.theGame.hidePossibleMovePoints();
-		if (this.notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT 
+		if (this.notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT
 			|| this.notationBuilder.status === WAITING_FOR_BOAT_BONUS_POINT) {
 			this.notationBuilder.status = READY_FOR_BONUS;
 			this.showHarmonyBonusMessage();
@@ -272,7 +274,7 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 };
 
 SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
-	if (this.theGame.getWinner() && this.notationBuilder.status !== WAITING_FOR_BONUS_ENDPOINT 
+	if (this.theGame.getWinner() && this.notationBuilder.status !== WAITING_FOR_BONUS_ENDPOINT
 			&& this.notationBuilder.status !== WAITING_FOR_BOAT_BONUS_POINT) {
 		return;
 	}
@@ -319,10 +321,10 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			// They're trying to move there! And they can! Exciting!
 			// Need the notation!
-			this.theGame.hidePossibleMovePoints();
 			this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
-			
+
 			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+			this.theGame.hidePossibleMovePoints(false, move);
 			var bonusAllowed = this.theGame.runNotationMove(move);
 
 			if (!gameOptionEnabled(OPTION_INFORMAL_START) && this.gameNotation.moves.length === 2) {
@@ -362,12 +364,12 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 				this.theGame.revealBoatBonusPoints(boardPoint);
 			} else {
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-				
+
 				this.gameNotation.addMove(move);
 				if (playingOnlineGame()) {
 					callSubmitMove();
 				} else {
-					finalizeMove();
+					finalizeMove(1);
 				}
 			}
 		} else {
@@ -376,7 +378,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_BOAT_BONUS_POINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
-			
+
 			this.notationBuilder.status = MOVE_DONE;
 
 			this.theGame.hidePossibleMovePoints();
@@ -386,7 +388,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 			if (playingOnlineGame()) {
 				callSubmitMove();
 			} else {
-				finalizeMove();
+				finalizeMove(1);	// TODO: Add the begin step num to `callSubmitMove` calls
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
@@ -404,7 +406,7 @@ SkudPaiShoController.prototype.skipHarmonyBonus = function() {
 		if (playingOnlineGame()) {
 			callSubmitMove();
 		} else {
-			finalizeMove();
+			finalizeMove(1);
 		}
 	}
 };
@@ -421,7 +423,7 @@ SkudPaiShoController.prototype.getTileMessage = function(tileDiv) {
 	if (divName.startsWith('G')) {
 		ownerName = GUEST;
 	}
-	
+
 	var tileCode = divName.substring(1);
 
 	var heading = SkudPaiShoTile.getTileName(tileCode);
@@ -574,7 +576,7 @@ SkudPaiShoController.prototype.getPointMessage = function(htmlPoint) {
 			var bullets = [];
 			tileHarmonies.forEach(function(harmony) {
 				var otherTile = harmony.getTileThatIsNotThisOne(boardPoint.tile);
-				bullets.push(otherTile.getName() 
+				bullets.push(otherTile.getName()
 					+ " to the " + harmony.getDirectionForTile(boardPoint.tile));
 			});
 			message.push("<strong>Currently in Harmony with: </strong>" + toBullets(bullets));
@@ -710,6 +712,10 @@ SkudPaiShoController.prototype.getAdditionalHelpTabDiv = function() {
 	settingsDiv.appendChild(this.buildTileDesignDropdownDiv());
 
 	settingsDiv.appendChild(document.createElement("br"));
+
+	settingsDiv.appendChild(this.buildToggleAnimationsDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
 };
 
@@ -719,4 +725,26 @@ SkudPaiShoController.prototype.buildTileDesignDropdownDiv = function() {
 							function() {
 								setSkudTilesOption(this.value);
 							});
+};
+
+SkudPaiShoController.prototype.buildToggleAnimationsDiv = function() {
+	var div = document.createElement("div");
+	var onOrOff = this.isAnimationsEnabled() ? "on" : "off";
+	div.innerHTML = "Move animations are " + onOrOff + ": <span class='skipBonus' onclick='gameController.toggleAnimations();'>toggle</span>";
+	return div;
+};
+
+SkudPaiShoController.prototype.toggleAnimations = function() {
+	if (this.isAnimationsEnabled()) {
+		localStorage.removeItem(SkudPaiShoController.animationsEnabledKey);
+		this.actuator.setAnimationOn(false);
+	} else {
+		localStorage.setItem(SkudPaiShoController.animationsEnabledKey, "true");
+		this.actuator.setAnimationOn(true);
+	}
+	clearMessage();
+};
+
+SkudPaiShoController.prototype.isAnimationsEnabled = function() {
+	return localStorage.getItem(SkudPaiShoController.animationsEnabledKey);
 };
