@@ -155,42 +155,54 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 	if (!boardPoint.hasTile() && moveToAnimate && moveToAnimate.bonusTileCode === "B" && !moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.bonusEndPoint, boardPoint.col, boardPoint.row)) {
 		// No tile here, but can animate the Boat removing the Accent Tile
 		var theImg = document.createElement("img");
-		var drainedOnThisTurn = false;
 
 		if (moveToAnimate) {
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep,
 				theImg,
-				drainedOnThisTurn);
+				{});
 		}
 		theDiv.appendChild(theImg);
 	} else if (boardPoint.hasTile()) {
 		theDiv.classList.add("hasTile");
 
 		var theImg = document.createElement("img");
-		var drainedOnThisTurn = false;
+		var flags = {
+			drainedOnThisTurn: false,
+			wasArranged: false,
+			didBonusMove: false
+		};
 
 		if (moveToAnimate) {
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep,
 				theImg,
-				drainedOnThisTurn);
+				flags);
 		}
 
 		var srcValue = getSkudTilesSrcPath();
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 
 		if (boardPoint.tile.harmonyOwners && !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
-			for (var i = 0; i < boardPoint.tile.harmonyOwners.length; i++) {
-				theDiv.classList.add(boardPoint.tile.harmonyOwners[i] + "harmony");
+			if (flags.didBonusMove || flags.wasArranged) {
+				setTimeout(function() {//Delay harmony outline until after a piece has moved
+					for (var i = 0; i < boardPoint.tile.harmonyOwners.length; i++) {
+						theDiv.classList.add(boardPoint.tile.harmonyOwners[i] + "harmony");
+					}
+				}, ((flags.didBonusMove ? 2 : 1) - moveAnimationBeginStep) * pieceAnimationLength);
+			} else {
+				for (var i = 0; i < boardPoint.tile.harmonyOwners.length; i++) {
+					theDiv.classList.add(boardPoint.tile.harmonyOwners[i] + "harmony");
+				}
 			}
 		}
 
 		if (boardPoint.tile.drained || boardPoint.tile.trapped) {
-			if (drainedOnThisTurn) {
+			if (flags.drainedOnThisTurn) {
 				setTimeout(function() {
 					theDiv.classList.add("drained");
 				}, pieceAnimationLength);
+			} else {
+				theDiv.classList.add("drained");
 			}
-			theDiv.classList.add("drained");
 		}
 
 		theDiv.appendChild(theImg);
@@ -222,11 +234,11 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 };
 
 SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep,
-															theImg, drainedOnThisTurn) {
+															theImg, flags) {
 	if (!this.animationOn) {
 		return;
 	}
-	
+
 	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y, placedOnAccent = false, boatRemovingAccent = false;
 
 	if (moveToAnimate.hasHarmonyBonus()) {
@@ -242,6 +254,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		} else if (moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.boatBonusPoint, x, y)) {// Moved by boat
 			x = moveToAnimate.bonusEndPoint.rowAndColumn.col;
 			y = moveToAnimate.bonusEndPoint.rowAndColumn.row;
+			flags.didBonusMove = true;
 		} else if (moveToAnimate.bonusTileCode === "W") {
 			var dx = x - moveToAnimate.bonusEndPoint.rowAndColumn.col;
 			var dy = y - moveToAnimate.bonusEndPoint.rowAndColumn.row;
@@ -250,12 +263,13 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 				else if (dy === -1 && dx > -1) x--;
 				else if (dx === -1 && dy < 1) y++;
 				else x++;
+				flags.didBonusMove = true;
 			}
 		} else if (moveToAnimate.bonusTileCode === "K") {
 			var dx = x - moveToAnimate.bonusEndPoint.rowAndColumn.col;
 			var dy = y - moveToAnimate.bonusEndPoint.rowAndColumn.row;
 			if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy && (dx + dy) !== (dx * dy)) {// Trapped by knotweed
-				drainedOnThisTurn = true;
+				flags.drainedOnThisTurn = true;
 			}
 		}
 	}
@@ -265,6 +279,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	if (moveAnimationBeginStep === 0) {
 		if (moveToAnimate.moveType === ARRANGING && boardPoint.tile && boardPoint.tile.type !== ACCENT_TILE) {
 			if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
+				flags.wasArranged = true;
 				x = moveToAnimate.startPoint.rowAndColumn.col;
 				y = moveToAnimate.startPoint.rowAndColumn.row;
 				theImg.style.transform = "scale(1.2)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
@@ -273,7 +288,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 				var dx = x - moveToAnimate.endPoint.rowAndColumn.col;
 				var dy = y - moveToAnimate.endPoint.rowAndColumn.row;
 				if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy) {// Trapped by orchid
-					drainedOnThisTurn = true;
+					flags.drainedOnThisTurn = true;
 				}
 			}
 		}
@@ -291,7 +306,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	}
 
 	if ((x !== ox || y !== oy) && boardPoint.tile && (boardPoint.tile.drained || boardPoint.tile.trapped)) {
-		drainedOnThisTurn = true;
+		flags.drainedOnThisTurn = true;
 	}
 
 	var pointSizeMultiplierX = 34;
@@ -313,7 +328,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 			theImg.style.transform = "scale(2)";
 		}
 	}
-	
+
 	ax = ((ax - ox) * pointSizeMultiplierX);
 	ay = ((ay - oy) * pointSizeMultiplierY);
 	requestAnimationFrame(function() {
@@ -327,7 +342,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 			theImg.style.top = "0px";
 			theImg.style.visibility = "visible";
 			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
-			
+
 			if (boatRemovingAccent) {
 				/* Change image to Boat being played */
 				theImg.classList.add("noTransition");
@@ -344,7 +359,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 				});
 			}
 		});
-	}, moveAnimationBeginStep === 0 ? pieceAnimationLength : 10);
+	}, moveAnimationBeginStep === 0 ? pieceAnimationLength : 0);
 };
 
 SkudPaiShoActuator.prototype.printBoard = function(board) {
