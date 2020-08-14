@@ -208,7 +208,7 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		theDiv.appendChild(theImg);
 
 		/* If capturing, preserve tile being captured on board during animation */
-		if (moveToAnimate && moveToAnimate.capturedTile
+		if (this.animationOn && moveToAnimate && moveToAnimate.capturedTile
 				&& isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
 			var theImgCaptured = document.createElement("img");
 			theImgCaptured.src = srcValue + moveToAnimate.capturedTile.getImageName() + ".png";
@@ -352,10 +352,10 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 				requestAnimationFrame(function() {
 					/* Animate (scale 0 to shrink into disappearing) */
 					theImg.classList.remove("noTransition");
-					theImg.style.transform = "scale(0)";
-					/* setTimeout(function() {
+					theImg.style.transform = "scale(1)";
+					setTimeout(function() {
 						theImg.style.visibility = "hidden";
-					}, pieceAnimationLength); */	// If want to hide the img after transform, perhaps if going with some other animation
+					}, pieceAnimationLength);	// If want to hide the img after transform, perhaps if going with some other animation
 				});
 			}
 		});

@@ -2603,7 +2603,7 @@ var QueryString = function () {
 		  for (var i = 0; i < currentMoveIndex; i++) {
 			  notation.addMove(gameController.gameNotation.moves[i]);
 		  }
-		  rerunAll();
+		//   rerunAll();	// Seems like this shouldn't be here.
   
 		  var linkUrl = "";
   
@@ -2630,9 +2630,6 @@ var QueryString = function () {
 			  message += "Here is the <a href=\"" + buildSpectateUrl() + "\" target='_blank'>spectate link</a> others can use to watch the game live and participate in the Game Chat.";
 		  }
 		  showModal("Game Links", message);
-	  // } else {
-	  // 	showModal("About Game Replay", "Click this link when viewing an online game to get a sharable game replay link.");
-	  // }
   }
   
   function buildSpectateUrl() {
@@ -2640,39 +2637,6 @@ var QueryString = function () {
 		  linkUrl = LZString.compressToEncodedURIComponent("watchGame=" + gameId);
 		  linkUrl = sandboxUrl + "?" + linkUrl;
 		  return linkUrl;
-	  }
-  }
-  
-  function openGameReplay() {
-	  if (currentGameData.hostUsername && currentGameData.guestUsername) {
-		  var notation = gameController.getNewGameNotation();
-		  for (var i = 0; i < currentMoveIndex; i++) {
-			  notation.addMove(gameController.gameNotation.moves[i]);
-		  }
-		  rerunAll();
-  
-		  var linkUrl = "";
-  
-		  if (currentGameData && currentGameData.gameTypeId) {
-			  linkUrl += "gameType=" + currentGameData.gameTypeId + "&";
-		  }
-		  linkUrl += "host=" + currentGameData.hostUsername + "&";
-		  linkUrl += "guest=" + currentGameData.guestUsername + "&";
-  
-		  linkUrl += "game=" + notation.notationTextForUrl();
-  
-		  if (ggOptions.length > 0) {
-			  linkUrl += "&gameOptions=" + JSON.stringify(ggOptions);
-		  }
-  
-		  linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
-  
-		  linkUrl = sandboxUrl + "?" + linkUrl;
-  
-		  debug(linkUrl);
-		  openLink(linkUrl);
-	  } else {
-		  showModal("About Game Replay", "Click this link when viewing an online game to open a sharable game replay link in a new window.");
 	  }
   }
   
