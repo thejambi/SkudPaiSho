@@ -182,7 +182,7 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 
 		if (boardPoint.tile.harmonyOwners && !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
-			if (flags.didBonusMove || flags.wasArranged) {
+			if (this.animationOn && (flags.didBonusMove || flags.wasArranged)) {
 				setTimeout(function() {//Delay harmony outline until after a piece has moved
 					for (var i = 0; i < boardPoint.tile.harmonyOwners.length; i++) {
 						theDiv.classList.add(boardPoint.tile.harmonyOwners[i] + "harmony");
