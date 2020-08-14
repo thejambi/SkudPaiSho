@@ -23,15 +23,15 @@ SkudPaiShoGameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-SkudPaiShoGameManager.prototype.actuate = function (moveToAnimate) {
+SkudPaiShoGameManager.prototype.actuate = function (moveToAnimate, moveAnimationBeginStep) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, moveToAnimate);
+	this.actuator.actuate(this.board, this.tileManager, moveToAnimate, moveAnimationBeginStep);
 	setGameLogText(this.gameLogText);
 };
 
-SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
+SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep) {
 	debug("Running Move(" + (withActuate ? "" : "Not ") + "Actuated): " + move.fullMoveText);
 
 	var errorFound = false;
@@ -75,12 +75,18 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
 		moveResults = this.board.moveTile(move.player, move.startPoint, move.endPoint);
 		bonusAllowed = moveResults.bonusAllowed;
 
+		move.capturedTile = moveResults.capturedTile;
+
 		if (moveResults.bonusAllowed && move.hasHarmonyBonus()) {
 			var tile = this.tileManager.grabTile(move.player, move.bonusTileCode);
+			move.accentTileUsed = tile;
 			if (move.boatBonusPoint) {
 				this.board.placeTile(tile, move.bonusEndPoint, this.tileManager, move.boatBonusPoint);
 			} else {
-				this.board.placeTile(tile, move.bonusEndPoint, this.tileManager);
+				placeTileResult = this.board.placeTile(tile, move.bonusEndPoint, this.tileManager);
+				if (placeTileResult && placeTileResult.tileRemovedWithBoat) {
+					move.tileRemovedWithBoat = placeTileResult.tileRemovedWithBoat;
+				}
 			}
 		} else if (!moveResults.bonusAllowed && move.hasHarmonyBonus()) {
 			debug("BONUS NOT ALLOWED so I won't give it to you!");
@@ -91,7 +97,7 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	if (withActuate) {
-		this.actuate(move);
+		this.actuate(move, moveAnimationBeginStep);
 	}
 
 	this.endGameWinners = [];

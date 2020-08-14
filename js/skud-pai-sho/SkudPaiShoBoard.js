@@ -350,6 +350,8 @@ SkudPaiShoBoard.prototype.newRow = function(numColumns, points) {
 };
 
 SkudPaiShoBoard.prototype.placeTile = function(tile, notationPoint, tileManager, extraBoatPoint) {
+	var tileRemovedWithBoat;
+
 	if (tile.type === ACCENT_TILE) {
 		if (tile.accentType === ROCK) {
 			this.placeRock(tile, notationPoint);
@@ -358,7 +360,7 @@ SkudPaiShoBoard.prototype.placeTile = function(tile, notationPoint, tileManager,
 		} else if (tile.accentType === KNOTWEED) {
 			this.placeKnotweed(tile, notationPoint);
 		} else if (tile.accentType === BOAT) {
-			this.placeBoat(tile, notationPoint, extraBoatPoint);
+			tileRemovedWithBoat = this.placeBoat(tile, notationPoint, extraBoatPoint);
 		} else if (tile.accentType === BAMBOO) {
 			this.placeBamboo(tile, notationPoint, false, tileManager);
 		} else if (tile.accentType === POND) {
@@ -375,6 +377,12 @@ SkudPaiShoBoard.prototype.placeTile = function(tile, notationPoint, tileManager,
 	// Things to do after a tile is placed
 	this.flagAllTrappedAndDrainedTiles();
 	this.analyzeHarmonies();
+
+	if (tile.accentType === BOAT) {
+		return {
+			tileRemovedWithBoat: tileRemovedWithBoat
+		};
+	}
 };
 
 SkudPaiShoBoard.prototype.putTileOnPoint = function(tile, notationPoint) {
@@ -607,6 +615,8 @@ SkudPaiShoBoard.prototype.placeBoat = function(tile, notationPoint, extraBoatPoi
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
 
+	var tileRemovedWithBoat;
+
 	if (!ignoreCheck && !this.canPlaceBoat(boardPoint, tile)) {
 		return false;
 	}
@@ -620,7 +630,7 @@ SkudPaiShoBoard.prototype.placeBoat = function(tile, notationPoint, extraBoatPoi
 		//boardPoint.putTile(tile);
 
 		// This line follows the actual current rule: Both removed from board
-		boardPoint.removeTile();
+		tileRemovedWithBoat = boardPoint.removeTile();
 
 		var rowCols = this.getSurroundingRowAndCols(rowAndCol);
 		// "Restore" surrounding tiles
@@ -645,6 +655,8 @@ SkudPaiShoBoard.prototype.placeBoat = function(tile, notationPoint, extraBoatPoi
 		destBoardPoint.putTile(boardPoint.removeTile());
 		boardPoint.putTile(tile);
 	}
+
+	return tileRemovedWithBoat;
 };
 
 SkudPaiShoBoard.prototype.canPlaceBamboo = function(boardPoint, tile) {

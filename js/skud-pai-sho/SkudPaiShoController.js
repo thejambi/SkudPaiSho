@@ -1,7 +1,7 @@
 /* Skud Pai Sho specific UI interaction logic */
 
 function SkudPaiShoController(gameContainer, isMobile) {
-	this.actuator = new SkudPaiShoActuator(gameContainer, isMobile);
+	this.actuator = new SkudPaiShoActuator(gameContainer, isMobile, this.isAnimationsEnabled());
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -12,6 +12,8 @@ function SkudPaiShoController(gameContainer, isMobile) {
 
 	this.isPaiShoGame = true;
 }
+
+SkudPaiShoController.animationsEnabledKey = "SkudPaiShoAnimationsEnabled";
 
 SkudPaiShoController.prototype.getGameTypeId = function() {
 	return GameType.SkudPaiSho.id;
@@ -367,7 +369,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 				if (playingOnlineGame()) {
 					callSubmitMove();
 				} else {
-					finalizeMove();
+					finalizeMove(1);
 				}
 			}
 		} else {
@@ -386,7 +388,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 			if (playingOnlineGame()) {
 				callSubmitMove();
 			} else {
-				finalizeMove();
+				finalizeMove(1);	// TODO: Add the begin step num to `callSubmitMove` calls
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
@@ -404,7 +406,7 @@ SkudPaiShoController.prototype.skipHarmonyBonus = function() {
 		if (playingOnlineGame()) {
 			callSubmitMove();
 		} else {
-			finalizeMove();
+			finalizeMove(1);
 		}
 	}
 };
@@ -710,6 +712,10 @@ SkudPaiShoController.prototype.getAdditionalHelpTabDiv = function() {
 	settingsDiv.appendChild(this.buildTileDesignDropdownDiv());
 
 	settingsDiv.appendChild(document.createElement("br"));
+
+	settingsDiv.appendChild(this.buildToggleAnimationsDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
 };
 
@@ -719,4 +725,26 @@ SkudPaiShoController.prototype.buildTileDesignDropdownDiv = function() {
 							function() {
 								setSkudTilesOption(this.value);
 							});
+};
+
+SkudPaiShoController.prototype.buildToggleAnimationsDiv = function() {
+	var div = document.createElement("div");
+	var onOrOff = this.isAnimationsEnabled() ? "on" : "off";
+	div.innerHTML = "Move animations are " + onOrOff + ": <span class='skipBonus' onclick='gameController.toggleAnimations();'>toggle</span>";
+	return div;
+};
+
+SkudPaiShoController.prototype.toggleAnimations = function() {
+	if (this.isAnimationsEnabled()) {
+		localStorage.removeItem(SkudPaiShoController.animationsEnabledKey);
+		this.actuator.setAnimationOn(false);
+	} else {
+		localStorage.setItem(SkudPaiShoController.animationsEnabledKey, "true");
+		this.actuator.setAnimationOn(true);
+	}
+	clearMessage();
+};
+
+SkudPaiShoController.prototype.isAnimationsEnabled = function() {
+	return localStorage.getItem(SkudPaiShoController.animationsEnabledKey);
 };

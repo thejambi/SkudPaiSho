@@ -1,8 +1,10 @@
 // Actuator
 
-function SkudPaiShoActuator(gameContainer, isMobile) {
+function SkudPaiShoActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
+
+	this.animationOn = enableAnimations;
 
 	var containers = setupPaiShoBoard(
 		this.gameContainer,
@@ -16,18 +18,26 @@ function SkudPaiShoActuator(gameContainer, isMobile) {
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-SkudPaiShoActuator.prototype.actuate = function(board, tileManager, moveToAnimate) {
+SkudPaiShoActuator.prototype.setAnimationOn = function(isOn) {
+	this.animationOn = isOn;
+};
+
+SkudPaiShoActuator.prototype.actuate = function(board, tileManager, moveToAnimate, moveAnimationBeginStep) {
 	var self = this;
   debug("Game Actuated");
 	// debugStackTrace();
 	// self.printBoard(board);
 
+	if (!moveAnimationBeginStep) {
+		moveAnimationBeginStep = 0;
+	}
+
 	window.requestAnimationFrame(function() {
-		self.htmlify(board, tileManager, moveToAnimate);
+		self.htmlify(board, tileManager, moveToAnimate, moveAnimationBeginStep);
 	});
 };
 
-SkudPaiShoActuator.prototype.htmlify = function(board, tileManager, moveToAnimate) {
+SkudPaiShoActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, moveAnimationBeginStep) {
 	this.clearContainer(this.boardContainer);
 
 	if (moveToAnimate && moveToAnimate.moveType === ARRANGING) {
@@ -42,7 +52,7 @@ SkudPaiShoActuator.prototype.htmlify = function(board, tileManager, moveToAnimat
 	board.cells.forEach(function(column) {
 		column.forEach(function(cell) {
 			if (cell) {
-				self.addBoardPoint(cell, moveToAnimate);
+				self.addBoardPoint(cell, moveToAnimate, moveAnimationBeginStep);
 			}
 		});
 	});
@@ -114,7 +124,7 @@ SkudPaiShoActuator.prototype.addTile = function(tile, mainContainer) {
 	container.appendChild(theDiv);
 };
 
-SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
+SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep) {
 	var self = this;
 
 	var theDiv = createBoardPointDiv(boardPoint);
@@ -142,94 +152,28 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 		}
 	}
 
-	if (boardPoint.hasTile()) {
+	if (!boardPoint.hasTile() && moveToAnimate && moveToAnimate.bonusTileCode === "B" && !moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.bonusEndPoint, boardPoint.col, boardPoint.row)) {
+		// No tile here, but can animate the Boat removing the Accent Tile
+		var theImg = document.createElement("img");
+		var drainedOnThisTurn = false;
+
+		if (moveToAnimate) {
+			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep,
+				theImg,
+				drainedOnThisTurn);
+		}
+		theDiv.appendChild(theImg);
+	} else if (boardPoint.hasTile()) {
 		theDiv.classList.add("hasTile");
 
 		var theImg = document.createElement("img");
 		var drainedOnThisTurn = false;
 
 		if (moveToAnimate) {
-			var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y, placedOnAccent = false;
-
-			if (moveToAnimate.hasHarmonyBonus()) {
-				debug(moveToAnimate.bonusTileCode);
-				if (isSamePoint(moveToAnimate.bonusEndPoint, ox, oy)) {// Placed on bonus turn
-					placedOnAccent = true;
-				} else if (moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.boatBonusPoint, x, y)) {// Moved by boat
-					x = moveToAnimate.bonusEndPoint.rowAndColumn.col;
-					y = moveToAnimate.bonusEndPoint.rowAndColumn.row;
-				} else if (moveToAnimate.bonusTileCode === "W") {
-					var dx = x - moveToAnimate.bonusEndPoint.rowAndColumn.col;
-					var dy = y - moveToAnimate.bonusEndPoint.rowAndColumn.row;
-					if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy && (dx + dy) !== (dx * dy)) {// Moved by wheel
-						if (dx === 1 && dy > -1) y--;
-						else if (dy === -1 && dx > -1) x--;
-						else if (dx === -1 && dy < 1) y++;
-						else x++;
-					}
-				} else if (moveToAnimate.bonusTileCode === "K") {
-					var dx = x - moveToAnimate.bonusEndPoint.rowAndColumn.col;
-					var dy = y - moveToAnimate.bonusEndPoint.rowAndColumn.row;
-					if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy && (dx + dy) !== (dx * dy)) {// Trapped by knotweed
-						drainedOnThisTurn = true;
-					}
-				}
-			}
-
-			var ax = x, ay = y;
-
-			if (moveToAnimate.moveType === ARRANGING && boardPoint.tile.type !== ACCENT_TILE) {
-				if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
-					x = moveToAnimate.startPoint.rowAndColumn.col;
-					y = moveToAnimate.startPoint.rowAndColumn.row;
-				} else if (moveToAnimate.isOrchidMove) {
-					var dx = x - moveToAnimate.endPoint.rowAndColumn.col;
-					var dy = y - moveToAnimate.endPoint.rowAndColumn.row;
-					if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy) {// Trapped by orchid
-						drainedOnThisTurn = true;
-					}
-				}
-			}
-
-			if (moveToAnimate.moveType === PLANTING) {
-				if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
-					if (piecePlaceAnimation === 1) {
-						theImg.style.transform = "scale(2)";
-						requestAnimationFrame(function() {
-							theImg.style.transform = "scale(1)";
-						});
-					}
-				}
-			}
-
-			if ((x !== ox || y !== oy) && (boardPoint.tile.drained || boardPoint.tile.trapped)) {
-				drainedOnThisTurn = true;
-			}
-
-			theImg.style.left = ((x - ox) * 34) + "px";
-			theImg.style.top = ((y - oy) * 34) + "px";
-			if (placedOnAccent) {
-				theImg.style.visibility = "hidden";
-				if (piecePlaceAnimation === 1) {
-					theImg.style.transform = "scale(2)";
-				}
-			}
-			ax = ((ax - ox) * 34);
-			ay = ((ay - oy) * 34);
-			requestAnimationFrame(function() {
-				theImg.style.left = ax+"px";
-				theImg.style.top = ay+"px";
-			});
-			setTimeout(function() {
-				requestAnimationFrame(function() {
-					theImg.style.left = "0px";
-					theImg.style.top = "0px";
-					theImg.style.visibility = "visible";
-					theImg.style.transform = "scale(1)";
-				});
-			}, pieceAnimationLength);
+			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep,
+				theImg,
+				drainedOnThisTurn);
 		}
-
 
 		var srcValue = getSkudTilesSrcPath();
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
@@ -250,6 +194,22 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 		}
 
 		theDiv.appendChild(theImg);
+
+		/* If capturing, preserve tile being captured on board during animation */
+		if (moveToAnimate && moveToAnimate.capturedTile
+				&& isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
+			var theImgCaptured = document.createElement("img");
+			theImgCaptured.src = srcValue + moveToAnimate.capturedTile.getImageName() + ".png";
+			theImgCaptured.classList.add("underneath");
+			theDiv.appendChild(theImgCaptured);
+
+			/* After animation, hide captured tile */
+			setTimeout(function() {
+				requestAnimationFrame(function() {
+					theImgCaptured.style.visibility = "hidden";
+				});
+			}, pieceAnimationLength);
+		}
 	}
 
 	this.boardContainer.appendChild(theDiv);
@@ -259,6 +219,132 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 		theBr.classList.add("clear");
 		this.boardContainer.appendChild(theBr);
 	}
+};
+
+SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep,
+															theImg, drainedOnThisTurn) {
+	if (!this.animationOn) {
+		return;
+	}
+	
+	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y, placedOnAccent = false, boatRemovingAccent = false;
+
+	if (moveToAnimate.hasHarmonyBonus()) {
+		debug(moveToAnimate.bonusTileCode);
+		if (isSamePoint(moveToAnimate.bonusEndPoint, ox, oy)) {// Placed on bonus turn
+			placedOnAccent = true;
+
+			if (moveToAnimate.bonusTileCode === "B" && !moveToAnimate.boatBonusPoint && moveToAnimate.tileRemovedWithBoat && isSamePoint(moveToAnimate.bonusEndPoint, ox, oy)) {// Placement of Boat to remove Accent Tile
+				var srcValue = getSkudTilesSrcPath();
+				theImg.src = srcValue + moveToAnimate.tileRemovedWithBoat.getImageName() + ".png";
+				boatRemovingAccent = true;
+			}
+		} else if (moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.boatBonusPoint, x, y)) {// Moved by boat
+			x = moveToAnimate.bonusEndPoint.rowAndColumn.col;
+			y = moveToAnimate.bonusEndPoint.rowAndColumn.row;
+		} else if (moveToAnimate.bonusTileCode === "W") {
+			var dx = x - moveToAnimate.bonusEndPoint.rowAndColumn.col;
+			var dy = y - moveToAnimate.bonusEndPoint.rowAndColumn.row;
+			if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy && (dx + dy) !== (dx * dy)) {// Moved by wheel
+				if (dx === 1 && dy > -1) y--;
+				else if (dy === -1 && dx > -1) x--;
+				else if (dx === -1 && dy < 1) y++;
+				else x++;
+			}
+		} else if (moveToAnimate.bonusTileCode === "K") {
+			var dx = x - moveToAnimate.bonusEndPoint.rowAndColumn.col;
+			var dy = y - moveToAnimate.bonusEndPoint.rowAndColumn.row;
+			if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy && (dx + dy) !== (dx * dy)) {// Trapped by knotweed
+				drainedOnThisTurn = true;
+			}
+		}
+	}
+
+	var ax = x, ay = y;
+
+	if (moveAnimationBeginStep === 0) {
+		if (moveToAnimate.moveType === ARRANGING && boardPoint.tile && boardPoint.tile.type !== ACCENT_TILE) {
+			if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
+				x = moveToAnimate.startPoint.rowAndColumn.col;
+				y = moveToAnimate.startPoint.rowAndColumn.row;
+				theImg.style.transform = "scale(1.2)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
+				theImg.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
+			} else if (moveToAnimate.isOrchidMove) {
+				var dx = x - moveToAnimate.endPoint.rowAndColumn.col;
+				var dy = y - moveToAnimate.endPoint.rowAndColumn.row;
+				if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy) {// Trapped by orchid
+					drainedOnThisTurn = true;
+				}
+			}
+		}
+
+		if (moveToAnimate.moveType === PLANTING) {
+			if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
+				if (piecePlaceAnimation === 1) {
+					theImg.style.transform = "scale(2)";
+					requestAnimationFrame(function() {
+						theImg.style.transform = "scale(1)";
+					});
+				}
+			}
+		}
+	}
+
+	if ((x !== ox || y !== oy) && boardPoint.tile && (boardPoint.tile.drained || boardPoint.tile.trapped)) {
+		drainedOnThisTurn = true;
+	}
+
+	var pointSizeMultiplierX = 34;
+	var pointSizeMultiplierY = pointSizeMultiplierX;
+	var unitString = "px";
+
+	/* For small screen size using dynamic vw units */
+	if (window.innerWidth <= 612) {
+		pointSizeMultiplierX = 5.5555;
+		pointSizeMultiplierY = 5.611;
+		unitString = "vw";
+	}
+
+	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+	if (placedOnAccent && !boatRemovingAccent) {
+		theImg.style.visibility = "hidden";
+		if (piecePlaceAnimation === 1) {
+			theImg.style.transform = "scale(2)";
+		}
+	}
+	
+	ax = ((ax - ox) * pointSizeMultiplierX);
+	ay = ((ay - oy) * pointSizeMultiplierY);
+	requestAnimationFrame(function() {
+		theImg.style.left = ax+unitString;
+		theImg.style.top = ay+unitString;
+		// theImg.style.transform = "scale(1)";	// This will size back to normal while moving after "picked up" scale
+	});
+	setTimeout(function() {
+		requestAnimationFrame(function() {
+			theImg.style.left = "0px";
+			theImg.style.top = "0px";
+			theImg.style.visibility = "visible";
+			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
+			
+			if (boatRemovingAccent) {
+				/* Change image to Boat being played */
+				theImg.classList.add("noTransition");
+				theImg.src = srcValue + moveToAnimate.accentTileUsed.getImageName() + ".png";
+				theImg.style.transform = "scale(2)";
+
+				requestAnimationFrame(function() {
+					/* Animate (scale 0 to shrink into disappearing) */
+					theImg.classList.remove("noTransition");
+					theImg.style.transform = "scale(0)";
+					/* setTimeout(function() {
+						theImg.style.visibility = "hidden";
+					}, pieceAnimationLength); */	// If want to hide the img after transform, perhaps if going with some other animation
+				});
+			}
+		});
+	}, moveAnimationBeginStep === 0 ? pieceAnimationLength : 10);
 };
 
 SkudPaiShoActuator.prototype.printBoard = function(board) {
