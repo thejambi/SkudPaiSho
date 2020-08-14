@@ -799,11 +799,13 @@ var QueryString = function () {
   
   function playAllMoves(moveAnimationBeginStep) {
 	  pauseRun();
+	  if (currentMoveIndex >= gameController.gameNotation.moves.length - 1) {
+		playPrevMove();	// If at end, jump to previous move so that final move can animate
+	  }
 	  while (currentMoveIndex < gameController.gameNotation.moves.length - 1) {
 		  playNextMove(false);
 	  }
 	playNextMove(true, moveAnimationBeginStep);
-	  // gameController.callActuate();
   }
   
   function playPause() {
