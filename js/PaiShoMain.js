@@ -1157,7 +1157,7 @@ var QueryString = function () {
   
 	  var inviteLinkUrl = createInviteLinkUrl(newGameId);
   
-	  showModal("Game Created!", "You just created a private game. Send <a href='" + inviteLinkUrl + "'>this invite link</a> to a friend so they can join. <br /><br />When a player joins this game, it will show up in your list of games when you click My Games.", true);
+	  showModal("Game Created!", "You just created a private game. Send <a href='" + inviteLinkUrl + "' target='_blank'>this invite link</a> to a friend so they can join. <br /><br />When a player joins this game, it will show up in your list of games when you click My Games.", true);
   };
   
   function createInviteLinkUrl(newGameId) {
