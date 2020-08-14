@@ -120,3 +120,7 @@ function getSkudTilesSrcPath() {
 	var srcValue = "images/SkudPaiSho/" + skudTilesKey + "/";
 	return srcValue;
 }
+
+function isSamePoint(movePoint, x, y) {
+	return movePoint.rowAndColumn.col === x && movePoint.rowAndColumn.row === y;
+}
