@@ -1177,10 +1177,11 @@ var QueryString = function () {
 	  completeJoinGameSeek({gameId:privateGameId});
   }
   
+  var submitMoveData = {};
   var submitMoveCallback = function submitMoveCallback() {
 	  debug("Inside submitMoveCallback");
 	  lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
-	  finalizeMove();
+	  finalizeMove(submitMoveData.moveAnimationBeginStep);
   
 	  startWatchingNumberOfGamesWhereUserTurn();
   
@@ -1480,7 +1481,10 @@ var QueryString = function () {
 	  tutorialInProgress = false;
   }
   
-  function callSubmitMove() {
+  function callSubmitMove(moveAnimationBeginStep) {
+		submitMoveData = {
+			moveAnimationBeginStep: moveAnimationBeginStep
+		};
 	  onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback);
   }
   
