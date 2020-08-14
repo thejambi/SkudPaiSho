@@ -367,7 +367,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 
 				this.gameNotation.addMove(move);
 				if (playingOnlineGame()) {
-					callSubmitMove();
+					callSubmitMove(1);
 				} else {
 					finalizeMove(1);
 				}
@@ -386,9 +386,9 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 			this.gameNotation.addMove(move);
 			if (playingOnlineGame()) {
-				callSubmitMove();
+				callSubmitMove(1);
 			} else {
-				finalizeMove(1);	// TODO: Add the begin step num to `callSubmitMove` calls
+				finalizeMove(1);
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
@@ -404,7 +404,7 @@ SkudPaiShoController.prototype.skipHarmonyBonus = function() {
 		var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 		this.gameNotation.addMove(move);
 		if (playingOnlineGame()) {
-			callSubmitMove();
+			callSubmitMove(1);
 		} else {
 			finalizeMove(1);
 		}
@@ -736,7 +736,7 @@ SkudPaiShoController.prototype.buildToggleAnimationsDiv = function() {
 
 SkudPaiShoController.prototype.toggleAnimations = function() {
 	if (this.isAnimationsEnabled()) {
-		localStorage.removeItem(SkudPaiShoController.animationsEnabledKey);
+		localStorage.setItem(SkudPaiShoController.animationsEnabledKey, "false");
 		this.actuator.setAnimationOn(false);
 	} else {
 		localStorage.setItem(SkudPaiShoController.animationsEnabledKey, "true");
@@ -746,5 +746,6 @@ SkudPaiShoController.prototype.toggleAnimations = function() {
 };
 
 SkudPaiShoController.prototype.isAnimationsEnabled = function() {
-	return localStorage.getItem(SkudPaiShoController.animationsEnabledKey);
+	/* Check !== false to default to on */
+	return localStorage.getItem(SkudPaiShoController.animationsEnabledKey) !== "false";
 };

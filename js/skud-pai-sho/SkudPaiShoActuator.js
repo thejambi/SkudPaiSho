@@ -182,7 +182,7 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 
 		if (boardPoint.tile.harmonyOwners && !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
-			if (flags.didBonusMove || flags.wasArranged) {
+			if (this.animationOn && (flags.didBonusMove || flags.wasArranged)) {
 				setTimeout(function() {//Delay harmony outline until after a piece has moved
 					for (var i = 0; i < boardPoint.tile.harmonyOwners.length; i++) {
 						theDiv.classList.add(boardPoint.tile.harmonyOwners[i] + "harmony");
@@ -208,7 +208,7 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		theDiv.appendChild(theImg);
 
 		/* If capturing, preserve tile being captured on board during animation */
-		if (moveToAnimate && moveToAnimate.capturedTile
+		if (this.animationOn && moveToAnimate && moveToAnimate.capturedTile
 				&& isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
 			var theImgCaptured = document.createElement("img");
 			theImgCaptured.src = srcValue + moveToAnimate.capturedTile.getImageName() + ".png";
@@ -250,6 +250,8 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 				var srcValue = getSkudTilesSrcPath();
 				theImg.src = srcValue + moveToAnimate.tileRemovedWithBoat.getImageName() + ".png";
 				boatRemovingAccent = true;
+			} else if (moveToAnimate.bonusTileCode === "B" && moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.bonusEndPoint, ox, oy)) {// Placement of Boat to move Flower Tile
+				theImg.style.zIndex = 90;	// Make sure Boat shows up above the Flower Tile it moves
 			}
 		} else if (moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.boatBonusPoint, x, y)) {// Moved by boat
 			x = moveToAnimate.bonusEndPoint.rowAndColumn.col;
@@ -352,10 +354,10 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 				requestAnimationFrame(function() {
 					/* Animate (scale 0 to shrink into disappearing) */
 					theImg.classList.remove("noTransition");
-					theImg.style.transform = "scale(0)";
-					/* setTimeout(function() {
+					theImg.style.transform = "scale(1)";
+					setTimeout(function() {
 						theImg.style.visibility = "hidden";
-					}, pieceAnimationLength); */	// If want to hide the img after transform, perhaps if going with some other animation
+					}, pieceAnimationLength);	// If want to hide the img after transform, perhaps if going with some other animation
 				});
 			}
 		});
