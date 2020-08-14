@@ -736,7 +736,7 @@ SkudPaiShoController.prototype.buildToggleAnimationsDiv = function() {
 
 SkudPaiShoController.prototype.toggleAnimations = function() {
 	if (this.isAnimationsEnabled()) {
-		localStorage.removeItem(SkudPaiShoController.animationsEnabledKey);
+		localStorage.setItem(SkudPaiShoController.animationsEnabledKey, "false");
 		this.actuator.setAnimationOn(false);
 	} else {
 		localStorage.setItem(SkudPaiShoController.animationsEnabledKey, "true");
@@ -746,5 +746,6 @@ SkudPaiShoController.prototype.toggleAnimations = function() {
 };
 
 SkudPaiShoController.prototype.isAnimationsEnabled = function() {
-	return localStorage.getItem(SkudPaiShoController.animationsEnabledKey);
+	/* Check !== false to default to on */
+	return localStorage.getItem(SkudPaiShoController.animationsEnabledKey) !== "false";
 };
