@@ -250,6 +250,8 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 				var srcValue = getSkudTilesSrcPath();
 				theImg.src = srcValue + moveToAnimate.tileRemovedWithBoat.getImageName() + ".png";
 				boatRemovingAccent = true;
+			} else if (moveToAnimate.bonusTileCode === "B" && moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.bonusEndPoint, ox, oy)) {// Placement of Boat to move Flower Tile
+				theImg.style.zIndex = 90;	// Make sure Boat shows up above the Flower Tile it moves
 			}
 		} else if (moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.boatBonusPoint, x, y)) {// Moved by boat
 			x = moveToAnimate.bonusEndPoint.rowAndColumn.col;
