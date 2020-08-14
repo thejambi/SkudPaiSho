@@ -3494,7 +3494,10 @@ var QueryString = function () {
 	  } else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 37) {
 		  /* Ctrl + Alt + <- */
 		  playPrevMove(true);
-	  }
+	  } else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 191) {
+		/* Ctrl + Alt + / */
+		playAllMoves();
+	}
   };
   
   /* Sound */
