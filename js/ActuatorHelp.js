@@ -1,3 +1,5 @@
+var sin45 = cos45 = Math.sin(Math.PI / 4);
+
 function createDivWithClass(className) {
 	var div = document.createElement("div");
 	div.classList.add(className);

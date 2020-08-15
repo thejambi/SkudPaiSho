@@ -2,7 +2,7 @@
 
 function VagabondController(gameContainer, isMobile) {
 	/* Set default preferences */
-	if (!localStorage.getItem(vagabondTileDesignTypeKey) 
+	if (!localStorage.getItem(vagabondTileDesignTypeKey)
 			|| !VagabondController.tileDesignTypeValues[localStorage.getItem(vagabondTileDesignTypeKey)]) {
 		localStorage.setItem(vagabondTileDesignTypeKey, "delion");
 	}
@@ -93,7 +93,7 @@ VagabondController.prototype.togglePeekAtOpponentMoves = function() {
 
 VagabondController.prototype.getAdditionalMessage = function() {
 	var msg = "";
-	
+
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
 			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
@@ -264,7 +264,7 @@ VagabondController.prototype.pointClicked = function(htmlPoint) {
 
 			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
 				this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
-				
+
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 				this.theGame.runNotationMove(move);
 

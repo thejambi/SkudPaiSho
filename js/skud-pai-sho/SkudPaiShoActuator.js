@@ -173,9 +173,7 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		};
 
 		if (moveToAnimate) {
-			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep,
-				theImg,
-				flags);
+			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags);
 		}
 
 		var srcValue = getSkudTilesSrcPath();
@@ -209,7 +207,7 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 
 		/* If capturing, preserve tile being captured on board during animation */
 		if (this.animationOn && moveToAnimate && moveToAnimate.capturedTile
-				&& isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
+				&& isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row) && moveAnimationBeginStep === 0) {
 			var theImgCaptured = document.createElement("img");
 			theImgCaptured.src = srcValue + moveToAnimate.capturedTile.getImageName() + ".png";
 			theImgCaptured.classList.add("underneath");
@@ -233,8 +231,7 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 	}
 };
 
-SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep,
-															theImg, flags) {
+SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags) {
 	if (!this.animationOn) {
 		return;
 	}
@@ -293,9 +290,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 					flags.drainedOnThisTurn = true;
 				}
 			}
-		}
-
-		if (moveToAnimate.moveType === PLANTING) {
+		} else if (moveToAnimate.moveType === PLANTING) {
 			if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
 				if (piecePlaceAnimation === 1) {
 					theImg.style.transform = "scale(2)";
