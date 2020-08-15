@@ -141,7 +141,7 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		var theImg = document.createElement("img");
 
 		if (moveToAnimate) {
-			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg);
+			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
 		}
 
 		var srcValue = this.getTileImageSourceDir();
@@ -175,7 +175,7 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 	}
 };
 
-VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg) {
+VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv) {
 	debug("Animating? "+this.animationOn);
 	if (!this.animationOn) return;
 
@@ -186,12 +186,13 @@ VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 			x = moveToAnimate.startPoint.rowAndColumn.col;
 			y = moveToAnimate.startPoint.rowAndColumn.row;
 			theImg.style.transform = "scale(1.2)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
-			theImg.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
+			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
 		}
 	} else if (moveToAnimate.moveType === DEPLOY) {
 		if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
 			if (piecePlaceAnimation === 1) {
 				theImg.style.transform = "scale(2)";
+				theDiv.style.zIndex = 99;
 				requestAnimationFrame(function() {
 					theImg.style.transform = "scale(1)";
 				});

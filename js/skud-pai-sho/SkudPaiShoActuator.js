@@ -315,6 +315,7 @@ SkudPaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 			if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
 				if (piecePlaceAnimation === 1) {
 					theImg.style.transform = "scale(2)";
+					theImg.style.zIndex = 99; // Show new pieces above others
 					requestAnimationFrame(function() {
 						theImg.style.transform = "scale(1)";
 					});
