@@ -199,7 +199,6 @@ VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 		}
 	}
 
-
 	var pointSizeMultiplierX = 34;
 	var pointSizeMultiplierY = pointSizeMultiplierX;
 	var unitString = "px";
@@ -221,8 +220,12 @@ VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 	requestAnimationFrame(function() {
 		theImg.style.left = "0px";
 		theImg.style.top = "0px";
-		theImg.style.transform = "scale(1)";	// This will size back to normal after moving
 	});
+	setTimeout(function() {
+		requestAnimationFrame(function() {
+			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
+		});
+	}, pieceAnimationLength);
 }
 
 VagabondActuator.prototype.getTileImageSourceDir = function() {
