@@ -26,6 +26,11 @@
  - **GameData.js**:
    - Added `debugStackTrace`.
 
+#8/13/2020
+ - **SkudPaiShoActuator.js**
+   - Created `flags` object to pass into `doAnimateBoardPoint`
+   - Delayed harmony outline until after a piece has finished moving
+
 #Issues
 **Known Issues**
  - When you create harmony on a move, then finish the move by using or skipping your bonus, it reanimates the entire move. I haven't found a good way to get around this since `finalizeMove` gets called, which replays all moves

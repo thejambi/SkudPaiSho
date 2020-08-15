@@ -799,11 +799,13 @@ var QueryString = function () {
   
   function playAllMoves(moveAnimationBeginStep) {
 	  pauseRun();
+	  if (currentMoveIndex >= gameController.gameNotation.moves.length - 1) {
+		playPrevMove();	// If at end, jump to previous move so that final move can animate
+	  }
 	  while (currentMoveIndex < gameController.gameNotation.moves.length - 1) {
 		  playNextMove(false);
 	  }
 	playNextMove(true, moveAnimationBeginStep);
-	  // gameController.callActuate();
   }
   
   function playPause() {
@@ -1155,7 +1157,7 @@ var QueryString = function () {
   
 	  var inviteLinkUrl = createInviteLinkUrl(newGameId);
   
-	  showModal("Game Created!", "You just created a private game. Send <a href='" + inviteLinkUrl + "'>this invite link</a> to a friend so they can join. <br /><br />When a player joins this game, it will show up in your list of games when you click My Games.", true);
+	  showModal("Game Created!", "You just created a private game. Send <a href='" + inviteLinkUrl + "' target='_blank'>this invite link</a> to a friend so they can join. <br /><br />When a player joins this game, it will show up in your list of games when you click My Games.", true);
   };
   
   function createInviteLinkUrl(newGameId) {
@@ -1177,10 +1179,11 @@ var QueryString = function () {
 	  completeJoinGameSeek({gameId:privateGameId});
   }
   
+  var submitMoveData = {};
   var submitMoveCallback = function submitMoveCallback() {
 	  debug("Inside submitMoveCallback");
 	  lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
-	  finalizeMove();
+	  finalizeMove(submitMoveData.moveAnimationBeginStep);
   
 	  startWatchingNumberOfGamesWhereUserTurn();
   
@@ -1480,7 +1483,10 @@ var QueryString = function () {
 	  tutorialInProgress = false;
   }
   
-  function callSubmitMove() {
+  function callSubmitMove(moveAnimationBeginStep) {
+		submitMoveData = {
+			moveAnimationBeginStep: moveAnimationBeginStep
+		};
 	  onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback);
   }
   
@@ -2603,7 +2609,7 @@ var QueryString = function () {
 		  for (var i = 0; i < currentMoveIndex; i++) {
 			  notation.addMove(gameController.gameNotation.moves[i]);
 		  }
-		  rerunAll();
+		//   rerunAll();	// Seems like this shouldn't be here.
   
 		  var linkUrl = "";
   
@@ -2630,9 +2636,6 @@ var QueryString = function () {
 			  message += "Here is the <a href=\"" + buildSpectateUrl() + "\" target='_blank'>spectate link</a> others can use to watch the game live and participate in the Game Chat.";
 		  }
 		  showModal("Game Links", message);
-	  // } else {
-	  // 	showModal("About Game Replay", "Click this link when viewing an online game to get a sharable game replay link.");
-	  // }
   }
   
   function buildSpectateUrl() {
@@ -2640,39 +2643,6 @@ var QueryString = function () {
 		  linkUrl = LZString.compressToEncodedURIComponent("watchGame=" + gameId);
 		  linkUrl = sandboxUrl + "?" + linkUrl;
 		  return linkUrl;
-	  }
-  }
-  
-  function openGameReplay() {
-	  if (currentGameData.hostUsername && currentGameData.guestUsername) {
-		  var notation = gameController.getNewGameNotation();
-		  for (var i = 0; i < currentMoveIndex; i++) {
-			  notation.addMove(gameController.gameNotation.moves[i]);
-		  }
-		  rerunAll();
-  
-		  var linkUrl = "";
-  
-		  if (currentGameData && currentGameData.gameTypeId) {
-			  linkUrl += "gameType=" + currentGameData.gameTypeId + "&";
-		  }
-		  linkUrl += "host=" + currentGameData.hostUsername + "&";
-		  linkUrl += "guest=" + currentGameData.guestUsername + "&";
-  
-		  linkUrl += "game=" + notation.notationTextForUrl();
-  
-		  if (ggOptions.length > 0) {
-			  linkUrl += "&gameOptions=" + JSON.stringify(ggOptions);
-		  }
-  
-		  linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
-  
-		  linkUrl = sandboxUrl + "?" + linkUrl;
-  
-		  debug(linkUrl);
-		  openLink(linkUrl);
-	  } else {
-		  showModal("About Game Replay", "Click this link when viewing an online game to open a sharable game replay link in a new window.");
 	  }
   }
   
@@ -3524,7 +3494,10 @@ var QueryString = function () {
 	  } else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 37) {
 		  /* Ctrl + Alt + <- */
 		  playPrevMove(true);
-	  }
+	  } else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 191) {
+		/* Ctrl + Alt + / */
+		playAllMoves();
+	}
   };
   
   /* Sound */
