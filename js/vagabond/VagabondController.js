@@ -7,7 +7,7 @@ function VagabondController(gameContainer, isMobile) {
 		localStorage.setItem(vagabondTileDesignTypeKey, "delion");
 	}
 
-	this.actuator = new VagabondActuator(gameContainer, isMobile);
+	this.actuator = new VagabondActuator(gameContainer, isMobile, this.isAnimationsEnabled());
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -18,6 +18,8 @@ function VagabondController(gameContainer, isMobile) {
 
 	this.isPaiShoGame = true;
 }
+
+VagabondController.animationsEnabledKey = "AnimationsEnabled";
 
 VagabondController.prototype.getGameTypeId = function() {
 	return GameType.VagabondPaiSho.id;
@@ -470,6 +472,10 @@ VagabondController.prototype.getAdditionalHelpTabDiv = function() {
 	settingsDiv.appendChild(movePeekingDiv);
 
 	settingsDiv.appendChild(document.createElement("br"));
+	
+	settingsDiv.appendChild(this.buildToggleAnimationsDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
 };
 
@@ -493,4 +499,27 @@ VagabondController.prototype.buildTileDesignDropdownDiv = function() {
 VagabondController.prototype.setTileDesignsPreference = function(tileDesignKey) {
 	localStorage.setItem(vagabondTileDesignTypeKey, tileDesignKey);
 	this.callActuate();
+};
+
+VagabondController.prototype.buildToggleAnimationsDiv = function() {
+	var div = document.createElement("div");
+	var onOrOff = this.isAnimationsEnabled() ? "on" : "off";
+	div.innerHTML = "Move animations are " + onOrOff + ": <span class='skipBonus' onclick='gameController.toggleAnimations();'>toggle</span>";
+	return div;
+};
+
+VagabondController.prototype.toggleAnimations = function() {
+	if (this.isAnimationsEnabled()) {
+		setUserGamePreference(VagabondController.animationsEnabledKey, "false");
+		this.actuator.setAnimationOn(false);
+	} else {
+		setUserGamePreference(VagabondController.animationsEnabledKey, "true");
+		this.actuator.setAnimationOn(true);
+	}
+	clearMessage();
+};
+
+VagabondController.prototype.isAnimationsEnabled = function() {
+	/* Check !== false to default to on */
+	return getUserGamePreference(VagabondController.animationsEnabledKey) !== "false";
 };

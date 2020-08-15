@@ -4,7 +4,7 @@ function VagabondActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
-	this.animationOn = enableAnimations || true;// TODO: remove "|| true," set up local storage
+	this.animationOn = enableAnimations;
 
 	var containers = setupPaiShoBoard(
 		this.gameContainer,
