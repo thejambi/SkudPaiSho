@@ -134,12 +134,33 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 		} else if (boardPoint.betweenHarmony && !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
-			theDiv.classList.add("betweenHarmony");
-			if (boardPoint.betweenHarmonyHost) {
-				theDiv.classList.add("bhHost");
-			}
-			if (boardPoint.betweenHarmonyGuest) {
-				theDiv.classList.add("bhGuest");
+			var isAnimationPointOfBoatRemovingAccentTile = this.animationOn
+					&& !boardPoint.hasTile() 
+					&& moveToAnimate && moveToAnimate.bonusTileCode === "B" 
+					&& !moveToAnimate.boatBonusPoint 
+					&& isSamePoint(moveToAnimate.bonusEndPoint, boardPoint.col, boardPoint.row);
+			var boatRemovingPointClassesToAddAfterAnimation = [];
+			if (isAnimationPointOfBoatRemovingAccentTile) {
+				boatRemovingPointClassesToAddAfterAnimation.push("betweenHarmony");
+				if (boardPoint.betweenHarmonyHost) {
+					boatRemovingPointClassesToAddAfterAnimation.push("bhHost");
+				}
+				if (boardPoint.betweenHarmonyGuest) {
+					boatRemovingPointClassesToAddAfterAnimation.push("bhGuest");
+				}
+				setTimeout(function() {
+					boatRemovingPointClassesToAddAfterAnimation.forEach(function(classToAdd) {
+						theDiv.classList.add(classToAdd);
+					});
+				}, pieceAnimationLength * (2 - moveAnimationBeginStep));
+			} else {
+				theDiv.classList.add("betweenHarmony");
+				if (boardPoint.betweenHarmonyHost) {
+					theDiv.classList.add("bhHost");
+				}
+				if (boardPoint.betweenHarmonyGuest) {
+					theDiv.classList.add("bhGuest");
+				}
 			}
 		}
 
@@ -152,7 +173,7 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		}
 	}
 
-	if (!boardPoint.hasTile() && moveToAnimate && moveToAnimate.bonusTileCode === "B" && !moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.bonusEndPoint, boardPoint.col, boardPoint.row)) {
+	if (isAnimationPointOfBoatRemovingAccentTile) {
 		// No tile here, but can animate the Boat removing the Accent Tile
 		var theImg = document.createElement("img");
 
