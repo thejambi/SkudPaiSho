@@ -13,7 +13,7 @@ function SkudPaiShoController(gameContainer, isMobile) {
 	this.isPaiShoGame = true;
 }
 
-SkudPaiShoController.animationsEnabledKey = "SkudPaiShoAnimationsEnabled";
+SkudPaiShoController.animationsEnabledKey = "AnimationsEnabled";
 
 SkudPaiShoController.prototype.getGameTypeId = function() {
 	return GameType.SkudPaiSho.id;
@@ -736,10 +736,10 @@ SkudPaiShoController.prototype.buildToggleAnimationsDiv = function() {
 
 SkudPaiShoController.prototype.toggleAnimations = function() {
 	if (this.isAnimationsEnabled()) {
-		localStorage.setItem(SkudPaiShoController.animationsEnabledKey, "false");
+		setUserGamePreference(SkudPaiShoController.animationsEnabledKey, "false");
 		this.actuator.setAnimationOn(false);
 	} else {
-		localStorage.setItem(SkudPaiShoController.animationsEnabledKey, "true");
+		setUserGamePreference(SkudPaiShoController.animationsEnabledKey, "true");
 		this.actuator.setAnimationOn(true);
 	}
 	clearMessage();
@@ -747,5 +747,5 @@ SkudPaiShoController.prototype.toggleAnimations = function() {
 
 SkudPaiShoController.prototype.isAnimationsEnabled = function() {
 	/* Check !== false to default to on */
-	return localStorage.getItem(SkudPaiShoController.animationsEnabledKey) !== "false";
+	return getUserGamePreference(SkudPaiShoController.animationsEnabledKey) !== "false";
 };
