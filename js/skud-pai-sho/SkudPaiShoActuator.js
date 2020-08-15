@@ -129,16 +129,17 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 
 	var theDiv = createBoardPointDiv(boardPoint);
 
+	var isAnimationPointOfBoatRemovingAccentTile = this.animationOn
+					&& !boardPoint.hasTile() 
+					&& moveToAnimate && moveToAnimate.bonusTileCode === "B" 
+					&& !moveToAnimate.boatBonusPoint 
+					&& isSamePoint(moveToAnimate.bonusEndPoint, boardPoint.col, boardPoint.row);
+
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 		} else if (boardPoint.betweenHarmony && !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
-			var isAnimationPointOfBoatRemovingAccentTile = this.animationOn
-					&& !boardPoint.hasTile() 
-					&& moveToAnimate && moveToAnimate.bonusTileCode === "B" 
-					&& !moveToAnimate.boatBonusPoint 
-					&& isSamePoint(moveToAnimate.bonusEndPoint, boardPoint.col, boardPoint.row);
 			var boatRemovingPointClassesToAddAfterAnimation = [];
 			if (isAnimationPointOfBoatRemovingAccentTile) {
 				boatRemovingPointClassesToAddAfterAnimation.push("betweenHarmony");
