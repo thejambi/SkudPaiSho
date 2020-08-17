@@ -3505,3 +3505,8 @@ var QueryString = function () {
 	  soundManager.toggleSoundOn();
   }
   
+  // For iOS
+window.addEventListener('touchstart', function() {
+	soundManager.makeNoNoise();
+}, false);
+
