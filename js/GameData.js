@@ -148,10 +148,18 @@ function shuffleArray(array) {
   }
 }
 
-function getRandomFromArray(array) {
+function removeRandomFromArray(array) {
   if (array && array.length) {
     var randomIndex = Math.floor(Math.random() * array.length);
     var randomEntry = array.splice(randomIndex, 1)[0];
+    return randomEntry;
+  }
+}
+
+function peekRandomFromArray(array) {
+  if (array && array.length) {
+    var randomIndex = Math.floor(Math.random() * array.length);
+    var randomEntry = array[randomIndex];
     return randomEntry;
   }
 }

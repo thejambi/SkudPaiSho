@@ -19,6 +19,6 @@ VagabondRandomAIv1.prototype.setPlayer = function(playerName) {
 VagabondRandomAIv1.prototype.getMove = function(game, moveNum) {
 	this.aiHelp.moveNum = moveNum;
 	var moves = this.aiHelp.getAllPossibleMoves(game, this.player);
-	return getRandomFromArray(moves);
+	return removeRandomFromArray(moves);
 };
 

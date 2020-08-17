@@ -32,7 +32,7 @@ function SoundManager() {
 }
 
 SoundManager.sounds = {
-	tileLand: "tileLand2"
+	tileLand: ["tileLand2", "tileLand3", "tileLand4", "tileLand5"]
 };
 
 SoundManager.prototype.playFileData = function (fileData) {
@@ -43,11 +43,16 @@ SoundManager.prototype.playFileData = function (fileData) {
 	}
 }
 
-SoundManager.prototype.playSound = function (fileValue) {
+SoundManager.prototype.playSound = function (soundType) {
 	if (this.storageManager.getSoundOff()) {
 		return;
 	}
 	// --- //
+
+	var fileValue = soundType;
+	if (Array.isArray(soundType)) {
+		fileValue = peekRandomFromArray(soundType);
+	}
 
 	var fileData = this.storageManager.getSoundFile(fileValue);
 	
