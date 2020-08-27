@@ -251,7 +251,7 @@ SkudAIv1.prototype.addAccentSelectionMoves = function(moves, game) {
 	/* Status: Random, working
 	*/
 
-	var tilePile = this.getTilePile(game, player);
+	var tilePile = this.getTilePile(game, this.player);
 
 	var availableAccents = [];
 
