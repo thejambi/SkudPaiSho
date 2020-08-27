@@ -1,0 +1,9 @@
+{
+  "name": "SkudPaiSho",
+  "version": "1.0.0",
+  "description": "Play a variety of fan-made Pai Sho games online with others",
+  "main": "index.js",
+  "repository": "https://github.com/JamesPuli/SkudPaiSho.git",
+  "author": "Scud",
+  "license": "MIT"
+}
