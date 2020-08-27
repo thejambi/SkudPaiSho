@@ -47,7 +47,8 @@ var QueryString = function () {
 	  xiangqi: "Xiangqi Style", //"xiangqi"
 	  water: "Water themed Vescucci Tiles",
 	  vescuccicolored: "Vescucci Colored",
-	  vescuccicolored2: "Vescucci Colored 2"
+	  vescuccicolored2: "Vescucci Colored 2",
+	  earth: "Earth themed Vescucci Tiles"
   };
   
   var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
