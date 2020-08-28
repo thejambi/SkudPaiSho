@@ -65,6 +65,7 @@ var QueryString = function () {
 	  fire: "Fire by BoomerangGuy",
 	  air: "Air by Monk_Gyatso",
 	  nick: "Nick style by BoomerangGuy",
+	  nickoffset: "Nick offset-lines",
 	  owl: "Order of the White Lotus by Geebung",
 	  metal: "Metal Bender style by ohreaganoe",
 	  whitethread: "White Thread by tree",
