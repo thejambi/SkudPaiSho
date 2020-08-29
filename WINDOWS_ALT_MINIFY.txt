@@ -1,0 +1,8 @@
+https://www.npmjs.com/package/uglifyjs-folder
+INSTALL NODE and execute npm install uglifyjs-folder -g
+
+afterwards in cmd place the command: uglifyjs-folder js -o all.min.js
+
+COPY content form all.min.js to bottom index.html (@ comment Compressed). 
+
+DO this every code update in the /js folder
