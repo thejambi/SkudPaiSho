@@ -70,7 +70,8 @@ var QueryString = function () {
 	  metal: "Metal Bender style by ohreaganoe",
 	  whitethread: "White Thread by tree",
 	  avatarstate: "Avatar State by el craken",
-	  blowtorch: "Blowtorch by ProfPetruescu"
+	  blowtorch: "Blowtorch by ProfPetruescu",
+	  checkeredtraining: "Checkered Training Board by Aba"
   };
   
   var paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
