@@ -6,7 +6,11 @@
   "repository": "https://github.com/JamesPuli/SkudPaiSho.git",
   "author": "Scud",
   "license": "MIT",
-  "dependencies": {
-    "babel": "^6.23.0"
+  "dependencies": {},
+  "scripts": {
+    "compile": "ls && ./minify.sh"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0"
   }
 }
