@@ -249,8 +249,8 @@ SkudPaiShoGameManager.prototype.getWinReason = function() {
 		}
 	} else if (this.board.winners.length === 2) {
 		return " formed Harmony Rings for a tie!";
-	} else if (this.board.endGameWinners.length === 2) {
-		return " tied with the same number of Harmonies!"
+	} else if (this.endGameWinners.length === 2) {
+		return " had the same number of Harmonies crossing the midlines for a tie!";	// Should there be any other tie breaker?
 	}
 };
 
