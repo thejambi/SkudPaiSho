@@ -1,3 +1,5 @@
+// DEFAULTS HERE ARE NOT USED IN THE PROJECT, BUT UNTOUCHED TO NOT BRING THE SITE IN CONFUSION
+// PAIJO USES THE INDEX.HTML as main (iframe in PaiJoController).
 
 function PaiJoBoardPoint() {
 	this.types = [];

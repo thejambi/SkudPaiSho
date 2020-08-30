@@ -2,15 +2,11 @@ var PaiJoVars = {};
 
 function PaiJoController(gameContainer, isMobile) {
 	PaiJoVars = {
-		DEFENDERS_PLAYER: HOST,
-		ATTACKERS_PLAYER: GUEST
-	}
+ 	}
 
 	if (gameOptionEnabled(OPTION_ATTACKERS_MOVE_FIRST)) {
 		PaiJoVars = {
-			ATTACKERS_PLAYER: HOST,
-			DEFENDERS_PLAYER: GUEST
-		}
+ 		}
 	}
 
 	if (!isMobile) {
@@ -18,15 +14,7 @@ function PaiJoController(gameContainer, isMobile) {
 	} else {
 		this.additionalTilePileClass = "";
 	}
-
-	/* Board setup code determines initial tile placement pattern on the board. */
-	this.attackersBoardSetupCode = 1;
-	this.defendersBoardSetupCode = 1;
-
-	if (gameOptionEnabled(FIVE_SIDED_BOARD)) {
-		this.attackersBoardSetupCode = 2;
-		this.defendersBoardSetupCode = 2;
-	}
+ 
 
 	this.actuator = new PaiJoActuator(gameContainer, isMobile, this.getHostTilesContainerDivs(), this.getGuestTilesContainerDivs());
 
@@ -41,30 +29,12 @@ PaiJoController.prototype.getGameTypeId = function() {
 
 /* Not required, but called from Main */
 PaiJoController.prototype.completeSetup = function() {
-	// Create initial board setup for Host and then Guest, but who are they?
-	if (HOST === PaiJoVars.DEFENDERS_PLAYER) {
-		this.addSetupForPlayerCode('D', this.defendersBoardSetupCode);
-		this.addSetupForPlayerCode('A', this.attackersBoardSetupCode);
-	} else {
-		this.addSetupForPlayerCode('A', this.attackersBoardSetupCode);
-		this.addSetupForPlayerCode('D', this.defendersBoardSetupCode);
-	}
-
-	// Finish with actuate
-	rerunAll();
+	 
 	this.callActuate();
 };
 
 PaiJoController.prototype.addSetupForPlayerCode = function(playerCode, boardSetupCode) {
-	/* Create initial board setup based on board setup code. 
-	 * (In the future, more board setup options could be added.)
-	 */
-	var moveText = "0" + playerCode + "." + boardSetupCode;
-	debug(moveText);
-	var move = new PaiJoNotationMove(moveText);
-	// this.theGame.runNotationMove(move);	// May not be needed
-	// Move all set. Add it to the notation!
-	this.gameNotation.addMove(move);
+	 
 };
 
 /* Required */
@@ -94,12 +64,15 @@ PaiJoController.prototype.getHostTilesContainerDivs = function() {
 
 /* Required by Main */
 PaiJoController.prototype.getGuestTilesContainerDivs = function() {
-	return "<div></div>";
+	return '<div><a href="/js/PaiJo/index.html" target="_blank">Fullscreen</a><br><br></div>';
 };
 
 /* Required by Main */
 PaiJoController.prototype.callActuate = function() {
 	this.theGame.actuate();
+		$(".board-container").css("overflow-x","hidden"); 
+	$(".board-container").css("height","500px");
+	$(".board-container").html("<iframe src='./js/PaiJo/index_embedded.html' style='width:99%;height:99%;'></iframe>");
 };
 
 /* Required by Main */
@@ -113,11 +86,19 @@ PaiJoController.prototype.resetMove = function() {
 
 /* Required by Main */
 PaiJoController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>PaiJo</h4>"
-	+ "<p><em>A Hnefatafl-inspired game played on a hex grid.</em></p>"
-	+ "<p>The Attackers begin in the corners and win by capturing the King.</p>"
-	+ "<p>The King and Defenders begin in the center and win by escorting the King to a corner space.</p>"
-	+ "<p>Read the rules and more about the game <a href='https://nxsgame.wordpress.com/2019/09/26/PaiJo/' target='_blank'>here</a>.</p>";
+	return '<a target="_blank" href="http://paisho.pbworks.com/w/page/102793894/Modern%20Pai%20Sho"> Source info - paisho.pbworks </a>'+
+'<p>The Game goes as follows:<br>You can only move one tile per turn. Each piece can only move to a space directly adjacent to it, or jump a piece that is owned by the player moving.</p>'+
+'<p>&nbsp;</p><p>Elemental:<br>Water: Wins against Earth, Losses to Air, Neutral with Fire <br>' +
+'Fire: Wins against Air, Losses to Earth, Neutral with Water <br>Earth:&nbsp;Wins against Fire, Losses to Water, Neutral with Air <br>'+
+'Air:&nbsp;Wins against Water, Losses to Fire, Neutral with Earth </p><br><p>Special: <br>'+
+'Avatar: Wins against Every, Losses to Every, Neutral with none<br>White Lotus: Wins against none, Losses to Every, Neutral with none</p>'+ 
+'<p>&nbsp;</p><p>The White Lotus piece can\'t jump and has one turn to escape "death" when it becomes in danger.'+
+'<br>Ever piece that become adjacent with a piece that it beats removes that piece, and if it is adjacent to a piece that beats it, it is removed.<br>'+
+'The Avatar piece beats any piece it attacks, and is beaten by any piece that attacks it. It then respawns at it\'s starting location if no piece is in the Avatars starting location(the place in started the game at) and no enemy piece is attacking that spot.'+
+'<br>After a piece is moved, it can be moved again to jump any piece owned by the player (this can be done as the first move too) any number of times, with the exception of the White Lotus, which can\'t jump any piece.<br>'+
+'When the White Lotus in under attack rather than instantly be removed from the board, it has one turn to be moved to a save location, if that proves impossible the attacking player has won.</p>'+
+'<p>&nbsp;</p><p>You win either by killing the opponents white lotus (DOMINANCE), or getting your safely to the center of the board for one full turn cycle.</p>  </div>'
+ 
 };
 
 /* Required by Main */
@@ -129,8 +110,7 @@ PaiJoController.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
-/* Using my own version of this, called directly instead of from Main */
-PaiJoController.prototype.unplayedTileClicked = function(tilePileContainerDiv) {
+ PaiJoController.prototype.unplayedTileClicked = function(tilePileContainerDiv) {
 	// No unplayed tiles in this game
 };
 
@@ -230,11 +210,8 @@ PaiJoController.prototype.getAiList = function() {
 
 /* Required by Main */
 PaiJoController.prototype.getCurrentPlayer = function() {
-	if (this.gameNotation.moves.length % 2 === 0) {
-		return HOST;
-	} else {
-		return GUEST;
-	}
+			return "";
+
 };
 
 /* Required by Main */
@@ -252,11 +229,4 @@ PaiJoController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 };
 
-/* Called by Main, not required */
-PaiJoController.prototype.optionOkToShow = function(option) {
-	if (option === KING_MOVES_LIKE_PAWNS) {
-		return gameOptionEnabled(FIVE_SIDED_BOARD);
-	} else {
-		return true;
-	}
-};
+ 
