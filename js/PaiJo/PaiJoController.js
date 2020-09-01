@@ -70,9 +70,8 @@ PaiJoController.prototype.getGuestTilesContainerDivs = function() {
 /* Required by Main */
 PaiJoController.prototype.callActuate = function() {
 	this.theGame.actuate();
-		$(".board-container").css("overflow-x","hidden"); 
-	$(".board-container").css("height","500px");
-	$(".board-container").html("<iframe src='./js/PaiJo/index_embedded.html' style='width:99%;height:99%;'></iframe>");
+		$(".board-container").css("height","550px");
+	$(".board-container").html("<iframe id='iPaiJo' src='./js/PaiJo/index_embedded.html' style='width:98%;height:99%;' frameBorder='0' scrolling='no'></iframe>");
 };
 
 /* Required by Main */

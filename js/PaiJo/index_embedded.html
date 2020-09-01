@@ -6,7 +6,7 @@
 <title>Modern Pai Sho - (Version Pai Jo)</title>
 <style>
 
-html{background-color:#3b3b39; color:white;}
+html{background-color:#3b3b39; color:white; }
 h3{text-align:center;}
 #pInfo{float:right; clear:both; padding-right:45px;}
  #spanSettings input, button  {margin-left:20%;}
@@ -29,8 +29,9 @@ h3{text-align:center;}
   transform: scale(1.5);
  }*/
 
-#tableDiv {
-        transform:rotate(45deg) scale(0.7);
+#tableDiv {   overflow: hidden;
+
+        transform:rotate(45deg) scale(0.84);
 float: right;
   clear: both;		margin-top: -1.5%;margin-left:17.5%; position:absolute;
 		/* added for 'real center'*/
@@ -185,12 +186,12 @@ abbr[title] {
                                   supported by Chrome, Edge, Opera and Firefox */
 }
 
+input[type=button], input[type=submit], input[type=reset] {color:white; background-color:black;}
 </style>
 </head>
 <body class="noselect"   oncontextmenu="return false;"> 
-
-<h3 >Modern Pai Sho - (Version Pai Jo)</h3>
-     <div id="tableDiv" style="  float:center;">
+<br><br>
+      <div id="tableDiv" style="  float:center;">
         Table will generate here.
     </div>
 
@@ -230,7 +231,7 @@ abbr[title] {
 
 <p id="pInfo" hidden>Loading...</p> 
 <div id="divGameLog"   style=" " hidden>   </div>
-<span id="spanLowerP"></span>
+<span id="spanLowerP" style="overflow-x:hidden;"></span>
 
 
 
