@@ -1756,6 +1756,17 @@ var QueryString = function () {
 			  MORE_ATTACKERS
 		  ]
 	  }
+	  ,
+	  PaiJo: {
+		  id: 12,
+		  desc: "Modern Pai Sho (PaiJo)",
+		  rulesUrl: "http://paisho.pbworks.com/w/page/102793894/Modern%20Pai%20Sho",
+		  gameOptions: [
+ 		  ],
+		  secretGameOptions: [
+			   
+		  ]
+	  }
   };
   function getGameControllerForGameType(gameTypeId) {
 	  var controller;
@@ -1800,6 +1811,10 @@ var QueryString = function () {
 		  case GameType.Hexentafl.id:
 			  controller = new HexentaflController(gameContainerDiv, isMobile);
 			  break;
+		  case GameType.PaiJo.id:
+			  controller = new PaiJoController(gameContainerDiv, isMobile);
+			  break;
+
 		  default:
 			  debug("Game Controller unavailable.");
 	  }
