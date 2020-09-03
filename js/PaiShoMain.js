@@ -45,10 +45,13 @@ var QueryString = function () {
 	  pixelsho: "Pixel Sho v1 Tiles", //"pixelsho",
 	  pixelsho2: "Pixel Sho v2 Tiles", //"pixelsho2",
 	  xiangqi: "Xiangqi Style", //"xiangqi"
-	  water: "Water themed Vescucci Tiles",
+	  water: "Water-Themed Vescucci Tiles",
 	  vescuccicolored: "Vescucci Colored",
 	  vescuccicolored2: "Vescucci Colored 2",
-	  earth: "Earth themed Vescucci Tiles"
+	  earth: "Earth-Themed Vescucci Tiles",
+	  chujired: "Chu Ji Red", //"chujired",
+	  chujiblue: "Chu Ji Blue", //"chujired",
+	  chujimono: "Chu Ji Monochrome" //"chujired"
   };
   
   var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
