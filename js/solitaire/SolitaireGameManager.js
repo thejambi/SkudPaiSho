@@ -27,7 +27,7 @@ SolitaireGameManager.prototype.actuate = function() {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, gameController.theGame, gameController.drawnTile);
+	this.actuator.actuate(this.board, this, gameController.drawnTile);
 };
 
 SolitaireGameManager.prototype.runNotationMove = function(move, withActuate) {

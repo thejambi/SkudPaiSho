@@ -1,15 +1,27 @@
 // Solitaire Game Manager
 
-function OvergrowthGameManager(actuator, ignoreActuate, isCopy) {
+function OvergrowthGameManager(actuator, ignoreActuate, isCopy, existingDrawnTile, existingLastDrawnTile) {
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;
 
 	this.tileManager = new OvergrowthTileManager();
 
+	this.drawnTile = existingDrawnTile;
+	this.lastDrawnTile = existingLastDrawnTile; // Save for Undo
+
+	this.drawRandomTile();
+
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
 }
+
+OvergrowthGameManager.prototype.drawRandomTile = function() {
+	if (gameController && !this.currentDrawnTileIsPresentInTileManager()) {
+		this.lastDrawnTile = this.drawnTile;
+		this.drawnTile = this.drawRandomTileFromTileManager(getCurrentPlayer());
+	}
+};
 
 // Set up the game
 OvergrowthGameManager.prototype.setup = function (ignoreActuate) {
@@ -27,7 +39,21 @@ OvergrowthGameManager.prototype.actuate = function() {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, gameController.theGame, gameController.drawnTile);
+
+	if (gameController) {
+		if (!this.drawnTile) {
+			this.drawRandomTile();
+		}
+		var tile = this.tileManager.peekTile(this.drawnTile.ownerName, this.drawnTile.code, this.drawnTile.id);
+		if (!tile) {
+			this.drawnTile = null;
+			this.lastDrawnTile = null; // Save for Undo
+
+			this.drawRandomTile();
+		}
+	}
+
+	this.actuator.actuate(this.board, this, this.drawnTile);
 };
 
 OvergrowthGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -57,7 +83,7 @@ OvergrowthGameManager.prototype.runNotationMove = function(move, withActuate) {
 	return bonusAllowed;
 };
 
-OvergrowthGameManager.prototype.drawRandomTile = function(playerName) {
+OvergrowthGameManager.prototype.drawRandomTileFromTileManager = function(playerName) {
 	return this.tileManager.drawRandomTile(playerName);
 };
 
@@ -157,6 +183,14 @@ OvergrowthGameManager.prototype.getWinResultTypeCode = function() {
 	if (this.endGameWinners.length === 1) {
 		return 1;
 	}
+};
+
+OvergrowthGameManager.prototype.currentDrawnTileIsPresentInTileManager = function() {
+	if (this.drawnTile) {
+		var tile = this.tileManager.peekTile(this.drawnTile.ownerName, this.drawnTile.code, this.drawnTile.id);
+		return tile;
+	}
+	return false;
 };
 
 OvergrowthGameManager.prototype.getCopy = function() {

@@ -10,11 +10,6 @@ function OvergrowthController(gameContainer, isMobile) {
 	this.resetGameManager();
 	this.resetNotationBuilder();
 
-	this.drawnTile = null;
-	this.lastDrawnTile = null; // Save for Undo
-
-	this.drawRandomTile();
-
 	this.isPaiShoGame = true;
 }
 
@@ -26,13 +21,12 @@ OvergrowthController.prototype.completeSetup = function() {
 	this.callActuate();
 };
 
-OvergrowthController.prototype.drawRandomTile = function() {
-	this.lastDrawnTile = this.drawnTile;
-	this.drawnTile = this.theGame.drawRandomTile(this.getCurrentPlayer());
-};
-
 OvergrowthController.prototype.resetGameManager = function() {
-	this.theGame = new OvergrowthGameManager(this.actuator);
+	if (this.theGame) {
+		this.theGame = new OvergrowthGameManager(this.actuator, false, false, this.theGame.drawnTile, this.theGame.lastDrawnTile);
+	} else {
+		this.theGame = new OvergrowthGameManager(this.actuator);
+	}
 };
 
 OvergrowthController.prototype.resetNotationBuilder = function() {
@@ -56,17 +50,6 @@ OvergrowthController.getGuestTilesContainerDivs = function() {
 };
 
 OvergrowthController.prototype.callActuate = function() {
-	// if tilemanager doesn't have drawnTile, draw tile?
-	if (this.drawnTile) {
-		var tile = this.theGame.tileManager.peekTile(this.getCurrentPlayer(), this.drawnTile.code, this.drawnTile.id);
-		if (!tile) {
-			this.drawnTile = null;
-			this.lastDrawnTile = null; // Save for Undo
-
-			this.drawRandomTile();
-		}
-	}
-
 	this.theGame.actuate();
 };
 
@@ -74,13 +57,13 @@ OvergrowthController.prototype.resetMove = function() {
 	// Remove last move
 	this.gameNotation.removeLastMove();
 
-	if (this.drawnTile) {
-		this.drawnTile.selectedFromPile = false;
-		this.theGame.tileManager.putTileBack(this.drawnTile);
+	if (this.theGame.drawnTile) {
+		this.theGame.drawnTile.selectedFromPile = false;
+		this.theGame.tileManager.putTileBack(this.theGame.drawnTile);
 	}
 
-	this.drawnTile = this.lastDrawnTile;
-	this.drawnTile.selectedFromPile = false;
+	this.theGame.drawnTile = this.lastDrawnTile;
+	this.theGame.drawnTile.selectedFromPile = false;
 };
 
 OvergrowthController.prototype.getDefaultHelpMessageText = function() {
@@ -121,7 +104,7 @@ OvergrowthController.prototype.unplayedTileClicked = function(tileDiv) {
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		tile.selectedFromPile = true;
-		this.drawnTile.selectedFromPile = true;
+		this.theGame.drawnTile.selectedFromPile = true;
 
 		this.notationBuilder.moveType = PLANTING;
 		this.notationBuilder.plantedFlowerType = tileCode;
@@ -158,7 +141,7 @@ OvergrowthController.prototype.pointClicked = function(htmlPoint) {
 
 			// Move all set. Add it to the notation!
 			this.gameNotation.addMove(move);
-			this.drawRandomTile();
+			this.theGame.drawRandomTile();
 			if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
 				createGameIfThatIsOk(GameType.OvergrowthPaiSho.id);
 			} else {
@@ -257,13 +240,13 @@ OvergrowthController.prototype.isSolitaire = function() {
 };
 
 OvergrowthController.prototype.setGameNotation = function(newGameNotation) {
-	if (this.drawnTile) {
-		this.drawnTile.selectedFromPile = false;
-		this.theGame.tileManager.putTileBack(this.drawnTile);
+	if (this.theGame.drawnTile) {
+		this.theGame.drawnTile.selectedFromPile = false;
+		this.theGame.tileManager.putTileBack(this.theGame.drawnTile);
 	}
 	this.resetGameManager();
 	this.gameNotation.setNotationText(newGameNotation);
-	this.drawRandomTile();
+	this.theGame.drawRandomTile();
 	this.theGame.actuate();
 };
 

@@ -27,7 +27,7 @@ CoopSolitaireGameManager.prototype.actuate = function() {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, gameController.theGame, gameController.drawnTile);
+	this.actuator.actuate(this.board, this, gameController.drawnTile);
 };
 
 CoopSolitaireGameManager.prototype.runNotationMove = function(move, withActuate) {
