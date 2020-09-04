@@ -17,9 +17,9 @@ CoopSolitaireGameManager.prototype.setup = function (ignoreActuate) {
 	this.board = new CoopSolitaireBoard();
 
 	// Update the actuator
-	// if (!ignoreActuate) {
-	// 	this.actuate();
-	// }
+	if (!ignoreActuate) {
+		this.actuate();
+	}
 };
 
 // Sends the updated board to the actuator
