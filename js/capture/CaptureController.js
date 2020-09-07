@@ -184,7 +184,7 @@ CaptureController.prototype.getCommonHelpMessageChunk = function() {
 };
 
 CaptureController.prototype.getCaptureCycleImageTag = function() {
-	return "<img src='capture/images/CaptureCycle.png' style='width:100%;' />";
+	return "<img src='images/Capture/CaptureCycle.png' style='width:100%;' />";
 };
 
 CaptureController.prototype.getTheMessage = function(tile, ownerName) {
