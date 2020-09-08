@@ -37,24 +37,24 @@ var QueryString = function () {
   
   var tileDesignTypeKey = "tileDesignTypeKey";
   var tileDesignTypeValues = {
-	  // hlowe: "Modern Tiles v1", //"hlowe",
-	  hlowenew: "Modern Tiles", //"hlowenew",
-	  hlowemono: "Modern Monochrome Tiles", //"hlowemono",
-	  vescucci: "Vescucci Tiles", //"vescucci",
+	  // hlowe: "Modern Tiles v1",
+	  hlowenew: "Modern Tiles",
+	  vescucci: "Vescucci Tiles",
 	  tggproject: "TGG Pai Sho Project",
+	  standard: "Pai Sho Project Tiles",
+	  pixelsho: "Pixel Sho v1 Tiles",
+	  pixelsho2: "Pixel Sho v2 Tiles",
+	  xiangqi: "Xiangqi Style",
+	  hlowemono: "Modern Monochrome Tiles",
 	  tggprojectmono: "TGG Pai Sho Project Monochrome",
-	  standard: "Pai Sho Project Tiles", //"standard",
-	  pixelsho: "Pixel Sho v1 Tiles", //"pixelsho",
-	  pixelsho2: "Pixel Sho v2 Tiles", //"pixelsho2",
-	  xiangqi: "Xiangqi Style", //"xiangqi"
-	  water: "Water-Themed Vescucci Tiles",
 	  vescuccicolored: "Vescucci Colored",
 	  vescuccicolored2: "Vescucci Colored 2",
 	  tggproject2: "TGG Project Alt Colors",
+	  water: "Water-Themed Vescucci Tiles",
 	  earth: "Earth-Themed Vescucci Tiles",
-	  chujired: "Chu Ji Red", //"chujired",
-	  chujiblue: "Chu Ji Blue", //"chujired",
-	  chujimono: "Chu Ji Monochrome" //"chujired"
+	  chujired: "Chu Ji Red",
+	  chujiblue: "Chu Ji Blue",
+	  chujimono: "Chu Ji Monochrome"
   };
   
   var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
