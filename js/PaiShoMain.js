@@ -69,7 +69,8 @@ var QueryString = function () {
 	  water: "Water by Monk_Gyatso",
 	  earth: "Earth by BoomerangGuy",
 	  fire: "Fire by BoomerangGuy",
-	  air: "Air by Monk_Gyatso",
+	  airnomad: "Air Nomads by Monk_Gyatso",
+	  air: "Air Themed by Monk_Gyatso",
 	  nick: "Nick style by BoomerangGuy",
 	  nickoffset: "Nick offset-lines",
 	  owl: "Order of the White Lotus by Geebung",
@@ -77,7 +78,8 @@ var QueryString = function () {
 	  whitethread: "White Thread by tree",
 	  avatarstate: "Avatar State by el craken",
 	  blowtorch: "Blowtorch by ProfPetruescu",
-	  checkeredtraining: "Checkered Training Board by Aba"
+	  checkeredtraining: "Checkered Training Board by Aba",
+	  forest: "Forest Board, dedicated to tree"
   };
   
   var paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
