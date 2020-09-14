@@ -38,9 +38,9 @@ var QueryString = function () {
   var tileDesignTypeKey = "tileDesignTypeKey";
   var tileDesignTypeValues = {
 	  // hlowe: "Modern Tiles v1",
+	  tggproject: "TGG Pai Sho Project",
 	  hlowenew: "Modern Tiles",
 	  vescucci: "Vescucci Tiles",
-	  tggproject: "TGG Pai Sho Project",
 	  standard: "Pai Sho Project Tiles",
 	  pixelsho: "Pixel Sho v1 Tiles",
 	  pixelsho2: "Pixel Sho v2 Tiles",
@@ -54,7 +54,8 @@ var QueryString = function () {
 	  earth: "Earth-Themed Vescucci Tiles",
 	  chujired: "Chu Ji Red",
 	  chujiblue: "Chu Ji Blue",
-	  chujimono: "Chu Ji Monochrome"
+	  chujimono: "Chu Ji Monochrome",
+	  azulejos: "Azulejos by Cannoli"
   };
   
   var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
@@ -78,6 +79,7 @@ var QueryString = function () {
 	  whitethread: "White Thread by tree",
 	  avatarstate: "Avatar State by el craken",
 	  blowtorch: "Blowtorch by ProfPetruescu",
+	  azul: "Azul by Cannoli",
 	  checkeredtraining: "Checkered Training Board by Aba",
 	  forest: "Forest Board, dedicated to tree"
   };
@@ -253,13 +255,9 @@ var QueryString = function () {
   
 	  /* Tile Design Preferences */
 	  if (!localStorage.getItem(tileDesignTypeKey)) {
-		  setSkudTilesOption("hlowenew");
+		  setSkudTilesOption("tggproject");
 	  } else {
-		  if (localStorage.getItem(tileDesignTypeKey) === tileDesignTypeValues.hlowe) {
-			  setSkudTilesOption("hlowenew");
-		  } else {
-			  setSkudTilesOption(localStorage.getItem(tileDesignTypeKey));
-		  }
+		setSkudTilesOption(localStorage.getItem(tileDesignTypeKey));
 	  }
   
 	  if (localStorage.getItem(paiShoBoardDesignTypeKey)) {
