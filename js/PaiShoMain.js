@@ -55,7 +55,8 @@ var QueryString = function () {
 	  chujired: "Chu Ji Red",
 	  chujiblue: "Chu Ji Blue",
 	  chujimono: "Chu Ji Monochrome",
-	  azulejos: "Azulejos by Cannoli"
+	  azulejos: "Azulejos by Cannoli",
+	  minimalist: "TGG Minimalist"
   };
   
   var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
