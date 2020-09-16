@@ -18,8 +18,11 @@ function OvergrowthGameManager(actuator, ignoreActuate, isCopy, existingDrawnTil
 
 OvergrowthGameManager.prototype.drawRandomTile = function() {
 	if (this.mustFetchNewRandomTile()) {
-		this.lastDrawnTile = this.drawnTile;
-		this.drawnTile = this.drawRandomTileFromTileManager(getCurrentPlayer());
+		var newDrawnTile = this.drawRandomTileFromTileManager(getCurrentPlayer());
+		if (newDrawnTile) {
+			this.lastDrawnTile = this.drawnTile;
+			this.drawnTile = newDrawnTile;
+		}
 	}
 };
 
@@ -59,7 +62,6 @@ OvergrowthGameManager.prototype.actuate = function() {
 			var tile = this.tileManager.peekTile(this.drawnTile.ownerName, this.drawnTile.code, this.drawnTile.id);
 			if (!tile) {
 				this.drawnTile = null;
-				this.lastDrawnTile = null; // Save for Undo
 
 				this.drawRandomTile();
 			}

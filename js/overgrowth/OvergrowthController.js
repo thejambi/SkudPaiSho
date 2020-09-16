@@ -62,7 +62,7 @@ OvergrowthController.prototype.resetMove = function() {
 		this.theGame.tileManager.putTileBack(this.theGame.drawnTile);
 	}
 
-	this.theGame.drawnTile = this.lastDrawnTile;
+	this.theGame.drawnTile = this.theGame.lastDrawnTile;
 	this.theGame.drawnTile.selectedFromPile = false;
 };
 
@@ -247,6 +247,10 @@ OvergrowthController.prototype.setGameNotation = function(newGameNotation) {
 	this.resetGameManager();
 	this.gameNotation.setNotationText(newGameNotation);
 	this.theGame.drawRandomTile();
+	this.theGame.actuate();
+};
+
+OvergrowthController.prototype.replayEnded = function() {
 	this.theGame.actuate();
 };
 
