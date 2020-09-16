@@ -797,6 +797,9 @@ var QueryString = function () {
 		  currentMoveIndex++;
 		  if (currentMoveIndex >= gameController.gameNotation.moves.length) {
 			  isInReplay = false;
+			  if (gameController.replayEnded) {
+				  gameController.replayEnded();
+			  }
 		  }
 		  if (withActuate) {
 			  refreshMessage();	// Adding this so it updates during replay... Is this the right spot?
