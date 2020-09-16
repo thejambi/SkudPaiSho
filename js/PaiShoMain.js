@@ -861,109 +861,109 @@ var QueryString = function () {
 	  }
   }
   
-  function pauseRun() {
-	  clearInterval(interval);
-	  interval = 0;
-	  document.querySelector(".playPauseButton").innerHTML = "<i class='fa fa-play' aria-hidden='true'></i>";
-  }
+function pauseRun() {
+	clearInterval(interval);
+	interval = 0;
+	document.querySelector(".playPauseButton").innerHTML = "<i class='fa fa-play' aria-hidden='true'></i>";
+}
+
+function getAdditionalMessage() {
+	var msg = "";
+
+	// Is it the player's turn?
+	// TODO Could maybe get rid of this
+	if (myTurn() && !userIsLoggedIn()) {
+		msg = " (You) " + msg;
+	}
+
+	msg += gameController.getAdditionalMessage();
+
+	if (gameController.theGame.getWinner()) {
+		// There is a winner!
+		msg += " <strong>" + gameController.theGame.getWinner() + gameController.theGame.getWinReason() + "</strong>";
+	} else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
+		msg += "Game has ended in a draw.";
+	}
+
+	if (msg === "<br />") {
+		msg = "";
+	}
+
+	return msg;
+}
+
+function getGameMessageElement() {
+	var gameMessage = document.querySelector(".gameMessage");
+	var gameMessage2 = document.querySelector(".gameMessage2");
+
+	if (gameController.showGameMessageUnderneath) {
+		gameMessage.innerHTML = "";
+		return gameMessage2;
+	} else {
+		if (gameMessage2) {
+			gameMessage2.innerHTML = "";
+		}
+		return gameMessage;
+	}
+}
   
-  function getAdditionalMessage() {
-	  var msg = "";
+function refreshMessage() {
+	var message = "";
+	if (!playingOnlineGame()) {
+		message += "Current Player: " + getCurrentPlayer() + "<br />";
+	}
+	message += getAdditionalMessage();
+
+	getGameMessageElement().innerHTML = message;
+
+	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn()) ||
+		gameController.isSolitaire()) {
+		showResetMoveMessage();
+	}
+}
   
-	  // Is it the player's turn?
-	  // TODO Could maybe get rid of this
-	  if (myTurn() && !userIsLoggedIn()) {
-		  msg = " (You) " + msg;
-	  }
-  
-	  msg += gameController.getAdditionalMessage();
-  
-	  if (gameController.theGame.getWinner()) {
-		  // There is a winner!
-		  msg += " <strong>" + gameController.theGame.getWinner() + gameController.theGame.getWinReason() + "</strong>";
-	  } else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
-		  msg += "Game has ended in a draw.";
-	  }
-  
-	  if (msg === "<br />") {
-		  msg = "";
-	  }
-  
-	  return msg;
-  }
-  
-  function getGameMessageElement() {
-	  var gameMessage = document.querySelector(".gameMessage");
-	  var gameMessage2 = document.querySelector(".gameMessage2");
-  
-	  if (gameController.showGameMessageUnderneath) {
-		  gameMessage.innerHTML = "";
-		  return gameMessage2;
-	  } else {
-		  if (gameMessage2) {
-			  gameMessage2.innerHTML = "";
-		  }
-		  return gameMessage;
-	  }
-  }
-  
-  function refreshMessage() {
-	  var message = "";
-	  if (!playingOnlineGame()) {
-		  message += "Current Player: " + getCurrentPlayer() + "<br />";
-	  }
-	  message += getAdditionalMessage();
-  
-	  getGameMessageElement().innerHTML = message;
-  
-	  if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn())
-			  || gameController.isSolitaire()) {
-		  showResetMoveMessage();
-	  }
-  }
-  
-  function rerunAll(soundOkToPlay, moveAnimationBeginStep) {
-	  gameController.resetGameManager();
-	  gameController.resetNotationBuilder();
-  
-	  currentMoveIndex = 0;
-  
-	  playAllMoves(moveAnimationBeginStep);
-  
-	  if (soundOkToPlay && soundManager.rerunAllSoundsAreEnabled()) {
+function rerunAll(soundOkToPlay, moveAnimationBeginStep) {
+	gameController.resetGameManager();
+	gameController.resetNotationBuilder();
+
+	currentMoveIndex = 0;
+
+	playAllMoves(moveAnimationBeginStep);
+
+	if (soundOkToPlay && soundManager.rerunAllSoundsAreEnabled()) {
 		soundManager.playSound(SoundManager.sounds.tileLand);
-	  }
-	  refreshMessage();
-  }
+	}
+	refreshMessage();
+}
   
-  var finalizeMove = function(moveAnimationBeginStep, ignoreNoEmail) {
-	  rerunAll(true, moveAnimationBeginStep);
-  
-	  // Only build url if not onlinePlay
-	  if (!playingOnlineGame()) {
-		  var linkUrl = "";
-		  if (hostEmail) {
-			  linkUrl += "host=" + hostEmail + "&";
-		  }
-		  if (guestEmail) {
-			  linkUrl += "guest=" + guestEmail + "&";
-		  }
-		  linkUrl += "game=" + gameController.gameNotation.notationTextForUrl();
-  
-		  if (ggOptions.length > 0) {
-			  linkUrl += "&gameOptions=" + JSON.stringify(ggOptions);
-		  }
-  
-		  // Compress, then build full URL
-		  linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
-  
-		  linkUrl = url + "?" + linkUrl;
-  
-		  linkShortenCallback(linkUrl, ignoreNoEmail);
-	  } else {
-		  linkShortenCallback('', ignoreNoEmail);
-	  }
-  }
+var finalizeMove = function (moveAnimationBeginStep, ignoreNoEmail) {
+  	rerunAll(true, moveAnimationBeginStep);
+
+  	// Only build url if not onlinePlay
+  	if (!playingOnlineGame()) {
+  		var linkUrl = "";
+  		if (hostEmail) {
+  			linkUrl += "host=" + hostEmail + "&";
+  		}
+  		if (guestEmail) {
+  			linkUrl += "guest=" + guestEmail + "&";
+  		}
+  		linkUrl += "game=" + gameController.gameNotation.notationTextForUrl();
+
+  		if (ggOptions.length > 0) {
+  			linkUrl += "&gameOptions=" + JSON.stringify(ggOptions);
+  		}
+
+  		// Compress, then build full URL
+  		linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
+
+  		linkUrl = url + "?" + linkUrl;
+
+  		linkShortenCallback(linkUrl, ignoreNoEmail);
+  	} else {
+  		linkShortenCallback('', ignoreNoEmail);
+  	}
+}
   
   function showSubmitMoveForm(url) {
 	  // Move has completed, so need to send to "current player"
@@ -989,468 +989,474 @@ var QueryString = function () {
 	  return onlinePlayEnabled && gameId > 0;
   }
   
-  function linkShortenCallback(shortUrl, ignoreNoEmail) {
-	  debug(shortUrl);
-  
-	  var aiList = gameController.getAiList();
-  
-	  var messageText = "";
-  
-	  if (currentMoveIndex == 1 && !haveBothEmails()) {
-		  if (!playingOnlineGame() && (currentGameData.gameTypeId === 1 || !currentGameData.gameTypeId)) {
-			  if (!ignoreNoEmail && !userIsLoggedIn()) {
-				  messageText = getNoUserEmailMessage() + "<br />";
-			  }
-		  }
-  
-		  if (aiList.length > 0) {
-			  for (var i = 0; i < aiList.length; i++) {
-				  messageText += "<span class='skipBonus' onclick='setAiIndex(" + i + ");'>Play " + aiList[i].getName() + "</span>";
-			  }
-			  if (aiList.length > 1) {
-				  messageText += "<span class='skipBonus' onclick='goai();'>AI vs AI</span>";
-			  }
-			  messageText += "<br />";
-		  }
-	  } else if (haveBothEmails()) {
-		  if (!metadata.tournamentName && !playingOnlineGame()) {
-			  messageText += "Or, copy and share this <a href=\"" + shortUrl + "\">link</a> with your opponent.";
-		  }
-		  if (!playingOnlineGame()) {
-			  showSubmitMoveForm(shortUrl);
-		  }
-	  } else if ((activeAi && getCurrentPlayer() === activeAi.player) || (activeAi2 && getCurrentPlayer() === activeAi2.player)) {
-		  //messageText += "<span class='skipBonus' onclick='playAiTurn();'>Submit move to AI</span>";
-		  messageText += "<em>THINKING...</em>";
-	  } else if (activeAi && activeAi.getMessage) {
-		  messageText += activeAi.getMessage();
-	  }
-  
-	  if (gameController.theGame.getWinner()) {
-		  // There is a winner!
-		  messageText += "<br /><strong>" + gameController.theGame.getWinner() + gameController.theGame.getWinReason() + "</strong>";
-		  // Save winner
-		  if (playingOnlineGame()) {
-			  var winnerUsername;
-			  if (gameController.theGame.getWinner() === HOST) {
-				  winnerUsername = currentGameData.hostUsername;
-			  } else if (gameController.theGame.getWinner() === GUEST) {
-				  winnerUsername = currentGameData.guestUsername;
-			  }
-  
-			  if (!winnerUsername) {
-				  // A tie.. special case
-				  onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
-			  } else {
-				  onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
-			  }
-		  }
-  
-		  if (gameController.isSolitaire) {
-			  messageText += getResetMoveText();
-		  }
-	  } else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
-		  if (playingOnlineGame()) {
-			  onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
-		  }
-		  messageText += "Game has ended in a draw.";
-  
-		  if (gameController.isSolitaire) {
-			  messageText += getResetMoveText();
-		  }
-	  } else {
-		  if (!playingOnlineGame()) {
-			  messageText += "Current Player: " + getCurrentPlayer() + "<br />";
-		  }
-		  messageText += gameController.getAdditionalMessage() + getResetMoveText();
-	  }
-  
-	  getGameMessageElement().innerHTML = messageText;
-  
-	  // QUICK!
-	  if ((activeAi && getCurrentPlayer() === activeAi.player) || (activeAi2 && getCurrentPlayer() === activeAi2.player)) {
-		  // setTimeout(function() { playAiTurn(); }, 100);	// Didn't work?
-		  playAiTurn();
-	  }
-  }
-  
-  function haveBothEmails() {
-	  return hostEmail && guestEmail && haveUserEmail();
-  }
-  
-  function getUserEmail() {
-	  return localStorage.getItem(userEmailKey);
-  }
-  
-  function getCurrentPlayerEmail() {
-	  var address;
-	  if (getCurrentPlayer() === HOST) {
-		  address = hostEmail;
-	  } else if (getCurrentPlayer() === GUEST) {
-		  address = guestEmail;
-	  }
-	  return address;
-  }
-  
-  function getOpponentPlayerEmail() {
-	  var address;
-	  if (getCurrentPlayer() === HOST) {
-		  address = guestEmail;
-	  } else if (getCurrentPlayer() === GUEST) {
-		  address = hostEmail;
-	  }
-	  return address;
-  }
-  
-  function getEmailBody(url) {
-	  var bodyMessage = "I just made move #" + gameController.gameNotation.getLastMoveNumber() + " in a game of Pai Sho! Click here to open our game: " + url;
-  
-	  bodyMessage += "[BR][BR]---- Full Details: ----[BR]Move: " + gameController.gameNotation.getLastMoveText()
-		  + "[BR][BR]Game Notation: [BR]" + gameController.gameNotation.getNotationForEmail();
-  
-	  return bodyMessage;
-  }
-  
-  function getCurrentPlayer() {
-	  return gameController.getCurrentPlayer();
-  }
-  
-  function getCurrentPlayerForReal() {
-	  return gameController.getCurrentPlayer();
-  }
-  
-  function getResetMoveText() {
-	  return "<br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
-  }
-  
-  function showResetMoveMessage() {
-	  getGameMessageElement().innerHTML += getResetMoveText();
-  }
-  
-  function resetMove() {
-	  gameController.resetMove();
-  
-	  rerunAll();
-	  // $('#contactform').addClass('gone');
-  }
-  
-  function myTurn() {
-	  var userEmail = localStorage.getItem(localEmailKey);
-	  if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
-		  if (getCurrentPlayer() === HOST) {
-			  return !hostEmail
-				  || (localStorage.getItem(localEmailKey) === hostEmail
-					  || (currentGameData.hostUsername && usernameEquals(currentGameData.hostUsername)));
-		  } else {
-			  return !guestEmail
-				  || (localStorage.getItem(localEmailKey) === guestEmail
-					  || (currentGameData.guestUsername && usernameEquals(currentGameData.guestUsername)));
-		  }
-	  } else {
-		  return true;
-	  }
-  }
-  
-  function myTurnForReal() {
-	  var userEmail = localStorage.getItem(localEmailKey);
-	  if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
-		  if (getCurrentPlayerForReal() === HOST) {
-			  return localStorage.getItem(localEmailKey) === hostEmail;
-		  } else {
-			  return localStorage.getItem(localEmailKey) === guestEmail;
-		  }
-	  } else {
-		  return true;
-	  }
-  }
-  
-  var createGameCallback = function createGameCallback(newGameId) {
-	  finalizeMove();
-	  lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
-  
-	  // If a solitaire game, automatically join game.
-	  if (gameController.isSolitaire()) {
-		  completeJoinGameSeek({gameId:newGameId});
-	  }
-  
-	  showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game if you'd like.<br /><br />If anyone joins this game, it will show up in your list of games when you click My Games.");
-  };
-  
-  var createPrivateGameCallback = function createPrivateGameCallback(newGameId) {
-	  finalizeMove();
-	  lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
-  
-	  // If a solitaire game, automatically join game.
-	  if (gameController.isSolitaire()) {
-		  completeJoinGameSeek({gameId:newGameId});
-	  }
-  
-	  var inviteLinkUrl = createInviteLinkUrl(newGameId);
-  
-	  showModal("Game Created!", "You just created a private game. Send <a href='" + inviteLinkUrl + "' target='_blank'>this invite link</a> to a friend so they can join. <br /><br />When a player joins this game, it will show up in your list of games when you click My Games.", true);
-  };
-  
-  function createInviteLinkUrl(newGameId) {
-	  linkUrl = LZString.compressToEncodedURIComponent("joinPrivateGame=" + newGameId + "&hostUserName=" + getUsername());
-	  linkUrl = sandboxUrl + "?" + linkUrl;
-	  return linkUrl;
-  }
-  
-  function askToJoinPrivateGame(privateGameId, hostUserName) {
-	  var message = "Do you want to join this game hosted by " + hostUserName + "?";
-	  message += "<br /><br />";
-	  message += "<div class='clickableText' onclick='closeModal(); yesJoinPrivateGame(" + privateGameId + ");'>Yes - join game</div>";
-	  message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
-  
-	  showModal("Join Private Game?", message, true);
-  }
-  
-  function yesJoinPrivateGame(privateGameId) {
-	  completeJoinGameSeek({gameId:privateGameId});
-  }
-  
-  var submitMoveData = {};
-  var submitMoveCallback = function submitMoveCallback() {
-	  debug("Inside submitMoveCallback");
-	  lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
-	  finalizeMove(submitMoveData.moveAnimationBeginStep);
-  
-	  startWatchingNumberOfGamesWhereUserTurn();
-  
-	  // Removing: Building this into the submit move
-	  // onlinePlayEngine.notifyUser(getLoginToken(), currentGameOpponentUsername, emptyCallback);
-  };
-  
-  function clearMessage() {
-	  var helpTabContentDiv = document.getElementById("helpTextContent");
-  
-	  // if (!defaultHelpMessageText) {	// Load help message every time
-		  defaultHelpMessageText = gameController.getDefaultHelpMessageText();
-	  // }
-	  helpTabContentDiv.innerHTML = defaultHelpMessageText;
-  
-	  var message = getTournamentText()
-		  + helpTabContentDiv.innerHTML;
-  
-	  helpTabContentDiv.innerHTML = message;
-  
-	  if (gameController.getAdditionalHelpTabDiv) {
-		  var additionalDiv = gameController.getAdditionalHelpTabDiv();
-		  helpTabContentDiv.appendChild(additionalDiv);
-	  }
-  
-	  if (gameController.isPaiShoGame) {
-		  helpTabContentDiv.appendChild(buildPaiShoSettingsDiv());
-	  }
-  }
-  
-  function haveUserEmail() {
-	  var userEmail = localStorage.getItem(localEmailKey);
-	  return userEmail && userEmail.includes("@") && userEmail.includes(".");
-  }
-  
-  function unplayedTileClicked(tileDiv) {
-	  gameController.unplayedTileClicked(tileDiv);
-  }
-  
-  function pointClicked(htmlPoint) {
-	  gameController.pointClicked(htmlPoint);
-  }
-  
-  function displayReturnedMessage(messageReturned) {
-	  var heading = messageReturned.heading;
-	  var message = messageReturned.message;
-	  if (heading) {
-		  if (message.length > 1) {
-			  setMessage(toHeading(heading) + toBullets(message));
-		  } else {
-			  setMessage(toHeading(heading) + toMessage(message));
-		  }
-	  } else {
-		  if (message.length > 1) {
-			  setMessage(toBullets(message));
-		  } else {
-			  setMessage(toMessage(message));
-		  }
-	  }
-  }
-  
-  function showTileMessage(tileDiv) {
-	  var messageReturned = gameController.getTileMessage(tileDiv);
-	  displayReturnedMessage(messageReturned);
-  }
-  
-  function showPointMessage(htmlPoint) {
-	  var messageReturned = gameController.getPointMessage(htmlPoint);
-	  if (messageReturned) {
-		  displayReturnedMessage(messageReturned);
-	  }
-  }
-  
-  function setMessage(msg) {
-	  if (msg === document.getElementById("helpTextContent").innerHTML) {
-		  clearMessage();
-	  } else {
-		  document.getElementById("helpTextContent").innerHTML = getTournamentText() + msg;
-	  }
-  }
-  
-  function getAltTilesOptionText() {
-	  return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.<br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "</p>";
-  }
-  
-  function getAltVagabondTilesOptionText() {
-	  return "<p><span class='skipBonus' onclick='toggleVagabondTileDesigns();'>Click here</span> to switch between standard and modern tile designs for Vagabond Pai Sho.</p>";
-  }
-  
-  function getTournamentText() {
-	  if (metadata.tournamentMatchNotes) {
-		  return metadata.tournamentName + "<br />" + metadata.tournamentMatchNotes + "<br />";
-	  }
-	  return "";
-  }
-  
-  function toHeading(str) {
-	  return "<h4>" + str + "</h4>";
-  }
-  
-  function toMessage(paragraphs) {
-	  var message = "";
-  
-	  if (paragraphs.length === 1) {
-		  return paragraphs[0];
-	  } else if (paragraphs.length > 1) {
-		  paragraphs.forEach(function(str) {
-			  message += "<p>" + str + "</p>";
-		  });
-	  }
-  
-	  return message;
-  }
-  
-  function toBullets(paragraphs) {
-	  var message = "<ul>";
-  
-	  paragraphs.forEach(function(str) {
-		  message += "<li>" + str + "</li>";
-	  });
-  
-	  message += "</ul>";
-  
-	  return message;
-  }
-  
-  function getNeutralPointMessage() {
-	  var msg = "<h4>Neutral Point</h4>";
-	  msg += "<ul>";
-	  msg += "<li>This point is Neutral, so any tile can land here.</li>";
-	  msg += "<li>If a tile that is on a point touches a Neutral area of the board, that point is considered Neutral.</li>";
-	  msg += "</ul>";
-	  return msg;
-  }
-  
-  function getRedPointMessage() {
-	  var msg = "<h4>Red Point</h4>";
-	  msg += "<p>This point is Red, so Basic White Flower Tiles are not allowed to land here.</p>";
-	  return msg;
-  }
-  
-  function getWhitePointMessage() {
-	  var msg = "<h4>White Point</h4>";
-	  msg += "<p>This point is White, so Basic Red Flower Tiles are not allowed to land here.</p>";
-	  return msg;
-  }
-  
-  function getRedWhitePointMessage() {
-	  var msg = "<h4>Red/White Point</h4>";
-	  msg += "<p>This point is both Red and White, so any tile is allowed to land here.</p>";
-	  return msg;
-  }
-  
-  function getGatePointMessage() {
-	  var msg = "<h4>Gate</h4>";
-	  msg += '<p>This point is a Gate. When Flower Tiles are played, they are <em>Planted</em> in an open Gate.</p>';
-	  msg += '<p>Tiles in a Gate are considered <em>Growing</em>, and when they have moved out of the Gate, they are considered <em>Blooming</em>.</p>';
-	  return msg;
-  }
-  
-  function sandboxitize() {
-	  var notation = gameController.getNewGameNotation();
-	  for (var i = 0; i < currentMoveIndex; i++) {
-		  notation.addMove(gameController.gameNotation.moves[i]);
-	  }
-  
-	  setGameController(currentGameData.gameTypeId, true);
-  
-	  if (userIsLoggedIn()) {
-		  currentGameData.hostUsername = getUsername();
-		  currentGameData.guestUsername = getUsername();
-	  }
-  
-	  gameController.setGameNotation(notation.notationTextForUrl());
-	  rerunAll();
-	  showReplayControls();
-  }
-  
-  function getLink(forSandbox) {
-	  var notation = gameController.getNewGameNotation();
-  
-	  for (var i = 0; i < currentMoveIndex; i++) {
-		  notation.addMove(gameController.gameNotation.moves[i]);
-	  }
-  
-	  var linkUrl = "";
-  
-	  if (currentGameData && currentGameData.gameTypeId) {
-		  linkUrl += "gameType=" + currentGameData.gameTypeId + "&";
-	  }
-  
-	  if (forSandbox && getUserEmail()) {
-		  linkUrl += "host=" + getUserEmail() + "&";
-		  linkUrl += "guest=" + getUserEmail() + "&";
-	  }
-  
-	  linkUrl += "game=" + notation.notationTextForUrl();
-  
-	  linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
-  
-	  linkUrl = sandboxUrl + "?" + linkUrl;
-  
-	  console.log(linkUrl);
-	  return linkUrl;
-  }
-  
-  function setAiIndex(i) {
-	  // Leave online game if needed
-	  if (playingOnlineGame()) {
-		  forgetCurrentGameInfo();
-	  }
-  
-	  var aiList = gameController.getAiList();
-  
-	  if (activeAi) {
-		  activeAi2 = aiList[i];
-		  activeAi2.setPlayer(getCurrentPlayer());
-	  } else {
-		  activeAi = aiList[i];
-		  activeAi.setPlayer(getCurrentPlayer());
-	  }
-	  gameController.startAiGame(finalizeMove);
-  }
-  
-  function clearAiPlayers() {
-	  activeAi = null;
-	  activeAi2 = null;
-  }
-  
-  function playAiTurn() {
-	  if (playingOnlineGame()) {
-		  clearAiPlayers();
-	  } else {
-		  gameController.playAiTurn(finalizeMove);
-	  }
-  }
-  
+function linkShortenCallback(shortUrl, ignoreNoEmail) {
+	debug(shortUrl);
+
+	var aiList = gameController.getAiList();
+
+	var messageText = "";
+
+	if (currentMoveIndex == 1 && !haveBothEmails()) {
+		if (!playingOnlineGame() && (currentGameData.gameTypeId === 1 || !currentGameData.gameTypeId)) {
+			if (!ignoreNoEmail && !userIsLoggedIn()) {
+				messageText = getNoUserEmailMessage() + "<br />";
+			}
+		}
+
+		if (aiList.length > 0) {
+			for (var i = 0; i < aiList.length; i++) {
+				messageText += "<span class='skipBonus' onclick='setAiIndex(" + i + ");'>Play " + aiList[i].getName() + "</span>";
+			}
+			if (aiList.length > 1) {
+				messageText += "<span class='skipBonus' onclick='goai();'>AI vs AI</span>";
+			}
+			messageText += "<br />";
+		}
+	} else if (haveBothEmails()) {
+		if (!metadata.tournamentName && !playingOnlineGame()) {
+			messageText += "Or, copy and share this <a href=\"" + shortUrl + "\">link</a> with your opponent.";
+		}
+		if (!playingOnlineGame()) {
+			showSubmitMoveForm(shortUrl);
+		}
+	} else if ((activeAi && getCurrentPlayer() === activeAi.player) || (activeAi2 && getCurrentPlayer() === activeAi2.player)) {
+		//messageText += "<span class='skipBonus' onclick='playAiTurn();'>Submit move to AI</span>";
+		messageText += "<em>THINKING...</em>";
+	} else if (activeAi && activeAi.getMessage) {
+		messageText += activeAi.getMessage();
+	}
+
+	if (gameController.theGame.getWinner()) {
+		// There is a winner!
+		messageText += "<br /><strong>" + gameController.theGame.getWinner() + gameController.theGame.getWinReason() + "</strong>";
+		// Save winner
+		if (playingOnlineGame()) {
+			var winnerUsername;
+			if (gameController.theGame.getWinner() === HOST) {
+				winnerUsername = currentGameData.hostUsername;
+			} else if (gameController.theGame.getWinner() === GUEST) {
+				winnerUsername = currentGameData.guestUsername;
+			}
+
+			if (!winnerUsername) {
+				// A tie.. special case
+				onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
+			} else {
+				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
+			}
+		}
+
+		if (gameController.isSolitaire) {
+			messageText += getResetMoveText();
+		}
+	} else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
+		if (playingOnlineGame()) {
+			onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
+		}
+		messageText += "Game has ended in a draw.";
+
+		if (gameController.isSolitaire) {
+			messageText += getResetMoveText();
+		}
+	} else {
+		if (!playingOnlineGame()) {
+			messageText += "Current Player: " + getCurrentPlayer() + "<br />";
+		}
+		messageText += gameController.getAdditionalMessage() + getResetMoveText();
+	}
+
+	getGameMessageElement().innerHTML = messageText;
+
+	// QUICK!
+	if ((activeAi && getCurrentPlayer() === activeAi.player) || (activeAi2 && getCurrentPlayer() === activeAi2.player)) {
+		// setTimeout(function() { playAiTurn(); }, 100);	// Didn't work?
+		playAiTurn();
+	}
+}
+  
+function haveBothEmails() {
+	return hostEmail && guestEmail && haveUserEmail();
+}
+  
+function getUserEmail() {
+	return localStorage.getItem(userEmailKey);
+}
+  
+function getCurrentPlayerEmail() {
+	var address;
+	if (getCurrentPlayer() === HOST) {
+		address = hostEmail;
+	} else if (getCurrentPlayer() === GUEST) {
+		address = guestEmail;
+	}
+	return address;
+}
+  
+function getOpponentPlayerEmail() {
+	var address;
+	if (getCurrentPlayer() === HOST) {
+		address = guestEmail;
+	} else if (getCurrentPlayer() === GUEST) {
+		address = hostEmail;
+	}
+	return address;
+}
+
+function getEmailBody(url) {
+	var bodyMessage = "I just made move #" + gameController.gameNotation.getLastMoveNumber() + " in a game of Pai Sho! Click here to open our game: " + url;
+
+	bodyMessage += "[BR][BR]---- Full Details: ----[BR]Move: " + gameController.gameNotation.getLastMoveText() +
+		"[BR][BR]Game Notation: [BR]" + gameController.gameNotation.getNotationForEmail();
+
+	return bodyMessage;
+}
+
+function getCurrentPlayer() {
+	return gameController.getCurrentPlayer();
+}
+
+function getCurrentPlayerForReal() {
+	return gameController.getCurrentPlayer();
+}
+
+function getResetMoveText() {
+	return "<br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
+}
+  
+function showResetMoveMessage() {
+	getGameMessageElement().innerHTML += getResetMoveText();
+}
+
+function resetMove() {
+	gameController.resetMove();
+
+	rerunAll();
+	// $('#contactform').addClass('gone');
+}
+  
+function myTurn() {
+	var userEmail = localStorage.getItem(localEmailKey);
+	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
+		if (getCurrentPlayer() === HOST) {
+			return !hostEmail ||
+				(localStorage.getItem(localEmailKey) === hostEmail ||
+					(currentGameData.hostUsername && usernameEquals(currentGameData.hostUsername)));
+		} else {
+			return !guestEmail ||
+				(localStorage.getItem(localEmailKey) === guestEmail ||
+					(currentGameData.guestUsername && usernameEquals(currentGameData.guestUsername)));
+		}
+	} else {
+		return true;
+	}
+}
+  
+function myTurnForReal() {
+	var userEmail = localStorage.getItem(localEmailKey);
+	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
+		if (getCurrentPlayerForReal() === HOST) {
+			return localStorage.getItem(localEmailKey) === hostEmail;
+		} else {
+			return localStorage.getItem(localEmailKey) === guestEmail;
+		}
+	} else {
+		return true;
+	}
+}
+  
+var createGameCallback = function createGameCallback(newGameId) {
+	finalizeMove();
+	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
+
+	// If a solitaire game, automatically join game.
+	if (gameController.isSolitaire()) {
+		completeJoinGameSeek({
+			gameId: newGameId
+		});
+	}
+
+	showModal("Game Created!", "You just created a game. Anyone can join it by clicking on Join Game. You can even join your own game if you'd like.<br /><br />If anyone joins this game, it will show up in your list of games when you click My Games.");
+};
+  
+var createPrivateGameCallback = function createPrivateGameCallback(newGameId) {
+	finalizeMove();
+	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
+
+	// If a solitaire game, automatically join game.
+	if (gameController.isSolitaire()) {
+		completeJoinGameSeek({
+			gameId: newGameId
+		});
+	}
+
+	var inviteLinkUrl = createInviteLinkUrl(newGameId);
+
+	showModal("Game Created!", "You just created a private game. Send <a href='" + inviteLinkUrl + "' target='_blank'>this invite link</a> to a friend so they can join. <br /><br />When a player joins this game, it will show up in your list of games when you click My Games.", true);
+};
+
+function createInviteLinkUrl(newGameId) {
+	linkUrl = LZString.compressToEncodedURIComponent("joinPrivateGame=" + newGameId + "&hostUserName=" + getUsername());
+	linkUrl = sandboxUrl + "?" + linkUrl;
+	return linkUrl;
+}
+
+function askToJoinPrivateGame(privateGameId, hostUserName) {
+	var message = "Do you want to join this game hosted by " + hostUserName + "?";
+	message += "<br /><br />";
+	message += "<div class='clickableText' onclick='closeModal(); yesJoinPrivateGame(" + privateGameId + ");'>Yes - join game</div>";
+	message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+
+	showModal("Join Private Game?", message, true);
+}
+
+function yesJoinPrivateGame(privateGameId) {
+	completeJoinGameSeek({
+		gameId: privateGameId
+	});
+}
+
+var submitMoveData = {};
+var submitMoveCallback = function submitMoveCallback() {
+	debug("Inside submitMoveCallback");
+	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
+	finalizeMove(submitMoveData.moveAnimationBeginStep);
+
+	startWatchingNumberOfGamesWhereUserTurn();
+
+	// Removing: Building this into the submit move
+	// onlinePlayEngine.notifyUser(getLoginToken(), currentGameOpponentUsername, emptyCallback);
+};
+
+function clearMessage() {
+	var helpTabContentDiv = document.getElementById("helpTextContent");
+
+	// if (!defaultHelpMessageText) {	// Load help message every time
+	defaultHelpMessageText = gameController.getDefaultHelpMessageText();
+	// }
+	helpTabContentDiv.innerHTML = defaultHelpMessageText;
+
+	var message = getTournamentText() +
+		helpTabContentDiv.innerHTML;
+
+	helpTabContentDiv.innerHTML = message;
+
+	if (gameController.getAdditionalHelpTabDiv) {
+		var additionalDiv = gameController.getAdditionalHelpTabDiv();
+		helpTabContentDiv.appendChild(additionalDiv);
+	}
+
+	if (gameController.isPaiShoGame) {
+		helpTabContentDiv.appendChild(buildPaiShoSettingsDiv());
+	}
+}
+
+function haveUserEmail() {
+	var userEmail = localStorage.getItem(localEmailKey);
+	return userEmail && userEmail.includes("@") && userEmail.includes(".");
+}
+
+function unplayedTileClicked(tileDiv) {
+	gameController.unplayedTileClicked(tileDiv);
+}
+
+function pointClicked(htmlPoint) {
+	gameController.pointClicked(htmlPoint);
+}
+
+function displayReturnedMessage(messageReturned) {
+	var heading = messageReturned.heading;
+	var message = messageReturned.message;
+	if (heading) {
+		if (message.length > 1) {
+			setMessage(toHeading(heading) + toBullets(message));
+		} else {
+			setMessage(toHeading(heading) + toMessage(message));
+		}
+	} else {
+		if (message.length > 1) {
+			setMessage(toBullets(message));
+		} else {
+			setMessage(toMessage(message));
+		}
+	}
+}
+
+function showTileMessage(tileDiv) {
+	var messageReturned = gameController.getTileMessage(tileDiv);
+	displayReturnedMessage(messageReturned);
+}
+
+function showPointMessage(htmlPoint) {
+	var messageReturned = gameController.getPointMessage(htmlPoint);
+	if (messageReturned) {
+		displayReturnedMessage(messageReturned);
+	}
+}
+
+function setMessage(msg) {
+	if (msg === document.getElementById("helpTextContent").innerHTML) {
+		clearMessage();
+	} else {
+		document.getElementById("helpTextContent").innerHTML = getTournamentText() + msg;
+	}
+}
+
+function getAltTilesOptionText() {
+	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.<br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "</p>";
+}
+
+function getAltVagabondTilesOptionText() {
+	return "<p><span class='skipBonus' onclick='toggleVagabondTileDesigns();'>Click here</span> to switch between standard and modern tile designs for Vagabond Pai Sho.</p>";
+}
+
+function getTournamentText() {
+	if (metadata.tournamentMatchNotes) {
+		return metadata.tournamentName + "<br />" + metadata.tournamentMatchNotes + "<br />";
+	}
+	return "";
+}
+
+function toHeading(str) {
+	return "<h4>" + str + "</h4>";
+}
+
+function toMessage(paragraphs) {
+	var message = "";
+
+	if (paragraphs.length === 1) {
+		return paragraphs[0];
+	} else if (paragraphs.length > 1) {
+		paragraphs.forEach(function (str) {
+			message += "<p>" + str + "</p>";
+		});
+	}
+
+	return message;
+}
+
+function toBullets(paragraphs) {
+	var message = "<ul>";
+
+	paragraphs.forEach(function (str) {
+		message += "<li>" + str + "</li>";
+	});
+
+	message += "</ul>";
+
+	return message;
+}
+
+function getNeutralPointMessage() {
+	var msg = "<h4>Neutral Point</h4>";
+	msg += "<ul>";
+	msg += "<li>This point is Neutral, so any tile can land here.</li>";
+	msg += "<li>If a tile that is on a point touches a Neutral area of the board, that point is considered Neutral.</li>";
+	msg += "</ul>";
+	return msg;
+}
+
+function getRedPointMessage() {
+	var msg = "<h4>Red Point</h4>";
+	msg += "<p>This point is Red, so Basic White Flower Tiles are not allowed to land here.</p>";
+	return msg;
+}
+
+function getWhitePointMessage() {
+	var msg = "<h4>White Point</h4>";
+	msg += "<p>This point is White, so Basic Red Flower Tiles are not allowed to land here.</p>";
+	return msg;
+}
+
+function getRedWhitePointMessage() {
+	var msg = "<h4>Red/White Point</h4>";
+	msg += "<p>This point is both Red and White, so any tile is allowed to land here.</p>";
+	return msg;
+}
+
+function getGatePointMessage() {
+	var msg = "<h4>Gate</h4>";
+	msg += '<p>This point is a Gate. When Flower Tiles are played, they are <em>Planted</em> in an open Gate.</p>';
+	msg += '<p>Tiles in a Gate are considered <em>Growing</em>, and when they have moved out of the Gate, they are considered <em>Blooming</em>.</p>';
+	return msg;
+}
+
+function sandboxitize() {
+	var notation = gameController.getNewGameNotation();
+	for (var i = 0; i < currentMoveIndex; i++) {
+		notation.addMove(gameController.gameNotation.moves[i]);
+	}
+
+	setGameController(currentGameData.gameTypeId, true);
+
+	if (userIsLoggedIn()) {
+		currentGameData.hostUsername = getUsername();
+		currentGameData.guestUsername = getUsername();
+	}
+
+	gameController.setGameNotation(notation.notationTextForUrl());
+	rerunAll();
+	showReplayControls();
+}
+
+function getLink(forSandbox) {
+	var notation = gameController.getNewGameNotation();
+
+	for (var i = 0; i < currentMoveIndex; i++) {
+		notation.addMove(gameController.gameNotation.moves[i]);
+	}
+
+	var linkUrl = "";
+
+	if (currentGameData && currentGameData.gameTypeId) {
+		linkUrl += "gameType=" + currentGameData.gameTypeId + "&";
+	}
+
+	if (forSandbox && getUserEmail()) {
+		linkUrl += "host=" + getUserEmail() + "&";
+		linkUrl += "guest=" + getUserEmail() + "&";
+	}
+
+	linkUrl += "game=" + notation.notationTextForUrl();
+
+	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
+
+	linkUrl = sandboxUrl + "?" + linkUrl;
+
+	console.log(linkUrl);
+	return linkUrl;
+}
+
+function setAiIndex(i) {
+	// Leave online game if needed
+	if (playingOnlineGame()) {
+		forgetCurrentGameInfo();
+	}
+
+	var aiList = gameController.getAiList();
+
+	if (activeAi) {
+		activeAi2 = aiList[i];
+		activeAi2.setPlayer(getCurrentPlayer());
+	} else {
+		activeAi = aiList[i];
+		activeAi.setPlayer(getCurrentPlayer());
+	}
+	gameController.startAiGame(finalizeMove);
+}
+
+function clearAiPlayers() {
+	activeAi = null;
+	activeAi2 = null;
+}
+
+function playAiTurn() {
+	if (playingOnlineGame()) {
+		clearAiPlayers();
+	} else {
+		gameController.playAiTurn(finalizeMove);
+	}
+}
+
   function sandboxFromMove() {
 	  // var link = getLink(true);
 	  // openLink(link);
