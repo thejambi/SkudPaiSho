@@ -1621,42 +1621,42 @@ function playAiTurn() {
 	  onlinePlayEngine.createDeviceIdForUser(tempUserId, createDeviceIdCallback);
   }
   
-  // TODO actualCode should be result...
-  var verifyCodeCallback = function verifyCodeCallback(actualCode) {
-	  if (codeToVerify === actualCode) {
-		  if (tempUserId && tempUserId > 0) {
-			  createUserCallback(tempUserId);
-		  } else {
-			  onlinePlayEngine.createUser(usernameBeingVerified, emailBeingVerified, createUserCallback);
-		  }
-	  } else {
-		  closeModal();
-		  emailBeingVerified = "";
-		  usernameBeingVerified = "";
-		  tempUserId = null;
-		  codeToVerify = 0;
-		  showModal("Validation Failed", "Validation failed. Please try again.");
-	  }
-  };
+// TODO actualCode should be result...
+var verifyCodeCallback = function verifyCodeCallback(actualCode) {
+	if (codeToVerify === actualCode) {
+		if (tempUserId && tempUserId > 0) {
+			createUserCallback(tempUserId);
+		} else {
+			onlinePlayEngine.createUser(usernameBeingVerified, emailBeingVerified, createUserCallback);
+		}
+	} else {
+		closeModal();
+		emailBeingVerified = "";
+		usernameBeingVerified = "";
+		tempUserId = null;
+		codeToVerify = 0;
+		showModal("Validation Failed", "Validation failed. Please try again.");
+	}
+};
+
+function getUserId() {
+	return localStorage.getItem(userIdKey);
+}
+
+function getUsername() {
+	return localStorage.getItem(usernameKey);
+}
+
+function getDeviceId() {
+	return localStorage.getItem(deviceIdKey);
+}
   
-  function getUserId() {
-	  return localStorage.getItem(userIdKey);
-  }
-  
-  function getUsername() {
-	  return localStorage.getItem(usernameKey);
-  }
-  
-  function getDeviceId() {
-	  return localStorage.getItem(deviceIdKey);
-  }
-  
-  function userIsLoggedIn() {
-	  return getUserId()
-		  && getUsername()
-		  && getUserEmail()
-		  && getDeviceId();
-  }
+function userIsLoggedIn() {
+	return getUserId() &&
+		getUsername() &&
+		getUserEmail() &&
+		getDeviceId();
+}
   
   function forgetCurrentGameInfo() {
 	  clearAiPlayers();
