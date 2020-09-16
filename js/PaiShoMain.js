@@ -1743,6 +1743,7 @@ function userIsLoggedIn() {
 		  desc: "Cooperative Solitaire",
 		  rulesUrl: "https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/",
 		  gameOptions: [
+			LESS_TILES,
 			  OPTION_DOUBLE_TILES,
 			  OPTION_INSANE_TILES
 		  ]

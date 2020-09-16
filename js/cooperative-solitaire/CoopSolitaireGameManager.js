@@ -1,15 +1,47 @@
 // Solitaire Game Manager
 
-function CoopSolitaireGameManager(actuator, ignoreActuate, isCopy) {
+function CoopSolitaireGameManager(actuator, ignoreActuate, isCopy, existingDrawnTile, existingLastDrawnTile) {
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;
 
 	this.tileManager = new CoopSolitaireTileManager();
 
+	this.drawnTile = existingDrawnTile;
+	this.lastDrawnTile = existingLastDrawnTile; // Save for Undo
+	this.drawnTilePlayer = null;
+
+	this.drawRandomTile();
+
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
 }
+
+CoopSolitaireGameManager.prototype.drawRandomTile = function() {
+	if (this.mustFetchNewRandomTile()) {
+		var newDrawnTile = this.drawRandomTileFromTileManager(getCurrentPlayer());
+		if (newDrawnTile) {
+			this.lastDrawnTile = this.drawnTile;
+			this.drawnTile = newDrawnTile;
+			this.drawnTilePlayer = getCurrentPlayer();
+		}
+	}
+};
+
+CoopSolitaireGameManager.prototype.mustFetchNewRandomTile = function() {
+	return !isInReplay && gameController &&
+		(!this.currentDrawnTileIsPresentInTileManager() ||
+			!this.drawnTile ||
+			this.drawnTilePlayer !== getCurrentPlayer());
+};
+
+CoopSolitaireGameManager.prototype.currentDrawnTileIsPresentInTileManager = function() {
+	if (this.drawnTile) {
+		var tile = this.tileManager.peekTile(this.drawnTile.ownerName, this.drawnTile.code, this.drawnTile.id);
+		return tile;
+	}
+	return false;
+};
 
 // Set up the game
 CoopSolitaireGameManager.prototype.setup = function (ignoreActuate) {
@@ -27,7 +59,22 @@ CoopSolitaireGameManager.prototype.actuate = function() {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this, gameController.drawnTile);
+
+	if (gameController) {
+		if (!this.drawnTile) {
+			this.drawRandomTile();
+		}
+		if (this.drawnTile) {
+			var tile = this.tileManager.peekTile(this.drawnTile.ownerName, this.drawnTile.code, this.drawnTile.id);
+			if (!tile) {
+				this.drawnTile = null;
+
+				this.drawRandomTile();
+			}
+		}
+	}
+
+	this.actuator.actuate(this.board, this, this.drawnTile);
 };
 
 CoopSolitaireGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -74,7 +121,7 @@ CoopSolitaireGameManager.prototype.runNotationMove = function(move, withActuate)
 	return bonusAllowed;
 };
 
-CoopSolitaireGameManager.prototype.drawRandomTile = function() {
+CoopSolitaireGameManager.prototype.drawRandomTileFromTileManager = function() {
 	return this.tileManager.drawRandomTile();
 };
 
