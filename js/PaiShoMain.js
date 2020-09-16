@@ -1519,107 +1519,107 @@ function playAiTurn() {
 	  tutorialInProgress = false;
   }
   
-  function callSubmitMove(moveAnimationBeginStep) {
-		submitMoveData = {
-			moveAnimationBeginStep: moveAnimationBeginStep
-		};
-	  onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback);
-  }
+function callSubmitMove(moveAnimationBeginStep) {
+	submitMoveData = {
+		moveAnimationBeginStep: moveAnimationBeginStep
+	};
+	onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback);
+}
+
+var sendVerificationCodeCallback = function sendVerificationCodeCallback(response) {
+	var message;
+	if (response.includes('has been sent')) {
+		message = "Verification code sent to " + emailBeingVerified + ". Be sure to check your spam or junk mail for the email.";
+		message += "<br />Didn't get the email? Check your spam again. If it isn't there, try a different email address. Some email services reject the verification email."
+	} else {
+		message = "Failed to send verification code, please try again. Join the Discord for help, or try another email address.";
+	}
+	document.getElementById('verificationCodeSendResponse').innerHTML = message;
+}
   
-  var sendVerificationCodeCallback = function sendVerificationCodeCallback(response) {
-	  var message;
-	  if (response.includes('has been sent')) {
-		  message = "Verification code sent to " + emailBeingVerified + ". Be sure to check your spam or junk mail for the email.";
-		  message += "<br />Didn't get the email? Check your spam again. If it isn't there, try a different email address. Some email services reject the verification email."
-	  } else {
-		  message = "Failed to send verification code, please try again. Join the Discord for help, or try another email address.";
-	  }
-	  document.getElementById('verificationCodeSendResponse').innerHTML = message;
-  }
+var isUserInfoAvailableCallback = function isUserInfoAvailableCallback(data) {
+	if (data && data.length > 0) {
+		// user info not available
+		showModal("Sign In", "Username or email unavailable.<br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
+	} else {
+		debug("Checkpoint");
+		document.getElementById("verificationCodeInput").disabled=false;
+		document.getElementById('verificationCodeSendResponse').innerHTML = "Sending code... <i class='fa fa-circle-o-notch fa-spin fa-fw'></i>";
+		onlinePlayEngine.sendVerificationCode(usernameBeingVerified, emailBeingVerified, sendVerificationCodeCallback);
+	}
+};
   
-  var isUserInfoAvailableCallback = function isUserInfoAvailableCallback(data) {
-	  if (data && data.length > 0) {
-		  // user info not available
-		  showModal("Sign In", "Username or email unavailable.<br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
-	  } else {
-		  debug("Checkpoint");
-		  document.getElementById("verificationCodeInput").disabled=false;
-		  document.getElementById('verificationCodeSendResponse').innerHTML = "Sending code... <i class='fa fa-circle-o-notch fa-spin fa-fw'></i>";
-		  onlinePlayEngine.sendVerificationCode(usernameBeingVerified, emailBeingVerified, sendVerificationCodeCallback);
-	  }
-  };
-  
-  var userInfoExistsCallback = function userInfoExistsCallback(data) {
-	  if (data && parseInt(data.trim()) > 0) {
-		  // existing userId found
-		  tempUserId = data.trim();
-		  isUserInfoAvailableCallback();	// will trigger send verification code
-	  } else {
-		  // userInfo entered was not exact match. Is it available?
-		  onlinePlayEngine.isUserInfoAvailable(usernameBeingVerified, emailBeingVerified, isUserInfoAvailableCallback);
-	  }
-  }
-  
-  function sendVerificationCodeClicked() {
-	  emailBeingVerified = document.getElementById("userEmailInput").value.trim().toLowerCase();
-	  usernameBeingVerified = document.getElementById("usernameInput").value.trim();
-  
-	  // Only continue if email and username pass validation
-	  if (emailBeingVerified.includes("@") && emailBeingVerified.includes(".")
-		  && usernameBeingVerified.match(/^([A-Za-z0-9_]){3,25}$/g)) {
-		  onlinePlayEngine.userInfoExists(usernameBeingVerified, emailBeingVerified, userInfoExistsCallback);
-	  } else {
-		  showModal("Sign In", "Invalid username or email. Your username cannot be too short or too long, and cannot contain spaces. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
-	  }
-  }
-  
-  function verifyCodeClicked() {
-	  if (usernameBeingVerified && usernameBeingVerified.trim() != ""
-		  && emailBeingVerified && emailBeingVerified.trim() != "") {
-  
-		  codeToVerify = document.getElementById("verificationCodeInput").value;
-		  if (codeToVerify && codeToVerify.trim() != "") {
-			  onlinePlayEngine.getVerificationCode(verifyCodeCallback);
-		  }
-	  }
-  }
-  
-  var createDeviceIdCallback = function createDeviceIdCallback(generatedDeviceId) {
-	  closeModal();
-  
-	  localStorage.setItem(deviceIdKey, parseInt(generatedDeviceId));
-	  localStorage.setItem(userIdKey, parseInt(tempUserId));
-	  localStorage.setItem(usernameKey, usernameBeingVerified);
-	  localStorage.setItem(userEmailKey, emailBeingVerified);
-  
-	  localStorage.setItem(localEmailKey, emailBeingVerified); // Old field..
-  
-	  if (localPlayerRole === HOST) {
-		  hostEmail = emailBeingVerified;
-	  } else if (localPlayerRole === GUEST) {
-		  guestEmail = emailBeingVerified;
-	  }
-  
-	  emailBeingVerified = "";
-	  usernameBeingVerified = "";
-	  tempUserId = null;
-	  codeToVerify = 0;
-  
-	  updateFooter();
-	  clearMessage();
-  
-	  setAccountHeaderLinkText();
-  
-	  initialVerifyLogin();
-  
-	  showModal("<i class='fa fa-check' aria-hidden='true'></i> Email Verified", "Hi, " + getUsername() + "! Your email has been successfully verified and you are now signed in.");
-  }
-  
-  var createUserCallback = function createUserCallback(generatedUserId) {
-	  tempUserId = generatedUserId;
-  
-	  onlinePlayEngine.createDeviceIdForUser(tempUserId, createDeviceIdCallback);
-  }
+var userInfoExistsCallback = function userInfoExistsCallback(data) {
+	if (data && parseInt(data.trim()) > 0) {
+		// existing userId found
+		tempUserId = data.trim();
+		isUserInfoAvailableCallback();	// will trigger send verification code
+	} else {
+		// userInfo entered was not exact match. Is it available?
+		onlinePlayEngine.isUserInfoAvailable(usernameBeingVerified, emailBeingVerified, isUserInfoAvailableCallback);
+	}
+}
+
+function sendVerificationCodeClicked() {
+	emailBeingVerified = document.getElementById("userEmailInput").value.trim().toLowerCase();
+	usernameBeingVerified = document.getElementById("usernameInput").value.trim();
+
+	// Only continue if email and username pass validation
+	if (emailBeingVerified.includes("@") && emailBeingVerified.includes(".")
+		&& usernameBeingVerified.match(/^([A-Za-z0-9_]){3,25}$/g)) {
+		onlinePlayEngine.userInfoExists(usernameBeingVerified, emailBeingVerified, userInfoExistsCallback);
+	} else {
+		showModal("Sign In", "Invalid username or email. Your username cannot be too short or too long, and cannot contain spaces. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
+	}
+}
+
+function verifyCodeClicked() {
+	if (usernameBeingVerified && usernameBeingVerified.trim() != ""
+		&& emailBeingVerified && emailBeingVerified.trim() != "") {
+
+		codeToVerify = document.getElementById("verificationCodeInput").value;
+		if (codeToVerify && codeToVerify.trim() != "") {
+			onlinePlayEngine.getVerificationCode(verifyCodeCallback);
+		}
+	}
+}
+
+var createDeviceIdCallback = function createDeviceIdCallback(generatedDeviceId) {
+	closeModal();
+
+	localStorage.setItem(deviceIdKey, parseInt(generatedDeviceId));
+	localStorage.setItem(userIdKey, parseInt(tempUserId));
+	localStorage.setItem(usernameKey, usernameBeingVerified);
+	localStorage.setItem(userEmailKey, emailBeingVerified);
+
+	localStorage.setItem(localEmailKey, emailBeingVerified); // Old field..
+
+	if (localPlayerRole === HOST) {
+		hostEmail = emailBeingVerified;
+	} else if (localPlayerRole === GUEST) {
+		guestEmail = emailBeingVerified;
+	}
+
+	emailBeingVerified = "";
+	usernameBeingVerified = "";
+	tempUserId = null;
+	codeToVerify = 0;
+
+	updateFooter();
+	clearMessage();
+
+	setAccountHeaderLinkText();
+
+	initialVerifyLogin();
+
+	showModal("<i class='fa fa-check' aria-hidden='true'></i> Email Verified", "Hi, " + getUsername() + "! Your email has been successfully verified and you are now signed in.");
+}
+
+var createUserCallback = function createUserCallback(generatedUserId) {
+	tempUserId = generatedUserId;
+
+	onlinePlayEngine.createDeviceIdForUser(tempUserId, createDeviceIdCallback);
+}
   
 // TODO actualCode should be result...
 var verifyCodeCallback = function verifyCodeCallback(actualCode) {
@@ -1749,8 +1749,9 @@ function userIsLoggedIn() {
 		  desc: "Overgrowth Pai Sho",
 		  rulesUrl: "https://skudpaisho.com/site/games/overgrowth-pai-sho/",
 		  gameOptions: [
-			  OPTION_FULL_TILES,
-			  FULL_POINTS_SCORING
+		  	LESS_TILES,
+		  	OPTION_FULL_TILES,
+		  	FULL_POINTS_SCORING
 		  ]
 	  },
 	  // Playground: {

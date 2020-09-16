@@ -17,10 +17,21 @@ function OvergrowthGameManager(actuator, ignoreActuate, isCopy, existingDrawnTil
 }
 
 OvergrowthGameManager.prototype.drawRandomTile = function() {
-	if (gameController && !this.currentDrawnTileIsPresentInTileManager()) {
+	if (this.mustFetchNewRandomTile()) {
 		this.lastDrawnTile = this.drawnTile;
 		this.drawnTile = this.drawRandomTileFromTileManager(getCurrentPlayer());
 	}
+};
+
+OvergrowthGameManager.prototype.mustFetchNewRandomTile = function() {
+	return !isInReplay && gameController &&
+		(!this.currentDrawnTileIsPresentInTileManager() ||
+			this.currentDrawnTileBelongsToOtherPlayer() ||
+			!this.drawnTile);
+};
+
+OvergrowthGameManager.prototype.currentDrawnTileBelongsToOtherPlayer = function() {
+	return this.drawnTile && getCurrentPlayer() !== this.drawnTile.ownerName;
 };
 
 // Set up the game
@@ -44,12 +55,14 @@ OvergrowthGameManager.prototype.actuate = function() {
 		if (!this.drawnTile) {
 			this.drawRandomTile();
 		}
-		var tile = this.tileManager.peekTile(this.drawnTile.ownerName, this.drawnTile.code, this.drawnTile.id);
-		if (!tile) {
-			this.drawnTile = null;
-			this.lastDrawnTile = null; // Save for Undo
+		if (this.drawnTile) {
+			var tile = this.tileManager.peekTile(this.drawnTile.ownerName, this.drawnTile.code, this.drawnTile.id);
+			if (!tile) {
+				this.drawnTile = null;
+				this.lastDrawnTile = null; // Save for Undo
 
-			this.drawRandomTile();
+				this.drawRandomTile();
+			}
 		}
 	}
 

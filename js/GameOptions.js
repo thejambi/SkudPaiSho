@@ -33,6 +33,9 @@ var RELEASE_CAPTIVE_TILES = "Release Captive Tiles";
 var BONUS_MOVEMENT_5 = "Bonus Movement With Captive (5)";
 var BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES = "Bonus Movement (+1) Per Captive";
 
+/* Overgrowth */
+var LESS_TILES = "Less Tiles";
+
 
 function gameOptionEnabled(optionName) {
 	return ggOptions.includes(optionName);
