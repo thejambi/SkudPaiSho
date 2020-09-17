@@ -82,7 +82,9 @@ var QueryString = function () {
 	  blowtorch: "Blowtorch by ProfPetruescu",
 	  azul: "Azul by Cannoli",
 	  checkeredtraining: "Checkered Training Board by Aba",
-	  forest: "Forest Board, dedicated to tree"
+	  forest: "Forest Board, dedicated to tree",
+	  flowergarden: "Flower Garden by Liam_Keaggy13",
+	  worldmap: "World Map by corky125"
   };
   
   var paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
