@@ -84,7 +84,8 @@ var QueryString = function () {
 	  checkeredtraining: "Checkered Training Board by Aba",
 	  forest: "Forest Board, dedicated to tree",
 	  flowergarden: "Flower Garden by Liam_Keaggy13",
-	  worldmap: "World Map by corky125"
+	  worldmap: "World Map by corky125",
+	  goldengarden: "Golden Garden by Sidereus"
   };
   
   var paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
