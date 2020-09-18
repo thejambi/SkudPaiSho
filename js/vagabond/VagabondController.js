@@ -482,6 +482,7 @@ VagabondController.prototype.getAdditionalHelpTabDiv = function() {
 VagabondController.tileDesignTypeValues = {
 	delion: "The Garden Gate Designs",
 	tggclassic: "TGG Classic",
+	gyatsocontrast: "Gyatso TGG Classic",
 	classic: "Classic Pai Sho Project",
 	water: "Water themed Garden Gate Designs",
 	fire: "Fire themed Garden Gate Designs",
