@@ -51,6 +51,7 @@ var QueryString = function () {
 	  vescuccicolored2: "Vescucci Colored 2",
 	  tggproject2: "TGG Project Alt Colors",
 	  gyatso: "Gyatso TGG Project Tiles",
+	  gyatsocontrast: "Gyatso TGG Tiles 2",
 	  water: "Water-Themed Vescucci Tiles",
 	  earth: "Earth-Themed Vescucci Tiles",
 	  chujired: "Chu Ji Red",
