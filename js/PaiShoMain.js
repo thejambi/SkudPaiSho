@@ -46,6 +46,7 @@ var QueryString = function () {
 	  pixelsho2: "Pixel Sho v2 Tiles",
 	  xiangqi: "Xiangqi Style",
 	  hlowemono: "Modern Monochrome Tiles",
+	  modernwood: "Modern Wooden Tiles",
 	  tggprojectmono: "TGG Pai Sho Project Monochrome",
 	  vescuccicolored: "Vescucci Colored",
 	  vescuccicolored2: "Vescucci Colored 2",
