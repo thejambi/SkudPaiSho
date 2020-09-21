@@ -58,10 +58,12 @@ VagabondGameManager.prototype.runNotationMove = function(move, withActuate) {
 };
 
 VagabondGameManager.prototype.buildDeployGameLogText = function(move, tile) {
-	this.gameLogText = move.player + ' placed ' + VagabondTile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
+	this.gameLogText = move.moveNum + move.playerCode + '. '
+		+ move.player + ' placed ' + VagabondTile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
 };
 VagabondGameManager.prototype.buildMoveGameLogText = function(move, moveDetails) {
-	this.gameLogText = move.player + ' moved ' + VagabondTile.getTileName(moveDetails.movedTile.code) + ' from ' + move.startPoint.pointText + ' to ' + move.endPoint.pointText;
+	this.gameLogText = move.moveNum + move.playerCode + '. '
+		+ move.player + ' moved ' + VagabondTile.getTileName(moveDetails.movedTile.code) + ' from ' + move.startPoint.pointText + ' to ' + move.endPoint.pointText;
 	if (moveDetails.capturedTile) {
 		this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ' + VagabondTile.getTileName(moveDetails.capturedTile.code);
 	}
