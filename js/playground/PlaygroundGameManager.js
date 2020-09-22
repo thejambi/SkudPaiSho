@@ -33,7 +33,9 @@ PlaygroundGameManager.prototype.actuate = function () {
 PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 	debug("Running Move: " + move.fullMoveText);
 
-	if (move.moveType === DEPLOY) {
+	if (move.moveType === END_GAME) {
+		this.board.winners.push("FUN");
+	} else if (move.moveType === DEPLOY) {
 		// Just placing tile on board
 		var tile = this.tileManager.grabTile(move.tileOwner, move.tileType);
 
@@ -126,6 +128,10 @@ PlaygroundGameManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
 
 PlaygroundGameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playerName) {
 	return this.tileManager.playerHasBothSpecialTilesRemaining(playerName);
+};
+
+PlaygroundGameManager.prototype.setWinnerIsFun = function() {
+	this.setWinner = true;
 };
 
 PlaygroundGameManager.prototype.getWinner = function() {

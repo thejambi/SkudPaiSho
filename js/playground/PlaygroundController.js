@@ -79,7 +79,18 @@ PlaygroundController.prototype.getAdditionalMessage = function() {
 		msg += "<span class='skipBonus' onClick='gameController.passTurn()'>End Turn</span><br />";
 	}
 
+	if (this.notationBuilder.endGame) {
+		msg += "Make a move to end the game.<br />";
+	} else {
+		msg += "<span class='skipBonus' onClick='gameController.setEndOfGame()'>Set end of game (click, then make a move to end game)</span><br />";
+	}
+
 	return msg;
+};
+
+PlaygroundController.prototype.setEndOfGame = function() {
+	this.notationBuilder.endGame = true;
+	refreshMessage();
 };
 
 PlaygroundController.prototype.passTurn = function() {
