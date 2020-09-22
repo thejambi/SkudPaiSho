@@ -1697,159 +1697,158 @@ function userIsLoggedIn() {
 	  updateCurrentGameTitle();
   }
   
-  var GameType = {
-	  SkudPaiSho: {
-		  id: 1,
-		  desc: "Skud Pai Sho",
-		  rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/",
-		  gameOptions: [
-			  OPTION_INFORMAL_START,
-			  OPTION_DOUBLE_ACCENT_TILES,
-			  OPTION_ANCIENT_OASIS_EXPANSION,
-			  NO_HARMONY_VISUAL_AIDS
-		  ]
-	  },
-	  VagabondPaiSho: {
-		  id: 2,
-		  desc: "Vagabond Pai Sho",
-		  rulesUrl: "https://skudpaisho.com/site/games/vagabond-pai-sho/",
-		  gameOptions: [
-			  OPTION_DOUBLE_TILES
-		  ]
-	  },
-	  CapturePaiSho: {
-		  id: 3,
-		  desc: "Capture Pai Sho",
-		  rulesUrl: "https://skudpaisho.com/site/games/capture-pai-sho/",
-		  gameOptions: []
-	  },
-	  StreetPaiSho: {
-		  id: 5,
-		  desc: "Street Pai Sho",
-		  rulesUrl: "https://skudpaisho.com/site/games/street-pai-sho/",
-		  gameOptions: [
-			  FORMAL_WIN_CONDITION,
-			  ORIGINAL_BOARD_SETUP,
-			  RELEASE_CAPTIVE_TILES,
-			  BONUS_MOVEMENT_5,
-			  BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES
-		  ]
-	  },
-	  SolitairePaiSho: {
-		  id: 4,
-		  desc: "Solitaire Pai Sho",
-		  rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/",
-		  gameOptions: [
-			  OPTION_DOUBLE_TILES,
-			  OPTION_INSANE_TILES
-		  ]
-	  },
-	  CoopSolitaire: {
-		  id: 6,
-		  desc: "Cooperative Solitaire",
-		  rulesUrl: "https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/",
-		  gameOptions: [
+var GameType = {
+	SkudPaiSho: {
+		id: 1,
+		desc: "Skud Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/",
+		gameOptions: [
+			OPTION_INFORMAL_START,
+			OPTION_DOUBLE_ACCENT_TILES,
+			OPTION_ANCIENT_OASIS_EXPANSION,
+			NO_HARMONY_VISUAL_AIDS
+		]
+	},
+	VagabondPaiSho: {
+		id: 2,
+		desc: "Vagabond Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/vagabond-pai-sho/",
+		gameOptions: [
+			OPTION_DOUBLE_TILES
+		]
+	},
+	CapturePaiSho: {
+		id: 3,
+		desc: "Capture Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/capture-pai-sho/",
+		gameOptions: []
+	},
+	StreetPaiSho: {
+		id: 5,
+		desc: "Street Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/street-pai-sho/",
+		gameOptions: [
+			FORMAL_WIN_CONDITION,
+			ORIGINAL_BOARD_SETUP,
+			RELEASE_CAPTIVE_TILES,
+			BONUS_MOVEMENT_5,
+			BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES
+		]
+	},
+	SolitairePaiSho: {
+		id: 4,
+		desc: "Solitaire Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/",
+		gameOptions: [
+			OPTION_DOUBLE_TILES,
+			OPTION_INSANE_TILES
+		]
+	},
+	CoopSolitaire: {
+		id: 6,
+		desc: "Cooperative Solitaire",
+		rulesUrl: "https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/",
+		gameOptions: [
 			LESS_TILES,
-			  OPTION_DOUBLE_TILES,
-			  OPTION_INSANE_TILES
-		  ]
-	  },
-	  OvergrowthPaiSho: {
-		  id: 8,
-		  desc: "Overgrowth Pai Sho",
-		  rulesUrl: "https://skudpaisho.com/site/games/overgrowth-pai-sho/",
-		  gameOptions: [
-		  	LESS_TILES,
-		  	OPTION_FULL_TILES,
-		  	FULL_POINTS_SCORING
-		  ]
-	  },
-	  // Playground: {
-	  // 	id: 7,
-	  // 	desc: "Pai Sho Playground",
-	  // 	rulesUrl: "https://skudpaisho.com/site/games/pai-sho-playground/",
-	  // 	gameOptions: []
-	  // },
-	  Blooms: {
-		  id: 9,
-		  desc: "Blooms",
-		  rulesUrl: "https://www.nickbentley.games/blooms-rules/",
-		  gameOptions: [
-			  SHORTER_GAME,
-			  FOUR_SIDED_BOARD,
-			  SIX_SIDED_BOARD
-		  ]
-	  },
-	  // ,
-	  Trifle: {
-		  id: 10,
-		  desc: "Pai and Sho's Trifle",
-		  rulesUrl: "https://skudpaisho.com/site/games/pai-shos-trifle/",
-		  gameOptions: []
-	  },
-	  Hexentafl: {
-		  id: 11,
-		  desc: "heXentafl",
-		  rulesUrl: "https://nxsgame.wordpress.com/2019/09/26/hexentafl/",
-		  gameOptions: [
-			  OPTION_ATTACKERS_MOVE_FIRST,
-			  FIVE_SIDED_BOARD,
-			  KING_MOVES_LIKE_PAWNS
-		  ],
-		  secretGameOptions: [
-			  MORE_ATTACKERS
-		  ]
-	  }
-  };
-  function getGameControllerForGameType(gameTypeId) {
-	  var controller;
-  
-	  var isMobile = window.mobileAndTabletcheck();
-  
-	  switch(gameTypeId) {
-		  case GameType.SkudPaiSho.id:
-			  controller = new SkudPaiShoController(gameContainerDiv, isMobile);
-			  break;
-		  case GameType.VagabondPaiSho.id:
-			  controller = new VagabondController(gameContainerDiv, isMobile);
-			  break;
-		  case GameType.SolitairePaiSho.id:
-			  controller = new SolitaireController(gameContainerDiv, isMobile);
-			  break;
-		  case GameType.CapturePaiSho.id:
-			  controller = new CaptureController(gameContainerDiv, isMobile);
-			  break;
-		  case GameType.StreetPaiSho.id:
-			  controller = new StreetController(gameContainerDiv, isMobile);
-			  break;
-		  case GameType.CoopSolitaire.id:
-			  controller = new CoopSolitaireController(gameContainerDiv, isMobile);
-			  break;
-		  // case GameType.Playground.id:
-		  // 	controller = new PlaygroundController(gameContainerDiv, isMobile);
-		  // 	break;
-		  case GameType.OvergrowthPaiSho.id:
-			  controller = new OvergrowthController(gameContainerDiv, isMobile);
-			  break;
-		  case GameType.Blooms.id:
-			  controller = new BloomsController(gameContainerDiv, isMobile);
-			  break;
-		  case GameType.Trifle.id:
-			  if (trifleOn || TrifleController.userIsTrifleDeveloper()) {
-				  controller = new TrifleController(gameContainerDiv, isMobile);
-			  } else {
-				  closeGame();
-			  }
-			  break;
-		  case GameType.Hexentafl.id:
-			  controller = new HexentaflController(gameContainerDiv, isMobile);
-			  break;
-		  default:
-			  debug("Game Controller unavailable.");
-	  }
-  
-	  return controller;
-  }
+			OPTION_DOUBLE_TILES,
+			OPTION_INSANE_TILES
+		]
+	},
+	OvergrowthPaiSho: {
+		id: 8,
+		desc: "Overgrowth Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/overgrowth-pai-sho/",
+		gameOptions: [
+			LESS_TILES,
+			OPTION_FULL_TILES,
+			FULL_POINTS_SCORING
+		]
+	},
+	Trifle: {
+		id: 10,
+		desc: "Pai and Sho's Trifle",
+		rulesUrl: "https://skudpaisho.com/site/games/pai-shos-trifle/",
+		gameOptions: []
+	},
+	Playground: {
+		id: 7,
+		desc: "Pai Sho Playground",
+		rulesUrl: "https://skudpaisho.com/site/games/pai-sho-playground/",
+		gameOptions: []
+	},
+	Blooms: {
+		id: 9,
+		desc: "Blooms",
+		rulesUrl: "https://www.nickbentley.games/blooms-rules/",
+		gameOptions: [
+			SHORTER_GAME,
+			FOUR_SIDED_BOARD,
+			SIX_SIDED_BOARD
+		]
+	},
+	Hexentafl: {
+		id: 11,
+		desc: "heXentafl",
+		rulesUrl: "https://nxsgame.wordpress.com/2019/09/26/hexentafl/",
+		gameOptions: [
+			OPTION_ATTACKERS_MOVE_FIRST,
+			FIVE_SIDED_BOARD,
+			KING_MOVES_LIKE_PAWNS
+		],
+		secretGameOptions: [
+			MORE_ATTACKERS
+		]
+	}
+};
+function getGameControllerForGameType(gameTypeId) {
+	var controller;
+
+	var isMobile = window.mobileAndTabletcheck();
+
+	switch (gameTypeId) {
+		case GameType.SkudPaiSho.id:
+			controller = new SkudPaiShoController(gameContainerDiv, isMobile);
+			break;
+		case GameType.VagabondPaiSho.id:
+			controller = new VagabondController(gameContainerDiv, isMobile);
+			break;
+		case GameType.SolitairePaiSho.id:
+			controller = new SolitaireController(gameContainerDiv, isMobile);
+			break;
+		case GameType.CapturePaiSho.id:
+			controller = new CaptureController(gameContainerDiv, isMobile);
+			break;
+		case GameType.StreetPaiSho.id:
+			controller = new StreetController(gameContainerDiv, isMobile);
+			break;
+		case GameType.CoopSolitaire.id:
+			controller = new CoopSolitaireController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Playground.id:
+			controller = new PlaygroundController(gameContainerDiv, isMobile);
+			break;
+		case GameType.OvergrowthPaiSho.id:
+			controller = new OvergrowthController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Blooms.id:
+			controller = new BloomsController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Trifle.id:
+			if (trifleOn || TrifleController.userIsTrifleDeveloper()) {
+				controller = new TrifleController(gameContainerDiv, isMobile);
+			} else {
+				closeGame();
+			}
+			break;
+		case GameType.Hexentafl.id:
+			controller = new HexentaflController(gameContainerDiv, isMobile);
+			break;
+		default:
+			debug("Game Controller unavailable.");
+	}
+
+	return controller;
+}
   function setGameController(gameTypeId, keepGameOptions) {
 	  setGameLogText('');
 	  var successResult = true;

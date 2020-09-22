@@ -16,6 +16,9 @@ function PlaygroundActuator(gameContainer, isMobile) {
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
+PlaygroundActuator.hostTeamTilesDivId = "hostTilesContainer";
+PlaygroundActuator.guestTeamTilesDivId = "guestTilesContainer";
+
 PlaygroundActuator.prototype.actuate = function(board, tileManager) {
 	var self = this;
 
@@ -41,13 +44,8 @@ PlaygroundActuator.prototype.htmlify = function(board, tileManager) {
 
 	var fullTileSet = new PlaygroundTileManager(true);
 
-	// Go through tile piles and clear containers
-	fullTileSet.hostTiles.forEach(function(tile) {
-		self.clearTileContainer(tile);
-	});
-	fullTileSet.guestTiles.forEach(function(tile) {
-		self.clearTileContainer(tile);
-	});
+	self.clearContainerWithId(PlaygroundActuator.hostTeamTilesDivId);
+	self.clearContainerWithId(PlaygroundActuator.guestTeamTilesDivId);
 
 	// Go through tile piles and display
 	tileManager.hostTiles.forEach(function(tile) {
@@ -64,18 +62,21 @@ PlaygroundActuator.prototype.clearContainer = function (container) {
 	}
 };
 
+PlaygroundActuator.prototype.clearContainerWithId = function(containerIdName) {
+	var container = document.getElementById(containerIdName);
+	if (container) {
+		this.clearContainer(container);
+	}
+};
+
 PlaygroundActuator.prototype.clearTileContainer = function (tile) {
-	var container = document.querySelector("." + tile.getImageName());
+	var container = document.querySelector("." + tile.getNotationName());
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-PlaygroundActuator.prototype.addTile = function(tile, mainContainer) {
-	var self = this;
-
-	var container = document.querySelector("." + tile.getImageName());
-
+PlaygroundActuator.prototype.addTile = function(tile, tileContainer) {
 	var theDiv = document.createElement("div");
 
 	theDiv.classList.add("point");
@@ -88,11 +89,12 @@ PlaygroundActuator.prototype.addTile = function(tile, mainContainer) {
 
 	var theImg = document.createElement("img");
 	
-	var srcValue = getSkudTilesSrcPath();
+	// var srcValue = getSkudTilesSrcPath();
+	var srcValue = this.getTileSrcPath(tile);
 	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
 
-	theDiv.setAttribute("name", tile.getImageName());
+	theDiv.setAttribute("name", tile.getNotationName());
 	theDiv.setAttribute("id", tile.id);
 
 	if (this.mobile) {
@@ -103,7 +105,25 @@ PlaygroundActuator.prototype.addTile = function(tile, mainContainer) {
 		theDiv.setAttribute("onmouseout", "clearMessage();");
 	}
 
-	container.appendChild(theDiv);
+	tileContainer.appendChild(theDiv);
+};
+
+PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
+	var srcValue = "images/";
+
+	var gameImgDir;
+	if (tile.gameType === GameType.SkudPaiSho) {
+		gameImgDir = "SkudPaiSho/" + skudTilesKey;
+	} else if (tile.gameType === GameType.VagabondPaiSho) {
+		gameImgDir = "Vagabond/" + localStorage.getItem(vagabondTileDesignTypeKey);
+	} else if (tile.gameType === GameType.CapturePaiSho) {
+		gameImgDir = "Capture";
+	}
+	if (gameImgDir) {
+		srcValue = srcValue + gameImgDir + "/";
+	}
+
+	return srcValue;
 };
 
 PlaygroundActuator.prototype.addBoardPoint = function(boardPoint) {
@@ -139,15 +159,8 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint) {
 		
 		var theImg = document.createElement("img");
 
-		var srcValue = getSkudTilesSrcPath();
+		var srcValue = this.getTileSrcPath(boardPoint.tile);
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
-		
-		if (boardPoint.tile.inHarmony) {
-			theDiv.classList.add(boardPoint.tile.ownerName + "harmony");
-		}
-		if (boardPoint.tile.drained || boardPoint.tile.trapped) {
-			theDiv.classList.add("drained");
-		}
 		
 		theDiv.appendChild(theImg);
 	}
@@ -162,7 +175,6 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint) {
 };
 
 PlaygroundActuator.prototype.printBoard = function(board) {
-
 	debug("");
 	var rowNum = 0;
 	board.cells.forEach(function (row) {

@@ -230,7 +230,7 @@ VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 }
 
 VagabondActuator.prototype.getTileImageSourceDir = function() {
-	return "images/Vagabond/" + localStorage.getItem("vagabondTileDesignTypeKey") + "/";
+	return "images/Vagabond/" + localStorage.getItem(vagabondTileDesignTypeKey) + "/";
 };
 
 VagabondActuator.prototype.printBoard = function(board) {

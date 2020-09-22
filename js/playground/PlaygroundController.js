@@ -38,11 +38,11 @@ PlaygroundController.prototype.getNewGameNotation = function() {
 };
 
 PlaygroundController.getHostTilesContainerDivs = function() {
-	return '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HL"></div> <div class="HO"></div>';
+	return '';
 };
 
 PlaygroundController.getGuestTilesContainerDivs = function() {
-	return '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
+	return '';
 };
 
 PlaygroundController.prototype.callActuate = function() {

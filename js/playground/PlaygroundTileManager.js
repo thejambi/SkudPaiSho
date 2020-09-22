@@ -18,23 +18,47 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	var tiles = [];
 
 	// Skud Pai Sho tiles
-	tiles.push(new PlaygroundTile('Skud_R', ownerCode));
-	tiles.push(new PlaygroundTile('Skud_W', ownerCode));
-	tiles.push(new PlaygroundTile('Skud_K', ownerCode));
-	tiles.push(new PlaygroundTile('Skud_B', ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, "Skud_R3", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, "Skud_R4", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, "Skud_R5", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, "Skud_W3", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, "Skud_W4", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, "Skud_W5", ownerCode));
+	
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, 'Skud_R', ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, 'Skud_W', ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, 'Skud_K', ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, 'Skud_B', ownerCode));
 
-	tiles.push(new PlaygroundTile("Skud_R3", ownerCode));
-	tiles.push(new PlaygroundTile("Skud_R4", ownerCode));
-	tiles.push(new PlaygroundTile("Skud_R5", ownerCode));
-	tiles.push(new PlaygroundTile("Skud_W3", ownerCode));
-	tiles.push(new PlaygroundTile("Skud_W4", ownerCode));
-	tiles.push(new PlaygroundTile("Skud_W5", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, 'Skud_L', ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, 'Skud_O', ownerCode));
 
-	tiles.push(new PlaygroundTile('Skud_L', ownerCode));
-	tiles.push(new PlaygroundTile('Skud_O', ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, 'Skud_M', ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, 'Skud_T', ownerCode));
+	tiles.push(new PlaygroundTile(GameType.SkudPaiSho, 'Skud_P', ownerCode));
 
 	// Vagabond tiles
-	
+	tiles.push(new PlaygroundTile(GameType.VagabondPaiSho, "Vagabond_S", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.VagabondPaiSho, "Vagabond_B", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.VagabondPaiSho, "Vagabond_W", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.VagabondPaiSho, "Vagabond_C", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.VagabondPaiSho, "Vagabond_F", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.VagabondPaiSho, "Vagabond_D", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.VagabondPaiSho, "Vagabond_L", ownerCode));
+
+	// Capture tiles
+	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_A", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_V", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_B", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_P", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_F", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_U", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_K", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_L", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_D", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_M", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_T", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_O", ownerCode));
 
 	return tiles;
 };

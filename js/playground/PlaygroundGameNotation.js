@@ -44,13 +44,10 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 		var char1 = moveText.charAt(1);
 		var char2 = moveText.charAt(2);
 		this.tileOwner = char0;
-		if (char2 === '(') {
-			this.tileType = char1;
-		} else {
-			this.tileType = char1 + "" + char2;
-		}
+		var parenIndex = moveText.indexOf("(");
+		this.tileType = moveText.substring(1, parenIndex);
 
-		if (moveText.charAt(2) === '(') {
+		if (moveText.charAt(parenIndex) === '(') {
 			// debug("parens checks out");
 		} else {
 			debug("Failure to plant");
@@ -58,7 +55,7 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 		}
 
 		if (moveText.endsWith(')')) {
-			this.endPoint = new NotationPoint(moveText.substring(moveText.indexOf('(')+1, moveText.indexOf(')')));
+			this.endPoint = new NotationPoint(moveText.substring(parenIndex+1, moveText.indexOf(')')));
 		} else {
 			this.valid = false;
 		}
