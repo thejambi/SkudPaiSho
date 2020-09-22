@@ -15,6 +15,7 @@ function PlaygroundController(gameContainer, isMobile) {
 	this.currentPlayingPlayer = HOST;
 
 	this.isPaiShoGame = true;
+	this.isInviteOnly = true;
 }
 
 PlaygroundController.prototype.getGameTypeId = function() {
@@ -74,7 +75,9 @@ PlaygroundController.prototype.getAdditionalMessage = function() {
 			msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move. <br />";
 		}
 	}
-	msg += "<span class='skipBonus' onClick='gameController.passTurn()'>End Turn</span><br />";
+	if (!playingOnlineGame) {
+		msg += "<span class='skipBonus' onClick='gameController.passTurn()'>End Turn</span><br />";
+	}
 
 	return msg;
 };
@@ -162,10 +165,14 @@ PlaygroundController.prototype.pointClicked = function(htmlPoint) {
 
 			// Move all set. Add it to the notation!
 			this.gameNotation.addMove(move);
-			if (playingOnlineGame()) {
-				callSubmitMove();
+			if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
+				createGameIfThatIsOk(GameType.Playground.id);
 			} else {
-				finalizeMove();
+				if (playingOnlineGame()) {
+					callSubmitMove();
+				} else {
+					finalizeMove();
+				}
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();

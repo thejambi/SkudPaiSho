@@ -2377,7 +2377,9 @@ function getGameControllerForGameType(gameTypeId) {
 			  yesCreateGame(gameTypeId);
 		  } else {
 			  var message = "<div>Do you want to create a game for others to join?</div>";
-			  message += "<br /><div class='clickableText' onclick='closeModal(); yesCreateGame(" + gameTypeId + ");'>Yes - create game</div>";
+			  if (!gameController.isInviteOnly) {
+			  	message += "<br /><div class='clickableText' onclick='closeModal(); yesCreateGame(" + gameTypeId + ");'>Yes - create game</div>";
+			  }
 			  message += "<br /><div class='clickableText' onclick='closeModal(); yesCreatePrivateGame(" + gameTypeId + ");'>Yes - create a private game with a friend</div>";
 			  message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
 			  showModal("Create game?", message);
