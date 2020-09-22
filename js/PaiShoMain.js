@@ -65,7 +65,7 @@ var QueryString = function () {
   var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
   var paiShoBoardDesignTypeValues = {
 	  default: "Default",
-	  nomadic: "Nomadic by Monk_Gyatso",
+	  nomadic: "Nomadic",
 	  mayfair: "Mayfair Filter",
 	  skudShop: "The Garden Gate Shop",
 	  vescucci: "Vescucci Style",
