@@ -345,7 +345,7 @@ var QueryString = function () {
 		  }
 	  }
   
-	  resetGlobalChats();
+	//   resetGlobalChats();	"Global Chats" tab is now "Links"
   
 	  initialVerifyLogin();
   
@@ -2477,16 +2477,17 @@ function getGameControllerForGameType(gameTypeId) {
 	  }
   };
   
+  /* This is AKA Display Links tab content */
   function resetGlobalChats() {
 	  // Clear all global chats..
-	  document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/dStDZx7' target='_blank'>Discord server</a>.<hr />";
+	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/dStDZx7' target='_blank'>Discord server</a>.<hr />";
   }
   
   function fetchInitialGlobalChats() {
-	  resetGlobalChats();
+	//   resetGlobalChats();
   
 	  // Fetch global chats..
-	  onlinePlayEngine.getInitialGlobalChatMessages(getInitialGlobalChatsCallback);
+	//   onlinePlayEngine.getInitialGlobalChatMessages(getInitialGlobalChatsCallback);
   }
   
   // var callLogOnlineStatusPulse = function callLogOnlineStatusPulse() {
