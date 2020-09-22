@@ -38,6 +38,7 @@ var QueryString = function () {
   var tileDesignTypeKey = "tileDesignTypeKey";
   var tileDesignTypeValues = {
 	  // hlowe: "Modern Tiles v1",
+	  gyatsocontrast: "The Garden Gate Gyatso Tiles",
 	  tggproject: "TGG Pai Sho Project",
 	  hlowenew: "Modern Tiles",
 	  vescucci: "Vescucci Tiles",
@@ -45,14 +46,13 @@ var QueryString = function () {
 	  pixelsho: "Pixel Sho v1 Tiles",
 	  pixelsho2: "Pixel Sho v2 Tiles",
 	  xiangqi: "Xiangqi Style",
+	  tggproject2: "TGG Project Alt Colors",
+	  gyatso: "Rustic Gyatso TGG Project Tiles",
 	  hlowemono: "Modern Monochrome Tiles",
 	  modernwood: "Modern Wooden Tiles",
 	  tggprojectmono: "TGG Pai Sho Project Monochrome",
 	  vescuccicolored: "Vescucci Colored",
 	  vescuccicolored2: "Vescucci Colored 2",
-	  tggproject2: "TGG Project Alt Colors",
-	  gyatso: "Gyatso TGG Project Tiles",
-	  gyatsocontrast: "Gyatso TGG Tiles 2",
 	  water: "Water-Themed Vescucci Tiles",
 	  earth: "Earth-Themed Vescucci Tiles",
 	  chujired: "Chu Ji Red",
@@ -65,6 +65,7 @@ var QueryString = function () {
   var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
   var paiShoBoardDesignTypeValues = {
 	  default: "Default",
+	  nomadic: "Nomadic by Monk_Gyatso",
 	  mayfair: "Mayfair Filter",
 	  skudShop: "The Garden Gate Shop",
 	  vescucci: "Vescucci Style",
@@ -262,7 +263,7 @@ var QueryString = function () {
   
 	  /* Tile Design Preferences */
 	  if (!localStorage.getItem(tileDesignTypeKey)) {
-		  setSkudTilesOption("tggproject");
+		  setSkudTilesOption("gyatsocontrast");
 	  } else {
 		setSkudTilesOption(localStorage.getItem(tileDesignTypeKey));
 	  }
@@ -270,7 +271,7 @@ var QueryString = function () {
 	  if (localStorage.getItem(paiShoBoardDesignTypeKey)) {
 		  setPaiShoBoardOption(localStorage.getItem(paiShoBoardDesignTypeKey));
 	  } else {
-		  setPaiShoBoardOption("mayfair");
+		  setPaiShoBoardOption("nomadic");
 	  }
   
 	  /* --- */
