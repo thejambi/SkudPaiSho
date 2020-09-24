@@ -66,6 +66,7 @@ var QueryString = function () {
   var paiShoBoardDesignTypeValues = {
 	  default: "Default",
 	  nomadic: "Nomadic",
+	  nomadicdark: "Nomadic Dark",
 	  mayfair: "Mayfair Filter",
 	  skudShop: "The Garden Gate Shop",
 	  vescucci: "Vescucci Style",
