@@ -2006,6 +2006,11 @@ function getGameControllerForGameType(gameTypeId) {
 				  var gameDisplayTitle = myGame.hostUsername;
 				  gameDisplayTitle += " vs. ";
 				  gameDisplayTitle += myGame.guestUsername;
+				  if (usernameEquals(myGame.winnerUsername)) {
+					  gameDisplayTitle += " [win]";
+				  } else if (myGame.winnerUsername === opponentUsername) {
+					  gameDisplayTitle += " [loss]";
+				  }
   
 				  message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
   
