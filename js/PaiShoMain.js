@@ -38,7 +38,7 @@ var QueryString = function () {
   var tileDesignTypeKey = "tileDesignTypeKey";
   var tileDesignTypeValues = {
 	  // hlowe: "Modern Tiles v1",
-	  gyatsocontrast: "The Garden Gate Gyatso Tiles",
+	  tgggyatso: "The Garden Gate Gyatso Tiles",
 	  tggproject: "TGG Pai Sho Project",
 	  hlowenew: "Modern Tiles",
 	  vescucci: "Vescucci Tiles",
@@ -47,7 +47,7 @@ var QueryString = function () {
 	  pixelsho2: "Pixel Sho v2 Tiles",
 	  xiangqi: "Xiangqi Style",
 	  tggproject2: "TGG Project Alt Colors",
-	  gyatso: "Rustic Gyatso TGG Project Tiles",
+	  rusticgyatso: "Rustic Gyatso TGG Project Tiles",
 	  hlowemono: "Modern Monochrome Tiles",
 	  modernwood: "Modern Wooden Tiles",
 	  tggprojectmono: "TGG Pai Sho Project Monochrome",
