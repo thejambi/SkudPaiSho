@@ -64,7 +64,7 @@ var QueryString = function () {
   
   var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
   var paiShoBoardDesignTypeValues = {
-	  default: "Default",
+	  tgg: "The Garden Gate",
 	  nomadic: "Nomadic",
 	  nomadicdark: "Nomadic Dark",
 	  mayfair: "Mayfair Filter",
@@ -73,6 +73,7 @@ var QueryString = function () {
 	  xiangqi: "Xiangqi-Style Tile Colors",
 	  pixelsho: "Pixel-Sho",
 	  remix: "Remix",
+	  default: "Old Default",
 	  water: "Water by Monk_Gyatso",
 	  earth: "Earth by BoomerangGuy",
 	  fire: "Fire by BoomerangGuy",
@@ -272,7 +273,7 @@ var QueryString = function () {
 	  if (localStorage.getItem(paiShoBoardDesignTypeKey)) {
 		  setPaiShoBoardOption(localStorage.getItem(paiShoBoardDesignTypeKey));
 	  } else {
-		  setPaiShoBoardOption("nomadic");
+		  setPaiShoBoardOption("tgg");
 	  }
   
 	  /* --- */
