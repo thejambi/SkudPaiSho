@@ -65,7 +65,7 @@ var MovementType = {
 
 var MovementRestriction = {
 	restrictedByOpponentTileZones: "restrictedByOpponentTileZones",
-	// immobilizedByAdjacentOpponentTile: "immobilizedByAdjacentOpponentTile",
+	// immobilizedByAdjacentOpponentTile: "immobilizedByAdjacentOpponentTile", // unused
 	immobilizedByOpponentTileZones: "immobilizedByOpponentTileZones",
 	mustPreserveDirection: "mustPreserveDirection"
 };
