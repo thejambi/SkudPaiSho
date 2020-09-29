@@ -67,6 +67,8 @@ function setupPaiShoBoard(gameContainer,
 	var svgContainerContainer = createDivWithClass("svgContainerContainer");
 	var bgSvg = createDivWithClass("bg-svg");
 
+	applyBoardOptionToBgSvg(bgSvg);
+
 	if (addVagabondBoardRotate) {
 		svgContainer.classList.add("vagabondBoardRotate");
 	}
@@ -115,6 +117,24 @@ function setupPaiShoBoard(gameContainer,
 		boardContainer: boardContainer,
 		hostTilesContainer: hostTilesContainer,
 		guestTilesContainer: guestTilesContainer
+	}
+}
+
+function applyBoardOptionToBgSvg(bgSvgIfKnown) {
+	var bgSvg = bgSvgIfKnown;
+	if (!bgSvg) {
+		var bgsvgs = document.getElementsByClassName("bg-svg");
+		if (bgsvgs && bgsvgs.length >= 1) {
+			bgSvg = bgsvgs[0];
+		}
+	}
+
+	if (bgSvg) {
+		var extension = ".png";
+		if (svgBoardDesigns.includes(paiShoBoardKey)) {
+			extension = ".svg";
+		}
+		bgSvg.style.backgroundImage = "url('style/board_" + paiShoBoardKey + extension + "')";
 	}
 }
 

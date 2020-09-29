@@ -62,156 +62,165 @@ var QueryString = function () {
 	  minimalist: "TGG Minimalist"
   };
   
-  var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
-  var paiShoBoardDesignTypeValues = {
-	  tgg: "The Garden Gate",
-	  nomadic: "Nomadic",
-	  mayfair: "Mayfair Filter",
-	  skudShop: "The Garden Gate Shop",
-	  vescucci: "Vescucci Style",
-	  xiangqi: "Xiangqi-Style Tile Colors",
-	  pixelsho: "Pixel-Sho",
-	  remix: "Remix",
-	  default: "Old Default",
-	  water: "Water by Monk_Gyatso",
-	  earth: "Earth by BoomerangGuy",
-	  fire: "Fire by BoomerangGuy",
-	  airnomad: "Air Nomads by Monk_Gyatso",
-	  air: "Air Themed by Monk_Gyatso",
-	  nick: "Nick style by BoomerangGuy",
-	  nickoffset: "Nick offset-lines",
-	  owl: "Order of the White Lotus by Geebung",
-	  metal: "Metal Bender style by ohreaganoe",
-	  whitethread: "White Thread by tree",
-	  avatarstate: "Avatar State by el craken",
-	  blowtorch: "Blowtorch by ProfPetruescu",
-	  azul: "Azul by Cannoli",
-	  checkeredtraining: "Checkered Training Board by Aba",
-	  forest: "Forest Board, dedicated to tree",
-	  flowergarden: "Flower Garden by Liam_Keaggy13",
-	  worldmap: "World Map by corky125",
-	  goldengarden: "Golden Garden by Sidereus"
-  };
+var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
+var paiShoBoardDesignTypeValues = {
+	tgg: "The Garden Gate",
+	nomadic: "Nomadic",
+	mayfair: "Mayfair Filter",
+	skudShop: "The Garden Gate Shop",
+	vescucci: "Vescucci Style",
+	xiangqi: "Xiangqi-Style Tile Colors",
+	pixelsho: "Pixel-Sho",
+	remix: "Remix",
+	lightmode: "Old Default Light Mode",
+	darkmode: "Old Default Dark Mode",
+	water: "Water by Monk_Gyatso",
+	earth: "Earth by BoomerangGuy",
+	fire: "Fire by BoomerangGuy",
+	airnomad: "Air Nomads by Monk_Gyatso",
+	air: "Air Themed by Monk_Gyatso",
+	nick: "Nick style by BoomerangGuy",
+	nickoffset: "Nick offset-lines",
+	owl: "Order of the White Lotus by Geebung",
+	metal: "Metal Bender style by ohreaganoe",
+	whitethread: "White Thread by tree",
+	avatarstate: "Avatar State by el craken",
+	blowtorch: "Blowtorch by ProfPetruescu",
+	azul: "Azul by Cannoli",
+	checkeredtraining: "Checkered Training Board by Aba",
+	forest: "Forest Board, dedicated to tree",
+	flowergarden: "Flower Garden by Liam_Keaggy13",
+	worldmap: "World Map by corky125",
+	goldengarden: "Golden Garden by Sidereus",
+	momo: "The Amazing Momo by TheRealMomo"
+};
+
+var svgBoardDesigns = [
+	"lightmode",
+	"darkmode",
+	"xiangqi"
+];
   
-  var paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
+var paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
+
+function buildDropdownDiv(dropdownId, labelText, valuesObject, selectedObjectKey, onchangeFunction) {
+	var containerDiv = document.createElement("div");
+
+	var theDropdown = document.createElement("select");
+	theDropdown.id = dropdownId;
+
+	var label = document.createElement("label");
+	label.for = dropdownId;
+	label.innerText = labelText;
+
+	Object.keys(valuesObject).forEach(function(key, index) {
+		var option = document.createElement("option");
+		option.value = key;
+		option.innerText = valuesObject[key];
+
+		if (key === selectedObjectKey) {
+			option.selected = true;
+		}
+
+		theDropdown.appendChild(option);
+	});
+
+	theDropdown.onchange = onchangeFunction;
+
+	containerDiv.appendChild(label);
+	containerDiv.appendChild(theDropdown);
+
+	return containerDiv;
+}
   
-  function buildDropdownDiv(dropdownId, labelText, valuesObject, selectedObjectKey, onchangeFunction) {
-	  var containerDiv = document.createElement("div");
+function buildPaiShoBoardDesignDropdownDiv() {
+	return buildDropdownDiv(paiShoBoardDesignDropdownId, "Pai Sho Board Design:", paiShoBoardDesignTypeValues,
+		localStorage.getItem(paiShoBoardDesignTypeKey),
+		function() {
+			setPaiShoBoardOption(this.value);
+		});
+}
   
-	  var theDropdown = document.createElement("select");
-	  theDropdown.id = dropdownId;
+function buildPaiShoSettingsDiv() {
+	var settingsDiv = document.createElement("div");
+
+	var heading = document.createElement("h4");
+	heading.innerText = "Pai Sho Game Preferences:";
+
+	settingsDiv.appendChild(heading);
+	settingsDiv.appendChild(buildPaiShoBoardDesignDropdownDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	return settingsDiv;
+}
   
-	  var label = document.createElement("label");
-	  label.for = dropdownId;
-	  label.innerText = labelText;
-  
-	  Object.keys(valuesObject).forEach(function(key,index) {
-		  var option = document.createElement("option");
-		  option.value = key;
-		  option.innerText = valuesObject[key];
-  
-		  if (key === selectedObjectKey) {
-			  option.selected = true;
-		  }
-  
-		  theDropdown.appendChild(option);
-	  });
-  
-	  theDropdown.onchange = onchangeFunction;
-  
-	  containerDiv.appendChild(label);
-	  containerDiv.appendChild(theDropdown);
-  
-	  return containerDiv;
-  }
-  
-  function buildPaiShoBoardDesignDropdownDiv() {
-	  return buildDropdownDiv(paiShoBoardDesignDropdownId, "Pai Sho Board Design:", paiShoBoardDesignTypeValues,
-							  localStorage.getItem(paiShoBoardDesignTypeKey),
-							  function() {
-								  setPaiShoBoardOption(this.value);
-							  });
-  }
-  
-  function buildPaiShoSettingsDiv() {
-	  var settingsDiv = document.createElement("div");
-  
-	  var heading = document.createElement("h4");
-	  heading.innerText = "Pai Sho Game Preferences:";
-  
-	  settingsDiv.appendChild(heading);
-	  settingsDiv.appendChild(buildPaiShoBoardDesignDropdownDiv());
-  
-	  settingsDiv.appendChild(document.createElement("br"));
-	  return settingsDiv;
-  }
-  
-  var vagabondTileDesignTypeKey = "vagabondTileDesignTypeKey";
-  
-  var usernameKey = "usernameKey";
-  var userEmailKey = "userEmailKey";
-  var userIdKey = "userIdKey";
-  var deviceIdKey = "deviceIdKey";
-  var deviceTokenKey = "deviceTokenKey";
-  
-  var welcomeTutorialDismissedKey = "welcomeTutorialDismissedKey";
-  
-  var url;
-  
-  var defaultHelpMessageText;
-  var defaultEmailMessageText;
-  
-  var localStorage;
-  
-  var hostEmail;
-  var guestEmail;
-  
-  var BRAND_NEW = "Brand New";
-  var MOVE_DONE = "Move Done";
-  var WAITING_FOR_ENDPOINT = "Waiting for endpoint";
-  var READY_FOR_BONUS = "READY_FOR_BONUS";
-  var WAITING_FOR_BONUS_ENDPOINT = "WAITING_FOR_BONUS_ENDPOINT";
-  var WAITING_FOR_BOAT_BONUS_POINT = "WAITING_FOR_BOAT_BONUS_POINT";
-  
-  var HOST_SELECT_ACCENTS = "HOST_SELECT_ACCENTS";
-  
-  var localPlayerRole = HOST;
-  
-  var activeAi;
-  var activeAi2;
-  var sandboxUrl;
-  var metadata = new Object();
-  var replayIntervalLength = 2100;
-  var pieceAnimationLength = 1000;// Note that this must be changed in the `.point img` `transition` property as well(main.css)
-  var piecePlaceAnimation = 1;// 0 = None, they just appear, 1 = 
-  
-  /* Online Play variables */
-  var onlinePlayEngine = new OnlinePlayEngine();
-  var appCaller;
-  
-  var gameId = -1;
-  var lastKnownGameNotation = "";
-  var gameWatchIntervalValue;
-  var currentGameOpponentUsername;
-  var currentGameData = new Object();
-  var currentMoveIndex = 0;
-  var isInReplay = false;
-  var interval = 0;
-  
-  var emailBeingVerified = "";
-  var usernameBeingVerified = "";
-  var codeToVerify = 0;
-  var tempUserId;
-  var myGamesList = [];
-  var gameSeekList = [];
-  var userOnlineIcon = "<span title='Online' style='color:#35ac19;'><i class='fa fa-user-circle-o' aria-hidden='true'></i></span>";
-  var userOfflineIcon = "<span title='Offline' style='color:gray;'><i class='fa fa-user-circle-o' aria-hidden='true'></i></span>";
-  var logOnlineStatusIntervalValue;
-  var userTurnCountInterval;
-  
-  var gameContainerDiv = document.getElementById("game-container");
-  var soundManager;
-  /* --- */
+var vagabondTileDesignTypeKey = "vagabondTileDesignTypeKey";
+
+var usernameKey = "usernameKey";
+var userEmailKey = "userEmailKey";
+var userIdKey = "userIdKey";
+var deviceIdKey = "deviceIdKey";
+var deviceTokenKey = "deviceTokenKey";
+
+var welcomeTutorialDismissedKey = "welcomeTutorialDismissedKey";
+
+var url;
+
+var defaultHelpMessageText;
+var defaultEmailMessageText;
+
+var localStorage;
+
+var hostEmail;
+var guestEmail;
+
+var BRAND_NEW = "Brand New";
+var MOVE_DONE = "Move Done";
+var WAITING_FOR_ENDPOINT = "Waiting for endpoint";
+var READY_FOR_BONUS = "READY_FOR_BONUS";
+var WAITING_FOR_BONUS_ENDPOINT = "WAITING_FOR_BONUS_ENDPOINT";
+var WAITING_FOR_BOAT_BONUS_POINT = "WAITING_FOR_BOAT_BONUS_POINT";
+
+var HOST_SELECT_ACCENTS = "HOST_SELECT_ACCENTS";
+
+var localPlayerRole = HOST;
+
+var activeAi;
+var activeAi2;
+var sandboxUrl;
+var metadata = new Object();
+var replayIntervalLength = 2100;
+var pieceAnimationLength = 1000; // Note that this must be changed in the `.point img` `transition` property as well(main.css)
+var piecePlaceAnimation = 1; // 0 = None, they just appear, 1 = 
+
+/* Online Play variables */
+var onlinePlayEngine = new OnlinePlayEngine();
+var appCaller;
+
+var gameId = -1;
+var lastKnownGameNotation = "";
+var gameWatchIntervalValue;
+var currentGameOpponentUsername;
+var currentGameData = new Object();
+var currentMoveIndex = 0;
+var isInReplay = false;
+var interval = 0;
+
+var emailBeingVerified = "";
+var usernameBeingVerified = "";
+var codeToVerify = 0;
+var tempUserId;
+var myGamesList = [];
+var gameSeekList = [];
+var userOnlineIcon = "<span title='Online' style='color:#35ac19;'><i class='fa fa-user-circle-o' aria-hidden='true'></i></span>";
+var userOfflineIcon = "<span title='Offline' style='color:gray;'><i class='fa fa-user-circle-o' aria-hidden='true'></i></span>";
+var logOnlineStatusIntervalValue;
+var userTurnCountInterval;
+
+var gameContainerDiv = document.getElementById("game-container");
+
+var soundManager;
+/* --- */
   
   window.requestAnimationFrame(function () {
 	  /* Online play is enabled! */
@@ -673,16 +682,19 @@ var QueryString = function () {
 	  }, REAL_TIME_GAME_WATCH_INTERVAL);
   }
   
-  /* Pai Sho Board Switches */
-  function setPaiShoBoardOption(newPaiShoBoardKey) {
-	  var oldClassName = paiShoBoardKey + "Board";
-	  gameContainerDiv.classList.remove(oldClassName);
-	  localStorage.setItem(paiShoBoardDesignTypeKey, newPaiShoBoardKey);
-	  paiShoBoardKey = newPaiShoBoardKey;
-	  var newClassName = paiShoBoardKey + "Board";
-	  gameContainerDiv.classList.add(newClassName);
-	  clearMessage(); // Refresh Help tab text
-  }
+/* Pai Sho Board Switches */
+function setPaiShoBoardOption(newPaiShoBoardKey) {
+	var oldClassName = paiShoBoardKey + "Board";
+	gameContainerDiv.classList.remove(oldClassName);
+	localStorage.setItem(paiShoBoardDesignTypeKey, newPaiShoBoardKey);
+	paiShoBoardKey = newPaiShoBoardKey;
+	var newClassName = paiShoBoardKey + "Board";
+	gameContainerDiv.classList.add(newClassName);
+
+	applyBoardOptionToBgSvg();
+
+	clearMessage(); // Refresh Help tab text
+}
   
   /* Skud Pai Sho Tile Design Switches */
   function setSkudTilesOption(newSkudTilesKey) {

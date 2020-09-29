@@ -343,7 +343,7 @@ div.tab .alertTab, div.tab .alertTab.active {
   padding-bottom: 100%;
   border: none;
 }
-.game-container.pixelsho .bg-svg {
+/* .game-container.pixelsho .bg-svg {
   background-image: url(pixelshoboard.png);
 }
 .game-container.pixelsho2 .bg-svg {
@@ -435,7 +435,7 @@ div.tab .alertTab, div.tab .alertTab.active {
 }
 .game-container.tggBoard .bg-svg {
   background-image: url(board_tgg.png);
-}
+} */
 
 figure > div {
   margin: 1em auto;
