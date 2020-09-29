@@ -37,6 +37,7 @@ var BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES = "Bonus Movement (+1) Per Captive";
 var LESS_TILES = "Less Tiles";
 
 /* Playground */
+var PLAY_IN_SPACES = "Play In Spaces";
 var VAGABOND_ROTATE = "Vagabond Board Rotation";
 var ADEVAR_ROTATE = "Adevar Board Rotation";
 

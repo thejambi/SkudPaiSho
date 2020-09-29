@@ -1789,6 +1789,7 @@ var GameType = {
 		desc: "Pai Sho Playground",
 		rulesUrl: "https://skudpaisho.com/site/games/pai-sho-playground/",
 		gameOptions: [
+			PLAY_IN_SPACES,
 			VAGABOND_ROTATE,
 			ADEVAR_ROTATE
 		]

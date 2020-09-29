@@ -23,8 +23,6 @@ PlaygroundActuator.guestTeamTilesDivId = "guestTilesContainer";
 PlaygroundActuator.prototype.actuate = function(board, tileManager) {
 	var self = this;
 
-	// self.printBoard(board);
-
 	window.requestAnimationFrame(function () {
 		self.htmlify(board, tileManager);
 	});
@@ -182,25 +180,4 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint) {
 	}
 };
 
-PlaygroundActuator.prototype.printBoard = function(board) {
-	debug("");
-	var rowNum = 0;
-	board.cells.forEach(function (row) {
-		var rowStr = rowNum + "\t: ";
-		row.forEach(function (boardPoint) {
-			var str = boardPoint.getConsoleDisplay();
-			if (str.length < 3) {
-				rowStr += " ";
-			}
-			rowStr = rowStr + str;
-			if (str.length < 2) {
-				rowStr = rowStr + " ";
-			}
-			
-		});
-		debug(rowStr);
-		rowNum++;
-	});
-	debug("");
-};
 

@@ -487,6 +487,12 @@ figure > div {
   height: 612px;
   width: 612px;
 }
+
+.pointContainerForPlayInSpaces {
+  height: 612px;
+  width: 612px;
+}
+
 .tilePileContainer {
   display: inline;
   float: left;
@@ -1293,7 +1299,7 @@ textarea {
       width: 100vw;
     }
 
-    .pointContainer {
+    .pointContainer, .pointContainerForPlayInSpaces {
       width: 100vw;
       height: 100vw;
     }
@@ -1481,7 +1487,7 @@ textarea {
       width: 306px;
     }
 
-    .pointContainer {
+    .pointContainer, .pointContainerForPlayInSpaces {
       width: 306px;
       height: 306px;
     }

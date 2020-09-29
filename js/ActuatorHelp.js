@@ -64,7 +64,11 @@ function setupPaiShoBoard(gameContainer,
 
 	removeChildren(gameContainer);
 
-	var boardContainer = createDivWithClass("pointContainer");
+	var ptContainerClass = "pointContainer";
+	if (gameOptionEnabled(PLAY_IN_SPACES)) {
+		ptContainerClass = "pointContainerForPlayInSpaces"
+	}
+	var boardContainer = createDivWithClass(ptContainerClass);
 
 	var bcontainer = createDivWithClass("board-container");
 	var svgContainer = createDivWithClass("svgContainer");
