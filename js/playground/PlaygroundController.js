@@ -74,6 +74,8 @@ PlaygroundController.prototype.getAdditionalMessage = function() {
 		} else {
 			msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move. <br />";
 		}
+
+		msg += getGameOptionsMessageHtml(GameType.Playground.gameOptions);
 	}
 	if (!playingOnlineGame) {
 		msg += "<span class='skipBonus' onClick='gameController.passTurn()'>End Turn</span><br />";

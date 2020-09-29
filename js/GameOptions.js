@@ -36,6 +36,10 @@ var BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES = "Bonus Movement (+1) Per Captive";
 /* Overgrowth */
 var LESS_TILES = "Less Tiles";
 
+/* Playground */
+var VAGABOND_ROTATE = "Vagabond Board Rotation";
+var ADEVAR_ROTATE = "Adevar Board Rotation";
+
 
 function gameOptionEnabled(optionName) {
 	return ggOptions.includes(optionName);

@@ -463,6 +463,24 @@ figure > div {
   transform: rotate(315deg);
 }
 
+.adevarBoardRotate {
+  -webkit-transform: rotate(135deg);
+  -moz-transform: rotate(135deg);
+  -o-transform: rotate(135deg);
+  -ms-transform: rotate(135deg);
+  transform: rotate(135deg);
+
+  z-index:0;
+}
+
+.adevarPointRotate {
+  -webkit-transform: rotate(225deg);
+  -moz-transform: rotate(225deg);
+  -o-transform: rotate(225deg);
+  -ms-transform: rotate(225deg);
+  transform: rotate(225deg);
+}
+
 .pointContainer {
   /*padding: 16px;*/
   padding: 17px;

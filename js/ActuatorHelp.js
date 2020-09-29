@@ -50,12 +50,16 @@ function createBoardPointDiv(boardPoint) {
 function setupPaiShoBoard(gameContainer,
 	hostTilesContainerDivs,
 	guestTilesContainerDivs,
-	rotateBoard) {
+	rotateBoard,
+	rotateType) {
 
 	var addVagabondBoardRotate = false;
+	var addAdevarBoardRotate = false;
 	// Check for existing vagabond class on board...
 	if (document.querySelector(".vagabondBoardRotate")) {
 		addVagabondBoardRotate = true;
+	} else if (document.querySelector(".adevarBoardRotate")) {
+		addAdevarBoardRotate = true;
 	}
 
 	removeChildren(gameContainer);
@@ -71,6 +75,8 @@ function setupPaiShoBoard(gameContainer,
 
 	if (addVagabondBoardRotate) {
 		svgContainer.classList.add("vagabondBoardRotate");
+	} else if (addAdevarBoardRotate) {
+		svgContainer.classList.add("adevarBoardRotate");
 	}
 
 	bgSvg.appendChild(boardContainer);
@@ -102,14 +108,19 @@ function setupPaiShoBoard(gameContainer,
 
 	var addClassAfterThisManyMs = 100;
 	if (rotateBoard) {
+		var rotateClass = "vagabondBoardRotate";
+		if (rotateType === ADEVAR_ROTATE) {
+			rotateClass = "adevarBoardRotate";
+		}
 		// Set Timeout to get animated board rotation
 		setTimeout(function () {
-			svgContainer.classList.add("vagabondBoardRotate");
+			svgContainer.classList.add(rotateClass);
 		}, addClassAfterThisManyMs);
 	} else {
 		// Set Timeout to get animated board rotation
 		setTimeout(function () {
 			svgContainer.classList.remove("vagabondBoardRotate");
+			svgContainer.classList.remove("adevarBoardRotate");
 		}, addClassAfterThisManyMs);
 	}
 

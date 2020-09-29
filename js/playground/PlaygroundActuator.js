@@ -8,7 +8,8 @@ function PlaygroundActuator(gameContainer, isMobile) {
 		this.gameContainer, 
 		PlaygroundController.getHostTilesContainerDivs(),
 		PlaygroundController.getGuestTilesContainerDivs(), 
-		false
+		(gameOptionEnabled(VAGABOND_ROTATE) || gameOptionEnabled(ADEVAR_ROTATE)),
+		(gameOptionEnabled(ADEVAR_ROTATE) ? ADEVAR_ROTATE : false)
 	);
 
 	this.boardContainer = containers.boardContainer;
@@ -118,6 +119,8 @@ PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
 		gameImgDir = "Vagabond/" + localStorage.getItem(vagabondTileDesignTypeKey);
 	} else if (tile.gameType === GameType.CapturePaiSho) {
 		gameImgDir = "Capture";
+	} else if (tile.gameType === GameType.Playground) {
+		gameImgDir = "Playground";
 	}
 	if (gameImgDir) {
 		srcValue = srcValue + gameImgDir + "/";
@@ -133,6 +136,11 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint) {
 	
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
+		if (gameOptionEnabled(VAGABOND_ROTATE)) {
+			theDiv.classList.add("vagabondPointRotate");
+		} else if (gameOptionEnabled(ADEVAR_ROTATE)) {
+			theDiv.classList.add("adevarPointRotate");
+		}
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 		} else if (boardPoint.betweenHarmony) {

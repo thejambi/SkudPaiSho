@@ -60,6 +60,9 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_T", ownerCode));
 	tiles.push(new PlaygroundTile(GameType.CapturePaiSho, "Capture_O", ownerCode));
 
+	// Playground Special
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Blank", ownerCode));
+
 	return tiles;
 };
 
