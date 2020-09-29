@@ -76,15 +76,16 @@ PlaygroundController.prototype.getAdditionalMessage = function() {
 		}
 
 		msg += getGameOptionsMessageHtml(GameType.Playground.gameOptions);
-	}
-	if (!playingOnlineGame) {
-		msg += "<span class='skipBonus' onClick='gameController.passTurn()'>End Turn</span><br />";
+	} else {
+		if (this.notationBuilder.endGame) {
+			msg += "Make a move to end the game. <span class='skipBonus' onClick='gameController.unsetEndOfGame()'>Remove end of game trigger</span><br />";
+		} else {
+			msg += "<span class='skipBonus' onClick='gameController.setEndOfGame()'>Set end of game (click, then make a move to end game)</span><br />";
+		}
 	}
 
-	if (this.notationBuilder.endGame) {
-		msg += "Make a move to end the game.<br />";
-	} else {
-		msg += "<span class='skipBonus' onClick='gameController.setEndOfGame()'>Set end of game (click, then make a move to end game)</span><br />";
+	if (!playingOnlineGame) {
+		msg += "<span class='skipBonus' onClick='gameController.passTurn()'>End Turn</span><br />";
 	}
 
 	return msg;
@@ -92,6 +93,11 @@ PlaygroundController.prototype.getAdditionalMessage = function() {
 
 PlaygroundController.prototype.setEndOfGame = function() {
 	this.notationBuilder.endGame = true;
+	refreshMessage();
+};
+
+PlaygroundController.prototype.unsetEndOfGame = function() {
+	this.notationBuilder.endGame = false;
 	refreshMessage();
 };
 
