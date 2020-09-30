@@ -63,6 +63,16 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	// Playground Special
 	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Blank", ownerCode));
 
+	// Adevar
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_Back", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_Echeveria", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_Foxglove", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_Iris", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_Lilac", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_OrientalLily", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_Vanguard", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_Zinnia", ownerCode));
+
 	return tiles;
 };
 
