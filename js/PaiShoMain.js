@@ -92,7 +92,8 @@ var paiShoBoardDesignTypeValues = {
 	flowergarden: "Flower Garden by Liam_Keaggy13",
 	worldmap: "World Map by corky125",
 	goldengarden: "Golden Garden by Sidereus",
-	momo: "The Amazing Momo by TheRealMomo"
+	momo: "The Amazing Momo by TheRealMomo",
+	vaaturaava: "Vaatu Raava by mrpandaber"
 };
 
 var svgBoardDesigns = [
