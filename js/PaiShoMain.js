@@ -273,7 +273,7 @@ var soundManager;
   
 	  /* Tile Design Preferences */
 	  if (!localStorage.getItem(tileDesignTypeKey)) {
-		  setSkudTilesOption("gyatsocontrast");
+		  setSkudTilesOption("tgggyatso");
 	  } else {
 		setSkudTilesOption(localStorage.getItem(tileDesignTypeKey));
 	  }
