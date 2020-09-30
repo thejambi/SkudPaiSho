@@ -84,11 +84,18 @@ PlaygroundController.prototype.getAdditionalMessage = function() {
 		}
 	}
 
-	if (!playingOnlineGame) {
-		msg += "<span class='skipBonus' onClick='gameController.passTurn()'>End Turn</span><br />";
+	if (!playingOnlineGame()) {
+		msg += "<span class='skipBonus' onClick='gameController.passTurn()'>Pass Turn</span><br />";
+		if (onlinePlayEnabled && this.gameNotation.moves.length > 0) {
+			msg += "<span class='skipBonus' onClick='gameController.startOnlineGame()'>End Game Setup and Create Game</span></br />";
+		}
 	}
 
 	return msg;
+};
+
+PlaygroundController.prototype.startOnlineGame = function() {
+	createGameIfThatIsOk(GameType.Playground.id);
 };
 
 PlaygroundController.prototype.setEndOfGame = function() {
@@ -184,14 +191,11 @@ PlaygroundController.prototype.pointClicked = function(htmlPoint) {
 
 			// Move all set. Add it to the notation!
 			this.gameNotation.addMove(move);
-			if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-				createGameIfThatIsOk(GameType.Playground.id);
+			
+			if (playingOnlineGame()) {
+				callSubmitMove();
 			} else {
-				if (playingOnlineGame()) {
-					callSubmitMove();
-				} else {
-					finalizeMove();
-				}
+				finalizeMove();
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
