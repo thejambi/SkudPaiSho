@@ -118,6 +118,8 @@ function setupPaiShoBoard(gameContainer,
 		}
 		// Set Timeout to get animated board rotation
 		setTimeout(function () {
+			svgContainer.classList.remove("vagabondBoardRotate");
+			svgContainer.classList.remove("adevarBoardRotate");
 			svgContainer.classList.add(rotateClass);
 		}, addClassAfterThisManyMs);
 	} else {
