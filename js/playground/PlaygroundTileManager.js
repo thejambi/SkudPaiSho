@@ -72,6 +72,7 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_OrientalLily", ownerCode));
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_Vanguard", ownerCode));
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_Zinnia", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_WatersReflection", ownerCode));
 
 	return tiles;
 };
