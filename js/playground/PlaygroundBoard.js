@@ -859,8 +859,8 @@ PlaygroundBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) 
 	return true;
 };
 
-PlaygroundBoard.prototype.canMoveTileToPoint = function(boardPointStart, boardPointEnd) {
-	return true;
+PlaygroundBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
+	return boardPointStart !== boardPointEnd;
 };
 
 PlaygroundBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {

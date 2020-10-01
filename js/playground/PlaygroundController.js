@@ -178,7 +178,7 @@ PlaygroundController.prototype.pointClicked = function(htmlPoint) {
 			this.notationBuilder.moveType = MOVE;
 			this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
-			this.theGame.revealAllPointsAsPossible();
+			this.theGame.revealPossibleMovePoints(boardPoint);
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
