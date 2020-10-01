@@ -148,7 +148,7 @@ PlaygroundGameManager.prototype.getWinner = function() {
 
 PlaygroundGameManager.prototype.getWinReason = function() {
 	if (this.board.winners.length === 1) {
-		return " created a Harmony Ring and won the game!";
+		return " wins! The game has ended.";
 	} else if (this.endGameWinners.length === 1) {
 		if (this.tileManager.getPlayerWithMoreAccentTiles()) {
 			return " won the game with more Accent Tiles left.";
