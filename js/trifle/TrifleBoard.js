@@ -1203,13 +1203,33 @@ TrifleBoard.prototype.applyWhenCapturingTrigger = function(tile, tileInfo, board
 	var self = this;
 	triggeredAbilities.forEach(function(triggeredAbility) {
 		// Verify any other trigger criteria here...
-
 		debug("When capturing trigger.. triggered");
+
+		var targetTiles = self.determineWhenCapturingTargetTiles(tile, tileInfo, triggeredAbility, boardPointOfTile, capturedTiles);
+		var targetTileTypes = self.determineWhenCapturingTargetTileTypes(tile, tileInfo, triggeredAbility, boardPointOfTile, capturedTiles);
 		
 		if (triggeredAbility.duration && triggeredAbility.duration > 0) {
-			self.activateAbility(tile, triggeredAbility);
+			targetTiles.forEach(function(targetTile) {
+				self.activateAbility(tile, targetTile, null, triggeredAbility);
+			});
+			targetTileTypes.forEach(function(targetTileType) {
+				self.activateAbility(tile, null, targetTileType, triggeredAbility);
+			});
 		}
 	});
+};
+
+TrifleBoard.prototype.determineWhenCapturingTargetTiles = function(tile, tileInfo, triggeredAbility, boardPointOfTile, capturedTiles) {
+	/* Currently supports TargetTileType: TileCategory.thisTile */
+	var targetTiles = [];
+	if (triggeredAbility.targetTileTypes && triggeredAbility.targetTileTypes.includes(TileCategory.thisTile)) {
+		targetTiles.push(tile);
+	}
+	return targetTiles;
+};
+
+TrifleBoard.prototype.determineWhenCapturingTargetTileTypes = function(tile, tileInfo, triggeredAbility, boardPointOfTile, capturedTiles) {
+	return [];
 };
 
 TrifleBoard.prototype.setPointFlags = function() {
@@ -1766,21 +1786,22 @@ TrifleBoard.prototype.tileHasActiveCaptureProtectionFromCapturingTile = function
 	this.activeDurationAbilities.forEach(function(durationAbilityEntry) {
 		debug("Active Duration Ability: ");
 		debug(durationAbilityEntry);
-		if (durationAbilityEntry.tile === tile) {
+		if (durationAbilityEntry.targetTile === tile) {	// OR target TileTypeMatches tile
 			debug("Yes, for this tile");
 			var capturingTileInfo = TrifleTiles[capturingTile.code];
-			if (
-				(durationAbilityEntry.ability.tileTypesProtectedFrom
-				&& arrayIncludesOneOf(durationAbilityEntry.ability.tileTypesProtectedFrom, capturingTileInfo.types))
-				||
-				(durationAbilityEntry.ability.tileTypesProtectedFrom
-					&& durationAbilityEntry.ability.tileTypesProtectedFrom.includes(TileCategory.allTileTypes))
-				||
-				(durationAbilityEntry.ability.tilesProtectedFrom
-				&& durationAbilityEntry.ability.tilesProtectedFrom.includes(capturingTile.code))
-			) {
-				tileHasActiveCaptureProtection = true;
-				return;
+			if (durationAbilityEntry.ability.type === Ability.protectFromCapture) {
+				if ((durationAbilityEntry.ability.tileTypesProtectedFrom
+					&& arrayIncludesOneOf(durationAbilityEntry.ability.tileTypesProtectedFrom, capturingTileInfo.types))
+					||
+					(durationAbilityEntry.ability.tileTypesProtectedFrom
+						&& durationAbilityEntry.ability.tileTypesProtectedFrom.includes(TileCategory.allTileTypes))
+					||
+					(durationAbilityEntry.ability.tilesProtectedFrom
+					&& durationAbilityEntry.ability.tilesProtectedFrom.includes(capturingTile.code))
+				) {
+					tileHasActiveCaptureProtection = true;
+					return;
+				}
 			}
 		}
 	});
@@ -2212,12 +2233,14 @@ TrifleBoard.prototype.setGuestGateOpen = function() {
 	}
 };
 
-TrifleBoard.prototype.activateAbility = function(tile, abilityInfo) {
+TrifleBoard.prototype.activateAbility = function(tileOwningAbility, targetTile, targetTileType, abilityInfo) {
 	if (abilityInfo.duration && abilityInfo.duration > 0) {
 		abilityInfo.active = true;
 		abilityInfo.remainingDuration = abilityInfo.duration;
 		this.activeDurationAbilities.push({
-			tile: tile,
+			grantingTile: tileOwningAbility,
+			targetTile: targetTile,
+			targetTileType: targetTileType,
 			ability: abilityInfo
 		});
 		debug("Activated ability!");

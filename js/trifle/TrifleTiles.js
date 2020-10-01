@@ -39,6 +39,7 @@ var TileType = {
 };
 
 var TileCategory = {
+	thisTile: "thisTile",
 	allTileTypes: "allTileTypes",
 	landingTile: "landingTile"
 };
@@ -103,8 +104,8 @@ var BoardPresenceAbility = {
 	increaseFriendlyTileMovementDistance: "increaseFriendlyTileMovementDistance",
 	// spawnAdditionalCopies: "spawnAdditionalCopies",	// TODO,
 	canBeCapturedByFriendlyTiles: "canBeCapturedByFriendlyTiles",
-	drawOpponentTilesInLineOfSight: "drawOpponentTilesInLineOfSight",
-	captureProtection: "captureProtection"
+	drawOpponentTilesInLineOfSight: "drawOpponentTilesInLineOfSight"
+	// captureProtection: "captureProtection"
 }
 
 var SpawnLocation = {
@@ -113,7 +114,8 @@ var SpawnLocation = {
 
 var Ability = {
 	captureTiles: "captureTiles",
-	removeEffects: "removeEffects"
+	removeEffects: "removeEffects",
+	protectFromCapture: "protectFromCapture"
 };
 
 var AbilityType = {
@@ -133,11 +135,7 @@ var TileTeam = {
 };
 
 var AbilitiesForType = {};
-	// protection: [
-	// 		ZoneAbility.protectFriendlyTilesFromCapture,
-	// 		BoardPresenceAbility.captureProtection
-	// 	]
-	// }
+
 var AbilityTypes = {};
 
 var TrifleTiles = {};
@@ -270,7 +268,7 @@ TrifleTileInfo.defineAbilitiesForAbilityTypes = function () {
 
 	AbilitiesForType[AbilityType.protection] = [
 		ZoneAbility.protectFriendlyTilesFromCapture,
-		BoardPresenceAbility.captureProtection
+		Ability.protectFromCapture
 	];
 };
 
@@ -281,7 +279,7 @@ TrifleTileInfo.defineAbilityTypes = function () {
 		AbilityType.protection
 	];
 
-	AbilityTypes[BoardPresenceAbility.captureProtection] = [
+	AbilityTypes[Ability.protectFromCapture] = [
 		AbilityType.protection
 	];
 };
@@ -620,7 +618,8 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		],
 		abilities: [
 			{
-				type: BoardPresenceAbility.captureProtection,
+				type: Ability.protectFromCapture,
+				targetTileTypes: [TileCategory.thisTile],
 				triggeringAction: AbilityTrigger.whenCapturing,
 				// triggerTargetTileType: [TileType.flower],	// Idea: For example - ability could trigger when capturing a Flower - It'd be better to create a Trigger object that contains all the trigger info
 				duration: 1,
