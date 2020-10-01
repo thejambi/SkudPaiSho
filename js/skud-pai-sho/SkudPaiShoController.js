@@ -709,7 +709,7 @@ SkudPaiShoController.prototype.getAdditionalHelpTabDiv = function() {
 	heading.innerText = "Skud Pai Sho Preferences:";
 
 	settingsDiv.appendChild(heading);
-	settingsDiv.appendChild(this.buildTileDesignDropdownDiv());
+	settingsDiv.appendChild(SkudPaiShoController.buildTileDesignDropdownDiv());
 
 	settingsDiv.appendChild(document.createElement("br"));
 
@@ -719,8 +719,9 @@ SkudPaiShoController.prototype.getAdditionalHelpTabDiv = function() {
 	return settingsDiv;
 };
 
-SkudPaiShoController.prototype.buildTileDesignDropdownDiv = function() {
-	return buildDropdownDiv("skudPaiShoTileDesignDropdown", "Tile Designs:", tileDesignTypeValues,
+SkudPaiShoController.buildTileDesignDropdownDiv = function(alternateLabelText) {
+	var labelText = alternateLabelText ? alternateLabelText : "Tile Designs";
+	return buildDropdownDiv("skudPaiShoTileDesignDropdown", labelText + ":", tileDesignTypeValues,
 							localStorage.getItem(tileDesignTypeKey),
 							function() {
 								setSkudTilesOption(this.value);

@@ -101,6 +101,8 @@ PlaygroundController.prototype.getAdditionalHelpTabDiv = function() {
 	heading.innerText = "Pai Sho Playground Preferences:";
 
 	settingsDiv.appendChild(heading);
+	settingsDiv.appendChild(SkudPaiShoController.buildTileDesignDropdownDiv("Skud Pai Sho Tile Designs"));
+	settingsDiv.appendChild(document.createElement("br"));
 	settingsDiv.appendChild(VagabondController.buildTileDesignDropdownDiv("Vagabond Tile Designs"));
 
 	settingsDiv.appendChild(document.createElement("br"));
