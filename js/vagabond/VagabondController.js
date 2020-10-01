@@ -468,7 +468,7 @@ VagabondController.prototype.getAdditionalHelpTabDiv = function() {
 
 
 	settingsDiv.appendChild(heading);
-	settingsDiv.appendChild(this.buildTileDesignDropdownDiv());
+	settingsDiv.appendChild(VagabondController.buildTileDesignDropdownDiv());
 	settingsDiv.appendChild(movePeekingDiv);
 
 	settingsDiv.appendChild(document.createElement("br"));
@@ -477,31 +477,6 @@ VagabondController.prototype.getAdditionalHelpTabDiv = function() {
 
 	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
-};
-
-VagabondController.tileDesignTypeValues = {
-	delion: "The Garden Gate Designs",
-	tggclassic: "TGG Classic",
-	tgggyatso: "Gyatso TGG Classic",
-	vescuccikoiwheel: "Vescucci Koi-Wheel",
-	classic: "Classic Pai Sho Project",
-	water: "Water themed Garden Gate Designs",
-	fire: "Fire themed Garden Gate Designs",
-	canon: "Canon colors Garden Gate Designs",
-	owl: "Order of the White Lotus Garden Gate Designs"
-};
-
-VagabondController.prototype.buildTileDesignDropdownDiv = function() {
-	return buildDropdownDiv("vagabondPaiShoTileDesignDropdown", "Tile Designs:", VagabondController.tileDesignTypeValues,
-							localStorage.getItem(vagabondTileDesignTypeKey),
-							function() {
-								gameController.setTileDesignsPreference(this.value);
-							});
-};
-
-VagabondController.prototype.setTileDesignsPreference = function(tileDesignKey) {
-	localStorage.setItem(vagabondTileDesignTypeKey, tileDesignKey);
-	this.callActuate();
 };
 
 VagabondController.prototype.buildToggleAnimationsDiv = function() {
@@ -526,3 +501,33 @@ VagabondController.prototype.isAnimationsEnabled = function() {
 	/* Check !== false to default to on */
 	return getUserGamePreference(VagabondController.animationsEnabledKey) !== "false";
 };
+
+/* Vagabond tile designs */
+VagabondController.tileDesignTypeValues = {
+	delion: "The Garden Gate Designs",
+	tggclassic: "TGG Classic",
+	tgggyatso: "Gyatso TGG Classic",
+	vescuccikoiwheel: "Vescucci Koi-Wheel",
+	classic: "Classic Pai Sho Project",
+	water: "Water themed Garden Gate Designs",
+	fire: "Fire themed Garden Gate Designs",
+	canon: "Canon colors Garden Gate Designs",
+	owl: "Order of the White Lotus Garden Gate Designs"
+};
+
+VagabondController.setTileDesignsPreference = function(tileDesignKey) {
+	localStorage.setItem(vagabondTileDesignTypeKey, tileDesignKey);
+	if (gameController && gameController.callActuate) {
+		gameController.callActuate();
+	}
+};
+
+VagabondController.buildTileDesignDropdownDiv = function(alternateLabelText) {
+	var labelText = alternateLabelText ? alternateLabelText : "Tile Designs";
+	return buildDropdownDiv("vagabondPaiShoTileDesignDropdown", labelText + ":", VagabondController.tileDesignTypeValues,
+							localStorage.getItem(vagabondTileDesignTypeKey),
+							function() {
+								VagabondController.setTileDesignsPreference(this.value);
+							});
+};
+

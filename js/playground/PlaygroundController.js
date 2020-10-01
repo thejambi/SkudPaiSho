@@ -94,6 +94,19 @@ PlaygroundController.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
+PlaygroundController.prototype.getAdditionalHelpTabDiv = function() {
+	var settingsDiv = document.createElement("div");
+
+	var heading = document.createElement("h4");
+	heading.innerText = "Pai Sho Playground Preferences:";
+
+	settingsDiv.appendChild(heading);
+	settingsDiv.appendChild(VagabondController.buildTileDesignDropdownDiv("Vagabond Tile Designs"));
+
+	settingsDiv.appendChild(document.createElement("br"));
+	return settingsDiv;
+};
+
 PlaygroundController.prototype.startOnlineGame = function() {
 	createGameIfThatIsOk(GameType.Playground.id);
 };
