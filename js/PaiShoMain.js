@@ -685,6 +685,9 @@ var soundManager;
   
 /* Pai Sho Board Switches */
 function setPaiShoBoardOption(newPaiShoBoardKey) {
+	if (!paiShoBoardDesignTypeValues[newPaiShoBoardKey]) {
+		newPaiShoBoardKey = "tgg";
+	}
 	var oldClassName = paiShoBoardKey + "Board";
 	gameContainerDiv.classList.remove(oldClassName);
 	localStorage.setItem(paiShoBoardDesignTypeKey, newPaiShoBoardKey);
