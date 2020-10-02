@@ -65,13 +65,17 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 
 	// Adevar
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_Back", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_Echeveria", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_Foxglove", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_Iris", ownerCode));
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_Lilac", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_OrientalLily", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_Vanguard", ownerCode));
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_Zinnia", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_Foxglove", ownerCode));
+	// Port goes here ---
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_Iris", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_OrientalLily", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_Echeveria", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_IrisSecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_OrientalLilySecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_EcheveriaSecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_Vanguard", ownerCode));
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_WatersReflection", ownerCode));
 
 	return tiles;
