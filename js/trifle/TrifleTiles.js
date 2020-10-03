@@ -26,7 +26,9 @@ var TrifleTileCodes = {
 	SaberToothMooseLion: 'SaberToothMooseLion',
 	AirGlider: 'AirGlider',
 	Shirshu: 'Shirshu',
-	BoarQPine: 'BoarQPine'
+	BoarQPine: 'BoarQPine',
+	Lavender: 'Lavender',
+	NobleRhubarb: 'NobleRhubarb'
 };
 
 var TileType = {
@@ -101,7 +103,7 @@ var ZoneAbility = {
 }
 
 var BoardPresenceAbility = {
-	increaseFriendlyTileMovementDistance: "increaseFriendlyTileMovementDistance",
+	increaseFriendlyTileMovementDistance: "increaseFriendlyTileMovementDistance",	// TODO replace with Ability.grantBonusMovement
 	// spawnAdditionalCopies: "spawnAdditionalCopies",	// TODO,
 	canBeCapturedByFriendlyTiles: "canBeCapturedByFriendlyTiles",
 	drawOpponentTilesInLineOfSight: "drawOpponentTilesInLineOfSight"
@@ -115,7 +117,8 @@ var SpawnLocation = {
 var Ability = {
 	captureTiles: "captureTiles",
 	removeEffects: "removeEffects",
-	protectFromCapture: "protectFromCapture"
+	protectFromCapture: "protectFromCapture",
+	grantBonusMovement: "grantBonusMovement"
 };
 
 var AbilityType = {
@@ -126,6 +129,7 @@ var AbilityTrigger = {
 	whenCaptured: "whenCaptured",
 	whenCapturing: "whenCapturing",
 	whenTileLandsInZone: "whenTileLandsInZone",
+	whenTileMovesFromWithinZone: "whenTileMovesFromWithinZone",
 	whileTileInLineOfSight: "whileTileInLineOfSight"
 };
 
@@ -453,7 +457,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 
 
 	/* Air Tiles */
-	TrifleTiles[TrifleTileCodes.AirBanner] = { /* Done */
+	TrifleTiles[TrifleTileCodes.AirBanner] = { /* Todo! */
 		types: [TileType.banner],
 		deployTypes: [ DeployType.anywhere ],
 		movements: [
@@ -464,6 +468,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		],
 		abilities: [
 			{
+				// TODO! There is no ZoneAbility.grantBonusTileMovement!
 				type: ZoneAbility.grantBonusTileMovement,
 				// amount: 1,
 				// targetTileTypes: [TileType.flower]
@@ -570,6 +575,35 @@ TrifleTileInfo.defineTrifleTiles = function() {
 					type: ZoneAbility.removesTileAbilities,
 					targetTeams: [TileTeam.friendly, TileTeam.enemy],
 					targetTileTypes: [TileCategory.allTileTypes]
+				}
+			]
+		}
+	};
+
+	TrifleTiles[TrifleTileCodes.NobleRhubarb] = {
+		types: [TileType.flower],
+		deployTypes: [DeployType.anywhere],
+		territorialZone: {
+			size: 1,
+			abilities: [
+				{
+					type: Ability.grantBonusMovement,
+					triggeringAction: AbilityTrigger.whenTileMovesFromWithinZone,
+					// ...
+				}
+			]
+		}
+	};
+
+	TrifleTiles[TrifleTileCodes.Lavender] = {
+		types: [TileType.flower],
+		deployTypes: [DeployType.anywhere],
+		territorialZone: {
+			size: 1,
+			abilities: [
+				{
+					type: ZoneAbility.immobilizesTiles,
+					targetTeams: [TileTeam.friendly, TileTeam.enemy]
 				}
 			]
 		}
