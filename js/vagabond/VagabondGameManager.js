@@ -50,6 +50,7 @@ VagabondGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 	if (move.moveType === DRAW_ACCEPT) {
 		this.gameHasEndedInDraw = true;
+		this.buildAcceptDrawGameLogText(move);
 	}
 
 	if (withActuate) {
@@ -59,7 +60,8 @@ VagabondGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 VagabondGameManager.prototype.buildDeployGameLogText = function(move, tile) {
 	this.gameLogText = move.moveNum + move.playerCode + '. '
-		+ move.player + ' placed ' + VagabondTile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
+		+ move.player + ' placed ' + VagabondTile.getTileName(tile.code) + ' at ' + move.endPoint.pointText
+		+ this.getPlayerHasOfferedDrawGameLogTextIfDrawOffered(move);
 };
 VagabondGameManager.prototype.buildMoveGameLogText = function(move, moveDetails) {
 	this.gameLogText = move.moveNum + move.playerCode + '. '
@@ -67,6 +69,18 @@ VagabondGameManager.prototype.buildMoveGameLogText = function(move, moveDetails)
 	if (moveDetails.capturedTile) {
 		this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ' + VagabondTile.getTileName(moveDetails.capturedTile.code);
 	}
+	this.gameLogText += this.getPlayerHasOfferedDrawGameLogTextIfDrawOffered(move);
+};
+VagabondGameManager.prototype.buildAcceptDrawGameLogText = function(move) {
+	this.gameLogText = move.moveNum + move.playerCode + '. '
+		+ 'Draw offer accepted. Game has ended in a draw.';
+};
+
+VagabondGameManager.prototype.getPlayerHasOfferedDrawGameLogTextIfDrawOffered = function(move) {
+	if (move.offerDraw) {
+		return ". A draw has been offered.";
+	}
+	return "";
 };
 
 VagabondGameManager.prototype.hasEnded = function() {

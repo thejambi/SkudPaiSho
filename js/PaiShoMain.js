@@ -1118,7 +1118,7 @@ function getCurrentPlayerEmail() {
 	}
 	return address;
 }
-  
+
 function getOpponentPlayerEmail() {
 	var address;
 	if (getCurrentPlayer() === HOST) {
