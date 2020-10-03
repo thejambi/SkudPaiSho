@@ -3194,6 +3194,10 @@ function getGameControllerForGameType(gameTypeId) {
 								  && game.lastPlayedUsername !== game.guestUsername) {
 							  message += "</em>";
 						  }
+
+						  if (game.gameResultId && game.gameResultId === 4) {	/* 4 is tie/draw */
+							message += " [draw]";
+						  }
   
 						  message += "</div>";
   

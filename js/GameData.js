@@ -27,7 +27,6 @@ var skudTilesKey = "standard";
 var paiShoBoardKey = "default";
 
 var debugOn = false;
-
 var trifleOn = false;
 
 /* Set to true if building for iOS, else set to false */
