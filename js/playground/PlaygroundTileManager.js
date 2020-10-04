@@ -64,6 +64,7 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Blank", ownerCode));
 
 	// Adevar
+	new AdevarOptions(); // Just to initialize
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_Back", ownerCode));
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_Lilac", ownerCode));
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_Zinnia", ownerCode));

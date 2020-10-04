@@ -120,7 +120,7 @@ PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
 	} else if (tile.gameType === GameType.Playground) {
 		gameImgDir = "Playground";
 	} else if (tile.gameType === "Adevar") {
-		gameImgDir = "Adevar";
+		gameImgDir = "Adevar/" + localStorage.getItem(AdevarOptions.tileDesignTypeKey);
 	}
 	if (gameImgDir) {
 		srcValue = srcValue + gameImgDir + "/";

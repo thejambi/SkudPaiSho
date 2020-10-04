@@ -104,6 +104,8 @@ PlaygroundController.prototype.getAdditionalHelpTabDiv = function() {
 	settingsDiv.appendChild(SkudPaiShoController.buildTileDesignDropdownDiv("Skud Pai Sho Tile Designs"));
 	settingsDiv.appendChild(document.createElement("br"));
 	settingsDiv.appendChild(VagabondController.buildTileDesignDropdownDiv("Vagabond Tile Designs"));
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(AdevarOptions.buildTileDesignDropdownDiv("Adevăr Tile Designs"));
 
 	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
