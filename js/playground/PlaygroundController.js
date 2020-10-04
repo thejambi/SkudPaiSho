@@ -16,6 +16,8 @@ function PlaygroundController(gameContainer, isMobile) {
 
 	this.isPaiShoGame = true;
 	this.isInviteOnly = true;
+
+	new AdevarOptions(); // Just to initialize tiles to show up
 }
 
 PlaygroundController.prototype.getGameTypeId = function() {

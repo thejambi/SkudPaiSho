@@ -1,7 +1,8 @@
 
 function AdevarOptions() {
     // Adevar options
-    if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)) {
+    if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
+            || !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
         AdevarOptions.setTileDesignsPreference("spoopy");
     }
 }
@@ -10,8 +11,8 @@ AdevarOptions.tileDesignTypeKey = "adevarTileDesignTypeKey";
 
 /* Adevar tile designs */
 AdevarOptions.tileDesignTypeValues = {
-	classic: "Adevar Classic",
-	spoopy: "Advevar Spoopy"
+	monochrome: "Adevar Monochrome",
+	spoopy: "Adevar Spoopy"
 };
 
 AdevarOptions.setTileDesignsPreference = function(tileDesignKey) {
