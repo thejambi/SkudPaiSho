@@ -3,7 +3,7 @@ function AdevarOptions() {
     // Adevar options
     if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
             || !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
-        AdevarOptions.setTileDesignsPreference("spoopy");
+        AdevarOptions.setTileDesignsPreference("spoopy", true);
     }
 }
 
@@ -15,9 +15,9 @@ AdevarOptions.tileDesignTypeValues = {
 	spoopy: "Adevar Spoopy"
 };
 
-AdevarOptions.setTileDesignsPreference = function(tileDesignKey) {
+AdevarOptions.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
 	localStorage.setItem(AdevarOptions.tileDesignTypeKey, tileDesignKey);
-	if (gameController && gameController.callActuate) {
+	if (gameController && gameController.callActuate && !ignoreActuate) {
 		gameController.callActuate();
 	}
 };

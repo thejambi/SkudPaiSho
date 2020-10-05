@@ -1505,41 +1505,62 @@ function playAiTurn() {
 	  showModal("", "Unable to load.");
   }
   
-  function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX) {
-	  // Make sure sidenav is closed
-	  closeNav();
-  
-	  // Get the modal
-	  var modal = document.getElementById('myMainModal');
-  
-	  // Get the <span> element that closes the modal
-	  var span = document.getElementsByClassName("myMainModalClose")[0];
-  
-	  var modalHeading = document.getElementById('modalHeading');
-	  modalHeading.innerHTML = headingHTMLText;
-  
-	  var modalMessage = document.getElementById('modalMessage');
-	  modalMessage.innerHTML = modalMessageHTMLText;
-  
-	  // When the user clicks the button, open the modal
-	  modal.style.display = "block";
-  
-	  // When the user clicks on <span> (x), close the modal
-	  span.onclick = function() {
-		  closeModal();
-	  };
-  
-	  if (tutorialInProgress) {
-		  onlyCloseByClickingX = true;
-	  }
-  
-	  // When the user clicks anywhere outside of the modal, close it
-	  window.onclick = function(event) {
-		  if (event.target == modal && !onlyCloseByClickingX) {
-			  closeModal();
-		  }
-	  };
-  }
+function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, yesNoOptions) {
+	// Make sure sidenav is closed
+	closeNav();
+
+	// Get the modal
+	var modal = document.getElementById('myMainModal');
+
+	// Get the <span> element that closes the modal
+	var span = document.getElementsByClassName("myMainModalClose")[0];
+
+	var modalHeading = document.getElementById('modalHeading');
+	modalHeading.innerHTML = headingHTMLText;
+
+	var modalMessage = document.getElementById('modalMessage');
+	modalMessage.innerHTML = modalMessageHTMLText;
+
+	if (yesNoOptions && yesNoOptions.yesFunction) {
+		modalMessage.appendChild(document.createElement("br"));
+
+		var yesDiv = document.createElement("div");
+		yesDiv.innerText = yesNoOptions.yesText ? yesNoOptions.yesText : "OK";
+		yesDiv.classList.add("clickableText");
+		yesDiv.onclick = yesNoOptions.yesFunction;
+		modalMessage.appendChild(yesDiv);
+
+		modalMessage.appendChild(document.createElement("br"));
+		var noDiv = document.createElement("div");
+		noDiv.innerText = yesNoOptions.noText ? yesNoOptions.noText : "Cancel";
+		noDiv.classList.add("clickableText");
+		if (yesNoOptions.noFunction) {
+			noDiv.onclick = yesNoOptions.noFunction;
+		} else {
+			noDiv.onclick = closeModal;
+		}
+		modalMessage.appendChild(noDiv);
+	}
+
+	// When the user clicks the button, open the modal
+	modal.style.display = "block";
+
+	// When the user clicks on <span> (x), close the modal
+	span.onclick = function () {
+		closeModal();
+	};
+
+	if (tutorialInProgress) {
+		onlyCloseByClickingX = true;
+	}
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function (event) {
+		if (event.target == modal && !onlyCloseByClickingX) {
+			closeModal();
+		}
+	};
+}
   
   function closeModal() {
 	  document.getElementById('myMainModal').style.display = "none";

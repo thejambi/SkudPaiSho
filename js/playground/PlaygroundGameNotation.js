@@ -2,7 +2,10 @@
 
 // --------------------------------------------- // 
 
-var END_GAME = "END_GAME";
+var PlaygroundMoveType = {
+	endGame: "END_GAME",
+	hideTileLibraries: "HideTileLibraries"
+};
 
 function PlaygroundNotationMove(text) {
 	this.fullMoveText = text;
@@ -43,7 +46,9 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 	}
 
 	if (moveText.includes("END")) {
-		this.moveType = END_GAME;
+		this.moveType = PlaygroundMoveType.endGame;
+	} else if (moveText.includes(PlaygroundMoveType.hideTileLibraries)) {
+		this.moveType = PlaygroundMoveType.hideTileLibraries;
 	}
 
 	if (this.moveType === DEPLOY) {
@@ -105,7 +110,7 @@ function PlaygroundNotationBuilder() {
 
 PlaygroundNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 	var notationLine = moveNum + player.charAt(0) + ".";
-	if (this.moveType === END_GAME) {
+	if (this.moveType === PlaygroundMoveType.endGame) {
 		notationLine += "END";
 	} else if (this.moveType === MOVE) {
 		notationLine += "(" + this.startPoint.pointText + ")-(" + this.endPoint.pointText + ")";
@@ -177,7 +182,7 @@ PlaygroundGameNotation.prototype.getNotationMoveFromBuilder = function(builder) 
 	}
 
 	if (builder.endGame) {
-		builder.moveType = END_GAME;
+		builder.moveType = PlaygroundMoveType.endGame;
 	}
 
 	return builder.getNotationMove(moveNum, builder.playingPlayer);

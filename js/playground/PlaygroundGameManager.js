@@ -14,6 +14,10 @@ function PlaygroundGameManager(actuator, ignoreActuate, isCopy) {
 // Set up the game
 PlaygroundGameManager.prototype.setup = function (ignoreActuate) {
 
+	this.actuateOptions = {
+		showTileLibrary: true
+	};
+
 	this.board = new PlaygroundBoard();
 
 	// Update the actuator
@@ -27,13 +31,13 @@ PlaygroundGameManager.prototype.actuate = function () {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager);
+	this.actuator.actuate(this.board, this.tileManager, this.actuateOptions);
 };
 
 PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 	debug("Running Move: " + move.fullMoveText);
 
-	if (move.moveType === END_GAME) {
+	if (move.moveType === PlaygroundMoveType.endGame) {
 		this.board.winners.push("FUN");
 	} else if (move.moveType === DEPLOY) {
 		// Just placing tile on board
@@ -42,6 +46,8 @@ PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 		this.board.placeTile(tile, move.endPoint);
 	} else if (move.moveType === MOVE) {
 		this.board.moveTile(move.startPoint, move.endPoint);
+	} else if (move.moveType === PlaygroundMoveType.hideTileLibraries) {
+		this.actuateOptions.showTileLibrary = false;
 	}
 
 	if (withActuate) {

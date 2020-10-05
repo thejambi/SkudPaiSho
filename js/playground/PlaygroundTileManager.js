@@ -2,12 +2,15 @@
 
 function PlaygroundTileManager(forActuating) {
 	if (forActuating) {
-		this.hostTiles = this.loadTileSet('H');
-		this.guestTiles = this.loadTileSet('G');
+		this.hostTileLibrary = this.loadTileSet('H');
+		this.guestTileLibrary = this.loadTileSet('G');
 		return;
 	}
-	this.hostTiles = this.loadTileSet('H');
-	this.guestTiles = this.loadTileSet('G');
+	this.hostTileLibrary = this.loadTileSet('H');
+	this.guestTileLibrary = this.loadTileSet('G');
+
+	this.hostTileReserve = [];
+	this.guestTileReserve = [];
 }
 
 PlaygroundTileManager.prototype.loadTileSet = function(ownerCode) {
@@ -82,9 +85,9 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 };
 
 PlaygroundTileManager.prototype.grabTile = function(player, tileCode) {
-	// var tilePile = this.hostTiles;
+	// var tilePile = this.hostTileLibrary;
 	// if (player === GUEST) {
-	// 	tilePile = this.guestTiles;
+	// 	tilePile = this.guestTileLibrary;
 	// }
 
 	// var tile;
@@ -111,9 +114,9 @@ PlaygroundTileManager.prototype.grabTile = function(player, tileCode) {
 };
 
 PlaygroundTileManager.prototype.peekTile = function(player, tileCode, tileId) {
-	var tilePile = this.hostTiles;
+	var tilePile = this.hostTileLibrary;
 	if (player === GUEST) {
-		tilePile = this.guestTiles;
+		tilePile = this.guestTileLibrary;
 	}
 
 	var tile;
@@ -140,18 +143,18 @@ PlaygroundTileManager.prototype.peekTile = function(player, tileCode, tileId) {
 };
 
 PlaygroundTileManager.prototype.removeSelectedTileFlags = function() {
-	this.hostTiles.forEach(function(tile) {
+	this.hostTileLibrary.forEach(function(tile) {
 		tile.selectedFromPile = false;
 	});
-	this.guestTiles.forEach(function(tile) {
+	this.guestTileLibrary.forEach(function(tile) {
 		tile.selectedFromPile = false;
 	});
 };
 
 PlaygroundTileManager.prototype.unselectTiles = function(player) {
-	var tilePile = this.hostTiles;
+	var tilePile = this.hostTileLibrary;
 	if (player === GUEST) {
-		tilePile = this.guestTiles;
+		tilePile = this.guestTileLibrary;
 	}
 
 	tilePile.forEach(function(tile) {
@@ -161,9 +164,9 @@ PlaygroundTileManager.prototype.unselectTiles = function(player) {
 
 // PlaygroundTileManager.prototype.putTileBack = function(tile) {
 // 	var player = tile.ownerName;
-// 	var tilePile = this.hostTiles;
+// 	var tilePile = this.hostTileLibrary;
 // 	if (player === GUEST) {
-// 		tilePile = this.guestTiles;
+// 		tilePile = this.guestTileLibrary;
 // 	}
 
 // 	tilePile.push(tile);
@@ -172,16 +175,16 @@ PlaygroundTileManager.prototype.unselectTiles = function(player) {
 PlaygroundTileManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
 	// Check Host
 	var hostHasBasic = false;
-	for (var i = 0; i < this.hostTiles.length; i++) {
-		if (this.hostTiles[i].type === BASIC_FLOWER) {
+	for (var i = 0; i < this.hostTileLibrary.length; i++) {
+		if (this.hostTileLibrary[i].type === BASIC_FLOWER) {
 			hostHasBasic = true;
 			break;
 		}
 	}
 
 	var guestHasBasic = false;
-	for (var i = 0; i < this.guestTiles.length; i++) {
-		if (this.guestTiles[i].type === BASIC_FLOWER) {
+	for (var i = 0; i < this.guestTileLibrary.length; i++) {
+		if (this.guestTileLibrary[i].type === BASIC_FLOWER) {
 			guestHasBasic = true;
 			break;
 		}
@@ -198,15 +201,15 @@ PlaygroundTileManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
 
 PlaygroundTileManager.prototype.getPlayerWithMoreAccentTiles = function() {
 	var hostCount = 0;
-	for (var i = 0; i < this.hostTiles.length; i++) {
-		if (this.hostTiles[i].type === ACCENT_TILE) {
+	for (var i = 0; i < this.hostTileLibrary.length; i++) {
+		if (this.hostTileLibrary[i].type === ACCENT_TILE) {
 			hostCount++;
 		}
 	}
 
 	var guestCount = 0;
-	for (var i = 0; i < this.guestTiles.length; i++) {
-		if (this.guestTiles[i].type === ACCENT_TILE) {
+	for (var i = 0; i < this.guestTileLibrary.length; i++) {
+		if (this.guestTileLibrary[i].type === ACCENT_TILE) {
 			guestCount++;
 		}
 	}
@@ -219,9 +222,9 @@ PlaygroundTileManager.prototype.getPlayerWithMoreAccentTiles = function() {
 };
 
 PlaygroundTileManager.prototype.playerHasBothSpecialTilesRemaining = function(player) {
-	var tilePile = this.hostTiles;
+	var tilePile = this.hostTileLibrary;
 	if (player === GUEST) {
-		tilePile = this.guestTiles;
+		tilePile = this.guestTileLibrary;
 	}
 
 	var specialTileCount = 0;
@@ -238,9 +241,9 @@ PlaygroundTileManager.prototype.playerHasBothSpecialTilesRemaining = function(pl
 PlaygroundTileManager.prototype.getCopy = function() {
 	var copy = new PlaygroundTileManager();
 
-	// copy this.hostTiles and this.guestTiles
-	copy.hostTiles = this.copyArr(this.hostTiles);
-	copy.guestTiles = this.copyArr(this.guestTiles);
+	// copy this.hostTileLibrary and this.guestTileLibrary
+	copy.hostTiles = this.copyArr(this.hostTileLibrary);
+	copy.guestTiles = this.copyArr(this.guestTileLibrary);
 	
 	return copy;
 };

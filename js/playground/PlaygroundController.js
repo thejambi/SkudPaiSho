@@ -118,8 +118,28 @@ PlaygroundController.prototype.startOnlineGame = function() {
 };
 
 PlaygroundController.prototype.setEndOfGame = function() {
+	var yesNoOptions = {};
+	yesNoOptions.yesText = "Yes - End Game and mark it Complete";
+	yesNoOptions.yesFunction = function() {
+		closeModal();
+		gameController.confirmEndGame();
+	};
+	yesNoOptions.noText = "No - Cancel";
+	showModal("End Game?", "Are you sure you would like to end the current game and mark it Complete?", false, yesNoOptions);
+};
+
+PlaygroundController.prototype.confirmEndGame = function() {
+	this.notationBuilder.playingPlayer = this.currentPlayingPlayer;
 	this.notationBuilder.endGame = true;
-	refreshMessage();
+	
+	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+	this.gameNotation.addMove(move);
+	
+	if (playingOnlineGame()) {
+		callSubmitMove();
+	} else {
+		finalizeMove();
+	}
 };
 
 PlaygroundController.prototype.unsetEndOfGame = function() {

@@ -20,8 +20,9 @@ function PlaygroundActuator(gameContainer, isMobile) {
 PlaygroundActuator.hostTeamTilesDivId = "hostTilesContainer";
 PlaygroundActuator.guestTeamTilesDivId = "guestTilesContainer";
 
-PlaygroundActuator.prototype.actuate = function(board, tileManager) {
+PlaygroundActuator.prototype.actuate = function(board, tileManager, actuateOptions) {
 	var self = this;
+	this.actuateOptions = actuateOptions;
 
 	window.requestAnimationFrame(function () {
 		self.htmlify(board, tileManager);
@@ -47,12 +48,14 @@ PlaygroundActuator.prototype.htmlify = function(board, tileManager) {
 	self.clearContainerWithId(PlaygroundActuator.guestTeamTilesDivId);
 
 	// Go through tile piles and display
-	tileManager.hostTiles.forEach(function(tile) {
-		self.addTile(tile, this.hostTilesContainer);
-	});
-	tileManager.guestTiles.forEach(function(tile) {
-		self.addTile(tile, this.guestTilesContainer);
-	});
+	if (this.actuateOptions.showTileLibrary) {
+		tileManager.hostTileLibrary.forEach(function(tile) {
+			self.addTile(tile, this.hostTilesContainer);
+		});
+		tileManager.guestTileLibrary.forEach(function(tile) {
+			self.addTile(tile, this.guestTilesContainer);
+		});
+	}
 };
 
 PlaygroundActuator.prototype.clearContainer = function (container) {
