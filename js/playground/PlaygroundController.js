@@ -82,7 +82,7 @@ PlaygroundController.prototype.getAdditionalMessage = function() {
 		if (this.notationBuilder.endGame) {
 			msg += "Make a move to end the game. <span class='skipBonus' onClick='gameController.unsetEndOfGame()'>Remove end of game trigger</span><br /><br />";
 		} else {
-			msg += "<span class='skipBonus' onClick='gameController.setEndOfGame()'>Set end of game (click, then make a move to end game)</span><br /><br />";
+			msg += "<span class='skipBonus' onClick='gameController.setEndOfGame()'>End this game</span><br /><br />";
 		}
 	}
 
@@ -129,7 +129,7 @@ PlaygroundController.prototype.setEndOfGame = function() {
 };
 
 PlaygroundController.prototype.confirmEndGame = function() {
-	this.notationBuilder.playingPlayer = this.currentPlayingPlayer;
+	this.notationBuilder.playingPlayer = this.getCurrentPlayingPlayer();
 	this.notationBuilder.endGame = true;
 	
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
@@ -182,7 +182,7 @@ PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
 		// new Deploy turn
 		tile.selectedFromPile = true;
 
-		this.notationBuilder.playingPlayer = this.currentPlayingPlayer;
+		this.notationBuilder.playingPlayer = this.getCurrentPlayingPlayer();
 		this.notationBuilder.moveType = DEPLOY;
 		this.notationBuilder.tileType = tileCode;
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
@@ -191,6 +191,18 @@ PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
 	} else {
 		this.theGame.hidePossibleMovePoints();
 		this.resetNotationBuilder();
+	}
+};
+
+PlaygroundController.prototype.getCurrentPlayingPlayer = function() {
+	if (playingOnlineGame()) {
+		if (usernameEquals(currentGameData.hostUsername)) {
+			return HOST;
+		} else if (usernameEquals(currentGameData.guestUsername)) {
+			return GUEST;
+		}
+	} else {
+		return this.currentPlayingPlayer;
 	}
 };
 
@@ -212,7 +224,7 @@ PlaygroundController.prototype.pointClicked = function(htmlPoint) {
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
-			this.notationBuilder.playingPlayer = this.currentPlayingPlayer;
+			this.notationBuilder.playingPlayer = this.getCurrentPlayingPlayer();
 			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 			this.notationBuilder.moveType = MOVE;
 			this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
@@ -312,7 +324,7 @@ PlaygroundController.prototype.getAiList = function() {
 };
 
 PlaygroundController.prototype.getCurrentPlayer = function() {
-	return this.currentPlayingPlayer;
+	return this.getCurrentPlayingPlayer();
 };
 
 PlaygroundController.prototype.cleanup = function() {

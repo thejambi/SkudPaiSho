@@ -1523,6 +1523,7 @@ function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, 
 
 	if (yesNoOptions && yesNoOptions.yesFunction) {
 		modalMessage.appendChild(document.createElement("br"));
+		modalMessage.appendChild(document.createElement("br"));
 
 		var yesDiv = document.createElement("div");
 		yesDiv.innerText = yesNoOptions.yesText ? yesNoOptions.yesText : "OK";
