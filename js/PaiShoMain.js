@@ -819,6 +819,12 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
 		  if (withActuate && soundManager.nextMoveSoundsAreEnabled()) {
 			soundManager.playSound(SoundManager.sounds.tileLand);
 		  }
+		  if (gameController.getSkipToIndex) {
+			  var newMoveIndex = gameController.getSkipToIndex(currentMoveIndex);
+			  for (currentMoveIndex; currentMoveIndex < newMoveIndex; currentMoveIndex++) {
+				gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], false);
+			  }
+		  }
 		  gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep);
 		  currentMoveIndex++;
 		  if (currentMoveIndex >= gameController.gameNotation.moves.length) {

@@ -50,7 +50,9 @@ PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 		this.board.placeTile(tile, move.endPoint);
 	} else if (move.moveType === MOVE) {
 		var capturedTile = this.board.moveTile(move.startPoint, move.endPoint);
-		this.tileManager.pilesByName.Captured.push(capturedTile);
+		if (capturedTile) {
+			this.tileManager.pilesByName.Captured.push(capturedTile);
+		}
 	} else if (move.moveType === PlaygroundMoveType.hideTileLibraries) {
 		this.actuateOptions.showTileLibrary = false;
 	} else if (move.moveType === PlaygroundMoveType.deployToTilePile) {

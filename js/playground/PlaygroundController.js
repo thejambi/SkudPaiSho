@@ -386,3 +386,12 @@ PlaygroundController.prototype.isSolitaire = function() {
 PlaygroundController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 };
+
+PlaygroundController.prototype.getSkipToIndex = function(currentMoveIndex) {
+	for (var i = currentMoveIndex; i < this.gameNotation.moves.length; i++) {
+		if (this.gameNotation.moves[i].moveType === PlaygroundMoveType.hideTileLibraries) {
+			return i;
+		}
+	}
+	return currentMoveIndex;
+};
