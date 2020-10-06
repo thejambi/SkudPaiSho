@@ -88,12 +88,30 @@ PlaygroundController.prototype.getAdditionalMessage = function() {
 
 	if (!playingOnlineGame()) {
 		msg += "<span class='skipBonus' onClick='gameController.passTurn()'>Pass Turn</span><br /><br />";
+		if (!this.theGame.isUsingTileReserves()) {
+			msg += "<span class='skipBonus' onClick='gameController.hideTileLibraries()'>Hide Tile Libraries</span><br />";
+		}
 		if (onlinePlayEnabled && this.gameNotation.moves.length > 0) {
-			msg += "<span class='skipBonus' onClick='gameController.startOnlineGame()'>End Game Setup and Create Game</span></br />";
+			msg += "<span class='skipBonus' onClick='gameController.startOnlineGame()'>End Game Setup and Create Game</span><br />";
 		}
 	}
 
 	return msg;
+};
+
+PlaygroundController.prototype.hideTileLibraries = function() {
+	this.notationBuilder.playingPlayer = this.getCurrentPlayingPlayer();
+	this.notationBuilder.moveType = PlaygroundMoveType.hideTileLibraries;
+	
+	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+	this.gameNotation.addMove(move);
+	
+	// Should not be playing online game here, but maybe in future, better support it
+	if (playingOnlineGame()) {
+		callSubmitMove();
+	} else {
+		finalizeMove();
+	}
 };
 
 PlaygroundController.prototype.getAdditionalHelpTabDiv = function() {
@@ -168,15 +186,19 @@ PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
 
 	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
+	var sourcePileName = tileDiv.getAttribute("data-pileName");
 	var playerCode = divName.charAt(0);
-	var tileCode = divName;//divName.substring(1);
+	var tileCode = divName;
 
 	var player = GUEST;
 	if (playerCode === 'H') {
 		player = HOST;
 	}
 
-	var tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
+	var tile;
+	if (divName !== "PossibleMove") {
+		tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
+	}
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// new Deploy turn
@@ -186,8 +208,34 @@ PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.moveType = DEPLOY;
 		this.notationBuilder.tileType = tileCode;
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
+		this.notationBuilder.sourcePileName = sourcePileName;
 
 		this.theGame.revealAllPointsAsPossible();
+	} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
+		if (divName === "PossibleMove") {
+			// Need the notation!
+			this.theGame.hidePossibleMovePoints();
+			if (this.notationBuilder.moveType === DEPLOY) {
+				this.notationBuilder.moveType = PlaygroundMoveType.deployToTilePile;
+			} else if (this.notationBuilder.moveType === MOVE) {
+				this.notationBuilder.moveType = PlaygroundMoveType.moveToTilePile;
+			}
+			this.notationBuilder.endPileName = sourcePileName;
+			
+			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+
+			// Move all set. Add it to the notation!
+			this.gameNotation.addMove(move);
+			
+			if (playingOnlineGame()) {
+				callSubmitMove();
+			} else {
+				finalizeMove();
+			}
+		} else {
+			this.theGame.hidePossibleMovePoints();
+			this.notationBuilder = new PlaygroundNotationBuilder();
+		}
 	} else {
 		this.theGame.hidePossibleMovePoints();
 		this.resetNotationBuilder();
@@ -259,7 +307,7 @@ PlaygroundController.prototype.getTileMessage = function(tileDiv) {
 	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 
-	var tile = new PlaygroundTile(divName.substring(1), divName.charAt(0));
+	var tile = new PlaygroundTile(null, divName.substring(1), divName.charAt(0));
 
 	var message = [];
 

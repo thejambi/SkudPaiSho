@@ -855,6 +855,12 @@ PlaygroundBoard.prototype.moveTile = function(notationPointStart, notationPointE
 	}
 };
 
+PlaygroundBoard.prototype.removeTile = function(notationPoint) {
+	var rowCol = notationPoint.rowAndColumn;
+	var boardPoint = this.cells[rowCol.row][rowCol.col];
+	return boardPoint.removeTile();
+};
+
 PlaygroundBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 	return true;
 };

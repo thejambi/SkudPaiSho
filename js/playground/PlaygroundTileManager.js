@@ -11,6 +11,14 @@ function PlaygroundTileManager(forActuating) {
 
 	this.hostTileReserve = [];
 	this.guestTileReserve = [];
+
+	this.capturedTiles = [];
+
+	this.pilesByName = {
+		HostReserve: this.hostTileReserve,
+		GuestReserve: this.guestTileReserve,
+		Captured: this.capturedTiles
+	};
 }
 
 PlaygroundTileManager.prototype.loadTileSet = function(ownerCode) {
@@ -71,7 +79,7 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_Lilac", ownerCode));
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_Zinnia", ownerCode));
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_Foxglove", ownerCode));
-	// Port goes here ---
+	tiles.push(new PlaygroundTile("Adevar", "Adevar_Gate", ownerCode));
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_Iris", ownerCode));
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_OrientalLily", ownerCode));
 	tiles.push(new PlaygroundTile("Adevar", "Adevar_Echeveria", ownerCode));
@@ -84,24 +92,25 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	return tiles;
 };
 
-PlaygroundTileManager.prototype.grabTile = function(player, tileCode) {
-	// var tilePile = this.hostTileLibrary;
-	// if (player === GUEST) {
-	// 	tilePile = this.guestTileLibrary;
-	// }
+PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePileName) {
+	if (sourcePileName && this.pilesByName[sourcePileName]) {
+		var tilePile = this.pilesByName[sourcePileName];
 
-	// var tile;
-	// for (var i = 0; i < tilePile.length; i++) {
-	// 	if (tilePile[i].code === tileCode) {
-	// 		newTileArr = tilePile.splice(i, 1);
-	// 		tile = newTileArr[0];
-	// 		break;
-	// 	}
-	// }
+		var tile;
+		for (var i = 0; i < tilePile.length; i++) {
+			if (tilePile[i].code === tileCode) {
+				newTileArr = tilePile.splice(i, 1);
+				tile = newTileArr[0];
+				break;
+			}
+		}
 
-	// if (!tile) {
-	// 	debug("NONE OF THAT TILE FOUND");
-	// }
+		if (!tile) {
+			debug("NONE OF THAT TILE FOUND");
+		}
+
+		return tile;
+	}
 
 	if (player === 'G') {
 		player = GUEST;
@@ -140,6 +149,44 @@ PlaygroundTileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	}
 
 	return tile;
+};
+
+PlaygroundTileManager.prototype.setZonesAsPossibleMovePoints = function() {
+	var possiblePiles = [
+		this.hostTileReserve,
+		this.guestTileReserve,
+		this.capturedTiles
+	];
+
+	var self = this;
+	possiblePiles.forEach(function(tilePile) {
+		self.addPossiblePointToZoneTilePile(tilePile);
+	});
+};
+
+PlaygroundTileManager.prototype.removeZonePossibleMoves = function() {
+	var possiblePiles = [
+		this.hostTileReserve,
+		this.guestTileReserve,
+		this.capturedTiles
+	];
+
+	var self = this;
+	possiblePiles.forEach(function(tilePile) {
+		self.removePossiblePointFromZoneTilePile(tilePile);
+	});
+};
+
+PlaygroundTileManager.prototype.addPossiblePointToZoneTilePile = function(tilePile) {
+	tilePile.push(new PlaygroundTile("PossibleMove", "PossibleMove", ""));
+};
+
+PlaygroundTileManager.prototype.removePossiblePointFromZoneTilePile = function(tilePile) {
+	for (var i = tilePile.length - 1; i > 0 && tilePile.length > 0; i--) {
+		if (tilePile[i].gameType === "PossibleMove") {
+			tilePile.splice(i, 1);
+		}
+	}
 };
 
 PlaygroundTileManager.prototype.removeSelectedTileFlags = function() {

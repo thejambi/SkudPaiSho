@@ -15,8 +15,10 @@ function PlaygroundGameManager(actuator, ignoreActuate, isCopy) {
 PlaygroundGameManager.prototype.setup = function (ignoreActuate) {
 
 	this.actuateOptions = {
-		showTileLibrary: true
+		showTileLibrary: true,
+		showTileReserve: true
 	};
+	this.usingTileReserves = false;
 
 	this.board = new PlaygroundBoard();
 
@@ -39,15 +41,23 @@ PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 	if (move.moveType === PlaygroundMoveType.endGame) {
 		this.board.winners.push("FUN");
+	} else if (move.moveType === PlaygroundMoveType.hideTileLibraries) {
+		this.usingTileReserves = true;
+		this.actuateOptions.showTileLibrary = false;
 	} else if (move.moveType === DEPLOY) {
 		// Just placing tile on board
-		var tile = this.tileManager.grabTile(move.tileOwner, move.tileType);
-
+		var tile = this.tileManager.grabTile(move.tileOwner, move.tileType, move.sourcePileName);
 		this.board.placeTile(tile, move.endPoint);
 	} else if (move.moveType === MOVE) {
 		this.board.moveTile(move.startPoint, move.endPoint);
 	} else if (move.moveType === PlaygroundMoveType.hideTileLibraries) {
 		this.actuateOptions.showTileLibrary = false;
+	} else if (move.moveType === PlaygroundMoveType.deployToTilePile) {
+		var tile = this.tileManager.grabTile(move.tileOwner, move.tileType, move.sourcePileName);
+		this.tileManager.pilesByName[move.endPileName].push(tile);
+	} else if (move.moveType === PlaygroundMoveType.moveToTilePile) {
+		var tile = this.board.removeTile(move.startPoint);
+		this.tileManager.pilesByName[move.endPileName].push(tile);
 	}
 
 	if (withActuate) {
@@ -57,6 +67,7 @@ PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 PlaygroundGameManager.prototype.revealAllPointsAsPossible = function() {
 	this.board.setAllPointsAsPossible();
+	this.tileManager.setZonesAsPossibleMovePoints();
 	this.actuate();
 };
 
@@ -65,6 +76,7 @@ PlaygroundGameManager.prototype.revealPossibleMovePoints = function(boardPoint, 
 		return;
 	}
 	this.board.setPossibleMovePoints(boardPoint);
+	this.tileManager.setZonesAsPossibleMovePoints();
 	
 	if (!ignoreActuate) {
 		this.actuate();
@@ -73,6 +85,7 @@ PlaygroundGameManager.prototype.revealPossibleMovePoints = function(boardPoint, 
 
 PlaygroundGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	this.board.removePossibleMovePoints();
+	this.tileManager.removeZonePossibleMoves();
 	this.tileManager.removeSelectedTileFlags();
 	if (!ignoreActuate) {
 		this.actuate();
@@ -183,4 +196,8 @@ PlaygroundGameManager.prototype.getCopy = function() {
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;
+};
+
+PlaygroundGameManager.prototype.isUsingTileReserves = function() {
+	return this.usingTileReserves;
 };

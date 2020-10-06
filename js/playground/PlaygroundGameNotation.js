@@ -4,7 +4,9 @@
 
 var PlaygroundMoveType = {
 	endGame: "END_GAME",
-	hideTileLibraries: "HideTileLibraries"
+	hideTileLibraries: "HideTileLibraries",
+	deployToTilePile: "DeployToTilePile",
+	moveToTilePile: "MoveToTilePile"
 };
 
 function PlaygroundNotationMove(text) {
@@ -49,27 +51,41 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 		this.moveType = PlaygroundMoveType.endGame;
 	} else if (moveText.includes(PlaygroundMoveType.hideTileLibraries)) {
 		this.moveType = PlaygroundMoveType.hideTileLibraries;
+	} else if (moveText.includes("-MoveToPile-")) {
+		this.moveType = PlaygroundMoveType.moveToTilePile;
+	} else if (moveText.includes("-DeployToPile-")) {
+		this.moveType = PlaygroundMoveType.deployToTilePile;
 	}
 
-	if (this.moveType === DEPLOY) {
+	if (this.moveType === DEPLOY || this.moveType === PlaygroundMoveType.deployToTilePile) {
 		var char1 = moveText.charAt(1);
 		var char2 = moveText.charAt(2);
 		this.tileOwner = char0;
 		var parenIndex = moveText.indexOf("(");
-		this.tileType = moveText.substring(1, parenIndex);
+		this.tileType;
+		if (this.moveType === DEPLOY) {
+			this.tileType = moveText.substring(1, parenIndex);
+		} else if (this.moveType === PlaygroundMoveType.deployToTilePile) {
+			this.tileType = moveText.substring(1, moveText.indexOf("-DeployToPile-"));
+		}
 
 		if (moveText.charAt(parenIndex) === '(') {
 			// debug("parens checks out");
-		} else {
+		} else if (this.moveType === DEPLOY) {
 			debug("Failure to plant");
 			this.valid = false;
 		}
 
-		if (moveText.endsWith(')')) {
+		if (this.moveType === PlaygroundMoveType.deployToTilePile) {
+			this.endPileName = moveText.substring(moveText.indexOf("-DeployToPile-") + "-DeployToPile-".length, moveText.indexOf("-FromPile-"));
+			debug(this.endPileName);
+		} else if (this.moveType === DEPLOY) {
 			this.endPoint = new NotationPoint(moveText.substring(parenIndex+1, moveText.indexOf(')')));
 		} else {
 			this.valid = false;
 		}
+
+		this.sourcePileName = moveText.substring(moveText.indexOf("-FromPile-") + "-FromPile-".length);
 	} else if (this.moveType === MOVE) {
 		// Get the two points from string like: (-8,0)-(-6,3)
 		var parts = moveText.substring(moveText.indexOf('(')+1).split(')-(');
@@ -77,6 +93,9 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 		this.startPoint = new NotationPoint(parts[0]);
 
 		this.endPoint = new NotationPoint(parts[1].substring(0, parts[1].indexOf(')')));
+	} else if (this.moveType === PlaygroundMoveType.moveToTilePile) {
+		this.startPoint = new NotationPoint(moveText.substring(moveText.indexOf("(") + 1, moveText.indexOf(")")));
+		this.endPileName = moveText.substring(moveText.indexOf("-MoveToPile-") + "-MoveToPile-".length);
 	}
 };
 
@@ -112,10 +131,16 @@ PlaygroundNotationBuilder.prototype.getNotationMove = function(moveNum, player) 
 	var notationLine = moveNum + player.charAt(0) + ".";
 	if (this.moveType === PlaygroundMoveType.endGame) {
 		notationLine += "END";
+	} else if (this.moveType === PlaygroundMoveType.hideTileLibraries) {
+		notationLine += PlaygroundMoveType.hideTileLibraries;
 	} else if (this.moveType === MOVE) {
 		notationLine += "(" + this.startPoint.pointText + ")-(" + this.endPoint.pointText + ")";
 	} else if (this.moveType === DEPLOY) {
-		notationLine += this.tileType + "(" + this.endPoint.pointText + ")";
+		notationLine += this.tileType + "(" + this.endPoint.pointText + ")-FromPile-" + this.sourcePileName;
+	} else if (this.moveType === PlaygroundMoveType.moveToTilePile) {
+		notationLine += "(" + this.startPoint.pointText + ")-MoveToPile-" + this.endPileName;
+	} else if (this.moveType === PlaygroundMoveType.deployToTilePile) {
+		notationLine += this.tileType + "-DeployToPile-" + this.endPileName + "-FromPile-" + this.sourcePileName;
 	}
 	
 	return new PlaygroundNotationMove(notationLine);

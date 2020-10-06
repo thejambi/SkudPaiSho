@@ -605,7 +605,7 @@ figure > div {
 
 
 
-.hostTilesContainer, .guestTilesContainer {
+.hostTilesContainer, .guestTilesContainer, .tileLibrary {
   display: inline-block;
   float: left;
   margin-top: 12px;

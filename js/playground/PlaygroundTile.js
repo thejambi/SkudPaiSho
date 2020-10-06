@@ -9,8 +9,6 @@ function PlaygroundTile(gameType, code, ownerCode) {
 		this.ownerName = GUEST;
 	} else if (this.ownerCode === 'H') {
 		this.ownerName = HOST;
-	} else {
-		debug("INCORRECT OWNER CODE");
 	}
 	this.id = tileId++;
 	this.drained = false;
