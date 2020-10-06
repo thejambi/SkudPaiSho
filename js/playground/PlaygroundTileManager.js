@@ -14,11 +14,10 @@ function PlaygroundTileManager(forActuating) {
 
 	this.capturedTiles = [];
 
-	this.pilesByName = {
-		HostReserve: this.hostTileReserve,
-		GuestReserve: this.guestTileReserve,
-		Captured: this.capturedTiles
-	};
+	this.pilesByName = {};
+	this.pilesByName[PlaygroundNotationContstants.hostReservePile] = this.hostTileReserve;
+	this.pilesByName[PlaygroundNotationContstants.guestReservePile] = this.guestTileReserve;
+	this.pilesByName[PlaygroundNotationContstants.capturedPile] = this.capturedTiles;
 }
 
 PlaygroundTileManager.prototype.loadTileSet = function(ownerCode) {
@@ -75,19 +74,19 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Blank", ownerCode));
 
 	// Adevar
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_Back", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_Lilac", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_Zinnia", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_Foxglove", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_Gate", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_Iris", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_OrientalLily", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_Echeveria", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_IrisSecondFace", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_OrientalLilySecondFace", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_EcheveriaSecondFace", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_Vanguard", ownerCode));
-	tiles.push(new PlaygroundTile("Adevar", "Adevar_WatersReflection", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_Back", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_Lilac", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_Zinnia", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_Foxglove", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_Gate", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_Iris", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_OrientalLily", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_Echeveria", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_IrisSecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_OrientalLilySecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_EcheveriaSecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_Vanguard", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_WatersReflection", ownerCode));
 
 	return tiles;
 };

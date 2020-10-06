@@ -9,6 +9,17 @@ var PlaygroundMoveType = {
 	moveToTilePile: "MoveToTilePile"
 };
 
+var PlaygroundNotationContstants = {
+	moveToPile: "-mp",
+	deployToPile: "-dp",
+	fromPile: "-fp",
+	hostLibraryPile: ":HL",
+	guestLibraryPile: ":GL",
+	hostReservePile: ":HR",
+	guestReservePile: ":GR",
+	capturedPile: ":C"
+};
+
 function PlaygroundNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
@@ -51,9 +62,9 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 		this.moveType = PlaygroundMoveType.endGame;
 	} else if (moveText.includes(PlaygroundMoveType.hideTileLibraries)) {
 		this.moveType = PlaygroundMoveType.hideTileLibraries;
-	} else if (moveText.includes("-MoveToPile-")) {
+	} else if (moveText.includes(PlaygroundNotationContstants.moveToPile)) {
 		this.moveType = PlaygroundMoveType.moveToTilePile;
-	} else if (moveText.includes("-DeployToPile-")) {
+	} else if (moveText.includes(PlaygroundNotationContstants.deployToPile)) {
 		this.moveType = PlaygroundMoveType.deployToTilePile;
 	}
 
@@ -66,7 +77,7 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 		if (this.moveType === DEPLOY) {
 			this.tileType = moveText.substring(1, parenIndex);
 		} else if (this.moveType === PlaygroundMoveType.deployToTilePile) {
-			this.tileType = moveText.substring(1, moveText.indexOf("-DeployToPile-"));
+			this.tileType = moveText.substring(1, moveText.indexOf(PlaygroundNotationContstants.deployToPile));
 		}
 
 		if (moveText.charAt(parenIndex) === '(') {
@@ -77,7 +88,7 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 		}
 
 		if (this.moveType === PlaygroundMoveType.deployToTilePile) {
-			this.endPileName = moveText.substring(moveText.indexOf("-DeployToPile-") + "-DeployToPile-".length, moveText.indexOf("-FromPile-"));
+			this.endPileName = moveText.substring(moveText.indexOf(PlaygroundNotationContstants.deployToPile) + PlaygroundNotationContstants.deployToPile.length, moveText.indexOf(PlaygroundNotationContstants.fromPile));
 			debug(this.endPileName);
 		} else if (this.moveType === DEPLOY) {
 			this.endPoint = new NotationPoint(moveText.substring(parenIndex+1, moveText.indexOf(')')));
@@ -85,7 +96,7 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 			this.valid = false;
 		}
 
-		this.sourcePileName = moveText.substring(moveText.indexOf("-FromPile-") + "-FromPile-".length);
+		this.sourcePileName = moveText.substring(moveText.indexOf(PlaygroundNotationContstants.fromPile) + PlaygroundNotationContstants.fromPile.length);
 	} else if (this.moveType === MOVE) {
 		// Get the two points from string like: (-8,0)-(-6,3)
 		var parts = moveText.substring(moveText.indexOf('(')+1).split(')-(');
@@ -95,7 +106,7 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 		this.endPoint = new NotationPoint(parts[1].substring(0, parts[1].indexOf(')')));
 	} else if (this.moveType === PlaygroundMoveType.moveToTilePile) {
 		this.startPoint = new NotationPoint(moveText.substring(moveText.indexOf("(") + 1, moveText.indexOf(")")));
-		this.endPileName = moveText.substring(moveText.indexOf("-MoveToPile-") + "-MoveToPile-".length);
+		this.endPileName = moveText.substring(moveText.indexOf(PlaygroundNotationContstants.moveToPile) + PlaygroundNotationContstants.moveToPile.length);
 	}
 };
 
@@ -136,11 +147,11 @@ PlaygroundNotationBuilder.prototype.getNotationMove = function(moveNum, player) 
 	} else if (this.moveType === MOVE) {
 		notationLine += "(" + this.startPoint.pointText + ")-(" + this.endPoint.pointText + ")";
 	} else if (this.moveType === DEPLOY) {
-		notationLine += this.tileType + "(" + this.endPoint.pointText + ")-FromPile-" + this.sourcePileName;
+		notationLine += this.tileType + "(" + this.endPoint.pointText + ")" + PlaygroundNotationContstants.fromPile + this.sourcePileName;
 	} else if (this.moveType === PlaygroundMoveType.moveToTilePile) {
-		notationLine += "(" + this.startPoint.pointText + ")-MoveToPile-" + this.endPileName;
+		notationLine += "(" + this.startPoint.pointText + ")" + PlaygroundNotationContstants.moveToPile + this.endPileName;
 	} else if (this.moveType === PlaygroundMoveType.deployToTilePile) {
-		notationLine += this.tileType + "-DeployToPile-" + this.endPileName + "-FromPile-" + this.sourcePileName;
+		notationLine += this.tileType + PlaygroundNotationContstants.deployToPile + this.endPileName + PlaygroundNotationContstants.fromPile + this.sourcePileName;
 	}
 	
 	return new PlaygroundNotationMove(notationLine);
