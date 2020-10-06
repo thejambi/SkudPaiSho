@@ -51,7 +51,7 @@ PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 	} else if (move.moveType === MOVE) {
 		var capturedTile = this.board.moveTile(move.startPoint, move.endPoint);
 		if (capturedTile) {
-			this.tileManager.pilesByName.Captured.push(capturedTile);
+			this.tileManager.pilesByName[PlaygroundNotationContstants.capturedPile].push(capturedTile);
 		}
 	} else if (move.moveType === PlaygroundMoveType.hideTileLibraries) {
 		this.actuateOptions.showTileLibrary = false;

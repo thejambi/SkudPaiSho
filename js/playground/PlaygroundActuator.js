@@ -99,22 +99,22 @@ PlaygroundActuator.prototype.htmlify = function(board, tileManager) {
 	// Go through tile piles and display
 	if (this.actuateOptions.showTileReserve) {
 		tileManager.hostTileReserve.forEach(function(tile) {
-			self.addTile(tile, hostTileReserveContainer, "HostReserve");
+			self.addTile(tile, hostTileReserveContainer, PlaygroundNotationContstants.hostReservePile);
 		});
 		tileManager.guestTileReserve.forEach(function(tile) {
-			self.addTile(tile, guestTileReserveContainer, "GuestReserve");
+			self.addTile(tile, guestTileReserveContainer, PlaygroundNotationContstants.guestReservePile);
 		});
 		tileManager.capturedTiles.forEach(function(tile) {
-			self.addTile(tile, capturedTileContainer, "Captured");
+			self.addTile(tile, capturedTileContainer, PlaygroundNotationContstants.capturedPile);
 		});
 	}
 
 	if (this.actuateOptions.showTileLibrary) {
 		tileManager.hostTileLibrary.forEach(function(tile) {
-			self.addTile(tile, hostTileLibraryContainer, "HostLibrary");
+			self.addTile(tile, hostTileLibraryContainer, PlaygroundNotationContstants.hostLibraryPile);
 		});
 		tileManager.guestTileLibrary.forEach(function(tile) {
-			self.addTile(tile, guestTileLibraryContainer, "GuestLibrary");
+			self.addTile(tile, guestTileLibraryContainer, PlaygroundNotationContstants.guestLibraryPile);
 		});
 	}
 };
