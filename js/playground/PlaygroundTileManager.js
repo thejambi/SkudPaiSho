@@ -181,7 +181,7 @@ PlaygroundTileManager.prototype.addPossiblePointToZoneTilePile = function(tilePi
 };
 
 PlaygroundTileManager.prototype.removePossiblePointFromZoneTilePile = function(tilePile) {
-	for (var i = tilePile.length - 1; i > 0 && tilePile.length > 0; i--) {
+	for (var i = tilePile.length - 1; i >= 0 && tilePile.length > 0; i--) {
 		if (tilePile[i].gameType === "PossibleMove") {
 			tilePile.splice(i, 1);
 		}
