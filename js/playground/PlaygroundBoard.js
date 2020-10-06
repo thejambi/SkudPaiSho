@@ -847,12 +847,15 @@ PlaygroundBoard.prototype.moveTile = function(notationPointStart, notationPointE
 		debug("Error: No tile to move!");
 	}
 
+	var capturedTile = boardPointEnd.removeTile();
 	var error = boardPointEnd.putTile(tile);
 
 	if (error) {
 		debug("Error moving tile. It probably didn't get moved.");
 		return false;
 	}
+
+	return capturedTile;
 };
 
 PlaygroundBoard.prototype.removeTile = function(notationPoint) {
