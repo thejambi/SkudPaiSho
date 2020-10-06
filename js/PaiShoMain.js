@@ -42,10 +42,13 @@ var QueryString = function () {
 	  tggproject: "TGG Pai Sho Project",
 	  hlowenew: "Modern Tiles",
 	  vescucci: "Vescucci Tiles",
-	  standard: "Pai Sho Project Tiles",
 	  pixelsho: "Pixel Sho v1 Tiles",
 	  pixelsho2: "Pixel Sho v2 Tiles",
 	  xiangqi: "Xiangqi Style",
+	  minimalist: "TGG Minimalist",
+	  chujired: "Chu Ji Red",
+	  azulejos: "Azulejos by Cannoli",
+	  standard: "Pai Sho Project Tiles",
 	  tggproject2: "TGG Project Alt Colors",
 	  rusticgyatso: "Rustic Gyatso TGG Project Tiles",
 	  hlowemono: "Modern Monochrome Tiles",
@@ -55,11 +58,8 @@ var QueryString = function () {
 	  vescuccicolored2: "Vescucci Colored 2",
 	  water: "Water-Themed Vescucci Tiles",
 	  earth: "Earth-Themed Vescucci Tiles",
-	  chujired: "Chu Ji Red",
 	  chujiblue: "Chu Ji Blue",
-	  chujimono: "Chu Ji Monochrome",
-	  azulejos: "Azulejos by Cannoli",
-	  minimalist: "TGG Minimalist"
+	  chujimono: "Chu Ji Monochrome"
   };
   
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
@@ -93,7 +93,9 @@ var paiShoBoardDesignTypeValues = {
 	worldmap: "World Map by corky125",
 	goldengarden: "Golden Garden by Sidereus",
 	momo: "The Amazing Momo by TheRealMomo",
-	vaaturaava: "Vaatu Raava by mrpandaber"
+	vaaturaava: "Vaatu Raava by mrpandaber",
+	eartharena: "Earth Arena by Yagalo",
+	waterarena: "Water Arena by Yagalo"
 };
 
 var svgBoardDesigns = [
