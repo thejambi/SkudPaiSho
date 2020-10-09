@@ -38,7 +38,7 @@ AdevarTile.prototype.getMoveDistance = function() {
 	} else if (this.code === 'O') {
 		return 6;
 	}
-	return 8;	// 8!?
+	return 8;	// 8!? lol
 };
 
 AdevarTile.prototype.getName = function() {
