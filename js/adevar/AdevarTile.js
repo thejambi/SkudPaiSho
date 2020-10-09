@@ -33,12 +33,22 @@ AdevarTile.prototype.getMovementInfo = function() {
 AdevarTile.prototype.getMoveDistance = function() {
 	if (this.type === BASIC_FLOWER) {	// Adjust accordingly :)
 		return parseInt(this.basicValue);
-	} else if (this.code === 'FOXGLOVE') {
+	} else if (this.code === 'Foxglove') {
 		return 5;
-	} else if (this.code === 'O') {
-		return 6;
+	} else if (this.code === 'Zinnia') {
+		return 4;
+	} else if (this.code === 'Lilac') {
+		return 3;
+	} else if (this.code === 'WatersReflection') {
+		return 7;
+	} else if (this.code === 'IrisSecondFace') {
+		return 7;
+	} else if (this.code === 'OrientalLilySecondFace') {
+		return 7;
+	} else if (this.code === 'EcheveriaSecondFace') {
+		return 7;
 	}
-	return 3;	// 8!? lol
+	return 0;	// 8!? lol
 };
 
 AdevarTile.prototype.getName = function() {
