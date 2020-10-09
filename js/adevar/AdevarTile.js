@@ -33,12 +33,12 @@ AdevarTile.prototype.getMovementInfo = function() {
 AdevarTile.prototype.getMoveDistance = function() {
 	if (this.type === BASIC_FLOWER) {	// Adjust accordingly :)
 		return parseInt(this.basicValue);
-	} else if (this.code === 'L') {
-		return 2;
+	} else if (this.code === 'FOXGLOVE') {
+		return 5;
 	} else if (this.code === 'O') {
 		return 6;
 	}
-	return 8;	// 8!? lol
+	return 3;	// 8!? lol
 };
 
 AdevarTile.prototype.getName = function() {
