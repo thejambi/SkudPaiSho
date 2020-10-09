@@ -508,6 +508,7 @@ VagabondController.tileDesignTypeValues = {
 	tggclassic: "TGG Classic",
 	tgggyatso: "Gyatso TGG Classic",
 	vescuccikoiwheel: "Vescucci Koi-Wheel",
+	vescuccikoiwheelrustic: "Rustic Vescucci Koi-Wheel",
 	classic: "Classic Pai Sho Project",
 	water: "Water themed Garden Gate Designs",
 	fire: "Fire themed Garden Gate Designs",
