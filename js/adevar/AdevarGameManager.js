@@ -37,7 +37,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 	if (move.moveType === DEPLOY) {
 		// Just placing tile on board
-		var tile = this.tileManager.grabTile(move.tileOwner, move.tileType, move.sourcePileName);
+		var tile = this.tileManager.grabTile(move.player, move.tileType);
 		this.board.placeTile(tile, move.endPoint);
 	} else if (move.moveType === MOVE) {
 		var moveTileResults = this.board.moveTile(move.startPoint, move.endPoint);

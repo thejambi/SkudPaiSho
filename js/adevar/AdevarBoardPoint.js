@@ -58,6 +58,17 @@ AdevarBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	return true;
 };
 
+AdevarBoardPoint.prototype.isPossibleForMovementType = function(movementInfo) {
+	return false; // ??
+};
+
+AdevarBoardPoint.prototype.setMoveDistanceRemaining = function(movementInfo, distanceRemaining) {
+	this.moveDistanceRemaining = distanceRemaining;
+};
+AdevarBoardPoint.prototype.getMoveDistanceRemaining = function(movementInfo) {
+	return this.moveDistanceRemaining;
+};
+
 AdevarBoardPoint.prototype.getCopy = function() {
 	var copy = new AdevarBoardPoint();
 

@@ -157,17 +157,20 @@ AdevarGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	// Example simple Arranging move: 7G.(8,0)-(7,1)
 
 	var moveNum = 0;
+	var player = HOST;
 
 	var lastMove = this.moves[this.moves.length-1];
 
 	if (lastMove) {
 		moveNum = lastMove.moveNum;
-		if (lastMove.player !== builder.playingPlayer) {
+		if (lastMove.player === GUEST) {
 			moveNum++;
+		} else {
+			player = GUEST;
 		}
 	}
 
-	return builder.getNotationMove(moveNum, builder.playingPlayer);
+	return builder.getNotationMove(moveNum, player);
 };
 
 AdevarGameNotation.prototype.loadMoves = function() {

@@ -1904,7 +1904,7 @@ function getGameControllerForGameType(gameTypeId) {
 			controller = new BloomsController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Trifle.id:
-			if (gameDevOn || GameType.Trifle.usersWithAccess.includes(getUsername)) {
+			if (gameDevOn || GameType.Trifle.usersWithAccess.includes(getUsername())) {
 				controller = new TrifleController(gameContainerDiv, isMobile);
 			} else {
 				closeGame();
@@ -2640,7 +2640,7 @@ function getGameControllerForGameType(gameTypeId) {
 	  if (
 		  gameDevOn 
 		  || !gameType.usersWithAccess
-		  || gameType.usersWithAccess.includes(getUsername)
+		  || gameType.usersWithAccess.includes(getUsername())
 		  ) {
 		  return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
 	  }

@@ -516,7 +516,7 @@ AdevarBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boa
 
 AdevarBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
 	if (boardPointStart.hasTile()) {
-		self.setPossibleMovesForMovement(tile.getMovementInfo(), boardPointStart);
+		this.setPossibleMovesForMovement(boardPointStart.tile.getMovementInfo(), boardPointStart);
 	}
 };
 
@@ -553,7 +553,6 @@ AdevarBoard.prototype.setPossibleMovementPointsFromMovePoints = function(movePoi
 				if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint)) {
 					var movementOk = self.setPointAsPossibleMovement(adjacentPoint, tile, originPoint);
 					if (movementOk) {
-						adjacentPoint.setPossibleForMovementType(movementInfo);
 						if (!adjacentPoint.hasTile() || canMoveThroughPoint) {
 							nextPointsConfirmed.push(adjacentPoint);
 						}
@@ -574,12 +573,17 @@ AdevarBoard.prototype.setPossibleMovementPointsFromMovePoints = function(movePoi
 		moveStepNumber + 1);
 };
 
+AdevarBoard.prototype.setPointAsPossibleMovement = function(targetPoint, tileBeingMoved, originPoint, currentMovementPath) {
+	targetPoint.addType(POSSIBLE_MOVE);
+	return true;
+};
+
 AdevarBoard.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targetPoint, fromPoint) {
 	var canCaptureTarget = this.targetPointHasTileThatCanBeCaptured(tile, movementInfo, fromPoint, targetPoint);
 	return !targetPoint.hasTile() || canCaptureTarget;
 };
 
-AdevarBoard.prototype.targetPointHasTileTileThatCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint) {
+AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint) {
 	return targetPoint.hasTile() 
 		&& this.tileCanCapture(tile, movementInfo, fromPoint, targetPoint);
 };

@@ -101,6 +101,10 @@ AdevarController.prototype.unplayedTileClicked = function(tileDiv) {
 		return;
 	}
 
+	if (!myTurn() && !this.peekAtOpponentMoves) {
+		return;
+	}
+
 	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 	var playerCode = divName.charAt(0);
@@ -112,6 +116,14 @@ AdevarController.prototype.unplayedTileClicked = function(tileDiv) {
 	}
 
 	var tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
+
+	if (tile.ownerName !== getCurrentPlayer() || !myTurn()) {
+		// Hey, that's not your tile!
+		this.checkingOutOpponentTileOrNotMyTurn = true;
+		if (!this.peekAtOpponentMoves) {
+			return;
+		}
+	}
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// new Deploy turn
@@ -139,6 +151,10 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 		return;
 	}
 
+	if (!myTurn() && !this.peekAtOpponentMoves) {
+		return;
+	}
+
 	var npText = htmlPoint.getAttribute("name");
 
 	var notationPoint = new NotationPoint(npText);
@@ -147,6 +163,14 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
+			if (boardPoint.tile.ownerName !== getCurrentPlayer() || !myTurn()) {
+				debug("That's not your tile!");
+				this.checkingOutOpponentTileOrNotMyTurn = true;
+				if (!this.peekAtOpponentMoves) {
+					return;
+				}
+			}
+			
 			this.notationBuilder.playingPlayer = this.getCurrentPlayer();
 			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 			this.notationBuilder.moveType = MOVE;
