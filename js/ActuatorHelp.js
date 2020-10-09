@@ -51,7 +51,8 @@ function setupPaiShoBoard(gameContainer,
 	hostTilesContainerDivs,
 	guestTilesContainerDivs,
 	rotateBoard,
-	rotateType) {
+	rotateType,
+	playInSpaces) {
 
 	var addVagabondBoardRotate = false;
 	var addAdevarBoardRotate = false;
@@ -65,7 +66,7 @@ function setupPaiShoBoard(gameContainer,
 	removeChildren(gameContainer);
 
 	var ptContainerClass = "pointContainer";
-	if (gameOptionEnabled(PLAY_IN_SPACES)) {
+	if (playInSpaces) {
 		ptContainerClass = "pointContainerForPlayInSpaces"
 	}
 	var boardContainer = createDivWithClass(ptContainerClass);

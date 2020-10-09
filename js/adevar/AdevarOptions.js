@@ -1,10 +1,10 @@
 
 function AdevarOptions() {
-    // Adevar options
-    if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
-            || !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
-        AdevarOptions.setTileDesignsPreference("spoopy", true);
-    }
+	// Adevar options
+	if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
+		|| !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
+		AdevarOptions.setTileDesignsPreference("spoopy", true);
+	}
 }
 
 AdevarOptions.tileDesignTypeKey = "adevarTileDesignTypeKey";

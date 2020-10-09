@@ -1817,7 +1817,14 @@ var GameType = {
 		id: 10,
 		desc: "Pai and Sho's Trifle",
 		rulesUrl: "https://skudpaisho.com/site/games/pai-shos-trifle/",
-		gameOptions: []
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho',
+			'abacadaren',
+			'Korron',
+			'vescucci',
+			'geebung02'
+		]
 	},
 	Playground: {
 		id: 7,
@@ -1850,6 +1857,16 @@ var GameType = {
 		],
 		secretGameOptions: [
 			MORE_ATTACKERS
+		]
+	},
+	Adevar: {
+		id: 12,
+		desc: "Adevăr Pai Sho",
+		rulesUrl: "",
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho',
+			'ProfPetruescu'
 		]
 	}
 };
@@ -1887,7 +1904,7 @@ function getGameControllerForGameType(gameTypeId) {
 			controller = new BloomsController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Trifle.id:
-			if (trifleOn || TrifleController.userIsTrifleDeveloper()) {
+			if (gameDevOn || GameType.Trifle.usersWithAccess.includes(getUsername)) {
 				controller = new TrifleController(gameContainerDiv, isMobile);
 			} else {
 				closeGame();
@@ -1895,6 +1912,13 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Hexentafl.id:
 			controller = new HexentaflController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Adevar.id:
+			if (gameDevOn || GameType.Adevar.usersWithAccess.includes(getUsername())) {
+				controller = new AdevarController(gameContainerDiv, isMobile);
+			} else {
+				closeGame();
+			}
 			break;
 		default:
 			debug("Game Controller unavailable.");
@@ -2356,9 +2380,15 @@ function getGameControllerForGameType(gameTypeId) {
 		  for (var index in gameSeekList) {
 			  var gameSeek = gameSeekList[index];
   
-			  if (gameSeek.gameTypeId !== GameType.Trifle.id
-				  || (gameSeek.gameTypeId === GameType.Trifle.id && TrifleController.userIsTrifleDeveloper())
-			  ) {
+			//   if (gameSeek.gameTypeId !== GameType.Trifle.id
+			// 	  || (gameSeek.gameTypeId === GameType.Trifle.id && TrifleController.userIsTrifleDeveloper())
+			//   ) {
+			if (
+				gameDevOn 
+				|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
+				|| getGameTypeEntryFromId(gameSeek.gameTypeId).includes(getUsername)
+			) {
+				
   
 				  var hostOnlineOrNotIconText = userOfflineIcon;
 				  if (gameSeek.hostOnline) {
@@ -2599,11 +2629,7 @@ function getGameControllerForGameType(gameTypeId) {
   }
   
   function closeGame() {
-	  if (trifleOn) {
-		  setGameController(GameType.Trifle.id);
-	  } else {
-		  setGameController(randomIntFromInterval(1,2));
-	  }
+	  setGameController(randomIntFromInterval(1,2));
   }
   
   function getSidenavNewGameEntryForGameType(gameType) {
@@ -2611,8 +2637,10 @@ function getGameControllerForGameType(gameTypeId) {
   }
   
   function getNewGameEntryForGameType(gameType) {
-	  if (trifleOn || gameType !== GameType.Trifle
-		  || (gameType === GameType.Trifle && TrifleController.userIsTrifleDeveloper())
+	  if (
+		  gameDevOn 
+		  || !gameType.usersWithAccess
+		  || gameType.usersWithAccess.includes(getUsername)
 		  ) {
 		  return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
 	  }

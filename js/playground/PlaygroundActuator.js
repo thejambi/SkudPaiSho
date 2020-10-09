@@ -9,7 +9,8 @@ function PlaygroundActuator(gameContainer, isMobile) {
 		PlaygroundController.getHostTilesContainerDivs(),
 		PlaygroundController.getGuestTilesContainerDivs(), 
 		(gameOptionEnabled(VAGABOND_ROTATE) || gameOptionEnabled(ADEVAR_ROTATE)),
-		(gameOptionEnabled(ADEVAR_ROTATE) ? ADEVAR_ROTATE : false)
+		(gameOptionEnabled(ADEVAR_ROTATE) ? ADEVAR_ROTATE : false),
+		gameOptionEnabled(PLAY_IN_SPACES)
 	);
 
 	this.boardContainer = containers.boardContainer;
