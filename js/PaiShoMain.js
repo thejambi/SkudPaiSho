@@ -94,8 +94,9 @@ var paiShoBoardDesignTypeValues = {
 	goldengarden: "Golden Garden by Sidereus",
 	momo: "The Amazing Momo by TheRealMomo",
 	vaaturaava: "Vaatu Raava by mrpandaber",
+	waterarena: "Water Arena by Yagalo",
 	eartharena: "Earth Arena by Yagalo",
-	waterarena: "Water Arena by Yagalo"
+	firearena: "Fire Arena by Yagalo"
 };
 
 var svgBoardDesigns = [
