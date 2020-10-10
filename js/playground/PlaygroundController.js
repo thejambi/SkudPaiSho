@@ -15,6 +15,9 @@ function PlaygroundController(gameContainer, isMobile) {
 	this.currentPlayingPlayer = HOST;
 
 	this.isPaiShoGame = true;
+	this.isInviteOnly = true;
+
+	new AdevarOptions(); // Just to initialize tiles to show up
 }
 
 PlaygroundController.prototype.getGameTypeId = function() {
@@ -38,11 +41,11 @@ PlaygroundController.prototype.getNewGameNotation = function() {
 };
 
 PlaygroundController.getHostTilesContainerDivs = function() {
-	return '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HL"></div> <div class="HO"></div>';
+	return '';
 };
 
 PlaygroundController.getGuestTilesContainerDivs = function() {
-	return '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
+	return '';
 };
 
 PlaygroundController.prototype.callActuate = function() {
@@ -73,10 +76,93 @@ PlaygroundController.prototype.getAdditionalMessage = function() {
 		} else {
 			msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move. <br />";
 		}
+
+		msg += getGameOptionsMessageHtml(GameType.Playground.gameOptions);
+	} else {
+		if (this.notationBuilder.endGame) {
+			msg += "Make a move to end the game. <span class='skipBonus' onClick='gameController.unsetEndOfGame()'>Remove end of game trigger</span><br /><br />";
+		} else {
+			msg += "<span class='skipBonus' onClick='gameController.setEndOfGame()'>End this game</span><br /><br />";
+		}
 	}
-	msg += "<span class='skipBonus' onClick='gameController.passTurn()'>End Turn</span><br />";
+
+	if (!playingOnlineGame()) {
+		msg += "<span class='skipBonus' onClick='gameController.passTurn()'>Pass Turn</span><br /><br />";
+		if (!this.theGame.isUsingTileReserves()) {
+			msg += "<span class='skipBonus' onClick='gameController.hideTileLibraries()'>Hide Tile Libraries</span><br />";
+		}
+		if (onlinePlayEnabled && this.gameNotation.moves.length > 0) {
+			msg += "<span class='skipBonus' onClick='gameController.startOnlineGame()'>End Game Setup and Create Game</span><br />";
+		}
+	}
 
 	return msg;
+};
+
+PlaygroundController.prototype.hideTileLibraries = function() {
+	this.notationBuilder.playingPlayer = this.getCurrentPlayingPlayer();
+	this.notationBuilder.moveType = PlaygroundMoveType.hideTileLibraries;
+	
+	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+	this.gameNotation.addMove(move);
+	
+	// Should not be playing online game here, but maybe in future, better support it
+	if (playingOnlineGame()) {
+		callSubmitMove();
+	} else {
+		finalizeMove();
+	}
+};
+
+PlaygroundController.prototype.getAdditionalHelpTabDiv = function() {
+	var settingsDiv = document.createElement("div");
+
+	var heading = document.createElement("h4");
+	heading.innerText = "Pai Sho Playground Preferences:";
+
+	settingsDiv.appendChild(heading);
+	settingsDiv.appendChild(SkudPaiShoController.buildTileDesignDropdownDiv("Skud Pai Sho Tile Designs"));
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(VagabondController.buildTileDesignDropdownDiv("Vagabond Tile Designs"));
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(AdevarOptions.buildTileDesignDropdownDiv("Adevăr Tile Designs"));
+
+	settingsDiv.appendChild(document.createElement("br"));
+	return settingsDiv;
+};
+
+PlaygroundController.prototype.startOnlineGame = function() {
+	createGameIfThatIsOk(GameType.Playground.id);
+};
+
+PlaygroundController.prototype.setEndOfGame = function() {
+	var yesNoOptions = {};
+	yesNoOptions.yesText = "Yes - End Game and mark it Complete";
+	yesNoOptions.yesFunction = function() {
+		closeModal();
+		gameController.confirmEndGame();
+	};
+	yesNoOptions.noText = "No - Cancel";
+	showModal("End Game?", "Are you sure you would like to end the current game and mark it Complete?", false, yesNoOptions);
+};
+
+PlaygroundController.prototype.confirmEndGame = function() {
+	this.notationBuilder.playingPlayer = this.getCurrentPlayingPlayer();
+	this.notationBuilder.endGame = true;
+	
+	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+	this.gameNotation.addMove(move);
+	
+	if (playingOnlineGame()) {
+		callSubmitMove();
+	} else {
+		finalizeMove();
+	}
+};
+
+PlaygroundController.prototype.unsetEndOfGame = function() {
+	this.notationBuilder.endGame = false;
+	refreshMessage();
 };
 
 PlaygroundController.prototype.passTurn = function() {
@@ -100,29 +186,71 @@ PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
 
 	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
+	var sourcePileName = tileDiv.getAttribute("data-pileName");
 	var playerCode = divName.charAt(0);
-	var tileCode = divName;//divName.substring(1);
+	var tileCode = divName;
 
 	var player = GUEST;
 	if (playerCode === 'H') {
 		player = HOST;
 	}
 
-	var tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
+	var tile;
+	if (divName !== "PossibleMove") {
+		tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
+	}
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// new Deploy turn
 		tile.selectedFromPile = true;
 
-		this.notationBuilder.playingPlayer = this.currentPlayingPlayer;
+		this.notationBuilder.playingPlayer = this.getCurrentPlayingPlayer();
 		this.notationBuilder.moveType = DEPLOY;
 		this.notationBuilder.tileType = tileCode;
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
+		this.notationBuilder.sourcePileName = sourcePileName;
 
 		this.theGame.revealAllPointsAsPossible();
+	} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
+		if (divName === "PossibleMove") {
+			// Need the notation!
+			this.theGame.hidePossibleMovePoints();
+			if (this.notationBuilder.moveType === DEPLOY) {
+				this.notationBuilder.moveType = PlaygroundMoveType.deployToTilePile;
+			} else if (this.notationBuilder.moveType === MOVE) {
+				this.notationBuilder.moveType = PlaygroundMoveType.moveToTilePile;
+			}
+			this.notationBuilder.endPileName = sourcePileName;
+			
+			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+
+			// Move all set. Add it to the notation!
+			this.gameNotation.addMove(move);
+			
+			if (playingOnlineGame()) {
+				callSubmitMove();
+			} else {
+				finalizeMove();
+			}
+		} else {
+			this.theGame.hidePossibleMovePoints();
+			this.notationBuilder = new PlaygroundNotationBuilder();
+		}
 	} else {
 		this.theGame.hidePossibleMovePoints();
 		this.resetNotationBuilder();
+	}
+};
+
+PlaygroundController.prototype.getCurrentPlayingPlayer = function() {
+	if (playingOnlineGame()) {
+		if (usernameEquals(currentGameData.hostUsername)) {
+			return HOST;
+		} else if (usernameEquals(currentGameData.guestUsername)) {
+			return GUEST;
+		}
+	} else {
+		return this.currentPlayingPlayer;
 	}
 };
 
@@ -144,12 +272,12 @@ PlaygroundController.prototype.pointClicked = function(htmlPoint) {
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
-			this.notationBuilder.playingPlayer = this.currentPlayingPlayer;
+			this.notationBuilder.playingPlayer = this.getCurrentPlayingPlayer();
 			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 			this.notationBuilder.moveType = MOVE;
 			this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
-			this.theGame.revealAllPointsAsPossible();
+			this.theGame.revealPossibleMovePoints(boardPoint);
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
@@ -162,6 +290,7 @@ PlaygroundController.prototype.pointClicked = function(htmlPoint) {
 
 			// Move all set. Add it to the notation!
 			this.gameNotation.addMove(move);
+			
 			if (playingOnlineGame()) {
 				callSubmitMove();
 			} else {
@@ -178,7 +307,7 @@ PlaygroundController.prototype.getTileMessage = function(tileDiv) {
 	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 
-	var tile = new PlaygroundTile(divName.substring(1), divName.charAt(0));
+	var tile = new PlaygroundTile(null, divName.substring(1), divName.charAt(0));
 
 	var message = [];
 
@@ -243,7 +372,7 @@ PlaygroundController.prototype.getAiList = function() {
 };
 
 PlaygroundController.prototype.getCurrentPlayer = function() {
-	return this.currentPlayingPlayer;
+	return this.getCurrentPlayingPlayer();
 };
 
 PlaygroundController.prototype.cleanup = function() {
@@ -256,4 +385,13 @@ PlaygroundController.prototype.isSolitaire = function() {
 
 PlaygroundController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
+};
+
+PlaygroundController.prototype.getSkipToIndex = function(currentMoveIndex) {
+	for (var i = currentMoveIndex; i < this.gameNotation.moves.length; i++) {
+		if (this.gameNotation.moves[i].moveType === PlaygroundMoveType.hideTileLibraries) {
+			return i;
+		}
+	}
+	return currentMoveIndex;
 };

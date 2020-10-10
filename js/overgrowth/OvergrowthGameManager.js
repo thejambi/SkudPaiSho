@@ -1,15 +1,41 @@
 // Solitaire Game Manager
 
-function OvergrowthGameManager(actuator, ignoreActuate, isCopy) {
+function OvergrowthGameManager(actuator, ignoreActuate, isCopy, existingDrawnTile, existingLastDrawnTile) {
 	this.isCopy = isCopy;
 
 	this.actuator = actuator;
 
 	this.tileManager = new OvergrowthTileManager();
 
+	this.drawnTile = existingDrawnTile;
+	this.lastDrawnTile = existingLastDrawnTile; // Save for Undo
+
+	this.drawRandomTile();
+
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
 }
+
+OvergrowthGameManager.prototype.drawRandomTile = function() {
+	if (this.mustFetchNewRandomTile()) {
+		var newDrawnTile = this.drawRandomTileFromTileManager(getCurrentPlayer());
+		if (newDrawnTile) {
+			this.lastDrawnTile = this.drawnTile;
+			this.drawnTile = newDrawnTile;
+		}
+	}
+};
+
+OvergrowthGameManager.prototype.mustFetchNewRandomTile = function() {
+	return !isInReplay && gameController &&
+		(!this.currentDrawnTileIsPresentInTileManager() ||
+			this.currentDrawnTileBelongsToOtherPlayer() ||
+			!this.drawnTile);
+};
+
+OvergrowthGameManager.prototype.currentDrawnTileBelongsToOtherPlayer = function() {
+	return this.drawnTile && getCurrentPlayer() !== this.drawnTile.ownerName;
+};
 
 // Set up the game
 OvergrowthGameManager.prototype.setup = function (ignoreActuate) {
@@ -17,9 +43,9 @@ OvergrowthGameManager.prototype.setup = function (ignoreActuate) {
 	this.board = new OvergrowthBoard();
 
 	// Update the actuator
-	// if (!ignoreActuate) {
-	// 	this.actuate();
-	// }
+	if (!ignoreActuate) {
+		this.actuate();
+	}
 };
 
 // Sends the updated board to the actuator
@@ -27,7 +53,22 @@ OvergrowthGameManager.prototype.actuate = function() {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, gameController.theGame, gameController.drawnTile);
+
+	if (gameController) {
+		if (!this.drawnTile) {
+			this.drawRandomTile();
+		}
+		if (this.drawnTile) {
+			var tile = this.tileManager.peekTile(this.drawnTile.ownerName, this.drawnTile.code, this.drawnTile.id);
+			if (!tile) {
+				this.drawnTile = null;
+
+				this.drawRandomTile();
+			}
+		}
+	}
+
+	this.actuator.actuate(this.board, this, this.drawnTile);
 };
 
 OvergrowthGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -57,7 +98,7 @@ OvergrowthGameManager.prototype.runNotationMove = function(move, withActuate) {
 	return bonusAllowed;
 };
 
-OvergrowthGameManager.prototype.drawRandomTile = function(playerName) {
+OvergrowthGameManager.prototype.drawRandomTileFromTileManager = function(playerName) {
 	return this.tileManager.drawRandomTile(playerName);
 };
 
@@ -157,6 +198,14 @@ OvergrowthGameManager.prototype.getWinResultTypeCode = function() {
 	if (this.endGameWinners.length === 1) {
 		return 1;
 	}
+};
+
+OvergrowthGameManager.prototype.currentDrawnTileIsPresentInTileManager = function() {
+	if (this.drawnTile) {
+		var tile = this.tileManager.peekTile(this.drawnTile.ownerName, this.drawnTile.code, this.drawnTile.id);
+		return tile;
+	}
+	return false;
 };
 
 OvergrowthGameManager.prototype.getCopy = function() {

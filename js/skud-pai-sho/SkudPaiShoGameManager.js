@@ -106,25 +106,25 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate, mo
 		var playerOutOfTiles = this.aPlayerIsOutOfBasicFlowerTiles();
 		if (playerOutOfTiles) {
 			debug("PLAYER OUT OF TILES: " + playerOutOfTiles);
-			// If a player has more accent tiles, they win
-			var playerMoreAccentTiles = this.tileManager.getPlayerWithMoreAccentTiles();
-			if (playerMoreAccentTiles) {
-				debug("Player has more Accent Tiles: " + playerMoreAccentTiles)
-				this.endGameWinners.push(playerMoreAccentTiles);
-			} else {
+			// (Previously, on Skud Pai Sho...) If a player has more accent tiles, they win
+			// var playerMoreAccentTiles = this.tileManager.getPlayerWithMoreAccentTiles();
+			// if (playerMoreAccentTiles) {
+			// 	debug("Player has more Accent Tiles: " + playerMoreAccentTiles)
+			// 	this.endGameWinners.push(playerMoreAccentTiles);
+			// } else {
 				// (Previously, on Skud Pai Sho...) Calculate player with most Harmonies
 				// var playerWithmostHarmonies = this.board.harmonyManager.getPlayerWithMostHarmonies();
 				// Calculate player with most Harmonies crossing midlines
-				var playerWithmostHarmonies = this.board.harmonyManager.getPlayerWithMostHarmoniesCrossingMidlines();
-				if (playerWithmostHarmonies) {
-					this.endGameWinners.push(playerWithmostHarmonies);
-					debug("Most Harmonies winner: " + playerWithmostHarmonies);
-				} else {
-					this.endGameWinners.push(HOST);
-					this.endGameWinners.push(GUEST);
-					debug("Most Harmonies is a tie!");
-				}
+			var playerWithmostHarmonies = this.board.harmonyManager.getPlayerWithMostHarmoniesCrossingMidlines();
+			if (playerWithmostHarmonies) {
+				this.endGameWinners.push(playerWithmostHarmonies);
+				debug("Most Harmonies winner: " + playerWithmostHarmonies);
+			} else {
+				this.endGameWinners.push(HOST);
+				this.endGameWinners.push(GUEST);
+				debug("Most Harmonies is a tie!");
 			}
+			// }
 		}
 	}
 
@@ -242,15 +242,11 @@ SkudPaiShoGameManager.prototype.getWinReason = function() {
 	if (this.board.winners.length === 1) {
 		return " created a Harmony Ring and won the game!";
 	} else if (this.endGameWinners.length === 1) {
-		if (this.tileManager.getPlayerWithMoreAccentTiles()) {
-			return " won the game with more Accent Tiles left.";
-		} else {
-			return " won the game with the most Harmonies crossing the midlines.";
-		}
+		return " won the game with the most Harmonies crossing the midlines.";
 	} else if (this.board.winners.length === 2) {
 		return " formed Harmony Rings for a tie!";
-	} else if (this.board.endGameWinners.length === 2) {
-		return " tied with the same number of Harmonies!"
+	} else if (this.endGameWinners.length === 2) {
+		return " had the same number of Harmonies crossing the midlines for a tie!";	// Should there be any other tie breaker?
 	}
 };
 

@@ -26,7 +26,9 @@ var TrifleTileCodes = {
 	SaberToothMooseLion: 'SaberToothMooseLion',
 	AirGlider: 'AirGlider',
 	Shirshu: 'Shirshu',
-	BoarQPine: 'BoarQPine'
+	BoarQPine: 'BoarQPine',
+	Lavender: 'Lavender',
+	NobleRhubarb: 'NobleRhubarb'
 };
 
 var TileType = {
@@ -39,6 +41,7 @@ var TileType = {
 };
 
 var TileCategory = {
+	thisTile: "thisTile",
 	allTileTypes: "allTileTypes",
 	landingTile: "landingTile"
 };
@@ -65,7 +68,7 @@ var MovementType = {
 
 var MovementRestriction = {
 	restrictedByOpponentTileZones: "restrictedByOpponentTileZones",
-	// immobilizedByAdjacentOpponentTile: "immobilizedByAdjacentOpponentTile",
+	// immobilizedByAdjacentOpponentTile: "immobilizedByAdjacentOpponentTile", // unused
 	immobilizedByOpponentTileZones: "immobilizedByOpponentTileZones",
 	mustPreserveDirection: "mustPreserveDirection"
 };
@@ -100,11 +103,11 @@ var ZoneAbility = {
 }
 
 var BoardPresenceAbility = {
-	increaseFriendlyTileMovementDistance: "increaseFriendlyTileMovementDistance",
+	increaseFriendlyTileMovementDistance: "increaseFriendlyTileMovementDistance",	// TODO replace with Ability.grantBonusMovement
 	// spawnAdditionalCopies: "spawnAdditionalCopies",	// TODO,
 	canBeCapturedByFriendlyTiles: "canBeCapturedByFriendlyTiles",
-	drawOpponentTilesInLineOfSight: "drawOpponentTilesInLineOfSight",
-	captureProtection: "captureProtection"
+	drawOpponentTilesInLineOfSight: "drawOpponentTilesInLineOfSight"
+	// captureProtection: "captureProtection"
 }
 
 var SpawnLocation = {
@@ -113,7 +116,9 @@ var SpawnLocation = {
 
 var Ability = {
 	captureTiles: "captureTiles",
-	removeEffects: "removeEffects"
+	removeEffects: "removeEffects",
+	protectFromCapture: "protectFromCapture",
+	grantBonusMovement: "grantBonusMovement"
 };
 
 var AbilityType = {
@@ -124,6 +129,7 @@ var AbilityTrigger = {
 	whenCaptured: "whenCaptured",
 	whenCapturing: "whenCapturing",
 	whenTileLandsInZone: "whenTileLandsInZone",
+	whenTileMovesFromWithinZone: "whenTileMovesFromWithinZone",
 	whileTileInLineOfSight: "whileTileInLineOfSight"
 };
 
@@ -133,11 +139,7 @@ var TileTeam = {
 };
 
 var AbilitiesForType = {};
-	// protection: [
-	// 		ZoneAbility.protectFriendlyTilesFromCapture,
-	// 		BoardPresenceAbility.captureProtection
-	// 	]
-	// }
+
 var AbilityTypes = {};
 
 var TrifleTiles = {};
@@ -270,7 +272,7 @@ TrifleTileInfo.defineAbilitiesForAbilityTypes = function () {
 
 	AbilitiesForType[AbilityType.protection] = [
 		ZoneAbility.protectFriendlyTilesFromCapture,
-		BoardPresenceAbility.captureProtection
+		Ability.protectFromCapture
 	];
 };
 
@@ -281,7 +283,7 @@ TrifleTileInfo.defineAbilityTypes = function () {
 		AbilityType.protection
 	];
 
-	AbilityTypes[BoardPresenceAbility.captureProtection] = [
+	AbilityTypes[Ability.protectFromCapture] = [
 		AbilityType.protection
 	];
 };
@@ -455,7 +457,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 
 
 	/* Air Tiles */
-	TrifleTiles[TrifleTileCodes.AirBanner] = { /* Done */
+	TrifleTiles[TrifleTileCodes.AirBanner] = { /* Todo! */
 		types: [TileType.banner],
 		deployTypes: [ DeployType.anywhere ],
 		movements: [
@@ -466,6 +468,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		],
 		abilities: [
 			{
+				// TODO! There is no ZoneAbility.grantBonusTileMovement!
 				type: ZoneAbility.grantBonusTileMovement,
 				// amount: 1,
 				// targetTileTypes: [TileType.flower]
@@ -577,6 +580,35 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		}
 	};
 
+	TrifleTiles[TrifleTileCodes.NobleRhubarb] = {
+		types: [TileType.flower],
+		deployTypes: [DeployType.anywhere],
+		territorialZone: {
+			size: 1,
+			abilities: [
+				{
+					type: Ability.grantBonusMovement,
+					triggeringAction: AbilityTrigger.whenTileMovesFromWithinZone,
+					// ...
+				}
+			]
+		}
+	};
+
+	TrifleTiles[TrifleTileCodes.Lavender] = {
+		types: [TileType.flower],
+		deployTypes: [DeployType.anywhere],
+		territorialZone: {
+			size: 1,
+			abilities: [
+				{
+					type: ZoneAbility.immobilizesTiles,
+					targetTeams: [TileTeam.friendly, TileTeam.enemy]
+				}
+			]
+		}
+	};
+
 	TrifleTiles[TrifleTileCodes.WaterBanner] = {	/* Done */
 		types: [TileType.banner],
 		deployTypes: [ DeployType.anywhere ],
@@ -620,7 +652,8 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		],
 		abilities: [
 			{
-				type: BoardPresenceAbility.captureProtection,
+				type: Ability.protectFromCapture,
+				targetTileTypes: [TileCategory.thisTile],
 				triggeringAction: AbilityTrigger.whenCapturing,
 				// triggerTargetTileType: [TileType.flower],	// Idea: For example - ability could trigger when capturing a Flower - It'd be better to create a Trigger object that contains all the trigger info
 				duration: 1,

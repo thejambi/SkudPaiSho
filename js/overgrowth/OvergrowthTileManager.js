@@ -20,6 +20,10 @@ OvergrowthTileManager.prototype.loadPlayerTileSet = function(ownerCode, doubleTi
 	var numAccentTiles = 1;
 	var numBasicFlowerTiles = 2;
 
+	if (gameOptionEnabled(LESS_TILES)) {
+		numAccentTiles = 0;
+		numBasicFlowerTiles = 1;
+	}
 	if (gameOptionEnabled(OPTION_FULL_TILES)) {
 		numAccentTiles = 2;
 		numBasicFlowerTiles = 3;

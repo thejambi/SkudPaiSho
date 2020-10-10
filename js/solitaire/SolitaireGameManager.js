@@ -17,9 +17,9 @@ SolitaireGameManager.prototype.setup = function (ignoreActuate) {
 	this.board = new SolitaireBoard();
 
 	// Update the actuator
-	// if (!ignoreActuate) {
-	// 	this.actuate();
-	// }
+	if (!ignoreActuate) {
+		this.actuate();
+	}
 };
 
 // Sends the updated board to the actuator
@@ -27,7 +27,7 @@ SolitaireGameManager.prototype.actuate = function() {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, gameController.theGame, gameController.drawnTile);
+	this.actuator.actuate(this.board, this, gameController.drawnTile);
 };
 
 SolitaireGameManager.prototype.runNotationMove = function(move, withActuate) {

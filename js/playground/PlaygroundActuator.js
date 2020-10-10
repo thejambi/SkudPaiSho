@@ -8,7 +8,9 @@ function PlaygroundActuator(gameContainer, isMobile) {
 		this.gameContainer, 
 		PlaygroundController.getHostTilesContainerDivs(),
 		PlaygroundController.getGuestTilesContainerDivs(), 
-		false
+		(gameOptionEnabled(VAGABOND_ROTATE) || gameOptionEnabled(ADEVAR_ROTATE)),
+		(gameOptionEnabled(ADEVAR_ROTATE) ? ADEVAR_ROTATE : false),
+		gameOptionEnabled(PLAY_IN_SPACES)
 	);
 
 	this.boardContainer = containers.boardContainer;
@@ -16,10 +18,12 @@ function PlaygroundActuator(gameContainer, isMobile) {
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-PlaygroundActuator.prototype.actuate = function(board, tileManager) {
-	var self = this;
+PlaygroundActuator.hostTeamTilesDivId = "hostTilesContainer";
+PlaygroundActuator.guestTeamTilesDivId = "guestTilesContainer";
 
-	// self.printBoard(board);
+PlaygroundActuator.prototype.actuate = function(board, tileManager, actuateOptions) {
+	var self = this;
+	this.actuateOptions = actuateOptions;
 
 	window.requestAnimationFrame(function () {
 		self.htmlify(board, tileManager);
@@ -41,21 +45,79 @@ PlaygroundActuator.prototype.htmlify = function(board, tileManager) {
 
 	var fullTileSet = new PlaygroundTileManager(true);
 
-	// Go through tile piles and clear containers
-	fullTileSet.hostTiles.forEach(function(tile) {
-		self.clearTileContainer(tile);
-	});
-	fullTileSet.guestTiles.forEach(function(tile) {
-		self.clearTileContainer(tile);
-	});
+	self.clearContainerWithId(PlaygroundActuator.hostTeamTilesDivId);
+	self.clearContainerWithId(PlaygroundActuator.guestTeamTilesDivId);
+
+	if (this.actuateOptions.showTileReserve) {
+		// Host Tile Reserve
+		var hostTileReserveContainer = document.createElement("span");
+		hostTileReserveContainer.classList.add("tileLibrary");
+		var hostReserveLabel = document.createElement("span");
+		hostReserveLabel.innerText = "--Host Tile Reserve--";
+		hostTileReserveContainer.appendChild(hostReserveLabel);
+		hostTileReserveContainer.appendChild(document.createElement("br"));
+		this.hostTilesContainer.appendChild(hostTileReserveContainer);
+
+		// Guest Tile Reserve
+		var guestTileReserveContainer = document.createElement("span");
+		guestTileReserveContainer.classList.add("tileLibrary");
+		var guestReserveLabel = document.createElement("span");
+		guestReserveLabel.innerText = "--Guest Tile Reserve--";
+		guestTileReserveContainer.appendChild(guestReserveLabel);
+		guestTileReserveContainer.appendChild(document.createElement("br"));
+		this.guestTilesContainer.appendChild(guestTileReserveContainer);
+
+		// Captured/Removed Bank
+		var capturedTileContainer = document.createElement("span");
+		capturedTileContainer.classList.add("tileLibrary");
+		var capturedTileLabel = document.createElement("span");
+		capturedTileLabel.innerText = "--Captured/Removed Tiles--";
+		capturedTileContainer.appendChild(capturedTileLabel);
+		capturedTileContainer.appendChild(document.createElement("br"));
+		this.guestTilesContainer.appendChild(capturedTileContainer);
+	}
+
+	if (this.actuateOptions.showTileLibrary) {
+		// Host Tile Library
+		var hostTileLibraryContainer = document.createElement("span");
+		hostTileLibraryContainer.classList.add("tileLibrary");
+		var hostLibraryLabel = document.createElement("span");
+		hostLibraryLabel.innerText = "--Host Tile Library--";
+		hostTileLibraryContainer.appendChild(hostLibraryLabel);
+		hostTileLibraryContainer.appendChild(document.createElement("br"));
+		this.guestTilesContainer.appendChild(hostTileLibraryContainer);
+
+		// Guest Tile Library
+		var guestTileLibraryContainer = document.createElement("span");
+		guestTileLibraryContainer.classList.add("tileLibrary");
+		var guestLibraryLabel = document.createElement("span");
+		guestLibraryLabel.innerText = "--Guest Tile Library--";
+		guestTileLibraryContainer.appendChild(guestLibraryLabel);
+		guestTileLibraryContainer.appendChild(document.createElement("br"));
+		this.guestTilesContainer.appendChild(guestTileLibraryContainer);
+	}
 
 	// Go through tile piles and display
-	tileManager.hostTiles.forEach(function(tile) {
-		self.addTile(tile, this.hostTilesContainer);
-	});
-	tileManager.guestTiles.forEach(function(tile) {
-		self.addTile(tile, this.guestTilesContainer);
-	});
+	if (this.actuateOptions.showTileReserve) {
+		tileManager.hostTileReserve.forEach(function(tile) {
+			self.addTile(tile, hostTileReserveContainer, PlaygroundNotationContstants.hostReservePile);
+		});
+		tileManager.guestTileReserve.forEach(function(tile) {
+			self.addTile(tile, guestTileReserveContainer, PlaygroundNotationContstants.guestReservePile);
+		});
+		tileManager.capturedTiles.forEach(function(tile) {
+			self.addTile(tile, capturedTileContainer, PlaygroundNotationContstants.capturedPile);
+		});
+	}
+
+	if (this.actuateOptions.showTileLibrary) {
+		tileManager.hostTileLibrary.forEach(function(tile) {
+			self.addTile(tile, hostTileLibraryContainer, PlaygroundNotationContstants.hostLibraryPile);
+		});
+		tileManager.guestTileLibrary.forEach(function(tile) {
+			self.addTile(tile, guestTileLibraryContainer, PlaygroundNotationContstants.guestLibraryPile);
+		});
+	}
 };
 
 PlaygroundActuator.prototype.clearContainer = function (container) {
@@ -64,36 +126,46 @@ PlaygroundActuator.prototype.clearContainer = function (container) {
 	}
 };
 
+PlaygroundActuator.prototype.clearContainerWithId = function(containerIdName) {
+	var container = document.getElementById(containerIdName);
+	if (container) {
+		this.clearContainer(container);
+	}
+};
+
 PlaygroundActuator.prototype.clearTileContainer = function (tile) {
-	var container = document.querySelector("." + tile.getImageName());
+	var container = document.querySelector("." + tile.getNotationName());
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-PlaygroundActuator.prototype.addTile = function(tile, mainContainer) {
-	var self = this;
-
-	var container = document.querySelector("." + tile.getImageName());
-
+PlaygroundActuator.prototype.addTile = function(tile, tileContainer, pileName) {
+	if (!tile) {
+		return;
+	}
 	var theDiv = document.createElement("div");
 
 	theDiv.classList.add("point");
 	theDiv.classList.add("hasTile");
 
-	if (tile.selectedFromPile) {
+	if (tile.selectedFromPile || tile.gameType === "PossibleMove") {
 		theDiv.classList.add("selectedFromPile");
 		theDiv.classList.add("drained");
 	}
 
-	var theImg = document.createElement("img");
-	
-	var srcValue = getSkudTilesSrcPath();
-	theImg.src = srcValue + tile.getImageName() + ".png";
-	theDiv.appendChild(theImg);
+	if (tile.gameType !== "PossibleMove") {
+		var theImg = document.createElement("img");
+		
+		// var srcValue = getSkudTilesSrcPath();
+		var srcValue = this.getTileSrcPath(tile);
+		theImg.src = srcValue + tile.getImageName() + ".png";
+		theDiv.appendChild(theImg);
+	}
 
-	theDiv.setAttribute("name", tile.getImageName());
+	theDiv.setAttribute("name", tile.getNotationName());
 	theDiv.setAttribute("id", tile.id);
+	theDiv.setAttribute("data-pileName", pileName);
 
 	if (this.mobile) {
 		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
@@ -103,7 +175,29 @@ PlaygroundActuator.prototype.addTile = function(tile, mainContainer) {
 		theDiv.setAttribute("onmouseout", "clearMessage();");
 	}
 
-	container.appendChild(theDiv);
+	tileContainer.appendChild(theDiv);
+};
+
+PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
+	var srcValue = "images/";
+
+	var gameImgDir;
+	if (tile.gameType === GameType.SkudPaiSho) {
+		gameImgDir = "SkudPaiSho/" + skudTilesKey;
+	} else if (tile.gameType === GameType.VagabondPaiSho) {
+		gameImgDir = "Vagabond/" + localStorage.getItem(vagabondTileDesignTypeKey);
+	} else if (tile.gameType === GameType.CapturePaiSho) {
+		gameImgDir = "Capture";
+	} else if (tile.gameType === GameType.Playground) {
+		gameImgDir = "Playground";
+	} else if (tile.gameType === "Advr") {
+		gameImgDir = "Adevar/" + localStorage.getItem(AdevarOptions.tileDesignTypeKey);
+	}
+	if (gameImgDir) {
+		srcValue = srcValue + gameImgDir + "/";
+	}
+
+	return srcValue;
 };
 
 PlaygroundActuator.prototype.addBoardPoint = function(boardPoint) {
@@ -113,6 +207,11 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint) {
 	
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
+		if (gameOptionEnabled(VAGABOND_ROTATE)) {
+			theDiv.classList.add("vagabondPointRotate");
+		} else if (gameOptionEnabled(ADEVAR_ROTATE)) {
+			theDiv.classList.add("adevarPointRotate");
+		}
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 		} else if (boardPoint.betweenHarmony) {
@@ -139,15 +238,8 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint) {
 		
 		var theImg = document.createElement("img");
 
-		var srcValue = getSkudTilesSrcPath();
+		var srcValue = this.getTileSrcPath(boardPoint.tile);
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
-		
-		if (boardPoint.tile.inHarmony) {
-			theDiv.classList.add(boardPoint.tile.ownerName + "harmony");
-		}
-		if (boardPoint.tile.drained || boardPoint.tile.trapped) {
-			theDiv.classList.add("drained");
-		}
 		
 		theDiv.appendChild(theImg);
 	}
@@ -161,26 +253,4 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint) {
 	}
 };
 
-PlaygroundActuator.prototype.printBoard = function(board) {
-
-	debug("");
-	var rowNum = 0;
-	board.cells.forEach(function (row) {
-		var rowStr = rowNum + "\t: ";
-		row.forEach(function (boardPoint) {
-			var str = boardPoint.getConsoleDisplay();
-			if (str.length < 3) {
-				rowStr += " ";
-			}
-			rowStr = rowStr + str;
-			if (str.length < 2) {
-				rowStr = rowStr + " ";
-			}
-			
-		});
-		debug(rowStr);
-		rowNum++;
-	});
-	debug("");
-};
 

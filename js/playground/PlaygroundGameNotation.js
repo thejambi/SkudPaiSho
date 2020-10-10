@@ -2,6 +2,24 @@
 
 // --------------------------------------------- // 
 
+var PlaygroundMoveType = {
+	endGame: "END_GAME",
+	hideTileLibraries: "HideTileLibraries",
+	deployToTilePile: "DeployToTilePile",
+	moveToTilePile: "MoveToTilePile"
+};
+
+var PlaygroundNotationContstants = {
+	moveToPile: "-mp",
+	deployToPile: "-dp",
+	fromPile: "-fp",
+	hostLibraryPile: ":HL",
+	guestLibraryPile: ":GL",
+	hostReservePile: ":HR",
+	guestReservePile: ":GR",
+	capturedPile: ":C"
+};
+
 function PlaygroundNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
@@ -40,28 +58,45 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 		this.moveType = DEPLOY;
 	}
 
-	if (this.moveType === DEPLOY) {
+	if (moveText.includes("END")) {
+		this.moveType = PlaygroundMoveType.endGame;
+	} else if (moveText.includes(PlaygroundMoveType.hideTileLibraries)) {
+		this.moveType = PlaygroundMoveType.hideTileLibraries;
+	} else if (moveText.includes(PlaygroundNotationContstants.moveToPile)) {
+		this.moveType = PlaygroundMoveType.moveToTilePile;
+	} else if (moveText.includes(PlaygroundNotationContstants.deployToPile)) {
+		this.moveType = PlaygroundMoveType.deployToTilePile;
+	}
+
+	if (this.moveType === DEPLOY || this.moveType === PlaygroundMoveType.deployToTilePile) {
 		var char1 = moveText.charAt(1);
 		var char2 = moveText.charAt(2);
 		this.tileOwner = char0;
-		if (char2 === '(') {
-			this.tileType = char1;
-		} else {
-			this.tileType = char1 + "" + char2;
+		var parenIndex = moveText.indexOf("(");
+		this.tileType;
+		if (this.moveType === DEPLOY) {
+			this.tileType = moveText.substring(1, parenIndex);
+		} else if (this.moveType === PlaygroundMoveType.deployToTilePile) {
+			this.tileType = moveText.substring(1, moveText.indexOf(PlaygroundNotationContstants.deployToPile));
 		}
 
-		if (moveText.charAt(2) === '(') {
+		if (moveText.charAt(parenIndex) === '(') {
 			// debug("parens checks out");
-		} else {
+		} else if (this.moveType === DEPLOY) {
 			debug("Failure to plant");
 			this.valid = false;
 		}
 
-		if (moveText.endsWith(')')) {
-			this.endPoint = new NotationPoint(moveText.substring(moveText.indexOf('(')+1, moveText.indexOf(')')));
+		if (this.moveType === PlaygroundMoveType.deployToTilePile) {
+			this.endPileName = moveText.substring(moveText.indexOf(PlaygroundNotationContstants.deployToPile) + PlaygroundNotationContstants.deployToPile.length, moveText.indexOf(PlaygroundNotationContstants.fromPile));
+			debug(this.endPileName);
+		} else if (this.moveType === DEPLOY) {
+			this.endPoint = new NotationPoint(moveText.substring(parenIndex+1, moveText.indexOf(')')));
 		} else {
 			this.valid = false;
 		}
+
+		this.sourcePileName = moveText.substring(moveText.indexOf(PlaygroundNotationContstants.fromPile) + PlaygroundNotationContstants.fromPile.length);
 	} else if (this.moveType === MOVE) {
 		// Get the two points from string like: (-8,0)-(-6,3)
 		var parts = moveText.substring(moveText.indexOf('(')+1).split(')-(');
@@ -69,6 +104,9 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 		this.startPoint = new NotationPoint(parts[0]);
 
 		this.endPoint = new NotationPoint(parts[1].substring(0, parts[1].indexOf(')')));
+	} else if (this.moveType === PlaygroundMoveType.moveToTilePile) {
+		this.startPoint = new NotationPoint(moveText.substring(moveText.indexOf("(") + 1, moveText.indexOf(")")));
+		this.endPileName = moveText.substring(moveText.indexOf(PlaygroundNotationContstants.moveToPile) + PlaygroundNotationContstants.moveToPile.length);
 	}
 };
 
@@ -102,10 +140,18 @@ function PlaygroundNotationBuilder() {
 
 PlaygroundNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 	var notationLine = moveNum + player.charAt(0) + ".";
-	if (this.moveType === MOVE) {
+	if (this.moveType === PlaygroundMoveType.endGame) {
+		notationLine += "END";
+	} else if (this.moveType === PlaygroundMoveType.hideTileLibraries) {
+		notationLine += PlaygroundMoveType.hideTileLibraries;
+	} else if (this.moveType === MOVE) {
 		notationLine += "(" + this.startPoint.pointText + ")-(" + this.endPoint.pointText + ")";
 	} else if (this.moveType === DEPLOY) {
-		notationLine += this.tileType + "(" + this.endPoint.pointText + ")";
+		notationLine += this.tileType + "(" + this.endPoint.pointText + ")" + PlaygroundNotationContstants.fromPile + this.sourcePileName;
+	} else if (this.moveType === PlaygroundMoveType.moveToTilePile) {
+		notationLine += "(" + this.startPoint.pointText + ")" + PlaygroundNotationContstants.moveToPile + this.endPileName;
+	} else if (this.moveType === PlaygroundMoveType.deployToTilePile) {
+		notationLine += this.tileType + PlaygroundNotationContstants.deployToPile + this.endPileName + PlaygroundNotationContstants.fromPile + this.sourcePileName;
 	}
 	
 	return new PlaygroundNotationMove(notationLine);
@@ -169,6 +215,10 @@ PlaygroundGameNotation.prototype.getNotationMoveFromBuilder = function(builder) 
 		if (lastMove.player !== builder.playingPlayer) {
 			moveNum++;
 		}
+	}
+
+	if (builder.endGame) {
+		builder.moveType = PlaygroundMoveType.endGame;
 	}
 
 	return builder.getNotationMove(moveNum, builder.playingPlayer);

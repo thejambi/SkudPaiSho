@@ -2,21 +2,19 @@
 var RED = "Red";
 var WHITE = "White";
 
-function PlaygroundTile(code, ownerCode) {
+function PlaygroundTile(gameType, code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
 		this.ownerName = GUEST;
 	} else if (this.ownerCode === 'H') {
 		this.ownerName = HOST;
-	} else {
-		debug("INCORRECT OWNER CODE");
 	}
 	this.id = tileId++;
 	this.drained = false;
 	this.selectedFromPile = false;
 
-	
+	this.gameType = gameType;
 }
 
 PlaygroundTile.prototype.getConsoleDisplay = function() {
@@ -24,8 +22,12 @@ PlaygroundTile.prototype.getConsoleDisplay = function() {
 };
 
 PlaygroundTile.prototype.getImageName = function() {
-	return this.ownerCode + "" + this.code;
+	return this.ownerCode + "" + this.code.substring(this.code.indexOf("_") + 1);
 };
+
+PlaygroundTile.prototype.getNotationName = function() {
+	return this.ownerCode + "" + this.code;
+}
 
 PlaygroundTile.prototype.getMoveDistance = function() {
 	if (this.type === BASIC_FLOWER) {
