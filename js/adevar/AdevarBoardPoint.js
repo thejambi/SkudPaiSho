@@ -69,6 +69,10 @@ AdevarBoardPoint.prototype.getMoveDistanceRemaining = function(movementInfo) {
 	return this.moveDistanceRemaining;
 };
 
+AdevarBoardPoint.prototype.clearPossibleMovementTypes = function() {
+	this.moveDistanceRemaining = null;
+};
+
 AdevarBoardPoint.prototype.getCopy = function() {
 	var copy = new AdevarBoardPoint();
 
@@ -101,9 +105,9 @@ AdevarBoardPoint.neutral = function() {
 	return point;
 };
 
-AdevarBoardPoint.gate = function() {
+AdevarBoardPoint.wall = function() {
 	var point = new AdevarBoardPoint();
-	point.addType(GATE);
+	point.addType(NON_PLAYABLE);
 
 	return point;
 };
