@@ -1,0 +1,12 @@
+https://www.npmjs.com/package/uglifyjs-folder
+INSTALL NODE and execute npm install uglifyjs-folder -g
+
+afterwards in cmd place the command: uglifyjs-folder js -o all.min.js
+
+COPY content from all.min.js to bottom index.html (@ comment Compressed). 
+
+DO this every code update in the /js folder
+
+NOTE FROM SKUD: Please put the code into a file named psmin_999.js (psmin_[some numbers go here]) instead to not break the usual minify script functionality. 
+You should be able to get the usual script to work in windows by using a bash shell or powershell in VSCode terminal.
+I recommend not pushing the psmin_999 file used.
