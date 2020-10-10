@@ -101,9 +101,9 @@ AdevarBoardPoint.neutral = function() {
 	return point;
 };
 
-AdevarBoardPoint.gate = function() {
+AdevarBoardPoint.wall = function() {
 	var point = new AdevarBoardPoint();
-	point.addType(GATE);
+	point.addType(NON_PLAYABLE);
 
 	return point;
 };
