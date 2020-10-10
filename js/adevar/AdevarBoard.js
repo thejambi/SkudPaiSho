@@ -14,11 +14,9 @@ AdevarBoard.prototype.brandNewForSpaces = function () {
 		Also, the types used here are not accurate (points created as neutral might be red, etc). 
 		You'll also need to adjust for the non-playable areas of the board near the red corners. */
 
-	cells[0] = this.newRow(6, 
+	cells[0] = this.newRow(4, 
 		[AdevarBoardPoint.neutral(),
 		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.gate(),
-		AdevarBoardPoint.gate(),
 		AdevarBoardPoint.neutral(),
 		AdevarBoardPoint.neutral()
 		]);
@@ -184,9 +182,8 @@ AdevarBoard.prototype.brandNewForSpaces = function () {
 		AdevarBoardPoint.neutral()
 		]);
 
-	cells[8] = this.newRow(18,
-		[AdevarBoardPoint.gate(),
-			AdevarBoardPoint.neutral(),
+	cells[8] = this.newRow(17,
+		[AdevarBoardPoint.neutral(),
 			AdevarBoardPoint.neutral(),
 			AdevarBoardPoint.neutral(),
 			AdevarBoardPoint.neutral(),
