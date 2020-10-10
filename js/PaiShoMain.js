@@ -1926,6 +1926,7 @@ function getGameControllerForGameType(gameTypeId) {
 
 	return controller;
 }
+
   function setGameController(gameTypeId, keepGameOptions) {
 	  setGameLogText('');
 	  var successResult = true;

@@ -69,6 +69,10 @@ AdevarBoardPoint.prototype.getMoveDistanceRemaining = function(movementInfo) {
 	return this.moveDistanceRemaining;
 };
 
+AdevarBoardPoint.prototype.clearPossibleMovementTypes = function() {
+	this.moveDistanceRemaining = null;
+};
+
 AdevarBoardPoint.prototype.getCopy = function() {
 	var copy = new AdevarBoardPoint();
 

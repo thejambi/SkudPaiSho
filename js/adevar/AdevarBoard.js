@@ -491,7 +491,7 @@ AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movem
 
 AdevarBoard.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, targetPoint) {
 	// return tile.canCapture(targetPoint.tile) // <-- and then implement
-	return true;
+	return tile !== targetPoint.tile;
 };
 
 AdevarBoard.prototype.tileCanMoveThroughPoint = function(tile, movementInfo, targetPoint, fromPoint) {
@@ -549,6 +549,7 @@ AdevarBoard.prototype.removePossibleMovePoints = function() {
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
 			boardPoint.removeType(POSSIBLE_MOVE);
+			boardPoint.clearPossibleMovementTypes();
 		});
 	});
 };
