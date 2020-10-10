@@ -33,12 +33,22 @@ AdevarTile.prototype.getMovementInfo = function() {
 AdevarTile.prototype.getMoveDistance = function() {
 	if (this.type === BASIC_FLOWER) {	// Adjust accordingly :)
 		return parseInt(this.basicValue);
-	} else if (this.code === 'L') {
-		return 2;
-	} else if (this.code === 'O') {
-		return 6;
+	} else if (this.code === 'Foxglove') {	// Gives the Foxglove 5 spaces of movement
+		return 5;
+	} else if (this.code === 'Zinnia') {	// Gives the Zinnia 4 spaces of movement
+		return 4;
+	} else if (this.code === 'Lilac') {		// Gives the Lilac 3 spaces of movement
+		return 3;
+	} else if (this.code === 'WatersReflection') {	//Gives the Reflection tile 7 spaces of movement
+		return 7;
+	} else if (this.code === 'IrisSecondFace') {			//
+		return 7;											//
+	} else if (this.code === 'OrientalLilySecondFace') {	// Gives the Second Faces tiles 7 spaces of movement
+		return 7;											//
+	} else if (this.code === 'EcheveriaSecondFace') {		//
+		return 7;
 	}
-	return 8;	// 8!?
+	return 0;	// 8!? lol
 };
 
 AdevarTile.prototype.getName = function() {

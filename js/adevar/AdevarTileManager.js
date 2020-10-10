@@ -21,15 +21,15 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 		tiles.push(new AdevarTile("Lilac", ownerCode));
 	}
 	
-	for (var i = 0; i < 10; i++) {
+	for (var i = 0; i < 8; i++) {
 		tiles.push(new AdevarTile("Zinnia", ownerCode));
 	}
 	
-	for (var i = 0; i < 10; i++) {
+	for (var i = 0; i < 5; i++) {
 		tiles.push(new AdevarTile("Foxglove", ownerCode));
 	}
 	
-	for (var i = 0; i < 10; i++) {
+	for (var i = 0; i < 2; i++) {
 		tiles.push(new AdevarTile("Gate", ownerCode));
 	}
 	
