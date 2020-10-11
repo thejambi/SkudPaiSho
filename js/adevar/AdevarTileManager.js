@@ -51,6 +51,8 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	
 	tiles.push(new AdevarTile("WatersReflection", ownerCode));
 
+	tiles.push(new AdevarTile("Blank", ownerCode));
+
 	return tiles;
 };
 
