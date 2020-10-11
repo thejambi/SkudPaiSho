@@ -464,18 +464,18 @@ SkudPaiShoController.prototype.getPointMessage = function(htmlPoint) {
 		if (boardPoint.tile.trapped) {
 			message.push("Currently <em>trapped</em> by an Orchid.")
 		}
-	} else {
-		if (boardPoint.isType(NEUTRAL)) {
-			message.push(getNeutralPointMessage());
-		} else if (boardPoint.isType(RED) && boardPoint.isType(WHITE)) {
-			message.push(getRedWhitePointMessage());
-		} else if (boardPoint.isType(RED)) {
-			message.push(getRedPointMessage());
-		} else if (boardPoint.isType(WHITE)) {
-			message.push(getWhitePointMessage());
-		} else if (boardPoint.isType(GATE)) {
-			message.push(getGatePointMessage());
-		}
+	}
+	
+	if (boardPoint.isType(NEUTRAL)) {
+		message.push(getNeutralPointMessage());
+	} else if (boardPoint.isType(RED) && boardPoint.isType(WHITE)) {
+		message.push(getRedWhitePointMessage());
+	} else if (boardPoint.isType(RED)) {
+		message.push(getRedPointMessage());
+	} else if (boardPoint.isType(WHITE)) {
+		message.push(getWhitePointMessage());
+	} else if (boardPoint.isType(GATE)) {
+		message.push(getGatePointMessage());
 	}
 
 	return {
