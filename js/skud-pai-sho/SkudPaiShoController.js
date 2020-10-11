@@ -417,14 +417,77 @@ SkudPaiShoController.prototype.getTileMessage = function(tileDiv) {
 
 	var tile = new SkudPaiShoTile(divName.substring(1), divName.charAt(0));
 
-	var message = [];
+	var tileMessage = this.getHelpMessageForTile(tile);
 
-	var ownerName = HOST;
-	if (divName.startsWith('G')) {
-		ownerName = GUEST;
+	return {
+		heading: tileMessage.heading,
+		message: tileMessage.message
+	}
+};
+
+SkudPaiShoController.prototype.getPointMessage = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+	var heading;
+	var message = [];
+	if (boardPoint.hasTile()) {
+		var tileMessage = this.getHelpMessageForTile(boardPoint.tile);
+		tileMessage.message.forEach(function(messageString){
+			message.push(messageString);
+		});
+		heading = tileMessage.heading;
+		// Specific tile message
+		/**
+		Rose
+		* In Harmony with Chrysanthemum to the north
+		* Trapped by Orchid
+		*/
+		var tileHarmonies = this.theGame.board.harmonyManager.getHarmoniesWithThisTile(boardPoint.tile);
+		if (tileHarmonies.length > 0) {
+			var bullets = [];
+			tileHarmonies.forEach(function(harmony) {
+				var otherTile = harmony.getTileThatIsNotThisOne(boardPoint.tile);
+				bullets.push(otherTile.getName()
+					+ " to the " + harmony.getDirectionForTile(boardPoint.tile));
+			});
+			message.push("<strong>Currently in Harmony with: </strong>" + toBullets(bullets));
+		}
+
+		// Drained? Trapped? Anything else?
+		if (boardPoint.tile.drained) {
+			message.push("Currently <em>drained</em> by a Knotweed.");
+		}
+		if (boardPoint.tile.trapped) {
+			message.push("Currently <em>trapped</em> by an Orchid.")
+		}
+	} else {
+		if (boardPoint.isType(NEUTRAL)) {
+			message.push(getNeutralPointMessage());
+		} else if (boardPoint.isType(RED) && boardPoint.isType(WHITE)) {
+			message.push(getRedWhitePointMessage());
+		} else if (boardPoint.isType(RED)) {
+			message.push(getRedPointMessage());
+		} else if (boardPoint.isType(WHITE)) {
+			message.push(getWhitePointMessage());
+		} else if (boardPoint.isType(GATE)) {
+			message.push(getGatePointMessage());
+		}
 	}
 
-	var tileCode = divName.substring(1);
+	return {
+		heading: heading,
+		message: message
+	}
+};
+
+SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
+	var message = [];
+
+	var tileCode = tile.code;
 
 	var heading = SkudPaiShoTile.getTileName(tileCode);
 
@@ -545,61 +608,6 @@ SkudPaiShoController.prototype.getTileMessage = function(tileDiv) {
 			message.push("Flower tiles surrounding a Lion Turtle form Harmony with all Basic Flower Tiles of either player");
 			message.push("The owner of the Lion Turtle owns the Harmonies that include both players' tiles");
 			message.push("(Overlap with other Lion Turtle tiles can combine this effect, so Harmonies can potentially belong to both players)");
-		}
-	}
-
-	return {
-		heading: heading,
-		message: message
-	}
-};
-
-SkudPaiShoController.prototype.getPointMessage = function(htmlPoint) {
-	var npText = htmlPoint.getAttribute("name");
-
-	var notationPoint = new NotationPoint(npText);
-	var rowCol = notationPoint.rowAndColumn;
-	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
-
-	var heading;
-	var message = [];
-	if (boardPoint.hasTile()) {
-		heading = boardPoint.tile.getName();
-		// Specific tile message
-		/**
-		Rose
-		* In Harmony with Chrysanthemum to the north
-		* Trapped by Orchid
-		*/
-		var tileHarmonies = this.theGame.board.harmonyManager.getHarmoniesWithThisTile(boardPoint.tile);
-		if (tileHarmonies.length > 0) {
-			var bullets = [];
-			tileHarmonies.forEach(function(harmony) {
-				var otherTile = harmony.getTileThatIsNotThisOne(boardPoint.tile);
-				bullets.push(otherTile.getName()
-					+ " to the " + harmony.getDirectionForTile(boardPoint.tile));
-			});
-			message.push("<strong>Currently in Harmony with: </strong>" + toBullets(bullets));
-		}
-
-		// Drained? Trapped? Anything else?
-		if (boardPoint.tile.drained) {
-			message.push("Currently <em>drained</em> by a Knotweed.");
-		}
-		if (boardPoint.tile.trapped) {
-			message.push("Currently <em>trapped</em> by an Orchid.")
-		}
-	} else {
-		if (boardPoint.isType(NEUTRAL)) {
-			message.push(getNeutralPointMessage());
-		} else if (boardPoint.isType(RED) && boardPoint.isType(WHITE)) {
-			message.push(getRedWhitePointMessage());
-		} else if (boardPoint.isType(RED)) {
-			message.push(getRedPointMessage());
-		} else if (boardPoint.isType(WHITE)) {
-			message.push(getWhitePointMessage());
-		} else if (boardPoint.isType(GATE)) {
-			message.push(getGatePointMessage());
 		}
 	}
 
