@@ -18,10 +18,10 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	var tiles = [];
 
 	/* Hidden Tiles - show first, and apply "selected" effect since one will be chosen */
-	tiles.push(new AdevarTile("Iris", ownerCode));
-	tiles.push(new AdevarTile("OrientalLily", ownerCode));
-	tiles.push(new AdevarTile("Echeveria", ownerCode));
-	// tiles.push(new AdevarTile("WhiteRose", ownerCode)); // etc
+	tiles.push(new AdevarTile(AdevarTileCode.iris, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.orientalLily, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.echeveria, ownerCode));
+	// tiles.push(new AdevarTile(AdevarTileCode.whiteRose, ownerCode)); // etc
 
 	// Apply "selected" effect to Hidden Tiles
 	tiles.forEach(function(tile) {
@@ -31,32 +31,32 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	/* The rest of the tiles */
 
 	for (var i = 0; i < 10; i++) {
-		tiles.push(new AdevarTile("Lilac", ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.lilac, ownerCode));
 	}
 	
 	for (var i = 0; i < 8; i++) {
-		tiles.push(new AdevarTile("Zinnia", ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.zinnia, ownerCode));
 	}
 	
 	for (var i = 0; i < 5; i++) {
-		tiles.push(new AdevarTile("Foxglove", ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.foxglove, ownerCode));
 	}
 	
 	for (var i = 0; i < 2; i++) {
-		tiles.push(new AdevarTile("Gate", ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.gate, ownerCode));
 	}
 	
-	tiles.push(new AdevarTile("IrisSecondFace", ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.irisSF, ownerCode));
 	
-	tiles.push(new AdevarTile("OrientalLilySecondFace", ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.orientalLilySF, ownerCode));
 	
-	tiles.push(new AdevarTile("EcheveriaSecondFace", ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.orientalLilySF, ownerCode));
 	
 	for (var i = 0; i < 2; i++) {
-		tiles.push(new AdevarTile("Vanguard", ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.vanguard, ownerCode));
 	}
 	
-	tiles.push(new AdevarTile("WatersReflection", ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.reflection, ownerCode));
 
 	return tiles;
 };
