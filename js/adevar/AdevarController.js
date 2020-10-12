@@ -105,7 +105,7 @@ AdevarController.prototype.unplayedTileClicked = function(tileDiv) {
 		return;
 	}
 
-	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
+	var divName = tileDiv.getAttribute("name");
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 	var playerCode = divName.charAt(0);
 	var tileCode = divName;
@@ -125,7 +125,26 @@ AdevarController.prototype.unplayedTileClicked = function(tileDiv) {
 		}
 	}
 
-	if (this.notationBuilder.status === BRAND_NEW) {
+	if (this.gameNotation.moves.length <= 1) {
+		// Choosing Hidden Tile
+		if (tile.type === AdevarTileType.hiddenTile) {
+			this.notationBuilder.moveType = AdevarMoveType.chooseHiddenTile;
+			this.notationBuilder.hiddenTileCode = tile.code;
+
+			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+
+			// Move all set. Add it to the notation!
+			this.gameNotation.addMove(move);
+			
+			if (playingOnlineGame()) {
+				callSubmitMove();
+			} else if (onlinePlayEnabled) {
+				createGameIfThatIsOk(GameType.Adevar.id);
+			} else {
+				finalizeMove();
+			}
+		}
+	} else if (this.notationBuilder.status === BRAND_NEW) {
 		// new Deploy turn
 		tile.selectedFromPile = true;
 

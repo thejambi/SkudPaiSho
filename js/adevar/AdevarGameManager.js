@@ -35,7 +35,9 @@ AdevarGameManager.prototype.actuate = function () {
 AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	debug("Running Move: " + move.fullMoveText);
 
-	if (move.moveType === DEPLOY) {
+	if (move.moveType === AdevarMoveType.chooseHiddenTile) {
+		// Need to do all the game setup as well as set the player's hidden tile
+	} else if (move.moveType === DEPLOY) {
 		// Just placing tile on board
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
 		this.board.placeTile(tile, move.endPoint);

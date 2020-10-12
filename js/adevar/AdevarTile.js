@@ -1,4 +1,28 @@
 
+var AdevarTileType = {
+	basic: "Basic",
+	gate: "Gate",
+	hiddenTile: "Hidden Tile",
+	secondFace: "Second Face",
+	vanguard: "Vanguard",
+	reflection: "Reflection"
+};
+
+var AdevarTileCode = {
+	lilac: "Lilac",
+	zinnia: "Zinna",
+	foxglove: "Foxglove",
+	gate: "Gate",
+	vanguard: "Vanguard",
+	reflection: "WatersReflection",
+	iris: "Iris",
+	irisSF: "IrisSecondFace",
+	orientalLily: "OrientalLily",
+	orientalLilySF: "OrientalLilySecondFace",
+	echevaria: "Echevaria",
+	echevariaSF: "EchevariaSecondFace"
+}
+
 function AdevarTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
@@ -10,6 +34,35 @@ function AdevarTile(code, ownerCode) {
 	this.id = tileId++;
 	this.drained = false;
 	this.selectedFromPile = false;
+	this.hidden = false;
+
+	switch (code) {
+		case AdevarTileCode.iris:
+		case AdevarTileCode.orientalLily:
+		case AdevarTileCode.echevaria:
+			this.type = AdevarTileType.hiddenTile;
+			break;
+		case AdevarTileCode.irisSF:
+		case AdevarTileCode.orientalLilySF:
+		case AdevarTileCode.echevariaSF:
+			this.type = AdevarTileType.secondFace;
+			break;
+		case AdevarTileCode.lilac:
+		case AdevarTileCode.zinnia:
+		case AdevarTileCode.foxglove:
+			this.type = AdevarTileType.basic;
+			break;
+		case AdevarTileCode.gate:
+			this.type = AdevarTileType.gate;
+			break;
+		case AdevarTileCode.vanguard:
+			this.type = AdevarTileType.vanguard;
+			break;
+		case AdevarTileCode.reflection:
+			this.type = AdevarTileType.reflection;
+			break;
+	}
+	
 }
 
 AdevarTile.prototype.getConsoleDisplay = function() {
@@ -31,24 +84,18 @@ AdevarTile.prototype.getMovementInfo = function() {
 };
 
 AdevarTile.prototype.getMoveDistance = function() {
-	if (this.type === BASIC_FLOWER) {	// Adjust accordingly :)
-		return parseInt(this.basicValue);
-	} else if (this.code === 'Foxglove') {	// Gives the Foxglove 5 spaces of movement
+	if (this.code === AdevarTileCode.foxglove) {	// Gives the Foxglove 5 spaces of movement
 		return 5;
-	} else if (this.code === 'Zinnia') {	// Gives the Zinnia 4 spaces of movement
+	} else if (this.code === AdevarTileCode.zinnia) {	// Gives the Zinnia 4 spaces of movement
 		return 4;
-	} else if (this.code === 'Lilac') {		// Gives the Lilac 3 spaces of movement
+	} else if (this.code === AdevarTileCode.lilac) {		// Gives the Lilac 3 spaces of movement
 		return 3;
-	} else if (this.code === 'WatersReflection') {	//Gives the Reflection tile 7 spaces of movement
+	} else if (this.type === AdevarTileType.reflection) {	//Gives the Reflection tile 7 spaces of movement
 		return 7;
-	} else if (this.code === 'IrisSecondFace') {			//
-		return 7;											//
-	} else if (this.code === 'OrientalLilySecondFace') {	// Gives the Second Faces tiles 7 spaces of movement
-		return 7;											//
-	} else if (this.code === 'EcheveriaSecondFace') {		//
+	} else if (this.type === AdevarTileType.secondFace) {	// Gives the Second Faces tiles 7 spaces of movement
 		return 7;
 	}
-	return 0;	// 8!? lol
+	return 0;	// Other tiles cannot move
 };
 
 AdevarTile.prototype.getName = function() {
