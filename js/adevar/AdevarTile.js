@@ -19,8 +19,8 @@ var AdevarTileCode = {
 	irisSF: "IrisSecondFace",
 	orientalLily: "OrientalLily",
 	orientalLilySF: "OrientalLilySecondFace",
-	echevaria: "Echevaria",
-	echevariaSF: "EchevariaSecondFace"
+	echeveria: "Echeveria",
+	echeveriaSF: "EcheveriaSecondFace"
 }
 
 function AdevarTile(code, ownerCode) {
@@ -39,12 +39,12 @@ function AdevarTile(code, ownerCode) {
 	switch (code) {
 		case AdevarTileCode.iris:
 		case AdevarTileCode.orientalLily:
-		case AdevarTileCode.echevaria:
+		case AdevarTileCode.echeveria:
 			this.type = AdevarTileType.hiddenTile;
 			break;
 		case AdevarTileCode.irisSF:
 		case AdevarTileCode.orientalLilySF:
-		case AdevarTileCode.echevariaSF:
+		case AdevarTileCode.echeveriaSF:
 			this.type = AdevarTileType.secondFace;
 			break;
 		case AdevarTileCode.lilac:
@@ -70,7 +70,8 @@ AdevarTile.prototype.getConsoleDisplay = function() {
 };
 
 AdevarTile.prototype.getImageName = function() {
-	return this.ownerCode + "" + this.code;
+	var codeToUse = this.hidden ? "Back" : this.code;
+	return this.ownerCode + "" + codeToUse;
 };
 
 AdevarTile.prototype.getNotationName = function() {

@@ -1,5 +1,22 @@
 // Skud Pai Sho Game Manager
 
+var AdevarBoardSetupPoints = {
+	hiddenTile: {
+		HOST: new NotationPoint("6,-6"),
+		GUEST: new NotationPoint("-5,5")
+	},
+	vanguard: {
+		HOST: [
+			new NotationPoint("5,-6"), 
+			new NotationPoint("6,-5")
+		],
+		GUEST: [
+			new NotationPoint("-5,4"), 
+			new NotationPoint("-4,5")
+		]
+	}
+};
+
 function AdevarGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
@@ -37,6 +54,21 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 	if (move.moveType === AdevarMoveType.chooseHiddenTile) {
 		// Need to do all the game setup as well as set the player's hidden tile
+		var hiddenTile = this.tileManager.grabTile(move.player, move.hiddenTileCode);
+		hiddenTile.hidden = true;
+		debug(hiddenTile);
+
+		// Place Hidden Tile
+		this.board.placeTile(hiddenTile, AdevarBoardSetupPoints.hiddenTile[move.player]);
+
+		var self = this;
+
+		// Place Vanguard tiles
+		AdevarBoardSetupPoints.vanguard[move.player].forEach(function(vanguardPoint) {
+			self.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.vanguard),
+				vanguardPoint);
+		});
+		
 	} else if (move.moveType === DEPLOY) {
 		// Just placing tile on board
 		var tile = this.tileManager.grabTile(move.player, move.tileType);

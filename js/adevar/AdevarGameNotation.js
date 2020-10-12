@@ -49,8 +49,8 @@ AdevarNotationMove.prototype.analyzeMove = function() {
 	}
 
 	if (this.moveType === AdevarMoveType.chooseHiddenTile) {
-		// Like: cHT:Echevaria
-		this.hiddenTileCode = moveText.substring(moveText.indexOf(AdevarMoveType.chooseHiddenTile + AdevarMoveType.chooseHiddenTile.length));
+		// Like: cHT:Echeveria
+		this.hiddenTileCode = moveText.substring(moveText.indexOf(AdevarMoveType.chooseHiddenTile) + AdevarMoveType.chooseHiddenTile.length);
 		debug(this.player + " has chosen Hidden Tile: " + this.hiddenTileCode + "... Now we just need to keep it secret...");
 	} else if (this.moveType === DEPLOY) {
 		var char1 = moveText.charAt(1);
