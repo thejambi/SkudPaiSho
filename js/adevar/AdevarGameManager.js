@@ -96,6 +96,8 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		hiddenTile.hidden = true;
 		debug(hiddenTile);
 
+		this.tileManager.removeRemainingHiddenTiles(move.player);
+
 		// Place Hidden Tile
 		this.board.placeTile(hiddenTile, AdevarBoardSetupPoints.hiddenTile[move.player]);
 
