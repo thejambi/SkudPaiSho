@@ -3,7 +3,7 @@ function AdevarOptions() {
 	// Adevar options
 	if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
 		|| !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
-		AdevarOptions.setTileDesignsPreference("spoopy", true);
+		AdevarOptions.setTileDesignsPreference("classic", true);
 	}
 }
 
@@ -11,6 +11,7 @@ AdevarOptions.tileDesignTypeKey = "adevarTileDesignTypeKey";
 
 /* Adevar tile designs */
 AdevarOptions.tileDesignTypeValues = {
+	classic: "Adevar Classic",
 	monochrome: "Adevar Monochrome",
 	spoopy: "Adevar Spoopy"
 };
