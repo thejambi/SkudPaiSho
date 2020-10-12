@@ -10,7 +10,7 @@ var AdevarTileType = {
 
 var AdevarTileCode = {
 	lilac: "Lilac",
-	zinnia: "Zinna",
+	zinnia: "Zinnia",
 	foxglove: "Foxglove",
 	gate: "Gate",
 	vanguard: "Vanguard",
