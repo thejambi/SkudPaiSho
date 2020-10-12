@@ -58,6 +58,8 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	
 	tiles.push(new AdevarTile(AdevarTileCode.reflection, ownerCode));
 
+	tiles.push(new AdevarTile("Blank", ownerCode));
+
 	return tiles;
 };
 

@@ -14,6 +14,44 @@ var AdevarBoardSetupPoints = {
 			new NotationPoint("-5,4"), 
 			new NotationPoint("-4,5")
 		]
+	},
+	gate: {
+		HOST: new NotationPoint("4,3"),
+		GUEST: new NotationPoint("-3,-4")
+	},
+	lilac: {
+		HOST: [
+			new NotationPoint("3,4"), 
+			new NotationPoint("5,2")
+		],
+		GUEST: [
+			new NotationPoint("-4,-3"), 
+			new NotationPoint("-2,-5")
+		]
+	},
+	zinnia: {
+		HOST: [
+			new NotationPoint("3,5"), 
+			new NotationPoint("6,2")
+		],
+		GUEST: [
+			new NotationPoint("-5,-3"), 
+			new NotationPoint("-2,-6")
+		]
+	},
+	foxglove: {
+		HOST: [
+			new NotationPoint("3,6"), 
+			new NotationPoint("7,2")
+		],
+		GUEST: [
+			new NotationPoint("-6,-3"), 
+			new NotationPoint("-2,-7")
+		]
+	},
+	reflection: {
+		HOST: new NotationPoint("5,4"),
+		GUEST: new NotationPoint("-4,-5")
 	}
 };
 
@@ -68,7 +106,31 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 			self.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.vanguard),
 				vanguardPoint);
 		});
+
+		// Place Gate tiles
+		this.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.gate), AdevarBoardSetupPoints.gate[move.player]);
 		
+		// Place Lilac tiles
+		AdevarBoardSetupPoints.lilac[move.player].forEach(function(lilacPoint) {
+			self.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.lilac),
+				lilacPoint);
+		});
+
+		// Place Zinnia tiles
+		AdevarBoardSetupPoints.zinnia[move.player].forEach(function(zinniaPoint) {
+			self.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.zinnia),
+				zinniaPoint);
+		});
+
+		// Place Foxglove tiles
+		AdevarBoardSetupPoints.foxglove[move.player].forEach(function(foxglovePoint) {
+			self.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.foxglove),
+				foxglovePoint);
+		});
+
+		// Place Reflection tile
+		this.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.reflection), AdevarBoardSetupPoints.reflection[move.player]);
+
 	} else if (move.moveType === DEPLOY) {
 		// Just placing tile on board
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
