@@ -375,9 +375,9 @@ var soundManager;
 		  jumpToGame(QueryString.watchGame);
 	  }
   
+	  /* If a link to a private game, jump to the game. */
 	  if (QueryString.joinPrivateGame) {
 		  jumpToGame(QueryString.joinPrivateGame);
-		  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
 	  }
   });
   
@@ -426,24 +426,29 @@ var soundManager;
 	showModal("Online Play Paused", "Sorry, something was wrong and online play is currently paused. Take a break for some tea!<br /><br />You may attempt to <span class='skipBonus' onclick='resumeOnlinePlay(); closeModal();'>resume online play</span>.", true);
   }
 
-  var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
-				  if (response === "Results exist") {
-					  startLoggingOnlineStatus();
-					  startWatchingNumberOfGamesWhereUserTurn();
-					  appCaller.alertAppLoaded();
-					  userIsSignedInOk = true;
-				  } else {
-					  // Cannot verify user login, forget all current stuff.
-					  if (getUsername()) {
-						  // showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
-						//   showModal("Signed Out", "Sorry you were unexpectedly signed out :( <br /><br />Please sign in again to keep playing.");
-						showOnlinePlayPausedModal();
-						onlinePlayPaused = true;
-					  }
-					  /* forgetCurrentGameInfo();
-					  forgetOnlinePlayInfo(); */
-				  }
-			  };
+var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
+	if (response === "Results exist") {
+		startLoggingOnlineStatus();
+		startWatchingNumberOfGamesWhereUserTurn();
+		appCaller.alertAppLoaded();
+		userIsSignedInOk = true;
+	} else {
+		// Cannot verify user login, forget all current stuff.
+		if (getUsername()) {
+			// showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
+			//   showModal("Signed Out", "Sorry you were unexpectedly signed out :( <br /><br />Please sign in again to keep playing.");
+			showOnlinePlayPausedModal();
+			onlinePlayPaused = true;
+		}
+		/* forgetCurrentGameInfo();
+		forgetOnlinePlayInfo(); */
+	}
+
+	/* Ask to join invite link game if present */
+	if (QueryString.joinPrivateGame) {
+		askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
+	}
+};
   
   function initialVerifyLogin() {
 	  if (onlinePlayEnabled) {
@@ -1156,6 +1161,9 @@ function getCurrentPlayerForReal() {
 }
 
 function getResetMoveText() {
+	if (activeAi) {
+		return "";	// Hide "Undo" if playing against an AI
+	}
 	return "<br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
 }
   
@@ -1237,12 +1245,26 @@ function createInviteLinkUrl(newGameId) {
 }
 
 function askToJoinPrivateGame(privateGameId, hostUserName) {
-	var message = "Do you want to join this game hosted by " + hostUserName + "?";
-	message += "<br /><br />";
-	message += "<div class='clickableText' onclick='closeModal(); yesJoinPrivateGame(" + privateGameId + ");'>Yes - join game</div>";
-	message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+	if (userIsLoggedIn()) {
+		var message = "Do you want to join this game hosted by " + hostUserName + "?";
+		message += "<br /><br />";
+		message += "<div class='clickableText' onclick='closeModal(); yesJoinPrivateGame(" + privateGameId + ");'>Yes - join game</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
 
-	showModal("Join Private Game?", message, true);
+		if (currentGameData.hostUsername && currentGameData.guestUsername) {
+			message = "A Guest has already joined this game.";
+			message += "<br /><br />";
+			message += "<div class='clickableText' onclick='closeModal();'>OK</div>";
+		}
+
+		showModal("Join Private Game?", message, true);
+	} else {
+		var message = "To join this game hosted by " + hostUserName + ", please sign in and then refresh this page.";
+		message += "<br /><br />";
+		message += "<div class='clickableText' onclick='closeModal();'>OK</div>";
+
+		showModal("Sign In Before Joining Game", message);
+	}
 }
 
 function yesJoinPrivateGame(privateGameId) {
@@ -2007,6 +2029,11 @@ function getGameControllerForGameType(gameTypeId) {
   
 		  startWatchingGameRealTime();
 		  updateFooter();
+
+		  /* Ask to join invite link game if present */
+		  if (QueryString.joinPrivateGame) {
+			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
+		  }
 	  }
   };
   

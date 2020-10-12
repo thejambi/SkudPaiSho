@@ -17,6 +17,19 @@ AdevarTileManager.prototype.loadTileSet = function(ownerCode) {
 AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	var tiles = [];
 
+	/* Hidden Tiles - show first, and apply "selected" effect since one will be chosen */
+	tiles.push(new AdevarTile("Iris", ownerCode));
+	tiles.push(new AdevarTile("OrientalLily", ownerCode));
+	tiles.push(new AdevarTile("Echeveria", ownerCode));
+	// tiles.push(new AdevarTile("WhiteRose", ownerCode)); // etc
+
+	// Apply "selected" effect to Hidden Tiles
+	tiles.forEach(function(tile) {
+		tile.selectedFromPile = true;
+	});
+
+	/* The rest of the tiles */
+
 	for (var i = 0; i < 10; i++) {
 		tiles.push(new AdevarTile("Lilac", ownerCode));
 	}
@@ -32,12 +45,6 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	for (var i = 0; i < 2; i++) {
 		tiles.push(new AdevarTile("Gate", ownerCode));
 	}
-	
-	tiles.push(new AdevarTile("Iris", ownerCode));
-	
-	tiles.push(new AdevarTile("OrientalLily", ownerCode));
-	
-	tiles.push(new AdevarTile("Echeveria", ownerCode));
 	
 	tiles.push(new AdevarTile("IrisSecondFace", ownerCode));
 	
