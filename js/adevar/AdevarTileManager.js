@@ -142,6 +142,26 @@ AdevarTileManager.prototype.putTileBack = function(tile) {
 	tilePile.push(tile);
 };
 
+AdevarTileManager.prototype.removeRemainingHiddenTiles = function(player) {
+	var tilePile = this.getTilePile(player);
+	if (tilePile) {
+		for (var i = tilePile.length - 1; i >= 0; i--) {
+			var tile = tilePile[i];
+			if (tile.type === AdevarTileType.hiddenTile) {
+				tilePile.splice(i, 1);
+			}
+		}
+	}
+};
+
+AdevarTileManager.prototype.getTilePile = function(player) {
+	var tilePile = this.hostTiles;
+	if (player === GUEST) {
+		tilePile = this.guestTiles;
+	}
+	return tilePile;
+};
+
 AdevarTileManager.prototype.getCopy = function() {
 	var copy = new AdevarTileManager();
 
