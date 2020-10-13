@@ -21,7 +21,10 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	tiles.push(new AdevarTile(AdevarTileCode.iris, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.orientalLily, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.echeveria, ownerCode));
-	// tiles.push(new AdevarTile(AdevarTileCode.whiteRose, ownerCode)); // etc
+	tiles.push(new AdevarTile(AdevarTileCode.whiteLotus, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.birdOfParadise, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.echinacea, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.whiteRose, ownerCode)); // etc
 
 	// Apply "selected" effect to Hidden Tiles
 	tiles.forEach(function(tile) {
@@ -47,10 +50,13 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	}
 	
 	tiles.push(new AdevarTile(AdevarTileCode.irisSF, ownerCode));
-	
 	tiles.push(new AdevarTile(AdevarTileCode.orientalLilySF, ownerCode));
-	
 	tiles.push(new AdevarTile(AdevarTileCode.echeveriaSF, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.whiteLotusSF, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.birdOfParadiseSF, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.whiteRoseSF, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.echinaceaSF, ownerCode));
+
 	
 	for (var i = 0; i < 2; i++) {
 		tiles.push(new AdevarTile(AdevarTileCode.vanguard, ownerCode));
