@@ -82,6 +82,8 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Advr", "Advr_Iris", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_OrientalLily", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_Echeveria", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_WhiteLotus", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_BirdOfParadise", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_IrisSecondFace", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_OrientalLilySecondFace", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_EcheveriaSecondFace", ownerCode));
