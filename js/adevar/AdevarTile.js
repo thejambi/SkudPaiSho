@@ -16,7 +16,7 @@ var AdevarTileCode = {
 	vanguard: "Vanguard",
 	reflection: "WatersReflection",
 	iris: "Iris",
-	irisSF: "Iris Second Face",
+	irisSF: "IrisSecondFace",
 	orientalLily: "OrientalLily",
 	orientalLilySF: "OrientalLilySecondFace",
 	echeveria: "Echeveria",
