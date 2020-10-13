@@ -50,7 +50,7 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	
 	tiles.push(new AdevarTile(AdevarTileCode.orientalLilySF, ownerCode));
 	
-	tiles.push(new AdevarTile(AdevarTileCode.orientalLilySF, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.echeveriaSF, ownerCode));
 	
 	for (var i = 0; i < 2; i++) {
 		tiles.push(new AdevarTile(AdevarTileCode.vanguard, ownerCode));
