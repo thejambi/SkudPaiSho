@@ -3,7 +3,8 @@ function AdevarOptions() {
 	// Adevar options
 	if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
 		|| !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
-		AdevarOptions.setTileDesignsPreference("classic", true);
+		// AdevarOptions.setTileDesignsPreference("classic", true);
+		AdevarOptions.setTileDesignsPreference("spoopy", true);
 	}
 }
 
