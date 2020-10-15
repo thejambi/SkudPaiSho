@@ -85,7 +85,7 @@ CaptureActuator.prototype.addTile = function(tile, mainContainer) {
 	}
 
 	var theImg = document.createElement("img");
-	theImg.src = "capture/images/" + tile.getImageName() + ".png";
+	theImg.src = "images/Capture/" + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
 
 	theDiv.setAttribute("name", tile.getImageName());
@@ -128,7 +128,7 @@ CaptureActuator.prototype.addBoardPoint = function(boardPoint) {
 		
 		var theImg = document.createElement("img");
 
-		theImg.src = "capture/images/" + boardPoint.tile.getImageName() + ".png";
+		theImg.src = "images/Capture/" + boardPoint.tile.getImageName() + ".png";
 		
 		if (boardPoint.tile.captureHelpFlag) {
 			theDiv.classList.add("GUESTharmony");

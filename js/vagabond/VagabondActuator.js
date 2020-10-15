@@ -167,12 +167,6 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 	}
 
 	this.boardContainer.appendChild(theDiv);
-
-	if (boardPoint.betweenHarmony && boardPoint.col === 16) {
-		var theBr = document.createElement("div");
-		theBr.classList.add("clear");
-		this.boardContainer.appendChild(theBr);
-	}
 };
 
 VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv) {
@@ -230,7 +224,7 @@ VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 }
 
 VagabondActuator.prototype.getTileImageSourceDir = function() {
-	return "images/Vagabond/" + localStorage.getItem("vagabondTileDesignTypeKey") + "/";
+	return "images/Vagabond/" + localStorage.getItem(vagabondTileDesignTypeKey) + "/";
 };
 
 VagabondActuator.prototype.printBoard = function(board) {

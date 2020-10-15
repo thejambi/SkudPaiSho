@@ -19,6 +19,9 @@ CoopSolitaireTileManager.prototype.loadSolitaireSet = function(ownerCode, double
 
 	// Double amount of tiles if doubleTiles enabled
 	var multiplier = 1;
+	if (gameOptionEnabled(LESS_TILES)) {
+		multiplier = 0.5;
+	}
 	if (doubleTiles) {
 		multiplier = 2;
 	}

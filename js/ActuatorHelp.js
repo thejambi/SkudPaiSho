@@ -50,25 +50,38 @@ function createBoardPointDiv(boardPoint) {
 function setupPaiShoBoard(gameContainer,
 	hostTilesContainerDivs,
 	guestTilesContainerDivs,
-	rotateBoard) {
+	rotateBoard,
+	rotateType,
+	playInSpaces) {
 
 	var addVagabondBoardRotate = false;
+	var addAdevarBoardRotate = false;
 	// Check for existing vagabond class on board...
 	if (document.querySelector(".vagabondBoardRotate")) {
 		addVagabondBoardRotate = true;
+	} else if (document.querySelector(".adevarBoardRotate")) {
+		addAdevarBoardRotate = true;
 	}
 
 	removeChildren(gameContainer);
 
-	var boardContainer = createDivWithClass("pointContainer");
+	var ptContainerClass = "pointContainer";
+	if (playInSpaces) {
+		ptContainerClass = "pointContainerForPlayInSpaces"
+	}
+	var boardContainer = createDivWithClass(ptContainerClass);
 
 	var bcontainer = createDivWithClass("board-container");
 	var svgContainer = createDivWithClass("svgContainer");
 	var svgContainerContainer = createDivWithClass("svgContainerContainer");
 	var bgSvg = createDivWithClass("bg-svg");
 
+	applyBoardOptionToBgSvg(bgSvg);
+
 	if (addVagabondBoardRotate) {
 		svgContainer.classList.add("vagabondBoardRotate");
+	} else if (addAdevarBoardRotate) {
+		svgContainer.classList.add("adevarBoardRotate");
 	}
 
 	bgSvg.appendChild(boardContainer);
@@ -100,14 +113,21 @@ function setupPaiShoBoard(gameContainer,
 
 	var addClassAfterThisManyMs = 100;
 	if (rotateBoard) {
+		var rotateClass = "vagabondBoardRotate";
+		if (rotateType === ADEVAR_ROTATE) {
+			rotateClass = "adevarBoardRotate";
+		}
 		// Set Timeout to get animated board rotation
 		setTimeout(function () {
-			svgContainer.classList.add("vagabondBoardRotate");
+			svgContainer.classList.remove("vagabondBoardRotate");
+			svgContainer.classList.remove("adevarBoardRotate");
+			svgContainer.classList.add(rotateClass);
 		}, addClassAfterThisManyMs);
 	} else {
 		// Set Timeout to get animated board rotation
 		setTimeout(function () {
 			svgContainer.classList.remove("vagabondBoardRotate");
+			svgContainer.classList.remove("adevarBoardRotate");
 		}, addClassAfterThisManyMs);
 	}
 
@@ -115,6 +135,24 @@ function setupPaiShoBoard(gameContainer,
 		boardContainer: boardContainer,
 		hostTilesContainer: hostTilesContainer,
 		guestTilesContainer: guestTilesContainer
+	}
+}
+
+function applyBoardOptionToBgSvg(bgSvgIfKnown) {
+	var bgSvg = bgSvgIfKnown;
+	if (!bgSvg) {
+		var bgsvgs = document.getElementsByClassName("bg-svg");
+		if (bgsvgs && bgsvgs.length >= 1) {
+			bgSvg = bgsvgs[0];
+		}
+	}
+
+	if (bgSvg) {
+		var extension = ".png";
+		if (svgBoardDesigns.includes(paiShoBoardKey)) {
+			extension = ".svg";
+		}
+		bgSvg.style.backgroundImage = "url('style/board_" + paiShoBoardKey + extension + "')";
 	}
 }
 

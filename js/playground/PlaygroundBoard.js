@@ -2,7 +2,13 @@
 
 function PlaygroundBoard() {
 	this.size = new RowAndColumn(17, 17);
-	this.cells = this.brandNew();
+
+	if (gameOptionEnabled(PLAY_IN_SPACES)) {
+		this.size = new RowAndColumn(18, 18);
+		this.cells = this.brandNewForSpaces();
+	} else {
+		this.cells = this.brandNew();
+	}
 
 	this.harmonyManager = new PlaygroundHarmonyManager();
 
@@ -10,6 +16,428 @@ function PlaygroundBoard() {
 	this.playedWhiteLotusTiles = [];
 	this.winners = [];
 }
+
+PlaygroundBoard.prototype.brandNewForSpaces = function () {
+	var cells = [];
+
+	cells[0] = this.newRow(6, 
+		[PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.gate(),
+		PlaygroundBoardPoint.gate(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[1] = this.newRow(10, 
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[2] = this.newRow(12, 
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[3] = this.newRow(14,
+		[PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[4] = this.newRow(16,
+		[PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[5] = this.newRow(16,
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[6] = this.newRow(18,
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[7] = this.newRow(18,
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[8] = this.newRow(18,
+		[PlaygroundBoardPoint.gate(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[9] = this.newRow(18,
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[10] = this.newRow(18,
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[11] = this.newRow(18,
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[12] = this.newRow(16,
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[13] = this.newRow(16,
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[14] = this.newRow(14,
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[15] = this.newRow(12,
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[16] = this.newRow(10,
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	cells[17] = this.newRow(6,
+		[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+		PlaygroundBoardPoint.neutral()
+		]);
+
+	for (var row = 0; row < cells.length; row++) {
+		for (var col = 0; col < cells[row].length; col++) {
+			cells[row][col].row = row;
+			cells[row][col].col = col;
+		}
+	}
+
+	return cells;
+};
 
 PlaygroundBoard.prototype.brandNew = function () {
 	var cells = [];
@@ -335,7 +763,7 @@ PlaygroundBoard.prototype.newRow = function(numColumns, points) {
 	for (var i = 0; i < this.size.row; i++) {
 		if (i < numBlanksOnSides) {
 			cells[i] = nonPoint;
-		} else if (i < numBlanksOnSides + numColumns) {
+		} else if (i < numBlanksOnSides + numColumns || numBlanksOnSides === 0) {
 			if (points) {
 				cells[i] = points[i - numBlanksOnSides];
 			} else {
@@ -419,20 +847,29 @@ PlaygroundBoard.prototype.moveTile = function(notationPointStart, notationPointE
 		debug("Error: No tile to move!");
 	}
 
+	var capturedTile = boardPointEnd.removeTile();
 	var error = boardPointEnd.putTile(tile);
 
 	if (error) {
 		debug("Error moving tile. It probably didn't get moved.");
 		return false;
 	}
+
+	return capturedTile;
+};
+
+PlaygroundBoard.prototype.removeTile = function(notationPoint) {
+	var rowCol = notationPoint.rowAndColumn;
+	var boardPoint = this.cells[rowCol.row][rowCol.col];
+	return boardPoint.removeTile();
 };
 
 PlaygroundBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 	return true;
 };
 
-PlaygroundBoard.prototype.canMoveTileToPoint = function(boardPointStart, boardPointEnd) {
-	return true;
+PlaygroundBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
+	return boardPointStart !== boardPointEnd;
 };
 
 PlaygroundBoard.prototype.verifyAbleToReach = function(boardPointStart, boardPointEnd, numMoves) {

@@ -77,7 +77,7 @@ SkudPaiShoController.prototype.resetMove = function() {
 };
 
 SkudPaiShoController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Skud Pai Sho</h4> <p>Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p> <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p> <p>Select tiles or points on the board to learn more or <a href='https://skudpaisho.com/site/games/skud-pai-sho/' target='_blank'>view the resources page</a> for the rules, a video tutorial on how to play, a print and play Pai Sho set, and more!</p>";
+	return "<h4>Skud Pai Sho</h4> <p>Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p> <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p> <p>Select tiles or points on the board to learn more, and read through the <a href='https://skudpaisho.com/site/games/skud-pai-sho/' target='_blank'>rules page</a> for the full rules.</p>";
 };
 
 SkudPaiShoController.prototype.getAdditionalMessage = function() {
@@ -417,14 +417,77 @@ SkudPaiShoController.prototype.getTileMessage = function(tileDiv) {
 
 	var tile = new SkudPaiShoTile(divName.substring(1), divName.charAt(0));
 
-	var message = [];
+	var tileMessage = this.getHelpMessageForTile(tile);
 
-	var ownerName = HOST;
-	if (divName.startsWith('G')) {
-		ownerName = GUEST;
+	return {
+		heading: tileMessage.heading,
+		message: tileMessage.message
+	}
+};
+
+SkudPaiShoController.prototype.getPointMessage = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+	var heading;
+	var message = [];
+	if (boardPoint.hasTile()) {
+		var tileMessage = this.getHelpMessageForTile(boardPoint.tile);
+		tileMessage.message.forEach(function(messageString){
+			message.push(messageString);
+		});
+		heading = tileMessage.heading;
+		// Specific tile message
+		/**
+		Rose
+		* In Harmony with Chrysanthemum to the north
+		* Trapped by Orchid
+		*/
+		var tileHarmonies = this.theGame.board.harmonyManager.getHarmoniesWithThisTile(boardPoint.tile);
+		if (tileHarmonies.length > 0) {
+			var bullets = [];
+			tileHarmonies.forEach(function(harmony) {
+				var otherTile = harmony.getTileThatIsNotThisOne(boardPoint.tile);
+				bullets.push(otherTile.getName()
+					+ " to the " + harmony.getDirectionForTile(boardPoint.tile));
+			});
+			message.push("<strong>Currently in Harmony with: </strong>" + toBullets(bullets));
+		}
+
+		// Drained? Trapped? Anything else?
+		if (boardPoint.tile.drained) {
+			message.push("Currently <em>drained</em> by a Knotweed.");
+		}
+		if (boardPoint.tile.trapped) {
+			message.push("Currently <em>trapped</em> by an Orchid.")
+		}
+	}
+	
+	if (boardPoint.isType(NEUTRAL)) {
+		message.push(getNeutralPointMessage());
+	} else if (boardPoint.isType(RED) && boardPoint.isType(WHITE)) {
+		message.push(getRedWhitePointMessage());
+	} else if (boardPoint.isType(RED)) {
+		message.push(getRedPointMessage());
+	} else if (boardPoint.isType(WHITE)) {
+		message.push(getWhitePointMessage());
+	} else if (boardPoint.isType(GATE)) {
+		message.push(getGatePointMessage());
 	}
 
-	var tileCode = divName.substring(1);
+	return {
+		heading: heading,
+		message: message
+	}
+};
+
+SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
+	var message = [];
+
+	var tileCode = tile.code;
 
 	var heading = SkudPaiShoTile.getTileName(tileCode);
 
@@ -554,61 +617,6 @@ SkudPaiShoController.prototype.getTileMessage = function(tileDiv) {
 	}
 };
 
-SkudPaiShoController.prototype.getPointMessage = function(htmlPoint) {
-	var npText = htmlPoint.getAttribute("name");
-
-	var notationPoint = new NotationPoint(npText);
-	var rowCol = notationPoint.rowAndColumn;
-	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
-
-	var heading;
-	var message = [];
-	if (boardPoint.hasTile()) {
-		heading = boardPoint.tile.getName();
-		// Specific tile message
-		/**
-		Rose
-		* In Harmony with Chrysanthemum to the north
-		* Trapped by Orchid
-		*/
-		var tileHarmonies = this.theGame.board.harmonyManager.getHarmoniesWithThisTile(boardPoint.tile);
-		if (tileHarmonies.length > 0) {
-			var bullets = [];
-			tileHarmonies.forEach(function(harmony) {
-				var otherTile = harmony.getTileThatIsNotThisOne(boardPoint.tile);
-				bullets.push(otherTile.getName()
-					+ " to the " + harmony.getDirectionForTile(boardPoint.tile));
-			});
-			message.push("<strong>Currently in Harmony with: </strong>" + toBullets(bullets));
-		}
-
-		// Drained? Trapped? Anything else?
-		if (boardPoint.tile.drained) {
-			message.push("Currently <em>drained</em> by a Knotweed.");
-		}
-		if (boardPoint.tile.trapped) {
-			message.push("Currently <em>trapped</em> by an Orchid.")
-		}
-	} else {
-		if (boardPoint.isType(NEUTRAL)) {
-			message.push(getNeutralPointMessage());
-		} else if (boardPoint.isType(RED) && boardPoint.isType(WHITE)) {
-			message.push(getRedWhitePointMessage());
-		} else if (boardPoint.isType(RED)) {
-			message.push(getRedPointMessage());
-		} else if (boardPoint.isType(WHITE)) {
-			message.push(getWhitePointMessage());
-		} else if (boardPoint.isType(GATE)) {
-			message.push(getGatePointMessage());
-		}
-	}
-
-	return {
-		heading: heading,
-		message: message
-	}
-};
-
 SkudPaiShoController.prototype.playAiTurn = function(finalizeMove) {
 	if (this.theGame.getWinner()) {
 		return;
@@ -709,7 +717,7 @@ SkudPaiShoController.prototype.getAdditionalHelpTabDiv = function() {
 	heading.innerText = "Skud Pai Sho Preferences:";
 
 	settingsDiv.appendChild(heading);
-	settingsDiv.appendChild(this.buildTileDesignDropdownDiv());
+	settingsDiv.appendChild(SkudPaiShoController.buildTileDesignDropdownDiv());
 
 	settingsDiv.appendChild(document.createElement("br"));
 
@@ -719,8 +727,9 @@ SkudPaiShoController.prototype.getAdditionalHelpTabDiv = function() {
 	return settingsDiv;
 };
 
-SkudPaiShoController.prototype.buildTileDesignDropdownDiv = function() {
-	return buildDropdownDiv("skudPaiShoTileDesignDropdown", "Tile Designs:", tileDesignTypeValues,
+SkudPaiShoController.buildTileDesignDropdownDiv = function(alternateLabelText) {
+	var labelText = alternateLabelText ? alternateLabelText : "Tile Designs";
+	return buildDropdownDiv("skudPaiShoTileDesignDropdown", labelText + ":", tileDesignTypeValues,
 							localStorage.getItem(tileDesignTypeKey),
 							function() {
 								setSkudTilesOption(this.value);
