@@ -659,7 +659,7 @@ AdevarBoard.prototype.setPossibleDeployPoints = function(tile) {
 };
 
 AdevarBoard.prototype.setPossibleDeployPointsAroundGates = function(tile) {
-	var gatePoints = this.getGatePoints(tile.ownerName);
+	var gatePoints = this.getTileTypePoints(tile.ownerName, AdevarTileType.gate);
 
 	var self = this;
 	gatePoints.forEach(function(gatePoint) {
@@ -672,15 +672,15 @@ AdevarBoard.prototype.setPossibleDeployPointsAroundGates = function(tile) {
 	});
 };
 
-AdevarBoard.prototype.getGatePoints = function(player) {
-	var gatePoints = [];
+AdevarBoard.prototype.getTileTypePoints = function(player, tileType) {
+	var tilePoints = [];
 	this.forEachBoardPointWithTile(function(boardPoint) {
 		if (boardPoint.tile.ownerName === player
-				&& boardPoint.tile.type === AdevarTileType.gate) {
-			gatePoints.push(boardPoint);
+				&& boardPoint.tile.type === tileType) {
+			tilePoints.push(boardPoint);
 		}
 	});
-	return gatePoints;
+	return tilePoints;
 };
 
 AdevarBoard.prototype.setAllPointsAsPossible = function() {
