@@ -156,6 +156,14 @@ AdevarGameManager.prototype.revealAllPointsAsPossible = function() {
 	this.actuate();
 };
 
+AdevarGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
+	this.board.setPossibleDeployPoints(tile);
+
+	if (!ignoreActuate) {
+		this.actuate();
+	}
+};
+
 AdevarGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
 	if (!boardPoint.hasTile()) {
 		return;

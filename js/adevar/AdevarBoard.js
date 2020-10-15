@@ -423,15 +423,15 @@ AdevarBoard.prototype.moveTile = function(notationPointStart, notationPointEnd) 
 
 AdevarBoard.prototype.shouldReturnCapturedTileToHandAfterCapture = function(capturingTile, capturedTile) {
 	if (capturedTile) {
-		if (arrayIncludesOneOf(
-				[
-					AdevarTileType.secondFace,
-					AdevarTileType.vanguard,
-					AdevarTileType.reflection,
-					AdevarTileType.gate
-				], 
-				[capturedTile.type])) 
-			{
+		if (arrayIncludesOneOf( 
+			[capturedTile.type],
+			[
+				AdevarTileType.secondFace,
+				AdevarTileType.vanguard,
+				AdevarTileType.reflection,
+				AdevarTileType.gate
+			]
+		)) {
 			return true;
 		}
 	}
@@ -567,6 +567,33 @@ AdevarBoard.prototype.canMoveHereMoreEfficientlyAlready = function(boardPoint, d
 	return boardPoint.getMoveDistanceRemaining(movementInfo) >= distanceRemaining;
 };
 
+AdevarBoard.prototype.getDirectlyAdjacentPoints = function(boardPoint) {
+	var possibleAdjacentPoints = [];
+
+	if (boardPoint.row > 0) {
+		possibleAdjacentPoints.push(this.cells[boardPoint.row - 1][boardPoint.col]);
+	}
+	if (boardPoint.row < paiShoBoardMaxRowOrCol) {
+		possibleAdjacentPoints.push(this.cells[boardPoint.row + 1][boardPoint.col]);
+	}
+	if (boardPoint.col > 0) {
+		possibleAdjacentPoints.push(this.cells[boardPoint.row][boardPoint.col - 1]);
+	}
+	if (boardPoint.col < paiShoBoardMaxRowOrCol) {
+		possibleAdjacentPoints.push(this.cells[boardPoint.row][boardPoint.col + 1]);
+	}
+
+	var adjacentPoints = [];
+
+	possibleAdjacentPoints.forEach(function(boardPoint) {
+		if (!boardPoint.isType(NON_PLAYABLE)) {
+			adjacentPoints.push(boardPoint);
+		}
+	});
+
+	return adjacentPoints;
+};
+
 AdevarBoard.prototype.getAdjacentPointsPotentialPossibleMoves = function(pointAlongTheWay, originPoint, mustPreserveDirection, movementInfo) {
 	var potentialMovePoints = [];
 
@@ -618,8 +645,45 @@ AdevarBoard.prototype.removePossibleMovePoints = function() {
 	});
 };
 
-AdevarBoard.prototype.setAllPointsAsPossible = function() {
+AdevarBoard.prototype.setPossibleDeployPoints = function(tile) {
+	if (arrayIncludesOneOf(
+		[tile.type],
+		[
+			AdevarTileType.basic,
+			AdevarTileType.secondFace,
+			AdevarTileType.reflection
+		]
+	)) {
+		this.setPossibleDeployPointsAroundGates(tile);
+	}
+};
+
+AdevarBoard.prototype.setPossibleDeployPointsAroundGates = function(tile) {
+	var gatePoints = this.getGatePoints(tile.ownerName);
+
 	var self = this;
+	gatePoints.forEach(function(gatePoint) {
+		self.getDirectlyAdjacentPoints(gatePoint).forEach(function(pointNextToGate) {
+			if (!pointNextToGate.hasTile()
+					|| self.targetPointHasTileThatCanBeCaptured(tile, null, null, pointNextToGate)) {
+				pointNextToGate.addType(POSSIBLE_MOVE);
+			}
+		});
+	});
+};
+
+AdevarBoard.prototype.getGatePoints = function(player) {
+	var gatePoints = [];
+	this.forEachBoardPointWithTile(function(boardPoint) {
+		if (boardPoint.tile.ownerName === player
+				&& boardPoint.tile.type === AdevarTileType.gate) {
+			gatePoints.push(boardPoint);
+		}
+	});
+	return gatePoints;
+};
+
+AdevarBoard.prototype.setAllPointsAsPossible = function() {
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
 			boardPoint.addType(POSSIBLE_MOVE);
