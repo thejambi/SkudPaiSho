@@ -83,7 +83,7 @@ AdevarTileManager.prototype.grabTile = function(player, tileCode) {
 	}
 
 	if (!tile) {
-		debug("NONE OF THAT TILE FOUND");
+		debug("NONE OF THAT TILE FOUND: " + player + " " + tileCode);
 	}
 
 	return tile;
