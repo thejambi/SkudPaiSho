@@ -50,17 +50,11 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	}
 	
 	tiles.push(new AdevarTile(AdevarTileCode.irisSF, ownerCode));
-	
 	tiles.push(new AdevarTile(AdevarTileCode.orientalLilySF, ownerCode));
-	
 	tiles.push(new AdevarTile(AdevarTileCode.echeveriaSF, ownerCode));
-
 	tiles.push(new AdevarTile(AdevarTileCode.whiteLotusSF, ownerCode));
-
 	tiles.push(new AdevarTile(AdevarTileCode.birdOfParadiseSF, ownerCode));
-
 	tiles.push(new AdevarTile(AdevarTileCode.whiteRoseSF, ownerCode));
-
 	tiles.push(new AdevarTile(AdevarTileCode.echinaceaSF, ownerCode));
 
 	
@@ -89,7 +83,7 @@ AdevarTileManager.prototype.grabTile = function(player, tileCode) {
 	}
 
 	if (!tile) {
-		debug("NONE OF THAT TILE FOUND");
+		debug("NONE OF THAT TILE FOUND: " + player + " " + tileCode);
 	}
 
 	return tile;

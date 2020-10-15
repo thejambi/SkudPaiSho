@@ -16,7 +16,7 @@ var AdevarTileCode = {
 	vanguard: "Vanguard",
 	reflection: "WatersReflection",
 	iris: "Iris",
-	irisSF: "Iris Second Face",
+	irisSF: "IrisSecondFace",
 	orientalLily: "OrientalLily",
 	orientalLilySF: "OrientalLilySecondFace",
 	echeveria: "Echeveria",
@@ -24,7 +24,7 @@ var AdevarTileCode = {
 	whiteLotus: "WhiteLotus",
 	whiteLotusSF: "WhiteLotusSecondFace",
 	birdOfParadise: "BirdOfParadise",
-	birdOfParadiseSF: "BirdOfParadiaseSecondFace",
+	birdOfParadiseSF: "BirdOfParadiseSecondFace",
 	echinacea: "Echinacea",
 	echinaceaSF: "EchinaceaSecondFace",
 	whiteRose: "WhiteRose",
@@ -113,6 +113,22 @@ AdevarTile.prototype.getMoveDistance = function() {
 		return 7;
 	}
 	return 0;	// Other tiles cannot move
+};
+
+AdevarTile.prototype.canCapture = function(targetTile) {
+	if (this.ownerName !== targetTile.ownerName) {
+		if (this.type === AdevarTileType.basic
+				&& targetTile.type === AdevarTileType.basic
+				&& targetTile.code !== this.code) {
+			return true;
+		}
+	}
+
+	return false;
+};
+
+AdevarTile.prototype.reveal = function() {
+	this.hidden = false;
 };
 
 AdevarTile.prototype.getName = function() {

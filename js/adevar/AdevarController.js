@@ -153,7 +153,7 @@ AdevarController.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.tileType = tileCode;
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
-		this.theGame.revealAllPointsAsPossible();
+		this.theGame.revealDeployPoints(tile);
 	} else {
 		this.theGame.hidePossibleMovePoints();
 		this.resetNotationBuilder();

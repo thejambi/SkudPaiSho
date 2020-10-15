@@ -360,14 +360,23 @@ AdevarBoard.prototype.newRow = function(numColumns, points) {
 };
 
 AdevarBoard.prototype.placeTile = function(tile, notationPoint) {
-	this.putTileOnPoint(tile, notationPoint);
+	return this.putTileOnPoint(tile, notationPoint);
 };
 
 AdevarBoard.prototype.putTileOnPoint = function(tile, notationPoint) {
 	var point = notationPoint.rowAndColumn;
 	point = this.cells[point.row][point.col];
 	
+	var capturedTile = point.removeTile();
+
 	point.putTile(tile);
+
+	var returnCapturedTileToHand = this.shouldReturnCapturedTileToHandAfterCapture(tile, capturedTile);
+
+	return {
+		capturedTile: capturedTile,
+		returnCapturedTileToHand: returnCapturedTileToHand
+	};
 };
 
 AdevarBoard.prototype.isValidRowCol = function(rowCol) {
@@ -400,9 +409,65 @@ AdevarBoard.prototype.moveTile = function(notationPointStart, notationPointEnd) 
 		return false;
 	}
 
+	if (capturedTile) {
+		this.applyTileCapturedTriggers(tile, capturedTile, boardPointStart, boardPointEnd);
+	}
+
+	var returnCapturedTileToHand = this.shouldReturnCapturedTileToHandAfterCapture(tile, capturedTile);
+
 	return {
-		capturedTile: capturedTile
+		capturedTile: capturedTile,
+		returnCapturedTileToHand: returnCapturedTileToHand
 	};
+};
+
+AdevarBoard.prototype.shouldReturnCapturedTileToHandAfterCapture = function(capturingTile, capturedTile) {
+	if (capturedTile) {
+		if (arrayIncludesOneOf( 
+			[capturedTile.type],
+			[
+				AdevarTileType.secondFace,
+				AdevarTileType.vanguard,
+				AdevarTileType.reflection,
+				AdevarTileType.gate
+			]
+		)) {
+			return true;
+		}
+	}
+
+	return false;
+};
+
+AdevarBoard.prototype.applyTileCapturedTriggers = function(capturingTile, capturedTile, moveStartedPoint, moveEndedPoint) {
+	if (capturedTile && capturingTile.type === AdevarTileType.reflection) {
+		this.revealTile(AdevarTileType.hiddenTile, capturedTile.ownerName);
+	}
+};
+
+AdevarBoard.prototype.revealTile = function(tileType, player) {
+	this.forEachBoardPointWithTile(function(boardPoint) {
+		if (boardPoint.tile.type === tileType && boardPoint.tile.ownerName === player) {
+			boardPoint.tile.reveal();
+		}
+	});
+};
+
+AdevarBoard.prototype.forEachBoardPoint = function(forEachFunc) {
+	this.cells.forEach(function(row) {
+		row.forEach(function(boardPoint) {
+			if (!boardPoint.isType(NON_PLAYABLE)) {
+				forEachFunc(boardPoint);
+			}
+		});
+	});
+};
+AdevarBoard.prototype.forEachBoardPointWithTile = function(forEachFunc) {
+	this.forEachBoardPoint(function(boardPoint) {
+		if (boardPoint.hasTile()) {
+			forEachFunc(boardPoint);
+		}
+	});
 };
 
 AdevarBoard.prototype.removeTile = function(notationPoint) {
@@ -490,8 +555,7 @@ AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movem
 };
 
 AdevarBoard.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, targetPoint) {
-	// return tile.canCapture(targetPoint.tile) // <-- and then implement
-	return tile !== targetPoint.tile;
+	return tile.canCapture(targetPoint.tile);
 };
 
 AdevarBoard.prototype.tileCanMoveThroughPoint = function(tile, movementInfo, targetPoint, fromPoint) {
@@ -501,6 +565,33 @@ AdevarBoard.prototype.tileCanMoveThroughPoint = function(tile, movementInfo, tar
 
 AdevarBoard.prototype.canMoveHereMoreEfficientlyAlready = function(boardPoint, distanceRemaining, movementInfo) {
 	return boardPoint.getMoveDistanceRemaining(movementInfo) >= distanceRemaining;
+};
+
+AdevarBoard.prototype.getDirectlyAdjacentPoints = function(boardPoint) {
+	var possibleAdjacentPoints = [];
+
+	if (boardPoint.row > 0) {
+		possibleAdjacentPoints.push(this.cells[boardPoint.row - 1][boardPoint.col]);
+	}
+	if (boardPoint.row < paiShoBoardMaxRowOrCol) {
+		possibleAdjacentPoints.push(this.cells[boardPoint.row + 1][boardPoint.col]);
+	}
+	if (boardPoint.col > 0) {
+		possibleAdjacentPoints.push(this.cells[boardPoint.row][boardPoint.col - 1]);
+	}
+	if (boardPoint.col < paiShoBoardMaxRowOrCol) {
+		possibleAdjacentPoints.push(this.cells[boardPoint.row][boardPoint.col + 1]);
+	}
+
+	var adjacentPoints = [];
+
+	possibleAdjacentPoints.forEach(function(boardPoint) {
+		if (!boardPoint.isType(NON_PLAYABLE)) {
+			adjacentPoints.push(boardPoint);
+		}
+	});
+
+	return adjacentPoints;
 };
 
 AdevarBoard.prototype.getAdjacentPointsPotentialPossibleMoves = function(pointAlongTheWay, originPoint, mustPreserveDirection, movementInfo) {
@@ -554,8 +645,45 @@ AdevarBoard.prototype.removePossibleMovePoints = function() {
 	});
 };
 
-AdevarBoard.prototype.setAllPointsAsPossible = function() {
+AdevarBoard.prototype.setPossibleDeployPoints = function(tile) {
+	if (arrayIncludesOneOf(
+		[tile.type],
+		[
+			AdevarTileType.basic,
+			AdevarTileType.secondFace,
+			AdevarTileType.reflection
+		]
+	)) {
+		this.setPossibleDeployPointsAroundGates(tile);
+	}
+};
+
+AdevarBoard.prototype.setPossibleDeployPointsAroundGates = function(tile) {
+	var gatePoints = this.getGatePoints(tile.ownerName);
+
 	var self = this;
+	gatePoints.forEach(function(gatePoint) {
+		self.getDirectlyAdjacentPoints(gatePoint).forEach(function(pointNextToGate) {
+			if (!pointNextToGate.hasTile()
+					|| self.targetPointHasTileThatCanBeCaptured(tile, null, null, pointNextToGate)) {
+				pointNextToGate.addType(POSSIBLE_MOVE);
+			}
+		});
+	});
+};
+
+AdevarBoard.prototype.getGatePoints = function(player) {
+	var gatePoints = [];
+	this.forEachBoardPointWithTile(function(boardPoint) {
+		if (boardPoint.tile.ownerName === player
+				&& boardPoint.tile.type === AdevarTileType.gate) {
+			gatePoints.push(boardPoint);
+		}
+	});
+	return gatePoints;
+};
+
+AdevarBoard.prototype.setAllPointsAsPossible = function() {
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
 			boardPoint.addType(POSSIBLE_MOVE);

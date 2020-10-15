@@ -134,13 +134,15 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		this.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.reflection), AdevarBoardSetupPoints.reflection[move.player]);
 
 	} else if (move.moveType === DEPLOY) {
-		// Just placing tile on board
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
-		this.board.placeTile(tile, move.endPoint);
+		var placeTileResults = this.board.placeTile(tile, move.endPoint);
+		if (placeTileResults.capturedTile && placeTileResults.returnCapturedTileToHand) {
+			this.tileManager.putTileBack(placeTileResults.capturedTile);
+		}
 	} else if (move.moveType === MOVE) {
 		var moveTileResults = this.board.moveTile(move.startPoint, move.endPoint);
-		if (moveTileResults.capturedTile && moveTileResults.putCapturedTileBackInHand) {
-			this.tileManager.putTileBack(capturedTile);
+		if (moveTileResults.capturedTile && moveTileResults.returnCapturedTileToHand) {
+			this.tileManager.putTileBack(moveTileResults.capturedTile);
 		}
 	}
 
@@ -152,6 +154,14 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 AdevarGameManager.prototype.revealAllPointsAsPossible = function() {
 	this.board.setAllPointsAsPossible();
 	this.actuate();
+};
+
+AdevarGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
+	this.board.setPossibleDeployPoints(tile);
+
+	if (!ignoreActuate) {
+		this.actuate();
+	}
 };
 
 AdevarGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
