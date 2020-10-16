@@ -37,15 +37,11 @@ VagabondController.prototype.resetGameManager = function() {
 	this.theGame = new VagabondGameManager(this.actuator);
 };
 
-VagabondController.prototype.resetNotationBuilder = function() {
-	// var offerDraw = false;
-	// if (this.notationBuilder) {
-	// 	offerDraw = this.notationBuilder.offerDraw;
-	// }
+VagabondController.prototype.resetNotationBuilder = function(applyDrawOffer) {
 	this.notationBuilder = new VagabondNotationBuilder();
-	// if (offerDraw) {
-	// 	this.notationBuilder.offerDraw = true;
-	// }
+	if (applyDrawOffer) {
+		this.notationBuilder.offerDraw = true;
+	}
 
 	this.checkingOutOpponentTileOrNotMyTurn = false;
 };
@@ -214,7 +210,7 @@ VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 		this.theGame.revealDeployPoints(tile.ownerName, tileCode); // New
 	} else {
 		this.theGame.hidePossibleMovePoints();
-		this.resetNotationBuilder();
+		this.resetNotationBuilder(this.notationBuilder.offerDraw);
 	}
 }
 
@@ -286,7 +282,7 @@ VagabondController.prototype.pointClicked = function(htmlPoint) {
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
-			this.resetNotationBuilder();
+			this.resetNotationBuilder(this.notationBuilder.offerDraw);
 		}
 	}
 }
