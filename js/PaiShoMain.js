@@ -1251,13 +1251,15 @@ function askToJoinPrivateGame(privateGameId, hostUserName) {
 		message += "<div class='clickableText' onclick='closeModal(); yesJoinPrivateGame(" + privateGameId + ");'>Yes - join game</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
 
-		if (currentGameData.hostUsername && currentGameData.guestUsername && !iAmPlayerInCurrentOnlineGame()) {
+		if (currentGameData.hostUsername && currentGameData.guestUsername) {
 			message = "A Guest has already joined this game.";
 			message += "<br /><br />";
 			message += "<div class='clickableText' onclick='closeModal();'>OK</div>";
 		}
 
-		showModal("Join Private Game?", message, true);
+		if (!iAmPlayerInCurrentOnlineGame()) {
+			showModal("Join Private Game?", message, true);
+		}
 	} else {
 		var message = "To join this game hosted by " + hostUserName + ", please sign in and then refresh this page.";
 		message += "<br /><br />";
@@ -2031,7 +2033,7 @@ function getGameControllerForGameType(gameTypeId) {
 		  updateFooter();
 
 		  /* Ask to join invite link game if present */
-		  if (QueryString.joinPrivateGame) {
+		  if (QueryString.joinPrivateGame && gameId === QueryString.joinPrivateGame) {
 			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
 		  }
 	  }
