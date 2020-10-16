@@ -704,7 +704,7 @@ AdevarBoard.prototype.tileCanLandOnPointWithoutBreakingPlotCountLimits = functio
 
 	var self = this;
 
-	var plotsHaveRoom = false;
+	var plotsHaveRoom = true;	// Assuming true, then validating below
 
 	targetPlots.forEach(function(targetPlot) {
 		var targetPlotCounts = self.basicTilePlotCounts[targetPlot];
@@ -724,7 +724,7 @@ AdevarBoard.prototype.tileCanLandOnPointWithoutBreakingPlotCountLimits = functio
 				[AdevarBoardPointType.NORTH_RED_PLOT, AdevarBoardPointType.SOUTH_RED_PLOT])) {
 			plotLimit = 2;	// Red Plot limit
 		}
-		plotsHaveRoom = plotLimit - plotCount >= targetPlotsRoomNeeded;
+		plotsHaveRoom = plotsHaveRoom && plotLimit - plotCount >= targetPlotsRoomNeeded;
 	});
 
 	return plotsHaveRoom;
