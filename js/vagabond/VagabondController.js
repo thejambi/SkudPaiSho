@@ -38,14 +38,14 @@ VagabondController.prototype.resetGameManager = function() {
 };
 
 VagabondController.prototype.resetNotationBuilder = function() {
-	var offerDraw = false;
-	if (this.notationBuilder) {
-		offerDraw = this.notationBuilder.offerDraw;
-	}
+	// var offerDraw = false;
+	// if (this.notationBuilder) {
+	// 	offerDraw = this.notationBuilder.offerDraw;
+	// }
 	this.notationBuilder = new VagabondNotationBuilder();
-	if (offerDraw) {
-		this.notationBuilder.offerDraw = true;
-	}
+	// if (offerDraw) {
+	// 	this.notationBuilder.offerDraw = true;
+	// }
 
 	this.checkingOutOpponentTileOrNotMyTurn = false;
 };
@@ -137,7 +137,7 @@ VagabondController.prototype.acceptDraw = function() {
 };
 
 VagabondController.prototype.confirmAcceptDraw = function() {
-	if (myTurn()) {
+	if (myTurn() && this.gameNotation.lastMoveHasDrawOffer()) {
 		this.resetNotationBuilder();
 		this.notationBuilder.moveType = DRAW_ACCEPT;
 

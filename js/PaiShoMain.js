@@ -1251,7 +1251,7 @@ function askToJoinPrivateGame(privateGameId, hostUserName) {
 		message += "<div class='clickableText' onclick='closeModal(); yesJoinPrivateGame(" + privateGameId + ");'>Yes - join game</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
 
-		if (currentGameData.hostUsername && currentGameData.guestUsername) {
+		if (currentGameData.hostUsername && currentGameData.guestUsername && !iAmPlayerInCurrentOnlineGame()) {
 			message = "A Guest has already joined this game.";
 			message += "<br /><br />";
 			message += "<div class='clickableText' onclick='closeModal();'>OK</div>";
