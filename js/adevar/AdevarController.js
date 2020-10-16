@@ -138,7 +138,7 @@ AdevarController.prototype.unplayedTileClicked = function(tileDiv) {
 			
 			if (playingOnlineGame()) {
 				callSubmitMove();
-			} else if (onlinePlayEnabled) {
+			} else if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
 				createGameIfThatIsOk(GameType.Adevar.id);
 			} else {
 				finalizeMove();

@@ -13,6 +13,7 @@ var AdevarBoardPointType = {
 
 function AdevarBoardPoint() {
 	this.types = [];
+	this.plotTypes = [];
 	this.row = -1;
 	this.col = -1;
 }
@@ -20,6 +21,12 @@ function AdevarBoardPoint() {
 AdevarBoardPoint.prototype.addType = function(type) {
 	if (!this.types.includes(type)) {
 		this.types.push(type);
+	}
+};
+
+AdevarBoardPoint.prototype.addPlotType = function(type) {
+	if (!this.plotTypes.includes(type)) {
+		this.plotTypes.push(type);
 	}
 };
 
@@ -113,6 +120,7 @@ AdevarBoardPoint.newPoint = function(pointTypes) {
 	var point = new AdevarBoardPoint();
 	pointTypes.forEach(function(pointType) {
 		point.addType(pointType);
+		point.addPlotType(pointType);
 	});
 	return point;
 };
