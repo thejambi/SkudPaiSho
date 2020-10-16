@@ -90,6 +90,13 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Advr", "Advr_Vanguard", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_WatersReflection", ownerCode));
 
+	// Warfront
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Cavalry", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Guardian", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Lotus", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_SiegeEngine", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Soldier", ownerCode));
+
 	return tiles;
 };
 

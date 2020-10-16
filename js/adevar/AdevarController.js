@@ -138,7 +138,7 @@ AdevarController.prototype.unplayedTileClicked = function(tileDiv) {
 			
 			if (playingOnlineGame()) {
 				callSubmitMove();
-			} else if (onlinePlayEnabled) {
+			} else if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
 				createGameIfThatIsOk(GameType.Adevar.id);
 			} else {
 				finalizeMove();
@@ -255,21 +255,12 @@ AdevarController.prototype.getPointMessage = function(htmlPoint) {
 
 	var heading;
 	var message = [];
+	
 	if (boardPoint.hasTile()) {
 		heading = boardPoint.tile.getName();
-	} else {
-		if (boardPoint.isType(NEUTRAL)) {
-			message.push(getNeutralPointMessage());
-		} else if (boardPoint.isType(RED) && boardPoint.isType(WHITE)) {
-			message.push(getRedWhitePointMessage());
-		} else if (boardPoint.isType(RED)) {
-			message.push(getRedPointMessage());
-		} else if (boardPoint.isType(WHITE)) {
-			message.push(getWhitePointMessage());
-		} else if (boardPoint.isType(GATE)) {
-			message.push(getGatePointMessage());
-		}
 	}
+
+	message.push(boardPoint.types);
 
 	return {
 		heading: heading,

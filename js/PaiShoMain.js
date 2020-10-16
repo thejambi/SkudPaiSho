@@ -3689,6 +3689,9 @@ document.onkeyup = function(e) {
 	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 188) {
 		/* Ctrl + Alt + < */
 		playPrevMove(true);
+	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 78) {
+		/* Ctrl + Alt + N */
+		newGameClicked();
 	}
 };
   

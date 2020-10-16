@@ -5,6 +5,8 @@ function AdevarBoard() {
 	this.cells = this.brandNewForSpaces();
 
 	this.winners = [];
+
+	this.basicTilePlotCounts = [];
 }
 
 AdevarBoard.prototype.brandNewForSpaces = function () {
@@ -15,156 +17,156 @@ AdevarBoard.prototype.brandNewForSpaces = function () {
 		You'll also need to adjust for the non-playable areas of the board near the red corners. */
 
 	cells[0] = this.newRow(6, 
-		[AdevarBoardPoint.neutral(),
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
 		AdevarBoardPoint.wall(),
 		AdevarBoardPoint.wall(),
 		AdevarBoardPoint.wall(),
 		AdevarBoardPoint.wall(),
-		AdevarBoardPoint.neutral()
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT])
 		]);
 
 	cells[1] = this.newRow(10, 
-		[AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
 			AdevarBoardPoint.wall(),
 			AdevarBoardPoint.wall(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral()
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT])
 		]);
 
 	cells[2] = this.newRow(12, 
-		[AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.whiteNeutral(),
-			AdevarBoardPoint.redNeutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral()
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT, AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT, AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT])
 		]);
 
 	cells[3] = this.newRow(14,
-		[AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.whiteNeutral(),
-		AdevarBoardPoint.white(),
-		AdevarBoardPoint.red(),
-		AdevarBoardPoint.redNeutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral()
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT, AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT, AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT])
 		]);
 
 	cells[4] = this.newRow(16,
-		[AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.whiteNeutral(),
-		AdevarBoardPoint.white(),
-		AdevarBoardPoint.white(),
-		AdevarBoardPoint.red(),
-		AdevarBoardPoint.red(),
-		AdevarBoardPoint.redNeutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral(),
-		AdevarBoardPoint.neutral()
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT, AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT, AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+		AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT])
 		]);
 
 	cells[5] = this.newRow(16,
-		[AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.whiteNeutral(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.redNeutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral()
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT, AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT, AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT])
 		]);
 
 	cells[6] = this.newRow(18,
-		[AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.whiteNeutral(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.redNeutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral()
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT, AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT, AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT])
 		]);
 
 	cells[7] = this.newRow(18,
 		[AdevarBoardPoint.wall(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.whiteNeutral(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.redNeutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT, AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT, AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
 			AdevarBoardPoint.wall()
 		]);
 
 	cells[8] = this.newRow(18,
 		[AdevarBoardPoint.wall(),
 			AdevarBoardPoint.wall(),
-			AdevarBoardPoint.whiteNeutral(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.redNeutral(),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT, AdevarBoardPointType.EAST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.EAST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.SOUTH_RED_PLOT, AdevarBoardPointType.SOUTH_NEUTRAL_PLOT]),
 			AdevarBoardPoint.wall(),
 			AdevarBoardPoint.wall()
 		]);
@@ -172,156 +174,156 @@ AdevarBoard.prototype.brandNewForSpaces = function () {
 	cells[9] = this.newRow(18,
 		[AdevarBoardPoint.wall(),
 			AdevarBoardPoint.wall(),
-			AdevarBoardPoint.redNeutral(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.whiteNeutral(),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT, AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT, AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
 			AdevarBoardPoint.wall(),
 			AdevarBoardPoint.wall()
 		]);
 
 	cells[10] = this.newRow(18,
 		[AdevarBoardPoint.wall(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.redNeutral(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.whiteNeutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT, AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT, AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
 			AdevarBoardPoint.wall()
 		]);
 
 	cells[11] = this.newRow(18,
-		[AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.redNeutral(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.whiteNeutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral()
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT, AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT, AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT])
 		]);
 
 	cells[12] = this.newRow(16,
-		[AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.redNeutral(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.whiteNeutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral()
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT, AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT, AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT])
 		]);
 
 	cells[13] = this.newRow(16,
-		[AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.redNeutral(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.whiteNeutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral()
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT, AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT, AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT])
 		]);
 
 	cells[14] = this.newRow(14,
-		[AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.redNeutral(),
-			AdevarBoardPoint.red(),
-			AdevarBoardPoint.white(),
-			AdevarBoardPoint.whiteNeutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral()
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT, AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT, AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT])
 		]);
 
 	cells[15] = this.newRow(12,
-		[AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.redNeutral(),
-			AdevarBoardPoint.whiteNeutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral()
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_RED_PLOT, AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_WHITE_PLOT, AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT])
 		]);
 
 	cells[16] = this.newRow(10,
-		[AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
 			AdevarBoardPoint.wall(),
 			AdevarBoardPoint.wall(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral(),
-			AdevarBoardPoint.neutral()
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT]),
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT])
 		]);
 
 	cells[17] = this.newRow(6,
-		[AdevarBoardPoint.neutral(),
+		[AdevarBoardPoint.newPoint([AdevarBoardPointType.NORTH_NEUTRAL_PLOT]),
 			AdevarBoardPoint.wall(),
 			AdevarBoardPoint.wall(),
 			AdevarBoardPoint.wall(),
 			AdevarBoardPoint.wall(),
-			AdevarBoardPoint.neutral()
+			AdevarBoardPoint.newPoint([AdevarBoardPointType.WEST_NEUTRAL_PLOT])
 		]);
 
 	for (var row = 0; row < cells.length; row++) {
@@ -357,6 +359,29 @@ AdevarBoard.prototype.newRow = function(numColumns, points) {
 	}
 
 	return cells;
+};
+
+AdevarBoard.prototype.countTilesInPlots = function() {
+	this.basicTilePlotCounts = {};
+	this.basicTilePlotCounts[AdevarBoardPointType.NORTH_NEUTRAL_PLOT] = { HOST: 0, GUEST: 0 };
+	this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_NEUTRAL_PLOT] = { HOST: 0, GUEST: 0 };
+	this.basicTilePlotCounts[AdevarBoardPointType.EAST_NEUTRAL_PLOT] = { HOST: 0, GUEST: 0 };
+	this.basicTilePlotCounts[AdevarBoardPointType.WEST_NEUTRAL_PLOT] = { HOST: 0, GUEST: 0 };
+	this.basicTilePlotCounts[AdevarBoardPointType.NORTH_RED_PLOT] = { HOST: 0, GUEST: 0 };
+	this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_RED_PLOT] = { HOST: 0, GUEST: 0 };
+	this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT] = { HOST: 0, GUEST: 0 };
+	this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT] = { HOST: 0, GUEST: 0 };
+
+	var self = this;
+	this.forEachBoardPointWithTile(function(boardPoint) {
+		if (boardPoint.tile.type === AdevarTileType.basic) {
+			boardPoint.plotTypes.forEach(function(pointType) {
+				self.basicTilePlotCounts[pointType][boardPoint.tile.ownerName] += 1 / boardPoint.plotTypes.length;
+			});
+		}
+	});
+
+	debug(this.basicTilePlotCounts);
 };
 
 AdevarBoard.prototype.placeTile = function(tile, notationPoint) {
@@ -470,12 +495,6 @@ AdevarBoard.prototype.forEachBoardPointWithTile = function(forEachFunc) {
 	});
 };
 
-AdevarBoard.prototype.removeTile = function(notationPoint) {
-	var rowCol = notationPoint.rowAndColumn;
-	var boardPoint = this.cells[rowCol.row][rowCol.col];
-	return boardPoint.removeTile();
-};
-
 AdevarBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
 	return boardPointStart !== boardPointEnd;
 };
@@ -516,7 +535,7 @@ AdevarBoard.prototype.setPossibleMovementPointsFromMovePoints = function(movePoi
 					adjacentPoint.setMoveDistanceRemaining(movementInfo, 0);
 				}
 				
-				if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint)) {
+				if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint, originPoint)) {
 					var movementOk = self.setPointAsPossibleMovement(adjacentPoint, tile, originPoint);
 					if (movementOk) {
 						if (!adjacentPoint.hasTile() || canMoveThroughPoint) {
@@ -544,9 +563,10 @@ AdevarBoard.prototype.setPointAsPossibleMovement = function(targetPoint, tileBei
 	return true;
 };
 
-AdevarBoard.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targetPoint, fromPoint) {
+AdevarBoard.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targetPoint, fromPoint, originPoint) {
 	var canCaptureTarget = this.targetPointHasTileThatCanBeCaptured(tile, movementInfo, fromPoint, targetPoint);
-	return !targetPoint.hasTile() || canCaptureTarget;
+	return (!targetPoint.hasTile() || canCaptureTarget)
+		&& this.tileCanLandOnPointWithoutBreakingPlotCountLimits(tile, targetPoint, originPoint);
 };
 
 AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint) {
@@ -664,12 +684,50 @@ AdevarBoard.prototype.setPossibleDeployPointsAroundGates = function(tile) {
 	var self = this;
 	gatePoints.forEach(function(gatePoint) {
 		self.getDirectlyAdjacentPoints(gatePoint).forEach(function(pointNextToGate) {
-			if (!pointNextToGate.hasTile()
-					|| self.targetPointHasTileThatCanBeCaptured(tile, null, null, pointNextToGate)) {
+			if ((!pointNextToGate.hasTile()
+					|| self.targetPointHasTileThatCanBeCaptured(tile, null, null, pointNextToGate))
+					&& self.tileCanLandOnPointWithoutBreakingPlotCountLimits(tile, pointNextToGate)) {
 				pointNextToGate.addType(POSSIBLE_MOVE);
 			}
 		});
 	});
+};
+
+AdevarBoard.prototype.tileCanLandOnPointWithoutBreakingPlotCountLimits = function(tile, targetPoint, movedFromPoint) {
+	if (tile.type !== AdevarTileType.basic) {
+		return true;	// Plot limits only apply to Basic tiles
+	}
+
+	var targetPlots = targetPoint.plotTypes;
+
+	var targetPlotsRoomNeeded = 1 / targetPlots.length;
+
+	var self = this;
+
+	var plotsHaveRoom = false;
+
+	targetPlots.forEach(function(targetPlot) {
+		var targetPlotCounts = self.basicTilePlotCounts[targetPlot];
+		var plotCount = targetPlotCounts[tile.ownerName];
+		// subtract from plot count if movedFromPoint shares plot type
+		if (movedFromPoint && movedFromPoint.plotTypes.includes(targetPlot)) {
+			plotCount -= 1 / movedFromPoint.plotTypes.length;
+		}
+		debug(targetPlot + ": " + plotCount);
+		var plotLimit = 9999;	// Neutral Plot, no limit
+		if (arrayIncludesOneOf(
+				[targetPlot], 
+				[AdevarBoardPointType.WEST_WHITE_PLOT, AdevarBoardPointType.EAST_WHITE_PLOT])) {
+			plotLimit = 3;	// White Plot limit
+		} else if (arrayIncludesOneOf(
+				[targetPlot], 
+				[AdevarBoardPointType.NORTH_RED_PLOT, AdevarBoardPointType.SOUTH_RED_PLOT])) {
+			plotLimit = 2;	// Red Plot limit
+		}
+		plotsHaveRoom = plotLimit - plotCount >= targetPlotsRoomNeeded;
+	});
+
+	return plotsHaveRoom;
 };
 
 AdevarBoard.prototype.getTileTypePoints = function(player, tileType) {

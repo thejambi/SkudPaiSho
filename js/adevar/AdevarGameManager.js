@@ -146,6 +146,8 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		}
 	}
 
+	this.board.countTilesInPlots();
+
 	if (withActuate) {
 		this.actuate();
 	}
