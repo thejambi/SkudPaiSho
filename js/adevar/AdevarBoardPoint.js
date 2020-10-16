@@ -1,5 +1,16 @@
 // Board Point
 
+var AdevarBoardPointType = {
+	NORTH_NEUTRAL_PLOT: "Northern Neutral Plot",
+	EAST_NEUTRAL_PLOT: "Eastern Neutral Plot",
+	SOUTH_NEUTRAL_PLOT: "Southern Neutral Plot",
+	WEST_NEUTRAL_PLOT: "Western Neutral Plot",
+	NORTH_RED_PLOT: "Northern Red Plot",
+	SOUTH_RED_PLOT: "Southern Red Plot",
+	WEST_WHITE_PLOT: "Western White Plot",
+	EAST_WHITE_PLOT: "Eastern White Plot"
+};
+
 function AdevarBoardPoint() {
 	this.types = [];
 	this.row = -1;
@@ -97,6 +108,14 @@ AdevarBoardPoint.prototype.getCopy = function() {
 
 
 // Point makers
+
+AdevarBoardPoint.newPoint = function(pointTypes) {
+	var point = new AdevarBoardPoint();
+	pointTypes.forEach(function(pointType) {
+		point.addType(pointType);
+	});
+	return point;
+};
 
 AdevarBoardPoint.neutral = function() {
 	var point = new AdevarBoardPoint();
