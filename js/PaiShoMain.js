@@ -1257,7 +1257,9 @@ function askToJoinPrivateGame(privateGameId, hostUserName) {
 			message += "<div class='clickableText' onclick='closeModal();'>OK</div>";
 		}
 
-		showModal("Join Private Game?", message, true);
+		if (!iAmPlayerInCurrentOnlineGame()) {
+			showModal("Join Private Game?", message, true);
+		}
 	} else {
 		var message = "To join this game hosted by " + hostUserName + ", please sign in and then refresh this page.";
 		message += "<br /><br />";
@@ -2031,7 +2033,7 @@ function getGameControllerForGameType(gameTypeId) {
 		  updateFooter();
 
 		  /* Ask to join invite link game if present */
-		  if (QueryString.joinPrivateGame) {
+		  if (QueryString.joinPrivateGame && gameId === QueryString.joinPrivateGame) {
 			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
 		  }
 	  }
@@ -3689,6 +3691,9 @@ document.onkeyup = function(e) {
 	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 188) {
 		/* Ctrl + Alt + < */
 		playPrevMove(true);
+	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 78) {
+		/* Ctrl + Alt + N */
+		newGameClicked();
 	}
 };
   

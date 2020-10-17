@@ -82,11 +82,20 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Advr", "Advr_Iris", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_OrientalLily", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_Echeveria", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_WhiteLotus", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_BirdOfParadise", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_IrisSecondFace", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_OrientalLilySecondFace", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_EcheveriaSecondFace", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_Vanguard", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_WatersReflection", ownerCode));
+
+	// Warfront
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Cavalry", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Guardian", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Lotus", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_SiegeEngine", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Soldier", ownerCode));
 
 	return tiles;
 };

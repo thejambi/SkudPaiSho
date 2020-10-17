@@ -2,6 +2,10 @@
 
 // --------------------------------------------- // 
 
+var AdevarMoveType = {
+	chooseHiddenTile: "cHT:"
+};
+
 function AdevarNotationMove(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
@@ -40,7 +44,15 @@ AdevarNotationMove.prototype.analyzeMove = function() {
 		this.moveType = DEPLOY;
 	}
 
-	if (this.moveType === DEPLOY) {
+	if (moveText.includes(AdevarMoveType.chooseHiddenTile)) {
+		this.moveType = AdevarMoveType.chooseHiddenTile;
+	}
+
+	if (this.moveType === AdevarMoveType.chooseHiddenTile) {
+		// Like: cHT:Echeveria
+		this.hiddenTileCode = moveText.substring(moveText.indexOf(AdevarMoveType.chooseHiddenTile) + AdevarMoveType.chooseHiddenTile.length);
+		debug(this.player + " has chosen Hidden Tile: " + this.hiddenTileCode + "... Now we just need to keep it secret...");
+	} else if (this.moveType === DEPLOY) {
 		var char1 = moveText.charAt(1);
 		var char2 = moveText.charAt(2);
 		this.tileOwner = char0;
@@ -81,8 +93,6 @@ AdevarNotationMove.prototype.equals = function(otherMove) {
 // --------------------------------------- //
 
 function AdevarNotationBuilder() {
-	// this.moveNum;	// Let's try making this magic
-	// this.player;		// Magic
 	this.moveType;
 
 	// DEPLOY
@@ -93,12 +103,17 @@ function AdevarNotationBuilder() {
 	this.startPoint;
 	//this.endPoint; // Also used in DEPLOY
 
+	// Choose Hidden Tile
+	this.hiddenTileCode;
+
 	this.status = BRAND_NEW;
 }
 
 AdevarNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 	var notationLine = moveNum + player.charAt(0) + ".";
-	if (this.moveType === MOVE) {
+	if (this.moveType === AdevarMoveType.chooseHiddenTile) {
+		notationLine += AdevarMoveType.chooseHiddenTile + this.hiddenTileCode;
+	} else if (this.moveType === MOVE) {
 		notationLine += "(" + this.startPoint.pointText + ")-(" + this.endPoint.pointText + ")";
 	} else if (this.moveType === DEPLOY) {
 		notationLine += this.tileType + "(" + this.endPoint.pointText + ")";
