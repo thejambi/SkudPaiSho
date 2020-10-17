@@ -57,7 +57,7 @@ StreetGameManager.prototype.runNotationMove = function(move, withActuate) {
 		// if (tileMoved.capturedTile && tileMoved.capturedTile.capturedTile) {
 		// 	this.tileManager.putTileBack(tileMoved.capturedTile.capturedTile);
 		// }
-	} else if (INITIAL_SETUP) {
+	} else if (INITIAL_SETUP) {	// TODO fix if check... moveType === ?
 		// Place tiles on board according to board setup code
 		
 		// Create point list

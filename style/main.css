@@ -343,7 +343,7 @@ div.tab .alertTab, div.tab .alertTab.active {
   padding-bottom: 100%;
   border: none;
 }
-.game-container.pixelsho .bg-svg {
+/* .game-container.pixelsho .bg-svg {
   background-image: url(pixelshoboard.png);
 }
 .game-container.pixelsho2 .bg-svg {
@@ -375,6 +375,9 @@ div.tab .alertTab, div.tab .alertTab.active {
 }
 .game-container.airBoard .bg-svg {
   background-image: url(board_air.png);
+}
+.game-container.airnomadBoard .bg-svg {
+  background-image: url(board_airnomad.png);
 }
 .game-container.earthBoard .bg-svg {
   background-image: url(board_earth.png);
@@ -409,6 +412,30 @@ div.tab .alertTab, div.tab .alertTab.active {
 .game-container.checkeredtrainingBoard .bg-svg {
   background-image: url(board_checkeredoffset.png);
 }
+.game-container.forestBoard .bg-svg {
+  background-image: url(board_forest.png);
+}
+.game-container.azulBoard .bg-svg {
+  background-image: url(board_azul.png);
+}
+.game-container.flowergardenBoard .bg-svg {
+  background-image: url(board_flowergarden.png);
+}
+.game-container.worldmapBoard .bg-svg {
+  background-image: url(board_worldmap.png);
+}
+.game-container.goldengardenBoard .bg-svg {
+  background-image: url(board_goldengarden.png);
+}
+.game-container.nomadicBoard .bg-svg {
+  background-image: url(board_nomadic.png);
+}
+.game-container.nomadicdarkBoard .bg-svg {
+  background-image: url(board_nomadicdark.png);
+}
+.game-container.tggBoard .bg-svg {
+  background-image: url(board_tgg.png);
+} */
 
 figure > div {
   margin: 1em auto;
@@ -436,12 +463,36 @@ figure > div {
   transform: rotate(315deg);
 }
 
+.adevarBoardRotate {
+  -webkit-transform: rotate(135deg);
+  -moz-transform: rotate(135deg);
+  -o-transform: rotate(135deg);
+  -ms-transform: rotate(135deg);
+  transform: rotate(135deg);
+
+  z-index:0;
+}
+
+.adevarPointRotate {
+  -webkit-transform: rotate(225deg);
+  -moz-transform: rotate(225deg);
+  -o-transform: rotate(225deg);
+  -ms-transform: rotate(225deg);
+  transform: rotate(225deg);
+}
+
 .pointContainer {
   /*padding: 16px;*/
   padding: 17px;
   height: 612px;
   width: 612px;
 }
+
+.pointContainerForPlayInSpaces {
+  height: 612px;
+  width: 612px;
+}
+
 .tilePileContainer {
   display: inline;
   float: left;
@@ -554,7 +605,7 @@ figure > div {
 
 
 
-.hostTilesContainer, .guestTilesContainer {
+.hostTilesContainer, .guestTilesContainer, .tileLibrary {
   display: inline-block;
   float: left;
   margin-top: 12px;
@@ -1248,7 +1299,7 @@ textarea {
       width: 100vw;
     }
 
-    .pointContainer {
+    .pointContainer, .pointContainerForPlayInSpaces {
       width: 100vw;
       height: 100vw;
     }
@@ -1436,7 +1487,7 @@ textarea {
       width: 306px;
     }
 
-    .pointContainer {
+    .pointContainer, .pointContainerForPlayInSpaces {
       width: 306px;
       height: 306px;
     }
