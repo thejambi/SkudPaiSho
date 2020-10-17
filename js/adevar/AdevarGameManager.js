@@ -71,6 +71,11 @@ AdevarGameManager.prototype.setup = function (ignoreActuate) {
 
 	this.usingTileReserves = false;
 
+	this.secondFaceTilePlayedCount = {
+		HOST: 0,
+		GUEST: 0
+	};
+
 	this.board = new AdevarBoard();
 
 	// Update the actuator
@@ -139,6 +144,12 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		if (placeTileResults.capturedTile && placeTileResults.returnCapturedTileToHand) {
 			this.tileManager.putTileBack(placeTileResults.capturedTile);
 		}
+		if (tile.type === AdevarTileType.secondFace) {
+			this.secondFaceTilePlayedCount[move.player]++;
+			if (this.secondFaceTilePlayedCount[move.player] === 2) {
+				this.tileManager.removeRemainingTilesOfType(move.player, AdevarTileType.secondFace);
+			} 
+		}
 	} else if (move.moveType === MOVE) {
 		var moveTileResults = this.board.moveTile(move.startPoint, move.endPoint);
 		if (moveTileResults.capturedTile && moveTileResults.returnCapturedTileToHand) {
@@ -159,7 +170,11 @@ AdevarGameManager.prototype.revealAllPointsAsPossible = function() {
 };
 
 AdevarGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
-	this.board.setPossibleDeployPoints(tile);
+	if (tile.type !== AdevarTileType.secondFace
+		|| (tile.type === AdevarTileType.secondFace && this.secondFaceTilePlayedCount[tile.ownerName] < 2)
+	) {
+		this.board.setPossibleDeployPoints(tile);
+	}
 
 	if (!ignoreActuate) {
 		this.actuate();
