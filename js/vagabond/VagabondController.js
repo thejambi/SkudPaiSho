@@ -37,13 +37,9 @@ VagabondController.prototype.resetGameManager = function() {
 	this.theGame = new VagabondGameManager(this.actuator);
 };
 
-VagabondController.prototype.resetNotationBuilder = function() {
-	var offerDraw = false;
-	if (this.notationBuilder) {
-		offerDraw = this.notationBuilder.offerDraw;
-	}
+VagabondController.prototype.resetNotationBuilder = function(applyDrawOffer) {
 	this.notationBuilder = new VagabondNotationBuilder();
-	if (offerDraw) {
+	if (applyDrawOffer) {
 		this.notationBuilder.offerDraw = true;
 	}
 
@@ -137,7 +133,7 @@ VagabondController.prototype.acceptDraw = function() {
 };
 
 VagabondController.prototype.confirmAcceptDraw = function() {
-	if (myTurn()) {
+	if (myTurn() && this.gameNotation.lastMoveHasDrawOffer()) {
 		this.resetNotationBuilder();
 		this.notationBuilder.moveType = DRAW_ACCEPT;
 
@@ -214,7 +210,7 @@ VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 		this.theGame.revealDeployPoints(tile.ownerName, tileCode); // New
 	} else {
 		this.theGame.hidePossibleMovePoints();
-		this.resetNotationBuilder();
+		this.resetNotationBuilder(this.notationBuilder.offerDraw);
 	}
 }
 
@@ -286,7 +282,7 @@ VagabondController.prototype.pointClicked = function(htmlPoint) {
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
-			this.resetNotationBuilder();
+			this.resetNotationBuilder(this.notationBuilder.offerDraw);
 		}
 	}
 }
@@ -509,6 +505,7 @@ VagabondController.tileDesignTypeValues = {
 	tgggyatso: "Gyatso TGG Classic",
 	vescuccikoiwheel: "Vescucci Koi-Wheel",
 	vescuccikoiwheelrustic: "Rustic Vescucci Koi-Wheel",
+	chujired: "Chuji Red",
 	classic: "Classic Pai Sho Project",
 	water: "Water themed Garden Gate Designs",
 	fire: "Fire themed Garden Gate Designs",

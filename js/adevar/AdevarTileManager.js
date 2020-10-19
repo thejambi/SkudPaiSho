@@ -149,11 +149,15 @@ AdevarTileManager.prototype.putTileBack = function(tile) {
 };
 
 AdevarTileManager.prototype.removeRemainingHiddenTiles = function(player) {
+	this.removeRemainingTilesOfType(player, AdevarTileType.hiddenTile);
+};
+
+AdevarTileManager.prototype.removeRemainingTilesOfType = function(player, tileType) {
 	var tilePile = this.getTilePile(player);
 	if (tilePile) {
 		for (var i = tilePile.length - 1; i >= 0; i--) {
 			var tile = tilePile[i];
-			if (tile.type === AdevarTileType.hiddenTile) {
+			if (tile.type === tileType) {
 				tilePile.splice(i, 1);
 			}
 		}

@@ -12,9 +12,10 @@ AdevarOptions.tileDesignTypeKey = "adevarTileDesignTypeKey";
 
 /* Adevar tile designs */
 AdevarOptions.tileDesignTypeValues = {
-	classic: "Adevar Classic",
+	// classic: "Adevar Classic",
 	monochrome: "Adevar Monochrome",
-	spoopy: "Adevar Spoopy"
+	spoopy: "Adevar Spoopy",
+	chuji: "Chuji"
 };
 
 AdevarOptions.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {

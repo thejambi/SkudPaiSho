@@ -59,7 +59,9 @@ var QueryString = function () {
 	  water: "Water-Themed Vescucci Tiles",
 	  earth: "Earth-Themed Vescucci Tiles",
 	  chujiblue: "Chu Ji Blue",
-	  chujimono: "Chu Ji Monochrome"
+	  chujimono: "Chu Ji Monochrome",
+	  azulejosmono: "Azulejos Monocromos",
+	  azulejosdemadera: "Azulejos de Madera"
   };
   
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
@@ -96,7 +98,8 @@ var paiShoBoardDesignTypeValues = {
 	vaaturaava: "Vaatu Raava by mrpandaber",
 	waterarena: "Water Arena by Yagalo",
 	eartharena: "Earth Arena by Yagalo",
-	firearena: "Fire Arena by Yagalo"
+	firearena: "Fire Arena by Yagalo",
+	ladenvar: "Ladenvăr by Sirstotes"
 };
 
 var svgBoardDesigns = [
@@ -525,7 +528,7 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
   };
   
   function usernameEquals(otherUsername) {
-	  return getUsername() && otherUsername.toLowerCase() === getUsername().toLowerCase();
+	  return otherUsername && getUsername() && otherUsername.toLowerCase() === getUsername().toLowerCase();
   }
   
   function setResponseText(text) {
@@ -1257,7 +1260,9 @@ function askToJoinPrivateGame(privateGameId, hostUserName) {
 			message += "<div class='clickableText' onclick='closeModal();'>OK</div>";
 		}
 
-		showModal("Join Private Game?", message, true);
+		if (!iAmPlayerInCurrentOnlineGame()) {
+			showModal("Join Private Game?", message, true);
+		}
 	} else {
 		var message = "To join this game hosted by " + hostUserName + ", please sign in and then refresh this page.";
 		message += "<br /><br />";
@@ -2031,7 +2036,7 @@ function getGameControllerForGameType(gameTypeId) {
 		  updateFooter();
 
 		  /* Ask to join invite link game if present */
-		  if (QueryString.joinPrivateGame) {
+		  if (QueryString.joinPrivateGame && gameId && gameId.toString() === QueryString.joinPrivateGame) {
 			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
 		  }
 	  }
