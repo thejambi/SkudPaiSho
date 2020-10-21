@@ -29,11 +29,11 @@ PlaygroundGameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-PlaygroundGameManager.prototype.actuate = function () {
+PlaygroundGameManager.prototype.actuate = function (moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, this.actuateOptions);
+	this.actuator.actuate(this.board, this.tileManager, this.actuateOptions, moveToAnimate);
 };
 
 PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -67,7 +67,7 @@ PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	if (withActuate) {
-		this.actuate();
+		this.actuate(move);
 	}
 };
 
