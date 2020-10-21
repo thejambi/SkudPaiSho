@@ -2419,7 +2419,7 @@ function getGameControllerForGameType(gameTypeId) {
 			if (
 				gameDevOn 
 				|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
-				|| getGameTypeEntryFromId(gameSeek.gameTypeId).includes(getUsername)
+				|| getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess.includes(getUsername())
 			) {
 				
   
