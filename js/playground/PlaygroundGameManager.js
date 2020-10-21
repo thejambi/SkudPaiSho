@@ -47,7 +47,10 @@ PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 	} else if (move.moveType === DEPLOY) {
 		// Just placing tile on board
 		var tile = this.tileManager.grabTile(move.tileOwner, move.tileType, move.sourcePileName);
-		this.board.placeTile(tile, move.endPoint);
+		var capturedTile = this.board.placeTile(tile, move.endPoint);
+		if (capturedTile) {
+			this.tileManager.pilesByName[PlaygroundNotationContstants.capturedPile].push(capturedTile);
+		}
 	} else if (move.moveType === MOVE) {
 		var capturedTile = this.board.moveTile(move.startPoint, move.endPoint);
 		if (capturedTile) {
