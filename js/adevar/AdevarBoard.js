@@ -575,7 +575,8 @@ AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movem
 };
 
 AdevarBoard.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, targetPoint) {
-	return tile.canCapture(targetPoint.tile);
+	return tile.canCapture(targetPoint.tile)
+		|| targetPoint.tile.type === AdevarTileType.hiddenTile;	// TODO hidden tile capturing work in progress
 };
 
 AdevarBoard.prototype.tileCanMoveThroughPoint = function(tile, movementInfo, targetPoint, fromPoint) {

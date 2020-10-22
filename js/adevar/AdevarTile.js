@@ -30,7 +30,7 @@ var AdevarTileCode = {
 	echinaceaSF: "EchinaceaSecondFace",
 	whiteRose: "WhiteRose",
 	whiteRoseSF: "WhiteRoseSecondFace"
-}
+};
 
 function AdevarTile(code, ownerCode) {
 	this.code = code;
@@ -125,10 +125,21 @@ AdevarTile.prototype.canCapture = function(targetTile) {
 		} else if (this.code === AdevarTileCode.foxglove
 				&& targetTile.type === AdevarTileType.reflection) {
 			return true;
+		} else if (this.type === AdevarTileType.reflection
+				&& targetTile.type === AdevarTileType.secondFace) {
+			return true;
+		} else if (this.type === AdevarTileType.secondFace
+				&& targetTile.type === AdevarTileType.hiddenTile
+				&& AdevarTile.hiddenTileMatchesSecondFace(targetTile, this)) {
+			return true;
 		}
 	}
 
 	return false;
+};
+
+AdevarTile.hiddenTileMatchesSecondFace = function(hiddenTile, secondFaceTile) {
+	return AdevarTileCode[hiddenTile.code + "SF"] === AdevarTileCode[secondFaceTile.code];
 };
 
 AdevarTile.prototype.reveal = function() {

@@ -95,7 +95,7 @@ AdevarGameManager.prototype.actuate = function () {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager);
+	this.actuator.actuate(this.board, this.tileManager, this.capturedTiles);	// TODO - show Captured Tiles in tile section as it's good for reference
 };
 
 AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -184,6 +184,10 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 	this.checkWinForPlayer(move.player);
 
+	if (this.endGameWinners.length > 0) {
+		this.board.revealTile(AdevarTileType.hiddenTile, this.endGameWinners[0]);
+	}
+
 	if (withActuate) {
 		this.actuate();
 	}
@@ -232,6 +236,13 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 	}
 
 	switch(hiddenTile.code) {
+		case AdevarTileCode.echeveria:
+			/* Objective: Capture at least 2 of each of your opponent’s basic tile types, 
+				as well as to have at least 1 of each of your basic tile types be captured */
+			if (this.playerHasEcheveriaWin(player)) {
+				this.endGameWinners.push(player);
+			}
+			break;
 		case AdevarTileCode.birdOfParadise:
 			/* Objective: At least one Basic tile in every Plot */
 			if (this.board.playerHasBasicTileInEveryPlot(player)) {
@@ -245,6 +256,46 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 	if (this.endGameWinners.length > 0) {
 		this.gameWinReason = " has completed their objective and won the game!";
 	}
+};
+
+AdevarGameManager.prototype.playerHasEcheveriaWin = function(player) {
+	var playerHasWin = false;
+
+	var capturedFriendlyTileCounts = {};
+	var capturedEnemyTileCounts = {};
+
+	this.capturedTiles.forEach(function(capturedTile) {
+		if (capturedTile.ownerName === player) {
+			// Friendly tile
+			if (!capturedFriendlyTileCounts[capturedTile.code]) {
+				capturedFriendlyTileCounts[capturedTile.code] = 1;
+			} else {
+				capturedFriendlyTileCounts[capturedTile.code]++;
+			}
+		} else {
+			// Enemy tile
+			if (!capturedEnemyTileCounts[capturedTile.code]) {
+				capturedEnemyTileCounts[capturedTile.code] = 1;
+			} else {
+				capturedEnemyTileCounts[capturedTile.code]++;
+			}
+		}
+	});
+
+	playerHasWin = capturedFriendlyTileCounts[AdevarTileCode.lilac]
+				&& capturedFriendlyTileCounts[AdevarTileCode.lilac] >= 1
+			&& capturedFriendlyTileCounts[AdevarTileCode.zinnia]
+				&& capturedFriendlyTileCounts[AdevarTileCode.zinnia] >= 1
+			&& capturedFriendlyTileCounts[AdevarTileCode.foxglove]
+				&& capturedFriendlyTileCounts[AdevarTileCode.foxglove] >= 1
+			&& capturedEnemyTileCounts[AdevarTileCode.lilac]
+				&& capturedEnemyTileCounts[AdevarTileCode.lilac] >= 2
+			&& capturedEnemyTileCounts[AdevarTileCode.zinnia]
+				&& capturedEnemyTileCounts[AdevarTileCode.zinnia] >= 2
+			&& capturedEnemyTileCounts[AdevarTileCode.foxglove]
+				&& capturedEnemyTileCounts[AdevarTileCode.foxglove] >= 2;
+
+	return playerHasWin;
 };
 
 AdevarGameManager.prototype.getWinner = function() {
