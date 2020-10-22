@@ -1446,7 +1446,11 @@ function getGatePointMessage() {
 function sandboxitize() {
 	var notation = gameController.getNewGameNotation();
 	for (var i = 0; i < currentMoveIndex; i++) {
-		notation.addMove(gameController.gameNotation.moves[i]);
+		if (gameController.getSandboxNotationMove) {
+			notation.addMove(gameController.getSandboxNotationMove(i));
+		} else {
+			notation.addMove(gameController.gameNotation.moves[i]);
+		}
 	}
 
 	setGameController(currentGameData.gameTypeId, true);
