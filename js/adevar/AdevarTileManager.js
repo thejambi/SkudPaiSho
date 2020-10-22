@@ -8,7 +8,21 @@ function AdevarTileManager(forActuating) {
 	}
 	this.hostTiles = this.loadTileSet('H');
 	this.guestTiles = this.loadTileSet('G');
+
+	this.loadHTSFMap();
 }
+
+AdevarTileManager.htSfMap = {};
+
+AdevarTileManager.prototype.loadHTSFMap = function() {
+	AdevarTileManager.htSfMap[AdevarTileCode.iris] = AdevarTileCode.irisSF;
+	AdevarTileManager.htSfMap[AdevarTileCode.echeveria] = AdevarTileCode.echeveriaSF;
+	AdevarTileManager.htSfMap[AdevarTileCode.orientalLily] = AdevarTileCode.orientalLilySF;
+	AdevarTileManager.htSfMap[AdevarTileCode.whiteRose] = AdevarTileCode.whiteRoseSF;
+	AdevarTileManager.htSfMap[AdevarTileCode.whiteLotus] = AdevarTileCode.whiteLotusSF;
+	AdevarTileManager.htSfMap[AdevarTileCode.birdOfParadise] = AdevarTileCode.birdOfParadiseSF;
+	// etc...
+};
 
 AdevarTileManager.prototype.loadTileSet = function(ownerCode) {
 	return this.loadAdevarSet(ownerCode);

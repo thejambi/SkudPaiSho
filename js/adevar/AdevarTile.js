@@ -139,7 +139,7 @@ AdevarTile.prototype.canCapture = function(targetTile) {
 };
 
 AdevarTile.hiddenTileMatchesSecondFace = function(hiddenTile, secondFaceTile) {
-	return AdevarTileCode[hiddenTile.code + "SF"] === AdevarTileCode[secondFaceTile.code];
+	return AdevarTileManager.htSfMap[hiddenTile.code] === secondFaceTile.code;
 };
 
 AdevarTile.prototype.reveal = function() {
