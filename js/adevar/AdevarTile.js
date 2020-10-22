@@ -122,6 +122,9 @@ AdevarTile.prototype.canCapture = function(targetTile) {
 				&& targetTile.type === AdevarTileType.basic
 				&& targetTile.code !== this.code) {
 			return true;
+		} else if (this.code === AdevarTileCode.foxglove
+				&& targetTile.type === AdevarTileType.reflection) {
+			return true;
 		}
 	}
 

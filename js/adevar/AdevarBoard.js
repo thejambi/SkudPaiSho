@@ -6,7 +6,7 @@ function AdevarBoard() {
 
 	this.winners = [];
 
-	this.basicTilePlotCounts = [];
+	this.basicTilePlotCounts = {};
 }
 
 AdevarBoard.prototype.brandNewForSpaces = function () {
@@ -465,7 +465,7 @@ AdevarBoard.prototype.shouldReturnCapturedTileToHandAfterCapture = function(capt
 };
 
 AdevarBoard.prototype.applyTileCapturedTriggers = function(capturingTile, capturedTile, moveStartedPoint, moveEndedPoint) {
-	if (capturedTile && capturingTile.type === AdevarTileType.reflection) {
+	if (capturedTile && capturedTile.type === AdevarTileType.reflection) {
 		this.revealTile(AdevarTileType.hiddenTile, capturedTile.ownerName);
 	}
 };
@@ -749,7 +749,20 @@ AdevarBoard.prototype.setAllPointsAsPossible = function() {
 			boardPoint.addType(POSSIBLE_MOVE);
 		});
 	});
-}
+};
+
+AdevarBoard.prototype.playerHasBasicTileInEveryPlot = function(player) {
+	var hasEveryPlot = true;
+	var self = this;
+	Object.keys(this.basicTilePlotCounts).forEach(function(key,index) {
+		var plotCount = self.basicTilePlotCounts[key][player];
+		if (plotCount < 1) {
+			hasEveryPlot = false;
+		}
+	});
+
+	return hasEveryPlot;
+};
 
 AdevarBoard.prototype.getCopy = function() {
 	var copyBoard = new AdevarBoard();

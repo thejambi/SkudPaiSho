@@ -64,6 +64,7 @@ function AdevarGameManager(actuator, ignoreActuate, isCopy) {
 
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
+	this.capturedTiles = [];
 }
 
 // Set up the game
@@ -74,6 +75,11 @@ AdevarGameManager.prototype.setup = function (ignoreActuate) {
 	this.secondFaceTilePlayedCount = {
 		HOST: 0,
 		GUEST: 0
+	};
+
+	this.playerHiddenTiles = {
+		HOST: null,
+		GUEST: null
 	};
 
 	this.board = new AdevarBoard();
@@ -99,7 +105,8 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		// Need to do all the game setup as well as set the player's hidden tile
 		var hiddenTile = this.tileManager.grabTile(move.player, move.hiddenTileCode);
 		hiddenTile.hidden = true;
-		debug(hiddenTile);
+		
+		this.playerHiddenTiles[move.player] = hiddenTile;
 
 		this.tileManager.removeRemainingHiddenTiles(move.player);
 
@@ -141,23 +148,41 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	} else if (move.moveType === DEPLOY) {
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
 		var placeTileResults = this.board.placeTile(tile, move.endPoint);
+
+		/* Record captured tile */
+		if (placeTileResults.capturedTile) {
+			this.capturedTiles.push(placeTileResults.capturedTile);
+		}
+
+		/* Return captured tile to tile reserve if needed */
 		if (placeTileResults.capturedTile && placeTileResults.returnCapturedTileToHand) {
 			this.tileManager.putTileBack(placeTileResults.capturedTile);
 		}
+
+		/* Remove Second Face tiles if player has played their second one */
 		if (tile.type === AdevarTileType.secondFace) {
 			this.secondFaceTilePlayedCount[move.player]++;
 			if (this.secondFaceTilePlayedCount[move.player] === 2) {
 				this.tileManager.removeRemainingTilesOfType(move.player, AdevarTileType.secondFace);
-			} 
+			}
 		}
 	} else if (move.moveType === MOVE) {
 		var moveTileResults = this.board.moveTile(move.startPoint, move.endPoint);
+
+		/* Record captured tile */
+		if (moveTileResults.capturedTile) {
+			this.capturedTiles.push(moveTileResults.capturedTile);
+		}
+
+		/* Return captured tile to tile reserve if needed */
 		if (moveTileResults.capturedTile && moveTileResults.returnCapturedTileToHand) {
 			this.tileManager.putTileBack(moveTileResults.capturedTile);
 		}
 	}
 
 	this.board.countTilesInPlots();
+
+	this.checkWinForPlayer(move.player);
 
 	if (withActuate) {
 		this.actuate();
@@ -200,65 +225,26 @@ AdevarGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	}
 };
 
-AdevarGameManager.prototype.revealOpenGates = function(player, moveNum, ignoreActuate) {
-	if (moveNum === 2) {
-		// guest selecting first tile
-		this.board.setGuestGateOpen();
-	} else {
-		this.board.setOpenGatePossibleMoves(player);
-	}
-	
-	if (!ignoreActuate) {
-		this.actuate();
-	}
-};
-
-AdevarGameManager.prototype.playerCanBonusPlant = function(player) {
-	if (!newGatesRule) {
-		return true;
-	}
-
-	if (lessBonus) {
-		return this.board.playerHasNoGrowingFlowers(player);
-	} else if (limitedGatesRule) {
-		// New Gate Rules: Player cannot plant on Bonus if already controlling any Gates
-		return this.board.playerHasNoGrowingFlowers(player);
-	} else if (newGatesRule) {
-		// New Gate Rules: Player cannot plant on Bonus if already controlling two Gates
-		return this.board.playerControlsLessThanTwoGates(player);
-	}
-};
-
-AdevarGameManager.prototype.revealSpecialFlowerPlacementPoints = function(player) {
-	if (!newSpecialFlowerRules) {
-		this.revealOpenGates(player);
+AdevarGameManager.prototype.checkWinForPlayer = function(player) {
+	var hiddenTile = this.playerHiddenTiles[player];
+	if (!hiddenTile) {
 		return;
 	}
 
-	this.board.revealSpecialFlowerPlacementPoints(player);
-	this.actuate();
-};
+	switch(hiddenTile.code) {
+		case AdevarTileCode.birdOfParadise:
+			/* Objective: At least one Basic tile in every Plot */
+			if (this.board.playerHasBasicTileInEveryPlot(player)) {
+				this.endGameWinners.push(player);
+			}
+			break;
+		default:
+			debug("No Hidden Tile Objective");
+	}
 
-AdevarGameManager.prototype.revealPossiblePlacementPoints = function(tile) {
-	this.board.revealPossiblePlacementPoints(tile);
-	this.actuate();
-};
-
-AdevarGameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
-	this.board.revealBoatBonusPoints(boardPoint);
-	this.actuate();
-};
-
-AdevarGameManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
-	return this.tileManager.aPlayerIsOutOfBasicFlowerTiles();
-};
-
-AdevarGameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playerName) {
-	return this.tileManager.playerHasBothSpecialTilesRemaining(playerName);
-};
-
-AdevarGameManager.prototype.setWinnerIsFun = function() {
-	this.setWinner = true;
+	if (this.endGameWinners.length > 0) {
+		this.gameWinReason = " has completed their objective and won the game!";
+	}
 };
 
 AdevarGameManager.prototype.getWinner = function() {
@@ -274,14 +260,8 @@ AdevarGameManager.prototype.getWinner = function() {
 };
 
 AdevarGameManager.prototype.getWinReason = function() {
-	if (this.board.winners.length === 1) {
-		return " wins! The game has ended.";
-	} else if (this.endGameWinners.length === 1) {
-		if (this.tileManager.getPlayerWithMoreAccentTiles()) {
-			return " won the game with more Accent Tiles left.";
-		} else {
-			return " won the game with the most Harmonies.";
-		}
+	if (this.endGameWinners.length === 1) {
+		return this.gameWinReason;
 	}
 };
 
