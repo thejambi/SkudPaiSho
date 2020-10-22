@@ -227,6 +227,7 @@ var userTurnCountInterval;
 var gameContainerDiv = document.getElementById("game-container");
 
 var soundManager;
+var animationsOnKey = "animationsOn";
 /* --- */
   
   window.requestAnimationFrame(function () {
@@ -3704,10 +3705,25 @@ document.onkeyup = function(e) {
 	}
 };
   
-  /* Sound */
-  function toggleSoundOn() {
-	  soundManager.toggleSoundOn();
-  }
+/* Sound */
+function toggleSoundOn() {
+	soundManager.toggleSoundOn();
+}
+
+function toggleAnimationsOn() {
+	if (isAnimationsOn()) {
+		localStorage.setItem(animationsOnKey, "false");
+	} else {
+		localStorage.setItem(animationsOnKey, "true");
+	}
+	if (gameController.setAnimationsOn) {
+		gameController.setAnimationsOn(isAnimationsOn());
+	}
+}
+
+function isAnimationsOn() {
+	return localStorage.getItem(animationsOnKey) !== "false";
+}
   
   // For iOS
 window.addEventListener('touchstart', function() {

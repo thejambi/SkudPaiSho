@@ -1,7 +1,7 @@
 /* Adevar specific UI interaction logic */
 
 function AdevarController(gameContainer, isMobile) {
-	this.actuator = new AdevarActuator(gameContainer, isMobile);
+	this.actuator = new AdevarActuator(gameContainer, isMobile, isAnimationsOn());
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -302,4 +302,8 @@ AdevarController.prototype.setGameNotation = function(newGameNotation) {
 
 AdevarController.prototype.getSandboxNotationMove = function(moveIndex) {
 	return this.gameNotation.getMoveWithoutHiddenDetails(moveIndex);
+};
+
+AdevarController.prototype.setAnimationsOn = function(isAnimationsOn) {
+	this.actuator.setAnimationOn(isAnimationsOn);
 };

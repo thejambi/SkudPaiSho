@@ -91,11 +91,11 @@ AdevarGameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-AdevarGameManager.prototype.actuate = function () {
+AdevarGameManager.prototype.actuate = function (moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, this.capturedTiles);	// TODO - show Captured Tiles in tile section as it's good for reference
+	this.actuator.actuate(this.board, this.tileManager, this.capturedTiles, moveToAnimate);	// TODO - show Captured Tiles in tile section as it's good for reference
 };
 
 AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -178,6 +178,8 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		if (moveTileResults.capturedTile && moveTileResults.returnCapturedTileToHand) {
 			this.tileManager.putTileBack(moveTileResults.capturedTile);
 		}
+
+		move.moveTileResults = moveTileResults;
 	}
 
 	this.board.countTilesInPlots();
@@ -189,7 +191,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	if (withActuate) {
-		this.actuate();
+		this.actuate(move);
 	}
 };
 

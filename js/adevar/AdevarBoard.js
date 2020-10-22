@@ -452,7 +452,9 @@ AdevarBoard.prototype.moveTile = function(notationPointStart, notationPointEnd) 
 
 	return {
 		capturedTile: capturedTile,
-		returnCapturedTileToHand: returnCapturedTileToHand
+		returnCapturedTileToHand: returnCapturedTileToHand,
+		tileMoved: tile,
+		tileInEndPoint: boardPointEnd.tile
 	};
 };
 
