@@ -73,6 +73,10 @@ AdevarTileManager.prototype.grabTile = function(player, tileCode) {
 		tilePile = this.guestTiles;
 	}
 
+	if (tileCode === AdevarTileCode.blankHiddenTile) {
+		return new AdevarTile(tileCode, getPlayerCodeFromName(player));
+	}
+
 	var tile;
 	for (var i = 0; i < tilePile.length; i++) {
 		if (tilePile[i].code === tileCode) {

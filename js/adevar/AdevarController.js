@@ -299,3 +299,7 @@ AdevarController.prototype.isSolitaire = function() {
 AdevarController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 };
+
+AdevarController.prototype.getSandboxNotationMove = function(moveIndex) {
+	return this.gameNotation.getMoveWithoutHiddenDetails(moveIndex);
+};

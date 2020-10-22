@@ -9,6 +9,7 @@ var AdevarTileType = {
 };
 
 var AdevarTileCode = {
+	blankHiddenTile: "HiddenTile",
 	lilac: "Lilac",
 	zinnia: "Zinnia",
 	foxglove: "Foxglove",
