@@ -588,8 +588,27 @@ AdevarBoard.prototype.setPointAsPossibleMovement = function(targetPoint, tileBei
 
 AdevarBoard.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targetPoint, fromPoint, originPoint) {
 	var canCaptureTarget = this.targetPointHasTileThatCanBeCaptured(tile, movementInfo, fromPoint, targetPoint);
+	var targetIsNotProtectedHiddenTile = !this.targetPointHasProtectedHiddenTile(targetPoint);
 	return (!targetPoint.hasTile() || canCaptureTarget)
-		&& this.tileCanLandOnPointWithoutBreakingPlotCountLimits(tile, targetPoint, originPoint);
+		&& this.tileCanLandOnPointWithoutBreakingPlotCountLimits(tile, targetPoint, originPoint)
+		&& targetIsNotProtectedHiddenTile;
+};
+
+AdevarBoard.prototype.targetPointHasProtectedHiddenTile = function(targetPoint) {
+	return targetPoint && targetPoint.tile 
+		&& targetPoint.tile.type === AdevarTileType.hiddenTile
+		&& this.pointIsAdjacentToVanguard(targetPoint);
+};
+
+AdevarBoard.prototype.pointIsAdjacentToVanguard = function(boardPoint) {
+	var adjacentPoints = this.getDirectlyAdjacentPoints(boardPoint);
+	var vanguardFound = false;
+	adjacentPoints.forEach(function(adjacentPoint) {
+		if (adjacentPoint.hasTile() && adjacentPoint.tile.type === AdevarTileType.vanguard) {
+			vanguardFound = true;
+		}
+	});
+	return vanguardFound;
 };
 
 AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint) {
