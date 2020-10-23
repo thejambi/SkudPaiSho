@@ -129,6 +129,9 @@ AdevarTile.prototype.canCapture = function(targetTile) {
 				&& targetTile.type === AdevarTileType.secondFace) {
 			return true;
 		} else if (this.type === AdevarTileType.secondFace
+				&& targetTile.type === AdevarTileType.vanguard) {
+			return true;
+		} else if (this.type === AdevarTileType.secondFace
 				&& targetTile.type === AdevarTileType.hiddenTile
 				&& AdevarTile.hiddenTileMatchesSecondFace(targetTile, this)) {
 			return true;
