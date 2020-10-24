@@ -156,6 +156,8 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 			this.capturedTiles.push(placeTileResults.capturedTile);
 		}
 
+		move.placeTileResults = placeTileResults;
+
 		/* Return captured tile to tile reserve if needed */
 		if (placeTileResults.capturedTile && placeTileResults.returnCapturedTileToHand) {
 			this.tileManager.putTileBack(placeTileResults.capturedTile);
@@ -172,7 +174,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		var moveTileResults = this.board.moveTile(move.startPoint, move.endPoint);
 
 		/* Record captured tile */
-		if (moveTileResults.capturedTile) {
+		if (moveTileResults.capturedTile && !moveTileResults.returnCapturedTileToHand) {
 			this.capturedTiles.push(moveTileResults.capturedTile);
 		}
 
@@ -190,8 +192,13 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		if (moveTileResults.wrongSFTileAttempt) {
 			/* Regrow Opponent Vanguards */
 			var opponentName = getOpponentName(move.player);
-			var regrowPoints = this.board.regrowVanguards(opponentName, this.getCapturedVanguardTilesForPlayer(opponentName));
-			move.vanguardRegrowPoints = regrowPoints;
+			var tilesReplaced = this.board.regrowVanguards(opponentName, this.getCapturedVanguardTilesForPlayer(opponentName));
+			if (tilesReplaced.length > 0) {
+				var self = this;
+				tilesReplaced.forEach(function(tile) {
+					self.tileManager.putTileBack(tile);
+				});
+			}
 		}
 	}
 

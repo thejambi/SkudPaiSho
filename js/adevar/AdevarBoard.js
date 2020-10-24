@@ -465,7 +465,6 @@ AdevarBoard.prototype.shouldReturnCapturedTileToHandAfterCapture = function(capt
 			[capturedTile.type],
 			[
 				AdevarTileType.secondFace,
-				AdevarTileType.vanguard,
 				AdevarTileType.reflection,
 				AdevarTileType.gate
 			]
@@ -497,12 +496,31 @@ AdevarBoard.prototype.applyTileCapturedTriggers = function(capturingTile, captur
 AdevarBoard.prototype.regrowVanguards = function(player, vanguardTiles) {
 	var vanguardNotationPoints = AdevarBoardSetupPoints.vanguard[player];
 
+	var tilesReplaced = [];
+
 	var self = this;
-
 	var vanguardTileIndex = 0;
+	vanguardNotationPoints.forEach(function(vanguardNotationPoint) {
+		var vanguardPoint = self.getPointFromNotationPoint(vanguardNotationPoint);
+		var vanguardTile = vanguardTiles[vanguardTileIndex];
+		vanguardTileIndex++;
+		if (vanguardTile) {
+			if (vanguardPoint.hasTile() && vanguardPoint.tile.type !== AdevarTileType.vanguard) {
+				tilesReplaced.push(vanguardPoint.removeTile());
+			}
+			vanguardPoint.putTile(vanguardTile);
+		}
+	});
 
+	return tilesReplaced;
+};
+
+AdevarBoard.prototype.regrowVanguardsOldVersion = function(player, vanguardTiles) {
+	var vanguardNotationPoints = AdevarBoardSetupPoints.vanguard[player];
+
+	var self = this;
+	var vanguardTileIndex = 0;
 	var regrowPoints = [];
-
 	vanguardNotationPoints.forEach(function(vanguardNotationPoint) {
 		var vanguardPoint = self.getPointFromNotationPoint(vanguardNotationPoint);
 		var vanguardClearToRegrow = !vanguardPoint.hasTile();
@@ -554,7 +572,7 @@ AdevarBoard.prototype.regrowVanguards = function(player, vanguardTiles) {
 		}
 	});
 
-	return regrowPoints;
+	return regrowPoints;	// Tiles not regrown would need to be returned to captured tile pile...
 };
 
 AdevarBoard.prototype.getPointFromNotationPoint = function(notationPoint) {

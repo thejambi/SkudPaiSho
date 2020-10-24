@@ -33,11 +33,11 @@ AdevarActuator.prototype.actuate = function(board, tileManager, capturedTiles, m
 	debug(moveToAnimate);
 
 	window.requestAnimationFrame(function () {
-		self.htmlify(board, tileManager, moveToAnimate);
+		self.htmlify(board, tileManager, moveToAnimate, capturedTiles);
 	});
 };
 
-AdevarActuator.prototype.htmlify = function(board, tileManager, moveToAnimate) {
+AdevarActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, capturedTiles) {
 	this.clearContainer(this.boardContainer);
 
 	var self = this;
@@ -53,12 +53,77 @@ AdevarActuator.prototype.htmlify = function(board, tileManager, moveToAnimate) {
 	self.clearContainerWithId(AdevarActuator.hostTeamTilesDivId);
 	self.clearContainerWithId(AdevarActuator.guestTeamTilesDivId);
 
+	// Host Tile Reserve
+	var hostTileReserveContainer = document.createElement("span");
+	hostTileReserveContainer.classList.add("tileLibrary");
+	// var hostReserveLabel = document.createElement("span");
+	// hostReserveLabel.innerText = "--Host Tile Reserve--";
+	// hostTileReserveContainer.appendChild(hostReserveLabel);
+	hostTileReserveContainer.appendChild(document.createElement("br"));
+	this.hostTilesContainer.appendChild(hostTileReserveContainer);
+
+	var hostCapturedTiles = this.getTilesForPlayer(capturedTiles, HOST);
+	var guestCapturedTiles = this.getTilesForPlayer(capturedTiles, GUEST);
+
+	var showHostCapturedTiles = hostCapturedTiles.length > 0;
+	if (showHostCapturedTiles) {
+		var hostCapturedTilesContainer = document.createElement("span");
+		hostCapturedTilesContainer.classList.add("tileLibrary");
+		var capturedTileLabel = document.createElement("span");
+		capturedTileLabel.innerText = "--Captured Tiles--";
+		hostCapturedTilesContainer.appendChild(capturedTileLabel);
+		hostCapturedTilesContainer.appendChild(document.createElement("br"));
+		this.hostTilesContainer.appendChild(hostCapturedTilesContainer);
+	}
+
+	// Guest Tile Reserve
+	var guestTileReserveContainer = document.createElement("span");
+	guestTileReserveContainer.classList.add("tileLibrary");
+	// var guestReserveLabel = document.createElement("span");
+	// guestReserveLabel.innerText = "--Guest Tile Reserve--";
+	// guestTileReserveContainer.appendChild(guestReserveLabel);
+	guestTileReserveContainer.appendChild(document.createElement("br"));
+	this.guestTilesContainer.appendChild(guestTileReserveContainer);
+
+	var showGuestCapturedTiles = guestCapturedTiles.length > 0;
+	if (showGuestCapturedTiles) {
+		var guestCapturedTilesContainer = document.createElement("span");
+		guestCapturedTilesContainer.classList.add("tileLibrary");
+		var capturedTileLabel = document.createElement("span");
+		capturedTileLabel.innerText = "--Captured Tiles--";
+		guestCapturedTilesContainer.appendChild(capturedTileLabel);
+		guestCapturedTilesContainer.appendChild(document.createElement("br"));
+		this.guestTilesContainer.appendChild(guestCapturedTilesContainer);
+	}
+
 	tileManager.hostTiles.forEach(function(tile) {
-		self.addTile(tile, this.hostTilesContainer);
+		self.addTile(tile, hostTileReserveContainer);
 	});
 	tileManager.guestTiles.forEach(function(tile) {
-		self.addTile(tile, this.guestTilesContainer);
+		self.addTile(tile, guestTileReserveContainer);
 	});
+	if (showHostCapturedTiles) {
+		hostCapturedTiles.forEach(function(tile) {
+			self.addTile(tile, hostCapturedTilesContainer, true);
+		});
+	}
+	if (showGuestCapturedTiles) {
+		guestCapturedTiles.forEach(function(tile) {
+			self.addTile(tile, guestCapturedTilesContainer, true);
+		});
+	}
+};
+
+AdevarActuator.prototype.getTilesForPlayer = function(tiles, player) {
+	var playerTiles = [];
+	if (tiles && tiles.length > 0) {
+		tiles.forEach(function(tile) {
+			if (tile.ownerName === player) {
+				playerTiles.push(tile);
+			}
+		});
+	}
+	return playerTiles;
 };
 
 AdevarActuator.prototype.clearContainer = function (container) {
@@ -81,7 +146,7 @@ AdevarActuator.prototype.clearTileContainer = function (tile) {
 	}
 };
 
-AdevarActuator.prototype.addTile = function(tile, tileContainer) {
+AdevarActuator.prototype.addTile = function(tile, tileContainer, isCaptured) {
 	if (!tile) {
 		return;
 	}
@@ -104,12 +169,14 @@ AdevarActuator.prototype.addTile = function(tile, tileContainer) {
 	theDiv.setAttribute("name", tile.getNotationName());
 	theDiv.setAttribute("id", tile.id);
 
-	if (this.mobile) {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
-	} else {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-		theDiv.setAttribute("onmouseout", "clearMessage();");
+	if (!isCaptured) {
+		if (this.mobile) {
+			theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		} else {
+			theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
+			theDiv.setAttribute("onmouseover", "showTileMessage(this);");
+			theDiv.setAttribute("onmouseout", "clearMessage();");
+		}
 	}
 
 	tileContainer.appendChild(theDiv);
@@ -182,10 +249,12 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		
 		theDiv.appendChild(theImg);
 
-		if (this.animationOn && moveToAnimate && moveToAnimate.capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
-			debug("Captured " + moveToAnimate.capturedTile.code);
+		var capturedTile = this.getCapturedTileFromMoveToAnimate(moveToAnimate);
+
+		if (this.animationOn && moveToAnimate && capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
+			debug("Captured " + capturedTile.code);
 			var theImgCaptured = document.createElement("img");
-			theImgCaptured.src = srcValue + moveToAnimate.capturedTile.getImageName() + ".png";
+			theImgCaptured.src = srcValue + capturedTile.getImageName() + ".png";
 			theImgCaptured.classList.add("underneath");
 			theDiv.appendChild(theImgCaptured);
 
@@ -199,6 +268,14 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 	}
 
 	this.boardContainer.appendChild(theDiv);
+};
+
+AdevarActuator.prototype.getCapturedTileFromMoveToAnimate = function(moveToAnimate) {
+	if (moveToAnimate && moveToAnimate.placeTileResults) {
+		return moveToAnimate.placeTileResults.capturedTile;
+	} else if (moveToAnimate && moveToAnimate.moveTileResults) {
+		return moveToAnimate.moveTileResults.capturedTile;
+	}
 };
 
 AdevarActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv) {
