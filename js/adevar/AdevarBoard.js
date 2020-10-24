@@ -445,7 +445,7 @@ AdevarBoard.prototype.moveTile = function(notationPointStart, notationPointEnd) 
 
 	if (wrongSFTile) {
 		boardPointEnd.putTile(capturedTile);
-		capturedTile = tile;
+		capturedTile = null;
 	}
 
 	var returnCapturedTileToHand = this.shouldReturnCapturedTileToHandAfterCapture(tile, capturedTile);

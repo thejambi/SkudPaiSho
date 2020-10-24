@@ -105,6 +105,10 @@ AdevarController.prototype.unplayedTileClicked = function(tileDiv) {
 		return;
 	}
 
+	if (this.gameNotation.notationText === QueryString.game && !gameDevOn) {
+		return;
+	}
+
 	var divName = tileDiv.getAttribute("name");
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 	var playerCode = divName.charAt(0);
@@ -171,6 +175,10 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 	}
 
 	if (!myTurn() && !this.peekAtOpponentMoves) {
+		return;
+	}
+
+	if (this.gameNotation.notationText === QueryString.game && !gameDevOn) {
 		return;
 	}
 

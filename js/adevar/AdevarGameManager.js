@@ -190,6 +190,9 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		}
 
 		if (moveTileResults.wrongSFTileAttempt) {
+			/* Remove SF tile (move to Captured pile) */
+			this.capturedTiles.push(moveTileResults.tileMoved);
+			
 			/* Regrow Opponent Vanguards */
 			var opponentName = getOpponentName(move.player);
 			var tilesReplaced = this.board.regrowVanguards(opponentName, this.getCapturedVanguardTilesForPlayer(opponentName));
