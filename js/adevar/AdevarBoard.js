@@ -909,6 +909,15 @@ AdevarBoard.prototype.playerHasFullRedAndWhitePlots = function(player) {
 		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] === 3
 };
 
+AdevarBoard.prototype.playerHasTileOfTypeAtPoint = function(player, notationPoint, tileType) {
+	var point = notationPoint.rowAndColumn;
+	point = this.cells[point.row][point.col];
+
+	return point.hasTile() 
+		&& point.tile.ownerName === player 
+		&& point.tile.type === tileType;
+};
+
 AdevarBoard.prototype.getCopy = function() {
 	var copyBoard = new AdevarBoard();
 

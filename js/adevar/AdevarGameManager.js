@@ -55,6 +55,65 @@ var AdevarBoardSetupPoints = {
 	}
 };
 
+var AdevarOrientalLilyObjectivePoints = [
+	{
+		HOST: [
+			new NotationPoint("0,-2"),
+			new NotationPoint("-1,0"),
+			new NotationPoint("2,-1"),
+			new NotationPoint("1,1"),
+			new NotationPoint("7,-1"),
+			new NotationPoint("0,6")
+		],
+		GUEST: [
+			new NotationPoint("0,1"),
+			new NotationPoint("-1,-1"),
+			new NotationPoint("2,0"),
+			new NotationPoint("1,-2"),
+			new NotationPoint("-6,0"),
+			new NotationPoint("1,-7")
+		]
+	},
+	{
+		HOST: [
+			new NotationPoint("0,-1"),
+			new NotationPoint("5,-5"),
+			new NotationPoint("-4,4"),
+			new NotationPoint("-1,3"),
+			new NotationPoint("4,-2"),
+			new NotationPoint("5,4")
+		],
+		GUEST: [
+			new NotationPoint("1,0"),
+			new NotationPoint("5,-5"),
+			new NotationPoint("-4,4"),
+			new NotationPoint("-3,1"),
+			new NotationPoint("2,-4"),
+			new NotationPoint("-4,-5")
+		]
+	},
+	{
+		HOST: [
+			new NotationPoint("1,0"),
+			new NotationPoint("2,1"),
+			new NotationPoint("-2,3"),
+			new NotationPoint("4,-3"),
+			new NotationPoint("5,2"),
+			new NotationPoint("3,4"),
+			new NotationPoint("6,5")
+		],
+		GUEST: [
+			new NotationPoint("0,-1"),
+			new NotationPoint("-1,-2"),
+			new NotationPoint("-3,2"),
+			new NotationPoint("3,-4"),
+			new NotationPoint("-2,-5"),
+			new NotationPoint("-4,-3"),
+			new NotationPoint("-5,-6")
+		]
+	}
+];
+
 function AdevarGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
@@ -240,7 +299,9 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	if (this.endGameWinners.length > 0) {
-		this.board.revealTile(AdevarTileType.hiddenTile, this.endGameWinners[0]);
+		// this.board.revealTile(AdevarTileType.hiddenTile, this.endGameWinners[0]);
+		this.board.revealTile(AdevarTileType.hiddenTile, HOST);
+		this.board.revealTile(AdevarTileType.hiddenTile, GUEST);
 	}
 
 	if (withActuate) {
@@ -324,6 +385,10 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 			/* Objective: Have 2 tiles in each Red Plot, and 3 tiles in each White Plot */
 			hasWin = this.board.playerHasFullRedAndWhitePlots(player);
 			break;
+		case AdevarTileCode.orientalLily:
+			/* Objective: Create an Oriental Lily Garden with Basic tiles */
+			hasWin = this.playerHasOrientalLilyWin(player);
+			break;
 		case AdevarTileCode.echeveria:
 			/* Objective: Capture at least 2 of each of your opponent’s basic tile types, 
 				as well as to have at least 1 of each of your basic tile types be captured */
@@ -348,6 +413,26 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 	if (this.endGameWinners.length > 0) {
 		this.gameWinReason = " has completed their objective and won the game!";
 	}
+};
+
+AdevarGameManager.prototype.playerHasOrientalLilyWin = function(player) {
+	/* Objective: Create an Oriental Lily Garden formation with Basic tiles */
+	var hasCompletedObjective = false;
+	var self = this;
+	AdevarOrientalLilyObjectivePoints.forEach(function(objectivePointsSet) {
+		var objectivePoints = objectivePointsSet[player];
+		var hasAllObjectivePoints = objectivePoints.length > 0;
+		objectivePoints.forEach(function(notationPoint) {
+			if (!self.board.playerHasTileOfTypeAtPoint(player, notationPoint, AdevarTileType.basic)) {
+				hasAllObjectivePoints = false;
+			}
+		});
+		if (hasAllObjectivePoints) {
+			hasCompletedObjective = true;
+		}
+	});
+
+	return hasCompletedObjective;
 };
 
 AdevarGameManager.prototype.playerHasWhiteRoseWin = function(player) {
