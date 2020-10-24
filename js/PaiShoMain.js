@@ -864,6 +864,8 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
 	  while (currentMoveIndex < moveToPlayTo) {
 		  playNextMove();
 	  }
+
+	  gameController.callActuate();
   
 	  if (soundManager.prevMoveSoundsAreEnabled()) {
 		soundManager.playSound(SoundManager.sounds.tileLand);
@@ -1898,7 +1900,9 @@ var GameType = {
 		gameOptions: [],
 		usersWithAccess: [
 			'SkudPaiSho',
-			'ProfPetruescu'
+			'ProfPetruescu',
+			'Aeneas',
+			'Sambews'
 		]
 	}
 };

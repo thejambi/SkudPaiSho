@@ -70,7 +70,7 @@ AdevarActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, c
 		var hostCapturedTilesContainer = document.createElement("span");
 		hostCapturedTilesContainer.classList.add("tileLibrary");
 		var capturedTileLabel = document.createElement("span");
-		capturedTileLabel.innerText = "--Captured/Removed Tiles--";
+		capturedTileLabel.innerText = "--Captured Tiles--";
 		hostCapturedTilesContainer.appendChild(capturedTileLabel);
 		hostCapturedTilesContainer.appendChild(document.createElement("br"));
 		this.hostTilesContainer.appendChild(hostCapturedTilesContainer);
@@ -90,7 +90,7 @@ AdevarActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, c
 		var guestCapturedTilesContainer = document.createElement("span");
 		guestCapturedTilesContainer.classList.add("tileLibrary");
 		var capturedTileLabel = document.createElement("span");
-		capturedTileLabel.innerText = "--Captured/Removed Tiles--";
+		capturedTileLabel.innerText = "--Captured Tiles--";
 		guestCapturedTilesContainer.appendChild(capturedTileLabel);
 		guestCapturedTilesContainer.appendChild(document.createElement("br"));
 		this.guestTilesContainer.appendChild(guestCapturedTilesContainer);

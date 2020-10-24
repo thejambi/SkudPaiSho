@@ -479,18 +479,26 @@ AdevarBoard.prototype.shouldReturnCapturedTileToHandAfterCapture = function(capt
 AdevarBoard.prototype.applyTileCapturedTriggers = function(capturingTile, capturedTile, moveStartedPoint, moveEndedPoint) {
 	var returnFlags = {};
 
-	if (capturedTile && capturedTile.type === AdevarTileType.reflection) {
-		this.revealTile(AdevarTileType.hiddenTile, capturedTile.ownerName);
-	} else if (capturedTile && capturedTile.type === AdevarTileType.hiddenTile) {
+	if (capturedTile && capturedTile.type === AdevarTileType.hiddenTile) {
 		/* Handle if Hidden Tile cannot be captured */
 		if (!capturingTile.canCapture(capturedTile)) {
-			debug("WRONG SF TILE");
 			/* Alert Game Manager to... Remove capturing SF from the game. Regrow Vanguard tiles. */
 			returnFlags.wrongSFTile = true;
 		}
 	}
 
 	return returnFlags;
+};
+
+AdevarBoard.prototype.removeSFThatCannotCaptureHT = function(player, targetHiddenTile) {
+	var removedInfo = {};
+	this.forEachBoardPointWithTile(function(boardPoint) {
+		if (boardPoint.tile.type === AdevarTileType.secondFace && !boardPoint.tile.canCapture(targetHiddenTile)) {
+			removedInfo.pointRemovedFrom = boardPoint;
+			removedInfo.tileRemoved = boardPoint.removeTile();
+		}
+	});
+	return removedInfo;
 };
 
 AdevarBoard.prototype.regrowVanguards = function(player, vanguardTiles) {

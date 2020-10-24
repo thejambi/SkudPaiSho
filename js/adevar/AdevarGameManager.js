@@ -1,4 +1,4 @@
-// Skud Pai Sho Game Manager
+// Adevar Pai Sho Game Manager
 
 var AdevarBoardSetupPoints = {
 	hiddenTile: {
@@ -207,6 +207,12 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.secondFace) {
 			/* Regrow player's Vanguards */
 			this.regrowVanguardsForPlayer(move.player);
+		}
+
+		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.reflection) {
+			/* Reflection captured, reveal captured tile owner's HT and return player's wrong SF on the board */
+			this.board.revealTile(AdevarTileType.hiddenTile, moveTileResults.capturedTile.ownerName);
+			move.removedSFInfo = this.board.removeSFThatCannotCaptureHT(move.player, this.playerHiddenTiles[moveTileResults.capturedTile.ownerName]);
 		}
 	}
 
