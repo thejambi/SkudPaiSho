@@ -77,6 +77,11 @@ AdevarGameManager.prototype.setup = function (ignoreActuate) {
 		GUEST: 0
 	};
 
+	this.secondFaceTilesPlayed = {
+		HOST: [],
+		GUEST: []
+	}
+
 	this.playerHiddenTiles = {
 		HOST: null,
 		GUEST: null
@@ -166,8 +171,9 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		/* Remove Second Face tiles if player has played their second one */
 		if (tile.type === AdevarTileType.secondFace) {
 			this.secondFaceTilePlayedCount[move.player]++;
+			this.secondFaceTilesPlayed[move.player].push(tile);
 			if (this.secondFaceTilePlayedCount[move.player] === 2) {
-				this.tileManager.removeRemainingTilesOfType(move.player, AdevarTileType.secondFace);
+				this.tileManager.removeRemainingTilesOfType(move.player, AdevarTileType.secondFace, this.secondFaceTilesPlayed[move.player]);
 			}
 		}
 	} else if (move.moveType === MOVE) {
@@ -192,16 +198,15 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		if (moveTileResults.wrongSFTileAttempt) {
 			/* Remove SF tile (move to Captured pile) */
 			this.capturedTiles.push(moveTileResults.tileMoved);
-			
+
 			/* Regrow Opponent Vanguards */
 			var opponentName = getOpponentName(move.player);
-			var tilesReplaced = this.board.regrowVanguards(opponentName, this.getCapturedVanguardTilesForPlayer(opponentName));
-			if (tilesReplaced.length > 0) {
-				var self = this;
-				tilesReplaced.forEach(function(tile) {
-					self.tileManager.putTileBack(tile);
-				});
-			}
+			this.regrowVanguardsForPlayer(opponentName);
+		}
+
+		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.secondFace) {
+			/* Regrow player's Vanguards */
+			this.regrowVanguardsForPlayer(move.player);
 		}
 	}
 
@@ -219,6 +224,16 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 	if (withActuate) {
 		this.actuate(move);
+	}
+};
+
+AdevarGameManager.prototype.regrowVanguardsForPlayer = function(player) {
+	var tilesReplaced = this.board.regrowVanguards(player, this.getCapturedVanguardTilesForPlayer(player));
+	if (tilesReplaced.length > 0) {
+		var self = this;
+		tilesReplaced.forEach(function(tile) {
+			self.tileManager.putTileBack(tile);
+		});
 	}
 };
 

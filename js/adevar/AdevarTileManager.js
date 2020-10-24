@@ -170,13 +170,15 @@ AdevarTileManager.prototype.removeRemainingHiddenTiles = function(player) {
 	this.removeRemainingTilesOfType(player, AdevarTileType.hiddenTile);
 };
 
-AdevarTileManager.prototype.removeRemainingTilesOfType = function(player, tileType) {
+AdevarTileManager.prototype.removeRemainingTilesOfType = function(player, tileType, exceptTheseTiles) {
 	var tilePile = this.getTilePile(player);
 	if (tilePile) {
 		for (var i = tilePile.length - 1; i >= 0; i--) {
 			var tile = tilePile[i];
 			if (tile.type === tileType) {
-				tilePile.splice(i, 1);
+				if (!(exceptTheseTiles && exceptTheseTiles.includes(tile))) {
+					tilePile.splice(i, 1);
+				}
 			}
 		}
 	}
