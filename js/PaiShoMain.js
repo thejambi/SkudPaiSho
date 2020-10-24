@@ -856,7 +856,7 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
   
 	  var moveToPlayTo = currentMoveIndex - 1;
   
-	  gameController.resetGameManager();
+	  gameController.resetGameManager(true);
 	  gameController.resetNotationBuilder();
   
 	  currentMoveIndex = 0;

@@ -21,8 +21,8 @@ AdevarController.prototype.getGameTypeId = function() {
 	return GameType.Adevar.id;
 };
 
-AdevarController.prototype.resetGameManager = function() {
-	this.theGame = new AdevarGameManager(this.actuator);
+AdevarController.prototype.resetGameManager = function(ignoreActuate) {
+	this.theGame = new AdevarGameManager(this.actuator, ignoreActuate);
 };
 
 AdevarController.prototype.resetNotationBuilder = function() {
