@@ -454,7 +454,8 @@ AdevarBoard.prototype.moveTile = function(notationPointStart, notationPointEnd) 
 		capturedTile: capturedTile,
 		returnCapturedTileToHand: returnCapturedTileToHand,
 		tileMoved: tile,
-		tileInEndPoint: boardPointEnd.tile
+		tileInEndPoint: boardPointEnd.tile,
+		wrongSFTileAttempt: wrongSFTile
 	};
 };
 
@@ -485,12 +486,71 @@ AdevarBoard.prototype.applyTileCapturedTriggers = function(capturingTile, captur
 		/* Handle if Hidden Tile cannot be captured */
 		if (!capturingTile.canCapture(capturedTile)) {
 			debug("WRONG SF TILE");
-			/* Remove capturing SF from the game. Regrow Vanguard tiles. Alert the Game Manager. */
+			/* Alert Game Manager to... Remove capturing SF from the game. Regrow Vanguard tiles. */
 			returnFlags.wrongSFTile = true;
 		}
 	}
 
 	return returnFlags;
+};
+
+AdevarBoard.prototype.regrowVanguards = function(player, vanguardTiles) {
+	var vanguardNotationPoints = AdevarBoardSetupPoints.vanguard[player];
+
+	var self = this;
+
+	var vanguardTileIndex = 0;
+
+	var regrowPoints = [];
+
+	vanguardNotationPoints.forEach(function(vanguardNotationPoint) {
+		var vanguardPoint = self.getPointFromNotationPoint(vanguardNotationPoint);
+		if (vanguardPoint.hasTile()) {
+			if (vanguardPoint.tile.type !== AdevarTileType.vanguard) {
+				debug("Moving tile to make way for the Vanguard!");
+				/* Move tile away... */
+				var pointToMoveTo = null;
+				var leastDistanceFromCenter = 99;
+				var preferredPoint = null;
+				var center = new NotationPoint("5,-5").rowAndColumn;
+				var vanguardPointRowAndCol = new RowAndColumn(vanguardPoint.row, vanguardPoint.col);
+				if (vanguardPointRowAndCol.x < 0) {
+					center = new NotationPoint("-4,4").rowAndColumn;
+				}
+				var adjacentPoints = self.getDirectlyAdjacentPoints(vanguardPoint);
+				adjacentPoints.forEach(function(adjacentPoint) {
+					if (!adjacentPoint.hasTile()) {
+						var adjPointRowAndCol = new RowAndColumn(adjacentPoint.row, adjacentPoint.col);
+						var distanceFromCenter = Math.abs(center.row - adjacentPoint.row) + Math.abs(center.col - adjacentPoint.col);
+						if (distanceFromCenter < leastDistanceFromCenter) {
+							leastDistanceFromCenter = distanceFromCenter;
+							pointToMoveTo = adjacentPoint;
+						}
+						if (distanceFromCenter === 2 && center.x !== adjPointRowAndCol.x && center.y !== adjPointRowAndCol.y) {
+							preferredPoint = adjacentPoint;
+						}
+					}
+				});
+				if (preferredPoint) {
+					pointToMoveTo = preferredPoint;
+				}
+				pointToMoveTo.putTile(vanguardPoint.removeTile());
+			}
+		}
+		var vanguardTile = vanguardTiles[vanguardTileIndex];
+		vanguardTileIndex++;
+		if (vanguardTile) {
+			regrowPoints.push(vanguardPoint);
+			vanguardPoint.putTile(vanguardTile);
+		}
+	});
+
+	return regrowPoints;
+};
+
+AdevarBoard.prototype.getPointFromNotationPoint = function(notationPoint) {
+	var rowAndCol = notationPoint.rowAndColumn;
+	return this.cells[rowAndCol.row][rowAndCol.col];
 };
 
 AdevarBoard.prototype.revealTile = function(tileType, player) {

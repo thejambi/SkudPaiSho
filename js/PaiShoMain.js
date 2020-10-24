@@ -3608,7 +3608,6 @@ function getGameControllerForGameType(gameTypeId) {
 		  var keyName = getUserGamePrefKeyName(preferenceKey);
 		  return localStorage.getItem(keyName);
 	  }
-	  debug("whops");
   }
   function setUserGamePreference(preferenceKey, value) {
 	  if (gameController && gameController.getGameTypeId) {

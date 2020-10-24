@@ -101,6 +101,8 @@ AdevarGameManager.prototype.actuate = function (moveToAnimate) {
 AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	debug("Running Move: " + move.fullMoveText);
 
+	var hiddenTileCaptured = false;
+
 	if (move.moveType === AdevarMoveType.chooseHiddenTile) {
 		// Need to do all the game setup as well as set the player's hidden tile
 		var hiddenTile = this.tileManager.grabTile(move.player, move.hiddenTileCode);
@@ -180,11 +182,26 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		}
 
 		move.moveTileResults = moveTileResults;
+
+		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.hiddenTile) {
+			hiddenTileCaptured = true;
+		}
+
+		if (moveTileResults.wrongSFTileAttempt) {
+			/* Regrow Opponent Vanguards */
+			var opponentName = getOpponentName(move.player);
+			var regrowPoints = this.board.regrowVanguards(opponentName, this.getCapturedVanguardTilesForPlayer(opponentName));
+			move.vanguardRegrowPoints = regrowPoints;
+		}
 	}
 
 	this.board.countTilesInPlots();
 
-	this.checkWinForPlayer(move.player);
+	if (hiddenTileCaptured) {
+		this.setWinByHiddenTileCaptureForPlayer(move.player);
+	} else {
+		this.checkWinForPlayer(move.player, hiddenTileCaptured);
+	}
 
 	if (this.endGameWinners.length > 0) {
 		this.board.revealTile(AdevarTileType.hiddenTile, this.endGameWinners[0]);
@@ -193,6 +210,18 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	if (withActuate) {
 		this.actuate(move);
 	}
+};
+
+AdevarGameManager.prototype.getCapturedVanguardTilesForPlayer = function(player) {
+	var capturedVanguardTiles = [];
+	for (var i = this.capturedTiles.length - 1; i >= 0; i--) {
+		var tile = this.capturedTiles[i];
+		if (tile.type === AdevarTileType.vanguard && tile.ownerName === player) {
+			capturedVanguardTiles.push(tile);
+			this.capturedTiles.splice(i, 1);
+		}
+	}
+	return capturedVanguardTiles;
 };
 
 AdevarGameManager.prototype.revealAllPointsAsPossible = function() {
@@ -229,6 +258,11 @@ AdevarGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	if (!ignoreActuate) {
 		this.actuate();
 	}
+};
+
+AdevarGameManager.prototype.setWinByHiddenTileCaptureForPlayer = function(player) {
+	this.endGameWinners.push(player);
+	this.gameWinReason = " has captured the opponent's Hidden Tile and won the game!";
 };
 
 AdevarGameManager.prototype.checkWinForPlayer = function(player) {
