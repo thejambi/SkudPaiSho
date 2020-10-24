@@ -505,7 +505,8 @@ AdevarBoard.prototype.regrowVanguards = function(player, vanguardTiles) {
 
 	vanguardNotationPoints.forEach(function(vanguardNotationPoint) {
 		var vanguardPoint = self.getPointFromNotationPoint(vanguardNotationPoint);
-		if (vanguardPoint.hasTile()) {
+		var vanguardClearToRegrow = !vanguardPoint.hasTile();
+		if (!vanguardClearToRegrow) {
 			if (vanguardPoint.tile.type !== AdevarTileType.vanguard) {
 				debug("Moving tile to make way for the Vanguard!");
 				/* Move tile away... */
@@ -534,14 +535,22 @@ AdevarBoard.prototype.regrowVanguards = function(player, vanguardTiles) {
 				if (preferredPoint) {
 					pointToMoveTo = preferredPoint;
 				}
-				pointToMoveTo.putTile(vanguardPoint.removeTile());
+				if (pointToMoveTo) {
+					pointToMoveTo.putTile(vanguardPoint.removeTile());
+					vanguardClearToRegrow = true;
+				}
 			}
 		}
-		var vanguardTile = vanguardTiles[vanguardTileIndex];
-		vanguardTileIndex++;
-		if (vanguardTile) {
-			regrowPoints.push(vanguardPoint);
-			vanguardPoint.putTile(vanguardTile);
+
+		if (vanguardClearToRegrow) {
+			var vanguardTile = vanguardTiles[vanguardTileIndex];
+			vanguardTileIndex++;
+			if (vanguardTile) {
+				regrowPoints.push(vanguardPoint);
+				vanguardPoint.putTile(vanguardTile);
+			}
+		} else {
+			debug("Vanguard cannot regrow!");
 		}
 	});
 
@@ -678,7 +687,7 @@ AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movem
 
 AdevarBoard.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, targetPoint) {
 	return tile.canCapture(targetPoint.tile)
-		|| targetPoint.tile.type === AdevarTileType.hiddenTile;	// TODO hidden tile capturing work in progress
+		|| (tile.type === AdevarTileType.secondFace && targetPoint.tile.type === AdevarTileType.hiddenTile);	// Allow attempting to capture HT with any SFT
 };
 
 AdevarBoard.prototype.tileCanMoveThroughPoint = function(tile, movementInfo, targetPoint, fromPoint) {
