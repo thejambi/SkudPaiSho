@@ -902,6 +902,13 @@ AdevarBoard.prototype.playerHasBasicTileInEveryPlot = function(player) {
 	return hasEveryPlot;
 };
 
+AdevarBoard.prototype.playerHasFullRedAndWhitePlots = function(player) {
+	return this.basicTilePlotCounts[AdevarBoardPointType.NORTH_RED_PLOT][player] === 2
+		&& this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_RED_PLOT][player] === 2
+		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][player] === 3
+		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] === 3
+};
+
 AdevarBoard.prototype.getCopy = function() {
 	var copyBoard = new AdevarBoard();
 

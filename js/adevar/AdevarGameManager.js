@@ -303,6 +303,12 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 	}
 
 	switch(hiddenTile.code) {
+		case AdevarTileCode.iris:
+			/* Objective: Have 2 tiles in each Red Plot, and 3 tiles in each White Plot */
+			if (this.board.playerHasFullRedAndWhitePlots(player)) {
+				this.endGameWinners.push(player);
+			}
+			break;
 		case AdevarTileCode.echeveria:
 			/* Objective: Capture at least 2 of each of your opponent’s basic tile types, 
 				as well as to have at least 1 of each of your basic tile types be captured */

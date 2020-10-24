@@ -32,7 +32,7 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	var tiles = [];
 
 	/* Hidden Tiles - show first, and apply "selected" effect since one will be chosen */
-	// tiles.push(new AdevarTile(AdevarTileCode.iris, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.iris, ownerCode));
 	// tiles.push(new AdevarTile(AdevarTileCode.orientalLily, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.echeveria, ownerCode));
 	// tiles.push(new AdevarTile(AdevarTileCode.whiteRose, ownerCode));
