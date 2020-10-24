@@ -35,7 +35,7 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	tiles.push(new AdevarTile(AdevarTileCode.iris, ownerCode));
 	// tiles.push(new AdevarTile(AdevarTileCode.orientalLily, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.echeveria, ownerCode));
-	// tiles.push(new AdevarTile(AdevarTileCode.whiteRose, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.whiteRose, ownerCode));
 	// tiles.push(new AdevarTile(AdevarTileCode.whiteLotus, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.birdOfParadise, ownerCode));
 	// tiles.push(new AdevarTile(AdevarTileCode.echinacea, ownerCode));

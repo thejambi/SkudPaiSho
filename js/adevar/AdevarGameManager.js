@@ -62,9 +62,11 @@ function AdevarGameManager(actuator, ignoreActuate, isCopy) {
 
 	this.tileManager = new AdevarTileManager();
 
-	this.setup(ignoreActuate);
 	this.endGameWinners = [];
 	this.capturedTiles = [];
+	this.playersWhoHaveCapturedReflection = [];
+
+	this.setup(ignoreActuate);
 }
 
 // Set up the game
@@ -112,6 +114,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		// Need to do all the game setup as well as set the player's hidden tile
 		var hiddenTile = this.tileManager.grabTile(move.player, move.hiddenTileCode);
 		hiddenTile.hidden = true;
+		hiddenTile.selectedFromPile = false;
 		
 		this.playerHiddenTiles[move.player] = hiddenTile;
 
@@ -176,6 +179,10 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 				this.tileManager.removeRemainingTilesOfType(move.player, AdevarTileType.secondFace, this.secondFaceTilesPlayed[move.player]);
 			}
 		}
+
+		if (placeTileResults.capturedTile && placeTileResults.capturedTile.type === AdevarTileType.reflection) {
+			this.playersWhoHaveCapturedReflection.push(move.player);
+		}
 	} else if (move.moveType === MOVE) {
 		var moveTileResults = this.board.moveTile(move.startPoint, move.endPoint);
 
@@ -213,6 +220,14 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 			/* Reflection captured, reveal captured tile owner's HT and return player's wrong SF on the board */
 			this.board.revealTile(AdevarTileType.hiddenTile, moveTileResults.capturedTile.ownerName);
 			move.removedSFInfo = this.board.removeSFThatCannotCaptureHT(move.player, this.playerHiddenTiles[moveTileResults.capturedTile.ownerName]);
+		}
+
+		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.reflection) {
+			this.playersWhoHaveCapturedReflection.push(move.player);
+		}
+
+		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.hiddenTile) {
+			moveTileResults.capturedTile.reveal();
 		}
 	}
 
@@ -302,28 +317,32 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 		return;
 	}
 
+	var hasWin = false;
+
 	switch(hiddenTile.code) {
 		case AdevarTileCode.iris:
 			/* Objective: Have 2 tiles in each Red Plot, and 3 tiles in each White Plot */
-			if (this.board.playerHasFullRedAndWhitePlots(player)) {
-				this.endGameWinners.push(player);
-			}
+			hasWin = this.board.playerHasFullRedAndWhitePlots(player);
 			break;
 		case AdevarTileCode.echeveria:
 			/* Objective: Capture at least 2 of each of your opponent’s basic tile types, 
 				as well as to have at least 1 of each of your basic tile types be captured */
-			if (this.playerHasEcheveriaWin(player)) {
-				this.endGameWinners.push(player);
-			}
+			hasWin = this.playerHasEcheveriaWin(player);
+			break;
+		case AdevarTileCode.whiteRose:
+			/* Objective: Capture opponent's Reflection tile */
+			hasWin = this.playerHasWhiteRoseWin(player);
 			break;
 		case AdevarTileCode.birdOfParadise:
 			/* Objective: At least one Basic tile in every Plot */
-			if (this.board.playerHasBasicTileInEveryPlot(player)) {
-				this.endGameWinners.push(player);
-			}
+			hasWin = this.board.playerHasBasicTileInEveryPlot(player);
 			break;
 		default:
 			debug("No Hidden Tile Objective");
+	}
+
+	if (hasWin) {
+		this.endGameWinners.push(player);
 	}
 
 	if (this.endGameWinners.length > 0) {
@@ -331,7 +350,14 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 	}
 };
 
+AdevarGameManager.prototype.playerHasWhiteRoseWin = function(player) {
+	/* Objective: Capture opponent's Reflection tile */
+	return this.playersWhoHaveCapturedReflection.includes(player);
+};
+
 AdevarGameManager.prototype.playerHasEcheveriaWin = function(player) {
+	/* Objective: Capture at least 2 of each of your opponent’s basic tile types, 
+		as well as to have at least 1 of each of your basic tile types be captured */
 	var playerHasWin = false;
 
 	var capturedFriendlyTileCounts = {};

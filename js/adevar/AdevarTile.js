@@ -142,7 +142,8 @@ AdevarTile.prototype.canCapture = function(targetTile) {
 };
 
 AdevarTile.hiddenTileMatchesSecondFace = function(hiddenTile, secondFaceTile) {
-	return AdevarTileManager.htSfMap[hiddenTile.code] === secondFaceTile.code;
+	return AdevarTileManager.htSfMap[hiddenTile.code] === secondFaceTile.code
+		|| hiddenTile.code === AdevarTileCode.whiteRose;
 };
 
 AdevarTile.prototype.reveal = function() {
