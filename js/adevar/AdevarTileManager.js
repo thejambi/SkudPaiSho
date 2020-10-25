@@ -71,8 +71,7 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	tiles.push(new AdevarTile(AdevarTileCode.whiteLotusSF, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.birdOfParadiseSF, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.whiteRoseSF, ownerCode));
-	tiles.push(new AdevarTile(AdevarTileCode.echinaceaSF, ownerCode));
-
+	// tiles.push(new AdevarTile(AdevarTileCode.echinaceaSF, ownerCode));
 	
 	for (var i = 0; i < 2; i++) {
 		tiles.push(new AdevarTile(AdevarTileCode.vanguard, ownerCode));
