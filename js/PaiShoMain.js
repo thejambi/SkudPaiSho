@@ -1900,6 +1900,7 @@ var GameType = {
 		gameOptions: [],
 		usersWithAccess: [
 			'SkudPaiSho',
+			'Zach',
 			'ProfPetruescu',
 			'Aeneas',
 			'Sambews'
