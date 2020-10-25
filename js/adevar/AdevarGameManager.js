@@ -94,7 +94,6 @@ var AdevarOrientalLilyObjectivePoints = [
 	},
 	{
 		HOST: [
-			new NotationPoint("1,0"),
 			new NotationPoint("2,1"),
 			new NotationPoint("-2,3"),
 			new NotationPoint("4,-3"),
@@ -103,7 +102,6 @@ var AdevarOrientalLilyObjectivePoints = [
 			new NotationPoint("6,5")
 		],
 		GUEST: [
-			new NotationPoint("0,-1"),
 			new NotationPoint("-1,-2"),
 			new NotationPoint("-3,2"),
 			new NotationPoint("3,-4"),
