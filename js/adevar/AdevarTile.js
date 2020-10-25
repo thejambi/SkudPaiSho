@@ -29,7 +29,9 @@ var AdevarTileCode = {
 	echinacea: "Echinacea",
 	echinaceaSF: "EchinaceaSecondFace",
 	whiteRose: "WhiteRose",
-	whiteRoseSF: "WhiteRoseSecondFace"
+	whiteRoseSF: "WhiteRoseSecondFace",
+	blackOrchid: "BlackOrchid",
+	blackOrchidSF: "BlackOrchidSecondFace"
 };
 
 function AdevarTile(code, ownerCode) {
@@ -152,6 +154,13 @@ AdevarTile.prototype.reveal = function() {
 
 AdevarTile.prototype.getName = function() {
 	return AdevarTile.getTileName(this.code);
+};
+
+AdevarTile.prototype.formsHarmonyWith = function(otherTile) {
+	return otherTile 
+		&& this.type === AdevarTileType.basic && otherTile.type === AdevarTileType.basic
+		&& this.ownerName === otherTile.ownerName
+		&& this.getMoveDistance() !== otherTile.getMoveDistance();
 };
 
 AdevarTile.prototype.getCopy = function() {

@@ -398,10 +398,18 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 			/* Objective: Capture opponent's Reflection tile */
 			hasWin = this.playerHasWhiteRoseWin(player);
 			break;
+		case AdevarTileCode.whiteLotus:
+			/* Objective: Form Skud Pai Sho-esque Harmony Ring with Basic tiles (3 - 4 - 5 order for Harmony Circle) */
+			hasWin = this.playerHasWhiteLotusWin(player);
+			break;
 		case AdevarTileCode.birdOfParadise:
 			/* Objective: At least one Basic tile in every Plot */
 			hasWin = this.board.playerHasBasicTileInEveryPlot(player);
 			break;
+		// case AdevarTileCode.blackOrchid:
+		// 	/* Objective: Have more Basic Tiles in each Plot (excluding the North/South Neutral Plots where players sit) than opponent */
+		// 	hasWin = this.hasBlackOrchidWin(player);
+		// 	break;
 		default:
 			debug("No Hidden Tile Objective");
 	}
@@ -413,6 +421,15 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 	if (this.endGameWinners.length > 0) {
 		this.gameWinReason = " has completed their objective and won the game!";
 	}
+};
+
+AdevarGameManager.prototype.hasBlackOrchidWin = function(player) {
+	//
+};
+
+AdevarGameManager.prototype.playerHasWhiteLotusWin = function(player) {
+	/* Objective: Form Skud Pai Sho-esque Harmony Ring with Basic tiles (3 - 4 - 5 order for Harmony Circle) */
+	return this.board.analyzeHarmoniesForPlayer(player);
 };
 
 AdevarGameManager.prototype.playerHasOrientalLilyWin = function(player) {

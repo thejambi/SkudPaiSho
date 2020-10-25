@@ -7,6 +7,8 @@ function AdevarBoard() {
 	this.winners = [];
 
 	this.basicTilePlotCounts = {};
+
+	this.harmonyManager = new AdevarHarmonyManager();
 }
 
 AdevarBoard.prototype.brandNewForSpaces = function () {
@@ -594,6 +596,147 @@ AdevarBoard.prototype.revealTile = function(tileType, player) {
 			boardPoint.tile.reveal();
 		}
 	});
+};
+
+AdevarBoard.prototype.analyzeHarmoniesForPlayer = function(player) {
+	this.harmonyManager.clearList();
+
+	var self = this;
+	this.forEachBoardPointWithTile(function(boardPoint) {
+		if (boardPoint.tile.type === AdevarTileType.basic) {
+			// Check for harmonies!
+			var tileHarmonies = self.getTileHarmonies(boardPoint);
+			// Add harmonies
+			self.harmonyManager.addHarmonies(tileHarmonies);
+
+			boardPoint.tile.harmonyOwners = [];
+
+			for (var i = 0; i < tileHarmonies.length; i++) {
+				for (var j = 0; j < tileHarmonies[i].owners.length; j++) {
+					var harmonyOwnerName = tileHarmonies[i].owners[j].ownerName;
+					var harmonyTile1 = tileHarmonies[i].tile1;
+					var harmonyTile2 = tileHarmonies[i].tile2;
+
+					if (!harmonyTile1.harmonyOwners) {
+						harmonyTile1.harmonyOwners = [];
+					}
+					if (!harmonyTile2.harmonyOwners) {
+						harmonyTile2.harmonyOwners = [];
+					}
+
+					if (!harmonyTile1.harmonyOwners.includes(harmonyOwnerName)) {
+						harmonyTile1.harmonyOwners.push(harmonyOwnerName);
+					}
+					if (!harmonyTile2.harmonyOwners.includes(harmonyOwnerName)) {
+						harmonyTile2.harmonyOwners.push(harmonyOwnerName);
+					}
+				}
+			}
+		}
+	});
+
+	var harmonyRingOwners = this.harmonyManager.harmonyRingExists();
+	return harmonyRingOwners.includes(player);
+};
+
+AdevarBoard.prototype.getTileHarmonies = function(boardPoint) {
+	var tile = boardPoint.tile;
+	var rowAndCol = boardPoint;
+	var tileHarmonies = [];
+
+	var leftHarmony = this.getHarmonyLeft(tile, rowAndCol);
+	if (leftHarmony) {
+		tileHarmonies.push(leftHarmony);
+	}
+
+	var rightHarmony = this.getHarmonyRight(tile, rowAndCol);
+	if (rightHarmony) {
+		tileHarmonies.push(rightHarmony);
+	}
+	
+	var upHarmony = this.getHarmonyUp(tile, rowAndCol);
+	if (upHarmony) {
+		tileHarmonies.push(upHarmony);
+	}
+
+	var downHarmony = this.getHarmonyDown(tile, rowAndCol);
+	if (downHarmony) {
+		tileHarmonies.push(downHarmony);
+	}
+
+	return tileHarmonies;
+};
+
+AdevarBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
+	var colToCheck = endRowCol.col - 1;
+
+	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile()
+			&& !this.cells[endRowCol.row][colToCheck].isType(NON_PLAYABLE)) {
+		colToCheck--;
+	}
+
+	if (colToCheck >= 0) {
+		var checkPoint = this.cells[endRowCol.row][colToCheck];
+
+		if (tile.formsHarmonyWith(checkPoint.tile)) {
+			var harmony = new AdevarHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+			return harmony;
+		}
+	}
+};
+
+AdevarBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
+	var colToCheck = endRowCol.col + 1;
+
+	while (colToCheck < this.size.col && !this.cells[endRowCol.row][colToCheck].hasTile()
+			&& !this.cells[endRowCol.row][colToCheck].isType(NON_PLAYABLE)) {
+		colToCheck++;
+	}
+
+	if (colToCheck < this.size.col) {
+		var checkPoint = this.cells[endRowCol.row][colToCheck];
+
+		if (tile.formsHarmonyWith(checkPoint.tile)) {
+			var harmony = new AdevarHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+			return harmony;
+		}
+	}
+};
+
+AdevarBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
+	var rowToCheck = endRowCol.row - 1;
+
+	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile()
+			&& !this.cells[rowToCheck][endRowCol.col].isType(NON_PLAYABLE)) {
+		rowToCheck--;
+	}
+
+	if (rowToCheck >= 0) {
+		var checkPoint = this.cells[rowToCheck][endRowCol.col];
+
+		if (tile.formsHarmonyWith(checkPoint.tile)) {
+			var harmony = new AdevarHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+			return harmony;
+		}
+	}
+};
+
+AdevarBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
+	var rowToCheck = endRowCol.row + 1;
+
+	while (rowToCheck < this.size.row && !this.cells[rowToCheck][endRowCol.col].hasTile()
+			&& !this.cells[rowToCheck][endRowCol.col].isType(NON_PLAYABLE)) {
+		rowToCheck++;
+	}
+
+	if (rowToCheck < this.size.row) {
+		var checkPoint = this.cells[rowToCheck][endRowCol.col];
+
+		if (tile.formsHarmonyWith(checkPoint.tile)) {
+			var harmony = new AdevarHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+			return harmony;
+		}
+	}
 };
 
 AdevarBoard.prototype.forEachBoardPoint = function(forEachFunc) {
