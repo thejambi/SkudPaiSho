@@ -185,17 +185,25 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 	}
 
 	if (!myTurn() && !this.peekAtOpponentMoves) {
-		if (usernameEquals(boardPoint.tile.ownerName)
-				&& boardPoint.tile.type === AdevarTileType.hiddenTile) {
-			boardPoint.tile.hidden = !boardPoint.tile.hidden;
-			this.callActuate();
+		if (boardPoint.hasTile()) {
+			var userIsHost = usernameEquals(currentGameData.hostUsername);
+			var userIsGuest = usernameEquals(currentGameData.guestUsername);
+			var userIsTileOwner = userIsHost ? boardPoint.tile.ownerName === HOST : userIsGuest && boardPoint.tile.ownerName === GUEST;
+			if (userIsTileOwner
+					&& boardPoint.tile.type === AdevarTileType.hiddenTile) {
+				boardPoint.tile.hidden = !boardPoint.tile.hidden;
+				this.callActuate();
+			}
 		}
 		return;
 	}
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
-			if ((usernameEquals(boardPoint.tile.ownerName) || (!playingOnlineGame() && getCurrentPlayer() === boardPoint.tile.ownerName))
+			var userIsHost = usernameEquals(currentGameData.hostUsername);
+			var userIsGuest = usernameEquals(currentGameData.guestUsername);
+			var userIsTileOwner = userIsHost ? boardPoint.tile.ownerName === HOST : userIsGuest && boardPoint.tile.ownerName === GUEST;
+			if ((userIsTileOwner || (!playingOnlineGame() && getCurrentPlayer() === boardPoint.tile.ownerName))
 					&& boardPoint.tile.type === AdevarTileType.hiddenTile) {
 				boardPoint.tile.hidden = !boardPoint.tile.hidden;
 				this.callActuate();
@@ -255,7 +263,7 @@ AdevarController.prototype.getTileMessage = function(tileDiv) {
 	
 	var tileCode = divName.substring(1);
 
-	var heading = AdevarTile.getTileName(tileCode);
+	var heading = tile.type === AdevarTileType.hiddenTile ? "Hidden Tile" : AdevarTile.getTileName(tileCode);
 
 	message.push(tile.ownerName + "'s tile");
 
@@ -276,7 +284,7 @@ AdevarController.prototype.getPointMessage = function(htmlPoint) {
 	var message = [];
 	
 	if (boardPoint.hasTile()) {
-		heading = boardPoint.tile.getName();
+		heading = boardPoint.tile.type === AdevarTileType.hiddenTile ? "Hidden Tile" : boardPoint.tile.getName();
 	}
 
 	message.push(boardPoint.types);
