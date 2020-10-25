@@ -55,7 +55,7 @@ AdevarActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, c
 
 	// Host Tile Reserve
 	var hostTileReserveContainer = document.createElement("span");
-	hostTileReserveContainer.classList.add("tileLibrary");
+	hostTileReserveContainer.classList.add("tileLibraryNoMargin");
 	// var hostReserveLabel = document.createElement("span");
 	// hostReserveLabel.innerText = "--Host Tile Reserve--";
 	// hostTileReserveContainer.appendChild(hostReserveLabel);
@@ -78,7 +78,7 @@ AdevarActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, c
 
 	// Guest Tile Reserve
 	var guestTileReserveContainer = document.createElement("span");
-	guestTileReserveContainer.classList.add("tileLibrary");
+	guestTileReserveContainer.classList.add("tileLibraryNoMargin");
 	// var guestReserveLabel = document.createElement("span");
 	// guestReserveLabel.innerText = "--Guest Tile Reserve--";
 	// guestTileReserveContainer.appendChild(guestReserveLabel);
