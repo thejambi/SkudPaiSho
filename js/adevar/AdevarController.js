@@ -168,15 +168,6 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 	if (this.theGame.getWinner()) {
 		return;
 	}
-	
-	if (currentMoveIndex !== this.gameNotation.moves.length) {
-		debug("Can only interact if all moves are played.");
-		return;
-	}
-
-	if (!myTurn() && !this.peekAtOpponentMoves) {
-		return;
-	}
 
 	if (this.gameNotation.notationText === QueryString.game && !gameDevOn) {
 		return;
@@ -188,22 +179,42 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 	var rowCol = notationPoint.rowAndColumn;
 	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
+	if (currentMoveIndex !== this.gameNotation.moves.length) {
+		debug("Can only interact if all moves are played.");
+		return;
+	}
+
+	if (!myTurn() && !this.peekAtOpponentMoves) {
+		if (usernameEquals(boardPoint.tile.ownerName)
+				&& boardPoint.tile.type === AdevarTileType.hiddenTile) {
+			boardPoint.tile.hidden = !boardPoint.tile.hidden;
+			this.callActuate();
+		}
+		return;
+	}
+
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
-			if (boardPoint.tile.ownerName !== getCurrentPlayer() || !myTurn()) {
-				debug("That's not your tile!");
-				this.checkingOutOpponentTileOrNotMyTurn = true;
-				if (!this.peekAtOpponentMoves) {
-					return;
+			if ((usernameEquals(boardPoint.tile.ownerName) || (!playingOnlineGame() && getCurrentPlayer() === boardPoint.tile.ownerName))
+					&& boardPoint.tile.type === AdevarTileType.hiddenTile) {
+				boardPoint.tile.hidden = !boardPoint.tile.hidden;
+				this.callActuate();
+			} else {
+				if (boardPoint.tile.ownerName !== getCurrentPlayer() || !myTurn()) {
+					debug("That's not your tile!");
+					this.checkingOutOpponentTileOrNotMyTurn = true;
+					if (!this.peekAtOpponentMoves) {
+						return;
+					}
 				}
-			}
-			
-			this.notationBuilder.playingPlayer = this.getCurrentPlayer();
-			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
-			this.notationBuilder.moveType = MOVE;
-			this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
+				
+				this.notationBuilder.playingPlayer = this.getCurrentPlayer();
+				this.notationBuilder.status = WAITING_FOR_ENDPOINT;
+				this.notationBuilder.moveType = MOVE;
+				this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
-			this.theGame.revealPossibleMovePoints(boardPoint);
+				this.theGame.revealPossibleMovePoints(boardPoint);
+			}
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
