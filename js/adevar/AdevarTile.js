@@ -9,6 +9,7 @@ var AdevarTileType = {
 };
 
 var AdevarTileCode = {
+	blankHiddenTile: "HiddenTile",
 	lilac: "Lilac",
 	zinnia: "Zinnia",
 	foxglove: "Foxglove",
@@ -28,8 +29,10 @@ var AdevarTileCode = {
 	echinacea: "Echinacea",
 	echinaceaSF: "EchinaceaSecondFace",
 	whiteRose: "WhiteRose",
-	whiteRoseSF: "WhiteRoseSecondFace"
-}
+	whiteRoseSF: "WhiteRoseSecondFace",
+	blackOrchid: "BlackOrchid",
+	blackOrchidSF: "BlackOrchidSecondFace"
+};
 
 function AdevarTile(code, ownerCode) {
 	this.code = code;
@@ -121,10 +124,28 @@ AdevarTile.prototype.canCapture = function(targetTile) {
 				&& targetTile.type === AdevarTileType.basic
 				&& targetTile.code !== this.code) {
 			return true;
+		} else if (this.code === AdevarTileCode.foxglove
+				&& targetTile.type === AdevarTileType.reflection) {
+			return true;
+		} else if (this.type === AdevarTileType.reflection
+				&& targetTile.type === AdevarTileType.secondFace) {
+			return true;
+		} else if (this.type === AdevarTileType.secondFace
+				&& targetTile.type === AdevarTileType.vanguard) {
+			return true;
+		} else if (this.type === AdevarTileType.secondFace
+				&& targetTile.type === AdevarTileType.hiddenTile
+				&& AdevarTile.hiddenTileMatchesSecondFace(targetTile, this)) {
+			return true;
 		}
 	}
 
 	return false;
+};
+
+AdevarTile.hiddenTileMatchesSecondFace = function(hiddenTile, secondFaceTile) {
+	return AdevarTileManager.htSfMap[hiddenTile.code] === secondFaceTile.code
+		|| hiddenTile.code === AdevarTileCode.whiteRose;
 };
 
 AdevarTile.prototype.reveal = function() {
@@ -133,6 +154,13 @@ AdevarTile.prototype.reveal = function() {
 
 AdevarTile.prototype.getName = function() {
 	return AdevarTile.getTileName(this.code);
+};
+
+AdevarTile.prototype.formsHarmonyWith = function(otherTile) {
+	return otherTile 
+		&& this.type === AdevarTileType.basic && otherTile.type === AdevarTileType.basic
+		&& this.ownerName === otherTile.ownerName
+		&& this.getMoveDistance() !== otherTile.getMoveDistance();
 };
 
 AdevarTile.prototype.getCopy = function() {

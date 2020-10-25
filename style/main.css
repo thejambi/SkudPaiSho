@@ -605,10 +605,15 @@ figure > div {
 
 
 
-.hostTilesContainer, .guestTilesContainer, .tileLibrary {
+.hostTilesContainer, .guestTilesContainer, tileLibrary {
   display: inline-block;
   float: left;
   margin-top: 12px;
+}
+
+.tileLibraryNoMargin {
+  display: inline-block;
+  float: left;
 }
 
 .tilePileContainer div div {
@@ -1439,7 +1444,7 @@ textarea {
   height: 5.047vw;
 }
 
-
+}
 
 
 @media only screen and (max-width: 450px) {

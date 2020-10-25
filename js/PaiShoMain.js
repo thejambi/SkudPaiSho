@@ -59,7 +59,9 @@ var QueryString = function () {
 	  water: "Water-Themed Vescucci Tiles",
 	  earth: "Earth-Themed Vescucci Tiles",
 	  chujiblue: "Chu Ji Blue",
-	  chujimono: "Chu Ji Monochrome"
+	  chujimono: "Chu Ji Monochrome",
+	  azulejosmono: "Azulejos Monocromos",
+	  azulejosdemadera: "Azulejos de Madera"
   };
   
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
@@ -96,7 +98,8 @@ var paiShoBoardDesignTypeValues = {
 	vaaturaava: "Vaatu Raava by mrpandaber",
 	waterarena: "Water Arena by Yagalo",
 	eartharena: "Earth Arena by Yagalo",
-	firearena: "Fire Arena by Yagalo"
+	firearena: "Fire Arena by Yagalo",
+	ladenvar: "Ladenvăr by Sirstotes"
 };
 
 var svgBoardDesigns = [
@@ -224,6 +227,7 @@ var userTurnCountInterval;
 var gameContainerDiv = document.getElementById("game-container");
 
 var soundManager;
+var animationsOnKey = "animationsOn";
 /* --- */
   
   window.requestAnimationFrame(function () {
@@ -525,7 +529,7 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
   };
   
   function usernameEquals(otherUsername) {
-	  return getUsername() && otherUsername.toLowerCase() === getUsername().toLowerCase();
+	  return otherUsername && getUsername() && otherUsername.toLowerCase() === getUsername().toLowerCase();
   }
   
   function setResponseText(text) {
@@ -852,7 +856,7 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
   
 	  var moveToPlayTo = currentMoveIndex - 1;
   
-	  gameController.resetGameManager();
+	  gameController.resetGameManager(true);
 	  gameController.resetNotationBuilder();
   
 	  currentMoveIndex = 0;
@@ -860,6 +864,8 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
 	  while (currentMoveIndex < moveToPlayTo) {
 		  playNextMove();
 	  }
+
+	  gameController.callActuate();
   
 	  if (soundManager.prevMoveSoundsAreEnabled()) {
 		soundManager.playSound(SoundManager.sounds.tileLand);
@@ -1443,7 +1449,11 @@ function getGatePointMessage() {
 function sandboxitize() {
 	var notation = gameController.getNewGameNotation();
 	for (var i = 0; i < currentMoveIndex; i++) {
-		notation.addMove(gameController.gameNotation.moves[i]);
+		if (gameController.getSandboxNotationMove) {
+			notation.addMove(gameController.getSandboxNotationMove(i));
+		} else {
+			notation.addMove(gameController.gameNotation.moves[i]);
+		}
 	}
 
 	setGameController(currentGameData.gameTypeId, true);
@@ -1890,7 +1900,10 @@ var GameType = {
 		gameOptions: [],
 		usersWithAccess: [
 			'SkudPaiSho',
-			'ProfPetruescu'
+			'Zach',
+			'ProfPetruescu',
+			'Aeneas',
+			'Sambews'
 		]
 	}
 };
@@ -2033,7 +2046,7 @@ function getGameControllerForGameType(gameTypeId) {
 		  updateFooter();
 
 		  /* Ask to join invite link game if present */
-		  if (QueryString.joinPrivateGame && gameId === QueryString.joinPrivateGame) {
+		  if (QueryString.joinPrivateGame && gameId && gameId.toString() === QueryString.joinPrivateGame) {
 			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
 		  }
 	  }
@@ -2416,7 +2429,7 @@ function getGameControllerForGameType(gameTypeId) {
 			if (
 				gameDevOn 
 				|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
-				|| getGameTypeEntryFromId(gameSeek.gameTypeId).includes(getUsername)
+				|| getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess.includes(getUsername())
 			) {
 				
   
@@ -3600,7 +3613,6 @@ function getGameControllerForGameType(gameTypeId) {
 		  var keyName = getUserGamePrefKeyName(preferenceKey);
 		  return localStorage.getItem(keyName);
 	  }
-	  debug("whops");
   }
   function setUserGamePreference(preferenceKey, value) {
 	  if (gameController && gameController.getGameTypeId) {
@@ -3697,10 +3709,25 @@ document.onkeyup = function(e) {
 	}
 };
   
-  /* Sound */
-  function toggleSoundOn() {
-	  soundManager.toggleSoundOn();
-  }
+/* Sound */
+function toggleSoundOn() {
+	soundManager.toggleSoundOn();
+}
+
+function toggleAnimationsOn() {
+	if (isAnimationsOn()) {
+		localStorage.setItem(animationsOnKey, "false");
+	} else {
+		localStorage.setItem(animationsOnKey, "true");
+	}
+	if (gameController.setAnimationsOn) {
+		gameController.setAnimationsOn(isAnimationsOn());
+	}
+}
+
+function isAnimationsOn() {
+	return localStorage.getItem(animationsOnKey) !== "false";
+}
   
   // For iOS
 window.addEventListener('touchstart', function() {

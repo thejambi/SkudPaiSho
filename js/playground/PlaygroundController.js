@@ -1,7 +1,7 @@
 /* Playground specific UI interaction logic */
 
 function PlaygroundController(gameContainer, isMobile) {
-	this.actuator = new PlaygroundActuator(gameContainer, isMobile);
+	this.actuator = new PlaygroundActuator(gameContainer, isMobile, this.isAnimationsEnabled());
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -19,6 +19,8 @@ function PlaygroundController(gameContainer, isMobile) {
 
 	new AdevarOptions(); // Just to initialize tiles to show up
 }
+
+PlaygroundController.animationsEnabledKey = "AnimationsEnabled";
 
 PlaygroundController.prototype.getGameTypeId = function() {
 	return GameType.Playground.id;
@@ -126,6 +128,9 @@ PlaygroundController.prototype.getAdditionalHelpTabDiv = function() {
 	settingsDiv.appendChild(VagabondController.buildTileDesignDropdownDiv("Vagabond Tile Designs"));
 	settingsDiv.appendChild(document.createElement("br"));
 	settingsDiv.appendChild(AdevarOptions.buildTileDesignDropdownDiv("Adevăr Tile Designs"));
+
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(this.buildToggleAnimationsDiv());
 
 	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
@@ -395,3 +400,27 @@ PlaygroundController.prototype.getSkipToIndex = function(currentMoveIndex) {
 	}
 	return currentMoveIndex;
 };
+
+PlaygroundController.prototype.buildToggleAnimationsDiv = function() {
+	var div = document.createElement("div");
+	var onOrOff = this.isAnimationsEnabled() ? "on" : "off";
+	div.innerHTML = "Move animations are " + onOrOff + ": <span class='skipBonus' onclick='gameController.toggleAnimations();'>toggle</span>";
+	return div;
+};
+
+PlaygroundController.prototype.toggleAnimations = function() {
+	if (this.isAnimationsEnabled()) {
+		setUserGamePreference(VagabondController.animationsEnabledKey, "false");
+		this.actuator.setAnimationOn(false);
+	} else {
+		setUserGamePreference(VagabondController.animationsEnabledKey, "true");
+		this.actuator.setAnimationOn(true);
+	}
+	clearMessage();
+};
+
+PlaygroundController.prototype.isAnimationsEnabled = function() {
+	/* Check !== false to default to on */
+	return getUserGamePreference(PlaygroundController.animationsEnabledKey) !== "false";
+};
+

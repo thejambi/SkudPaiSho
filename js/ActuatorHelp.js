@@ -1,4 +1,9 @@
+/* Used in Vagabond Board Rotate: */
 var sin45 = cos45 = Math.sin(Math.PI / 4);
+
+/* Used in Adevar Board Rotate */
+var sin135 = Math.sin(Math.PI / 4);
+var cos135 = -Math.sin(Math.PI / 4);
 
 function createDivWithClass(className) {
 	var div = document.createElement("div");

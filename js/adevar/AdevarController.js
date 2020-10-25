@@ -1,7 +1,7 @@
 /* Adevar specific UI interaction logic */
 
 function AdevarController(gameContainer, isMobile) {
-	this.actuator = new AdevarActuator(gameContainer, isMobile);
+	this.actuator = new AdevarActuator(gameContainer, isMobile, isAnimationsOn());
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -21,8 +21,8 @@ AdevarController.prototype.getGameTypeId = function() {
 	return GameType.Adevar.id;
 };
 
-AdevarController.prototype.resetGameManager = function() {
-	this.theGame = new AdevarGameManager(this.actuator);
+AdevarController.prototype.resetGameManager = function(ignoreActuate) {
+	this.theGame = new AdevarGameManager(this.actuator, ignoreActuate);
 };
 
 AdevarController.prototype.resetNotationBuilder = function() {
@@ -105,6 +105,10 @@ AdevarController.prototype.unplayedTileClicked = function(tileDiv) {
 		return;
 	}
 
+	if (this.gameNotation.notationText === QueryString.game && !gameDevOn) {
+		return;
+	}
+
 	var divName = tileDiv.getAttribute("name");
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 	var playerCode = divName.charAt(0);
@@ -164,13 +168,8 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 	if (this.theGame.getWinner()) {
 		return;
 	}
-	
-	if (currentMoveIndex !== this.gameNotation.moves.length) {
-		debug("Can only interact if all moves are played.");
-		return;
-	}
 
-	if (!myTurn() && !this.peekAtOpponentMoves) {
+	if (this.gameNotation.notationText === QueryString.game && !gameDevOn) {
 		return;
 	}
 
@@ -180,22 +179,50 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 	var rowCol = notationPoint.rowAndColumn;
 	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
+	if (currentMoveIndex !== this.gameNotation.moves.length) {
+		debug("Can only interact if all moves are played.");
+		return;
+	}
+
+	if (!myTurn() && !this.peekAtOpponentMoves) {
+		if (boardPoint.hasTile()) {
+			var userIsHost = usernameEquals(currentGameData.hostUsername);
+			var userIsGuest = usernameEquals(currentGameData.guestUsername);
+			var userIsTileOwner = userIsHost ? boardPoint.tile.ownerName === HOST : userIsGuest && boardPoint.tile.ownerName === GUEST;
+			if (userIsTileOwner
+					&& boardPoint.tile.type === AdevarTileType.hiddenTile) {
+				boardPoint.tile.hidden = !boardPoint.tile.hidden;
+				this.callActuate();
+			}
+		}
+		return;
+	}
+
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
-			if (boardPoint.tile.ownerName !== getCurrentPlayer() || !myTurn()) {
-				debug("That's not your tile!");
-				this.checkingOutOpponentTileOrNotMyTurn = true;
-				if (!this.peekAtOpponentMoves) {
-					return;
+			var userIsHost = usernameEquals(currentGameData.hostUsername);
+			var userIsGuest = usernameEquals(currentGameData.guestUsername);
+			var userIsTileOwner = userIsHost ? boardPoint.tile.ownerName === HOST : userIsGuest && boardPoint.tile.ownerName === GUEST;
+			if ((userIsTileOwner || (!playingOnlineGame() && getCurrentPlayer() === boardPoint.tile.ownerName))
+					&& boardPoint.tile.type === AdevarTileType.hiddenTile) {
+				boardPoint.tile.hidden = !boardPoint.tile.hidden;
+				this.callActuate();
+			} else {
+				if (boardPoint.tile.ownerName !== getCurrentPlayer() || !myTurn()) {
+					debug("That's not your tile!");
+					this.checkingOutOpponentTileOrNotMyTurn = true;
+					if (!this.peekAtOpponentMoves) {
+						return;
+					}
 				}
-			}
-			
-			this.notationBuilder.playingPlayer = this.getCurrentPlayer();
-			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
-			this.notationBuilder.moveType = MOVE;
-			this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
+				
+				this.notationBuilder.playingPlayer = this.getCurrentPlayer();
+				this.notationBuilder.status = WAITING_FOR_ENDPOINT;
+				this.notationBuilder.moveType = MOVE;
+				this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
-			this.theGame.revealPossibleMovePoints(boardPoint);
+				this.theGame.revealPossibleMovePoints(boardPoint);
+			}
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
@@ -236,7 +263,7 @@ AdevarController.prototype.getTileMessage = function(tileDiv) {
 	
 	var tileCode = divName.substring(1);
 
-	var heading = AdevarTile.getTileName(tileCode);
+	var heading = tile.type === AdevarTileType.hiddenTile ? "Hidden Tile" : AdevarTile.getTileName(tileCode);
 
 	message.push(tile.ownerName + "'s tile");
 
@@ -257,7 +284,7 @@ AdevarController.prototype.getPointMessage = function(htmlPoint) {
 	var message = [];
 	
 	if (boardPoint.hasTile()) {
-		heading = boardPoint.tile.getName();
+		heading = boardPoint.tile.type === AdevarTileType.hiddenTile ? "Hidden Tile" : boardPoint.tile.getName();
 	}
 
 	message.push(boardPoint.types);
@@ -298,4 +325,12 @@ AdevarController.prototype.isSolitaire = function() {
 
 AdevarController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
+};
+
+AdevarController.prototype.getSandboxNotationMove = function(moveIndex) {
+	return this.gameNotation.getMoveWithoutHiddenDetails(moveIndex);
+};
+
+AdevarController.prototype.setAnimationsOn = function(isAnimationsOn) {
+	this.actuator.setAnimationOn(isAnimationsOn);
 };
