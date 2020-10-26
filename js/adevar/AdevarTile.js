@@ -26,12 +26,38 @@ var AdevarTileCode = {
 	whiteLotusSF: "WhiteLotusSecondFace",
 	birdOfParadise: "BirdOfParadise",
 	birdOfParadiseSF: "BirdOfParadiseSecondFace",
-	echinacea: "Echinacea",
-	echinaceaSF: "EchinaceaSecondFace",
+	// echinacea: "Echinacea",
+	// echinaceaSF: "EchinaceaSecondFace",
 	whiteRose: "WhiteRose",
 	whiteRoseSF: "WhiteRoseSecondFace",
 	blackOrchid: "BlackOrchid",
 	blackOrchidSF: "BlackOrchidSecondFace"
+};
+
+var AdevarTileNames = {
+	blankHiddenTile: "Hidden Tile",
+	lilac: "Lilac",
+	zinnia: "Zinnia",
+	foxglove: "Foxglove",
+	gate: "Gate",
+	vanguard: "Vanguard",
+	reflection: "Water's Reflection",
+	iris: "Iris",
+	irisSF: "Iris Second Face",
+	orientalLily: "Oriental Lily",
+	orientalLilySF: "Oriental Lily Second Face",
+	echeveria: "Echeveria",
+	echeveriaSF: "Echeveria Second Face",
+	whiteLotus: "White Lotus",
+	whiteLotusSF: "White Lotus Second Face",
+	birdOfParadise: "Bird Of Paradise",
+	birdOfParadiseSF: "Bird Of Paradise Second Face",
+	// echinacea: "Echinacea",
+	// echinaceaSF: "Echinacea Second Face",
+	whiteRose: "White Rose",
+	whiteRoseSF: "White Rose Second Face",
+	blackOrchid: "Black Orchid",
+	blackOrchidSF: "Black Orchid Second Face"
 };
 
 function AdevarTile(code, ownerCode) {
@@ -167,7 +193,16 @@ AdevarTile.prototype.getCopy = function() {
 	return new AdevarTile(this.code, this.ownerCode);
 };
 
+AdevarTile.getTileCodeKey = function(tileCode) {
+	var tileCodeKey = null;
+	Object.keys(AdevarTileCode).forEach(function(key,index) {
+		if (AdevarTileCode[key] === tileCode) {
+			tileCodeKey = key;
+		}
+	});
+	return tileCodeKey;
+};
 
 AdevarTile.getTileName = function(tileCode) {
-	return tileCode;
+	return AdevarTileNames[AdevarTile.getTileCodeKey(tileCode)];
 };

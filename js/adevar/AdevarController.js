@@ -64,7 +64,9 @@ AdevarController.prototype.resetMove = function() {
 };
 
 AdevarController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Adevăr Pai Sho</h4> <p>Coming soon...</p>";
+	var message = "<h4>Adevăr Pai Sho</h4> <p>Adevăr Pai Sho is a Pai Sho game created by Jonathan Petruescu. It's a game of strategy, deception, and wit as players sneakily accomplish their hidden objective and take down their opponent's Hidden Tile. Be careful when achieving your objective, because trying to win could be the very thing that makes you lose!</p>";
+	message += "<p>See the <a href='https://skudpaisho.com/site/games/adevar-pai-sho/' target='_blank'>Adevăr page</a> for rules and more about the game.</p>";
+	return message;
 };
 
 AdevarController.prototype.getAdditionalMessage = function() {
@@ -72,9 +74,9 @@ AdevarController.prototype.getAdditionalMessage = function() {
 	
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
+			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by choosing a Hidden Tile.<br />";
 		} else {
-			msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move. <br />";
+			msg += "Sign in to enable online gameplay. Or, start playing a local game by choosing a Hidden Tile.<br />";
 		}
 
 		msg += getGameOptionsMessageHtml(GameType.Adevar.gameOptions);
@@ -254,7 +256,7 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 };
 
 AdevarController.prototype.getTileMessage = function(tileDiv) {
-	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
+	var divName = tileDiv.getAttribute("name");
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 
 	var tile = new AdevarTile(null, divName.substring(1), divName.charAt(0));
