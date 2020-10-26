@@ -1804,6 +1804,19 @@ var GameType = {
 			OPTION_DOUBLE_TILES
 		]
 	},
+	Adevar: {
+		id: 12,
+		desc: "Adevăr Pai Sho",
+		rulesUrl: "",
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho',
+			'Zach',
+			'ProfPetruescu',
+			'Aeneas',
+			'Sambews'
+		]
+	},
 	CapturePaiSho: {
 		id: 3,
 		desc: "Capture Pai Sho",
@@ -1895,19 +1908,6 @@ var GameType = {
 		],
 		secretGameOptions: [
 			MORE_ATTACKERS
-		]
-	},
-	Adevar: {
-		id: 12,
-		desc: "Adevăr Pai Sho",
-		rulesUrl: "",
-		gameOptions: [],
-		usersWithAccess: [
-			'SkudPaiSho',
-			'Zach',
-			'ProfPetruescu',
-			'Aeneas',
-			'Sambews'
 		]
 	}
 };
@@ -2676,7 +2676,13 @@ function getGameControllerForGameType(gameTypeId) {
   }
   
   function closeGame() {
-	  setGameController(randomIntFromInterval(1,2));
+	  var defaultGameTypeIds = [
+		  GameType.SkudPaiSho.id,
+		  GameType.VagabondPaiSho.id
+		//   ,
+		//   GameType.Adevar.id
+	  ]
+	  setGameController(defaultGameTypeIds[randomIntFromInterval(0,defaultGameTypeIds.length-1)]);
   }
   
   function getSidenavNewGameEntryForGameType(gameType) {
