@@ -38,7 +38,7 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	tiles.push(new AdevarTile(AdevarTileCode.whiteRose, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.whiteLotus, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.birdOfParadise, ownerCode));
-	// tiles.push(new AdevarTile(AdevarTileCode.blackOrchid, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.blackOrchid, ownerCode));
 
 	// Apply "selected" effect to Hidden Tiles
 	tiles.forEach(function(tile) {
@@ -69,7 +69,7 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	tiles.push(new AdevarTile(AdevarTileCode.whiteLotusSF, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.birdOfParadiseSF, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.whiteRoseSF, ownerCode));
-	// tiles.push(new AdevarTile(AdevarTileCode.blackOrchidSF, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.blackOrchidSF, ownerCode));
 	
 	for (var i = 0; i < 2; i++) {
 		tiles.push(new AdevarTile(AdevarTileCode.vanguard, ownerCode));
