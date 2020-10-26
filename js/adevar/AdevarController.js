@@ -259,7 +259,7 @@ AdevarController.prototype.getTileMessage = function(tileDiv) {
 	var divName = tileDiv.getAttribute("name");
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 
-	var tile = new AdevarTile(null, divName.substring(1), divName.charAt(0));
+	var tile = new AdevarTile(divName.substring(1), divName.charAt(0));
 
 	var message = [];
 
