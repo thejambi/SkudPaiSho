@@ -130,6 +130,7 @@ function AdevarGameManager(actuator, ignoreActuate, isCopy) {
 AdevarGameManager.prototype.setup = function (ignoreActuate) {
 
 	this.usingTileReserves = false;
+	this.disableUndo = false;
 
 	this.secondFaceTilePlayedCount = {
 		HOST: 0,
@@ -166,6 +167,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	debug("Running Move: " + move.fullMoveText);
 
 	var hiddenTileCaptured = false;
+	this.disableUndo = false;
 
 	if (move.moveType === AdevarMoveType.chooseHiddenTile) {
 		// Need to do all the game setup as well as set the player's hidden tile
@@ -260,6 +262,8 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		}
 
 		if (moveTileResults.wrongSFTileAttempt) {
+			this.disableUndo = true;
+
 			/* Remove SF tile (move to Captured pile) */
 			this.capturedTiles.push(moveTileResults.tileMoved);
 
@@ -275,6 +279,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.reflection) {
 			/* Reflection captured, reveal captured tile owner's HT and return player's wrong SF on the board */
+			this.disableUndo = true;
 			this.board.revealTile(AdevarTileType.hiddenTile, moveTileResults.capturedTile.ownerName);
 			move.removedSFInfo = this.board.removeSFThatCannotCaptureHT(move.player, this.playerHiddenTiles[moveTileResults.capturedTile.ownerName]);
 		}
@@ -404,10 +409,10 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 			/* Objective: At least one Basic tile in every Plot */
 			hasWin = this.board.playerHasBasicTileInEveryPlot(player);
 			break;
-		// case AdevarTileCode.blackOrchid:
-		// 	/* Objective: Have more Basic Tiles in each Plot (excluding the North/South Neutral Plots where players sit) than opponent */
-		// 	hasWin = this.hasBlackOrchidWin(player);
-		// 	break;
+		case AdevarTileCode.blackOrchid:
+			/* Objective: [Beta] Call a Gate completely in opponent's starting Neutral Plot */
+			hasWin = this.hasBlackOrchidWin(player);
+			break;
 		default:
 			debug("No Hidden Tile Objective");
 	}
@@ -422,7 +427,8 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 };
 
 AdevarGameManager.prototype.hasBlackOrchidWin = function(player) {
-	//
+	/* Objective: [Beta] Call a Gate completely in opponent's starting Neutral Plot */
+	return this.board.playerHasGateInOpponentNeutralPlot(player);
 };
 
 AdevarGameManager.prototype.playerHasWhiteLotusWin = function(player) {

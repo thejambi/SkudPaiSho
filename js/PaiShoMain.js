@@ -1170,7 +1170,11 @@ function getResetMoveText() {
 	if (activeAi) {
 		return "";	// Hide "Undo" if playing against an AI
 	}
-	return "<br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
+	if (!gameController.undoMoveAllowed || gameController.undoMoveAllowed()) {
+		return "<br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
+	} else {
+		return "";
+	}
 }
   
 function showResetMoveMessage() {

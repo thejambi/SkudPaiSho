@@ -82,11 +82,17 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Advr", "Advr_Iris", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_OrientalLily", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_Echeveria", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_WhiteRose", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_WhiteLotus", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_BirdOfParadise", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_BlackOrchid", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_IrisSecondFace", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_OrientalLilySecondFace", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_EcheveriaSecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_WhiteRoseSecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_WhiteLotusSecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_BirdOfParadiseSecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_BlackOrchidSecondFace", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_Vanguard", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_WatersReflection", ownerCode));
 

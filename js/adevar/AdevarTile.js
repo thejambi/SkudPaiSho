@@ -52,7 +52,7 @@ function AdevarTile(code, ownerCode) {
 		case AdevarTileCode.orientalLily:
 		case AdevarTileCode.whiteLotus:
 		case AdevarTileCode.birdOfParadise:
-		case AdevarTileCode.echinacea:
+		case AdevarTileCode.blackOrchid:
 		case AdevarTileCode.whiteRose:
 		case AdevarTileCode.echeveria:
 			this.type = AdevarTileType.hiddenTile;
@@ -61,7 +61,7 @@ function AdevarTile(code, ownerCode) {
 		case AdevarTileCode.orientalLilySF:
 		case AdevarTileCode.whiteLotusSF:
 		case AdevarTileCode.birdOfParadiseSF:
-		case AdevarTileCode.echinaceaSF:
+		case AdevarTileCode.blackOrchidSF:
 		case AdevarTileCode.whiteRoseSF:
 		case AdevarTileCode.echeveriaSF:
 			this.type = AdevarTileType.secondFace;
