@@ -3607,23 +3607,32 @@ function getGameControllerForGameType(gameTypeId) {
 	  document.body.setAttribute("data-theme", currentTheme);
   }
   
-  /* Game Controller classes should call these for user's preferences */
-  function getUserGamePrefKeyName(preferenceKey) {
-	  return "GameType" + gameController.getGameTypeId() + preferenceKey;
-  }
-  function getUserGamePreference(preferenceKey) {
-	  if (gameController && gameController.getGameTypeId) {
-		  debug(gameController.getGameTypeId());
-		  var keyName = getUserGamePrefKeyName(preferenceKey);
-		  return localStorage.getItem(keyName);
-	  }
-  }
-  function setUserGamePreference(preferenceKey, value) {
-	  if (gameController && gameController.getGameTypeId) {
-		  var keyName = getUserGamePrefKeyName(preferenceKey);
-		  localStorage.setItem(keyName, value);
-	  }
-  }
+/* Game Controller classes should call these for user's preferences */
+function getUserGamePrefKeyName(preferenceKey) {
+	return "GameType" + gameController.getGameTypeId() + preferenceKey;
+}
+function getUserGamePreference(preferenceKey) {
+	if (gameController && gameController.getGameTypeId) {
+		debug(gameController.getGameTypeId());
+		var keyName = getUserGamePrefKeyName(preferenceKey);
+		return localStorage.getItem(keyName);
+	}
+}
+function setUserGamePreference(preferenceKey, value) {
+	if (gameController && gameController.getGameTypeId) {
+		var keyName = getUserGamePrefKeyName(preferenceKey);
+		localStorage.setItem(keyName, value);
+	}
+}
+
+function buildPreferenceDropdownDiv(labelText, dropdownId, valuesObject, preferenceKey) {
+	return buildDropdownDiv(dropdownId, labelText + ":", valuesObject,
+				getUserGamePreference(preferenceKey),
+				function() {
+					setUserGamePreference(preferenceKey, this.value);
+					gameController.callActuate();
+				});
+};
   
   function setGameLogText(text) {
 	  var newText = '';
