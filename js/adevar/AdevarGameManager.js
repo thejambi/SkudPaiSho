@@ -389,20 +389,15 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 			hasWin = this.board.playerHasFullRedAndWhitePlots(player);
 			break;
 		case AdevarTileCode.orientalLily:
-			/* Objective: Create an Oriental Lily Garden with Basic tiles */
 			hasWin = this.playerHasOrientalLilyWin(player);
 			break;
 		case AdevarTileCode.echeveria:
-			/* Objective: Capture at least 2 of each of your opponent’s basic tile types, 
-				as well as to have at least 1 of each of your basic tile types be captured */
 			hasWin = this.playerHasEcheveriaWin(player);
 			break;
 		case AdevarTileCode.whiteRose:
-			/* Objective: Capture opponent's Reflection tile */
 			hasWin = this.playerHasWhiteRoseWin(player);
 			break;
 		case AdevarTileCode.whiteLotus:
-			/* Objective: Form Skud Pai Sho-esque Harmony Ring with Basic tiles (3 - 4 - 5 order for Harmony Circle) */
 			hasWin = this.playerHasWhiteLotusWin(player);
 			break;
 		case AdevarTileCode.birdOfParadise:
@@ -410,7 +405,6 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 			hasWin = this.board.playerHasBasicTileInEveryPlot(player);
 			break;
 		case AdevarTileCode.blackOrchid:
-			/* Objective: [Beta] Call a Gate completely in opponent's starting Neutral Plot */
 			hasWin = this.hasBlackOrchidWin(player);
 			break;
 		default:
@@ -428,7 +422,10 @@ AdevarGameManager.prototype.checkWinForPlayer = function(player) {
 
 AdevarGameManager.prototype.hasBlackOrchidWin = function(player) {
 	/* Objective: [Beta] Call a Gate completely in opponent's starting Neutral Plot */
-	return this.board.playerHasGateInOpponentNeutralPlot(player);
+	// return this.board.playerHasGateInOpponentNeutralPlot(player);
+
+	/* Objective: Have more tiles in each plot (except opponent's starting Neutral Plot) than opponent */
+	return this.board.playerHasMoreBasicTilesInEachNonOwnedPlot(player);
 };
 
 AdevarGameManager.prototype.playerHasWhiteLotusWin = function(player) {

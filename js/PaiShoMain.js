@@ -1814,7 +1814,8 @@ var GameType = {
 			'Zach',
 			'ProfPetruescu',
 			'Aeneas',
-			'Sambews'
+			'Sambews',
+			'Lord_Llama'
 		]
 	},
 	CapturePaiSho: {
