@@ -454,8 +454,11 @@ AdevarGameManager.prototype.playerHasOrientalLilyWin = function(player) {
 };
 
 AdevarGameManager.prototype.playerHasWhiteRoseWin = function(player) {
-	/* Objective: Capture opponent's Reflection tile */
-	return this.playersWhoHaveCapturedReflection.includes(player);
+	/* Objective: [Old] Capture opponent's Reflection tile */
+	// return this.playersWhoHaveCapturedReflection.includes(player);
+
+	/* Objective: [Beta] Call a Gate completely in opponent's starting Neutral Plot */
+	return this.board.playerHasGateInOpponentNeutralPlot(player);
 };
 
 AdevarGameManager.prototype.playerHasEcheveriaWin = function(player) {

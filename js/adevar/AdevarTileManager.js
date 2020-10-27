@@ -15,13 +15,16 @@ function AdevarTileManager(forActuating) {
 AdevarTileManager.htSfMap = {};
 
 AdevarTileManager.prototype.loadHTSFMap = function() {
-	AdevarTileManager.htSfMap[AdevarTileCode.iris] = AdevarTileCode.irisSF;
-	AdevarTileManager.htSfMap[AdevarTileCode.echeveria] = AdevarTileCode.echeveriaSF;
-	AdevarTileManager.htSfMap[AdevarTileCode.orientalLily] = AdevarTileCode.orientalLilySF;
-	AdevarTileManager.htSfMap[AdevarTileCode.whiteRose] = AdevarTileCode.whiteRoseSF;
-	AdevarTileManager.htSfMap[AdevarTileCode.whiteLotus] = AdevarTileCode.whiteLotusSF;
-	AdevarTileManager.htSfMap[AdevarTileCode.birdOfParadise] = AdevarTileCode.birdOfParadiseSF;
-	AdevarTileManager.htSfMap[AdevarTileCode.blackOrchid] = AdevarTileCode.blackOrchidSF;
+	var theMap = {};
+	theMap[AdevarTileCode.iris] = AdevarTileCode.irisSF;
+	theMap[AdevarTileCode.echeveria] = AdevarTileCode.echeveriaSF;
+	theMap[AdevarTileCode.orientalLily] = AdevarTileCode.orientalLilySF;
+	theMap[AdevarTileCode.whiteRose] = AdevarTileCode.whiteRoseSF;
+	theMap[AdevarTileCode.whiteLotus] = AdevarTileCode.whiteLotusSF;
+	theMap[AdevarTileCode.birdOfParadise] = AdevarTileCode.birdOfParadiseSF;
+	theMap[AdevarTileCode.blackOrchid] = AdevarTileCode.blackOrchidSF;
+
+	AdevarTileManager.htSfMap = new TwoWayMap(theMap);
 };
 
 AdevarTileManager.prototype.loadTileSet = function(ownerCode) {

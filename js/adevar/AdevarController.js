@@ -267,17 +267,71 @@ AdevarController.prototype.getTileMessage = function(tileDiv) {
 	if (divName.startsWith('G')) {
 		ownerName = GUEST;
 	}
-	
-	var tileCode = divName.substring(1);
 
-	var heading = tile.type === AdevarTileType.hiddenTile ? "Hidden Tile" : AdevarTile.getTileName(tileCode);
+	var heading = this.getTileMessageHeading(tile, true);
 
-	message.push(tile.ownerName + "'s tile");
+	var tileMessages = this.getTileMessages(tile, true);
+	tileMessages.forEach(function(tileMessage) {
+		message.push(tileMessage);
+	});
 
 	return {
 		heading: heading,
 		message: message
 	}
+};
+
+AdevarController.prototype.getTileMessageHeading = function(tile, inTilePile) {
+	return tile.type === AdevarTileType.hiddenTile && tile.hidden && !inTilePile ? "Hidden Tile" : tile.getName();
+};
+
+AdevarController.prototype.getTileMessages = function(tile, inTilePile) {
+	var tileMessages = [];
+	tileMessages.push(tile.ownerName + "'s tile");
+
+	var hiddenTileForObjective = null;
+	if (tile.type === AdevarTileType.hiddenTile && inTilePile) {
+		hiddenTileForObjective = tile;
+	} else if (tile.type === AdevarTileType.secondFace) {
+		hiddenTileForObjective = new AdevarTile(AdevarTileManager.htSfMap.reverseLookup(tile.code), tile.ownerCode);
+	}
+	if (hiddenTileForObjective) {
+		tileMessages.push(this.buildHiddenTileObjectiveMessage(hiddenTileForObjective));
+	}
+
+	return tileMessages;
+};
+
+AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile) {
+	var objective = null;
+	switch(hiddenTile.code) {
+		case AdevarTileCode.iris:
+			objective = "Have 2 tiles in each Red Plot, and 3 tiles in each White Plot";
+			break;
+		case AdevarTileCode.orientalLily:
+			objective = "Create an Oriental Lily Garden formation with Basic tiles (see rules for Garden diagrams)";
+			break;
+		case AdevarTileCode.echeveria:
+			objective = "Capture at least 2 of each of your opponent’s Basic tile types, and have at least 1 of each of your Basic tile types be captured";
+			break;
+		case AdevarTileCode.whiteRose:
+			objective = "Call a Gate completely in your opponent's starting Neutral Plot";
+			break;
+		case AdevarTileCode.whiteLotus:
+			objective = "Form a \"Harmony Ring\" similar to Skud Pai Sho using Basic tiles (Lilac - Zinnia - Foxglove order for Harmony Circle)";
+			break;
+		case AdevarTileCode.birdOfParadise:
+			objective = "Have at least one total Basic tile in each of the 8 Plots on the board";
+			break;
+		case AdevarTileCode.blackOrchid:
+			objective = "Have more Basic tiles in each plot, except for the starting North and South Neutral Plots, than your opponent";
+			break;
+		default:
+			objective = "Unknown";
+			break;
+	}
+
+	return hiddenTile.getName() + "'s Objective: " + objective;
 };
 
 AdevarController.prototype.getPointMessage = function(htmlPoint) {
@@ -291,10 +345,17 @@ AdevarController.prototype.getPointMessage = function(htmlPoint) {
 	var message = [];
 	
 	if (boardPoint.hasTile()) {
-		heading = boardPoint.tile.type === AdevarTileType.hiddenTile ? "Hidden Tile" : boardPoint.tile.getName();
+		heading = this.getTileMessageHeading(boardPoint.tile);
+		var tileMessages = this.getTileMessages(boardPoint.tile);
+		tileMessages.forEach(function(tileMessage) {
+			message.push(tileMessage);
+		});
 	}
 
-	message.push(boardPoint.types);
+	message.push(
+		(boardPoint.plotTypes.length > 1 ? "Plots: " : "Plot: ")
+		+ boardPoint.plotTypes.toString().replace(",", ", ")
+	);
 
 	return {
 		heading: heading,
