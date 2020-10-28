@@ -504,14 +504,8 @@ AdevarGameManager.prototype.playerHasEcheveriaWin = function(player) {
 };
 
 AdevarGameManager.prototype.getWinner = function() {
-	if (this.board.winners.length === 1) {
-		return this.board.winners[0];
-	} else if (this.board.winners.length > 1) {
-		return "BOTH players";
-	} else if (this.endGameWinners.length === 1) {
+	if (this.endGameWinners.length === 1) {
 		return this.endGameWinners[0];
-	} else if (this.endGameWinners.length > 1) {
-		return "BOTH players";
 	}
 };
 
@@ -522,16 +516,8 @@ AdevarGameManager.prototype.getWinReason = function() {
 };
 
 AdevarGameManager.prototype.getWinResultTypeCode = function() {
-	if (this.board.winners.length === 1) {
-		return 1;	// Harmony Ring is 1
-	} else if (this.endGameWinners.length === 1) {
-		if (this.tileManager.getPlayerWithMoreAccentTiles()) {
-			return 2;	// More Accent Tiles remaining
-		} else {
-			return 3;	// Most Harmonies
-		}
-	} else if (this.endGameWinners.length > 1) {
-		return 4;	// Tie
+	if (this.endGameWinners.length === 1) {
+		return 1;
 	}
 };
 
