@@ -170,8 +170,7 @@ AdevarTile.prototype.canCapture = function(targetTile) {
 };
 
 AdevarTile.hiddenTileMatchesSecondFace = function(hiddenTile, secondFaceTile) {
-	return AdevarTileManager.htSfMap.lookup(hiddenTile.code) === secondFaceTile.code
-		|| hiddenTile.code === AdevarTileCode.whiteRose;
+	return AdevarTileManager.htSfMap.lookup(hiddenTile.code) === secondFaceTile.code;
 };
 
 AdevarTile.prototype.reveal = function() {
