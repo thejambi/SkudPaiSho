@@ -611,6 +611,11 @@ figure > div {
   margin-top: 12px;
 }
 
+.tileLibraryNoMargin {
+  display: inline-block;
+  float: left;
+}
+
 .tilePileContainer div div {
   display: inline;
   float: left;
@@ -1439,7 +1444,7 @@ textarea {
   height: 5.047vw;
 }
 
-
+}
 
 
 @media only screen and (max-width: 450px) {

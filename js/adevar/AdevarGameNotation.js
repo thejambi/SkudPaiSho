@@ -51,7 +51,6 @@ AdevarNotationMove.prototype.analyzeMove = function() {
 	if (this.moveType === AdevarMoveType.chooseHiddenTile) {
 		// Like: cHT:Echeveria
 		this.hiddenTileCode = moveText.substring(moveText.indexOf(AdevarMoveType.chooseHiddenTile) + AdevarMoveType.chooseHiddenTile.length);
-		debug(this.player + " has chosen Hidden Tile: " + this.hiddenTileCode + "... Now we just need to keep it secret...");
 	} else if (this.moveType === DEPLOY) {
 		var char1 = moveText.charAt(1);
 		var char2 = moveText.charAt(2);
@@ -86,6 +85,14 @@ AdevarNotationMove.prototype.isValidNotation = function() {
 
 AdevarNotationMove.prototype.equals = function(otherMove) {
 	return this.fullMoveText === otherMove.fullMoveText;
+};
+
+AdevarNotationMove.prototype.copyWithoutHiddenDetails = function() {
+	if (this.moveType === AdevarMoveType.chooseHiddenTile) {
+		return new AdevarNotationMove(this.fullMoveText.replace(this.hiddenTileCode, AdevarTileCode.blankHiddenTile));
+	} else {
+		return this;
+	}
 };
 
 
@@ -232,9 +239,9 @@ AdevarGameNotation.prototype.notationTextForUrl = function() {
 
 AdevarGameNotation.prototype.getNotationForEmail = function() {
 	var lines = [];
-	if (this.notationText) {
+	if (this.notationText && this.notationText.includes("1H.")) {
 		if (this.notationText.includes(';')) {
-			lines = this.notationText.split(";");
+			lines = this.notationText.substring(this.notationText.indexOf("1H.")).split(";");
 		} else {
 			lines = [this.notationText];
 		}
@@ -255,6 +262,10 @@ AdevarGameNotation.prototype.getLastMoveText = function() {
 
 AdevarGameNotation.prototype.getLastMoveNumber = function() {
 	return this.moves[this.moves.length - 1].moveNum;
+};
+
+AdevarGameNotation.prototype.getMoveWithoutHiddenDetails = function(moveIndex) {
+	return this.moves[moveIndex].copyWithoutHiddenDetails();
 };
 
 

@@ -6,7 +6,9 @@ function AdevarBoard() {
 
 	this.winners = [];
 
-	this.basicTilePlotCounts = [];
+	this.basicTilePlotCounts = {};
+
+	this.harmonyManager = new AdevarHarmonyManager();
 }
 
 AdevarBoard.prototype.brandNewForSpaces = function () {
@@ -434,15 +436,28 @@ AdevarBoard.prototype.moveTile = function(notationPointStart, notationPointEnd) 
 		return false;
 	}
 
+	var wrongSFTile = false;
+
 	if (capturedTile) {
-		this.applyTileCapturedTriggers(tile, capturedTile, boardPointStart, boardPointEnd);
+		var captureTriggerFlags = this.applyTileCapturedTriggers(tile, capturedTile, boardPointStart, boardPointEnd);
+		if (captureTriggerFlags.wrongSFTile) {
+			wrongSFTile = true;
+		}
+	}
+
+	if (wrongSFTile) {
+		boardPointEnd.putTile(capturedTile);
+		capturedTile = null;
 	}
 
 	var returnCapturedTileToHand = this.shouldReturnCapturedTileToHandAfterCapture(tile, capturedTile);
 
 	return {
 		capturedTile: capturedTile,
-		returnCapturedTileToHand: returnCapturedTileToHand
+		returnCapturedTileToHand: returnCapturedTileToHand,
+		tileMoved: tile,
+		tileInEndPoint: boardPointEnd.tile,
+		wrongSFTileAttempt: wrongSFTile
 	};
 };
 
@@ -452,7 +467,6 @@ AdevarBoard.prototype.shouldReturnCapturedTileToHandAfterCapture = function(capt
 			[capturedTile.type],
 			[
 				AdevarTileType.secondFace,
-				AdevarTileType.vanguard,
 				AdevarTileType.reflection,
 				AdevarTileType.gate
 			]
@@ -465,9 +479,115 @@ AdevarBoard.prototype.shouldReturnCapturedTileToHandAfterCapture = function(capt
 };
 
 AdevarBoard.prototype.applyTileCapturedTriggers = function(capturingTile, capturedTile, moveStartedPoint, moveEndedPoint) {
-	if (capturedTile && capturingTile.type === AdevarTileType.reflection) {
-		this.revealTile(AdevarTileType.hiddenTile, capturedTile.ownerName);
+	var returnFlags = {};
+
+	if (capturedTile && capturedTile.type === AdevarTileType.hiddenTile) {
+		/* Handle if Hidden Tile cannot be captured */
+		if (!capturingTile.canCapture(capturedTile)) {
+			/* Alert Game Manager to... Remove capturing SF from the game. Regrow Vanguard tiles. */
+			returnFlags.wrongSFTile = true;
+		}
 	}
+
+	return returnFlags;
+};
+
+AdevarBoard.prototype.removeSFThatCannotCaptureHT = function(player, targetHiddenTile) {
+	var removedInfo = {};
+	this.forEachBoardPointWithTile(function(boardPoint) {
+		if (boardPoint.tile.type === AdevarTileType.secondFace && !boardPoint.tile.canCapture(targetHiddenTile)) {
+			removedInfo.pointRemovedFrom = boardPoint;
+			removedInfo.tileRemoved = boardPoint.removeTile();
+		}
+	});
+	return removedInfo;
+};
+
+AdevarBoard.prototype.regrowVanguards = function(player, vanguardTiles) {
+	var vanguardNotationPoints = AdevarBoardSetupPoints.vanguard[player];
+
+	var tilesReplaced = [];
+
+	var self = this;
+	var vanguardTileIndex = 0;
+	vanguardNotationPoints.forEach(function(vanguardNotationPoint) {
+		var vanguardPoint = self.getPointFromNotationPoint(vanguardNotationPoint);
+		var vanguardTile = vanguardTiles[vanguardTileIndex];
+		vanguardTileIndex++;
+		if (vanguardTile) {
+			if (vanguardPoint.hasTile() && vanguardPoint.tile.type !== AdevarTileType.vanguard) {
+				tilesReplaced.push(vanguardPoint.removeTile());
+			}
+			vanguardPoint.putTile(vanguardTile);
+		}
+	});
+
+	return tilesReplaced;
+};
+
+AdevarBoard.prototype.regrowVanguardsOldVersion = function(player, vanguardTiles) {
+	var vanguardNotationPoints = AdevarBoardSetupPoints.vanguard[player];
+
+	var self = this;
+	var vanguardTileIndex = 0;
+	var regrowPoints = [];
+	vanguardNotationPoints.forEach(function(vanguardNotationPoint) {
+		var vanguardPoint = self.getPointFromNotationPoint(vanguardNotationPoint);
+		var vanguardClearToRegrow = !vanguardPoint.hasTile();
+		if (!vanguardClearToRegrow) {
+			if (vanguardPoint.tile.type !== AdevarTileType.vanguard) {
+				debug("Moving tile to make way for the Vanguard!");
+				/* Move tile away... */
+				var pointToMoveTo = null;
+				var leastDistanceFromCenter = 99;
+				var preferredPoint = null;
+				var center = new NotationPoint("5,-5").rowAndColumn;
+				var vanguardPointRowAndCol = new RowAndColumn(vanguardPoint.row, vanguardPoint.col);
+				if (vanguardPointRowAndCol.x < 0) {
+					center = new NotationPoint("-4,4").rowAndColumn;
+				}
+				var adjacentPoints = self.getDirectlyAdjacentPoints(vanguardPoint);
+				adjacentPoints.forEach(function(adjacentPoint) {
+					if (!adjacentPoint.hasTile()) {
+						var adjPointRowAndCol = new RowAndColumn(adjacentPoint.row, adjacentPoint.col);
+						var distanceFromCenter = Math.abs(center.row - adjacentPoint.row) + Math.abs(center.col - adjacentPoint.col);
+						if (distanceFromCenter < leastDistanceFromCenter) {
+							leastDistanceFromCenter = distanceFromCenter;
+							pointToMoveTo = adjacentPoint;
+						}
+						if (distanceFromCenter === 2 && center.x !== adjPointRowAndCol.x && center.y !== adjPointRowAndCol.y) {
+							preferredPoint = adjacentPoint;
+						}
+					}
+				});
+				if (preferredPoint) {
+					pointToMoveTo = preferredPoint;
+				}
+				if (pointToMoveTo) {
+					pointToMoveTo.putTile(vanguardPoint.removeTile());
+					vanguardClearToRegrow = true;
+				}
+			}
+		}
+
+		if (vanguardClearToRegrow) {
+			var vanguardTile = vanguardTiles[vanguardTileIndex];
+			vanguardTileIndex++;
+			if (vanguardTile) {
+				regrowPoints.push(vanguardPoint);
+				vanguardPoint.putTile(vanguardTile);
+			}
+		} else {
+			debug("Vanguard cannot regrow!");
+		}
+	});
+
+	return regrowPoints;	// Tiles not regrown would need to be returned to captured tile pile...
+};
+
+AdevarBoard.prototype.getPointFromNotationPoint = function(notationPoint) {
+	var rowAndCol = notationPoint.rowAndColumn;
+	return this.cells[rowAndCol.row][rowAndCol.col];
 };
 
 AdevarBoard.prototype.revealTile = function(tileType, player) {
@@ -476,6 +596,159 @@ AdevarBoard.prototype.revealTile = function(tileType, player) {
 			boardPoint.tile.reveal();
 		}
 	});
+};
+
+AdevarBoard.prototype.analyzeHarmoniesForPlayer = function(player) {
+	this.harmonyManager.clearList();
+
+	var self = this;
+	this.forEachBoardPointWithTile(function(boardPoint) {
+		if (boardPoint.tile.type === AdevarTileType.basic) {
+			// Check for harmonies!
+			var tileHarmonies = self.getTileHarmonies(boardPoint);
+			// Add harmonies
+			self.harmonyManager.addHarmonies(tileHarmonies);
+
+			boardPoint.tile.harmonyOwners = [];
+
+			for (var i = 0; i < tileHarmonies.length; i++) {
+				for (var j = 0; j < tileHarmonies[i].owners.length; j++) {
+					var harmonyOwnerName = tileHarmonies[i].owners[j].ownerName;
+					var harmonyTile1 = tileHarmonies[i].tile1;
+					var harmonyTile2 = tileHarmonies[i].tile2;
+
+					if (!harmonyTile1.harmonyOwners) {
+						harmonyTile1.harmonyOwners = [];
+					}
+					if (!harmonyTile2.harmonyOwners) {
+						harmonyTile2.harmonyOwners = [];
+					}
+
+					if (!harmonyTile1.harmonyOwners.includes(harmonyOwnerName)) {
+						harmonyTile1.harmonyOwners.push(harmonyOwnerName);
+					}
+					if (!harmonyTile2.harmonyOwners.includes(harmonyOwnerName)) {
+						harmonyTile2.harmonyOwners.push(harmonyOwnerName);
+					}
+				}
+			}
+		}
+	});
+
+	var harmonyRingOwners = this.harmonyManager.harmonyRingExists();
+	return harmonyRingOwners.includes(player);
+};
+
+AdevarBoard.prototype.getTileHarmonies = function(boardPoint) {
+	var tile = boardPoint.tile;
+	var rowAndCol = boardPoint;
+	var tileHarmonies = [];
+
+	var leftHarmony = this.getHarmonyLeft(tile, rowAndCol);
+	if (leftHarmony) {
+		tileHarmonies.push(leftHarmony);
+	}
+
+	var rightHarmony = this.getHarmonyRight(tile, rowAndCol);
+	if (rightHarmony) {
+		tileHarmonies.push(rightHarmony);
+	}
+	
+	var upHarmony = this.getHarmonyUp(tile, rowAndCol);
+	if (upHarmony) {
+		tileHarmonies.push(upHarmony);
+	}
+
+	var downHarmony = this.getHarmonyDown(tile, rowAndCol);
+	if (downHarmony) {
+		tileHarmonies.push(downHarmony);
+	}
+
+	return tileHarmonies;
+};
+
+AdevarBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
+	var colToCheck = endRowCol.col - 1;
+
+	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile()
+			&& !this.cells[endRowCol.row][colToCheck].isType(NON_PLAYABLE)) {
+		colToCheck--;
+	}
+
+	if (colToCheck >= 0) {
+		var checkPoint = this.cells[endRowCol.row][colToCheck];
+
+		if (tile.formsHarmonyWith(checkPoint.tile)) {
+			var harmony = new AdevarHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+			return harmony;
+		}
+	}
+};
+
+AdevarBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
+	var colToCheck = endRowCol.col + 1;
+
+	while (colToCheck < this.size.col && !this.cells[endRowCol.row][colToCheck].hasTile()
+			&& !this.cells[endRowCol.row][colToCheck].isType(NON_PLAYABLE)) {
+		colToCheck++;
+	}
+
+	if (colToCheck < this.size.col) {
+		var checkPoint = this.cells[endRowCol.row][colToCheck];
+
+		if (tile.formsHarmonyWith(checkPoint.tile)) {
+			var harmony = new AdevarHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+			return harmony;
+		}
+	}
+};
+
+AdevarBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
+	var rowToCheck = endRowCol.row - 1;
+
+	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile()
+			&& !this.cells[rowToCheck][endRowCol.col].isType(NON_PLAYABLE)) {
+		rowToCheck--;
+	}
+
+	if (rowToCheck >= 0) {
+		var checkPoint = this.cells[rowToCheck][endRowCol.col];
+
+		if (tile.formsHarmonyWith(checkPoint.tile)) {
+			var harmony = new AdevarHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+			return harmony;
+		}
+	}
+};
+
+AdevarBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
+	var rowToCheck = endRowCol.row + 1;
+
+	while (rowToCheck < this.size.row && !this.cells[rowToCheck][endRowCol.col].hasTile()
+			&& !this.cells[rowToCheck][endRowCol.col].isType(NON_PLAYABLE)) {
+		rowToCheck++;
+	}
+
+	if (rowToCheck < this.size.row) {
+		var checkPoint = this.cells[rowToCheck][endRowCol.col];
+
+		if (tile.formsHarmonyWith(checkPoint.tile)) {
+			var harmony = new AdevarHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+			return harmony;
+		}
+	}
+};
+
+AdevarBoard.prototype.playerHasGateInOpponentNeutralPlot = function(player) {
+	var hasGateInOpponentNeutralPlot = false;
+	var targetPlot = player === HOST ? AdevarBoardPointType.NORTH_NEUTRAL_PLOT : AdevarBoardPointType.SOUTH_NEUTRAL_PLOT;
+	this.forEachBoardPointWithTile(function(boardPoint) {
+		if (boardPoint.tile.type === AdevarTileType.gate && boardPoint.tile.ownerName === player
+				&& boardPoint.isType(targetPlot) && boardPoint.plotTypes.length === 1) {
+			hasGateInOpponentNeutralPlot = true;
+		}
+	});
+	return hasGateInOpponentNeutralPlot;
 };
 
 AdevarBoard.prototype.forEachBoardPoint = function(forEachFunc) {
@@ -565,8 +838,27 @@ AdevarBoard.prototype.setPointAsPossibleMovement = function(targetPoint, tileBei
 
 AdevarBoard.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targetPoint, fromPoint, originPoint) {
 	var canCaptureTarget = this.targetPointHasTileThatCanBeCaptured(tile, movementInfo, fromPoint, targetPoint);
+	var targetIsNotProtectedHiddenTile = !this.targetPointHasProtectedHiddenTile(targetPoint);
 	return (!targetPoint.hasTile() || canCaptureTarget)
-		&& this.tileCanLandOnPointWithoutBreakingPlotCountLimits(tile, targetPoint, originPoint);
+		&& this.tileCanLandOnPointWithoutBreakingPlotCountLimits(tile, targetPoint, originPoint)
+		&& targetIsNotProtectedHiddenTile;
+};
+
+AdevarBoard.prototype.targetPointHasProtectedHiddenTile = function(targetPoint) {
+	return targetPoint && targetPoint.tile 
+		&& targetPoint.tile.type === AdevarTileType.hiddenTile
+		&& this.pointIsAdjacentToVanguard(targetPoint);
+};
+
+AdevarBoard.prototype.pointIsAdjacentToVanguard = function(boardPoint) {
+	var adjacentPoints = this.getDirectlyAdjacentPoints(boardPoint);
+	var vanguardFound = false;
+	adjacentPoints.forEach(function(adjacentPoint) {
+		if (adjacentPoint.hasTile() && adjacentPoint.tile.type === AdevarTileType.vanguard) {
+			vanguardFound = true;
+		}
+	});
+	return vanguardFound;
 };
 
 AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint) {
@@ -575,7 +867,8 @@ AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movem
 };
 
 AdevarBoard.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, targetPoint) {
-	return tile.canCapture(targetPoint.tile);
+	return tile.canCapture(targetPoint.tile)
+		|| (tile.type === AdevarTileType.secondFace && targetPoint.tile.type === AdevarTileType.hiddenTile);	// Allow attempting to capture HT with any SFT
 };
 
 AdevarBoard.prototype.tileCanMoveThroughPoint = function(tile, movementInfo, targetPoint, fromPoint) {
@@ -749,7 +1042,46 @@ AdevarBoard.prototype.setAllPointsAsPossible = function() {
 			boardPoint.addType(POSSIBLE_MOVE);
 		});
 	});
+};
+
+AdevarBoard.prototype.playerHasBasicTileInEveryPlot = function(player) {
+	var hasEveryPlot = true;
+	var self = this;
+	Object.keys(this.basicTilePlotCounts).forEach(function(key,index) {
+		var plotCount = self.basicTilePlotCounts[key][player];
+		if (plotCount < 1) {
+			hasEveryPlot = false;
+		}
+	});
+
+	return hasEveryPlot;
+};
+
+AdevarBoard.prototype.playerHasFullRedAndWhitePlots = function(player) {
+	return this.basicTilePlotCounts[AdevarBoardPointType.NORTH_RED_PLOT][player] === 2
+		&& this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_RED_PLOT][player] === 2
+		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][player] === 3
+		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] === 3
+};
+
+AdevarBoard.prototype.playerHasMoreBasicTilesInEachNonOwnedPlot = function(player) {
+	var opponent = getOpponentName(player);
+	return this.basicTilePlotCounts[AdevarBoardPointType.NORTH_RED_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.NORTH_RED_PLOT][opponent]
+		&& this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_RED_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_RED_PLOT][opponent]
+		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][opponent]
+		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][opponent]
+		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_NEUTRAL_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.EAST_NEUTRAL_PLOT][opponent]
+		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_NEUTRAL_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.WEST_NEUTRAL_PLOT][opponent];
 }
+
+AdevarBoard.prototype.playerHasTileOfTypeAtPoint = function(player, notationPoint, tileType) {
+	var point = notationPoint.rowAndColumn;
+	point = this.cells[point.row][point.col];
+
+	return point.hasTile() 
+		&& point.tile.ownerName === player 
+		&& point.tile.type === tileType;
+};
 
 AdevarBoard.prototype.getCopy = function() {
 	var copyBoard = new AdevarBoard();

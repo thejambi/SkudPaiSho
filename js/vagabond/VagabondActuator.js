@@ -221,7 +221,7 @@ VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
 		});
 	}, pieceAnimationLength);
-}
+};
 
 VagabondActuator.prototype.getTileImageSourceDir = function() {
 	return "images/Vagabond/" + localStorage.getItem(vagabondTileDesignTypeKey) + "/";

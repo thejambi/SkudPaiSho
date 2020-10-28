@@ -9,6 +9,7 @@ var AdevarTileType = {
 };
 
 var AdevarTileCode = {
+	blankHiddenTile: "HiddenTile",
 	lilac: "Lilac",
 	zinnia: "Zinnia",
 	foxglove: "Foxglove",
@@ -25,11 +26,39 @@ var AdevarTileCode = {
 	whiteLotusSF: "WhiteLotusSecondFace",
 	birdOfParadise: "BirdOfParadise",
 	birdOfParadiseSF: "BirdOfParadiseSecondFace",
-	echinacea: "Echinacea",
-	echinaceaSF: "EchinaceaSecondFace",
+	// echinacea: "Echinacea",
+	// echinaceaSF: "EchinaceaSecondFace",
 	whiteRose: "WhiteRose",
-	whiteRoseSF: "WhiteRoseSecondFace"
-}
+	whiteRoseSF: "WhiteRoseSecondFace",
+	blackOrchid: "BlackOrchid",
+	blackOrchidSF: "BlackOrchidSecondFace"
+};
+
+var AdevarTileNames = {
+	blankHiddenTile: "Hidden Tile",
+	lilac: "Lilac",
+	zinnia: "Zinnia",
+	foxglove: "Foxglove",
+	gate: "Gate",
+	vanguard: "Vanguard",
+	reflection: "Water's Reflection",
+	iris: "Iris",
+	irisSF: "Iris Second Face",
+	orientalLily: "Oriental Lily",
+	orientalLilySF: "Oriental Lily Second Face",
+	echeveria: "Echeveria",
+	echeveriaSF: "Echeveria Second Face",
+	whiteLotus: "White Lotus",
+	whiteLotusSF: "White Lotus Second Face",
+	birdOfParadise: "Bird Of Paradise",
+	birdOfParadiseSF: "Bird Of Paradise Second Face",
+	// echinacea: "Echinacea",
+	// echinaceaSF: "Echinacea Second Face",
+	whiteRose: "White Rose",
+	whiteRoseSF: "White Rose Second Face",
+	blackOrchid: "Black Orchid",
+	blackOrchidSF: "Black Orchid Second Face"
+};
 
 function AdevarTile(code, ownerCode) {
 	this.code = code;
@@ -49,7 +78,7 @@ function AdevarTile(code, ownerCode) {
 		case AdevarTileCode.orientalLily:
 		case AdevarTileCode.whiteLotus:
 		case AdevarTileCode.birdOfParadise:
-		case AdevarTileCode.echinacea:
+		case AdevarTileCode.blackOrchid:
 		case AdevarTileCode.whiteRose:
 		case AdevarTileCode.echeveria:
 			this.type = AdevarTileType.hiddenTile;
@@ -58,7 +87,7 @@ function AdevarTile(code, ownerCode) {
 		case AdevarTileCode.orientalLilySF:
 		case AdevarTileCode.whiteLotusSF:
 		case AdevarTileCode.birdOfParadiseSF:
-		case AdevarTileCode.echinaceaSF:
+		case AdevarTileCode.blackOrchidSF:
 		case AdevarTileCode.whiteRoseSF:
 		case AdevarTileCode.echeveriaSF:
 			this.type = AdevarTileType.secondFace;
@@ -148,6 +177,11 @@ AdevarTile.prototype.canCapture = function(targetTile) {
 	return false;
 };
 
+AdevarTile.hiddenTileMatchesSecondFace = function(hiddenTile, secondFaceTile) {
+	return AdevarTileManager.htSfMap.lookup(hiddenTile.code) === secondFaceTile.code
+		|| hiddenTile.code === AdevarTileCode.whiteRose;
+};
+
 AdevarTile.prototype.reveal = function() {
 	this.hidden = false;
 };
@@ -156,11 +190,27 @@ AdevarTile.prototype.getName = function() {
 	return AdevarTile.getTileName(this.code);
 };
 
+AdevarTile.prototype.formsHarmonyWith = function(otherTile) {
+	return otherTile 
+		&& this.type === AdevarTileType.basic && otherTile.type === AdevarTileType.basic
+		&& this.ownerName === otherTile.ownerName
+		&& this.getMoveDistance() !== otherTile.getMoveDistance();
+};
+
 AdevarTile.prototype.getCopy = function() {
 	return new AdevarTile(this.code, this.ownerCode);
 };
 
+AdevarTile.getTileCodeKey = function(tileCode) {
+	var tileCodeKey = null;
+	Object.keys(AdevarTileCode).forEach(function(key,index) {
+		if (AdevarTileCode[key] === tileCode) {
+			tileCodeKey = key;
+		}
+	});
+	return tileCodeKey;
+};
 
 AdevarTile.getTileName = function(tileCode) {
-	return tileCode;
+	return AdevarTileNames[AdevarTile.getTileCodeKey(tileCode)];
 };

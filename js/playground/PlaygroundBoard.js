@@ -778,7 +778,14 @@ PlaygroundBoard.prototype.newRow = function(numColumns, points) {
 };
 
 PlaygroundBoard.prototype.placeTile = function(tile, notationPoint, extraBoatPoint) {
+	var point = notationPoint.rowAndColumn;
+	point = this.cells[point.row][point.col];
+
+	var capturedTile = point.tile;
+
 	this.putTileOnPoint(tile, notationPoint);
+
+	return capturedTile;
 };
 
 PlaygroundBoard.prototype.putTileOnPoint = function(tile, notationPoint) {
