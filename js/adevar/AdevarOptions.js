@@ -1,6 +1,9 @@
 
 function AdevarOptions() {
 	// Adevar options
+	if (gameDevOn || GameType.Adevar.usersWithAccess.includes(getUsername())) {
+		AdevarOptions.tileDesignTypeValues.classic = "Adevar Classic";
+	}
 	if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
 		|| !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
 		// AdevarOptions.setTileDesignsPreference("classic", true);

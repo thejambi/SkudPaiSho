@@ -529,3 +529,9 @@ VagabondController.buildTileDesignDropdownDiv = function(alternateLabelText) {
 							});
 };
 
+VagabondController.prototype.setAnimationsOn = function(isAnimationsOn) {
+	if (isAnimationsOn !== this.isAnimationsEnabled()) {
+		this.toggleAnimations();
+	}
+};
+
