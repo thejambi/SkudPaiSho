@@ -306,7 +306,7 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 	var objective = null;
 	switch(hiddenTile.code) {
 		case AdevarTileCode.iris:
-			objective = "Have 2 tiles in each Red Plot, and 3 tiles in each White Plot";
+			objective = "Have 2 Basic tiles in each Red Plot, and 3 Basic tiles in each White Plot";
 			break;
 		case AdevarTileCode.orientalLily:
 			objective = "Create an Oriental Lily Garden formation with Basic tiles (see rules for Garden diagrams)";
