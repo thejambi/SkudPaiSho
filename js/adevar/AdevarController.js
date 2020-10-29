@@ -64,7 +64,7 @@ AdevarController.prototype.resetMove = function() {
 };
 
 AdevarController.prototype.getDefaultHelpMessageText = function() {
-	var message = "<h4>Adevăr Pai Sho</h4> <p>Adevăr Pai Sho is a Pai Sho game created by Jonathan Petruescu. It's a game of strategy, deception, and wit as players sneakily accomplish their hidden objective and take down their opponent's Hidden Tile. Be careful when achieving your objective, because trying to win could be the very thing that makes you lose!</p>";
+	var message = "<h4>Adevăr Pai Sho [Beta]</h4> <p>Adevăr Pai Sho is a Pai Sho game created by Jonathan Petruescu. It's a game of strategy, deception, and wit as players sneakily accomplish their hidden objective and take down their opponent's Hidden Tile. Be careful when achieving your objective, because trying to win could be the very thing that makes you lose!</p>";
 	message += "<p>See the <a href='https://skudpaisho.com/site/games/adevar-pai-sho/' target='_blank'>Adevăr page</a> for rules and more about the game.</p>";
 	return message;
 };
