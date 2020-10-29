@@ -1450,7 +1450,20 @@ function getGatePointMessage() {
 	return msg;
 }
 
+function userHasGameAccess() {
+	var gameTypeId = gameController.getGameTypeId && gameController.getGameTypeId();
+	return gameTypeId 
+		&& (gameDevOn 
+			|| !getGameTypeEntryFromId(gameTypeId).usersWithAccess
+			|| getGameTypeEntryFromId(gameTypeId).usersWithAccess.includes(getUsername()));
+}
+
 function sandboxitize() {
+	/* Verify game access if it would start a new game at move 0 */
+	if (currentMoveIndex === 0 && !userHasGameAccess()) {
+		return;
+	}
+
 	var notation = gameController.getNewGameNotation();
 	for (var i = 0; i < currentMoveIndex; i++) {
 		if (gameController.getSandboxNotationMove) {
@@ -1811,9 +1824,17 @@ var GameType = {
 		gameOptions: [],
 		usersWithAccess: [
 			'SkudPaiSho',
-			'Zach',
 			'ProfPetruescu',
-			'Aeneas',
+			'Zach',
+			'abacadaren',
+			'SpinxKreuz',
+			'Monk_Gyatso',	// Patreon supporters
+			'Cannoli',
+			'whitmore12',
+			'Pronetowander',
+			'Pavonee',
+			'summerghost',
+			'Aeneas',	// Adevar hypesquad
 			'Sambews',
 			'Lord_Llama'
 		]
@@ -1956,11 +1977,11 @@ function getGameControllerForGameType(gameTypeId) {
 			controller = new HexentaflController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Adevar.id:
-			if (gameDevOn || GameType.Adevar.usersWithAccess.includes(getUsername())) {
+			// if (gameDevOn || GameType.Adevar.usersWithAccess.includes(getUsername())) {
 				controller = new AdevarController(gameContainerDiv, isMobile);
-			} else {
-				closeGame();
-			}
+			// } else {
+			// 	closeGame();
+			// }
 			break;
 		default:
 			debug("Game Controller unavailable.");
