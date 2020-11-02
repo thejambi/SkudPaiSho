@@ -1,7 +1,7 @@
 /* Adevar specific UI interaction logic */
 
 function AdevarController(gameContainer, isMobile) {
-	this.actuator = new AdevarActuator(gameContainer, isMobile);
+	this.actuator = new AdevarActuator(gameContainer, isMobile, isAnimationsOn());
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -21,8 +21,8 @@ AdevarController.prototype.getGameTypeId = function() {
 	return GameType.Adevar.id;
 };
 
-AdevarController.prototype.resetGameManager = function() {
-	this.theGame = new AdevarGameManager(this.actuator);
+AdevarController.prototype.resetGameManager = function(ignoreActuate) {
+	this.theGame = new AdevarGameManager(this.actuator, ignoreActuate);
 };
 
 AdevarController.prototype.resetNotationBuilder = function() {
@@ -49,6 +49,11 @@ AdevarController.prototype.callActuate = function() {
 	this.theGame.actuate();
 };
 
+AdevarController.prototype.undoMoveAllowed = function() {
+	return !this.theGame.getWinner()
+		&& !this.theGame.disableUndo;
+};
+
 AdevarController.prototype.resetMove = function() {
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// Remove last move
@@ -59,7 +64,11 @@ AdevarController.prototype.resetMove = function() {
 };
 
 AdevarController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Adevăr Pai Sho</h4> <p>Coming soon...</p>";
+	var message = "<h4>Adevăr Pai Sho</h4> <p>Adevăr Pai Sho is a game of strategy, deception, and wit as players sneakily accomplish their hidden objective and take down their opponent's Hidden Tile. Be careful when achieving your objective, because trying to win could be the very thing that makes you lose! ";
+	message += "See the <a href='https://tinyurl.com/adevarrulebook' target='_blank'>Adevăr rules</a> for the full rules and more about the game.</p>";
+	message += "<p>Before the game, players each choose a Hidden Tile. The game is won when a player completes the objective given to them by their chosen Hidden Tile or captures their opponent’s Hidden Tile with their corresponding Second Face tile.</p>";
+	message += "<p>On a turn, players either move a tile on the board or call a new tile onto the board.</p>";
+	return message;
 };
 
 AdevarController.prototype.getAdditionalMessage = function() {
@@ -67,9 +76,9 @@ AdevarController.prototype.getAdditionalMessage = function() {
 	
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
+			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by choosing a Hidden Tile.<br />";
 		} else {
-			msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move. <br />";
+			msg += "Sign in to enable online gameplay. Or, start playing a local game by choosing a Hidden Tile.<br />";
 		}
 
 		msg += getGameOptionsMessageHtml(GameType.Adevar.gameOptions);
@@ -102,6 +111,10 @@ AdevarController.prototype.unplayedTileClicked = function(tileDiv) {
 	}
 
 	if (!myTurn() && !this.peekAtOpponentMoves) {
+		return;
+	}
+
+	if (this.gameNotation.notationText === QueryString.game && !gameDevOn) {
 		return;
 	}
 
@@ -164,13 +177,8 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 	if (this.theGame.getWinner()) {
 		return;
 	}
-	
-	if (currentMoveIndex !== this.gameNotation.moves.length) {
-		debug("Can only interact if all moves are played.");
-		return;
-	}
 
-	if (!myTurn() && !this.peekAtOpponentMoves) {
+	if (this.gameNotation.notationText === QueryString.game && !gameDevOn) {
 		return;
 	}
 
@@ -180,22 +188,50 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 	var rowCol = notationPoint.rowAndColumn;
 	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
+	if (currentMoveIndex !== this.gameNotation.moves.length) {
+		debug("Can only interact if all moves are played.");
+		return;
+	}
+
+	if (!myTurn() && !this.peekAtOpponentMoves) {
+		if (boardPoint.hasTile()) {
+			var userIsHost = usernameEquals(currentGameData.hostUsername);
+			var userIsGuest = usernameEquals(currentGameData.guestUsername);
+			var userIsTileOwner = userIsHost ? boardPoint.tile.ownerName === HOST : userIsGuest && boardPoint.tile.ownerName === GUEST;
+			if (userIsTileOwner
+					&& boardPoint.tile.type === AdevarTileType.hiddenTile) {
+				boardPoint.tile.hidden = !boardPoint.tile.hidden;
+				this.callActuate();
+			}
+		}
+		return;
+	}
+
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
-			if (boardPoint.tile.ownerName !== getCurrentPlayer() || !myTurn()) {
-				debug("That's not your tile!");
-				this.checkingOutOpponentTileOrNotMyTurn = true;
-				if (!this.peekAtOpponentMoves) {
-					return;
+			var userIsHost = usernameEquals(currentGameData.hostUsername);
+			var userIsGuest = usernameEquals(currentGameData.guestUsername);
+			var userIsTileOwner = userIsHost ? boardPoint.tile.ownerName === HOST : userIsGuest && boardPoint.tile.ownerName === GUEST;
+			if ((userIsTileOwner || (!playingOnlineGame() && getCurrentPlayer() === boardPoint.tile.ownerName))
+					&& boardPoint.tile.type === AdevarTileType.hiddenTile) {
+				boardPoint.tile.hidden = !boardPoint.tile.hidden;
+				this.callActuate();
+			} else {
+				if (boardPoint.tile.ownerName !== getCurrentPlayer() || !myTurn()) {
+					debug("That's not your tile!");
+					this.checkingOutOpponentTileOrNotMyTurn = true;
+					if (!this.peekAtOpponentMoves) {
+						return;
+					}
 				}
-			}
-			
-			this.notationBuilder.playingPlayer = this.getCurrentPlayer();
-			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
-			this.notationBuilder.moveType = MOVE;
-			this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
+				
+				this.notationBuilder.playingPlayer = this.getCurrentPlayer();
+				this.notationBuilder.status = WAITING_FOR_ENDPOINT;
+				this.notationBuilder.moveType = MOVE;
+				this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
-			this.theGame.revealPossibleMovePoints(boardPoint);
+				this.theGame.revealPossibleMovePoints(boardPoint);
+			}
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
@@ -222,10 +258,10 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 };
 
 AdevarController.prototype.getTileMessage = function(tileDiv) {
-	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
+	var divName = tileDiv.getAttribute("name");
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 
-	var tile = new AdevarTile(null, divName.substring(1), divName.charAt(0));
+	var tile = new AdevarTile(divName.substring(1), divName.charAt(0));
 
 	var message = [];
 
@@ -233,17 +269,112 @@ AdevarController.prototype.getTileMessage = function(tileDiv) {
 	if (divName.startsWith('G')) {
 		ownerName = GUEST;
 	}
-	
-	var tileCode = divName.substring(1);
 
-	var heading = AdevarTile.getTileName(tileCode);
+	var heading = this.getTileMessageHeading(tile, true);
 
-	message.push(tile.ownerName + "'s tile");
+	var tileMessages = this.getTileMessages(tile, true);
+	tileMessages.forEach(function(tileMessage) {
+		message.push(tileMessage);
+	});
 
 	return {
 		heading: heading,
 		message: message
 	}
+};
+
+AdevarController.prototype.getTileMessageHeading = function(tile, inTilePile) {
+	return tile.type === AdevarTileType.hiddenTile && tile.hidden && !inTilePile ? "Hidden Tile" : tile.getName();
+};
+
+AdevarController.prototype.getTileMessages = function(tile, inTilePile) {
+	var tileMessages = [];
+	tileMessages.push(tile.ownerName + "'s tile");
+
+	var hiddenTileForObjective = null;
+	if (tile.type === AdevarTileType.hiddenTile && (!tile.hidden || inTilePile)) {
+		hiddenTileForObjective = tile;
+	} else if (tile.type === AdevarTileType.secondFace) {
+		hiddenTileForObjective = new AdevarTile(AdevarTileManager.htSfMap.reverseLookup(tile.code), tile.ownerCode);
+	}
+	if (hiddenTileForObjective) {
+		tileMessages.push(this.buildHiddenTileObjectiveMessage(hiddenTileForObjective));
+	}
+
+	var otherTileMessages = this.buildOtherTileMessages(tile);
+	otherTileMessages.forEach(function(msg) {
+		tileMessages.push(msg);
+	});
+
+	return tileMessages;
+};
+
+AdevarController.prototype.buildOtherTileMessages = function(tile) {
+	var messages = [];
+	if (tile.type === AdevarTileType.basic) {
+		messages.push("Basic Tile");
+		messages.push("Moves up to " + tile.getMoveDistance() + " spaces");
+		messages.push("Basic tiles are called onto the board next to your Gate pieces");
+		messages.push("Basic tiles can capture opponent's Basic tiles of different types when being moved or called onto the board (e.g. your Lilac tiles can capture your opponent's Zinna and Foxglove tiles)");
+		if (tile.code === AdevarTileCode.foxglove) {
+			messages.push("Foxglove tiles can also capture the opponent's Water's Reflection tile");
+		}
+	} else if (tile.type === AdevarTileType.gate) {
+		messages.push("Gate Tile");
+		messages.push("Basic tiles, Second Face tiles, and Water's Reflection tiles are called to the board through your Gate tiles");
+		messages.push("Gate tiles are called onto the board next to your Basic tiles");
+	} else if (tile.type === AdevarTileType.reflection) {
+		messages.push("Water's Reflection Tile");
+		messages.push("Can move up to 7 spaces");
+		messages.push("Can capture Second Face tiles");
+		messages.push("Can be captured by Foxglove tiles");
+		messages.push("Returned to tile reserve when captured and can be called back to the board through a Gate tile");
+	} else if (tile.type === AdevarTileType.secondFace) {
+		messages.push("Can move up to 7 spaces");
+		messages.push("Can capture Vanguard tiles and its corresponding Hidden Tile");
+		messages.push("Can be captured by Water's Reflection tile");
+		messages.push("Returned to tile reserve when captured and can be called back to the board through a Gate tile");
+		messages.push("A player may only play 2 Second Face tiles during a game");
+	} else if (tile.type === AdevarTileType.vanguard) {
+		messages.push("Vanguard Tile");
+		messages.push("Vanguard tiles protect the Hidden Tile, so both must be captured before attempting to capture the guarded Hidden Tile");
+		messages.push("Can be captured by Second Face tiles");
+		messages.push("Captured Vanguard tiles regrow when an attacking Second Face tile attempts to capture the Hidden Tile but is not the corresponding Second Face, or the attacking Second Face tile is captured");
+	}
+
+	return messages;
+};
+
+AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile) {
+	var objective = null;
+	switch(hiddenTile.code) {
+		case AdevarTileCode.iris:
+			objective = "Have 2 Basic tiles in each Red Plot, and 3 Basic tiles in each White Plot";
+			break;
+		case AdevarTileCode.orientalLily:
+			objective = "Create an Oriental Lily Garden formation with Basic tiles (see rules for Garden diagrams)";
+			break;
+		case AdevarTileCode.echeveria:
+			objective = "Capture at least 2 of each of your opponent’s Basic tile types, and have at least 1 of each of your Basic tile types be captured";
+			break;
+		case AdevarTileCode.whiteRose:
+			objective = "Call a Gate completely in your opponent's starting Neutral Plot";
+			break;
+		case AdevarTileCode.whiteLotus:
+			objective = "Form a \"Harmony Ring\" similar to Skud Pai Sho using Basic tiles (Lilac - Zinnia - Foxglove order for Harmony Circle)";
+			break;
+		case AdevarTileCode.birdOfParadise:
+			objective = "Have at least one total Basic tile in each of the 8 Plots on the board";
+			break;
+		case AdevarTileCode.blackOrchid:
+			objective = "Have more Basic tiles in each plot, except for the starting North and South Neutral Plots, than your opponent";
+			break;
+		default:
+			objective = "Unknown";
+			break;
+	}
+
+	return hiddenTile.getName() + "'s Objective: " + objective;
 };
 
 AdevarController.prototype.getPointMessage = function(htmlPoint) {
@@ -257,10 +388,32 @@ AdevarController.prototype.getPointMessage = function(htmlPoint) {
 	var message = [];
 	
 	if (boardPoint.hasTile()) {
-		heading = boardPoint.tile.getName();
+		heading = this.getTileMessageHeading(boardPoint.tile);
+		var tileMessages = this.getTileMessages(boardPoint.tile);
+		tileMessages.forEach(function(tileMessage) {
+			message.push(tileMessage);
+		});
 	}
 
-	message.push(boardPoint.types);
+	/* Plot info */
+	message.push(
+		(boardPoint.plotTypes.length > 1 ? "Plots: " : "Plot: ")
+		+ boardPoint.plotTypes.toString().replace(",", ", ")
+	);
+
+	boardPoint.plotTypes.forEach(function(plotType) {
+		if ([AdevarBoardPointType.NORTH_RED_PLOT, AdevarBoardPointType.SOUTH_RED_PLOT].includes(plotType)) {
+			message.push("A player may have up to two Basic tiles in each Red plot at a time");
+		} else if ([AdevarBoardPointType.EAST_WHITE_PLOT, AdevarBoardPointType.WEST_WHITE_PLOT].includes(plotType)) {
+			message.push("A player may have up to three Basic tiles in each White plot at a time");
+		} else {
+			message.push("Neutral plots have no Basic tile limit");
+		}
+	});
+
+	if (boardPoint.plotTypes.length > 1) {
+		message.push("A tile here is counted as 1/2 in each plot it is touching");
+	}
 
 	return {
 		heading: heading,
@@ -298,4 +451,12 @@ AdevarController.prototype.isSolitaire = function() {
 
 AdevarController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
+};
+
+AdevarController.prototype.getSandboxNotationMove = function(moveIndex) {
+	return this.gameNotation.getMoveWithoutHiddenDetails(moveIndex);
+};
+
+AdevarController.prototype.setAnimationsOn = function(isAnimationsOn) {
+	this.actuator.setAnimationOn(isAnimationsOn);
 };

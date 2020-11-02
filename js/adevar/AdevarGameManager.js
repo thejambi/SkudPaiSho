@@ -1,4 +1,4 @@
-// Skud Pai Sho Game Manager
+// Adevar Pai Sho Game Manager
 
 var AdevarBoardSetupPoints = {
 	hiddenTile: {
@@ -55,6 +55,85 @@ var AdevarBoardSetupPoints = {
 	}
 };
 
+var AdevarOrientalLilyObjectivePoints = [
+	{
+		HOST: [
+			// new NotationPoint("0,-2"),
+			// new NotationPoint("-1,0"),
+			// new NotationPoint("2,-1"),
+			// new NotationPoint("1,1"),
+			// new NotationPoint("7,-1"),
+			// new NotationPoint("0,6")
+			new NotationPoint("2,-1"),
+			new NotationPoint("0,1"),
+			new NotationPoint("7,-1"),
+			new NotationPoint("0,6"),
+			new NotationPoint("6,5")
+		],
+		GUEST: [
+			// new NotationPoint("0,1"),
+			// new NotationPoint("-1,-1"),
+			// new NotationPoint("2,0"),
+			// new NotationPoint("1,-2"),
+			// new NotationPoint("-6,0"),
+			// new NotationPoint("1,-7")
+			new NotationPoint("1,-2"),
+			new NotationPoint("-1,0"),
+			new NotationPoint("1,-7"),
+			new NotationPoint("-6,0"),
+			new NotationPoint("-5,-6")
+		]
+	},
+	{
+		HOST: [
+			// new NotationPoint("0,-1"),
+			// new NotationPoint("5,-5"),
+			// new NotationPoint("-4,4"),
+			// new NotationPoint("-1,3"),
+			// new NotationPoint("4,-2"),
+			// new NotationPoint("5,4")
+			new NotationPoint("4,-2"),
+			new NotationPoint("-1,3"),
+			new NotationPoint("7,-4"),
+			new NotationPoint("-3,6"),
+			new NotationPoint("5,4")
+		],
+		GUEST: [
+			// new NotationPoint("1,0"),
+			// new NotationPoint("5,-5"),
+			// new NotationPoint("-4,4"),
+			// new NotationPoint("-3,1"),
+			// new NotationPoint("2,-4"),
+			// new NotationPoint("-4,-5")
+			new NotationPoint("2,-4"),
+			new NotationPoint("-3,1"),
+			new NotationPoint("4,-7"),
+			new NotationPoint("-6,3"),
+			new NotationPoint("-4,-5")
+		]
+	},
+	{
+		HOST: [
+			new NotationPoint("4,-3"),
+			new NotationPoint("-2,3"),
+			new NotationPoint("2,1"),
+			new NotationPoint("5,2"),
+			new NotationPoint("3,4"),
+			// new NotationPoint("6,5")
+			new NotationPoint("5,4")
+		],
+		GUEST: [
+			new NotationPoint("3,-4"),
+			new NotationPoint("-3,2"),
+			new NotationPoint("-1,-2"),
+			new NotationPoint("-2,-5"),
+			new NotationPoint("-4,-3"),
+			// new NotationPoint("-5,-6")
+			new NotationPoint("-4,-5")
+		]
+	}
+];
+
 function AdevarGameManager(actuator, ignoreActuate, isCopy) {
 	this.isCopy = isCopy;
 
@@ -62,14 +141,33 @@ function AdevarGameManager(actuator, ignoreActuate, isCopy) {
 
 	this.tileManager = new AdevarTileManager();
 
-	this.setup(ignoreActuate);
 	this.endGameWinners = [];
+	this.capturedTiles = [];
+	this.playersWhoHaveCapturedReflection = [];
+
+	this.setup(ignoreActuate);
 }
 
 // Set up the game
 AdevarGameManager.prototype.setup = function (ignoreActuate) {
 
 	this.usingTileReserves = false;
+	this.disableUndo = false;
+
+	this.secondFaceTilePlayedCount = {
+		HOST: 0,
+		GUEST: 0
+	};
+
+	this.secondFaceTilesPlayed = {
+		HOST: [],
+		GUEST: []
+	}
+
+	this.playerHiddenTiles = {
+		HOST: null,
+		GUEST: null
+	};
 
 	this.board = new AdevarBoard();
 
@@ -80,21 +178,26 @@ AdevarGameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-AdevarGameManager.prototype.actuate = function () {
+AdevarGameManager.prototype.actuate = function (moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager);
+	this.actuator.actuate(this.board, this.tileManager, this.capturedTiles, moveToAnimate);	// TODO - show Captured Tiles in tile section as it's good for reference
 };
 
 AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	debug("Running Move: " + move.fullMoveText);
 
+	var hiddenTileCaptured = false;
+	this.disableUndo = false;
+
 	if (move.moveType === AdevarMoveType.chooseHiddenTile) {
 		// Need to do all the game setup as well as set the player's hidden tile
 		var hiddenTile = this.tileManager.grabTile(move.player, move.hiddenTileCode);
 		hiddenTile.hidden = true;
-		debug(hiddenTile);
+		hiddenTile.selectedFromPile = false;
+		
+		this.playerHiddenTiles[move.player] = hiddenTile;
 
 		this.tileManager.removeRemainingHiddenTiles(move.player);
 
@@ -136,21 +239,121 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	} else if (move.moveType === DEPLOY) {
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
 		var placeTileResults = this.board.placeTile(tile, move.endPoint);
+
+		/* Record captured tile */
+		if (placeTileResults.capturedTile) {
+			this.capturedTiles.push(placeTileResults.capturedTile);
+		}
+
+		move.placeTileResults = placeTileResults;
+
+		/* Return captured tile to tile reserve if needed */
 		if (placeTileResults.capturedTile && placeTileResults.returnCapturedTileToHand) {
 			this.tileManager.putTileBack(placeTileResults.capturedTile);
 		}
+
+		/* Remove Second Face tiles if player has played their second one */
+		if (tile.type === AdevarTileType.secondFace) {
+			this.secondFaceTilePlayedCount[move.player]++;
+			this.secondFaceTilesPlayed[move.player].push(tile);
+			if (this.secondFaceTilePlayedCount[move.player] === 2) {
+				this.tileManager.removeRemainingTilesOfType(move.player, AdevarTileType.secondFace, this.secondFaceTilesPlayed[move.player]);
+			}
+		}
+
+		if (placeTileResults.capturedTile && placeTileResults.capturedTile.type === AdevarTileType.reflection) {
+			this.playersWhoHaveCapturedReflection.push(move.player);
+		}
 	} else if (move.moveType === MOVE) {
 		var moveTileResults = this.board.moveTile(move.startPoint, move.endPoint);
+
+		/* Record captured tile */
+		if (moveTileResults.capturedTile && !moveTileResults.returnCapturedTileToHand) {
+			this.capturedTiles.push(moveTileResults.capturedTile);
+		}
+
+		/* Return captured tile to tile reserve if needed */
 		if (moveTileResults.capturedTile && moveTileResults.returnCapturedTileToHand) {
 			this.tileManager.putTileBack(moveTileResults.capturedTile);
+		}
+
+		move.moveTileResults = moveTileResults;
+
+		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.hiddenTile) {
+			hiddenTileCaptured = true;
+		}
+
+		if (moveTileResults.wrongSFTileAttempt) {
+			this.disableUndo = true;
+
+			/* Remove SF tile (move to Captured pile) */
+			this.capturedTiles.push(moveTileResults.tileMoved);
+
+			/* Regrow Opponent Vanguards */
+			var opponentName = getOpponentName(move.player);
+			this.regrowVanguardsForPlayer(opponentName);
+		}
+
+		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.secondFace) {
+			/* Regrow player's Vanguards */
+			this.regrowVanguardsForPlayer(move.player);
+		}
+
+		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.reflection) {
+			/* Reflection captured, reveal captured tile owner's HT and return player's wrong SF on the board */
+			this.disableUndo = true;
+			this.board.revealTile(AdevarTileType.hiddenTile, moveTileResults.capturedTile.ownerName);
+			move.removedSFInfo = this.board.removeSFThatCannotCaptureHT(move.player, this.playerHiddenTiles[moveTileResults.capturedTile.ownerName]);
+		}
+
+		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.reflection) {
+			this.playersWhoHaveCapturedReflection.push(move.player);
+		}
+
+		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.hiddenTile) {
+			moveTileResults.capturedTile.reveal();
 		}
 	}
 
 	this.board.countTilesInPlots();
 
-	if (withActuate) {
-		this.actuate();
+	if (hiddenTileCaptured) {
+		this.setWinByHiddenTileCaptureForPlayer(move.player);
+	} else {
+		this.checkWinForPlayer(move.player, hiddenTileCaptured);
 	}
+
+	if (this.endGameWinners.length > 0) {
+		// this.board.revealTile(AdevarTileType.hiddenTile, this.endGameWinners[0]);
+		this.board.revealTile(AdevarTileType.hiddenTile, HOST);
+		this.board.revealTile(AdevarTileType.hiddenTile, GUEST);
+	}
+
+	if (withActuate) {
+		this.actuate(move);
+	}
+};
+
+AdevarGameManager.prototype.regrowVanguardsForPlayer = function(player) {
+	var tilesReplaced = this.board.regrowVanguards(player, this.getCapturedVanguardTilesForPlayer(player));
+	if (tilesReplaced.length > 0) {
+		var self = this;
+		tilesReplaced.forEach(function(tile) {
+			self.tileManager.putTileBack(tile);
+		});
+	}
+};
+
+AdevarGameManager.prototype.getCapturedVanguardTilesForPlayer = function(player) {
+	var capturedVanguardTiles = [];
+	for (var i = this.capturedTiles.length - 1; i >= 0; i--) {
+		var tile = this.capturedTiles[i];
+		if (tile.type === AdevarTileType.vanguard && tile.ownerName === player) {
+			capturedVanguardTiles.push(tile);
+			this.capturedTiles.splice(i, 1);
+		}
+	}
+	return capturedVanguardTiles;
 };
 
 AdevarGameManager.prototype.revealAllPointsAsPossible = function() {
@@ -159,7 +362,11 @@ AdevarGameManager.prototype.revealAllPointsAsPossible = function() {
 };
 
 AdevarGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
-	this.board.setPossibleDeployPoints(tile);
+	if (tile.type !== AdevarTileType.secondFace
+		|| (tile.type === AdevarTileType.secondFace && this.secondFaceTilePlayedCount[tile.ownerName] < 2)
+	) {
+		this.board.setPossibleDeployPoints(tile);
+	}
 
 	if (!ignoreActuate) {
 		this.actuate();
@@ -185,102 +392,154 @@ AdevarGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	}
 };
 
-AdevarGameManager.prototype.revealOpenGates = function(player, moveNum, ignoreActuate) {
-	if (moveNum === 2) {
-		// guest selecting first tile
-		this.board.setGuestGateOpen();
-	} else {
-		this.board.setOpenGatePossibleMoves(player);
-	}
-	
-	if (!ignoreActuate) {
-		this.actuate();
-	}
+AdevarGameManager.prototype.setWinByHiddenTileCaptureForPlayer = function(player) {
+	this.endGameWinners.push(player);
+	this.gameWinReason = " has captured the opponent's Hidden Tile and won the game!";
 };
 
-AdevarGameManager.prototype.playerCanBonusPlant = function(player) {
-	if (!newGatesRule) {
-		return true;
-	}
-
-	if (lessBonus) {
-		return this.board.playerHasNoGrowingFlowers(player);
-	} else if (limitedGatesRule) {
-		// New Gate Rules: Player cannot plant on Bonus if already controlling any Gates
-		return this.board.playerHasNoGrowingFlowers(player);
-	} else if (newGatesRule) {
-		// New Gate Rules: Player cannot plant on Bonus if already controlling two Gates
-		return this.board.playerControlsLessThanTwoGates(player);
-	}
-};
-
-AdevarGameManager.prototype.revealSpecialFlowerPlacementPoints = function(player) {
-	if (!newSpecialFlowerRules) {
-		this.revealOpenGates(player);
+AdevarGameManager.prototype.checkWinForPlayer = function(player) {
+	var hiddenTile = this.playerHiddenTiles[player];
+	if (!hiddenTile) {
 		return;
 	}
 
-	this.board.revealSpecialFlowerPlacementPoints(player);
-	this.actuate();
+	var hasWin = false;
+
+	switch(hiddenTile.code) {
+		case AdevarTileCode.iris:
+			/* Objective: Have 2 tiles in each Red Plot, and 3 tiles in each White Plot */
+			hasWin = this.board.playerHasFullRedAndWhitePlots(player);
+			break;
+		case AdevarTileCode.orientalLily:
+			hasWin = this.playerHasOrientalLilyWin(player);
+			break;
+		case AdevarTileCode.echeveria:
+			hasWin = this.playerHasEcheveriaWin(player);
+			break;
+		case AdevarTileCode.whiteRose:
+			hasWin = this.playerHasWhiteRoseWin(player);
+			break;
+		case AdevarTileCode.whiteLotus:
+			hasWin = this.playerHasWhiteLotusWin(player);
+			break;
+		case AdevarTileCode.birdOfParadise:
+			/* Objective: At least one Basic tile in every Plot */
+			hasWin = this.board.playerHasBasicTileInEveryPlot(player);
+			break;
+		case AdevarTileCode.blackOrchid:
+			hasWin = this.hasBlackOrchidWin(player);
+			break;
+		default:
+			debug("No Hidden Tile Objective");
+	}
+
+	if (hasWin) {
+		this.endGameWinners.push(player);
+	}
+
+	if (this.endGameWinners.length > 0) {
+		this.gameWinReason = " has completed their objective and won the game!";
+	}
 };
 
-AdevarGameManager.prototype.revealPossiblePlacementPoints = function(tile) {
-	this.board.revealPossiblePlacementPoints(tile);
-	this.actuate();
+AdevarGameManager.prototype.hasBlackOrchidWin = function(player) {
+	/* Objective: [Beta] Call a Gate completely in opponent's starting Neutral Plot */
+	// return this.board.playerHasGateInOpponentNeutralPlot(player);
+
+	/* Objective: Have more tiles in each plot (except opponent's starting Neutral Plot) than opponent */
+	return this.board.playerHasMoreBasicTilesInEachNonOwnedPlot(player);
 };
 
-AdevarGameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
-	this.board.revealBoatBonusPoints(boardPoint);
-	this.actuate();
+AdevarGameManager.prototype.playerHasWhiteLotusWin = function(player) {
+	/* Objective: Form Skud Pai Sho-esque Harmony Ring with Basic tiles (3 - 4 - 5 order for Harmony Circle) */
+	return this.board.analyzeHarmoniesForPlayer(player);
 };
 
-AdevarGameManager.prototype.aPlayerIsOutOfBasicFlowerTiles = function() {
-	return this.tileManager.aPlayerIsOutOfBasicFlowerTiles();
+AdevarGameManager.prototype.playerHasOrientalLilyWin = function(player) {
+	/* Objective: Create an Oriental Lily Garden formation with Basic tiles */
+	var hasCompletedObjective = false;
+	var self = this;
+	AdevarOrientalLilyObjectivePoints.forEach(function(objectivePointsSet) {
+		var objectivePoints = objectivePointsSet[player];
+		var hasAllObjectivePoints = objectivePoints.length > 0;
+		objectivePoints.forEach(function(notationPoint) {
+			if (!self.board.playerHasTileOfTypeAtPoint(player, notationPoint, AdevarTileType.basic)) {
+				hasAllObjectivePoints = false;
+			}
+		});
+		if (hasAllObjectivePoints) {
+			hasCompletedObjective = true;
+		}
+	});
+
+	return hasCompletedObjective;
 };
 
-AdevarGameManager.prototype.playerHasNotPlayedEitherSpecialTile = function(playerName) {
-	return this.tileManager.playerHasBothSpecialTilesRemaining(playerName);
+AdevarGameManager.prototype.playerHasWhiteRoseWin = function(player) {
+	/* Objective: [Old] Capture opponent's Reflection tile */
+	// return this.playersWhoHaveCapturedReflection.includes(player);
+
+	/* Objective: [Beta] Call a Gate completely in opponent's starting Neutral Plot */
+	return this.board.playerHasGateInOpponentNeutralPlot(player);
 };
 
-AdevarGameManager.prototype.setWinnerIsFun = function() {
-	this.setWinner = true;
+AdevarGameManager.prototype.playerHasEcheveriaWin = function(player) {
+	/* Objective: Capture at least 2 of each of your opponent’s basic tile types, 
+		as well as to have at least 1 of each of your basic tile types be captured */
+	var playerHasWin = false;
+
+	var capturedFriendlyTileCounts = {};
+	var capturedEnemyTileCounts = {};
+
+	this.capturedTiles.forEach(function(capturedTile) {
+		if (capturedTile.ownerName === player) {
+			// Friendly tile
+			if (!capturedFriendlyTileCounts[capturedTile.code]) {
+				capturedFriendlyTileCounts[capturedTile.code] = 1;
+			} else {
+				capturedFriendlyTileCounts[capturedTile.code]++;
+			}
+		} else {
+			// Enemy tile
+			if (!capturedEnemyTileCounts[capturedTile.code]) {
+				capturedEnemyTileCounts[capturedTile.code] = 1;
+			} else {
+				capturedEnemyTileCounts[capturedTile.code]++;
+			}
+		}
+	});
+
+	playerHasWin = capturedFriendlyTileCounts[AdevarTileCode.lilac]
+				&& capturedFriendlyTileCounts[AdevarTileCode.lilac] >= 1
+			&& capturedFriendlyTileCounts[AdevarTileCode.zinnia]
+				&& capturedFriendlyTileCounts[AdevarTileCode.zinnia] >= 1
+			&& capturedFriendlyTileCounts[AdevarTileCode.foxglove]
+				&& capturedFriendlyTileCounts[AdevarTileCode.foxglove] >= 1
+			&& capturedEnemyTileCounts[AdevarTileCode.lilac]
+				&& capturedEnemyTileCounts[AdevarTileCode.lilac] >= 2
+			&& capturedEnemyTileCounts[AdevarTileCode.zinnia]
+				&& capturedEnemyTileCounts[AdevarTileCode.zinnia] >= 2
+			&& capturedEnemyTileCounts[AdevarTileCode.foxglove]
+				&& capturedEnemyTileCounts[AdevarTileCode.foxglove] >= 2;
+
+	return playerHasWin;
 };
 
 AdevarGameManager.prototype.getWinner = function() {
-	if (this.board.winners.length === 1) {
-		return this.board.winners[0];
-	} else if (this.board.winners.length > 1) {
-		return "BOTH players";
-	} else if (this.endGameWinners.length === 1) {
+	if (this.endGameWinners.length === 1) {
 		return this.endGameWinners[0];
-	} else if (this.endGameWinners.length > 1) {
-		return "BOTH players";
 	}
 };
 
 AdevarGameManager.prototype.getWinReason = function() {
-	if (this.board.winners.length === 1) {
-		return " wins! The game has ended.";
-	} else if (this.endGameWinners.length === 1) {
-		if (this.tileManager.getPlayerWithMoreAccentTiles()) {
-			return " won the game with more Accent Tiles left.";
-		} else {
-			return " won the game with the most Harmonies.";
-		}
+	if (this.endGameWinners.length === 1) {
+		return this.gameWinReason;
 	}
 };
 
 AdevarGameManager.prototype.getWinResultTypeCode = function() {
-	if (this.board.winners.length === 1) {
-		return 1;	// Harmony Ring is 1
-	} else if (this.endGameWinners.length === 1) {
-		if (this.tileManager.getPlayerWithMoreAccentTiles()) {
-			return 2;	// More Accent Tiles remaining
-		} else {
-			return 3;	// Most Harmonies
-		}
-	} else if (this.endGameWinners.length > 1) {
-		return 4;	// Tie
+	if (this.endGameWinners.length === 1) {
+		return 1;
 	}
 };
 

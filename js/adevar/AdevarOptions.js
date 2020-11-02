@@ -3,8 +3,7 @@ function AdevarOptions() {
 	// Adevar options
 	if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
 		|| !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
-		// AdevarOptions.setTileDesignsPreference("classic", true);
-		AdevarOptions.setTileDesignsPreference("spoopy", true);
+		AdevarOptions.setTileDesignsPreference("classic", true);
 	}
 }
 
@@ -14,7 +13,9 @@ AdevarOptions.tileDesignTypeKey = "adevarTileDesignTypeKey";
 AdevarOptions.tileDesignTypeValues = {
 	classic: "Adevar Classic",
 	monochrome: "Adevar Monochrome",
-	spoopy: "Adevar Spoopy"
+	// spoopy: "Adevar Spoopy",
+	icy: "Adevar Icy",
+	chuji: "Chuji"
 };
 
 AdevarOptions.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {

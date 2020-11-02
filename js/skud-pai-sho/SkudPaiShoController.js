@@ -758,3 +758,9 @@ SkudPaiShoController.prototype.isAnimationsEnabled = function() {
 	/* Check !== false to default to on */
 	return getUserGamePreference(SkudPaiShoController.animationsEnabledKey) !== "false";
 };
+
+SkudPaiShoController.prototype.setAnimationsOn = function(isAnimationsOn) {
+	if (isAnimationsOn !== this.isAnimationsEnabled()) {
+		this.toggleAnimations();
+	}
+};

@@ -505,6 +505,7 @@ VagabondController.tileDesignTypeValues = {
 	tgggyatso: "Gyatso TGG Classic",
 	vescuccikoiwheel: "Vescucci Koi-Wheel",
 	vescuccikoiwheelrustic: "Rustic Vescucci Koi-Wheel",
+	chujired: "Chuji Red",
 	classic: "Classic Pai Sho Project",
 	water: "Water themed Garden Gate Designs",
 	fire: "Fire themed Garden Gate Designs",
@@ -526,5 +527,11 @@ VagabondController.buildTileDesignDropdownDiv = function(alternateLabelText) {
 							function() {
 								VagabondController.setTileDesignsPreference(this.value);
 							});
+};
+
+VagabondController.prototype.setAnimationsOn = function(isAnimationsOn) {
+	if (isAnimationsOn !== this.isAnimationsEnabled()) {
+		this.toggleAnimations();
+	}
 };
 

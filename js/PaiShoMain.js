@@ -59,7 +59,9 @@ var QueryString = function () {
 	  water: "Water-Themed Vescucci Tiles",
 	  earth: "Earth-Themed Vescucci Tiles",
 	  chujiblue: "Chu Ji Blue",
-	  chujimono: "Chu Ji Monochrome"
+	  chujimono: "Chu Ji Monochrome",
+	  azulejosmono: "Azulejos Monocromos",
+	  azulejosdemadera: "Azulejos de Madera"
   };
   
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
@@ -96,7 +98,8 @@ var paiShoBoardDesignTypeValues = {
 	vaaturaava: "Vaatu Raava by mrpandaber",
 	waterarena: "Water Arena by Yagalo",
 	eartharena: "Earth Arena by Yagalo",
-	firearena: "Fire Arena by Yagalo"
+	firearena: "Fire Arena by Yagalo",
+	ladenvar: "Ladenvăr by Sirstotes"
 };
 
 var svgBoardDesigns = [
@@ -224,6 +227,7 @@ var userTurnCountInterval;
 var gameContainerDiv = document.getElementById("game-container");
 
 var soundManager;
+var animationsOnKey = "animationsOn";
 /* --- */
   
   window.requestAnimationFrame(function () {
@@ -525,7 +529,7 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
   };
   
   function usernameEquals(otherUsername) {
-	  return getUsername() && otherUsername.toLowerCase() === getUsername().toLowerCase();
+	  return otherUsername && getUsername() && otherUsername.toLowerCase() === getUsername().toLowerCase();
   }
   
   function setResponseText(text) {
@@ -852,7 +856,7 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
   
 	  var moveToPlayTo = currentMoveIndex - 1;
   
-	  gameController.resetGameManager();
+	  gameController.resetGameManager(true);
 	  gameController.resetNotationBuilder();
   
 	  currentMoveIndex = 0;
@@ -860,6 +864,8 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
 	  while (currentMoveIndex < moveToPlayTo) {
 		  playNextMove();
 	  }
+
+	  gameController.callActuate();
   
 	  if (soundManager.prevMoveSoundsAreEnabled()) {
 		soundManager.playSound(SoundManager.sounds.tileLand);
@@ -1164,7 +1170,11 @@ function getResetMoveText() {
 	if (activeAi) {
 		return "";	// Hide "Undo" if playing against an AI
 	}
-	return "<br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
+	if (!gameController.undoMoveAllowed || gameController.undoMoveAllowed()) {
+		return "<br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
+	} else {
+		return "";
+	}
 }
   
 function showResetMoveMessage() {
@@ -1440,10 +1450,27 @@ function getGatePointMessage() {
 	return msg;
 }
 
+function userHasGameAccess() {
+	var gameTypeId = gameController.getGameTypeId && gameController.getGameTypeId();
+	return gameTypeId 
+		&& (gameDevOn 
+			|| !getGameTypeEntryFromId(gameTypeId).usersWithAccess
+			|| getGameTypeEntryFromId(gameTypeId).usersWithAccess.includes(getUsername()));
+}
+
 function sandboxitize() {
+	/* Verify game access if it would start a new game at move 0 */
+	if (currentMoveIndex === 0 && !userHasGameAccess()) {
+		return;
+	}
+
 	var notation = gameController.getNewGameNotation();
 	for (var i = 0; i < currentMoveIndex; i++) {
-		notation.addMove(gameController.gameNotation.moves[i]);
+		if (gameController.getSandboxNotationMove) {
+			notation.addMove(gameController.getSandboxNotationMove(i));
+		} else {
+			notation.addMove(gameController.gameNotation.moves[i]);
+		}
 	}
 
 	setGameController(currentGameData.gameTypeId, true);
@@ -1790,6 +1817,12 @@ var GameType = {
 			OPTION_DOUBLE_TILES
 		]
 	},
+	Adevar: {
+		id: 12,
+		desc: "Adevăr Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
+		gameOptions: []
+	},
 	CapturePaiSho: {
 		id: 3,
 		desc: "Capture Pai Sho",
@@ -1882,16 +1915,6 @@ var GameType = {
 		secretGameOptions: [
 			MORE_ATTACKERS
 		]
-	},
-	Adevar: {
-		id: 12,
-		desc: "Adevăr Pai Sho",
-		rulesUrl: "",
-		gameOptions: [],
-		usersWithAccess: [
-			'SkudPaiSho',
-			'ProfPetruescu'
-		]
 	}
 };
 function getGameControllerForGameType(gameTypeId) {
@@ -1938,11 +1961,7 @@ function getGameControllerForGameType(gameTypeId) {
 			controller = new HexentaflController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Adevar.id:
-			if (gameDevOn || GameType.Adevar.usersWithAccess.includes(getUsername())) {
-				controller = new AdevarController(gameContainerDiv, isMobile);
-			} else {
-				closeGame();
-			}
+			controller = new AdevarController(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
@@ -2033,7 +2052,7 @@ function getGameControllerForGameType(gameTypeId) {
 		  updateFooter();
 
 		  /* Ask to join invite link game if present */
-		  if (QueryString.joinPrivateGame && gameId === QueryString.joinPrivateGame) {
+		  if (QueryString.joinPrivateGame && gameId && gameId.toString() === QueryString.joinPrivateGame) {
 			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
 		  }
 	  }
@@ -2416,7 +2435,7 @@ function getGameControllerForGameType(gameTypeId) {
 			if (
 				gameDevOn 
 				|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
-				|| getGameTypeEntryFromId(gameSeek.gameTypeId).includes(getUsername)
+				|| getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess.includes(getUsername())
 			) {
 				
   
@@ -2659,7 +2678,12 @@ function getGameControllerForGameType(gameTypeId) {
   }
   
   function closeGame() {
-	  setGameController(randomIntFromInterval(1,2));
+	  var defaultGameTypeIds = [
+		  GameType.SkudPaiSho.id,
+		  GameType.VagabondPaiSho.id,
+		  GameType.Adevar.id
+	  ]
+	  setGameController(defaultGameTypeIds[randomIntFromInterval(0,defaultGameTypeIds.length-1)]);
   }
   
   function getSidenavNewGameEntryForGameType(gameType) {
@@ -3590,24 +3614,32 @@ function getGameControllerForGameType(gameTypeId) {
 	  document.body.setAttribute("data-theme", currentTheme);
   }
   
-  /* Game Controller classes should call these for user's preferences */
-  function getUserGamePrefKeyName(preferenceKey) {
-	  return "GameType" + gameController.getGameTypeId() + preferenceKey;
-  }
-  function getUserGamePreference(preferenceKey) {
-	  if (gameController && gameController.getGameTypeId) {
-		  debug(gameController.getGameTypeId());
-		  var keyName = getUserGamePrefKeyName(preferenceKey);
-		  return localStorage.getItem(keyName);
-	  }
-	  debug("whops");
-  }
-  function setUserGamePreference(preferenceKey, value) {
-	  if (gameController && gameController.getGameTypeId) {
-		  var keyName = getUserGamePrefKeyName(preferenceKey);
-		  localStorage.setItem(keyName, value);
-	  }
-  }
+/* Game Controller classes should call these for user's preferences */
+function getUserGamePrefKeyName(preferenceKey) {
+	return "GameType" + gameController.getGameTypeId() + preferenceKey;
+}
+function getUserGamePreference(preferenceKey) {
+	if (gameController && gameController.getGameTypeId) {
+		debug(gameController.getGameTypeId());
+		var keyName = getUserGamePrefKeyName(preferenceKey);
+		return localStorage.getItem(keyName);
+	}
+}
+function setUserGamePreference(preferenceKey, value) {
+	if (gameController && gameController.getGameTypeId) {
+		var keyName = getUserGamePrefKeyName(preferenceKey);
+		localStorage.setItem(keyName, value);
+	}
+}
+
+function buildPreferenceDropdownDiv(labelText, dropdownId, valuesObject, preferenceKey) {
+	return buildDropdownDiv(dropdownId, labelText + ":", valuesObject,
+				getUserGamePreference(preferenceKey),
+				function() {
+					setUserGamePreference(preferenceKey, this.value);
+					gameController.callActuate();
+				});
+};
   
   function setGameLogText(text) {
 	  var newText = '';
@@ -3697,10 +3729,25 @@ document.onkeyup = function(e) {
 	}
 };
   
-  /* Sound */
-  function toggleSoundOn() {
-	  soundManager.toggleSoundOn();
-  }
+/* Sound */
+function toggleSoundOn() {
+	soundManager.toggleSoundOn();
+}
+
+function toggleAnimationsOn() {
+	if (isAnimationsOn()) {
+		localStorage.setItem(animationsOnKey, "false");
+	} else {
+		localStorage.setItem(animationsOnKey, "true");
+	}
+	if (gameController.setAnimationsOn) {
+		gameController.setAnimationsOn(isAnimationsOn());
+	}
+}
+
+function isAnimationsOn() {
+	return localStorage.getItem(animationsOnKey) !== "false";
+}
   
   // For iOS
 window.addEventListener('touchstart', function() {
