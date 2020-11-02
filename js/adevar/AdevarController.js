@@ -64,8 +64,9 @@ AdevarController.prototype.resetMove = function() {
 };
 
 AdevarController.prototype.getDefaultHelpMessageText = function() {
-	var message = "<h4>Adevăr Pai Sho [Beta]</h4> <p>Adevăr Pai Sho is a Pai Sho game created by Jonathan Petruescu. It's a game of strategy, deception, and wit as players sneakily accomplish their hidden objective and take down their opponent's Hidden Tile. Be careful when achieving your objective, because trying to win could be the very thing that makes you lose!</p>";
-	message += "<p>See the <a href='https://skudpaisho.com/site/games/adevar-pai-sho/' target='_blank'>Adevăr page</a> for rules and more about the game.</p>";
+	var message = "<h4>Adevăr Pai Sho</h4> <p>Adevăr Pai Sho is a game of strategy, deception, and wit as players sneakily accomplish their hidden objective and take down their opponent's Hidden Tile. Be careful when achieving your objective, because trying to win could be the very thing that makes you lose! ";
+	message += "See the <a href='https://tinyurl.com/adevarrulebook' target='_blank'>Adevăr rules</a> for the full rules and more about the game.</p>";
+	message += "<p>Before the game, players each choose a Hidden Tile. The game is won when a player completes the objective given to them by their chosen Hidden Tile or captures their opponent’s Hidden Tile with their corresponding Second Face tile.</p>";
 	return message;
 };
 
@@ -299,7 +300,23 @@ AdevarController.prototype.getTileMessages = function(tile, inTilePile) {
 		tileMessages.push(this.buildHiddenTileObjectiveMessage(hiddenTileForObjective));
 	}
 
+	var otherTileMessages = this.buildOtherTileMessages(tile);
+	otherTileMessages.forEach(function(msg) {
+		tileMessages.push(msg);
+	});
+
 	return tileMessages;
+};
+
+AdevarController.prototype.buildOtherTileMessages = function(tile) {
+	var messages = [];
+	if (tile.type === AdevarTileType.basic) {
+		messages.push("Basic Tile");
+		messages.push("Moves up to " + tile.getMoveDistance() + " spaces");
+		messages.push("Basic tiles are called onto the board through Gate pieces");
+	}
+
+	return messages;
 };
 
 AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile) {
@@ -352,10 +369,25 @@ AdevarController.prototype.getPointMessage = function(htmlPoint) {
 		});
 	}
 
+	/* Plot info */
 	message.push(
 		(boardPoint.plotTypes.length > 1 ? "Plots: " : "Plot: ")
 		+ boardPoint.plotTypes.toString().replace(",", ", ")
 	);
+
+	boardPoint.plotTypes.forEach(function(plotType) {
+		if ([AdevarBoardPointType.NORTH_RED_PLOT, AdevarBoardPointType.SOUTH_RED_PLOT].includes(plotType)) {
+			message.push("A player may have up to two Basic tiles in each Red plot at a time");
+		} else if ([AdevarBoardPointType.EAST_WHITE_PLOT, AdevarBoardPointType.WEST_WHITE_PLOT].includes(plotType)) {
+			message.push("A player may have up to three Basic tiles in each White plot at a time");
+		} else {
+			message.push("Neutral plots have no Basic tile limit");
+		}
+	});
+
+	if (boardPoint.plotTypes.length > 1) {
+		message.push("A tile here is counted as 1/2 in each plot it is touching");
+	}
 
 	return {
 		heading: heading,
