@@ -1821,23 +1821,7 @@ var GameType = {
 		id: 12,
 		desc: "Adevăr Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
-		gameOptions: [],
-		usersWithAccess: [
-			'SkudPaiSho',
-			'ProfPetruescu',
-			'Zach',
-			'abacadaren',
-			'SpinxKreuz',
-			'Monk_Gyatso',	// Patreon supporters
-			'Cannoli',
-			'whitmore12',
-			'Pronetowander',
-			'Pavonee',
-			'summerghost',
-			'Aeneas',	// Adevar hypesquad
-			'Sambews',
-			'Lord_Llama'
-		]
+		gameOptions: []
 	},
 	CapturePaiSho: {
 		id: 3,
@@ -1977,11 +1961,7 @@ function getGameControllerForGameType(gameTypeId) {
 			controller = new HexentaflController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Adevar.id:
-			// if (gameDevOn || GameType.Adevar.usersWithAccess.includes(getUsername())) {
-				controller = new AdevarController(gameContainerDiv, isMobile);
-			// } else {
-			// 	closeGame();
-			// }
+			controller = new AdevarController(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
@@ -2700,9 +2680,8 @@ function getGameControllerForGameType(gameTypeId) {
   function closeGame() {
 	  var defaultGameTypeIds = [
 		  GameType.SkudPaiSho.id,
-		  GameType.VagabondPaiSho.id
-		//   ,
-		//   GameType.Adevar.id
+		  GameType.VagabondPaiSho.id,
+		  GameType.Adevar.id
 	  ]
 	  setGameController(defaultGameTypeIds[randomIntFromInterval(0,defaultGameTypeIds.length-1)]);
   }

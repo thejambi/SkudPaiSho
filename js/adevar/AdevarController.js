@@ -67,6 +67,7 @@ AdevarController.prototype.getDefaultHelpMessageText = function() {
 	var message = "<h4>Adevăr Pai Sho</h4> <p>Adevăr Pai Sho is a game of strategy, deception, and wit as players sneakily accomplish their hidden objective and take down their opponent's Hidden Tile. Be careful when achieving your objective, because trying to win could be the very thing that makes you lose! ";
 	message += "See the <a href='https://tinyurl.com/adevarrulebook' target='_blank'>Adevăr rules</a> for the full rules and more about the game.</p>";
 	message += "<p>Before the game, players each choose a Hidden Tile. The game is won when a player completes the objective given to them by their chosen Hidden Tile or captures their opponent’s Hidden Tile with their corresponding Second Face tile.</p>";
+	message += "<p>On a turn, players either move a tile on the board or call a new tile onto the board.</p>";
 	return message;
 };
 
@@ -291,7 +292,7 @@ AdevarController.prototype.getTileMessages = function(tile, inTilePile) {
 	tileMessages.push(tile.ownerName + "'s tile");
 
 	var hiddenTileForObjective = null;
-	if (tile.type === AdevarTileType.hiddenTile && inTilePile) {
+	if (tile.type === AdevarTileType.hiddenTile && (!tile.hidden || inTilePile)) {
 		hiddenTileForObjective = tile;
 	} else if (tile.type === AdevarTileType.secondFace) {
 		hiddenTileForObjective = new AdevarTile(AdevarTileManager.htSfMap.reverseLookup(tile.code), tile.ownerCode);
@@ -313,7 +314,32 @@ AdevarController.prototype.buildOtherTileMessages = function(tile) {
 	if (tile.type === AdevarTileType.basic) {
 		messages.push("Basic Tile");
 		messages.push("Moves up to " + tile.getMoveDistance() + " spaces");
-		messages.push("Basic tiles are called onto the board through Gate pieces");
+		messages.push("Basic tiles are called onto the board next to your Gate pieces");
+		messages.push("Basic tiles can capture opponent's Basic tiles of different types when being moved or called onto the board (e.g. your Lilac tiles can capture your opponent's Zinna and Foxglove tiles)");
+		if (tile.code === AdevarTileCode.foxglove) {
+			messages.push("Foxglove tiles can also capture the opponent's Water's Reflection tile");
+		}
+	} else if (tile.type === AdevarTileType.gate) {
+		messages.push("Gate Tile");
+		messages.push("Basic tiles, Second Face tiles, and Water's Reflection tiles are called to the board through your Gate tiles");
+		messages.push("Gate tiles are called onto the board next to your Basic tiles");
+	} else if (tile.type === AdevarTileType.reflection) {
+		messages.push("Water's Reflection Tile");
+		messages.push("Can move up to 7 spaces");
+		messages.push("Can capture Second Face tiles");
+		messages.push("Can be captured by Foxglove tiles");
+		messages.push("Returned to tile reserve when captured and can be called back to the board through a Gate tile");
+	} else if (tile.type === AdevarTileType.secondFace) {
+		messages.push("Can move up to 7 spaces");
+		messages.push("Can capture Vanguard tiles and its corresponding Hidden Tile");
+		messages.push("Can be captured by Water's Reflection tile");
+		messages.push("Returned to tile reserve when captured and can be called back to the board through a Gate tile");
+		messages.push("A player may only play 2 Second Face tiles during a game");
+	} else if (tile.type === AdevarTileType.vanguard) {
+		messages.push("Vanguard Tile");
+		messages.push("Vanguard tiles protect the Hidden Tile, so both must be captured before attempting to capture the guarded Hidden Tile");
+		messages.push("Can be captured by Second Face tiles");
+		messages.push("Captured Vanguard tiles regrow when an attacking Second Face tile attempts to capture the Hidden Tile but is not the corresponding Second Face, or the attacking Second Face tile is captured");
 	}
 
 	return messages;
