@@ -1820,7 +1820,7 @@ var GameType = {
 	Adevar: {
 		id: 12,
 		desc: "Adevăr Pai Sho",
-		rulesUrl: "",
+		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
 		gameOptions: [],
 		usersWithAccess: [
 			'SkudPaiSho',
