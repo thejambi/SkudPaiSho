@@ -58,56 +58,78 @@ var AdevarBoardSetupPoints = {
 var AdevarOrientalLilyObjectivePoints = [
 	{
 		HOST: [
-			new NotationPoint("0,-2"),
-			new NotationPoint("-1,0"),
+			// new NotationPoint("0,-2"),
+			// new NotationPoint("-1,0"),
+			// new NotationPoint("2,-1"),
+			// new NotationPoint("1,1"),
+			// new NotationPoint("7,-1"),
+			// new NotationPoint("0,6")
 			new NotationPoint("2,-1"),
-			new NotationPoint("1,1"),
+			new NotationPoint("0,1"),
 			new NotationPoint("7,-1"),
-			new NotationPoint("0,6")
+			new NotationPoint("0,6"),
+			new NotationPoint("6,5")
 		],
 		GUEST: [
-			new NotationPoint("0,1"),
-			new NotationPoint("-1,-1"),
-			new NotationPoint("2,0"),
+			// new NotationPoint("0,1"),
+			// new NotationPoint("-1,-1"),
+			// new NotationPoint("2,0"),
+			// new NotationPoint("1,-2"),
+			// new NotationPoint("-6,0"),
+			// new NotationPoint("1,-7")
 			new NotationPoint("1,-2"),
+			new NotationPoint("-1,0"),
+			new NotationPoint("1,-7"),
 			new NotationPoint("-6,0"),
-			new NotationPoint("1,-7")
+			new NotationPoint("-5,-6")
 		]
 	},
 	{
 		HOST: [
-			new NotationPoint("0,-1"),
-			new NotationPoint("5,-5"),
-			new NotationPoint("-4,4"),
-			new NotationPoint("-1,3"),
+			// new NotationPoint("0,-1"),
+			// new NotationPoint("5,-5"),
+			// new NotationPoint("-4,4"),
+			// new NotationPoint("-1,3"),
+			// new NotationPoint("4,-2"),
+			// new NotationPoint("5,4")
 			new NotationPoint("4,-2"),
+			new NotationPoint("-1,3"),
+			new NotationPoint("7,-4"),
+			new NotationPoint("-3,6"),
 			new NotationPoint("5,4")
 		],
 		GUEST: [
-			new NotationPoint("1,0"),
-			new NotationPoint("5,-5"),
-			new NotationPoint("-4,4"),
-			new NotationPoint("-3,1"),
+			// new NotationPoint("1,0"),
+			// new NotationPoint("5,-5"),
+			// new NotationPoint("-4,4"),
+			// new NotationPoint("-3,1"),
+			// new NotationPoint("2,-4"),
+			// new NotationPoint("-4,-5")
 			new NotationPoint("2,-4"),
+			new NotationPoint("-3,1"),
+			new NotationPoint("4,-7"),
+			new NotationPoint("-6,3"),
 			new NotationPoint("-4,-5")
 		]
 	},
 	{
 		HOST: [
-			new NotationPoint("2,1"),
-			new NotationPoint("-2,3"),
 			new NotationPoint("4,-3"),
+			new NotationPoint("-2,3"),
+			new NotationPoint("2,1"),
 			new NotationPoint("5,2"),
 			new NotationPoint("3,4"),
-			new NotationPoint("6,5")
+			// new NotationPoint("6,5")
+			new NotationPoint("5,4")
 		],
 		GUEST: [
-			new NotationPoint("-1,-2"),
-			new NotationPoint("-3,2"),
 			new NotationPoint("3,-4"),
+			new NotationPoint("-3,2"),
+			new NotationPoint("-1,-2"),
 			new NotationPoint("-2,-5"),
 			new NotationPoint("-4,-3"),
-			new NotationPoint("-5,-6")
+			// new NotationPoint("-5,-6")
+			new NotationPoint("-4,-5")
 		]
 	}
 ];
