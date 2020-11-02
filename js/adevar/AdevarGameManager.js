@@ -153,6 +153,7 @@ AdevarGameManager.prototype.setup = function (ignoreActuate) {
 
 	this.usingTileReserves = false;
 	this.disableUndo = false;
+	this.gameLogText = "";
 
 	this.secondFaceTilePlayedCount = {
 		HOST: 0,
@@ -182,7 +183,12 @@ AdevarGameManager.prototype.actuate = function (moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, this.capturedTiles, moveToAnimate);	// TODO - show Captured Tiles in tile section as it's good for reference
+	this.actuator.actuate(this.board, this.tileManager, this.capturedTiles, moveToAnimate);
+
+	if (this.endGameWinners.length > 0) {
+		this.gameLogText += ". " + this.endGameWinners[0] + this.gameWinReason;
+	}
+	setGameLogText(this.gameLogText);
 };
 
 AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -236,6 +242,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		// Place Reflection tile
 		this.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.reflection), AdevarBoardSetupPoints.reflection[move.player]);
 
+		this.buildChooseHiddenTileGameLogText(move);
 	} else if (move.moveType === DEPLOY) {
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
 		var placeTileResults = this.board.placeTile(tile, move.endPoint);
@@ -264,6 +271,8 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		if (placeTileResults.capturedTile && placeTileResults.capturedTile.type === AdevarTileType.reflection) {
 			this.playersWhoHaveCapturedReflection.push(move.player);
 		}
+
+		this.buildDeployGameLogText(move, tile);
 	} else if (move.moveType === MOVE) {
 		var moveTileResults = this.board.moveTile(move.startPoint, move.endPoint);
 
@@ -313,6 +322,8 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.hiddenTile) {
 			moveTileResults.capturedTile.reveal();
 		}
+
+		this.buildMoveGameLogText(move);
 	}
 
 	this.board.countTilesInPlots();
@@ -332,6 +343,31 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	if (withActuate) {
 		this.actuate(move);
 	}
+};
+
+AdevarGameManager.prototype.buildChooseHiddenTileGameLogText = function(move) {
+	this.gameLogText = this.getGameLogTextStart(move);
+	this.gameLogText += move.player + " selected a Hidden Tile";
+};
+
+AdevarGameManager.prototype.buildDeployGameLogText = function(move, calledTile) {
+	this.gameLogText = this.getGameLogTextStart(move);
+	this.gameLogText += move.player + " called " + AdevarTile.getTileName(calledTile.code);
+	if (move.placeTileResults.capturedTile) {
+		this.gameLogText += " and captured " + AdevarTile.getTileName(move.placeTileResults.capturedTile.code);
+	}
+};
+
+AdevarGameManager.prototype.buildMoveGameLogText = function(move) {
+	this.gameLogText = this.getGameLogTextStart(move);
+	this.gameLogText += move.player + " moved " + AdevarTile.getTileName(move.moveTileResults.tileMoved.code);
+	if (move.moveTileResults.capturedTile) {
+		this.gameLogText += " and captured " + AdevarTile.getTileName(move.moveTileResults.capturedTile.code);
+	}
+};
+
+AdevarGameManager.prototype.getGameLogTextStart = function(move) {
+	return move.moveNum + move.playerCode + '. ';
 };
 
 AdevarGameManager.prototype.regrowVanguardsForPlayer = function(player) {
