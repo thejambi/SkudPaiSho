@@ -1,7 +1,11 @@
 
 function AdevarOptions() {
 	// Adevar options
-	if (gameDevOn || GameType.Adevar.usersWithAccess.includes(getUsername())) {
+	var classicDudes = [
+		'SkudPaiSho',
+		'ProfPetruescu'
+	];
+	if (gameDevOn || classicDudes.includes(getUsername())) {
 		AdevarOptions.tileDesignTypeValues.classic = "Adevar Classic";
 	}
 	if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
@@ -18,6 +22,7 @@ AdevarOptions.tileDesignTypeValues = {
 	// classic: "Adevar Classic",
 	monochrome: "Adevar Monochrome",
 	spoopy: "Adevar Spoopy",
+	icy: "Adevar Icy",
 	chuji: "Chuji"
 };
 
