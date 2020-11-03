@@ -74,6 +74,7 @@ function AdevarTile(code, ownerCode) {
 	this.hidden = false;
 
 	switch (code) {
+		case AdevarTileCode.blankHiddenTile:
 		case AdevarTileCode.iris:
 		case AdevarTileCode.orientalLily:
 		case AdevarTileCode.whiteLotus:
