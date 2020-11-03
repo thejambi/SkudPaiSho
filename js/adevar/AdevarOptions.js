@@ -1,13 +1,9 @@
 
 function AdevarOptions() {
 	// Adevar options
-	if (gameDevOn || GameType.Adevar.usersWithAccess.includes(getUsername())) {
-		AdevarOptions.tileDesignTypeValues.classic = "Adevar Classic";
-	}
 	if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
 		|| !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
-		// AdevarOptions.setTileDesignsPreference("classic", true);
-		AdevarOptions.setTileDesignsPreference("spoopy", true);
+		AdevarOptions.setTileDesignsPreference("classic", true);
 	}
 }
 
@@ -15,9 +11,10 @@ AdevarOptions.tileDesignTypeKey = "adevarTileDesignTypeKey";
 
 /* Adevar tile designs */
 AdevarOptions.tileDesignTypeValues = {
-	// classic: "Adevar Classic",
+	classic: "Adevar Classic",
 	monochrome: "Adevar Monochrome",
-	spoopy: "Adevar Spoopy",
+	// spoopy: "Adevar Spoopy",
+	icy: "Adevar Icy",
 	chuji: "Chuji"
 };
 

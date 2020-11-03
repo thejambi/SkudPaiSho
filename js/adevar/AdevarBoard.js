@@ -739,6 +739,18 @@ AdevarBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
 	}
 };
 
+AdevarBoard.prototype.playerHasGateInOpponentNeutralPlot = function(player) {
+	var hasGateInOpponentNeutralPlot = false;
+	var targetPlot = player === HOST ? AdevarBoardPointType.NORTH_NEUTRAL_PLOT : AdevarBoardPointType.SOUTH_NEUTRAL_PLOT;
+	this.forEachBoardPointWithTile(function(boardPoint) {
+		if (boardPoint.tile.type === AdevarTileType.gate && boardPoint.tile.ownerName === player
+				&& boardPoint.isType(targetPlot) && boardPoint.plotTypes.length === 1) {
+			hasGateInOpponentNeutralPlot = true;
+		}
+	});
+	return hasGateInOpponentNeutralPlot;
+};
+
 AdevarBoard.prototype.forEachBoardPoint = function(forEachFunc) {
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
@@ -1051,6 +1063,16 @@ AdevarBoard.prototype.playerHasFullRedAndWhitePlots = function(player) {
 		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][player] === 3
 		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] === 3
 };
+
+AdevarBoard.prototype.playerHasMoreBasicTilesInEachNonOwnedPlot = function(player) {
+	var opponent = getOpponentName(player);
+	return this.basicTilePlotCounts[AdevarBoardPointType.NORTH_RED_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.NORTH_RED_PLOT][opponent]
+		&& this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_RED_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_RED_PLOT][opponent]
+		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][opponent]
+		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][opponent]
+		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_NEUTRAL_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.EAST_NEUTRAL_PLOT][opponent]
+		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_NEUTRAL_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.WEST_NEUTRAL_PLOT][opponent];
+}
 
 AdevarBoard.prototype.playerHasTileOfTypeAtPoint = function(player, notationPoint, tileType) {
 	var point = notationPoint.rowAndColumn;

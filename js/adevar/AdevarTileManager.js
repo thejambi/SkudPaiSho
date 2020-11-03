@@ -15,13 +15,16 @@ function AdevarTileManager(forActuating) {
 AdevarTileManager.htSfMap = {};
 
 AdevarTileManager.prototype.loadHTSFMap = function() {
-	AdevarTileManager.htSfMap[AdevarTileCode.iris] = AdevarTileCode.irisSF;
-	AdevarTileManager.htSfMap[AdevarTileCode.echeveria] = AdevarTileCode.echeveriaSF;
-	AdevarTileManager.htSfMap[AdevarTileCode.orientalLily] = AdevarTileCode.orientalLilySF;
-	AdevarTileManager.htSfMap[AdevarTileCode.whiteRose] = AdevarTileCode.whiteRoseSF;
-	AdevarTileManager.htSfMap[AdevarTileCode.whiteLotus] = AdevarTileCode.whiteLotusSF;
-	AdevarTileManager.htSfMap[AdevarTileCode.birdOfParadise] = AdevarTileCode.birdOfParadiseSF;
-	// etc...
+	var theMap = {};
+	theMap[AdevarTileCode.iris] = AdevarTileCode.irisSF;
+	theMap[AdevarTileCode.echeveria] = AdevarTileCode.echeveriaSF;
+	theMap[AdevarTileCode.orientalLily] = AdevarTileCode.orientalLilySF;
+	theMap[AdevarTileCode.whiteRose] = AdevarTileCode.whiteRoseSF;
+	theMap[AdevarTileCode.whiteLotus] = AdevarTileCode.whiteLotusSF;
+	theMap[AdevarTileCode.birdOfParadise] = AdevarTileCode.birdOfParadiseSF;
+	theMap[AdevarTileCode.blackOrchid] = AdevarTileCode.blackOrchidSF;
+
+	AdevarTileManager.htSfMap = new TwoWayMap(theMap);
 };
 
 AdevarTileManager.prototype.loadTileSet = function(ownerCode) {
@@ -38,9 +41,7 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	tiles.push(new AdevarTile(AdevarTileCode.whiteRose, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.whiteLotus, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.birdOfParadise, ownerCode));
-	// tiles.push(new AdevarTile(AdevarTileCode.blackOrchid, ownerCode));
-	// tiles.push(new AdevarTile(AdevarTileCode.echinacea, ownerCode));
-	// etc
+	tiles.push(new AdevarTile(AdevarTileCode.blackOrchid, ownerCode));
 
 	// Apply "selected" effect to Hidden Tiles
 	tiles.forEach(function(tile) {
@@ -71,7 +72,7 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	tiles.push(new AdevarTile(AdevarTileCode.whiteLotusSF, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.birdOfParadiseSF, ownerCode));
 	tiles.push(new AdevarTile(AdevarTileCode.whiteRoseSF, ownerCode));
-	// tiles.push(new AdevarTile(AdevarTileCode.echinaceaSF, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.blackOrchidSF, ownerCode));
 	
 	for (var i = 0; i < 2; i++) {
 		tiles.push(new AdevarTile(AdevarTileCode.vanguard, ownerCode));

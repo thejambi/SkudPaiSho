@@ -97,6 +97,19 @@ var WHITE_LOTUS = "White Lotus";
 var ORCHID = "Orchid";
 
 
+/* Helpful methods, polyfills, etc */
+function TwoWayMap(map) {
+  /* https://stackoverflow.com/questions/21070836/how-can-i-create-a-two-way-mapping-in-javascript-or-some-other-way-to-swap-out */
+  this.map = map;
+  this.reverseMap = {};
+  for(var key in map) {
+     var value = map[key];
+     this.reverseMap[value] = key;   
+  }
+}
+TwoWayMap.prototype.lookup = function(key){ return this.map[key]; };
+TwoWayMap.prototype.reverseLookup = function(key){ return this.reverseMap[key]; };
+
 function arrayIncludesAll(array1, array2) {
   for (var i = 0; i < array2.length; i++) {
     if (!array1.includes(array2[i])) {

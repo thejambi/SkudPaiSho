@@ -1170,7 +1170,11 @@ function getResetMoveText() {
 	if (activeAi) {
 		return "";	// Hide "Undo" if playing against an AI
 	}
-	return "<br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
+	if (!gameController.undoMoveAllowed || gameController.undoMoveAllowed()) {
+		return "<br /><span class='skipBonus' onclick='resetMove();'>Undo move</span>";
+	} else {
+		return "";
+	}
 }
   
 function showResetMoveMessage() {
@@ -1446,7 +1450,20 @@ function getGatePointMessage() {
 	return msg;
 }
 
+function userHasGameAccess() {
+	var gameTypeId = gameController.getGameTypeId && gameController.getGameTypeId();
+	return gameTypeId 
+		&& (gameDevOn 
+			|| !getGameTypeEntryFromId(gameTypeId).usersWithAccess
+			|| getGameTypeEntryFromId(gameTypeId).usersWithAccess.includes(getUsername()));
+}
+
 function sandboxitize() {
+	/* Verify game access if it would start a new game at move 0 */
+	if (currentMoveIndex === 0 && !userHasGameAccess()) {
+		return;
+	}
+
 	var notation = gameController.getNewGameNotation();
 	for (var i = 0; i < currentMoveIndex; i++) {
 		if (gameController.getSandboxNotationMove) {
@@ -1800,6 +1817,12 @@ var GameType = {
 			OPTION_DOUBLE_TILES
 		]
 	},
+	Adevar: {
+		id: 12,
+		desc: "Adevăr Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
+		gameOptions: []
+	},
 	CapturePaiSho: {
 		id: 3,
 		desc: "Capture Pai Sho",
@@ -1892,19 +1915,6 @@ var GameType = {
 		secretGameOptions: [
 			MORE_ATTACKERS
 		]
-	},
-	Adevar: {
-		id: 12,
-		desc: "Adevăr Pai Sho",
-		rulesUrl: "",
-		gameOptions: [],
-		usersWithAccess: [
-			'SkudPaiSho',
-			'Zach',
-			'ProfPetruescu',
-			'Aeneas',
-			'Sambews'
-		]
 	}
 };
 function getGameControllerForGameType(gameTypeId) {
@@ -1951,11 +1961,7 @@ function getGameControllerForGameType(gameTypeId) {
 			controller = new HexentaflController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Adevar.id:
-			if (gameDevOn || GameType.Adevar.usersWithAccess.includes(getUsername())) {
-				controller = new AdevarController(gameContainerDiv, isMobile);
-			} else {
-				closeGame();
-			}
+			controller = new AdevarController(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
@@ -2672,7 +2678,12 @@ function getGameControllerForGameType(gameTypeId) {
   }
   
   function closeGame() {
-	  setGameController(randomIntFromInterval(1,2));
+	  var defaultGameTypeIds = [
+		  GameType.SkudPaiSho.id,
+		  GameType.VagabondPaiSho.id,
+		  GameType.Adevar.id
+	  ]
+	  setGameController(defaultGameTypeIds[randomIntFromInterval(0,defaultGameTypeIds.length-1)]);
   }
   
   function getSidenavNewGameEntryForGameType(gameType) {
@@ -3603,23 +3614,32 @@ function getGameControllerForGameType(gameTypeId) {
 	  document.body.setAttribute("data-theme", currentTheme);
   }
   
-  /* Game Controller classes should call these for user's preferences */
-  function getUserGamePrefKeyName(preferenceKey) {
-	  return "GameType" + gameController.getGameTypeId() + preferenceKey;
-  }
-  function getUserGamePreference(preferenceKey) {
-	  if (gameController && gameController.getGameTypeId) {
-		  debug(gameController.getGameTypeId());
-		  var keyName = getUserGamePrefKeyName(preferenceKey);
-		  return localStorage.getItem(keyName);
-	  }
-  }
-  function setUserGamePreference(preferenceKey, value) {
-	  if (gameController && gameController.getGameTypeId) {
-		  var keyName = getUserGamePrefKeyName(preferenceKey);
-		  localStorage.setItem(keyName, value);
-	  }
-  }
+/* Game Controller classes should call these for user's preferences */
+function getUserGamePrefKeyName(preferenceKey) {
+	return "GameType" + gameController.getGameTypeId() + preferenceKey;
+}
+function getUserGamePreference(preferenceKey) {
+	if (gameController && gameController.getGameTypeId) {
+		debug(gameController.getGameTypeId());
+		var keyName = getUserGamePrefKeyName(preferenceKey);
+		return localStorage.getItem(keyName);
+	}
+}
+function setUserGamePreference(preferenceKey, value) {
+	if (gameController && gameController.getGameTypeId) {
+		var keyName = getUserGamePrefKeyName(preferenceKey);
+		localStorage.setItem(keyName, value);
+	}
+}
+
+function buildPreferenceDropdownDiv(labelText, dropdownId, valuesObject, preferenceKey) {
+	return buildDropdownDiv(dropdownId, labelText + ":", valuesObject,
+				getUserGamePreference(preferenceKey),
+				function() {
+					setUserGamePreference(preferenceKey, this.value);
+					gameController.callActuate();
+				});
+};
   
   function setGameLogText(text) {
 	  var newText = '';

@@ -85,7 +85,8 @@ CaptureActuator.prototype.addTile = function(tile, mainContainer) {
 	}
 
 	var theImg = document.createElement("img");
-	theImg.src = "images/Capture/" + tile.getImageName() + ".png";
+	var srcValue = this.getTileImageSourceDir();
+	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
 
 	theDiv.setAttribute("name", tile.getImageName());
@@ -127,8 +128,8 @@ CaptureActuator.prototype.addBoardPoint = function(boardPoint) {
 		theDiv.classList.add("hasTile");
 		
 		var theImg = document.createElement("img");
-
-		theImg.src = "images/Capture/" + boardPoint.tile.getImageName() + ".png";
+		var srcValue = this.getTileImageSourceDir();
+		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 		
 		if (boardPoint.tile.captureHelpFlag) {
 			theDiv.classList.add("GUESTharmony");
@@ -150,6 +151,10 @@ CaptureActuator.prototype.addBoardPoint = function(boardPoint) {
 		theBr.classList.add("clear");
 		this.boardContainer.appendChild(theBr);
 	}
+};
+
+CaptureActuator.prototype.getTileImageSourceDir = function() {
+	return "images/Capture/" + getUserGamePreference(CapturePreferences.tileDesignKey) + "/";
 };
 
 CaptureActuator.prototype.printBoard = function(board) {
