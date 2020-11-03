@@ -155,7 +155,7 @@ AdevarGameManager.prototype.setup = function (ignoreActuate) {
 	this.disableUndo = false;
 	this.gameLogText = "";
 
-	this.secondFaceTilePlayedCount = {
+	this.secondFaceTilesOnBoardCount = {
 		HOST: 0,
 		GUEST: 0
 	};
@@ -163,7 +163,7 @@ AdevarGameManager.prototype.setup = function (ignoreActuate) {
 	this.secondFaceTilesPlayed = {
 		HOST: [],
 		GUEST: []
-	}
+	};
 
 	this.playerHiddenTiles = {
 		HOST: null,
@@ -261,10 +261,13 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 		/* Remove Second Face tiles if player has played their second one */
 		if (tile.type === AdevarTileType.secondFace) {
-			this.secondFaceTilePlayedCount[move.player]++;
-			this.secondFaceTilesPlayed[move.player].push(tile);
-			if (this.secondFaceTilePlayedCount[move.player] === 2) {
-				this.tileManager.removeRemainingTilesOfType(move.player, AdevarTileType.secondFace, this.secondFaceTilesPlayed[move.player]);
+			this.secondFaceTilesOnBoardCount[move.player]++;
+
+			if (!this.secondFaceTilesPlayed[move.player].includes(tile)) {	// If a new SF tile used
+				this.secondFaceTilesPlayed[move.player].push(tile);
+				if (this.secondFaceTilesPlayed[move.player].length === 2) {
+					this.tileManager.removeRemainingTilesOfType(move.player, AdevarTileType.secondFace, this.secondFaceTilesPlayed[move.player]);
+				}
 			}
 		}
 
@@ -304,8 +307,8 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		}
 
 		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.secondFace) {
-			/* Regrow player's Vanguards */
 			this.regrowVanguardsForPlayer(move.player);
+			this.secondFaceTilesOnBoardCount[getOpponentName(move.player)]--;
 		}
 
 		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.reflection) {
@@ -399,7 +402,7 @@ AdevarGameManager.prototype.revealAllPointsAsPossible = function() {
 
 AdevarGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
 	if (tile.type !== AdevarTileType.secondFace
-		|| (tile.type === AdevarTileType.secondFace && this.secondFaceTilePlayedCount[tile.ownerName] < 2)
+		|| (tile.type === AdevarTileType.secondFace && this.secondFaceTilesOnBoardCount[tile.ownerName] < 1)
 	) {
 		this.board.setPossibleDeployPoints(tile);
 	}
