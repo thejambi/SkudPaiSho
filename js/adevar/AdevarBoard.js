@@ -462,17 +462,18 @@ AdevarBoard.prototype.moveTile = function(notationPointStart, notationPointEnd) 
 };
 
 AdevarBoard.prototype.shouldReturnCapturedTileToHandAfterCapture = function(capturingTile, capturedTile) {
-	if (capturedTile) {
-		if (arrayIncludesOneOf( 
-			[capturedTile.type],
-			[
-				AdevarTileType.secondFace,
-				AdevarTileType.reflection,
-				AdevarTileType.gate
-			]
-		)) {
-			return true;
-		}
+	if (capturedTile
+		&& [
+			AdevarTileType.secondFace,
+			AdevarTileType.reflection,
+			AdevarTileType.gate
+		].includes(capturedTile.type)
+	) {
+		return true;
+	}
+	
+	if (capturingTile && [AdevarTileType.secondFace, AdevarTileType.reflection].includes(capturingTile.type)) {
+		return true;
 	}
 
 	return false;
@@ -863,9 +864,15 @@ AdevarBoard.prototype.pointIsAdjacentToVanguard = function(boardPoint) {
 	return vanguardFound;
 };
 
-AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint) {
+AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint, isDeploy) {
 	return targetPoint.hasTile() 
-		&& this.tileCanCapture(tile, movementInfo, fromPoint, targetPoint);
+		&& (
+			this.tileCanCapture(tile, movementInfo, fromPoint, targetPoint)
+			|| (isDeploy 
+				&& [AdevarTileType.secondFace, AdevarTileType.reflection].includes(tile.type)
+				&& targetPoint.tile.ownerName !== tile.ownerName
+				)
+		);
 };
 
 AdevarBoard.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, targetPoint) {
@@ -982,7 +989,7 @@ AdevarBoard.prototype.setPossibleDeployPointsAroundTilesOfType = function(tile, 
 	targetTilePoints.forEach(function(targetTilePoint) {
 		self.getDirectlyAdjacentPoints(targetTilePoint).forEach(function(pointNextToTargtTile) {
 			if ((!pointNextToTargtTile.hasTile()
-					|| self.targetPointHasTileThatCanBeCaptured(tile, null, null, pointNextToTargtTile))
+					|| self.targetPointHasTileThatCanBeCaptured(tile, null, null, pointNextToTargtTile, true))
 					&& self.tileCanLandOnPointWithoutBreakingPlotCountLimits(tile, pointNextToTargtTile)) {
 				pointNextToTargtTile.addType(POSSIBLE_MOVE);
 			}

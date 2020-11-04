@@ -248,7 +248,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		var placeTileResults = this.board.placeTile(tile, move.endPoint);
 
 		/* Record captured tile */
-		if (placeTileResults.capturedTile) {
+		if (placeTileResults.capturedTile && !placeTileResults.returnCapturedTileToHand) {
 			this.capturedTiles.push(placeTileResults.capturedTile);
 		}
 
