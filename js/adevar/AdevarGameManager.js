@@ -316,6 +316,10 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 			this.disableUndo = true;
 			this.board.revealTile(AdevarTileType.hiddenTile, moveTileResults.capturedTile.ownerName);
 			move.removedSFInfo = this.board.removeSFThatCannotCaptureHT(move.player, this.playerHiddenTiles[moveTileResults.capturedTile.ownerName]);
+			if (move.removedSFInfo.tileRemoved) {
+				this.secondFaceTilesOnBoardCount[move.removedSFInfo.tileRemoved.ownerName]--;
+				this.tileManager.putTileBack(move.removedSFInfo.tileRemoved);
+			}
 		}
 
 		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.reflection) {

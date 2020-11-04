@@ -495,7 +495,9 @@ AdevarBoard.prototype.applyTileCapturedTriggers = function(capturingTile, captur
 AdevarBoard.prototype.removeSFThatCannotCaptureHT = function(player, targetHiddenTile) {
 	var removedInfo = {};
 	this.forEachBoardPointWithTile(function(boardPoint) {
-		if (boardPoint.tile.type === AdevarTileType.secondFace && !boardPoint.tile.canCapture(targetHiddenTile)) {
+		if (boardPoint.tile.type === AdevarTileType.secondFace
+				&& boardPoint.tile.ownerName === player
+				&& !boardPoint.tile.canCapture(targetHiddenTile)) {
 			removedInfo.pointRemovedFrom = boardPoint;
 			removedInfo.tileRemoved = boardPoint.removeTile();
 		}
