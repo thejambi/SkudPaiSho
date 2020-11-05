@@ -534,7 +534,7 @@ AdevarHarmonyManager.prototype.isCenterInsideShapeOld = function(shapePoints) {
 /* Based on Winding Number algorithm https://gist.github.com/thejambi/6ae53b6ab2636c8aff367195efeb4f44 */
 AdevarHarmonyManager.prototype.isCenterInsideShape = function(vs) {
 	var x = .5;
-	var y = .5;
+	var y = -.5;
 
 	var wn = 0;
 

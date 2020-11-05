@@ -185,9 +185,6 @@ AdevarGameManager.prototype.actuate = function (moveToAnimate) {
 	}
 	this.actuator.actuate(this.board, this.tileManager, this.capturedTiles, moveToAnimate);
 
-	if (this.endGameWinners.length > 0) {
-		this.gameLogText += ". " + this.endGameWinners[0] + this.gameWinReason;
-	}
 	setGameLogText(this.gameLogText);
 };
 
@@ -339,6 +336,10 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		this.setWinByHiddenTileCaptureForPlayer(move.player);
 	} else {
 		this.checkWinForPlayer(move.player, hiddenTileCaptured);
+	}
+
+	if (this.endGameWinners.length > 0) {
+		this.gameLogText += ". " + this.endGameWinners[0] + this.gameWinReason;
 	}
 
 	if (this.endGameWinners.length > 0) {

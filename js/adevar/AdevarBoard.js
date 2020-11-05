@@ -382,8 +382,6 @@ AdevarBoard.prototype.countTilesInPlots = function() {
 			});
 		}
 	});
-
-	debug(this.basicTilePlotCounts);
 };
 
 AdevarBoard.prototype.placeTile = function(tile, notationPoint) {
@@ -1017,7 +1015,6 @@ AdevarBoard.prototype.tileCanLandOnPointWithoutBreakingPlotCountLimits = functio
 		if (movedFromPoint && movedFromPoint.plotTypes.includes(targetPlot)) {
 			plotCount -= 1 / movedFromPoint.plotTypes.length;
 		}
-		debug(targetPlot + ": " + plotCount);
 		var plotLimit = 9999;	// Neutral Plot, no limit
 		if (arrayIncludesOneOf(
 				[targetPlot], 
