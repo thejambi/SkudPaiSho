@@ -396,7 +396,7 @@ AdevarBoard.prototype.putTileOnPoint = function(tile, notationPoint) {
 
 	point.putTile(tile);
 
-	var returnCapturedTileToHand = this.shouldReturnCapturedTileToHandAfterCapture(tile, capturedTile);
+	var returnCapturedTileToHand = this.shouldReturnCapturedTileToHandAfterCapture(tile, capturedTile, true);
 
 	return {
 		capturedTile: capturedTile,
@@ -459,7 +459,7 @@ AdevarBoard.prototype.moveTile = function(notationPointStart, notationPointEnd) 
 	};
 };
 
-AdevarBoard.prototype.shouldReturnCapturedTileToHandAfterCapture = function(capturingTile, capturedTile) {
+AdevarBoard.prototype.shouldReturnCapturedTileToHandAfterCapture = function(capturingTile, capturedTile, isDeploy) {
 	if (capturedTile
 		&& [
 			AdevarTileType.secondFace,
@@ -470,7 +470,7 @@ AdevarBoard.prototype.shouldReturnCapturedTileToHandAfterCapture = function(capt
 		return true;
 	}
 	
-	if (capturingTile && [AdevarTileType.secondFace, AdevarTileType.reflection].includes(capturingTile.type)) {
+	if (isDeploy && capturingTile && [AdevarTileType.secondFace, AdevarTileType.reflection].includes(capturingTile.type)) {
 		return true;
 	}
 
