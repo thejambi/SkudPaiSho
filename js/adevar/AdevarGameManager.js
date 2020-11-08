@@ -301,6 +301,8 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 			/* Regrow Opponent Vanguards */
 			var opponentName = getOpponentName(move.player);
 			this.regrowVanguardsForPlayer(opponentName);
+
+			this.secondFaceTilesOnBoardCount[move.player]--;
 		}
 
 		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.secondFace) {
