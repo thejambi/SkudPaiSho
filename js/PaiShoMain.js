@@ -2752,6 +2752,12 @@ function getGameControllerForGameType(gameTypeId) {
 		  document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
 		  onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, sendChatCallback);
 	  }
+
+	  /* Secret easter eggs... */
+	  if (chatMessage.toLowerCase().includes('spoopy')) {
+		new AdevarOptions();
+		AdevarOptions.commenceSpoopy();
+	  }
   }
   
   document.getElementById('chatMessageInput').onkeypress = function(e){

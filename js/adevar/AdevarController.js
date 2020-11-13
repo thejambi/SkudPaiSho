@@ -352,7 +352,7 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 			objective = "Have 2 Basic tiles in each Red Plot, and 3 Basic tiles in each White Plot";
 			break;
 		case AdevarTileCode.orientalLily:
-			objective = "Create an Oriental Lily Garden formation with Basic tiles (see rules for Garden diagrams)";
+			objective = "Create an Oriental Lily Garden formation with Basic tiles (see rules or below image for Garden diagrams)<br /><img alt='Adevar Oriental Lily Gardens Diagram' style='width:100%' src='images/Adevar/OrientalLilyDiagram.png' />";
 			break;
 		case AdevarTileCode.echeveria:
 			objective = "Capture at least 2 of each of your opponent’s Basic tile types, and have at least 1 of each of your Basic tile types be captured";

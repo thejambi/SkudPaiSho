@@ -33,3 +33,8 @@ AdevarOptions.buildTileDesignDropdownDiv = function(alternateLabelText) {
 								AdevarOptions.setTileDesignsPreference(this.value);
 							});
 };
+
+AdevarOptions.commenceSpoopy = function() {
+	AdevarOptions.tileDesignTypeValues['spoopy'] = "Adevar Spoopy";
+	AdevarOptions.setTileDesignsPreference('spoopy');
+};
