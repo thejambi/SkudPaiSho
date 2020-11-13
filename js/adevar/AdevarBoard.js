@@ -514,12 +514,19 @@ AdevarBoard.prototype.regrowVanguards = function(player, vanguardTiles) {
 	vanguardNotationPoints.forEach(function(vanguardNotationPoint) {
 		var vanguardPoint = self.getPointFromNotationPoint(vanguardNotationPoint);
 		var vanguardTile = vanguardTiles[vanguardTileIndex];
-		vanguardTileIndex++;
 		if (vanguardTile) {
+			var needToReplace = false;
 			if (vanguardPoint.hasTile() && vanguardPoint.tile.type !== AdevarTileType.vanguard) {
 				tilesReplaced.push(vanguardPoint.removeTile());
+				needToReplace = true;
 			}
-			vanguardPoint.putTile(vanguardTile);
+			if (!vanguardPoint.hasTile()) {
+				needToReplace = true;
+			}
+			if (needToReplace) {
+				vanguardPoint.putTile(vanguardTile);
+				vanguardTileIndex++;
+			}
 		}
 	});
 

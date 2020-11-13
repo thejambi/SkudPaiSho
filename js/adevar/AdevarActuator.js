@@ -224,6 +224,12 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 
 		var tileMoved = boardPoint.tile;
 
+		var showMovedTileDuringAnimation = this.animationOn && moveToAnimate && moveToAnimate.moveTileResults && moveToAnimate.moveTileResults.tileMoved
+											&& isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row);
+		if (showMovedTileDuringAnimation) {
+			tileMoved = moveToAnimate.moveTileResults.tileMoved;
+		}
+
 		if (this.animationOn && moveToAnimate && moveToAnimate.moveTileResults && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)
 				&& moveToAnimate.moveTileResults.tileMoved !== moveToAnimate.moveTileResults.tileInEndPoint) {
 			/* This is when a SF tile attempts to capture wrong HT */
@@ -250,6 +256,14 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		theDiv.appendChild(theImg);
 
 		var capturedTile = this.getCapturedTileFromMoveToAnimate(moveToAnimate);
+
+		if (showMovedTileDuringAnimation) {
+			setTimeout(function() {
+				requestAnimationFrame(function(){
+					theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
+				});
+			}, pieceAnimationLength);
+		}
 
 		if (this.animationOn && moveToAnimate && capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
 			debug("Captured " + capturedTile.code);
