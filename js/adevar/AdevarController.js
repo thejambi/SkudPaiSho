@@ -415,6 +415,14 @@ AdevarController.prototype.getPointMessage = function(htmlPoint) {
 		message.push("A tile here is counted as 1/2 in each plot it is touching");
 	}
 
+	var self = this;
+
+	boardPoint.plotTypes.forEach(function(plotType) {
+		var hostPlotCount = self.theGame.board.getPlotCountForPlayer(plotType, HOST);
+		var guestPlotCount = self.theGame.board.getPlotCountForPlayer(plotType, GUEST);
+		message.push("Basic Tiles in " + plotType + ":<br />HOST: " + hostPlotCount + ", GUEST: " + guestPlotCount);
+	});
+
 	return {
 		heading: heading,
 		message: message

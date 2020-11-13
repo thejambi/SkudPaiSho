@@ -384,6 +384,13 @@ AdevarBoard.prototype.countTilesInPlots = function() {
 	});
 };
 
+AdevarBoard.prototype.getPlotCountForPlayer = function(plotType, player) {
+	if (this.basicTilePlotCounts[plotType]) {
+		return this.basicTilePlotCounts[plotType][player];
+	}
+	return 0;
+};
+
 AdevarBoard.prototype.placeTile = function(tile, notationPoint) {
 	return this.putTileOnPoint(tile, notationPoint);
 };
