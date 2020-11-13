@@ -538,24 +538,24 @@ AdevarHarmonyManager.prototype.isCenterInsideShape = function(vs) {
 
 	var wn = 0;
 
-    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-      var xi = parseFloat(vs[i][0]), yi = parseFloat(vs[i][1]);
-	  var xj = parseFloat(vs[j][0]), yj = parseFloat(vs[j][1]);
-	}
+	for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+		var xi = parseFloat(vs[i][0]), yi = parseFloat(vs[i][1]);
+		var xj = parseFloat(vs[j][0]), yj = parseFloat(vs[j][1]);
 
-      if (yj <= y) {
-        if (yi > y) {
-          if (this.isLeft([xj, yj], [xi, yi], [x,y]) > 0) {
-            wn++;
-          }
-        }
-      } else {
-        if (yi <= y) {
-          if (this.isLeft([xj, yj], [xi, yi], [x, y]) < 0) {
-            wn--;
-          }
-        }
-      }
+		if (yj <= y) {
+			if (yi > y) {
+				if (this.isLeft([xj, yj], [xi, yi], [x, y]) > 0) {
+					wn++;
+				}
+			}
+		} else {
+			if (yi <= y) {
+				if (this.isLeft([xj, yj], [xi, yi], [x, y]) < 0) {
+					wn--;
+				}
+			}
+		}
+	}
 
 	return wn != 0;
 };
