@@ -211,6 +211,12 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		}
 	}
 
+	if (boardPoint.gardenHighlightNumbers.length > 0) {
+		boardPoint.gardenHighlightNumbers.forEach(function(number) {
+			theDiv.classList.add("adevar_highlight" + number);
+		});
+	}
+
 	if (boardPoint.hasTile()) {
 		theDiv.classList.add("hasTile");
 		

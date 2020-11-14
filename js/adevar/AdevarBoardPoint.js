@@ -16,6 +16,7 @@ function AdevarBoardPoint() {
 	this.plotTypes = [];
 	this.row = -1;
 	this.col = -1;
+	this.gardenHighlightNumbers = [];
 }
 
 AdevarBoardPoint.prototype.addType = function(type) {
@@ -89,6 +90,14 @@ AdevarBoardPoint.prototype.getMoveDistanceRemaining = function(movementInfo) {
 
 AdevarBoardPoint.prototype.clearPossibleMovementTypes = function() {
 	this.moveDistanceRemaining = null;
+};
+
+AdevarBoardPoint.prototype.highlight = function(gardenNumber) {
+	this.gardenHighlightNumbers.push(gardenNumber);
+};
+
+AdevarBoardPoint.prototype.removeHighlight = function() {
+	this.gardenHighlightNumbers = [];
 };
 
 AdevarBoardPoint.prototype.getCopy = function() {

@@ -1105,6 +1105,35 @@ AdevarBoard.prototype.playerHasTileOfTypeAtPoint = function(player, notationPoin
 		&& point.tile.type === tileType;
 };
 
+AdevarBoard.prototype.highlightOrientalLilyObjective = function() {
+	var self = this;
+	var gardenNumber = 1;
+	AdevarOrientalLilyObjectivePoints.forEach(function(objectivePointsSet) {
+		var objectivePoints = objectivePointsSet[HOST];
+
+		objectivePoints.forEach(function(notationPoint) {
+			var point = notationPoint.rowAndColumn;
+			point = self.cells[point.row][point.col];
+			point.highlight(gardenNumber);
+		});
+
+		var objectivePointsGuest = objectivePointsSet[GUEST];
+		objectivePointsGuest.forEach(function(notationPoint) {
+			var point = notationPoint.rowAndColumn;
+			point = self.cells[point.row][point.col];
+			point.highlight(gardenNumber + 3);
+		});
+
+		gardenNumber++;
+	});
+};
+
+AdevarBoard.prototype.removeHighlights = function() {
+	this.forEachBoardPoint(function(boardPoint) {
+		boardPoint.removeHighlight();
+	});
+};
+
 AdevarBoard.prototype.getCopy = function() {
 	var copyBoard = new AdevarBoard();
 
