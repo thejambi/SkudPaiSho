@@ -6,6 +6,8 @@ function AdevarActuator(gameContainer, isMobile, enableAnimations) {
 
 	this.animationOn = enableAnimations;
 
+	this.orientalLilyDivs = [];
+
 	var containers = setupPaiShoBoard(
 		this.gameContainer, 
 		AdevarController.getHostTilesContainerDivs(),
@@ -29,6 +31,7 @@ AdevarActuator.prototype.setAnimationOn = function(isOn) {
 
 AdevarActuator.prototype.actuate = function(board, tileManager, capturedTiles, moveToAnimate) {
 	var self = this;
+	this.orientalLilyDivs = [];
 
 	debug(moveToAnimate);
 
@@ -215,6 +218,7 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		boardPoint.gardenHighlightNumbers.forEach(function(number) {
 			theDiv.classList.add("adevar_highlight" + number);
 		});
+		this.orientalLilyDivs.push(theDiv);
 	}
 
 	if (boardPoint.hasTile()) {
@@ -347,5 +351,17 @@ AdevarActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimat
 			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
 		});
 	}, pieceAnimationLength);
+};
+
+AdevarActuator.prototype.showOrientalLilyHighlights = function() {
+	this.orientalLilyDivs.forEach(function(theDiv) {
+		theDiv.classList.add("adevar_highlightOn");
+	});
+};
+
+AdevarActuator.prototype.hideOrientalLilyHighlights = function() {
+	this.orientalLilyDivs.forEach(function(theDiv) {
+		theDiv.classList.remove("adevar_highlightOn");
+	});
 };
 

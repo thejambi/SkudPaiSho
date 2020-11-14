@@ -361,16 +361,14 @@ AdevarController.prototype.buildOtherTileMessages = function(tile) {
 
 AdevarController.prototype.showOrientalLilyHelp = function() {
 	if (!this.lilyHelpOn) {
-		this.theGame.board.highlightOrientalLilyObjective();
-		this.callActuate();
+		this.theGame.actuator.showOrientalLilyHighlights();
 		this.lilyHelpOn = true;
 	}
 };
 
 AdevarController.prototype.hideOrientalLilyHelp = function() {
 	if (this.lilyHelpOn) {
-		this.theGame.board.removeHighlights();
-		this.callActuate();
+		this.theGame.actuator.hideOrientalLilyHighlights();
 		this.lilyHelpOn = false;
 	}
 };
@@ -383,7 +381,7 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 			objective = "Have 2 Basic tiles in each Red Plot, and 3 Basic tiles in each White Plot";
 			break;
 		case AdevarTileCode.orientalLily:
-			objective = "Create an Oriental Lily Garden formation with Basic tiles on your side of the board (see rules, image below, or board highlights for Garden diagrams)<br /><img alt='Adevar Oriental Lily Gardens Diagram' style='width:100%' src='images/Adevar/OrientalLilyDiagram.png' />";
+			objective = "Create one of the three Oriental Lily Garden formations with Basic tiles on your side of the board (see rules, image below, or board highlights for Garden diagrams)<br /><img alt='Adevar Oriental Lily Gardens Diagram' style='width:100%' src='images/Adevar/OrientalLilyDiagram.png' />";
 			this.showLilyHelp = true;
 			break;
 		case AdevarTileCode.echeveria:

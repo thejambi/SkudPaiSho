@@ -9,6 +9,8 @@ function AdevarBoard() {
 	this.basicTilePlotCounts = {};
 
 	this.harmonyManager = new AdevarHarmonyManager();
+
+	this.markOrientalLilyObjectivePoints();
 }
 
 AdevarBoard.prototype.brandNewForSpaces = function () {
@@ -1105,7 +1107,7 @@ AdevarBoard.prototype.playerHasTileOfTypeAtPoint = function(player, notationPoin
 		&& point.tile.type === tileType;
 };
 
-AdevarBoard.prototype.highlightOrientalLilyObjective = function() {
+AdevarBoard.prototype.markOrientalLilyObjectivePoints = function() {
 	var self = this;
 	var gardenNumber = 1;
 	AdevarOrientalLilyObjectivePoints.forEach(function(objectivePointsSet) {
@@ -1125,12 +1127,6 @@ AdevarBoard.prototype.highlightOrientalLilyObjective = function() {
 		});
 
 		gardenNumber++;
-	});
-};
-
-AdevarBoard.prototype.removeHighlights = function() {
-	this.forEachBoardPoint(function(boardPoint) {
-		boardPoint.removeHighlight();
 	});
 };
 
