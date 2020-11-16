@@ -1269,7 +1269,7 @@ function askToJoinPrivateGame(privateGameId, hostUserName) {
 		}
 
 		if (!iAmPlayerInCurrentOnlineGame()) {
-			showModal("Join Private Game?", message, true);
+			showModal("Join Game?", message, true);
 		}
 	} else {
 		var message = "To join this game hosted by " + hostUserName + ", please sign in and then refresh this page.";
