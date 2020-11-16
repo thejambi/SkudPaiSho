@@ -99,7 +99,8 @@ var paiShoBoardDesignTypeValues = {
 	waterarena: "Water Arena by Yagalo",
 	eartharena: "Earth Arena by Yagalo",
 	firearena: "Fire Arena by Yagalo",
-	ladenvar: "Ladenvăr by Sirstotes"
+	ladenvar: "Ladenvăr by Sirstotes",
+	christmas: "Christmas"
 };
 
 var svgBoardDesigns = [
@@ -2739,7 +2740,6 @@ function getGameControllerForGameType(gameTypeId) {
   }
   
   /* Chat */
-  
   var sendChatCallback = function sendChatCallback(result) {
 	  document.getElementById('sendChatMessageButton').innerHTML = "Send";
 	  document.getElementById('chatMessageInput').value = "";
@@ -2753,12 +2753,20 @@ function getGameControllerForGameType(gameTypeId) {
 		  onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, sendChatCallback);
 	  }
 
-	  /* Secret easter eggs... */
-	  if (chatMessage.toLowerCase().includes('spoopy')) {
+	  processChatCommands(chatMessage);
+  }
+
+var processChatCommands = function(chatMessage) {
+	/* Secret easter eggs... */
+	if (chatMessage.toLowerCase().includes('spoopy')) {
 		new AdevarOptions();
 		AdevarOptions.commenceSpoopy();
-	  }
-  }
+	}
+	if (chatMessage.toLowerCase().includes('christmas')) {
+		new AdevarOptions();
+		AdevarOptions.includeChristmas();
+	}
+};
   
   document.getElementById('chatMessageInput').onkeypress = function(e){
 	   var code = (e.keyCode ? e.keyCode : e.which);
