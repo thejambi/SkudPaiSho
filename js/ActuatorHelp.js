@@ -157,7 +157,16 @@ function applyBoardOptionToBgSvg(bgSvgIfKnown) {
 		if (svgBoardDesigns.includes(paiShoBoardKey)) {
 			extension = ".svg";
 		}
-		bgSvg.style.backgroundImage = "url('style/board_" + paiShoBoardKey + extension + "')";
+
+		var boardUrl = "style/board_" + paiShoBoardKey + extension;
+
+		var customBoardUrl = localStorage.getItem(customBoardUrlKey);
+		if (paiShoBoardKey === 'applycustomboard' && customBoardUrl) {
+			debug("Custom board! " + customBoardUrl);
+			boardUrl = customBoardUrl;
+		}
+
+		bgSvg.style.backgroundImage = "url('" + boardUrl + "')";
 	}
 }
 

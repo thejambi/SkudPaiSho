@@ -65,6 +65,7 @@ var QueryString = function () {
   };
   
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
+var customBoardUrlKey = "customBoardUrlKey";
 var paiShoBoardDesignTypeValues = {
 	tgg: "The Garden Gate",
 	nomadic: "Nomadic",
@@ -102,7 +103,8 @@ var paiShoBoardDesignTypeValues = {
 	ladenvar: "Ladenvăr by Sirstotes",
 	christmas: "Christmas",
 	offsetcheckeredred: "Offset Checkered Red",
-	offsetcheckeredgreen: "Offset Checkered Green"
+	offsetcheckeredgreen: "Offset Checkered Green",
+	applycustomboard: "Use Custom Board from URL"
 };
 
 var svgBoardDesigns = [
@@ -147,6 +149,9 @@ function buildPaiShoBoardDesignDropdownDiv() {
 	return buildDropdownDiv(paiShoBoardDesignDropdownId, "Pai Sho Board Design:", paiShoBoardDesignTypeValues,
 		localStorage.getItem(paiShoBoardDesignTypeKey),
 		function() {
+			if (this.value === 'applycustomboard') {
+				promptCustomBoardURL();
+			}
 			setPaiShoBoardOption(this.value);
 		});
 }
@@ -713,6 +718,22 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
 	applyBoardOptionToBgSvg();
 
 	clearMessage(); // Refresh Help tab text
+}
+
+function promptCustomBoardURL() {
+	var message = "<br /><input type='text' id='customBoardInput' name='customBoardInput' /><br />";
+	message += "<br /><div class='clickableText' onclick='setCustomBoardFromInput()'>Apply Custom Board</div>";
+
+	showModal("Use Custom Board URL", message);
+}
+
+function setCustomBoardFromInput() {
+	customBoardUrl = document.getElementById('customBoardInput').value;
+	debug(customBoardUrl);
+	closeModal();
+
+	localStorage.setItem(customBoardUrlKey, customBoardUrl);
+	applyBoardOptionToBgSvg();
 }
   
   /* Skud Pai Sho Tile Design Switches */
