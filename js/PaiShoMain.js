@@ -100,7 +100,9 @@ var paiShoBoardDesignTypeValues = {
 	eartharena: "Earth Arena by Yagalo",
 	firearena: "Fire Arena by Yagalo",
 	ladenvar: "Ladenvăr by Sirstotes",
-	christmas: "Christmas"
+	christmas: "Christmas",
+	offsetcheckeredred: "Offset Checkered Red",
+	offsetcheckeredgreen: "Offset Checkered Green"
 };
 
 var svgBoardDesigns = [
@@ -1255,6 +1257,14 @@ function createInviteLinkUrl(newGameId) {
 	return linkUrl;
 }
 
+function askToJoinGame(gameId, hostUsername) {
+	/* Set up QueryString as if joining through game invite link to trigger asking */
+	QueryString.joinPrivateGame = gameId.toString();
+	QueryString.hostUserName = hostUsername;
+	QueryString.allowJoiningOwnGame = true;
+	jumpToGame(gameId);
+}
+
 function askToJoinPrivateGame(privateGameId, hostUserName) {
 	if (userIsLoggedIn()) {
 		var message = "Do you want to join this game hosted by " + hostUserName + "?";
@@ -1268,7 +1278,7 @@ function askToJoinPrivateGame(privateGameId, hostUserName) {
 			message += "<div class='clickableText' onclick='closeModal();'>OK</div>";
 		}
 
-		if (!iAmPlayerInCurrentOnlineGame()) {
+		if (!iAmPlayerInCurrentOnlineGame() || QueryString.allowJoiningOwnGame) {
 			showModal("Join Game?", message, true);
 		}
 	} else {
@@ -2055,6 +2065,8 @@ function getGameControllerForGameType(gameTypeId) {
 		  /* Ask to join invite link game if present */
 		  if (QueryString.joinPrivateGame && gameId && gameId.toString() === QueryString.joinPrivateGame) {
 			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
+			  /* Once we ask after jumping into a game, we won't need to ask again */
+			  QueryString.joinPrivateGame = null;
 		  }
 	  }
   };
@@ -2331,7 +2343,7 @@ function getGameControllerForGameType(gameTypeId) {
 			  closeModal();
 			  showModal("Cannot Join Game", "You are already playing a game against that user, so you will have to finish that game first.");
 		  } else {
-			  completeJoinGameSeek(gameSeek);
+			askToJoinGame(gameSeek.gameId, gameSeek.hostUsername);
 		  }
 	  } else {
 		  // No results, means ok to join game
