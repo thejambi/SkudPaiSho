@@ -1195,11 +1195,11 @@ function myTurn() {
 	var userEmail = localStorage.getItem(localEmailKey);
 	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
 		if (getCurrentPlayer() === HOST) {
-			return !hostEmail ||
+			return (!hostEmail && !playingOnlineGame()) ||
 				(localStorage.getItem(localEmailKey) === hostEmail ||
 					(currentGameData.hostUsername && usernameEquals(currentGameData.hostUsername)));
 		} else {
-			return !guestEmail ||
+			return (!guestEmail && !playingOnlineGame()) ||
 				(localStorage.getItem(localEmailKey) === guestEmail ||
 					(currentGameData.guestUsername && usernameEquals(currentGameData.guestUsername)));
 		}
