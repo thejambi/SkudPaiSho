@@ -88,6 +88,10 @@ AdevarController.prototype.getAdditionalMessage = function() {
 			msg += "Sign in to enable online gameplay. Or, start playing a local game by choosing a Hidden Tile.<br />";
 		}
 
+		if (gameOptionEnabled(ADEVAR_LITE)) {
+			msg += "<br /><strong>Adevăr Lite</strong> is a <em>training wheels</em> mode for beginners to learn the game - players play with their Hidden Tiles revealed and win by accomplishing their chosen Hidden Tile objective.<br />";
+		}
+
 		msg += getGameOptionsMessageHtml(GameType.Adevar.gameOptions);
 	}
 
