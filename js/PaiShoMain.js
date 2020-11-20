@@ -105,7 +105,7 @@ var paiShoBoardDesignTypeValues = {
 	// offsetcheckeredgreen: "Offset Checkered Green",
 	lightmode: "Old Default Light Mode",
 	darkmode: "Old Default Dark Mode",
-	christmas: "Christmas",
+	christmas: "Christmas by Prof. Petruescu",
 	applycustomboard: "Use Custom Board from URL"
 };
 
@@ -2802,7 +2802,7 @@ var processChatCommands = function(chatMessage) {
 		new AdevarOptions();
 		AdevarOptions.commenceSpoopy();
 	}
-	if (chatMessage.toLowerCase().includes('christmas')) {
+	if (chatMessage.toLowerCase().includes('christmas') && usernameIsOneOf['SkudPaiSho']) {
 		new AdevarOptions();
 		AdevarOptions.includeChristmas();
 	}
