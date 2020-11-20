@@ -104,6 +104,7 @@ var paiShoBoardDesignTypeValues = {
 	christmas: "Christmas",
 	offsetcheckeredred: "Offset Checkered Red",
 	offsetcheckeredgreen: "Offset Checkered Green",
+	nomadsky: "Nomad's Sky by Morbius",
 	applycustomboard: "Use Custom Board from URL"
 };
 
@@ -1853,7 +1854,9 @@ var GameType = {
 		id: 12,
 		desc: "Adevăr Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
-		gameOptions: []
+		gameOptions: [
+			ADEVAR_LITE
+		]
 	},
 	CapturePaiSho: {
 		id: 3,
