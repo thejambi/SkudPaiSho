@@ -722,7 +722,11 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
 }
 
 function promptCustomBoardURL() {
-	var message = "<br /><input type='text' id='customBoardInput' name='customBoardInput' /><br />";
+	customBoardUrl = "https://skudpaisho.com/style/board_tgg.png";
+	localStorage.setItem(customBoardUrlKey, customBoardUrl);
+
+	var message = "<p>You can use one of many fan-created board designs. See the boards in the #board-design channel in The Garden Gate Discord. Copy and paste the link to a board image to use here:</p>";
+	message += "<br /><input type='text' id='customBoardInput' name='customBoardInput' /><br />";
 	message += "<br /><div class='clickableText' onclick='setCustomBoardFromInput()'>Apply Custom Board</div>";
 
 	showModal("Use Custom Board URL", message);
@@ -730,7 +734,6 @@ function promptCustomBoardURL() {
 
 function setCustomBoardFromInput() {
 	customBoardUrl = document.getElementById('customBoardInput').value;
-	debug(customBoardUrl);
 	closeModal();
 
 	localStorage.setItem(customBoardUrlKey, customBoardUrl);

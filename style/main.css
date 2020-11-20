@@ -1198,6 +1198,7 @@ input,
 textarea {
   background: var(--input-background);
   color: var(--input-color);
+  border: 1px solid #cac8bf;
 }
 
 /** --- Adevar --- */
