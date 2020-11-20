@@ -61,7 +61,8 @@ var QueryString = function () {
 	  chujiblue: "Chu Ji Blue",
 	  chujimono: "Chu Ji Monochrome",
 	  azulejosmono: "Azulejos Monocromos",
-	  azulejosdemadera: "Azulejos de Madera"
+	  azulejosdemadera: "Azulejos de Madera",
+	  christmas: "Christmastime colors"
   };
   
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
