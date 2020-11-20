@@ -2802,7 +2802,7 @@ var processChatCommands = function(chatMessage) {
 		new AdevarOptions();
 		AdevarOptions.commenceSpoopy();
 	}
-	if (chatMessage.toLowerCase().includes('christmas') && usernameIsOneOf['SkudPaiSho']) {
+	if (chatMessage.toLowerCase().includes('christmas') && usernameIsOneOf(['SkudPaiSho'])) {
 		new AdevarOptions();
 		AdevarOptions.includeChristmas();
 	}
