@@ -221,7 +221,7 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 			var userIsTileOwner = userIsHost ? boardPoint.tile.ownerName === HOST : userIsGuest && boardPoint.tile.ownerName === GUEST;
 			if ((userIsTileOwner || (!playingOnlineGame() && getCurrentPlayer() === boardPoint.tile.ownerName))
 					&& boardPoint.tile.type === AdevarTileType.hiddenTile) {
-				boardPoint.tile.hidden = !boardPoint.tile.hidden;
+				boardPoint.tile.hidden = !boardPoint.tile.hidden && !gameOptionEnabled(ADEVAR_LITE);
 				this.callActuate();
 			} else {
 				if (boardPoint.tile.ownerName !== getCurrentPlayer() || !myTurn()) {
