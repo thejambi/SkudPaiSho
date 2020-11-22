@@ -190,7 +190,9 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		});
 
 		// Place Gate tiles
-		this.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.gate), AdevarBoardSetupPoints.gate[move.player]);
+		var homeGateTile = self.tileManager.grabTile(move.player, AdevarTileCode.gate);
+		homeGateTile.isHomeGate = true;
+		this.board.placeTile(homeGateTile, AdevarBoardSetupPoints.gate[move.player]);
 		
 		// Place Lilac tiles
 		AdevarBoardSetupPoints.lilac[move.player].forEach(function(lilacPoint) {

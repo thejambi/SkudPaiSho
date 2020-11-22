@@ -984,12 +984,13 @@ AdevarBoard.prototype.removePossibleMovePoints = function() {
 };
 
 AdevarBoard.prototype.setPossibleDeployPoints = function(tile) {
-	if (arrayIncludesOneOf(
+	if (tile.type === AdevarTileType.reflection) {
+		this.setPossibleDeployPointsAroundTilesOfType(tile, AdevarTileType.gate, true);
+	} else if (arrayIncludesOneOf(
 		[tile.type],
 		[
 			AdevarTileType.basic,
-			AdevarTileType.secondFace,
-			AdevarTileType.reflection
+			AdevarTileType.secondFace
 		]
 	)) {
 		this.setPossibleDeployPointsAroundTilesOfType(tile, AdevarTileType.gate);
@@ -998,18 +999,20 @@ AdevarBoard.prototype.setPossibleDeployPoints = function(tile) {
 	}
 };
 
-AdevarBoard.prototype.setPossibleDeployPointsAroundTilesOfType = function(tile, tileType) {
+AdevarBoard.prototype.setPossibleDeployPointsAroundTilesOfType = function(tile, tileType, onlyHomeGate) {
 	var targetTilePoints = this.getTileTypePoints(tile.ownerName, tileType);
 
 	var self = this;
 	targetTilePoints.forEach(function(targetTilePoint) {
-		self.getDirectlyAdjacentPoints(targetTilePoint).forEach(function(pointNextToTargtTile) {
-			if ((!pointNextToTargtTile.hasTile()
+		if ((onlyHomeGate && targetTilePoint.tile.isHomeGate) || !onlyHomeGate) {
+			self.getDirectlyAdjacentPoints(targetTilePoint).forEach(function(pointNextToTargtTile) {
+				if ((!pointNextToTargtTile.hasTile()
 					|| self.targetPointHasTileThatCanBeCaptured(tile, null, null, pointNextToTargtTile, true))
 					&& self.tileCanLandOnPointWithoutBreakingPlotCountLimits(tile, pointNextToTargtTile)) {
-				pointNextToTargtTile.addType(POSSIBLE_MOVE);
-			}
-		});
+					pointNextToTargtTile.addType(POSSIBLE_MOVE);
+				}
+			});
+		}
 	});
 };
 
