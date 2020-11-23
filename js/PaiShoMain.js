@@ -723,7 +723,7 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
 }
 
 function promptCustomBoardURL() {
-	if (!customBoardUrl) {
+	if (!localStorage.getItem(customBoardUrlKey)) {
 		customBoardUrl = "https://skudpaisho.com/style/board_tgg.png";
 	}
 	localStorage.setItem(customBoardUrlKey, customBoardUrl);
@@ -739,7 +739,9 @@ function setCustomBoardFromInput() {
 	customBoardUrl = document.getElementById('customBoardInput').value;
 	closeModal();
 
-	localStorage.setItem(customBoardUrlKey, customBoardUrl);
+	if (customBoardUrl) {
+		localStorage.setItem(customBoardUrlKey, customBoardUrl);
+	}
 	applyBoardOptionToBgSvg();
 }
   
