@@ -44,6 +44,7 @@ AdevarOptions.commenceSpoopy = function() {
 
 AdevarOptions.includeChristmas = function() {
 	AdevarOptions.tileDesignTypeValues['christmas'] = "Adevar Christmas";
+	AdevarOptions.tileDesignTypeValues['chu-ji-holiday'] = "Chuji Holiday";
 };
 
 AdevarOptions.prototype.addChristmasIfOk = function() {
