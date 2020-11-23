@@ -723,7 +723,9 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
 }
 
 function promptCustomBoardURL() {
-	customBoardUrl = "https://skudpaisho.com/style/board_tgg.png";
+	if (!customBoardUrl) {
+		customBoardUrl = "https://skudpaisho.com/style/board_tgg.png";
+	}
 	localStorage.setItem(customBoardUrlKey, customBoardUrl);
 
 	var message = "<p>You can use one of many fan-created board designs. See the boards in the #board-design channel in The Garden Gate Discord. Copy and paste the link to a board image to use here:</p>";
@@ -2805,6 +2807,11 @@ var processChatCommands = function(chatMessage) {
 	if (chatMessage.toLowerCase().includes('christmas') && usernameIsOneOf(['SkudPaiSho'])) {
 		new AdevarOptions();
 		AdevarOptions.includeChristmas();
+	}
+	if (chatMessage.toLowerCase().includes('thanksgiving') && gameController && gameController.getGameTypeId 
+			&& gameController.getGameTypeId() === GameType.Adevar.id) {
+		paiShoBoardDesignTypeValues['adevarsketch'] = "Adevar Sketch";
+		setPaiShoBoardOption('adevarsketch');
 	}
 };
   
