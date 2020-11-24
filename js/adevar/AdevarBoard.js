@@ -9,6 +9,8 @@ function AdevarBoard() {
 	this.basicTilePlotCounts = {};
 
 	this.harmonyManager = new AdevarHarmonyManager();
+
+	this.markOrientalLilyObjectivePoints();
 }
 
 AdevarBoard.prototype.brandNewForSpaces = function () {
@@ -382,8 +384,13 @@ AdevarBoard.prototype.countTilesInPlots = function() {
 			});
 		}
 	});
+};
 
-	debug(this.basicTilePlotCounts);
+AdevarBoard.prototype.getPlotCountForPlayer = function(plotType, player) {
+	if (this.basicTilePlotCounts[plotType]) {
+		return this.basicTilePlotCounts[plotType][player];
+	}
+	return 0;
 };
 
 AdevarBoard.prototype.placeTile = function(tile, notationPoint) {
@@ -398,7 +405,7 @@ AdevarBoard.prototype.putTileOnPoint = function(tile, notationPoint) {
 
 	point.putTile(tile);
 
-	var returnCapturedTileToHand = this.shouldReturnCapturedTileToHandAfterCapture(tile, capturedTile);
+	var returnCapturedTileToHand = this.shouldReturnCapturedTileToHandAfterCapture(tile, capturedTile, true);
 
 	return {
 		capturedTile: capturedTile,
@@ -461,18 +468,19 @@ AdevarBoard.prototype.moveTile = function(notationPointStart, notationPointEnd) 
 	};
 };
 
-AdevarBoard.prototype.shouldReturnCapturedTileToHandAfterCapture = function(capturingTile, capturedTile) {
-	if (capturedTile) {
-		if (arrayIncludesOneOf( 
-			[capturedTile.type],
-			[
-				AdevarTileType.secondFace,
-				AdevarTileType.reflection,
-				AdevarTileType.gate
-			]
-		)) {
-			return true;
-		}
+AdevarBoard.prototype.shouldReturnCapturedTileToHandAfterCapture = function(capturingTile, capturedTile, isDeploy) {
+	if (capturedTile
+		&& [
+			AdevarTileType.secondFace,
+			AdevarTileType.reflection,
+			AdevarTileType.gate
+		].includes(capturedTile.type)
+	) {
+		return true;
+	}
+	
+	if (isDeploy && capturingTile && [AdevarTileType.secondFace, AdevarTileType.reflection].includes(capturingTile.type)) {
+		return true;
 	}
 
 	return false;
@@ -495,7 +503,9 @@ AdevarBoard.prototype.applyTileCapturedTriggers = function(capturingTile, captur
 AdevarBoard.prototype.removeSFThatCannotCaptureHT = function(player, targetHiddenTile) {
 	var removedInfo = {};
 	this.forEachBoardPointWithTile(function(boardPoint) {
-		if (boardPoint.tile.type === AdevarTileType.secondFace && !boardPoint.tile.canCapture(targetHiddenTile)) {
+		if (boardPoint.tile.type === AdevarTileType.secondFace
+				&& boardPoint.tile.ownerName === player
+				&& !boardPoint.tile.canCapture(targetHiddenTile)) {
 			removedInfo.pointRemovedFrom = boardPoint;
 			removedInfo.tileRemoved = boardPoint.removeTile();
 		}
@@ -513,12 +523,19 @@ AdevarBoard.prototype.regrowVanguards = function(player, vanguardTiles) {
 	vanguardNotationPoints.forEach(function(vanguardNotationPoint) {
 		var vanguardPoint = self.getPointFromNotationPoint(vanguardNotationPoint);
 		var vanguardTile = vanguardTiles[vanguardTileIndex];
-		vanguardTileIndex++;
 		if (vanguardTile) {
+			var needToReplace = false;
 			if (vanguardPoint.hasTile() && vanguardPoint.tile.type !== AdevarTileType.vanguard) {
 				tilesReplaced.push(vanguardPoint.removeTile());
+				needToReplace = true;
 			}
-			vanguardPoint.putTile(vanguardTile);
+			if (!vanguardPoint.hasTile()) {
+				needToReplace = true;
+			}
+			if (needToReplace) {
+				vanguardPoint.putTile(vanguardTile);
+				vanguardTileIndex++;
+			}
 		}
 	});
 
@@ -861,9 +878,17 @@ AdevarBoard.prototype.pointIsAdjacentToVanguard = function(boardPoint) {
 	return vanguardFound;
 };
 
-AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint) {
-	return targetPoint.hasTile() 
-		&& this.tileCanCapture(tile, movementInfo, fromPoint, targetPoint);
+AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint, isDeploy) {
+	/* If Deploying a SF or Reflection tile... */
+	if (isDeploy && [AdevarTileType.secondFace, AdevarTileType.reflection].includes(tile.type)) {
+		return targetPoint.hasTile()
+			&& targetPoint.tile.ownerName !== tile.ownerName
+			&& targetPoint.tile.type === AdevarTileType.basic;
+	} else {
+		/* If Moving, or Deploying any other kind of tile... */
+		return targetPoint.hasTile() 
+			&& this.tileCanCapture(tile, movementInfo, fromPoint, targetPoint);
+	}
 };
 
 AdevarBoard.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, targetPoint) {
@@ -959,12 +984,13 @@ AdevarBoard.prototype.removePossibleMovePoints = function() {
 };
 
 AdevarBoard.prototype.setPossibleDeployPoints = function(tile) {
-	if (arrayIncludesOneOf(
+	if (tile.type === AdevarTileType.reflection) {
+		this.setPossibleDeployPointsAroundTilesOfType(tile, AdevarTileType.gate, true);
+	} else if (arrayIncludesOneOf(
 		[tile.type],
 		[
 			AdevarTileType.basic,
-			AdevarTileType.secondFace,
-			AdevarTileType.reflection
+			AdevarTileType.secondFace
 		]
 	)) {
 		this.setPossibleDeployPointsAroundTilesOfType(tile, AdevarTileType.gate);
@@ -973,18 +999,20 @@ AdevarBoard.prototype.setPossibleDeployPoints = function(tile) {
 	}
 };
 
-AdevarBoard.prototype.setPossibleDeployPointsAroundTilesOfType = function(tile, tileType) {
+AdevarBoard.prototype.setPossibleDeployPointsAroundTilesOfType = function(tile, tileType, onlyHomeGate) {
 	var targetTilePoints = this.getTileTypePoints(tile.ownerName, tileType);
 
 	var self = this;
 	targetTilePoints.forEach(function(targetTilePoint) {
-		self.getDirectlyAdjacentPoints(targetTilePoint).forEach(function(pointNextToTargtTile) {
-			if ((!pointNextToTargtTile.hasTile()
-					|| self.targetPointHasTileThatCanBeCaptured(tile, null, null, pointNextToTargtTile))
+		if ((onlyHomeGate && targetTilePoint.tile.isHomeGate) || !onlyHomeGate) {
+			self.getDirectlyAdjacentPoints(targetTilePoint).forEach(function(pointNextToTargtTile) {
+				if ((!pointNextToTargtTile.hasTile()
+					|| self.targetPointHasTileThatCanBeCaptured(tile, null, null, pointNextToTargtTile, true))
 					&& self.tileCanLandOnPointWithoutBreakingPlotCountLimits(tile, pointNextToTargtTile)) {
-				pointNextToTargtTile.addType(POSSIBLE_MOVE);
-			}
-		});
+					pointNextToTargtTile.addType(POSSIBLE_MOVE);
+				}
+			});
+		}
 	});
 };
 
@@ -1008,7 +1036,6 @@ AdevarBoard.prototype.tileCanLandOnPointWithoutBreakingPlotCountLimits = functio
 		if (movedFromPoint && movedFromPoint.plotTypes.includes(targetPlot)) {
 			plotCount -= 1 / movedFromPoint.plotTypes.length;
 		}
-		debug(targetPlot + ": " + plotCount);
 		var plotLimit = 9999;	// Neutral Plot, no limit
 		if (arrayIncludesOneOf(
 				[targetPlot], 
@@ -1081,6 +1108,29 @@ AdevarBoard.prototype.playerHasTileOfTypeAtPoint = function(player, notationPoin
 	return point.hasTile() 
 		&& point.tile.ownerName === player 
 		&& point.tile.type === tileType;
+};
+
+AdevarBoard.prototype.markOrientalLilyObjectivePoints = function() {
+	var self = this;
+	var gardenNumber = 1;
+	AdevarOrientalLilyObjectivePoints.forEach(function(objectivePointsSet) {
+		var objectivePoints = objectivePointsSet[HOST];
+
+		objectivePoints.forEach(function(notationPoint) {
+			var point = notationPoint.rowAndColumn;
+			point = self.cells[point.row][point.col];
+			point.highlight(gardenNumber);
+		});
+
+		var objectivePointsGuest = objectivePointsSet[GUEST];
+		objectivePointsGuest.forEach(function(notationPoint) {
+			var point = notationPoint.rowAndColumn;
+			point = self.cells[point.row][point.col];
+			point.highlight(gardenNumber + 3);
+		});
+
+		gardenNumber++;
+	});
 };
 
 AdevarBoard.prototype.getCopy = function() {

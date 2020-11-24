@@ -61,45 +61,52 @@ var QueryString = function () {
 	  chujiblue: "Chu Ji Blue",
 	  chujimono: "Chu Ji Monochrome",
 	  azulejosmono: "Azulejos Monocromos",
-	  azulejosdemadera: "Azulejos de Madera"
+	  azulejosdemadera: "Azulejos de Madera",
+	  christmas: "Christmastime colors"
   };
   
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
+var customBoardUrlKey = "customBoardUrlKey";
 var paiShoBoardDesignTypeValues = {
 	tgg: "The Garden Gate",
 	nomadic: "Nomadic",
 	mayfair: "Mayfair Filter",
 	skudShop: "The Garden Gate Shop",
-	vescucci: "Vescucci Style",
-	xiangqi: "Xiangqi-Style Tile Colors",
-	pixelsho: "Pixel-Sho",
+	// vescucci: "Vescucci Style",
+	// xiangqi: "Xiangqi-Style Tile Colors",
+	// pixelsho: "Pixel-Sho",
 	remix: "Remix",
-	lightmode: "Old Default Light Mode",
-	darkmode: "Old Default Dark Mode",
+	nomadsky: "Nomad's Sky by Morbius",
 	water: "Water by Monk_Gyatso",
-	earth: "Earth by BoomerangGuy",
+	// earth: "Earth by BoomerangGuy",
 	fire: "Fire by BoomerangGuy",
 	airnomad: "Air Nomads by Monk_Gyatso",
-	air: "Air Themed by Monk_Gyatso",
-	nick: "Nick style by BoomerangGuy",
-	nickoffset: "Nick offset-lines",
-	owl: "Order of the White Lotus by Geebung",
-	metal: "Metal Bender style by ohreaganoe",
-	whitethread: "White Thread by tree",
-	avatarstate: "Avatar State by el craken",
-	blowtorch: "Blowtorch by ProfPetruescu",
+	// air: "Air Themed by Monk_Gyatso",
+	// nick: "Nick style by BoomerangGuy",
+	// nickoffset: "Nick offset-lines",
+	// owl: "Order of the White Lotus by Geebung",
+	// metal: "Metal Bender style by ohreaganoe",
+	// whitethread: "White Thread by tree",
+	// avatarstate: "Avatar State by el craken",
+	// blowtorch: "Blowtorch by ProfPetruescu",
 	azul: "Azul by Cannoli",
-	checkeredtraining: "Checkered Training Board by Aba",
-	forest: "Forest Board, dedicated to tree",
-	flowergarden: "Flower Garden by Liam_Keaggy13",
-	worldmap: "World Map by corky125",
-	goldengarden: "Golden Garden by Sidereus",
-	momo: "The Amazing Momo by TheRealMomo",
-	vaaturaava: "Vaatu Raava by mrpandaber",
-	waterarena: "Water Arena by Yagalo",
-	eartharena: "Earth Arena by Yagalo",
-	firearena: "Fire Arena by Yagalo",
-	ladenvar: "Ladenvăr by Sirstotes"
+	// checkeredtraining: "Checkered Training Board by Aba",
+	// forest: "Forest Board, dedicated to tree",
+	// flowergarden: "Flower Garden by Liam_Keaggy13",
+	// worldmap: "World Map by corky125",
+	// goldengarden: "Golden Garden by Sidereus",
+	// momo: "The Amazing Momo by TheRealMomo",
+	// vaaturaava: "Vaatu Raava by mrpandaber",
+	// waterarena: "Water Arena by Yagalo",
+	// eartharena: "Earth Arena by Yagalo",
+	// firearena: "Fire Arena by Yagalo",
+	// ladenvar: "Ladenvăr by Sirstotes",
+	// offsetcheckeredred: "Offset Checkered Red",
+	// offsetcheckeredgreen: "Offset Checkered Green",
+	lightmode: "Old Default Light Mode",
+	darkmode: "Old Default Dark Mode",
+	christmas: "Christmas by Prof. Petruescu",
+	applycustomboard: "Use Custom Board from URL"
 };
 
 var svgBoardDesigns = [
@@ -144,6 +151,9 @@ function buildPaiShoBoardDesignDropdownDiv() {
 	return buildDropdownDiv(paiShoBoardDesignDropdownId, "Pai Sho Board Design:", paiShoBoardDesignTypeValues,
 		localStorage.getItem(paiShoBoardDesignTypeKey),
 		function() {
+			if (this.value === 'applycustomboard') {
+				promptCustomBoardURL();
+			}
 			setPaiShoBoardOption(this.value);
 		});
 }
@@ -711,6 +721,31 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
 
 	clearMessage(); // Refresh Help tab text
 }
+
+function promptCustomBoardURL() {
+	if (localStorage.getItem(customBoardUrlKey)) {
+		customBoardUrl = localStorage.getItem(customBoardUrlKey);
+	} else {
+		customBoardUrl = "https://skudpaisho.com/style/board_tgg.png";
+	}
+	localStorage.setItem(customBoardUrlKey, customBoardUrl);
+
+	var message = "<p>You can use one of many fan-created board designs. See the boards in the #board-design channel in The Garden Gate Discord. Copy and paste the link to a board image to use here:</p>";
+	message += "<br /><input type='text' id='customBoardInput' name='customBoardInput' /><br />";
+	message += "<br /><div class='clickableText' onclick='setCustomBoardFromInput()'>Apply Custom Board</div>";
+
+	showModal("Use Custom Board URL", message);
+}
+
+function setCustomBoardFromInput() {
+	customBoardUrl = document.getElementById('customBoardInput').value;
+	closeModal();
+
+	if (customBoardUrl) {
+		localStorage.setItem(customBoardUrlKey, customBoardUrl);
+	}
+	applyBoardOptionToBgSvg();
+}
   
   /* Skud Pai Sho Tile Design Switches */
   function setSkudTilesOption(newSkudTilesKey) {
@@ -1192,11 +1227,11 @@ function myTurn() {
 	var userEmail = localStorage.getItem(localEmailKey);
 	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
 		if (getCurrentPlayer() === HOST) {
-			return !hostEmail ||
+			return (!hostEmail && !playingOnlineGame()) ||
 				(localStorage.getItem(localEmailKey) === hostEmail ||
 					(currentGameData.hostUsername && usernameEquals(currentGameData.hostUsername)));
 		} else {
-			return !guestEmail ||
+			return (!guestEmail && !playingOnlineGame()) ||
 				(localStorage.getItem(localEmailKey) === guestEmail ||
 					(currentGameData.guestUsername && usernameEquals(currentGameData.guestUsername)));
 		}
@@ -1254,6 +1289,14 @@ function createInviteLinkUrl(newGameId) {
 	return linkUrl;
 }
 
+function askToJoinGame(gameId, hostUsername) {
+	/* Set up QueryString as if joining through game invite link to trigger asking */
+	QueryString.joinPrivateGame = gameId.toString();
+	QueryString.hostUserName = hostUsername;
+	QueryString.allowJoiningOwnGame = true;
+	jumpToGame(gameId);
+}
+
 function askToJoinPrivateGame(privateGameId, hostUserName) {
 	if (userIsLoggedIn()) {
 		var message = "Do you want to join this game hosted by " + hostUserName + "?";
@@ -1267,8 +1310,8 @@ function askToJoinPrivateGame(privateGameId, hostUserName) {
 			message += "<div class='clickableText' onclick='closeModal();'>OK</div>";
 		}
 
-		if (!iAmPlayerInCurrentOnlineGame()) {
-			showModal("Join Private Game?", message, true);
+		if (!iAmPlayerInCurrentOnlineGame() || QueryString.allowJoiningOwnGame) {
+			showModal("Join Game?", message, true);
 		}
 	} else {
 		var message = "To join this game hosted by " + hostUserName + ", please sign in and then refresh this page.";
@@ -1821,7 +1864,9 @@ var GameType = {
 		id: 12,
 		desc: "Adevăr Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
-		gameOptions: []
+		gameOptions: [
+			ADEVAR_LITE
+		]
 	},
 	CapturePaiSho: {
 		id: 3,
@@ -2054,6 +2099,8 @@ function getGameControllerForGameType(gameTypeId) {
 		  /* Ask to join invite link game if present */
 		  if (QueryString.joinPrivateGame && gameId && gameId.toString() === QueryString.joinPrivateGame) {
 			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
+			  /* Once we ask after jumping into a game, we won't need to ask again */
+			  QueryString.joinPrivateGame = null;
 		  }
 	  }
   };
@@ -2330,7 +2377,7 @@ function getGameControllerForGameType(gameTypeId) {
 			  closeModal();
 			  showModal("Cannot Join Game", "You are already playing a game against that user, so you will have to finish that game first.");
 		  } else {
-			  completeJoinGameSeek(gameSeek);
+			askToJoinGame(gameSeek.gameId, gameSeek.hostUsername);
 		  }
 	  } else {
 		  // No results, means ok to join game
@@ -2739,7 +2786,6 @@ function getGameControllerForGameType(gameTypeId) {
   }
   
   /* Chat */
-  
   var sendChatCallback = function sendChatCallback(result) {
 	  document.getElementById('sendChatMessageButton').innerHTML = "Send";
 	  document.getElementById('chatMessageInput').value = "";
@@ -2752,7 +2798,26 @@ function getGameControllerForGameType(gameTypeId) {
 		  document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
 		  onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, sendChatCallback);
 	  }
+
+	  processChatCommands(chatMessage);
   }
+
+var processChatCommands = function(chatMessage) {
+	/* Secret easter eggs... */
+	if (chatMessage.toLowerCase().includes('spoopy')) {
+		new AdevarOptions();
+		AdevarOptions.commenceSpoopy();
+	}
+	if (chatMessage.toLowerCase().includes('christmas') && usernameIsOneOf(['SkudPaiSho'])) {
+		new AdevarOptions();
+		AdevarOptions.includeChristmas();
+	}
+	if (chatMessage.toLowerCase().includes('thanksgiving') && gameController && gameController.getGameTypeId 
+			&& gameController.getGameTypeId() === GameType.Adevar.id) {
+		paiShoBoardDesignTypeValues['adevarsketch'] = "Adevar Sketch";
+		setPaiShoBoardOption('adevarsketch');
+	}
+};
   
   document.getElementById('chatMessageInput').onkeypress = function(e){
 	   var code = (e.keyCode ? e.keyCode : e.which);

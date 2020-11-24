@@ -6,6 +6,8 @@ function AdevarActuator(gameContainer, isMobile, enableAnimations) {
 
 	this.animationOn = enableAnimations;
 
+	this.orientalLilyDivs = [];
+
 	var containers = setupPaiShoBoard(
 		this.gameContainer, 
 		AdevarController.getHostTilesContainerDivs(),
@@ -29,6 +31,7 @@ AdevarActuator.prototype.setAnimationOn = function(isOn) {
 
 AdevarActuator.prototype.actuate = function(board, tileManager, capturedTiles, moveToAnimate) {
 	var self = this;
+	this.orientalLilyDivs = [];
 
 	debug(moveToAnimate);
 
@@ -211,6 +214,13 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		}
 	}
 
+	if (boardPoint.gardenHighlightNumbers.length > 0) {
+		boardPoint.gardenHighlightNumbers.forEach(function(number) {
+			theDiv.classList.add("adevar_highlight" + number);
+		});
+		this.orientalLilyDivs.push(theDiv);
+	}
+
 	if (boardPoint.hasTile()) {
 		theDiv.classList.add("hasTile");
 		
@@ -223,6 +233,12 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		var srcValue = this.getTileSrcPath(boardPoint.tile);
 
 		var tileMoved = boardPoint.tile;
+
+		var showMovedTileDuringAnimation = this.animationOn && moveToAnimate && moveToAnimate.moveTileResults && moveToAnimate.moveTileResults.tileMoved
+											&& isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row);
+		if (showMovedTileDuringAnimation) {
+			tileMoved = moveToAnimate.moveTileResults.tileMoved;
+		}
 
 		if (this.animationOn && moveToAnimate && moveToAnimate.moveTileResults && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)
 				&& moveToAnimate.moveTileResults.tileMoved !== moveToAnimate.moveTileResults.tileInEndPoint) {
@@ -250,6 +266,14 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		theDiv.appendChild(theImg);
 
 		var capturedTile = this.getCapturedTileFromMoveToAnimate(moveToAnimate);
+
+		if (showMovedTileDuringAnimation) {
+			setTimeout(function() {
+				requestAnimationFrame(function(){
+					theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
+				});
+			}, pieceAnimationLength);
+		}
 
 		if (this.animationOn && moveToAnimate && capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
 			debug("Captured " + capturedTile.code);
@@ -327,5 +351,17 @@ AdevarActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimat
 			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
 		});
 	}, pieceAnimationLength);
+};
+
+AdevarActuator.prototype.showOrientalLilyHighlights = function() {
+	this.orientalLilyDivs.forEach(function(theDiv) {
+		theDiv.classList.add("adevar_highlightOn");
+	});
+};
+
+AdevarActuator.prototype.hideOrientalLilyHighlights = function() {
+	this.orientalLilyDivs.forEach(function(theDiv) {
+		theDiv.classList.remove("adevar_highlightOn");
+	});
 };
 

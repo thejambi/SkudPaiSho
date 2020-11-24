@@ -1198,6 +1198,39 @@ input,
 textarea {
   background: var(--input-background);
   color: var(--input-color);
+  border: 1px solid #cac8bf;
+}
+
+/** --- Adevar --- */
+.adevar_highlightOn.adevar_highlight1 {
+  box-shadow: 0px 0px 8px 4px #de6;
+}
+.adevar_highlightOn.adevar_highlight2 {
+  box-shadow: 0px 0px 8px 4px rgb(102, 204, 187);
+}
+.adevar_highlightOn.adevar_highlight3 {
+  box-shadow: 0px 0px 8px 4px #87f;
+}
+
+.adevar_highlightOn.adevar_highlight2.adevar_highlight3 {
+  box-shadow: 0px 0px 8px 4px #77A2E6;
+}
+
+.adevar_highlightOn.adevar_highlight4 {
+  box-shadow: 0px 0px 8px 4px rgb(108, 117, 50);
+}
+.adevar_highlightOn.adevar_highlight5 {
+  box-shadow: 0px 0px 8px 4px rgb(52, 112, 102);
+}
+.adevar_highlightOn.adevar_highlight6 {
+  box-shadow: 0px 0px 8px 4px rgb(54, 46, 100);
+}
+.adevar_highlightOn.adevar_highlight5.adevar_highlight6 {
+  box-shadow: 0px 0px 8px 4px #3f4d7a;
+}
+
+.adevar_highlightOn {
+  transition: box-shadow 0.5s;
 }
 
 
