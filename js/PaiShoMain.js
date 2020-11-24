@@ -723,7 +723,9 @@ function setPaiShoBoardOption(newPaiShoBoardKey) {
 }
 
 function promptCustomBoardURL() {
-	if (!localStorage.getItem(customBoardUrlKey)) {
+	if (localStorage.getItem(customBoardUrlKey)) {
+		customBoardUrl = localStorage.getItem(customBoardUrlKey);
+	} else {
 		customBoardUrl = "https://skudpaisho.com/style/board_tgg.png";
 	}
 	localStorage.setItem(customBoardUrlKey, customBoardUrl);
