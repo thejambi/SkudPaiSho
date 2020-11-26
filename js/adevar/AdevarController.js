@@ -114,17 +114,21 @@ AdevarController.prototype.getAdditionalHelpTabDiv = function() {
 
 	settingsDiv.appendChild(heading);
 	settingsDiv.appendChild(AdevarOptions.buildTileDesignDropdownDiv("Tile Designs"));
-	settingsDiv.appendChild(document.createElement("br"));
-	settingsDiv.appendChild(AdevarOptions.buildToggleViewAsGuestDiv());
+
+	if (!playingOnlineGame() || !iAmPlayerInCurrentOnlineGame() || getOnlineGameOpponentUsername() === getUsername()) {
+		settingsDiv.appendChild(document.createElement("br"));
+		settingsDiv.appendChild(AdevarOptions.buildToggleViewAsGuestDiv());
+	}
 
 	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
 };
 
 AdevarController.prototype.toggleViewAsGuest = function() {
-	AdevarOptions.viewAsGuest = true;
+	AdevarOptions.viewAsGuest = !AdevarOptions.viewAsGuest;
 	this.createActuator();
 	this.callActuate();
+	clearMessage();
 };
 
 AdevarController.prototype.unplayedTileClicked = function(tileDiv) {
@@ -516,6 +520,11 @@ AdevarController.prototype.isSolitaire = function() {
 
 AdevarController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
+	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && getOnlineGameOpponentUsername() != getUsername()) {
+		new AdevarOptions();	// To set perspective...
+		this.createActuator();
+		clearMessage();
+	}
 };
 
 AdevarController.prototype.getSandboxNotationMove = function(moveIndex) {
