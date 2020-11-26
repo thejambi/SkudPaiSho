@@ -339,7 +339,7 @@ OnlinePlayEngine.prototype.getGameTypeDesc = function(gameTypeId, callback) {
             }
         }
     );
-}
+};
 
 OnlinePlayEngine.prototype.sendChat = function(gameId, loginToken, chatMessage, callback) {
     $.post("sendChatMessage.php", 
@@ -592,3 +592,14 @@ OnlinePlayEngine.prototype.createTournamentRoundMatch = function(loginToken, rou
     );
 };
 
+/* Other */
+
+OnlinePlayEngine.prototype.getActiveGamesCount = function(callback) {
+    $.get("getActiveGamesCount.php?", 
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};

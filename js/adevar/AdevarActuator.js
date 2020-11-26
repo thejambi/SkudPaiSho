@@ -13,7 +13,7 @@ function AdevarActuator(gameContainer, isMobile, enableAnimations) {
 		AdevarController.getHostTilesContainerDivs(),
 		AdevarController.getGuestTilesContainerDivs(), 
 		true, 
-		ADEVAR_ROTATE,
+		AdevarOptions.viewAsGuest ? ADEVAR_GUEST_ROTATE : ADEVAR_ROTATE,
 		true
 	);
 
@@ -199,7 +199,11 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 	
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
-		theDiv.classList.add("adevarPointRotate");
+		if (AdevarOptions.viewAsGuest) {
+			theDiv.classList.add("adevarGuestPointRotate");
+		} else {
+			theDiv.classList.add("adevarPointRotate");
+		}
 
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
@@ -339,8 +343,13 @@ AdevarActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimat
 
 	var left = (x - ox);
 	var top = (y - oy);
-	theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
-	theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
+	if (AdevarOptions.viewAsGuest) {
+		theImg.style.left = ((left * -cos135 - top * -sin135) * pointSizeMultiplierX) + unitString;
+		theImg.style.top = ((top * -cos135 + left * -sin135) * pointSizeMultiplierY) + unitString;
+	} else {
+		theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
+		theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
+	}
 
 	requestAnimationFrame(function() {
 		theImg.style.left = "0px";

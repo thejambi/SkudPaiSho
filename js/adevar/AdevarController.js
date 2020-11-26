@@ -1,7 +1,10 @@
 /* Adevar specific UI interaction logic */
 
 function AdevarController(gameContainer, isMobile) {
-	this.actuator = new AdevarActuator(gameContainer, isMobile, isAnimationsOn());
+	new AdevarOptions(); // Just to initialize
+	this.gameContainer = gameContainer;
+	this.isMobile = isMobile;
+	this.createActuator();
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -13,9 +16,14 @@ function AdevarController(gameContainer, isMobile) {
 	showReplayControls();
 
 	this.isPaiShoGame = true;
-
-	new AdevarOptions(); // Just to initialize
 }
+
+AdevarController.prototype.createActuator = function() {
+	this.actuator = new AdevarActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	if (this.theGame) {
+		this.theGame.updateActuator(this.actuator);
+	}
+};
 
 AdevarController.prototype.getGameTypeId = function() {
 	return GameType.Adevar.id;
@@ -106,9 +114,17 @@ AdevarController.prototype.getAdditionalHelpTabDiv = function() {
 
 	settingsDiv.appendChild(heading);
 	settingsDiv.appendChild(AdevarOptions.buildTileDesignDropdownDiv("Tile Designs"));
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(AdevarOptions.buildToggleViewAsGuestDiv());
 
 	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
+};
+
+AdevarController.prototype.toggleViewAsGuest = function() {
+	AdevarOptions.viewAsGuest = true;
+	this.createActuator();
+	this.callActuate();
 };
 
 AdevarController.prototype.unplayedTileClicked = function(tileDiv) {
