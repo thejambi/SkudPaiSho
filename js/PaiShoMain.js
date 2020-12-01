@@ -694,8 +694,7 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 	  debug("Starting to watch game");
   
 	  // Setup game watching...
-	  document.getElementById('chatMessagesDisplay').innerHTML = "";
-	  lastChatTimestamp = '1970-01-01 00:00:00';
+	  clearGameChats();
   
 	  /* Setup chat heading message with link to previously active game */
 	  // TODO
@@ -3836,7 +3835,10 @@ function isTimestampsOn() {
 }
 function toggleTimestamps() {
 	localStorage.setItem(showTimestampsKey, !isTimestampsOn());
+	clearGameChats();
+}
+
+function clearGameChats() {
 	document.getElementById('chatMessagesDisplay').innerHTML = "";
 	lastChatTimestamp = '1970-01-01 00:00:00';
 }
-
