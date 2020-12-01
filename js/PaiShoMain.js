@@ -179,6 +179,8 @@ var userIdKey = "userIdKey";
 var deviceIdKey = "deviceIdKey";
 var deviceTokenKey = "deviceTokenKey";
 
+var showTimestampsKey = "showTimestamps";
+
 var welcomeTutorialDismissedKey = "welcomeTutorialDismissedKey";
 
 var url;
@@ -626,8 +628,15 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 		  for (var index in chatMessageList) {
 			  var chatMessage = chatMessageList[index];
 			  var chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
-			  newChatMessagesHtml += "<div class='chatMessage'><em>" + chatMsgTimestamp + "</em> <strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+
+			  newChatMessagesHtml += "<div class='chatMessage'>";
   
+			  if (isTimestampsOn()) {
+				  newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
+			  }
+
+			  newChatMessagesHtml += "<strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+
 			  // The most recent message will determine whether to alert
 			  if (!usernameEquals(chatMessage.username)) {
 				  // Set chat tab color to alert new messages if newest message is not from user
@@ -656,14 +665,13 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
   };
   
   function getTimestampString(timestampStr) {
-	  var dte = new Date(timestampStr);
-  
-	  var fullDateStr = dte.toString();
-	  fullDateStr = fullDateStr.substring(0,fullDateStr.indexOf("GMT")) + "GMT-0400 (Eastern Daylight Time)";
-  
-	  dte = new Date(fullDateStr);
-  
-	  return dte.toLocaleString();
+	  var dte = new Date(timestampStr + " UTC");
+
+	  var localeStr = dte.toLocaleString();
+	  if (localeStr.toLowerCase().includes("invalid")) {
+		return timestampStr + " UTC";
+	  }
+	  return localeStr;
   }
   
   function gameWatchPulse() {
@@ -2451,63 +2459,62 @@ function getGameControllerForGameType(gameTypeId) {
 	  return gameOptionsSupported;
   }
   
-  var getGameSeeksCallback = function getGameSeeksCallback(results) {
-	  var message = "No games available to join. You should start one!";
-	  if (results) {
-		  message = "";
-		  var resultRows = results.split('\n');
-  
-		  gameSeekList = [];
-  
-		  for (var index in resultRows) {
-			  var row = resultRows[index].split('|||');
-			  var gameSeek = {
-				  gameId:parseInt(row[0]),
-				  gameTypeId:parseInt(row[1]),
-				  gameTypeDesc:row[2],
-				  hostId:row[3],
-				  hostUsername:row[4],
-				  hostOnline:parseInt(row[5]),
-				  gameOptions:parseGameOptions(row[6])
-			  };
-			  gameSeekList.push(gameSeek);
-		  }
-		  var gameTypeHeading = "";
-		  for (var index in gameSeekList) {
-			  var gameSeek = gameSeekList[index];
-  
-			//   if (gameSeek.gameTypeId !== GameType.Trifle.id
-			// 	  || (gameSeek.gameTypeId === GameType.Trifle.id && TrifleController.userIsTrifleDeveloper())
-			//   ) {
+var getGameSeeksCallback = function getGameSeeksCallback(results) {
+	var message = "No games available to join. You should start one!";
+	if (results) {
+		message = "";
+		var resultRows = results.split('\n');
+
+		gameSeekList = [];
+
+		for (var index in resultRows) {
+			var row = resultRows[index].split('|||');
+			var gameSeek = {
+				gameId: parseInt(row[0]),
+				gameTypeId: parseInt(row[1]),
+				gameTypeDesc: row[2],
+				hostId: row[3],
+				hostUsername: row[4],
+				hostOnline: parseInt(row[5]),
+				gameOptions: parseGameOptions(row[6])
+			};
+			gameSeekList.push(gameSeek);
+		}
+		var gameTypeHeading = "";
+		for (var index in gameSeekList) {
+			var gameSeek = gameSeekList[index];
 			if (
-				gameDevOn 
+				gameDevOn
 				|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
 				|| getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess.includes(getUsername())
 			) {
-				
-  
-				  var hostOnlineOrNotIconText = userOfflineIcon;
-				  if (gameSeek.hostOnline) {
-					  hostOnlineOrNotIconText = userOnlineIcon;
-				  }
-  
-				  if (gameSeek.gameTypeDesc !== gameTypeHeading) {
-					  if (gameTypeHeading !== "") {
-						  message += "<br />";
-					  }
-					  gameTypeHeading = gameSeek.gameTypeDesc;
-					  message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
-				  }
-				  message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
-				  for (var i = 0; i < gameSeek.gameOptions.length; i++) {
-					  message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + gameSeek.gameOptions[i] + "</em></div>"
-				  }
-				  message += "</div>";
-			  }
-		  }
-	  }
-	  showModal("Join a game", message);
-  };
+				var hostOnlineOrNotIconText = userOfflineIcon;
+				if (gameSeek.hostOnline) {
+					hostOnlineOrNotIconText = userOnlineIcon;
+				}
+
+				if (gameSeek.gameTypeDesc !== gameTypeHeading) {
+					if (gameTypeHeading !== "") {
+						message += "<br />";
+					}
+					gameTypeHeading = gameSeek.gameTypeDesc;
+					message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+				}
+				message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
+				for (var i = 0; i < gameSeek.gameOptions.length; i++) {
+					message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + gameSeek.gameOptions[i] + "</em></div>"
+				}
+				message += "</div>";
+			}
+		}
+	}
+
+	message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
+
+	onlinePlayEngine.getActiveGamesCount(getActiveGamesCountCallback);
+
+	showModal("Join a game", message);
+};
   
   /* From https://css-tricks.com/snippets/javascript/unescape-html-in-js/ */
   function htmlDecode(input){
@@ -2526,23 +2533,33 @@ function getGameControllerForGameType(gameTypeId) {
 		  return [];
 	  }
   }
-  
-  function viewGameSeeksClicked() {
-	  if (!window.navigator.onLine) {
-		  showCurrentlyOfflineModal();
-	  } else if (onlinePlayEnabled && userIsLoggedIn()) {
+
+function viewGameSeeksClicked() {
+	if (!window.navigator.onLine) {
+		showCurrentlyOfflineModal();
+	} else if (onlinePlayEnabled && userIsLoggedIn()) {
 		if (!onlinePlayPaused) {
-		  showModal("Join a game", getLoadingModalText());
-		  onlinePlayEngine.getGameSeeks(getGameSeeksCallback);
+			showModal("Join a game", getLoadingModalText());
+			onlinePlayEngine.getGameSeeks(getGameSeeksCallback);
 		} else {
 			showOnlinePlayPausedModal();
 		}
-	  } else if (onlinePlayEnabled) {
-		  showModal("Join a game", "<span class='skipBonus' onclick='loginClicked();'>Sign in</span> to play real-time games with others online. When you are signed in, this is where you can join games against other players.");
-	  } else {
-		  showModal("Join a game", "Online play is disabled right now. Maybe you are offline. Try again later!");
-	  }
-  }
+	} else if (onlinePlayEnabled) {
+		var message = "<span class='skipBonus' onclick='loginClicked();'>Sign in</span> to play real-time games with others online. When you are signed in, this is where you can join games against other players.";
+		message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
+		showModal("Join a game", message);
+		onlinePlayEngine.getActiveGamesCount(getActiveGamesCountCallback);
+	} else {
+		showModal("Join a game", "Online play is disabled right now. Maybe you are offline. Try again later!");
+	}
+}
+
+var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
+	var activeCountDiv = document.getElementById('activeGamesCountDisplay');
+	if (activeCountDiv) {
+		activeCountDiv.innerText = count + " games being played in the past 24 hours!";
+	}
+};
   
   /* Creating a public game */
   var yesCreateGame = function yesCreateGame(gameTypeId) {
@@ -2811,11 +2828,6 @@ var processChatCommands = function(chatMessage) {
 	if (chatMessage.toLowerCase().includes('christmas') && usernameIsOneOf(['SkudPaiSho'])) {
 		new AdevarOptions();
 		AdevarOptions.includeChristmas();
-	}
-	if (chatMessage.toLowerCase().includes('thanksgiving') && gameController && gameController.getGameTypeId 
-			&& gameController.getGameTypeId() === GameType.Adevar.id) {
-		paiShoBoardDesignTypeValues['adevarsketch'] = "Adevar Sketch";
-		setPaiShoBoardOption('adevarsketch');
 	}
 };
   
@@ -3818,4 +3830,13 @@ function isAnimationsOn() {
 window.addEventListener('touchstart', function() {
 	soundManager.makeNoNoise();
 }, false);
+
+function isTimestampsOn() {
+	return localStorage.getItem(showTimestampsKey) === "true";
+}
+function toggleTimestamps() {
+	localStorage.setItem(showTimestampsKey, !isTimestampsOn());
+	document.getElementById('chatMessagesDisplay').innerHTML = "";
+	lastChatTimestamp = '1970-01-01 00:00:00';
+}
 
