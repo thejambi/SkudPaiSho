@@ -106,6 +106,7 @@ var paiShoBoardDesignTypeValues = {
 	lightmode: "Old Default Light Mode",
 	darkmode: "Old Default Dark Mode",
 	christmas: "Christmas by Prof. Petruescu",
+	chujiholiday: "Chu Ji Holiday Board",
 	applycustomboard: "Use Custom Board from URL"
 };
 
