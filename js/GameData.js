@@ -25,6 +25,7 @@ var specialFlowerLimitedRule = false; // NOT UI READY, DO NOT SET TO TRUE. Canno
 
 var skudTilesKey = "standard";
 var paiShoBoardKey = "default";
+var customBoardUrl = null;
 
 var debugOn = false;
 var gameDevOn = false;

@@ -74,6 +74,7 @@ function AdevarTile(code, ownerCode) {
 	this.hidden = false;
 
 	switch (code) {
+		case AdevarTileCode.blankHiddenTile:
 		case AdevarTileCode.iris:
 		case AdevarTileCode.orientalLily:
 		case AdevarTileCode.whiteLotus:
@@ -136,8 +137,8 @@ AdevarTile.prototype.getMoveDistance = function() {
 		return 4;
 	} else if (this.code === AdevarTileCode.lilac) {		// Gives the Lilac 3 spaces of movement
 		return 3;
-	} else if (this.type === AdevarTileType.reflection) {	//Gives the Reflection tile 7 spaces of movement
-		return 7;
+	} else if (this.type === AdevarTileType.reflection) {
+		return 5;
 	} else if (this.type === AdevarTileType.secondFace) {	// Gives the Second Faces tiles 7 spaces of movement
 		return 7;
 	}

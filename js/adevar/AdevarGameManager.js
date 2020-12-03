@@ -58,12 +58,6 @@ var AdevarBoardSetupPoints = {
 var AdevarOrientalLilyObjectivePoints = [
 	{
 		HOST: [
-			// new NotationPoint("0,-2"),
-			// new NotationPoint("-1,0"),
-			// new NotationPoint("2,-1"),
-			// new NotationPoint("1,1"),
-			// new NotationPoint("7,-1"),
-			// new NotationPoint("0,6")
 			new NotationPoint("2,-1"),
 			new NotationPoint("0,1"),
 			new NotationPoint("7,-1"),
@@ -71,12 +65,6 @@ var AdevarOrientalLilyObjectivePoints = [
 			new NotationPoint("6,5")
 		],
 		GUEST: [
-			// new NotationPoint("0,1"),
-			// new NotationPoint("-1,-1"),
-			// new NotationPoint("2,0"),
-			// new NotationPoint("1,-2"),
-			// new NotationPoint("-6,0"),
-			// new NotationPoint("1,-7")
 			new NotationPoint("1,-2"),
 			new NotationPoint("-1,0"),
 			new NotationPoint("1,-7"),
@@ -86,12 +74,6 @@ var AdevarOrientalLilyObjectivePoints = [
 	},
 	{
 		HOST: [
-			// new NotationPoint("0,-1"),
-			// new NotationPoint("5,-5"),
-			// new NotationPoint("-4,4"),
-			// new NotationPoint("-1,3"),
-			// new NotationPoint("4,-2"),
-			// new NotationPoint("5,4")
 			new NotationPoint("4,-2"),
 			new NotationPoint("-1,3"),
 			new NotationPoint("7,-4"),
@@ -99,12 +81,6 @@ var AdevarOrientalLilyObjectivePoints = [
 			new NotationPoint("5,4")
 		],
 		GUEST: [
-			// new NotationPoint("1,0"),
-			// new NotationPoint("5,-5"),
-			// new NotationPoint("-4,4"),
-			// new NotationPoint("-3,1"),
-			// new NotationPoint("2,-4"),
-			// new NotationPoint("-4,-5")
 			new NotationPoint("2,-4"),
 			new NotationPoint("-3,1"),
 			new NotationPoint("4,-7"),
@@ -119,7 +95,6 @@ var AdevarOrientalLilyObjectivePoints = [
 			new NotationPoint("2,1"),
 			new NotationPoint("5,2"),
 			new NotationPoint("3,4"),
-			// new NotationPoint("6,5")
 			new NotationPoint("5,4")
 		],
 		GUEST: [
@@ -128,7 +103,6 @@ var AdevarOrientalLilyObjectivePoints = [
 			new NotationPoint("-1,-2"),
 			new NotationPoint("-2,-5"),
 			new NotationPoint("-4,-3"),
-			// new NotationPoint("-5,-6")
 			new NotationPoint("-4,-5")
 		]
 	}
@@ -153,8 +127,9 @@ AdevarGameManager.prototype.setup = function (ignoreActuate) {
 
 	this.usingTileReserves = false;
 	this.disableUndo = false;
+	this.gameLogText = "";
 
-	this.secondFaceTilePlayedCount = {
+	this.secondFaceTilesOnBoardCount = {
 		HOST: 0,
 		GUEST: 0
 	};
@@ -162,7 +137,7 @@ AdevarGameManager.prototype.setup = function (ignoreActuate) {
 	this.secondFaceTilesPlayed = {
 		HOST: [],
 		GUEST: []
-	}
+	};
 
 	this.playerHiddenTiles = {
 		HOST: null,
@@ -182,7 +157,9 @@ AdevarGameManager.prototype.actuate = function (moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, this.capturedTiles, moveToAnimate);	// TODO - show Captured Tiles in tile section as it's good for reference
+	this.actuator.actuate(this.board, this.tileManager, this.capturedTiles, moveToAnimate);
+
+	setGameLogText(this.gameLogText);
 };
 
 AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -194,7 +171,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	if (move.moveType === AdevarMoveType.chooseHiddenTile) {
 		// Need to do all the game setup as well as set the player's hidden tile
 		var hiddenTile = this.tileManager.grabTile(move.player, move.hiddenTileCode);
-		hiddenTile.hidden = true;
+		hiddenTile.hidden = !gameOptionEnabled(ADEVAR_LITE);
 		hiddenTile.selectedFromPile = false;
 		
 		this.playerHiddenTiles[move.player] = hiddenTile;
@@ -213,7 +190,9 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		});
 
 		// Place Gate tiles
-		this.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.gate), AdevarBoardSetupPoints.gate[move.player]);
+		var homeGateTile = self.tileManager.grabTile(move.player, AdevarTileCode.gate);
+		homeGateTile.isHomeGate = true;
+		this.board.placeTile(homeGateTile, AdevarBoardSetupPoints.gate[move.player]);
 		
 		// Place Lilac tiles
 		AdevarBoardSetupPoints.lilac[move.player].forEach(function(lilacPoint) {
@@ -234,14 +213,17 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		});
 
 		// Place Reflection tile
-		this.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.reflection), AdevarBoardSetupPoints.reflection[move.player]);
+		if (!gameOptionEnabled(ADEVAR_LITE)) {
+			this.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.reflection), AdevarBoardSetupPoints.reflection[move.player]);
+		}
 
+		this.buildChooseHiddenTileGameLogText(move);
 	} else if (move.moveType === DEPLOY) {
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
 		var placeTileResults = this.board.placeTile(tile, move.endPoint);
 
 		/* Record captured tile */
-		if (placeTileResults.capturedTile) {
+		if (placeTileResults.capturedTile && !placeTileResults.returnCapturedTileToHand) {
 			this.capturedTiles.push(placeTileResults.capturedTile);
 		}
 
@@ -254,16 +236,21 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 
 		/* Remove Second Face tiles if player has played their second one */
 		if (tile.type === AdevarTileType.secondFace) {
-			this.secondFaceTilePlayedCount[move.player]++;
-			this.secondFaceTilesPlayed[move.player].push(tile);
-			if (this.secondFaceTilePlayedCount[move.player] === 2) {
-				this.tileManager.removeRemainingTilesOfType(move.player, AdevarTileType.secondFace, this.secondFaceTilesPlayed[move.player]);
+			this.secondFaceTilesOnBoardCount[move.player]++;
+
+			if (!this.secondFaceTilesPlayed[move.player].includes(tile)) {	// If a new SF tile used
+				this.secondFaceTilesPlayed[move.player].push(tile);
+				if (this.secondFaceTilesPlayed[move.player].length === 2) {
+					this.tileManager.removeRemainingTilesOfType(move.player, AdevarTileType.secondFace, this.secondFaceTilesPlayed[move.player]);
+				}
 			}
 		}
 
 		if (placeTileResults.capturedTile && placeTileResults.capturedTile.type === AdevarTileType.reflection) {
 			this.playersWhoHaveCapturedReflection.push(move.player);
 		}
+
+		this.buildDeployGameLogText(move, tile);
 	} else if (move.moveType === MOVE) {
 		var moveTileResults = this.board.moveTile(move.startPoint, move.endPoint);
 
@@ -292,11 +279,13 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 			/* Regrow Opponent Vanguards */
 			var opponentName = getOpponentName(move.player);
 			this.regrowVanguardsForPlayer(opponentName);
+
+			this.secondFaceTilesOnBoardCount[move.player]--;
 		}
 
 		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.secondFace) {
-			/* Regrow player's Vanguards */
 			this.regrowVanguardsForPlayer(move.player);
+			this.secondFaceTilesOnBoardCount[getOpponentName(move.player)]--;
 		}
 
 		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.reflection) {
@@ -304,6 +293,10 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 			this.disableUndo = true;
 			this.board.revealTile(AdevarTileType.hiddenTile, moveTileResults.capturedTile.ownerName);
 			move.removedSFInfo = this.board.removeSFThatCannotCaptureHT(move.player, this.playerHiddenTiles[moveTileResults.capturedTile.ownerName]);
+			if (move.removedSFInfo.tileRemoved) {
+				this.secondFaceTilesOnBoardCount[move.removedSFInfo.tileRemoved.ownerName]--;
+				this.tileManager.putTileBack(move.removedSFInfo.tileRemoved);
+			}
 		}
 
 		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.reflection) {
@@ -313,6 +306,8 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.hiddenTile) {
 			moveTileResults.capturedTile.reveal();
 		}
+
+		this.buildMoveGameLogText(move);
 	}
 
 	this.board.countTilesInPlots();
@@ -324,6 +319,10 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	if (this.endGameWinners.length > 0) {
+		this.gameLogText += ". " + this.endGameWinners[0] + this.gameWinReason;
+	}
+
+	if (this.endGameWinners.length > 0) {
 		// this.board.revealTile(AdevarTileType.hiddenTile, this.endGameWinners[0]);
 		this.board.revealTile(AdevarTileType.hiddenTile, HOST);
 		this.board.revealTile(AdevarTileType.hiddenTile, GUEST);
@@ -332,6 +331,31 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	if (withActuate) {
 		this.actuate(move);
 	}
+};
+
+AdevarGameManager.prototype.buildChooseHiddenTileGameLogText = function(move) {
+	this.gameLogText = this.getGameLogTextStart(move);
+	this.gameLogText += move.player + " selected a Hidden Tile";
+};
+
+AdevarGameManager.prototype.buildDeployGameLogText = function(move, calledTile) {
+	this.gameLogText = this.getGameLogTextStart(move);
+	this.gameLogText += move.player + " called " + AdevarTile.getTileName(calledTile.code);
+	if (move.placeTileResults.capturedTile) {
+		this.gameLogText += " and captured " + AdevarTile.getTileName(move.placeTileResults.capturedTile.code);
+	}
+};
+
+AdevarGameManager.prototype.buildMoveGameLogText = function(move) {
+	this.gameLogText = this.getGameLogTextStart(move);
+	this.gameLogText += move.player + " moved " + AdevarTile.getTileName(move.moveTileResults.tileMoved.code);
+	if (move.moveTileResults.capturedTile) {
+		this.gameLogText += " and captured " + AdevarTile.getTileName(move.moveTileResults.capturedTile.code);
+	}
+};
+
+AdevarGameManager.prototype.getGameLogTextStart = function(move) {
+	return move.moveNum + move.playerCode + '. ';
 };
 
 AdevarGameManager.prototype.regrowVanguardsForPlayer = function(player) {
@@ -363,7 +387,7 @@ AdevarGameManager.prototype.revealAllPointsAsPossible = function() {
 
 AdevarGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
 	if (tile.type !== AdevarTileType.secondFace
-		|| (tile.type === AdevarTileType.secondFace && this.secondFaceTilePlayedCount[tile.ownerName] < 2)
+		|| (tile.type === AdevarTileType.secondFace && this.secondFaceTilesOnBoardCount[tile.ownerName] < 1)
 	) {
 		this.board.setPossibleDeployPoints(tile);
 	}

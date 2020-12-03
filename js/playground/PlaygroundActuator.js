@@ -195,7 +195,7 @@ PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
 	} else if (tile.gameType === GameType.VagabondPaiSho) {
 		gameImgDir = "Vagabond/" + localStorage.getItem(vagabondTileDesignTypeKey);
 	} else if (tile.gameType === GameType.CapturePaiSho) {
-		gameImgDir = "Capture";
+		gameImgDir = "Capture/" + getUserGamePreference(CapturePreferences.tileDesignKey);
 	} else if (tile.gameType === GameType.Playground) {
 		gameImgDir = "Playground";
 	} else if (tile.gameType === "Advr") {

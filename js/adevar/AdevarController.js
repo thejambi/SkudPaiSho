@@ -64,6 +64,13 @@ AdevarController.prototype.resetMove = function() {
 };
 
 AdevarController.prototype.getDefaultHelpMessageText = function() {
+	this.showLilyHelp = false;
+	if (this.showLilyHelp) {
+		this.showOrientalLilyHelp();
+	} else {
+		this.hideOrientalLilyHelp();
+	}
+
 	var message = "<h4>Adevăr Pai Sho</h4> <p>Adevăr Pai Sho is a game of strategy, deception, and wit as players sneakily accomplish their hidden objective and take down their opponent's Hidden Tile. Be careful when achieving your objective, because trying to win could be the very thing that makes you lose! ";
 	message += "See the <a href='https://tinyurl.com/adevarrulebook' target='_blank'>Adevăr rules</a> for the full rules and more about the game.</p>";
 	message += "<p>Before the game, players each choose a Hidden Tile. The game is won when a player completes the objective given to them by their chosen Hidden Tile or captures their opponent’s Hidden Tile with their corresponding Second Face tile.</p>";
@@ -79,6 +86,10 @@ AdevarController.prototype.getAdditionalMessage = function() {
 			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by choosing a Hidden Tile.<br />";
 		} else {
 			msg += "Sign in to enable online gameplay. Or, start playing a local game by choosing a Hidden Tile.<br />";
+		}
+
+		if (gameOptionEnabled(ADEVAR_LITE)) {
+			msg += "<br /><strong>Adevăr Lite</strong> is a <em>training wheels</em> mode for beginners to learn the game - players play with their Hidden Tiles revealed and win by accomplishing their chosen Hidden Tile objective.<br />";
 		}
 
 		msg += getGameOptionsMessageHtml(GameType.Adevar.gameOptions);
@@ -214,7 +225,7 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 			var userIsTileOwner = userIsHost ? boardPoint.tile.ownerName === HOST : userIsGuest && boardPoint.tile.ownerName === GUEST;
 			if ((userIsTileOwner || (!playingOnlineGame() && getCurrentPlayer() === boardPoint.tile.ownerName))
 					&& boardPoint.tile.type === AdevarTileType.hiddenTile) {
-				boardPoint.tile.hidden = !boardPoint.tile.hidden;
+				boardPoint.tile.hidden = !boardPoint.tile.hidden && !gameOptionEnabled(ADEVAR_LITE);
 				this.callActuate();
 			} else {
 				if (boardPoint.tile.ownerName !== getCurrentPlayer() || !myTurn()) {
@@ -258,6 +269,7 @@ AdevarController.prototype.pointClicked = function(htmlPoint) {
 };
 
 AdevarController.prototype.getTileMessage = function(tileDiv) {
+	this.showLilyHelp = false;
 	var divName = tileDiv.getAttribute("name");
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 
@@ -276,6 +288,12 @@ AdevarController.prototype.getTileMessage = function(tileDiv) {
 	tileMessages.forEach(function(tileMessage) {
 		message.push(tileMessage);
 	});
+
+	if (this.showLilyHelp) {
+		this.showOrientalLilyHelp();
+	} else {
+		this.hideOrientalLilyHelp();
+	}
 
 	return {
 		heading: heading,
@@ -345,14 +363,30 @@ AdevarController.prototype.buildOtherTileMessages = function(tile) {
 	return messages;
 };
 
+AdevarController.prototype.showOrientalLilyHelp = function() {
+	if (!this.lilyHelpOn) {
+		this.theGame.actuator.showOrientalLilyHighlights();
+		this.lilyHelpOn = true;
+	}
+};
+
+AdevarController.prototype.hideOrientalLilyHelp = function() {
+	if (this.lilyHelpOn) {
+		this.theGame.actuator.hideOrientalLilyHighlights();
+		this.lilyHelpOn = false;
+	}
+};
+
 AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile) {
 	var objective = null;
+	this.showLilyHelp = false;
 	switch(hiddenTile.code) {
 		case AdevarTileCode.iris:
 			objective = "Have 2 Basic tiles in each Red Plot, and 3 Basic tiles in each White Plot";
 			break;
 		case AdevarTileCode.orientalLily:
-			objective = "Create an Oriental Lily Garden formation with Basic tiles (see rules for Garden diagrams)";
+			objective = "Create one of the three Oriental Lily Garden formations with Basic tiles on your side of the board (see rules, image below, or board highlights for Garden diagrams)<br /><img alt='Adevar Oriental Lily Gardens Diagram' style='width:100%' src='images/Adevar/OrientalLilyDiagram.png' />";
+			this.showLilyHelp = true;
 			break;
 		case AdevarTileCode.echeveria:
 			objective = "Capture at least 2 of each of your opponent’s Basic tile types, and have at least 1 of each of your Basic tile types be captured";
@@ -378,6 +412,7 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 };
 
 AdevarController.prototype.getPointMessage = function(htmlPoint) {
+	this.showLilyHelp = false;
 	var npText = htmlPoint.getAttribute("name");
 
 	var notationPoint = new NotationPoint(npText);
@@ -413,6 +448,20 @@ AdevarController.prototype.getPointMessage = function(htmlPoint) {
 
 	if (boardPoint.plotTypes.length > 1) {
 		message.push("A tile here is counted as 1/2 in each plot it is touching");
+	}
+
+	var self = this;
+
+	boardPoint.plotTypes.forEach(function(plotType) {
+		var hostPlotCount = self.theGame.board.getPlotCountForPlayer(plotType, HOST);
+		var guestPlotCount = self.theGame.board.getPlotCountForPlayer(plotType, GUEST);
+		message.push("Basic Tiles in " + plotType + ":<br />HOST: " + hostPlotCount + ", GUEST: " + guestPlotCount);
+	});
+
+	if (this.showLilyHelp) {
+		this.showOrientalLilyHelp();
+	} else {
+		this.hideOrientalLilyHelp();
 	}
 
 	return {
