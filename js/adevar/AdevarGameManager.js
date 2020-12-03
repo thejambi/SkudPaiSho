@@ -122,6 +122,10 @@ function AdevarGameManager(actuator, ignoreActuate, isCopy) {
 	this.setup(ignoreActuate);
 }
 
+AdevarGameManager.prototype.updateActuator = function(newActuator) {
+	this.actuator = newActuator;
+};
+
 // Set up the game
 AdevarGameManager.prototype.setup = function (ignoreActuate) {
 

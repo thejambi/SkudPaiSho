@@ -179,6 +179,8 @@ var userIdKey = "userIdKey";
 var deviceIdKey = "deviceIdKey";
 var deviceTokenKey = "deviceTokenKey";
 
+var showTimestampsKey = "showTimestamps";
+
 var welcomeTutorialDismissedKey = "welcomeTutorialDismissedKey";
 
 var url;
@@ -238,6 +240,8 @@ var gameContainerDiv = document.getElementById("game-container");
 
 var soundManager;
 var animationsOnKey = "animationsOn";
+
+// var sendJoinGameChatMessage = false;
 /* --- */
   
   window.requestAnimationFrame(function () {
@@ -626,8 +630,15 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 		  for (var index in chatMessageList) {
 			  var chatMessage = chatMessageList[index];
 			  var chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
-			  newChatMessagesHtml += "<div class='chatMessage'><em>" + chatMsgTimestamp + "</em> <strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+
+			  newChatMessagesHtml += "<div class='chatMessage'>";
   
+			  if (isTimestampsOn()) {
+				  newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
+			  }
+
+			  newChatMessagesHtml += "<strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+
 			  // The most recent message will determine whether to alert
 			  if (!usernameEquals(chatMessage.username)) {
 				  // Set chat tab color to alert new messages if newest message is not from user
@@ -656,14 +667,13 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
   };
   
   function getTimestampString(timestampStr) {
-	  var dte = new Date(timestampStr);
-  
-	  var fullDateStr = dte.toString();
-	  fullDateStr = fullDateStr.substring(0,fullDateStr.indexOf("GMT")) + "GMT-0400 (Eastern Daylight Time)";
-  
-	  dte = new Date(fullDateStr);
-  
-	  return dte.toLocaleString();
+	  var dte = new Date(timestampStr + " UTC");
+
+	  var localeStr = dte.toLocaleString();
+	  if (localeStr.toLowerCase().includes("invalid")) {
+		return timestampStr + " UTC";
+	  }
+	  return localeStr;
   }
   
   function gameWatchPulse() {
@@ -686,8 +696,7 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 	  debug("Starting to watch game");
   
 	  // Setup game watching...
-	  document.getElementById('chatMessagesDisplay').innerHTML = "";
-	  lastChatTimestamp = '1970-01-01 00:00:00';
+	  clearGameChats();
   
 	  /* Setup chat heading message with link to previously active game */
 	  // TODO
@@ -1125,6 +1134,9 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 				onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
 			} else {
 				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
+				// if (shouldSendJamboreeNoteChat(currentGameData.gameTypeId)) {
+				// 	sendChat(buildCompletedGameChatMessage());
+				// }
 			}
 		}
 
@@ -2089,6 +2101,7 @@ function getGameControllerForGameType(gameTypeId) {
   
 		  currentGameData.hostUsername = myGame.hostUsername;
 		  currentGameData.guestUsername = myGame.guestUsername;
+		  currentGameData.lastUpdatedTimestamp = myGame.timestamp;
   
 		  hostEmail = myGame.hostUsername;
 		  guestEmail = myGame.guestUsername;
@@ -2102,8 +2115,25 @@ function getGameControllerForGameType(gameTypeId) {
 			  /* Once we ask after jumping into a game, we won't need to ask again */
 			  QueryString.joinPrivateGame = null;
 		  }
+
+		//   if (sendJoinGameChatMessage && shouldSendJamboreeNoteChat(myGame.gameTypeId)) {
+		// 	  sendJoinGameChatMessage = false;
+		// 		sendChat(buildJoinGameChatMessage());
+		//   }
 	  }
   };
+
+function buildJoinGameChatMessage() {
+	return "[Jamboree Note] Game joined at " + new Date().toString();
+}
+
+function buildCompletedGameChatMessage() {
+	return "[Jamboree Note] Game completed at " + new Date().toString();
+}
+
+function shouldSendJamboreeNoteChat(gameTypeId) {
+	return gameTypeId === GameType.Adevar.id;
+}
   
   function jumpToGame(gameIdChosen) {
 	  if (!onlinePlayEnabled) {
@@ -2131,7 +2161,8 @@ function getGameControllerForGameType(gameTypeId) {
 			  isUserTurn:parseInt(row[7]),
 			  gameOptions:parseGameOptions(row[8]),
 			  winnerUsername:row[9],
-			  resultId:parseInt(row[10])
+			  resultId:parseInt(row[10]),
+			  timestamp:row[11]
 		  };
 		  myGamesList.push(myGame);
 	  }
@@ -2147,58 +2178,61 @@ function getGameControllerForGameType(gameTypeId) {
 	  }
   }
   
-  var showPastGamesCallback = function showPastGamesCallback(results) {
-	  var message = "No completed games.";
-	  if (results) {
-		  message = "";
-  
-		  var showAll = showAllCompletedGamesInList;
-		  var countOfGamesShown = 0;
-  
-		  populateMyGamesList(results);
-  
-		  var gameTypeHeading = "";
-		  for (var index in myGamesList) {
-			  var myGame = myGamesList[index];
-  
-			  if (myGame.resultId !== 8) { /* Skip showing games that were Quit */
-				  if (myGame.gameTypeDesc !== gameTypeHeading) {
-					  if (gameTypeHeading !== "") {
-						  message += "<br />";
-					  }
-					  gameTypeHeading = myGame.gameTypeDesc;
-					  message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
-				  }
-  
-				  var gId = parseInt(myGame.gameId);
-				  var userIsHost = usernameEquals(myGame.hostUsername);
-				  var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
-  
-				  var gameDisplayTitle = myGame.hostUsername;
-				  gameDisplayTitle += " vs. ";
-				  gameDisplayTitle += myGame.guestUsername;
-				  if (usernameEquals(myGame.winnerUsername)) {
-					  gameDisplayTitle += " [win]";
-				  } else if (myGame.winnerUsername === opponentUsername) {
-					  gameDisplayTitle += " [loss]";
-				  }
-  
-				  message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
-  
-				  countOfGamesShown++;
-				  if (!showAll && countOfGamesShown > 20) {
-					  break;
-				  }
-			  }
-		  }
-	  }
-  
-	  if (!showAll) {
-		  message += "<br /><div class='clickableText' onclick='showAllCompletedGames();'>Show all</div>";
-	  }
-  
-	  showModal("Completed Games", message);
-  };
+var showPastGamesCallback = function showPastGamesCallback(results) {
+	var message = "No completed games.";
+	if (results) {
+		message = "";
+
+		var showAll = showAllCompletedGamesInList;
+		var countOfGamesShown = 0;
+
+		populateMyGamesList(results);
+
+		var gameTypeHeading = "";
+		for (var index in myGamesList) {
+			var myGame = myGamesList[index];
+
+			if (myGame.gameTypeDesc !== gameTypeHeading) {
+				if (gameTypeHeading !== "") {
+					message += "<br />";
+				}
+				gameTypeHeading = myGame.gameTypeDesc;
+				message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+			}
+
+			var gId = parseInt(myGame.gameId);
+			var userIsHost = usernameEquals(myGame.hostUsername);
+			var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+
+			var gameDisplayTitle = myGame.hostUsername;
+			gameDisplayTitle += " vs. ";
+			gameDisplayTitle += myGame.guestUsername;
+			if (myGame.resultId === 10) {
+				gameDisplayTitle += " [inactive]";
+			} else if (myGame.resultId === 8) {
+				gameDisplayTitle += " [quit]";
+			} else if (usernameEquals(myGame.winnerUsername)) {
+				gameDisplayTitle += " [win]";
+			} else if (myGame.winnerUsername === opponentUsername) {
+				gameDisplayTitle += " [loss]";
+			}
+
+			message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
+
+			countOfGamesShown++;
+			if (!showAll && countOfGamesShown > 20) {
+				break;
+			}
+
+		}
+	}
+
+	if (!showAll) {
+		message += "<br /><div class='clickableText' onclick='showAllCompletedGames();'>Show all</div>";
+	}
+
+	showModal("Completed Games", message);
+};
   
   var showAllCompletedGamesInList = false;
   function showPastGamesClicked() {
@@ -2343,6 +2377,7 @@ function getGameControllerForGameType(gameTypeId) {
   var completeJoinGameSeekCallback = function completeJoinGameSeekCallback(gameJoined) {
 	  var gameSeek = selectedGameSeek;
 	  if (gameJoined) {
+		//   sendJoinGameChatMessage = true;
 		  jumpToGame(gameSeek.gameId);
 		  closeModal();
 	  }
@@ -2451,63 +2486,62 @@ function getGameControllerForGameType(gameTypeId) {
 	  return gameOptionsSupported;
   }
   
-  var getGameSeeksCallback = function getGameSeeksCallback(results) {
-	  var message = "No games available to join. You should start one!";
-	  if (results) {
-		  message = "";
-		  var resultRows = results.split('\n');
-  
-		  gameSeekList = [];
-  
-		  for (var index in resultRows) {
-			  var row = resultRows[index].split('|||');
-			  var gameSeek = {
-				  gameId:parseInt(row[0]),
-				  gameTypeId:parseInt(row[1]),
-				  gameTypeDesc:row[2],
-				  hostId:row[3],
-				  hostUsername:row[4],
-				  hostOnline:parseInt(row[5]),
-				  gameOptions:parseGameOptions(row[6])
-			  };
-			  gameSeekList.push(gameSeek);
-		  }
-		  var gameTypeHeading = "";
-		  for (var index in gameSeekList) {
-			  var gameSeek = gameSeekList[index];
-  
-			//   if (gameSeek.gameTypeId !== GameType.Trifle.id
-			// 	  || (gameSeek.gameTypeId === GameType.Trifle.id && TrifleController.userIsTrifleDeveloper())
-			//   ) {
+var getGameSeeksCallback = function getGameSeeksCallback(results) {
+	var message = "No games available to join. You should start one!";
+	if (results) {
+		message = "";
+		var resultRows = results.split('\n');
+
+		gameSeekList = [];
+
+		for (var index in resultRows) {
+			var row = resultRows[index].split('|||');
+			var gameSeek = {
+				gameId: parseInt(row[0]),
+				gameTypeId: parseInt(row[1]),
+				gameTypeDesc: row[2],
+				hostId: row[3],
+				hostUsername: row[4],
+				hostOnline: parseInt(row[5]),
+				gameOptions: parseGameOptions(row[6])
+			};
+			gameSeekList.push(gameSeek);
+		}
+		var gameTypeHeading = "";
+		for (var index in gameSeekList) {
+			var gameSeek = gameSeekList[index];
 			if (
-				gameDevOn 
+				gameDevOn
 				|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
 				|| getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess.includes(getUsername())
 			) {
-				
-  
-				  var hostOnlineOrNotIconText = userOfflineIcon;
-				  if (gameSeek.hostOnline) {
-					  hostOnlineOrNotIconText = userOnlineIcon;
-				  }
-  
-				  if (gameSeek.gameTypeDesc !== gameTypeHeading) {
-					  if (gameTypeHeading !== "") {
-						  message += "<br />";
-					  }
-					  gameTypeHeading = gameSeek.gameTypeDesc;
-					  message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
-				  }
-				  message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
-				  for (var i = 0; i < gameSeek.gameOptions.length; i++) {
-					  message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + gameSeek.gameOptions[i] + "</em></div>"
-				  }
-				  message += "</div>";
-			  }
-		  }
-	  }
-	  showModal("Join a game", message);
-  };
+				var hostOnlineOrNotIconText = userOfflineIcon;
+				if (gameSeek.hostOnline) {
+					hostOnlineOrNotIconText = userOnlineIcon;
+				}
+
+				if (gameSeek.gameTypeDesc !== gameTypeHeading) {
+					if (gameTypeHeading !== "") {
+						message += "<br />";
+					}
+					gameTypeHeading = gameSeek.gameTypeDesc;
+					message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+				}
+				message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
+				for (var i = 0; i < gameSeek.gameOptions.length; i++) {
+					message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + gameSeek.gameOptions[i] + "</em></div>"
+				}
+				message += "</div>";
+			}
+		}
+	}
+
+	message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
+
+	onlinePlayEngine.getActiveGamesCount(getActiveGamesCountCallback);
+
+	showModal("Join a game", message);
+};
   
   /* From https://css-tricks.com/snippets/javascript/unescape-html-in-js/ */
   function htmlDecode(input){
@@ -2526,23 +2560,33 @@ function getGameControllerForGameType(gameTypeId) {
 		  return [];
 	  }
   }
-  
-  function viewGameSeeksClicked() {
-	  if (!window.navigator.onLine) {
-		  showCurrentlyOfflineModal();
-	  } else if (onlinePlayEnabled && userIsLoggedIn()) {
+
+function viewGameSeeksClicked() {
+	if (!window.navigator.onLine) {
+		showCurrentlyOfflineModal();
+	} else if (onlinePlayEnabled && userIsLoggedIn()) {
 		if (!onlinePlayPaused) {
-		  showModal("Join a game", getLoadingModalText());
-		  onlinePlayEngine.getGameSeeks(getGameSeeksCallback);
+			showModal("Join a game", getLoadingModalText());
+			onlinePlayEngine.getGameSeeks(getGameSeeksCallback);
 		} else {
 			showOnlinePlayPausedModal();
 		}
-	  } else if (onlinePlayEnabled) {
-		  showModal("Join a game", "<span class='skipBonus' onclick='loginClicked();'>Sign in</span> to play real-time games with others online. When you are signed in, this is where you can join games against other players.");
-	  } else {
-		  showModal("Join a game", "Online play is disabled right now. Maybe you are offline. Try again later!");
-	  }
-  }
+	} else if (onlinePlayEnabled) {
+		var message = "<span class='skipBonus' onclick='loginClicked();'>Sign in</span> to play real-time games with others online. When you are signed in, this is where you can join games against other players.";
+		message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
+		showModal("Join a game", message);
+		onlinePlayEngine.getActiveGamesCount(getActiveGamesCountCallback);
+	} else {
+		showModal("Join a game", "Online play is disabled right now. Maybe you are offline. Try again later!");
+	}
+}
+
+var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
+	var activeCountDiv = document.getElementById('activeGamesCountDisplay');
+	if (activeCountDiv) {
+		activeCountDiv.innerText = count + " games being played in the past 24 hours!";
+	}
+};
   
   /* Creating a public game */
   var yesCreateGame = function yesCreateGame(gameTypeId) {
@@ -2791,8 +2835,11 @@ function getGameControllerForGameType(gameTypeId) {
 	  document.getElementById('chatMessageInput').value = "";
   };
   
-  var sendChat = function() {
+  var sendChat = function(chatMessageIfDifferentFromInput) {
 	  var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value).trim();
+	  if (chatMessageIfDifferentFromInput) {
+		  chatMessage = chatMessageIfDifferentFromInput;
+	  }
 	  chatMessage = chatMessage.replace(/\n/g, ' ');	// Convert newlines to spaces.
 	  if (chatMessage) {
 		  document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
@@ -2811,11 +2858,6 @@ var processChatCommands = function(chatMessage) {
 	if (chatMessage.toLowerCase().includes('christmas') && usernameIsOneOf(['SkudPaiSho'])) {
 		new AdevarOptions();
 		AdevarOptions.includeChristmas();
-	}
-	if (chatMessage.toLowerCase().includes('thanksgiving') && gameController && gameController.getGameTypeId 
-			&& gameController.getGameTypeId() === GameType.Adevar.id) {
-		paiShoBoardDesignTypeValues['adevarsketch'] = "Adevar Sketch";
-		setPaiShoBoardOption('adevarsketch');
 	}
 };
   
@@ -3000,19 +3042,43 @@ var processChatCommands = function(chatMessage) {
 		  onlinePlayEngine.updateGameWinInfoAsTie(gameId, 8, getLoginToken(), quitOnlineGameCallback);
 	  }
   }
+
+  function quitInactiveOnlineGame() {
+	if (iAmPlayerInCurrentOnlineGame()
+			&& !gameController.theGame.getWinner()
+			  && (!myTurn() || currentGameData.hostUsername === currentGameData.guestUsername)
+			  && onlineGameIsOldEnoughToBeQuit()) {
+		onlinePlayEngine.updateGameWinInfoAsTie(gameId, 10, getLoginToken(), quitOnlineGameCallback);
+	}
+  }
   
   function quitOnlineGameClicked() {
 	  var message = "";
-	  if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !gameController.theGame.getWinner()) {
-		  message = "<div>Are you sure you want to quit and end this online game? The game will end and will NOT appear in your Completed Games list.</div>";
-		  message += "<br /><div class='clickableText' onclick='closeModal(); quitOnlineGame();'>Yes - quit current game</div>";
+	  if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame() 
+			  && !gameController.theGame.getWinner()
+			  && (!myTurn() || currentGameData.hostUsername === currentGameData.guestUsername)
+			  && onlineGameIsOldEnoughToBeQuit()) {
+		  message = "<div>Are you sure you want to quit and end this inactive game? The game will end and will appear as Inactive in your Completed Games list.</div>";
+		  message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - quit current game</div>";
 		  message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
 	  } else {
-		  message = "When playing an unfinished online game, this is where you can quit or leave a game if you wish to do so.";
+		  message = "When playing an unfinished inactive online game, this is where you can quit or leave a game if you wish to do so.";
 	  }
   
 	  showModal("Quit Current Online Game", message);
   }
+
+function onlineGameIsOldEnoughToBeQuit() {
+	var currentGameTimestampDate = buildDateFromTimestamp(currentGameData.lastUpdatedTimestamp);
+	var nowDate = new Date();
+	var difference = nowDate.getTime() - currentGameTimestampDate.getTime();
+	var daysDifference = difference / 1000 / 60 / 60 / 24;
+	return daysDifference >= 7 || usernameEquals('Zach');
+}
+
+function buildDateFromTimestamp(timestampStr) {
+	return new Date(timestampStr.replace(" ","T"));
+}
   
   var tutorialInProgress = false;
   
@@ -3819,3 +3885,15 @@ window.addEventListener('touchstart', function() {
 	soundManager.makeNoNoise();
 }, false);
 
+function isTimestampsOn() {
+	return localStorage.getItem(showTimestampsKey) === "true";
+}
+function toggleTimestamps() {
+	localStorage.setItem(showTimestampsKey, !isTimestampsOn());
+	clearGameChats();
+}
+
+function clearGameChats() {
+	document.getElementById('chatMessagesDisplay').innerHTML = "";
+	lastChatTimestamp = '1970-01-01 00:00:00';
+}

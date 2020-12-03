@@ -41,6 +41,8 @@ var PLAY_IN_SPACES = "Play In Spaces";
 var VAGABOND_ROTATE = "Vagabond Board Rotation";
 var ADEVAR_ROTATE = "Adevar Board Rotation";
 
+var ADEVAR_GUEST_ROTATE = "Adevar Board Guest Rotation";
+
 /* Adevar */
 var ADEVAR_LITE = "Lite - Beginner Game";
 

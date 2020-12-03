@@ -1,7 +1,10 @@
 /* Adevar specific UI interaction logic */
 
 function AdevarController(gameContainer, isMobile) {
-	this.actuator = new AdevarActuator(gameContainer, isMobile, isAnimationsOn());
+	new AdevarOptions(); // Just to initialize
+	this.gameContainer = gameContainer;
+	this.isMobile = isMobile;
+	this.createActuator();
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -13,9 +16,14 @@ function AdevarController(gameContainer, isMobile) {
 	showReplayControls();
 
 	this.isPaiShoGame = true;
-
-	new AdevarOptions(); // Just to initialize
 }
+
+AdevarController.prototype.createActuator = function() {
+	this.actuator = new AdevarActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	if (this.theGame) {
+		this.theGame.updateActuator(this.actuator);
+	}
+};
 
 AdevarController.prototype.getGameTypeId = function() {
 	return GameType.Adevar.id;
@@ -107,8 +115,20 @@ AdevarController.prototype.getAdditionalHelpTabDiv = function() {
 	settingsDiv.appendChild(heading);
 	settingsDiv.appendChild(AdevarOptions.buildTileDesignDropdownDiv("Tile Designs"));
 
+	if (!playingOnlineGame() || !iAmPlayerInCurrentOnlineGame() || getOnlineGameOpponentUsername() === getUsername()) {
+		settingsDiv.appendChild(document.createElement("br"));
+		settingsDiv.appendChild(AdevarOptions.buildToggleViewAsGuestDiv());
+	}
+
 	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
+};
+
+AdevarController.prototype.toggleViewAsGuest = function() {
+	AdevarOptions.viewAsGuest = !AdevarOptions.viewAsGuest;
+	this.createActuator();
+	this.callActuate();
+	clearMessage();
 };
 
 AdevarController.prototype.unplayedTileClicked = function(tileDiv) {
@@ -500,6 +520,11 @@ AdevarController.prototype.isSolitaire = function() {
 
 AdevarController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
+	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && getOnlineGameOpponentUsername() != getUsername()) {
+		new AdevarOptions();	// To set perspective...
+		this.createActuator();
+		clearMessage();
+	}
 };
 
 AdevarController.prototype.getSandboxNotationMove = function(moveIndex) {

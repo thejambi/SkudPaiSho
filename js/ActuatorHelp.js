@@ -61,11 +61,14 @@ function setupPaiShoBoard(gameContainer,
 
 	var addVagabondBoardRotate = false;
 	var addAdevarBoardRotate = false;
+	var addAdevarGuestBoardRotate = false;
 	// Check for existing vagabond class on board...
 	if (document.querySelector(".vagabondBoardRotate")) {
 		addVagabondBoardRotate = true;
 	} else if (document.querySelector(".adevarBoardRotate")) {
 		addAdevarBoardRotate = true;
+	} else if (document.querySelector(".adevarGuestBoardRotate")) {
+		addAdevarGuestBoardRotate = true;
 	}
 
 	removeChildren(gameContainer);
@@ -87,6 +90,8 @@ function setupPaiShoBoard(gameContainer,
 		svgContainer.classList.add("vagabondBoardRotate");
 	} else if (addAdevarBoardRotate) {
 		svgContainer.classList.add("adevarBoardRotate");
+	} else if (addAdevarGuestBoardRotate) {
+		svgContainer.classList.add("adevarGuestBoardRotate");
 	}
 
 	bgSvg.appendChild(boardContainer);
@@ -121,11 +126,14 @@ function setupPaiShoBoard(gameContainer,
 		var rotateClass = "vagabondBoardRotate";
 		if (rotateType === ADEVAR_ROTATE) {
 			rotateClass = "adevarBoardRotate";
+		} else if (rotateType === ADEVAR_GUEST_ROTATE) {
+			rotateClass = "adevarGuestBoardRotate";
 		}
 		// Set Timeout to get animated board rotation
 		setTimeout(function () {
 			svgContainer.classList.remove("vagabondBoardRotate");
 			svgContainer.classList.remove("adevarBoardRotate");
+			svgContainer.classList.remove("adevarGuestBoardRotate");
 			svgContainer.classList.add(rotateClass);
 		}, addClassAfterThisManyMs);
 	} else {
@@ -133,6 +141,7 @@ function setupPaiShoBoard(gameContainer,
 		setTimeout(function () {
 			svgContainer.classList.remove("vagabondBoardRotate");
 			svgContainer.classList.remove("adevarBoardRotate");
+			svgContainer.classList.remove("adevarGuestBoardRotate");
 		}, addClassAfterThisManyMs);
 	}
 
