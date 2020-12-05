@@ -2856,10 +2856,6 @@ var processChatCommands = function(chatMessage) {
 		new AdevarOptions();
 		AdevarOptions.commenceSpoopy();
 	}
-	if (chatMessage.toLowerCase().includes('christmas')) {
-		new AdevarOptions();
-		AdevarOptions.includeChristmas();
-	}
 };
   
   document.getElementById('chatMessageInput').onkeypress = function(e){
