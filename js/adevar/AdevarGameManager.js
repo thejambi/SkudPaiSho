@@ -391,7 +391,8 @@ AdevarGameManager.prototype.revealAllPointsAsPossible = function() {
 
 AdevarGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
 	if (tile.type !== AdevarTileType.secondFace
-		|| (tile.type === AdevarTileType.secondFace && this.secondFaceTilesOnBoardCount[tile.ownerName] < 1)
+		|| (tile.type === AdevarTileType.secondFace && this.secondFaceTilesOnBoardCount[tile.ownerName] < 1
+				&& this.opponentNonMatchingHTNotRevealed(tile))
 	) {
 		this.board.setPossibleDeployPoints(tile);
 	}
@@ -400,6 +401,12 @@ AdevarGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
 		this.actuate();
 	}
 };
+
+AdevarGameManager.prototype.opponentNonMatchingHTNotRevealed = function(sfTile) {
+	var opponent = getOpponentName(sfTile.ownerName);
+	return this.playerHiddenTiles[opponent].hidden
+		|| AdevarTile.hiddenTileMatchesSecondFace(this.playerHiddenTiles[opponent], sfTile);
+}
 
 AdevarGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
 	if (!boardPoint.hasTile()) {
