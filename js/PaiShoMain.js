@@ -3043,8 +3043,9 @@ var processChatCommands = function(chatMessage) {
   function quitInactiveOnlineGame() {
 	if (iAmPlayerInCurrentOnlineGame()
 			&& !gameController.theGame.getWinner()
-			  && (!myTurn() || currentGameData.hostUsername === currentGameData.guestUsername)
-			  && onlineGameIsOldEnoughToBeQuit()) {
+			&& (currentGameData.hostUsername === currentGameData.guestUsername
+				|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
+	) {
 		onlinePlayEngine.updateGameWinInfoAsTie(gameId, 10, getLoginToken(), quitOnlineGameCallback);
 	}
   }
@@ -3053,8 +3054,9 @@ var processChatCommands = function(chatMessage) {
 	  var message = "";
 	  if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame() 
 			  && !gameController.theGame.getWinner()
-			  && (!myTurn() || currentGameData.hostUsername === currentGameData.guestUsername)
-			  && onlineGameIsOldEnoughToBeQuit()) {
+			  && (currentGameData.hostUsername === currentGameData.guestUsername
+				  || (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
+		) {
 		  message = "<div>Are you sure you want to quit and end this inactive game? The game will end and will appear as Inactive in your Completed Games list.</div>";
 		  message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - quit current game</div>";
 		  message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
