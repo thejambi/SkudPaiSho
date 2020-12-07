@@ -2585,7 +2585,7 @@ function viewGameSeeksClicked() {
 var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
 	var activeCountDiv = document.getElementById('activeGamesCountDisplay');
 	if (activeCountDiv) {
-		activeCountDiv.innerText = count + " games being played in the past 24 hours!";
+		activeCountDiv.innerText = count + " games active in the past 24 hours!";
 	}
 };
   
