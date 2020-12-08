@@ -880,7 +880,14 @@ AdevarBoard.prototype.pointIsAdjacentToVanguard = function(boardPoint) {
 
 AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint, isDeploy) {
 	/* If Deploying a SF or Reflection tile... */
-	if (isDeploy && [AdevarTileType.secondFace, AdevarTileType.reflection].includes(tile.type)) {
+	if (isDeploy && AdevarTileType.reflection === tile.type) {
+		return targetPoint.hasTile()
+			&& (
+				(targetPoint.tile.ownerName !== tile.ownerName
+					&& targetPoint.tile.type === AdevarTileType.basic)
+				|| this.tileCanCapture(tile, movementInfo, fromPoint, targetPoint)
+			)
+	} else if (isDeploy && AdevarTileType.secondFace === tile.type) {
 		return targetPoint.hasTile()
 			&& targetPoint.tile.ownerName !== tile.ownerName
 			&& targetPoint.tile.type === AdevarTileType.basic;

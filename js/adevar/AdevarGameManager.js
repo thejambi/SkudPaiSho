@@ -262,6 +262,11 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 			this.playersWhoHaveCapturedReflection.push(move.player);
 		}
 
+		if (placeTileResults.capturedTile && placeTileResults.capturedTile.type === AdevarTileType.secondFace) {
+			this.regrowVanguardsForPlayer(move.player);
+			this.secondFaceTilesOnBoardCount[getOpponentName(move.player)]--;
+		}
+
 		this.buildDeployGameLogText(move, tile);
 	} else if (move.moveType === MOVE) {
 		var moveTileResults = this.board.moveTile(move.startPoint, move.endPoint);
