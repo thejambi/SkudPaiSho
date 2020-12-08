@@ -194,6 +194,11 @@ PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
 		return;
 	}
 
+	if (!iAmPlayerInCurrentOnlineGame() && !gameOptionEnabled(SPECTATORS_CAN_PLAY)) {
+		debug("Player not allowed to play.");
+		return;
+	}
+
 	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 	var sourcePileName = tileDiv.getAttribute("data-pileName");
@@ -258,6 +263,8 @@ PlaygroundController.prototype.getCurrentPlayingPlayer = function() {
 			return HOST;
 		} else if (usernameEquals(currentGameData.guestUsername)) {
 			return GUEST;
+		} else if (gameOptionEnabled(SPECTATORS_CAN_PLAY)) {
+			return getUsername();
 		}
 	} else {
 		return this.currentPlayingPlayer;
@@ -271,6 +278,11 @@ PlaygroundController.prototype.pointClicked = function(htmlPoint) {
 	
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
+		return;
+	}
+
+	if (!iAmPlayerInCurrentOnlineGame() && !gameOptionEnabled(SPECTATORS_CAN_PLAY)) {
+		debug("Player not allowed to play.");
 		return;
 	}
 

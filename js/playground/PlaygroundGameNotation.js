@@ -139,7 +139,8 @@ function PlaygroundNotationBuilder() {
 }
 
 PlaygroundNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
-	var notationLine = moveNum + player.charAt(0) + ".";
+	var playerNotationAbbr = player === HOST || player === GUEST ? player.charAt(0) : player;
+	var notationLine = moveNum + playerNotationAbbr + ".";
 	if (this.moveType === PlaygroundMoveType.endGame) {
 		notationLine += "END";
 	} else if (this.moveType === PlaygroundMoveType.hideTileLibraries) {
