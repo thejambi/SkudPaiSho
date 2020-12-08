@@ -251,6 +251,14 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		}
 
 		if (placeTileResults.capturedTile && placeTileResults.capturedTile.type === AdevarTileType.reflection) {
+			/* Reflection captured, reveal captured tile owner's HT and return player's wrong SF on the board */
+			this.disableUndo = true;
+			this.board.revealTile(AdevarTileType.hiddenTile, placeTileResults.capturedTile.ownerName);
+			move.removedSFInfo = this.board.removeSFThatCannotCaptureHT(move.player, this.playerHiddenTiles[placeTileResults.capturedTile.ownerName]);
+			if (move.removedSFInfo.tileRemoved) {
+				this.secondFaceTilesOnBoardCount[move.removedSFInfo.tileRemoved.ownerName]--;
+				this.tileManager.putTileBack(move.removedSFInfo.tileRemoved);
+			}
 			this.playersWhoHaveCapturedReflection.push(move.player);
 		}
 
@@ -301,9 +309,6 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 				this.secondFaceTilesOnBoardCount[move.removedSFInfo.tileRemoved.ownerName]--;
 				this.tileManager.putTileBack(move.removedSFInfo.tileRemoved);
 			}
-		}
-
-		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.reflection) {
 			this.playersWhoHaveCapturedReflection.push(move.player);
 		}
 
