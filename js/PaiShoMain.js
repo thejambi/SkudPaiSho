@@ -2309,7 +2309,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 			  // message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\"," + myGame.gameTypeId + ");'>" + gameDisplayTitle + "</div>";
 			  message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
 			  for (var i = 0; i < myGame.gameOptions.length; i++) {
-				  message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + gameOptionDescriptions[myGame.gameOptions[i]] + "</em></div>"
+				  message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + getGameOptionDescription(myGame.gameOptions[i]) + "</em></div>"
 			  }
 		  }
 	  }
@@ -2536,7 +2536,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 				}
 				message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
 				for (var i = 0; i < gameSeek.gameOptions.length; i++) {
-					message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + gameOptionDescriptions[gameSeek.gameOptions[i]] + "</em></div>"
+					message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></div>"
 				}
 				message += "</div>";
 			}
@@ -3240,7 +3240,7 @@ function buildDateFromTimestamp(timestampStr) {
 		  if (!gameOptionEnabled(options[i])) {
 			  if (!gameController.optionOkToShow
 					  || (gameController.optionOkToShow && gameController.optionOkToShow(options[i]))) {
-				  msg += "<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>&bull;&nbsp;Add game option: " + gameOptionDescriptions[options[i]] + "</span><br />";
+				  msg += "<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>&bull;&nbsp;Add game option: " + getGameOptionDescription(options[i]) + "</span><br />";
 			  }
 		  }
 	  }

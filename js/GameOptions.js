@@ -83,6 +83,15 @@ legacyGameOptionsMap[ADEVAR_LITE] = "Lite - Beginner Game";
 var gameOptionDescriptions = copyObject(legacyGameOptionsMap);
 gameOptionDescriptions[SPECTATORS_CAN_PLAY] = "Allow Spectators to make moves";
 
+function getGameOptionDescription(optionName) {
+	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
+		return gameOptionDescriptions[optionName];
+	} else {
+		return optionName;
+	}
+}
+
 function gameOptionEnabled(optionName) {
 	return ggOptions.includes(optionName) || ggOptions.includes(legacyGameOptionsMap[optionName]);
 }
+
