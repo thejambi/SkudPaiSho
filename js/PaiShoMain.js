@@ -62,6 +62,7 @@ var QueryString = function () {
 	  chujimono: "Chu Ji Monochrome",
 	  azulejosmono: "Azulejos Monocromos",
 	  azulejosdemadera: "Azulejos de Madera",
+	  tggwater: "TGG Water Tribe",
 	  christmas: "Christmastime colors"
   };
   
