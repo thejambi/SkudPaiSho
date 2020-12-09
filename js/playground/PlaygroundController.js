@@ -194,7 +194,7 @@ PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
 		return;
 	}
 
-	if (!iAmPlayerInCurrentOnlineGame() && !gameOptionEnabled(SPECTATORS_CAN_PLAY)) {
+	if (playingOnlineGame() && !iAmPlayerInCurrentOnlineGame() && !gameOptionEnabled(SPECTATORS_CAN_PLAY)) {
 		debug("Player not allowed to play.");
 		return;
 	}
@@ -281,7 +281,7 @@ PlaygroundController.prototype.pointClicked = function(htmlPoint) {
 		return;
 	}
 
-	if (!iAmPlayerInCurrentOnlineGame() && !gameOptionEnabled(SPECTATORS_CAN_PLAY)) {
+	if (playingOnlineGame() && !iAmPlayerInCurrentOnlineGame() && !gameOptionEnabled(SPECTATORS_CAN_PLAY)) {
 		debug("Player not allowed to play.");
 		return;
 	}
