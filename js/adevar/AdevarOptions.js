@@ -21,8 +21,9 @@ AdevarOptions.tileDesignTypeValues = {
 	// spoopy: "Adevar Spoopy",
 	icy: "Adevar Icy",
 	chuji: "Chuji",
+	// irl: "TGG Shop IRL",
 	christmas: "Adevar Festive",
-	'chu-ji-holiday': "Chu Ji Holiday" 
+	'chu-ji-holiday': "Chu Ji Holiday"
 };
 
 AdevarOptions.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
