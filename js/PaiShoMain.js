@@ -70,6 +70,7 @@ var customBoardUrlKey = "customBoardUrlKey";
 var paiShoBoardDesignTypeValues = {
 	tgg: "The Garden Gate",
 	nomadic: "Nomadic",
+	classy: "Classy Vescucci",
 	mayfair: "Mayfair Filter",
 	skudShop: "The Garden Gate Shop",
 	// vescucci: "Vescucci Style",
