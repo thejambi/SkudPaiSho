@@ -106,6 +106,7 @@ var paiShoBoardDesignTypeValues = {
 	// offsetcheckeredgreen: "Offset Checkered Green",
 	lightmode: "Old Default Light Mode",
 	darkmode: "Old Default Dark Mode",
+	adevarofficial: "Adevăr Official",
 	christmas: "Christmas by Prof. Petruescu",
 	chujiholiday: "Chu Ji Holiday Board",
 	applycustomboard: "Use Custom Board from URL"
