@@ -1891,7 +1891,7 @@ TrifleBoard.prototype.tileZonedOutOfSpace = function(tile, movementInfo, targetP
 	return isZonedOut;
 };
 
-TrifleBoard.prototype.tileZonedOutOfSpaceByZoneAbility = function(tileCode, ownerName, targetPoint) {
+TrifleBoard.prototype.tileZonedOutOfSpaceByZoneAbility = function(tileCode, ownerName, targetPoint, originPoint) {
 	var isZonedOut = false;
 
 	var tileOwnerCode = getPlayerCodeFromName(ownerName);
@@ -1910,20 +1910,20 @@ TrifleBoard.prototype.tileZonedOutOfSpaceByZoneAbility = function(tileCode, owne
 				if (
 					(
 						zoneAbilityInfo.type === ZoneAbility.restrictMovementWithinZone
-					) && (
+					) && (	// Zone ability target team matches
 						(zoneAbilityInfo.targetTeams.includes(TileTeam.friendly)
 							&& tileOwnerCode === checkBoardPoint.tile.ownerCode)
 						|| (zoneAbilityInfo.targetTeams.includes(TileTeam.enemy)
 							&& tileOwnerCode !== checkBoardPoint.tile.ownerCode)
 					) && (
-						(
+						(	// Zone ability target tile types matches, if present
 							zoneAbilityInfo.targetTileTypes 
 							&& (
 								arrayIncludesOneOf(zoneAbilityInfo.targetTileTypes, tileInfo.types)
 								|| zoneAbilityInfo.targetTileTypes.includes(TileCategory.allTileTypes)
 							)
 						)
-						|| (
+						|| (	// OR zone ability target tiles matches, if present
 							zoneAbilityInfo.targetTileCodes 
 							&& zoneAbilityInfo.targetTileCodes.includes(tileCode)
 						)
@@ -1931,6 +1931,11 @@ TrifleBoard.prototype.tileZonedOutOfSpaceByZoneAbility = function(tileCode, owne
 						self.pointTileZoneContainsPoint(checkBoardPoint, targetPoint)
 					) && (
 						abilityIsActive
+					) && (	// If deploy (no originPoint) or tile origin was inside zone and movement is unable to escape zone, allow it to move farther away from center
+						!originPoint
+						|| (
+							true
+						)
 					)
 				) {
 					isZonedOut = true;
@@ -2023,7 +2028,7 @@ TrifleBoard.prototype.setDeployPointsPossibleMoves = function(player, tileCode) 
 			this.forEachBoardPoint(function(boardPoint) {
 				if (!boardPoint.hasTile()
 						&& !boardPoint.isType(GATE)
-						&& !self.tileZonedOutOfSpaceByZoneAbility(tileCode, player, boardPoint)) {
+						&& !self.tileZonedOutOfSpaceByZoneAbility(tileCode, player, boardPoint, null)) {
 					boardPoint.addType(POSSIBLE_MOVE);
 				}
 			});
