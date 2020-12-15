@@ -1950,9 +1950,7 @@ var GameType = {
 		gameOptions: [
 			PLAY_IN_SPACES,
 			VAGABOND_ROTATE,
-			ADEVAR_ROTATE
-		],
-		secretGameOptions: [
+			ADEVAR_ROTATE,
 			SPECTATORS_CAN_PLAY
 		]
 	},
@@ -1963,9 +1961,7 @@ var GameType = {
 		gameOptions: [
 			SHORTER_GAME,
 			FOUR_SIDED_BOARD,
-			SIX_SIDED_BOARD
-		],
-		secretGameOptions: [
+			SIX_SIDED_BOARD,
 			EIGHT_SIDED_BOARD
 		]
 	},
@@ -2778,6 +2774,10 @@ var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
   }
   
   function closeGame() {
+	  if (gameDevOn) {
+		  setGameController(GameType.Trifle.id);
+		  return;
+	  }
 	  var defaultGameTypeIds = [
 		  GameType.SkudPaiSho.id,
 		  GameType.VagabondPaiSho.id,
@@ -2863,6 +2863,9 @@ var processChatCommands = function(chatMessage) {
 	if (chatMessage.toLowerCase().includes('spoopy')) {
 		new AdevarOptions();
 		AdevarOptions.commenceSpoopy();
+	} else if (chatMessage.toLowerCase().includes('irlplease')) {
+		new AdevarOptions();
+		AdevarOptions.commenceIrl();
 	}
 };
   
