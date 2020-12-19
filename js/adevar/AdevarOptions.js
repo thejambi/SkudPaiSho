@@ -20,7 +20,7 @@ AdevarOptions.tileDesignTypeValues = {
 	monochrome: "Adevar Monochrome",
 	// spoopy: "Adevar Spoopy",
 	icy: "Adevar Icy",
-	irl: "Adevar Red Oak & Walnut",
+	irl: "Adevar TGG Red Oak & Walnut",
 	chuji: "Chuji",
 	christmas: "Adevar Festive",
 	'chu-ji-holiday': "Chu Ji Holiday"
