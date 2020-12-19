@@ -62,4 +62,4 @@ AdevarOptions.commenceSpoopy = function() {
 AdevarOptions.commenceIrl = function() {
 	AdevarOptions.tileDesignTypeValues['irl'] = "TGG Shop IRL";
 	AdevarOptions.setTileDesignsPreference('irl');
-}
+};
