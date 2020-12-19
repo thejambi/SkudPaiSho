@@ -20,8 +20,8 @@ AdevarOptions.tileDesignTypeValues = {
 	monochrome: "Adevar Monochrome",
 	// spoopy: "Adevar Spoopy",
 	icy: "Adevar Icy",
+	irl: "Adevar Red Oak & Walnut",
 	chuji: "Chuji",
-	// irl: "TGG Shop IRL",
 	christmas: "Adevar Festive",
 	'chu-ji-holiday': "Chu Ji Holiday"
 };
@@ -57,9 +57,4 @@ AdevarOptions.buildToggleViewAsGuestDiv = function() {
 AdevarOptions.commenceSpoopy = function() {
 	AdevarOptions.tileDesignTypeValues['spoopy'] = "Adevar Spoopy";
 	AdevarOptions.setTileDesignsPreference('spoopy');
-};
-
-AdevarOptions.commenceIrl = function() {
-	AdevarOptions.tileDesignTypeValues['irl'] = "TGG Shop IRL";
-	AdevarOptions.setTileDesignsPreference('irl');
 };

@@ -2863,9 +2863,6 @@ var processChatCommands = function(chatMessage) {
 	if (chatMessage.toLowerCase().includes('spoopy')) {
 		new AdevarOptions();
 		AdevarOptions.commenceSpoopy();
-	} else if (chatMessage.toLowerCase().includes('irlplease')) {
-		new AdevarOptions();
-		AdevarOptions.commenceIrl();
 	}
 };
   
