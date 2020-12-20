@@ -67,7 +67,8 @@ var QueryString = function () {
   
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
 var customBoardUrlKey = "customBoardUrlKey";
-var paiShoBoardDesignTypeValues = {
+var customBoardUrlArrayKey = "customBoardUrlArrayKey";
+var paiShoBoardDesignTypeValuesDefault = {
 	tgg: "The Garden Gate",
 	nomadic: "Nomadic",
 	classy: "Classy Vescucci",
@@ -112,6 +113,8 @@ var paiShoBoardDesignTypeValues = {
 	applycustomboard: "Use Custom Board from URL"
 };
 
+var paiShoBoardDesignTypeValues = {};
+
 var svgBoardDesigns = [
 	"lightmode",
 	"darkmode",
@@ -119,6 +122,21 @@ var svgBoardDesigns = [
 ];
   
 var paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
+
+function buildBoardDesignsValues() {
+	paiShoBoardDesignTypeValues = copyObject(paiShoBoardDesignTypeValuesDefault);
+	var customBoardArray = JSON.parse(localStorage.getItem(customBoardUrlArrayKey));
+	
+	if (customBoardArray && customBoardArray.length) {
+		for (var i = 0; i < customBoardArray.length; i++) {
+			var name = customBoardArray[i].name;
+			var url = customBoardArray[i].url;
+			if (name && url) {
+				paiShoBoardDesignTypeValues["customBoard" + name] = name;
+			}
+		}
+	}
+}
 
 function buildDropdownDiv(dropdownId, labelText, valuesObject, selectedObjectKey, onchangeFunction) {
 	var containerDiv = document.createElement("div");
@@ -276,6 +294,8 @@ var animationsOnKey = "animationsOn";
 	  applyDataTheme();
   
 	  defaultEmailMessageText = document.querySelector(".footer").innerHTML;
+
+	  buildBoardDesignsValues();
   
 	  if (QueryString.gameType) {
 		  clearOptions();
@@ -718,13 +738,15 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
   }
   
 /* Pai Sho Board Switches */
-function setPaiShoBoardOption(newPaiShoBoardKey) {
+function setPaiShoBoardOption(newPaiShoBoardKey, isTemporary) {
 	if (!paiShoBoardDesignTypeValues[newPaiShoBoardKey]) {
 		newPaiShoBoardKey = "tgg";
 	}
 	var oldClassName = paiShoBoardKey + "Board";
 	gameContainerDiv.classList.remove(oldClassName);
-	localStorage.setItem(paiShoBoardDesignTypeKey, newPaiShoBoardKey);
+	if (!isTemporary) {
+		localStorage.setItem(paiShoBoardDesignTypeKey, newPaiShoBoardKey);
+	}
 	paiShoBoardKey = newPaiShoBoardKey;
 	var newClassName = paiShoBoardKey + "Board";
 	gameContainerDiv.classList.add(newClassName);
@@ -743,20 +765,44 @@ function promptCustomBoardURL() {
 	localStorage.setItem(customBoardUrlKey, customBoardUrl);
 
 	var message = "<p>You can use one of many fan-created board designs. See the boards in the #board-design channel in The Garden Gate Discord. Copy and paste the link to a board image to use here:</p>";
-	message += "<br /><input type='text' id='customBoardInput' name='customBoardInput' /><br />";
+	message += "<br />Name: <input type='text' id='customBoardNameInput' name='customBoardNameInput' /><br />";
+	message += "<br />URL: <input type='text' id='customBoardInput' name='customBoardInput' /><br />";
 	message += "<br /><div class='clickableText' onclick='setCustomBoardFromInput()'>Apply Custom Board</div>";
+	message += "<br /><br /><div class='clickableText' onclick='clearCustomBoardEntries()'>Clear Custom Boards</div>";
 
 	showModal("Use Custom Board URL", message);
 }
 
+function clearCustomBoardEntries() {
+	localStorage.removeItem(customBoardUrlArrayKey);
+	buildBoardDesignsValues();
+	clearMessage();
+	closeModal();
+}
+
 function setCustomBoardFromInput() {
+	var customBoardName = document.getElementById('customBoardNameInput').value;
 	customBoardUrl = document.getElementById('customBoardInput').value;
 	closeModal();
+
+	if (customBoardName && customBoardUrl) {
+		var customBoardArray = JSON.parse(localStorage.getItem(customBoardUrlArrayKey));
+		if (!customBoardArray) {
+			customBoardArray = [];
+		}
+		customBoardArray.push({
+			name: customBoardName,
+			url: customBoardUrl
+		});
+		localStorage.setItem(customBoardUrlArrayKey, JSON.stringify(customBoardArray));
+		buildBoardDesignsValues();
+	}
 
 	if (customBoardUrl) {
 		localStorage.setItem(customBoardUrlKey, customBoardUrl);
 	}
 	applyBoardOptionToBgSvg();
+	clearMessage();
 }
   
   /* Skud Pai Sho Tile Design Switches */
@@ -3776,6 +3822,9 @@ function buildPreferenceDropdownDiv(labelText, dropdownId, valuesObject, prefere
 				function() {
 					setUserGamePreference(preferenceKey, this.value);
 					gameController.callActuate();
+					if (gameController.gamePreferenceSet) {
+						gameController.gamePreferenceSet(preferenceKey);
+					}
 				});
 };
   

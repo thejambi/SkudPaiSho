@@ -169,6 +169,17 @@ function applyBoardOptionToBgSvg(bgSvgIfKnown) {
 
 		var boardUrl = "style/board_" + paiShoBoardKey + extension;
 
+		if (paiShoBoardKey.includes("customBoard")) {
+			var customBoardArray = JSON.parse(localStorage.getItem(customBoardUrlArrayKey));
+			if (customBoardArray && customBoardArray.length) {
+				for (var i = 0; i < customBoardArray.length; i++) {
+					if (customBoardArray[i].name === paiShoBoardKey.substring(11)) {
+						boardUrl = customBoardArray[i].url;
+					}
+				}
+			}
+		}
+
 		var customBoardUrl = localStorage.getItem(customBoardUrlKey);
 		if (paiShoBoardKey === 'applycustomboard' && customBoardUrl) {
 			debug("Custom board! " + customBoardUrl);
