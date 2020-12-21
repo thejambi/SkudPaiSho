@@ -110,7 +110,7 @@ var paiShoBoardDesignTypeValuesDefault = {
 	adevar: "Adevăr",
 	christmas: "Christmas by Prof. Petruescu",
 	chujiholiday: "Chu Ji Holiday Board",
-	applycustomboard: "Use Custom Board from URL"
+	applycustomboard: "Add Custom Board from URL"
 };
 
 var paiShoBoardDesignTypeValues = {};
@@ -132,7 +132,7 @@ function buildBoardDesignsValues() {
 			var name = customBoardArray[i].name;
 			var url = customBoardArray[i].url;
 			if (name && url) {
-				paiShoBoardDesignTypeValues["customBoard" + name] = name;
+				paiShoBoardDesignTypeValues["customBoard" + name.replace(/ /g,'_')] = name;
 			}
 		}
 	}

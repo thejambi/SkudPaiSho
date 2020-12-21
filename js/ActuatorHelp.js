@@ -173,7 +173,7 @@ function applyBoardOptionToBgSvg(bgSvgIfKnown) {
 			var customBoardArray = JSON.parse(localStorage.getItem(customBoardUrlArrayKey));
 			if (customBoardArray && customBoardArray.length) {
 				for (var i = 0; i < customBoardArray.length; i++) {
-					if (customBoardArray[i].name === paiShoBoardKey.substring(11)) {
+					if (customBoardArray[i].name.replace(/ /g,'_') === paiShoBoardKey.substring(11)) {
 						boardUrl = customBoardArray[i].url;
 					}
 				}
