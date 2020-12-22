@@ -202,6 +202,8 @@ PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
 		gameImgDir = "Adevar/" + localStorage.getItem(AdevarOptions.tileDesignTypeKey);
 	} else if (tile.gameType === "Warfront") {
 		gameImgDir = "Warfront";
+	} else {
+		gameImgDir = tile.gameType;
 	}
 	if (gameImgDir) {
 		srcValue = srcValue + gameImgDir + "/";

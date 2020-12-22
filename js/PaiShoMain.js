@@ -67,9 +67,11 @@ var QueryString = function () {
   
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
 var customBoardUrlKey = "customBoardUrlKey";
-var paiShoBoardDesignTypeValues = {
+var customBoardUrlArrayKey = "customBoardUrlArrayKey";
+var paiShoBoardDesignTypeValuesDefault = {
 	tgg: "The Garden Gate",
 	nomadic: "Nomadic",
+	classy: "Classy Vescucci",
 	mayfair: "Mayfair Filter",
 	skudShop: "The Garden Gate Shop",
 	// vescucci: "Vescucci Style",
@@ -105,9 +107,13 @@ var paiShoBoardDesignTypeValues = {
 	// offsetcheckeredgreen: "Offset Checkered Green",
 	lightmode: "Old Default Light Mode",
 	darkmode: "Old Default Dark Mode",
+	adevar: "Adevăr",
 	christmas: "Christmas by Prof. Petruescu",
-	applycustomboard: "Use Custom Board from URL"
+	chujiholiday: "Chu Ji Holiday Board",
+	applycustomboard: "Add Custom Board from URL"
 };
+
+var paiShoBoardDesignTypeValues = {};
 
 var svgBoardDesigns = [
 	"lightmode",
@@ -116,6 +122,21 @@ var svgBoardDesigns = [
 ];
   
 var paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
+
+function buildBoardDesignsValues() {
+	paiShoBoardDesignTypeValues = copyObject(paiShoBoardDesignTypeValuesDefault);
+	var customBoardArray = JSON.parse(localStorage.getItem(customBoardUrlArrayKey));
+	
+	if (customBoardArray && customBoardArray.length) {
+		for (var i = 0; i < customBoardArray.length; i++) {
+			var name = customBoardArray[i].name;
+			var url = customBoardArray[i].url;
+			if (name && url) {
+				paiShoBoardDesignTypeValues["customBoard" + name.replace(/ /g,'_')] = name;
+			}
+		}
+	}
+}
 
 function buildDropdownDiv(dropdownId, labelText, valuesObject, selectedObjectKey, onchangeFunction) {
 	var containerDiv = document.createElement("div");
@@ -273,6 +294,8 @@ var animationsOnKey = "animationsOn";
 	  applyDataTheme();
   
 	  defaultEmailMessageText = document.querySelector(".footer").innerHTML;
+
+	  buildBoardDesignsValues();
   
 	  if (QueryString.gameType) {
 		  clearOptions();
@@ -715,13 +738,15 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
   }
   
 /* Pai Sho Board Switches */
-function setPaiShoBoardOption(newPaiShoBoardKey) {
+function setPaiShoBoardOption(newPaiShoBoardKey, isTemporary) {
 	if (!paiShoBoardDesignTypeValues[newPaiShoBoardKey]) {
 		newPaiShoBoardKey = "tgg";
 	}
 	var oldClassName = paiShoBoardKey + "Board";
 	gameContainerDiv.classList.remove(oldClassName);
-	localStorage.setItem(paiShoBoardDesignTypeKey, newPaiShoBoardKey);
+	if (!isTemporary) {
+		localStorage.setItem(paiShoBoardDesignTypeKey, newPaiShoBoardKey);
+	}
 	paiShoBoardKey = newPaiShoBoardKey;
 	var newClassName = paiShoBoardKey + "Board";
 	gameContainerDiv.classList.add(newClassName);
@@ -740,20 +765,44 @@ function promptCustomBoardURL() {
 	localStorage.setItem(customBoardUrlKey, customBoardUrl);
 
 	var message = "<p>You can use one of many fan-created board designs. See the boards in the #board-design channel in The Garden Gate Discord. Copy and paste the link to a board image to use here:</p>";
-	message += "<br /><input type='text' id='customBoardInput' name='customBoardInput' /><br />";
+	message += "<br />Name: <input type='text' id='customBoardNameInput' name='customBoardNameInput' /><br />";
+	message += "<br />URL: <input type='text' id='customBoardInput' name='customBoardInput' /><br />";
 	message += "<br /><div class='clickableText' onclick='setCustomBoardFromInput()'>Apply Custom Board</div>";
+	message += "<br /><br /><div class='clickableText' onclick='clearCustomBoardEntries()'>Clear Custom Boards</div>";
 
 	showModal("Use Custom Board URL", message);
 }
 
+function clearCustomBoardEntries() {
+	localStorage.removeItem(customBoardUrlArrayKey);
+	buildBoardDesignsValues();
+	clearMessage();
+	closeModal();
+}
+
 function setCustomBoardFromInput() {
+	var customBoardName = document.getElementById('customBoardNameInput').value;
 	customBoardUrl = document.getElementById('customBoardInput').value;
 	closeModal();
+
+	if (customBoardName && customBoardUrl) {
+		var customBoardArray = JSON.parse(localStorage.getItem(customBoardUrlArrayKey));
+		if (!customBoardArray) {
+			customBoardArray = [];
+		}
+		customBoardArray.push({
+			name: customBoardName,
+			url: customBoardUrl
+		});
+		localStorage.setItem(customBoardUrlArrayKey, JSON.stringify(customBoardArray));
+		buildBoardDesignsValues();
+	}
 
 	if (customBoardUrl) {
 		localStorage.setItem(customBoardUrlKey, customBoardUrl);
 	}
 	applyBoardOptionToBgSvg();
+	clearMessage();
 }
   
   /* Skud Pai Sho Tile Design Switches */
@@ -1947,7 +1996,8 @@ var GameType = {
 		gameOptions: [
 			PLAY_IN_SPACES,
 			VAGABOND_ROTATE,
-			ADEVAR_ROTATE
+			ADEVAR_ROTATE,
+			SPECTATORS_CAN_PLAY
 		]
 	},
 	Blooms: {
@@ -1957,7 +2007,8 @@ var GameType = {
 		gameOptions: [
 			SHORTER_GAME,
 			FOUR_SIDED_BOARD,
-			SIX_SIDED_BOARD
+			SIX_SIDED_BOARD,
+			EIGHT_SIDED_BOARD
 		]
 	},
 	Hexentafl: {
@@ -2302,7 +2353,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 			  // message += "<div class='clickableText' onclick='jumpToGame(" + gId + "," + userIsHost + ",\"" + opponentUsername + "\"," + myGame.gameTypeId + ");'>" + gameDisplayTitle + "</div>";
 			  message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
 			  for (var i = 0; i < myGame.gameOptions.length; i++) {
-				  message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + myGame.gameOptions[i] + "</em></div>"
+				  message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + getGameOptionDescription(myGame.gameOptions[i]) + "</em></div>"
 			  }
 		  }
 	  }
@@ -2529,7 +2580,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 				}
 				message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
 				for (var i = 0; i < gameSeek.gameOptions.length; i++) {
-					message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + gameSeek.gameOptions[i] + "</em></div>"
+					message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></div>"
 				}
 				message += "</div>";
 			}
@@ -2584,7 +2635,7 @@ function viewGameSeeksClicked() {
 var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
 	var activeCountDiv = document.getElementById('activeGamesCountDisplay');
 	if (activeCountDiv) {
-		activeCountDiv.innerText = count + " games being played in the past 24 hours!";
+		activeCountDiv.innerText = count + " games active in the past 24 hours!";
 	}
 };
   
@@ -2769,6 +2820,10 @@ var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
   }
   
   function closeGame() {
+	  if (gameDevOn) {
+		  setGameController(GameType.Trifle.id);
+		  return;
+	  }
 	  var defaultGameTypeIds = [
 		  GameType.SkudPaiSho.id,
 		  GameType.VagabondPaiSho.id,
@@ -2854,10 +2909,6 @@ var processChatCommands = function(chatMessage) {
 	if (chatMessage.toLowerCase().includes('spoopy')) {
 		new AdevarOptions();
 		AdevarOptions.commenceSpoopy();
-	}
-	if (chatMessage.toLowerCase().includes('christmas') && usernameIsOneOf(['SkudPaiSho'])) {
-		new AdevarOptions();
-		AdevarOptions.includeChristmas();
 	}
 };
   
@@ -3046,8 +3097,9 @@ var processChatCommands = function(chatMessage) {
   function quitInactiveOnlineGame() {
 	if (iAmPlayerInCurrentOnlineGame()
 			&& !gameController.theGame.getWinner()
-			  && (!myTurn() || currentGameData.hostUsername === currentGameData.guestUsername)
-			  && onlineGameIsOldEnoughToBeQuit()) {
+			&& (currentGameData.hostUsername === currentGameData.guestUsername
+				|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
+	) {
 		onlinePlayEngine.updateGameWinInfoAsTie(gameId, 10, getLoginToken(), quitOnlineGameCallback);
 	}
   }
@@ -3056,8 +3108,9 @@ var processChatCommands = function(chatMessage) {
 	  var message = "";
 	  if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame() 
 			  && !gameController.theGame.getWinner()
-			  && (!myTurn() || currentGameData.hostUsername === currentGameData.guestUsername)
-			  && onlineGameIsOldEnoughToBeQuit()) {
+			  && (currentGameData.hostUsername === currentGameData.guestUsername
+				  || (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
+		) {
 		  message = "<div>Are you sure you want to quit and end this inactive game? The game will end and will appear as Inactive in your Completed Games list.</div>";
 		  message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - quit current game</div>";
 		  message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
@@ -3235,7 +3288,7 @@ function buildDateFromTimestamp(timestampStr) {
 		  if (!gameOptionEnabled(options[i])) {
 			  if (!gameController.optionOkToShow
 					  || (gameController.optionOkToShow && gameController.optionOkToShow(options[i]))) {
-				  msg += "<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>&bull;&nbsp;Add game option: " + options[i] + "</span><br />";
+				  msg += "<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>&bull;&nbsp;Add game option: " + getGameOptionDescription(options[i]) + "</span><br />";
 			  }
 		  }
 	  }
@@ -3769,6 +3822,9 @@ function buildPreferenceDropdownDiv(labelText, dropdownId, valuesObject, prefere
 				function() {
 					setUserGamePreference(preferenceKey, this.value);
 					gameController.callActuate();
+					if (gameController.gamePreferenceSet) {
+						gameController.gamePreferenceSet(preferenceKey);
+					}
 				});
 };
   

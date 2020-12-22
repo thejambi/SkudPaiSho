@@ -251,7 +251,20 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		}
 
 		if (placeTileResults.capturedTile && placeTileResults.capturedTile.type === AdevarTileType.reflection) {
+			/* Reflection captured, reveal captured tile owner's HT and return player's wrong SF on the board */
+			this.disableUndo = true;
+			this.board.revealTile(AdevarTileType.hiddenTile, placeTileResults.capturedTile.ownerName);
+			move.removedSFInfo = this.board.removeSFThatCannotCaptureHT(move.player, this.playerHiddenTiles[placeTileResults.capturedTile.ownerName]);
+			if (move.removedSFInfo.tileRemoved) {
+				this.secondFaceTilesOnBoardCount[move.removedSFInfo.tileRemoved.ownerName]--;
+				this.tileManager.putTileBack(move.removedSFInfo.tileRemoved);
+			}
 			this.playersWhoHaveCapturedReflection.push(move.player);
+		}
+
+		if (placeTileResults.capturedTile && placeTileResults.capturedTile.type === AdevarTileType.secondFace) {
+			this.regrowVanguardsForPlayer(move.player);
+			this.secondFaceTilesOnBoardCount[getOpponentName(move.player)]--;
 		}
 
 		this.buildDeployGameLogText(move, tile);
@@ -301,9 +314,6 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 				this.secondFaceTilesOnBoardCount[move.removedSFInfo.tileRemoved.ownerName]--;
 				this.tileManager.putTileBack(move.removedSFInfo.tileRemoved);
 			}
-		}
-
-		if (moveTileResults.capturedTile && moveTileResults.capturedTile.type === AdevarTileType.reflection) {
 			this.playersWhoHaveCapturedReflection.push(move.player);
 		}
 
@@ -391,7 +401,8 @@ AdevarGameManager.prototype.revealAllPointsAsPossible = function() {
 
 AdevarGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
 	if (tile.type !== AdevarTileType.secondFace
-		|| (tile.type === AdevarTileType.secondFace && this.secondFaceTilesOnBoardCount[tile.ownerName] < 1)
+		|| (tile.type === AdevarTileType.secondFace && this.secondFaceTilesOnBoardCount[tile.ownerName] < 1
+				&& this.opponentNonMatchingHTNotRevealed(tile))
 	) {
 		this.board.setPossibleDeployPoints(tile);
 	}
@@ -400,6 +411,12 @@ AdevarGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
 		this.actuate();
 	}
 };
+
+AdevarGameManager.prototype.opponentNonMatchingHTNotRevealed = function(sfTile) {
+	var opponent = getOpponentName(sfTile.ownerName);
+	return this.playerHiddenTiles[opponent].hidden
+		|| AdevarTile.hiddenTileMatchesSecondFace(this.playerHiddenTiles[opponent], sfTile);
+}
 
 AdevarGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
 	if (!boardPoint.hasTile()) {

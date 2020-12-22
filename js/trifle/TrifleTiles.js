@@ -1,34 +1,61 @@
 
 var TrifleTileCodes = {
-	SkyBison: 'SkyBison',
-	Badgermole: 'Badgermole',
 	Wheel: 'Wheel',
-	Chrysanthemum: 'Chrysanthemum',
-	FireLily: 'FireLily',
-	Dragon: 'Dragon',
+	
+	
+	
 	Lotus: 'Lotus',
-	MessengerHawk: 'MessengerHawk',
+	/* Air */
 	AirBanner: 'AirBanner',
-	// FlyingLemur: 'FlyingLemur',
-	RingTailedLemur: 'RingTailedLemur',
+	SkyBison: 'SkyBison',
+	// RingTailedLemur: 'RingTailedLemur',
+	FlyingLemur: "FlyingLemur",
 	HermitCrab: 'HermitCrab',
 	Firefly: 'Firefly',
-	Dandelion: 'Dandelion',
+	// Dandelion: 'Dandelion',	// Future
+	Chrysanthemum: 'Chrysanthemum',
 	Edelweiss: 'Edelweiss',
+	NobleRhubarb: 'NobleRhubarb',
+	Chamomile: "Chamomile",
+	Lavender: 'Lavender',
+	/* Water */
 	WaterBanner: 'WaterBanner',
 	SnowLeopard: "SnowLeopard",
 	PolarBearDog: 'PolarBearDog',
 	BuffaloYak: 'BuffaloYak',
+	SnowWolf: "SnowWolf",
 	TitanArum: 'TitanArum',
 	LilyPad: 'LilyPad',
-	Lupine: 'Lupine',
+	Cattail: "Cattail",
+	WaterHyacinth: "WaterHyacinth",
+	// Lupine: 'Lupine',	// Future
+	/* Earth */
 	EarthBanner: 'EarthBanner',
+	Badgermole: 'Badgermole',
 	SaberToothMooseLion: 'SaberToothMooseLion',
-	AirGlider: 'AirGlider',
 	Shirshu: 'Shirshu',
 	BoarQPine: 'BoarQPine',
-	Lavender: 'Lavender',
-	NobleRhubarb: 'NobleRhubarb'
+	CherryBlossom: "CherryBlossom",
+	Sunflower: "Sunflower",
+	MoonFlower: "Moon Flower",
+	/* Fire */
+	FireBanner: "FireBanner",
+	Dragon: 'Dragon',
+	KomodoRhino: "KomodoRhino",
+	MongooseLizard: "MongooseLizard",
+	ArmadilloBear: "ArmadilloBear",
+	MessengerHawk: 'MessengerHawk',
+	FireLily: 'FireLily',
+	GrassWeed: "GrassWeed",
+	GrippingGrass: "GrippingGrass",
+	Saffron: "Saffron",
+	/* Spirit */
+	SpiritBanner: "SpiritBanner",
+	BaboonSpirit: "BaboonSpirit",
+	Cabbage: "Cabbage",
+	SpiritPortal: "SpiritPortal",
+	/* Other */
+	AirGlider: 'AirGlider'
 };
 
 var TileType = {
@@ -476,7 +503,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	/* TrifleTiles[TrifleTileCodes.FlyingLemur] = {
+	/* TrifleTiles[TrifleTileCodes.RingTailedLemur] = {
 		types: [TileType.animal],
 		deployTypes: [ DeployType.anywhere ],
 		movements: [
@@ -493,7 +520,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		]
 	}; */
 
-	TrifleTiles[TrifleTileCodes.RingTailedLemur] = { /* Done */
+	TrifleTiles[TrifleTileCodes.FlyingLemur] = { /* Done */
 		types: [TileType.animal],
 		deployTypes: [ DeployType.temple ],
 		movements: [

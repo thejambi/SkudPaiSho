@@ -20,6 +20,8 @@ function PlaygroundController(gameContainer, isMobile) {
 	new AdevarOptions(); // Just to initialize tiles to show up
 }
 
+PlaygroundController.playgroundBoardDesign = "playgroundBoardDesign";
+
 PlaygroundController.prototype.getGameTypeId = function() {
 	return GameType.Playground.id;
 };
@@ -29,6 +31,10 @@ PlaygroundController.prototype.completeSetup = function() {
 	if (!getUserGamePreference(CapturePreferences.tileDesignKey)
 			|| !CapturePreferences.tileDesignTypeValues[getUserGamePreference(CapturePreferences.tileDesignKey)]) {
 		setUserGamePreference(CapturePreferences.tileDesignKey, "original");
+	}
+
+	if (getUserGamePreference(PlaygroundController.playgroundBoardDesign)) {
+		setPaiShoBoardOption(getUserGamePreference(PlaygroundController.playgroundBoardDesign), true);
 	}
 };
 
@@ -138,7 +144,16 @@ PlaygroundController.prototype.getAdditionalHelpTabDiv = function() {
 	settingsDiv.appendChild(buildPreferenceDropdownDiv("Capture Tile Designs", "capturePaiShoDesignsDropdown", CapturePreferences.tileDesignTypeValues, CapturePreferences.tileDesignKey));
 
 	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(buildPreferenceDropdownDiv("Playground Board", "playgroundBoardDropdown", paiShoBoardDesignTypeValues, PlaygroundController.playgroundBoardDesign));
+
+	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
+};
+
+PlaygroundController.prototype.gamePreferenceSet = function(preferenceKey) {
+	if (preferenceKey === PlaygroundController.playgroundBoardDesign) {
+		setPaiShoBoardOption(getUserGamePreference(PlaygroundController.playgroundBoardDesign), true);
+	}
 };
 
 PlaygroundController.prototype.startOnlineGame = function() {
@@ -191,6 +206,11 @@ PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
 	
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
+		return;
+	}
+
+	if (playingOnlineGame() && !iAmPlayerInCurrentOnlineGame() && !gameOptionEnabled(SPECTATORS_CAN_PLAY)) {
+		debug("Player not allowed to play.");
 		return;
 	}
 
@@ -258,6 +278,8 @@ PlaygroundController.prototype.getCurrentPlayingPlayer = function() {
 			return HOST;
 		} else if (usernameEquals(currentGameData.guestUsername)) {
 			return GUEST;
+		} else if (gameOptionEnabled(SPECTATORS_CAN_PLAY)) {
+			return getUsername();
 		}
 	} else {
 		return this.currentPlayingPlayer;
@@ -271,6 +293,11 @@ PlaygroundController.prototype.pointClicked = function(htmlPoint) {
 	
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
+		return;
+	}
+
+	if (playingOnlineGame() && !iAmPlayerInCurrentOnlineGame() && !gameOptionEnabled(SPECTATORS_CAN_PLAY)) {
+		debug("Player not allowed to play.");
 		return;
 	}
 
@@ -408,5 +435,9 @@ PlaygroundController.prototype.getSkipToIndex = function(currentMoveIndex) {
 
 PlaygroundController.prototype.setAnimationsOn = function(isAnimationsOn) {
 	this.actuator.setAnimationOn(isAnimationsOn);
+};
+
+PlaygroundController.prototype.cleanup = function() {
+	setPaiShoBoardOption(localStorage.getItem(paiShoBoardDesignTypeKey));
 };
 
