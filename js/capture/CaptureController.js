@@ -4,6 +4,7 @@ var CapturePreferences = {
 	tileDesignKey: "TileDesigns",
 	tileDesignTypeValues: {
 		original: "Original",
+		chuji: "Chu Ji by Sirstotes",
 		minimalist: "Minimalist by Sirstotes"
 	}
 };
