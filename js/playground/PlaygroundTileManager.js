@@ -112,16 +112,14 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Chess", "Chess_P", ownerCode));
 
 	// Other from Sirstotes
-	tiles.push(new PlaygroundTile("ChuJi", "ChuJi_Water", ownerCode));
-	tiles.push(new PlaygroundTile("ChuJi", "ChuJi_Earth", ownerCode));
-	tiles.push(new PlaygroundTile("ChuJi", "ChuJi_Fire", ownerCode));
-	tiles.push(new PlaygroundTile("ChuJi", "ChuJi_Air", ownerCode));
-	tiles.push(new PlaygroundTile("ChuJi", "ChuJi_RedLotus", ownerCode));
-	tiles.push(new PlaygroundTile("ChuJi", "ChuJi_Oasis", ownerCode));
-	tiles.push(new PlaygroundTile("ChuJi", "ChuJi_Library", ownerCode));
-	tiles.push(new PlaygroundTile("ChuJi", "ChuJi_Temple", ownerCode));
-	// tiles.push(new PlaygroundTile("ChuJi", "ChuJi_", ownerCode));
-	// tiles.push(new PlaygroundTile("ChuJi", "ChuJi_", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Water", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Earth", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Fire", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Air", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_RedLotus", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Oasis", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Library", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Temple", ownerCode));
 
 	return tiles;
 };
