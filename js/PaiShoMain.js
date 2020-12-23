@@ -1740,7 +1740,8 @@ function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed) {
 	if (moveIsConfirmed || !isMoveConfirmationRequired()) {	/* Move should be processed */
 		onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback);
 	} else {
-		// Move needs to be confirmed
+		/* Move needs to be confirmed. Finalize move and show confirm button. */
+		finalizeMove(submitMoveData.moveAnimationBeginStep);
 		showConfirmMoveButton();
 	}
 }
@@ -2364,6 +2365,9 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 		  }
 	  }
 	  message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
+
+	  message += "<br /><br /><div><span class='skipBonus' onclick='showPreferences();'>Device Preferences</span></div><br />";
+
 	  message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
 	  // message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
 	  showModal("Active Games", message);
@@ -3980,5 +3984,13 @@ function hideConfirmMoveButton() {
 function confirmMoveClicked() {
 	callSubmitMove(submitMoveData.moveAnimationBeginStep, true);
 	hideConfirmMoveButton();
+}
+
+function showPreferences() {
+	var message = "";
+
+	message += "<div><input id='confirmMoveBeforeSubmittingCheckbox' type='checkbox' onclick='toggleConfirmMovePreference();' checked='" + isMoveConfirmationRequired() + "'><label for='confirmMoveBeforeSubmittingCheckbox'> Confirm move before submitting?</label></div>";
+
+	showModal("Device Preferences", message);
 }
 
