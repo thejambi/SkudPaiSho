@@ -1282,6 +1282,7 @@ function resetMove() {
 	gameController.resetMove();
 
 	rerunAll();
+	hideConfirmMoveButton();
 	// $('#contactform').addClass('gone');
 }
   
