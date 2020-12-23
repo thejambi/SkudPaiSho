@@ -3989,7 +3989,8 @@ function confirmMoveClicked() {
 function showPreferences() {
 	var message = "";
 
-	message += "<div><input id='confirmMoveBeforeSubmittingCheckbox' type='checkbox' onclick='toggleConfirmMovePreference();' checked='" + isMoveConfirmationRequired() + "'><label for='confirmMoveBeforeSubmittingCheckbox'> Confirm move before submitting?</label></div>";
+	var checkedValue = isMoveConfirmationRequired() ? "checked='true'" : "";
+	message += "<div><input id='confirmMoveBeforeSubmittingCheckbox' type='checkbox' onclick='toggleConfirmMovePreference();' " + checkedValue + "'><label for='confirmMoveBeforeSubmittingCheckbox'> Confirm move before submitting?</label></div>";
 
 	showModal("Device Preferences", message);
 }
