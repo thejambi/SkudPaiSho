@@ -306,6 +306,10 @@ div.tab .alertTab, div.tab .alertTab.active {
   background-color: #bbb;
 }
 
+#confirmMoveButton .replayButton {
+  width: 211px;
+}
+
 .board-container {
   display: inline-block;
   float: left;

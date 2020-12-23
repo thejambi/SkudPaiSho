@@ -261,6 +261,7 @@ var gameContainerDiv = document.getElementById("game-container");
 
 var soundManager;
 var animationsOnKey = "animationsOn";
+var confirmMoveKey = "confirmMove";
 
 // var sendJoinGameChatMessage = false;
 /* --- */
@@ -1732,11 +1733,16 @@ function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, 
 	  tutorialInProgress = false;
   }
   
-function callSubmitMove(moveAnimationBeginStep) {
+function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed) {
 	submitMoveData = {
 		moveAnimationBeginStep: moveAnimationBeginStep
 	};
-	onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback);
+	if (moveIsConfirmed || !isMoveConfirmationRequired()) {	/* Move should be processed */
+		onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback);
+	} else {
+		// Move needs to be confirmed
+		showConfirmMoveButton();
+	}
 }
 
 var sendVerificationCodeCallback = function sendVerificationCodeCallback(response) {
@@ -3953,3 +3959,26 @@ function clearGameChats() {
 	document.getElementById('chatMessagesDisplay').innerHTML = "";
 	lastChatTimestamp = '1970-01-01 00:00:00';
 }
+
+function isMoveConfirmationRequired() {
+	return localStorage.getItem(confirmMoveKey) === "true";
+}
+
+function toggleConfirmMovePreference() {
+	localStorage.setItem(confirmMoveKey, !isMoveConfirmationRequired());
+}
+
+function showConfirmMoveButton() {
+	showReplayControls();
+	document.getElementById('confirmMoveButton').classList.remove('gone');
+}
+
+function hideConfirmMoveButton() {
+	document.getElementById('confirmMoveButton').classList.add('gone');
+}
+
+function confirmMoveClicked() {
+	callSubmitMove(submitMoveData.moveAnimationBeginStep, true);
+	hideConfirmMoveButton();
+}
+
