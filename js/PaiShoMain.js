@@ -42,7 +42,7 @@ var QueryString = function () {
 	  tggproject: "TGG Pai Sho Project",
 	  hlowenew: "Modern Tiles",
 	  vescucci: "Vescucci Tiles",
-	  vescuccicolor: "Vescucci Color",
+	  vescuccicolor: "Classy Vescucci",
 	  pixelsho: "Pixel Sho v1 Tiles",
 	  pixelsho2: "Pixel Sho v2 Tiles",
 	  xiangqi: "Xiangqi Style",
