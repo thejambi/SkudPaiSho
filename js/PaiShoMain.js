@@ -1929,7 +1929,8 @@ var GameType = {
 		desc: "Vagabond Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/vagabond-pai-sho/",
 		gameOptions: [
-			OPTION_DOUBLE_TILES
+			OPTION_DOUBLE_TILES,
+			SWAP_BISON_WITH_LEMUR
 		]
 	},
 	Adevar: {

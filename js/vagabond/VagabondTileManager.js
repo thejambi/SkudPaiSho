@@ -23,7 +23,11 @@ VagabondTileManager.prototype.loadTileSet = function(ownerCode) {
 VagabondTileManager.prototype.addTiles = function(tiles, ownerCode) {
 	// 2 of each of these tiles
 	for (var i = 0; i < 2; i++) {
-		tiles.push(new VagabondTile('S', ownerCode));
+		if (gameOptionEnabled(SWAP_BISON_WITH_LEMUR)) {
+			tiles.push(new VagabondTile(VagabondTileCodes.FlyingLemur, ownerCode));
+		} else {
+			tiles.push(new VagabondTile('S', ownerCode));
+		}
 		tiles.push(new VagabondTile('B', ownerCode));
 		tiles.push(new VagabondTile('W', ownerCode));
 		tiles.push(new VagabondTile('C', ownerCode));

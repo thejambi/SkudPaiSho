@@ -14,6 +14,9 @@ var CLASSIC_RULES = "ClassicRules";
 
 var FULL_POINTS_SCORING = "FullPointsScoring";
 
+/* Vagabond */
+var SWAP_BISON_WITH_LEMUR = "SwapBisonWithLemur";
+
 /* Blooms */
 var FOUR_SIDED_BOARD = "BoardSize4";	// It's funny because the name is all wrong, but I always think of it in those words
 var SHORTER_GAME = "ShorterGame";
@@ -82,6 +85,7 @@ legacyGameOptionsMap[ADEVAR_LITE] = "Lite - Beginner Game";
 /* Game Option Descriptions - Game Options must have nice names :) */
 var gameOptionDescriptions = copyObject(legacyGameOptionsMap);
 gameOptionDescriptions[SPECTATORS_CAN_PLAY] = "Allow Spectators to make moves";
+gameOptionDescriptions[SWAP_BISON_WITH_LEMUR] = "Trifle Preview: Lemur instead of Bison";
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {

@@ -509,7 +509,7 @@ VagabondBoard.prototype.blockTilesAdjacentToPointIfNeeded = function(boardPoint)
 	for (var i = 0; i < rowCols.length; i++) {
 		var bp = this.cells[rowCols[i].row][rowCols[i].col];
 		if (bp.hasTile()) {
-			if (bp.tile.code === 'S' && bp.tile.ownerName !== chrysanthemumOwner) {
+			if ([VagabondTileCodes.SkyBison, VagabondTileCodes.FlyingLemur].includes(bp.tile.code) && bp.tile.ownerName !== chrysanthemumOwner) {
 				bp.tile.blocked = true;
 			}
 		}
@@ -728,7 +728,7 @@ VagabondBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, b
 		return false;
 	} else {
 		// Move may be possible. But there may be tiles in the way...
-		if (!this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves, boardPointStart.tile)) {
+		if (!this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves, boardPointStart.tile) && boardPointStart.tile.code !== VagabondTileCodes.FlyingLemur) {
 			return false;
 		}
 	}
@@ -810,7 +810,7 @@ VagabondBoard.prototype.pathFound = function(boardPointStart, boardPointEnd, num
   }
 
 	// If this point is surrounded by a Chrysanthemum and moving tile is Sky Bison, cannot keep moving.
-	if (movingTile.code === 'S' && this.pointIsNextToOpponentTile(boardPointStart, movingTile.ownerCode, 'C')) {
+	if ([VagabondTileCodes.SkyBison, VagabondTileCodes.FlyingLemur].includes(movingTile.code) && this.pointIsNextToOpponentTile(boardPointStart, movingTile.ownerCode, 'C')) {
 		return false;
 	}
   
@@ -954,7 +954,7 @@ VagabondBoard.prototype.setDeployPointsPossibleMoves = function(player, tileCode
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
 			if (!bp.hasTile() && !bp.isType(NON_PLAYABLE)) {
-				if (tileCode === 'S') {
+				if (tileCode === 'S' || tileCode === VagabondTileCodes.FlyingLemur) {
 					if (bp.isType(GATE)) {
 						bp.addType(POSSIBLE_MOVE);
 					}
