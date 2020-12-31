@@ -2093,6 +2093,9 @@ function getGameControllerForGameType(gameTypeId) {
   function setGameController(gameTypeId, keepGameOptions) {
 	  setGameLogText('');
 	  var successResult = true;
+	  
+	  hideConfirmMoveButton();
+	 
 	  // Previous game controller cleanup
 	  if (gameController) {
 		  gameController.cleanup();
@@ -3970,7 +3973,7 @@ function clearGameChats() {
 }
 
 function isMoveConfirmationRequired() {
-	return localStorage.getItem(confirmMoveKey) === "true";
+	return localStorage.getItem(confirmMoveKey) !== "false";
 }
 
 function toggleConfirmMovePreference() {
