@@ -14,6 +14,7 @@
   --hexentafld-bakcground: #000;
   --input-background: #1b1b19;
   --input-color: #faf8ef;
+  --replayControlsColor: #cac8bf;
 }
 
 [data-theme="dark"] {
@@ -254,6 +255,7 @@ div.tab .alertTab, div.tab .alertTab.active {
   z-index: 103;
   background-color: #444;
   border-top: var(--replay-controls-border-top);
+  color: var(--replayControlsColor);
 }
 
 #replayControls .center {
@@ -293,6 +295,7 @@ div.tab .alertTab, div.tab .alertTab.active {
   border: 1px solid #ccc;
   border-radius: 3px;
   background-color: var(--replay-button-background);
+  color: var(--color);
   display: block;
   float: left;
   text-align: center;
@@ -308,6 +311,9 @@ div.tab .alertTab, div.tab .alertTab.active {
 
 #confirmMoveButton .replayButton {
   width: 211px;
+  color: var(--body-background-color);
+  background-color: var(--color);
+  box-shadow: 0px 0px 4px 4px var(--color);
 }
 
 .board-container {
