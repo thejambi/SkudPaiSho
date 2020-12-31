@@ -3983,6 +3983,7 @@ function toggleConfirmMovePreference() {
 function showConfirmMoveButton() {
 	showReplayControls();
 	document.getElementById('confirmMoveButton').classList.remove('gone');
+	OnboardingFunctions.showConfirmMoveButtonHelp();
 }
 
 function hideConfirmMoveButton() {
