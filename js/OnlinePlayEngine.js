@@ -603,3 +603,21 @@ OnlinePlayEngine.prototype.getActiveGamesCount = function(callback) {
         }
     );
 };
+
+OnlinePlayEngine.prototype.get2020CompletedGameStats = function(loginToken, callback) {
+    $.post("backend/get2020GameStatsForUser.php",
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId
+        },
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            } else {
+                callFailed();
+            }
+        }
+    );
+};
