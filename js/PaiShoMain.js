@@ -900,6 +900,8 @@ function setCustomBoardFromInput() {
 	  updateFooter();
 	  clearMessage();
 	  setAccountHeaderLinkText();
+
+	  OnboardingFunctions.resetOnBoarding();
   }
   
   function rewindAllMoves() {
@@ -1080,7 +1082,7 @@ function rerunAll(soundOkToPlay, moveAnimationBeginStep) {
 	refreshMessage();
 }
   
-var finalizeMove = function (moveAnimationBeginStep, ignoreNoEmail) {
+var finalizeMove = function (moveAnimationBeginStep, ignoreNoEmail, okToUpdateWinInfo) {
   	rerunAll(true, moveAnimationBeginStep);
 
   	// Only build url if not onlinePlay
@@ -1103,9 +1105,9 @@ var finalizeMove = function (moveAnimationBeginStep, ignoreNoEmail) {
 
   		linkUrl = url + "?" + linkUrl;
 
-  		linkShortenCallback(linkUrl, ignoreNoEmail);
+  		linkShortenCallback(linkUrl, ignoreNoEmail, okToUpdateWinInfo);
   	} else {
-  		linkShortenCallback('', ignoreNoEmail);
+  		linkShortenCallback('', ignoreNoEmail, okToUpdateWinInfo);
   	}
 }
   
@@ -1133,7 +1135,7 @@ var finalizeMove = function (moveAnimationBeginStep, ignoreNoEmail) {
 	  return onlinePlayEnabled && gameId > 0;
   }
   
-function linkShortenCallback(shortUrl, ignoreNoEmail) {
+function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
 	debug(shortUrl);
 
 	var aiList = gameController.getAiList();
@@ -1174,7 +1176,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 		// There is a winner!
 		messageText += "<br /><strong>" + gameController.theGame.getWinner() + gameController.theGame.getWinReason() + "</strong>";
 		// Save winner
-		if (playingOnlineGame()) {
+		if (okToUpdateWinInfo && playingOnlineGame()) {
 			var winnerUsername;
 			if (gameController.theGame.getWinner() === HOST) {
 				winnerUsername = currentGameData.hostUsername;
@@ -1187,9 +1189,6 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 				onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
 			} else {
 				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
-				// if (shouldSendJamboreeNoteChat(currentGameData.gameTypeId)) {
-				// 	sendChat(buildCompletedGameChatMessage());
-				// }
 			}
 		}
 
@@ -1197,7 +1196,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail) {
 			messageText += getResetMoveText();
 		}
 	} else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
-		if (playingOnlineGame()) {
+		if (okToUpdateWinInfo && playingOnlineGame()) {
 			onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
 		}
 		messageText += "Game has ended in a draw.";
@@ -1398,7 +1397,7 @@ var submitMoveData = {};
 var submitMoveCallback = function submitMoveCallback() {
 	debug("Inside submitMoveCallback");
 	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
-	finalizeMove(submitMoveData.moveAnimationBeginStep);
+	finalizeMove(submitMoveData.moveAnimationBeginStep, false, true);
 
 	startWatchingNumberOfGamesWhereUserTurn();
 
@@ -2373,6 +2372,8 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 		  }
 	  }
 	  message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
+
+	  message += "<br /><br /><div><span class='skipBonus' onclick='show2020GameStats();'>** 2020 Completed Game Stats **</span></div><br />";
 
 	  message += "<br /><br /><div><span class='skipBonus' onclick='showPreferences();'>Device Preferences</span></div><br />";
 
@@ -4002,5 +4003,49 @@ function showPreferences() {
 	message += "<div><input id='confirmMoveBeforeSubmittingCheckbox' type='checkbox' onclick='toggleConfirmMovePreference();' " + checkedValue + "'><label for='confirmMoveBeforeSubmittingCheckbox'> Confirm move before submitting?</label></div>";
 
 	showModal("Device Preferences", message);
+}
+
+function show2020GameStats(showWins) {
+	onlinePlayEngine.get2020CompletedGameStats(
+		getLoginToken(), 
+		function(results) {
+			if (results) {
+				var resultData = {};
+				try {
+					resultData = JSON.parse(results);
+				} catch (error) {
+					debug("Error parsing info");
+					closeModal();
+					showModal("Error", "Error getting stats info.");
+				}
+		
+				debug(results);
+				debug(resultData);
+
+				if (resultData.stats) {
+
+					var message = getUsername() + "'s total completed games against other players:<br />";
+
+					var stats = resultData.stats;
+
+					for (var i = 0; i < stats.length; i++) {
+						var totalWins = stats[i].totalWins ? stats[i].totalWins : 0;
+						var winPercent = Math.round(totalWins / stats[i].totalGamesCompleted * 100);
+						if (showWins) {
+							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " wins, " + winPercent + "%)";
+						} else {
+							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted;
+						}
+					}
+
+					if (!showWins) {
+						message += "<br /><br /><span class='skipBonus' onclick='show2020GameStats(true);'>Show number of wins for each game</span>";
+					}
+
+					showModal("2020 Completed Games Stats", message);
+				}
+			}
+		}
+	);
 }
 
