@@ -3681,9 +3681,11 @@ function buildDateFromTimestamp(timestampStr) {
 		  }
 		  message += "<div class='clickableText' onclick='changeTournamentStatus(" + resultData.id + "," + nextStatusId + ")'>" + nextStatusActionText + "</div>";
   
+		  var mostRecentRound = null;
 		  if (resultData.rounds && resultData.rounds.length > 0) {
 			  for (var i = 0; i < resultData.rounds.length; i++) {
 				  var round = resultData.rounds[i];
+				  mostRecentRound = round;
 				  var roundName = htmlEscape(round.name);
 				  message += "<br /><div class='clickableText' onclick='roundClicked(" + round.id + ",\"" + roundName + "\")'>" + roundName + "</div>";
 				  /* Display all games for round */
@@ -3694,6 +3696,11 @@ function buildDateFromTimestamp(timestampStr) {
 					  }
 				  }
 			  }
+
+			  /* Automatically select the most recent Round for match creating */
+			  setTimeout(function(){
+				  roundClicked(mostRecentRound.id, htmlEscape(mostRecentRound.name));
+			  }, 200);
 		  } else {
 			  message += "<br /><em>No rounds</em>";
 		  }
