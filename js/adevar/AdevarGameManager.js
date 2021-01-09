@@ -56,6 +56,8 @@ var AdevarBoardSetupPoints = {
 };
 
 var AdevarOrientalLilyObjectivePoints = [
+	/* Pre-3.9.6 */
+	/*
 	{
 		HOST: [
 			new NotationPoint("2,-1"),
@@ -104,6 +106,62 @@ var AdevarOrientalLilyObjectivePoints = [
 			new NotationPoint("-2,-5"),
 			new NotationPoint("-4,-3"),
 			new NotationPoint("-4,-5")
+		]
+	} */
+
+	/* 3.9.6 Oriental Lily update */
+	{	// Garden A
+		HOST: [
+			new NotationPoint("4,-2"),
+			new NotationPoint("-1,3"),
+			new NotationPoint("7,-3"),
+			new NotationPoint("-2,6"),
+			new NotationPoint("3,2"),
+			new NotationPoint("6,2"),
+			new NotationPoint("3,5")
+		],
+		GUEST: [
+			new NotationPoint("2,-4"),
+			new NotationPoint("-3,1"),
+			new NotationPoint("3,-7"),
+			new NotationPoint("-6,2"),
+			new NotationPoint("-2,-3"),
+			new NotationPoint("-2,-6"),
+			new NotationPoint("-5,-3")
+		]
+	},
+	{	// Garden B
+		HOST: [
+			new NotationPoint("2,-2"),
+			new NotationPoint("-1,1"),
+			new NotationPoint("7,-1"),
+			new NotationPoint("0,6"),
+			new NotationPoint("5,4")
+		],
+		GUEST: [
+			new NotationPoint("2,-2"),
+			new NotationPoint("-1,1"),
+			new NotationPoint("1,-7"),
+			new NotationPoint("-6,0"),
+			new NotationPoint("-4,-5")
+		]
+	},
+	{	// Garden C
+		HOST: [
+			new NotationPoint("4,-3"),
+			new NotationPoint("-2,3"),
+			new NotationPoint("2,1"),
+			new NotationPoint("5,2"),
+			new NotationPoint("3,4"),
+			new NotationPoint("6,5")
+		],
+		GUEST: [
+			new NotationPoint("3,-4"),
+			new NotationPoint("-3,2"),
+			new NotationPoint("-1,-2"),
+			new NotationPoint("-2,-5"),
+			new NotationPoint("-4,-3"),
+			new NotationPoint("-5,-6")
 		]
 	}
 ];
