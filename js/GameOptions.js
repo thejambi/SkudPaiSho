@@ -50,6 +50,9 @@ var ADEVAR_GUEST_ROTATE = "AdevarBoardGuestRotation";
 /* Adevar */
 var ADEVAR_LITE = "LiteGame";
 
+/* Tumbleweed */
+var HEXHEX_11 = "hexhex11";
+
 /* Game Option Legacy Map - These were stored as full names in database before current setup, must support */
 var legacyGameOptionsMap = {};
 legacyGameOptionsMap[OPTION_DOUBLE_TILES] = "Double Tiles";
@@ -86,6 +89,7 @@ legacyGameOptionsMap[ADEVAR_LITE] = "Lite - Beginner Game";
 var gameOptionDescriptions = copyObject(legacyGameOptionsMap);
 gameOptionDescriptions[SPECTATORS_CAN_PLAY] = "Allow Spectators to make moves";
 gameOptionDescriptions[SWAP_BISON_WITH_LEMUR] = "Trifle Preview: Lemur instead of Bison";
+gameOptionDescriptions[HEXHEX_11] = "Board Size: 11 per side";
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {

@@ -1228,6 +1228,27 @@ input[type=submit] {
   color: black;
 }
 
+/* Tumbleweed */
+
+.boardHexhex8 {
+  width: 910px;
+  margin: -65px 0 0 -119px;
+  transform: scale(0.78);
+}
+
+.boardHexhex11 {
+  width: 1500px;
+  margin: -190px 0 0 -416px;
+  transform: scale(0.45);
+}
+
+.boardHexhex12 {
+  width: 1500px;
+  margin: -190px 0 0 -416px;
+  transform: scale(0.45);
+}
+
+
 
 /* --- General Dark Mode Styles --- */
 input,
@@ -1464,6 +1485,12 @@ textarea {
   width: 160vw;
   margin: -20vw 0 0 -31vw;
   transform: scale(0.65);
+}
+
+.boardHexhex8 {
+  width: 160vw;
+  margin: -14vw 0 0 -25vw;
+  transform: scale(0.72);
 }
 
 .blooms12sidedBoard {

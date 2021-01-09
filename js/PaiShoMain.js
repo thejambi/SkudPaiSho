@@ -2035,7 +2035,18 @@ var GameType = {
 			MORE_ATTACKERS
 		]
 	}
+	,
+	Tumbleweed: {
+		id: 13,
+		desc: "Tumbleweed",
+		rulesUrl: "https://www.boardgamegeek.com/boardgame/318702/tumbleweed",
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho'
+		]
+	}
 };
+
 function getGameControllerForGameType(gameTypeId) {
 	var controller;
 
@@ -2081,6 +2092,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Adevar.id:
 			controller = new AdevarController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Tumbleweed.id:
+			controller = new TumbleweedController(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
