@@ -356,3 +356,32 @@ TumbleweedBoard.prototype.countSettlements = function(player) {
 	return settlementCount;
 };
 
+TumbleweedBoard.prototype.getAllPossiblePoints = function() {
+	var possiblePoints = [];
+	this.forEachBoardPoint(function(boardPoint) {
+		if (boardPoint.isType(POSSIBLE_MOVE)) {
+			possiblePoints.push(boardPoint);
+		}
+	});
+	return possiblePoints;
+};
+
+TumbleweedBoard.prototype.allSpacesSettled = function() {
+	var allSettled = true;
+	this.forEachBoardPoint(function(boardPoint) {
+		if (!boardPoint.hasSettlement()) {
+			allSettled = false;
+		}
+	});
+	return allSettled;
+};
+
+
+TumbleweedBoard.prototype.getCopy = function() {
+	var copyBoard = new TumbleweedBoard();
+
+	copyBoard.cells = copyArray(this.cells);
+
+	return copyBoard;
+};
+

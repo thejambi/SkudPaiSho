@@ -1142,7 +1142,10 @@ function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
 
 	var messageText = "";
 
-	if (currentMoveIndex == 1 && !haveBothEmails()) {
+	if ((
+			(!gameController.readyToShowPlayAgainstAiOption && currentMoveIndex == 1) 
+			|| (gameController.readyToShowPlayAgainstAiOption && gameController.readyToShowPlayAgainstAiOption())
+		) && !haveBothEmails()) {
 		if (!playingOnlineGame() && (currentGameData.gameTypeId === 1 || !currentGameData.gameTypeId)) {
 			if (!ignoreNoEmail && !userIsLoggedIn()) {
 				messageText = getNoUserEmailMessage() + "<br />";

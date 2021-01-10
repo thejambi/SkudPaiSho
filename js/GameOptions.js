@@ -52,6 +52,7 @@ var ADEVAR_LITE = "LiteGame";
 
 /* Tumbleweed */
 var HEXHEX_11 = "hexhex11";
+var HEXHEX_6 = "hexhex6";
 
 /* Game Option Legacy Map - These were stored as full names in database before current setup, must support */
 var legacyGameOptionsMap = {};
@@ -90,6 +91,7 @@ var gameOptionDescriptions = copyObject(legacyGameOptionsMap);
 gameOptionDescriptions[SPECTATORS_CAN_PLAY] = "Allow Spectators to make moves";
 gameOptionDescriptions[SWAP_BISON_WITH_LEMUR] = "Trifle Preview: Lemur instead of Bison";
 gameOptionDescriptions[HEXHEX_11] = "Board Size: 11 per side";
+gameOptionDescriptions[HEXHEX_6] = "Board Size: 6 per side";
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {

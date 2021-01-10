@@ -23,6 +23,10 @@ TumbleweedBoardPoint.prototype.addType = function(type) {
 	}
 };
 
+TumbleweedBoardPoint.prototype.isType = function(type) {
+	return this.types.includes(type);
+};
+
 TumbleweedBoardPoint.prototype.removeType = function(type) {
 	for (var i = 0; i < this.types.length; i++) {
 		if (this.types[i] === type) {

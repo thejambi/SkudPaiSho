@@ -76,29 +76,31 @@ TumbleweedController.prototype.resetMove = function() {
 /* Required by Main */
 TumbleweedController.prototype.getDefaultHelpMessageText = function() {
 	return "<h4>Tumbleweed</h4>"
-	+ "<p>It's a game! Place settlements in line of sight of other settlements to dominate the earth!</p>";
+	+ "<p>Created by Michał Zapała in 2020, Tumbleweed belongs to the territory family of games such as Go.</p>"
+	+ "<p>The winner is the player that occupies the most spaces at the end of the game.</p>"
+	+ "<p>On a turn, you may settle in a space or pass your turn.</p>"
+	+ "<p>When settling a space, you place a stack of pieces on a space:"
+	+ "<ul><li>The number of pieces in the placed stack is the number of spaces occupied by the player in the space’s line of sight</li>"
+	+ "<li>If the space is occupied, the stack being placed must be larger than the stack already occupying the space</li></ul>"
+	+ "<p>The board begins with a neutral settlement of 2 in the center. This stack may be overtaken as any other stack.</p>";
 };
 
 /* Required by Main */
 TumbleweedController.prototype.getAdditionalMessage = function() {
 	var msg = "";
 
-	if (this.gameNotation.moves.length === 0) {
+	if (this.gameNotation.moves.length <= 1) {
 		msg += "To begin a game, the Host places one piece for each player. Then the Guest will choose to begin playing or swap pieces.";
-		msg += getGameOptionsMessageHtml(GameType.Tumbleweed.gameOptions);
+		if (this.gameNotation.moves.length === 0) {
+			msg += getGameOptionsMessageHtml(GameType.Tumbleweed.gameOptions);
+		}
 	} else if (this.gameNotation.moves.length === 2) {
-		msg += "Hey. Wanna swap? If so... well, click this. ";
-		msg += "<br /><span class='skipBonus' onclick='gameController.doSwap();'>Swap pieces</span><br />";
+		msg += "<br />Make the first move or choose to <span class='skipBonus' onclick='gameController.doSwap();'>swap initial pieces</span><br />";
 	} else if (this.gameNotation.moves.length > 2) {
 		msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
 		msg += "<br /><span>Host settlements: " + this.theGame.hostScore + "</span>";
 		msg += "<br /><span>Guest settlements: " + this.theGame.guestScore + "</span>";
 	}
-
-	// if (this.notationBuilder.selectedPiece) {
-	// 	msg += "<br />Place second stone or <span class='clickableText' onclick='gameController.skipSecondPiece();'>skip</span>";
-	// 	msg += getResetMoveText();
-	// }
 
 	return msg;
 };
@@ -197,7 +199,24 @@ TumbleweedController.prototype.playAiTurn = function(finalizeMove) {
 		return;
 	}
 	var theAi = activeAi;
-	// ... ?
+	if (activeAi2) {
+		if (activeAi2.player === getCurrentPlayer()) {
+			theAi = activeAi2;
+		}
+	}
+
+	var playerMoveNum = this.gameNotation.getPlayerMoveNum();
+
+	var self = this;
+	setTimeout(function() {
+		var move = theAi.getMove(self.theGame.getCopy(), playerMoveNum);
+		if (!move) {
+			debug("No move given...");
+			return;
+		}
+		self.gameNotation.addMove(move);
+		finalizeMove();
+	}, 10);
 };
 
 /* Required by Main (maybe only if getAiList has contents) */
@@ -207,8 +226,8 @@ TumbleweedController.prototype.startAiGame = function(finalizeMove) {
 
 /* Required by Main */
 TumbleweedController.prototype.getAiList = function() {
-	// return [new TumbleweedRandomAIv1()];
-	return [];
+	return [new TumbleweedRandomAIv1()];
+	// return [];
 };
 
 /* Required by Main */
@@ -294,3 +313,6 @@ TumbleweedController.prototype.passTurn = function() {
 	}
 };
 
+TumbleweedController.prototype.readyToShowPlayAgainstAiOption = function() {
+	return this.gameNotation.moves.length === 2;
+};

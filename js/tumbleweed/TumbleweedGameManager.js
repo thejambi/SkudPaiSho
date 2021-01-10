@@ -56,7 +56,7 @@ TumbleweedGameManager.prototype.runNotationMove = function(move, withActuate, is
 
 	this.calculateScores();
 
-	if (this.passInSuccessionCount === 2) {
+	if (this.passInSuccessionCount === 2 || this.board.allSpacesSettled()) {
 		// both players passed, end of game
 		this.endOfGame = true;
 	}
