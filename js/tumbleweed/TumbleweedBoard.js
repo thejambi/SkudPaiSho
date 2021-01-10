@@ -12,6 +12,8 @@ function TumbleweedBoard() {
 	this.edgeLength = 8;
 	if (gameOptionEnabled(HEXHEX_11)) {
 		this.edgeLength = 11;
+	} else if (gameOptionEnabled(HEXHEX_6)) {
+		this.edgeLength = 6;
 	}
 
 	this.cells = this.brandNew();

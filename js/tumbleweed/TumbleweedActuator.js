@@ -9,6 +9,8 @@ function TumbleweedActuator(gameContainer, isMobile, hostTilesContainerDivs, gue
 	var boardClass = "boardHexhex8";
 	if (gameOptionEnabled(HEXHEX_11)) {
 		boardClass = "boardHexhex11";
+	} else if (gameOptionEnabled(HEXHEX_6)) {
+		boardClass = "boardHexhex6";
 	}
 	var boardContainer = createDivWithClass(boardClass);
 
