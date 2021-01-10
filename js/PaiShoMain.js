@@ -2050,7 +2050,9 @@ var GameType = {
 		usersWithAccess: [
 			'SkudPaiSho',
 			'pronetowander',
-			'Samurai_Appa'
+			'Samurai_Appa',
+			'Zapawa',
+			'alek'
 		]
 	}
 };

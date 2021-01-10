@@ -150,16 +150,6 @@ TumbleweedController.prototype.unplayedTileClicked = function(tilePileContainerD
 
 /* Required by Main Actuator creates anything that calls pointClicked in Main. Actuator could call something like this directly instead. */
 TumbleweedController.prototype.pointClicked = function(htmlPoint) {
-	var npText = htmlPoint.getAttribute("name"); // like 'f5'
-
-	var boardPoint = this.theGame.board.getBoardPointFromNotationPoint(npText);
-
-	/* Fake hover effect */
-	if (this.actuator.isMobile) {
-		htmlPoint.classList.add("hexagonHover");
-		setTimeout(function() { htmlPoint.classList.remove("hexagonHover") }, 400);
-	}
-
 	if (this.theGame.hasEnded()) {
 		return;
 	}
@@ -169,6 +159,21 @@ TumbleweedController.prototype.pointClicked = function(htmlPoint) {
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
 		return;
+	}
+
+	if (this.notationBuilder.status === BRAND_NEW) {
+		this.theGame.revealPossibleSettlePoints(getCurrentPlayer(), true);
+		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
+	}
+
+	var npText = htmlPoint.getAttribute("name"); // like 'f5'
+
+	var boardPoint = this.theGame.board.getBoardPointFromNotationPoint(npText);
+
+	/* Fake hover effect */
+	if (this.actuator.isMobile) {
+		htmlPoint.classList.add("hexagonHover");
+		setTimeout(function() { htmlPoint.classList.remove("hexagonHover") }, 400);
 	}
 
 	if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
