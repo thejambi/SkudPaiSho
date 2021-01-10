@@ -162,7 +162,16 @@ TumbleweedController.prototype.pointClicked = function(htmlPoint) {
 	}
 
 	if (this.notationBuilder.status === BRAND_NEW) {
-		this.theGame.revealPossibleSettlePoints(getCurrentPlayer(), true);
+		if (this.gameNotation.moves.length <= 1) {
+			this.theGame.revealPossibleInitialPlacementPoints(true);
+			var forPlayer = HOST;
+			if (this.gameNotation.moves.length == 1) {
+				forPlayer = GUEST;
+			}
+			this.notationBuilder.initialPlacementForPlayer = forPlayer;
+		} else {
+			this.theGame.revealPossibleSettlePoints(getCurrentPlayer(), true);
+		}
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 	}
 
