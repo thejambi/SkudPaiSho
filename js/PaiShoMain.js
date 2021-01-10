@@ -2040,9 +2040,12 @@ var GameType = {
 		id: 13,
 		desc: "Tumbleweed",
 		rulesUrl: "https://www.boardgamegeek.com/boardgame/318702/tumbleweed",
-		gameOptions: [],
+		gameOptions: [
+			HEXHEX_11
+		],
 		usersWithAccess: [
-			'SkudPaiSho'
+			'SkudPaiSho',
+			'pronetowander'
 		]
 	}
 };
@@ -2571,7 +2574,8 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
   }
   
 var getGameSeeksCallback = function getGameSeeksCallback(results) {
-	var message = "No games available to join. You should start one!";
+	var message = "";
+	var gameSeeksDisplayed = false;
 	if (results) {
 		message = "";
 		var resultRows = results.split('\n');
@@ -2616,8 +2620,13 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 					message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></div>"
 				}
 				message += "</div>";
+				gameSeeksDisplayed = true;
 			}
 		}
+	}
+
+	if (!gameSeeksDisplayed) {
+		message = "No games available to join. You should start one!";
 	}
 
 	message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
@@ -2854,7 +2863,7 @@ var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
   
   function closeGame() {
 	  if (gameDevOn) {
-		  setGameController(GameType.Trifle.id);
+		  setGameController(GameType.Tumbleweed.id);
 		  return;
 	  }
 	  var defaultGameTypeIds = [

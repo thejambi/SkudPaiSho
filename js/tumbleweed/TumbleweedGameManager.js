@@ -5,6 +5,8 @@ function TumbleweedGameManager(actuator, ignoreActuate, isCopy) {
 
 	this.hostScore = 0;
 	this.guestScore = 0;
+
+	this.endOfGame = false;
 	
 	this.setup(ignoreActuate);
 }
@@ -12,9 +14,13 @@ function TumbleweedGameManager(actuator, ignoreActuate, isCopy) {
 TumbleweedGameManager.prototype.setup = function(ignoreActuate) {
 	this.board = new TumbleweedBoard();
 
-	this.board.createNeutralSettlement("h8", 2);
+	if (gameOptionEnabled(HEXHEX_11)) {
+		this.board.createNeutralSettlement("k11", 2);
+	} else {
+		this.board.createNeutralSettlement("h8", 2);
+	}
 
-	// game option 11?...
+	this.passInSuccessionCount = 0;
 
 	if (!ignoreActuate) {
 		this.actuate();
@@ -33,18 +39,37 @@ TumbleweedGameManager.prototype.runNotationMove = function(move, withActuate, is
 	debug("Running Move: " + move.fullMoveText);
 
 	if (move.swap) {
-		// 
+		this.board.doInitialSwap();
 	} else if (move.passTurn) {
-		// 
+		this.passInSuccessionCount++;
 	} else if (move.initialPlacementForPlayer) {
 		this.board.placeSettlement(move.initialPlacementForPlayer, move.deployPoint, 1);
 	} else if (move.deployPoint) {
 		this.board.placeSettlement(move.player, move.deployPoint);
 	}
 
+	if (!move.passTurn) {
+		this.passInSuccessionCount = 0;
+	}
+
+	this.calculateScores();
+
+	if (this.passInSuccessionCount === 2) {
+		// both players passed, end of game
+		this.endOfGame = true;
+	}
+
 	if (withActuate) {
 		this.actuate();
 	}
+};
+
+TumbleweedGameManager.prototype.calculateScores = function() {
+	this.hostScore = this.board.countSettlements(HOST);
+	this.guestScore = this.board.countSettlements(GUEST);
+
+	debug("HOST Score: " + this.hostScore);
+	debug("GUEST Score: " + this.guestScore);
 };
 
 TumbleweedGameManager.prototype.revealPossibleInitialPlacementPoints = function(ignoreActuate) {
@@ -77,10 +102,14 @@ TumbleweedGameManager.prototype.hasEnded = function() {
 
 /* Required by Main */
 TumbleweedGameManager.prototype.getWinner = function() {
-	if (this.hostScore >= this.board.scoreNeededToWin) {
-		return HOST;
-	} else if (this.guestScore >= this.board.scoreNeededToWin) {
-		return GUEST;
+	if (this.endOfGame) {
+		if (this.hostScore > this.guestScore) {
+			return HOST;
+		} else if (this.guestScore > this.hostScore) {
+			return GUEST;
+		} else {
+			return "BOTH players";
+		}
 	}
 };
 

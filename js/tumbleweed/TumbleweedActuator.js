@@ -6,12 +6,18 @@ function TumbleweedActuator(gameContainer, isMobile, hostTilesContainerDivs, gue
 
 	removeChildren(gameContainer);
 
-	var boardContainer = createDivWithClass("boardHexhex8");
+	var boardClass = "boardHexhex8";
+	if (gameOptionEnabled(HEXHEX_11)) {
+		boardClass = "boardHexhex11";
+	}
+	var boardContainer = createDivWithClass(boardClass);
 
 	var hostTilesContainer = createDivWithClass("hostTilesContainer");
 	var guestTilesContainer = createDivWithClass("guestTilesContainer");
 
 	var bcontainer = createDivWithClass("board-container");
+
+	bcontainer.classList.add(boardClass+"bottomMargin");
 
 	bcontainer.appendChild(boardContainer);
 
@@ -140,6 +146,13 @@ TumbleweedActuator.prototype.addBoardPoint = function(rowDiv, boardPoint) {
 			}
 
 			theSpan.innerText = boardPoint.getSettlementValue();
+			theSpan.style.fontWeight = "bold";
+			theSpan.style.fontSize = "x-large";
+			theSpan.style.color = "black";
+			
+			if (boardPoint.getSettlementOwner() !== HOST && boardPoint.getSettlementOwner() !== GUEST) {
+				theSpan.style.color = "white";
+			}
 		}
 	}
 

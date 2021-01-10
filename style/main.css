@@ -1235,11 +1235,17 @@ input[type=submit] {
   margin: -65px 0 0 -119px;
   transform: scale(0.78);
 }
+.boardHexhex8bottomMargin {
+  margin-bottom: -60px;
+}
 
 .boardHexhex11 {
   width: 1500px;
-  margin: -190px 0 0 -416px;
-  transform: scale(0.45);
+  margin: -198px 0 0 -331px;
+  transform: scale(0.55);
+}
+.boardHexhex11bottomMargin {
+  margin-bottom: -210px;
 }
 
 .boardHexhex12 {
@@ -1491,6 +1497,18 @@ textarea {
   width: 160vw;
   margin: -14vw 0 0 -25vw;
   transform: scale(0.72);
+}
+.boardHexhex8bottomMargin {
+  margin-bottom: -15vw;
+}
+
+.boardHexhex11 {
+  width: 195vw;
+  margin: -38vw 0 0 -47vw;
+  transform: scale(0.51);
+}
+.boardHexhex11bottomMargin {
+  margin-bottom: -40vw;
 }
 
 .blooms12sidedBoard {

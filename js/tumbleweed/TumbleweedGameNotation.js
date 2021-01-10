@@ -52,7 +52,7 @@ TumbleweedNotationMove.prototype.analyzeMove = function() {
 };
 
 TumbleweedNotationMove.prototype.isValidNotation = function() {
-	return this.deployPoint || this.passTurn;
+	return this.deployPoint || this.passTurn || this.swap;
 };
 
 TumbleweedNotationMove.prototype.equals = function(otherMove) {

@@ -78,7 +78,7 @@ TumbleweedController.prototype.resetMove = function() {
 /* Required by Main */
 TumbleweedController.prototype.getDefaultHelpMessageText = function() {
 	return "<h4>Tumbleweed</h4>"
-	+ "<p>It's a game!</p>";
+	+ "<p>It's a game! Place settlements in line of sight of other settlements to dominate the earth!</p>";
 };
 
 /* Required by Main */
@@ -86,8 +86,13 @@ TumbleweedController.prototype.getAdditionalMessage = function() {
 	var msg = "";
 
 	if (this.gameNotation.moves.length === 0) {
-		msg += "To begin a game, the Host places one stone.";
+		msg += "To begin a game, the Host places one piece for each player. Then the Guest will choose to begin playing or swap pieces.";
 		msg += getGameOptionsMessageHtml(GameType.Tumbleweed.gameOptions);
+	} else if (this.gameNotation.moves.length === 2) {
+		msg += "Hey. Wanna swap? If so... well, click this. ";
+		msg += "<br /><span class='skipBonus' onclick='gameController.doSwap();'>Swap pieces</span><br />";
+	} else if (this.gameNotation.moves.length > 2) {
+		msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
 	}
 
 	// if (this.notationBuilder.selectedPiece) {
@@ -116,7 +121,7 @@ TumbleweedController.prototype.unplayedTileClicked = function(tilePileContainerD
 		player = HOST;
 	}
 
-	if (player !== getCurrentPlayer() && this.gameNotation.moves.length > 2) {
+	if (player !== getCurrentPlayer() && this.gameNotation.moves.length >= 2) {
 		return;
 	}
 
@@ -253,7 +258,7 @@ TumbleweedController.prototype.completeMove = function() {
 
 	// Move all set. Add it to the notation!
 	this.gameNotation.addMove(move);
-	if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
+	if (onlinePlayEnabled && this.gameNotation.moves.length === 2) {
 		createGameIfThatIsOk(this.getGameTypeId());
 	} else {
 		if (playingOnlineGame()) {
@@ -267,5 +272,19 @@ TumbleweedController.prototype.completeMove = function() {
 /* Called by Main, not required */
 TumbleweedController.prototype.optionOkToShow = function(option) {
 	return true;
+};
+
+TumbleweedController.prototype.doSwap = function() {
+	if (this.gameNotation.moves.length === 2) {
+		this.notationBuilder.swap = true;
+		this.completeMove();
+	}
+};
+
+TumbleweedController.prototype.passTurn = function() {
+	if (this.gameNotation.moves.length > 2) {
+		this.notationBuilder.passTurn = true;
+		this.completeMove();
+	}
 };
 

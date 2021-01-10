@@ -328,3 +328,28 @@ TumbleweedBoard.prototype.removePossibleMovePoints = function() {
 	});
 };
 
+TumbleweedBoard.prototype.doInitialSwap = function() {
+	var hostPoint;
+	var guestPoint;
+	this.forEachBoardPoint(function(boardPoint) {
+		if (boardPoint.getSettlementOwner() === HOST) {
+			hostPoint = boardPoint;
+		} else if (boardPoint.getSettlementOwner() === GUEST) {
+			guestPoint = boardPoint;
+		}
+	});
+
+	hostPoint.setSettlement(GUEST, 1);
+	guestPoint.setSettlement(HOST, 1);
+};
+
+TumbleweedBoard.prototype.countSettlements = function(player) {
+	var settlementCount = 0;
+	this.forEachBoardPoint(function(boardPoint) {
+		if (boardPoint.getSettlementOwner() === player) {
+			settlementCount++;
+		}
+	});
+	return settlementCount;
+};
+
