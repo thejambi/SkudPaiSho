@@ -14,11 +14,13 @@ function TumbleweedGameManager(actuator, ignoreActuate, isCopy) {
 TumbleweedGameManager.prototype.setup = function(ignoreActuate) {
 	this.board = new TumbleweedBoard();
 
+	var neutralSettlementNotationPoint = "h8";
 	if (gameOptionEnabled(HEXHEX_11)) {
-		this.board.createNeutralSettlement("k11", 2);
-	} else {
-		this.board.createNeutralSettlement("h8", 2);
+		neutralSettlementNotationPoint = "k11";
+	} else if (gameOptionEnabled(HEXHEX_6)) {
+		neutralSettlementNotationPoint = "f6";
 	}
+	this.board.createNeutralSettlement(neutralSettlementNotationPoint, 2);
 
 	this.passInSuccessionCount = 0;
 

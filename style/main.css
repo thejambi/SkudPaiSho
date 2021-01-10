@@ -1230,6 +1230,15 @@ input[type=submit] {
 
 /* Tumbleweed */
 
+.boardHexhex6 {
+  width: 612px;
+  margin: -18px 0 0 -25px;
+  transform: scale(0.9);
+}
+.boardHexhex6bottomMargin {
+  margin-bottom: -20px;
+}
+
 .boardHexhex8 {
   width: 910px;
   margin: -65px 0 0 -119px;
@@ -1491,6 +1500,15 @@ textarea {
   width: 160vw;
   margin: -20vw 0 0 -31vw;
   transform: scale(0.65);
+}
+
+.boardHexhex6 {
+  width: 110vw;
+  margin: 1vw 0 0 -5vw;
+  transform: scale(0.95);
+}
+.boardHexhex6bottomMargin {
+  margin-bottom: 0vw;
 }
 
 .boardHexhex8 {

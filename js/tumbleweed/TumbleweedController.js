@@ -11,8 +11,6 @@ function TumbleweedController(gameContainer, isMobile) {
 	this.resetGameManager();
 	this.resetNotationBuilder();
 	this.resetGameNotation();
-
-	// this.debugMessage = "";
 }
 
 TumbleweedController.prototype.getGameTypeId = function() {
@@ -62,8 +60,8 @@ TumbleweedController.prototype.callActuate = function() {
 
 /* Required by Main */
 TumbleweedController.prototype.resetMove = function() {
-	if (this.notationBuilder.piece1 && this.notationBuilder.deployPoint1) {
-		// Restore first piece, then just rerun
+	if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
+		// just rerun
 	} else {
 		// Remove last move
 		this.gameNotation.removeLastMove();
@@ -271,7 +269,13 @@ TumbleweedController.prototype.completeMove = function() {
 
 /* Called by Main, not required */
 TumbleweedController.prototype.optionOkToShow = function(option) {
-	return true;
+	if (option === HEXHEX_11) {
+		return !gameOptionEnabled(HEXHEX_6);
+	} else if (option === HEXHEX_6) {
+		return !gameOptionEnabled(HEXHEX_11);
+	} else {
+		return true;
+	}
 };
 
 TumbleweedController.prototype.doSwap = function() {
