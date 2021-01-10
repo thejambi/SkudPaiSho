@@ -20,6 +20,7 @@ function TumbleweedBoard() {
 }
 
 TumbleweedBoard.prototype.brandNew = function() {
+	TumbleweedBoardPoint.notationPointStringMap = {};
 	var cells = [];
 
 	var numRows = this.edgeLength * 2 - 1;

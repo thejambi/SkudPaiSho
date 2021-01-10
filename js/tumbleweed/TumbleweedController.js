@@ -91,6 +91,8 @@ TumbleweedController.prototype.getAdditionalMessage = function() {
 		msg += "<br /><span class='skipBonus' onclick='gameController.doSwap();'>Swap pieces</span><br />";
 	} else if (this.gameNotation.moves.length > 2) {
 		msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
+		msg += "<br /><span>Host settlements: " + this.theGame.hostScore + "</span>";
+		msg += "<br /><span>Guest settlements: " + this.theGame.guestScore + "</span>";
 	}
 
 	// if (this.notationBuilder.selectedPiece) {
