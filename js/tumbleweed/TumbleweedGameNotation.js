@@ -150,7 +150,7 @@ TumbleweedGameNotation.prototype.getNotationMoveFromBuilder = function(builder) 
 		moveNum = lastMove.moveNum;
 		if (lastMove.player === GUEST) {
 			moveNum++;
-		} else if (lastMove.initialPlacementForPlayer === GUEST) {
+		} else if (lastMove.initialPlacementForPlayer === HOST) {
 			moveNum++;
 			player = GUEST;
 		} else if (lastMove.moveNum <= 1) {

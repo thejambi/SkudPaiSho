@@ -45,12 +45,12 @@ TumbleweedController.prototype.getNewGameNotation = function() {
 
 /* Required by Main */
 TumbleweedController.prototype.getHostTilesContainerDivs = function() {
-	return "<div class='bloomsTileContainer'><div class='hexagon bloomsTilePileTile bloomsG1 " + this.additionalTilePileClass + "' name='H1' onclick='gameController.unplayedTileClicked(this)'><span></span></div></div>";
+	return "<div class='bloomsTileContainer'><div id='tumbleweedHostContainer' class='hexagon bloomsTilePileTile bloomsG1 " + this.additionalTilePileClass + "' name='H1' onclick='gameController.unplayedTileClicked(this)'><span></span></div></div>";
 };
 
 /* Required by Main */
 TumbleweedController.prototype.getGuestTilesContainerDivs = function() {
-	return "<div class='bloomsTileContainer'><div class='hexagon bloomsTilePileTile bloomsH2 " + this.additionalTilePileClass + "' name='G1' onclick='gameController.unplayedTileClicked(this)'><span></span></div></div>";
+	return "<div class='bloomsTileContainer'><div id='tumbleweedGuestContainer' class='hexagon bloomsTilePileTile bloomsH2 " + this.additionalTilePileClass + "' name='G1' onclick='gameController.unplayedTileClicked(this)'><span></span></div></div>";
 };
 
 /* Required by Main */
@@ -90,7 +90,7 @@ TumbleweedController.prototype.getAdditionalMessage = function() {
 	var msg = "";
 
 	if (this.gameNotation.moves.length <= 1) {
-		msg += "To begin a game, the Host places one piece for each player. Then the Guest will choose to begin playing or swap pieces.";
+		msg += "To begin a game, the Host places one of the Guest's pieces (red), and then one of their own. Then the Guest will choose to begin playing or swap the position of the pieces on the board.";
 		if (this.gameNotation.moves.length === 0) {
 			msg += getGameOptionsMessageHtml(GameType.Tumbleweed.gameOptions);
 		}
@@ -127,16 +127,23 @@ TumbleweedController.prototype.unplayedTileClicked = function(tilePileContainerD
 		return;
 	}
 
+	if (this.gameNotation.moves.length === 0) {
+		// Override to have click affect GUEST piece
+		tilePileContainerDiv = document.getElementById('tumbleweedGuestContainer');
+	} else if (this.gameNotation.moves.length === 1) {
+		// Override to have click affect HOST piece
+		tilePileContainerDiv = document.getElementById('tumbleweedHostContainer');
+	}
+
 	tilePileContainerDiv.classList.add('bloomsSelectedTile');
-	this.selectedTilePileContainerDiv = tilePileContainerDiv;
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 		if (this.gameNotation.moves.length <= 1) {
 			this.theGame.revealPossibleInitialPlacementPoints();
-			var forPlayer = HOST;
-			if (this.gameNotation.moves.length == 1) {
-				forPlayer = GUEST;
+			var forPlayer = GUEST;
+			if (this.gameNotation.moves.length === 1) {
+				forPlayer = HOST;
 			}
 			this.notationBuilder.initialPlacementForPlayer = forPlayer;
 		} else {
@@ -164,9 +171,9 @@ TumbleweedController.prototype.pointClicked = function(htmlPoint) {
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (this.gameNotation.moves.length <= 1) {
 			this.theGame.revealPossibleInitialPlacementPoints(true);
-			var forPlayer = HOST;
-			if (this.gameNotation.moves.length == 1) {
-				forPlayer = GUEST;
+			var forPlayer = GUEST;
+			if (this.gameNotation.moves.length === 1) {
+				forPlayer = HOST;
 			}
 			this.notationBuilder.initialPlacementForPlayer = forPlayer;
 		} else {

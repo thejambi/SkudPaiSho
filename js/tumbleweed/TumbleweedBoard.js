@@ -369,7 +369,7 @@ TumbleweedBoard.prototype.getAllPossiblePoints = function() {
 TumbleweedBoard.prototype.allSpacesSettled = function() {
 	var allSettled = true;
 	this.forEachBoardPoint(function(boardPoint) {
-		if (!boardPoint.hasSettlement()) {
+		if (boardPoint.isType(TumbleweedBoardPoint.Types.normal) && !boardPoint.hasSettlement()) {
 			allSettled = false;
 		}
 	});
