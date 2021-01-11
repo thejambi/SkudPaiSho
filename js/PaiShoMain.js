@@ -2041,18 +2041,11 @@ var GameType = {
 	,
 	Tumbleweed: {
 		id: 13,
-		desc: "Tumbleweed",
+		desc: "Tumbleweed (beta)",
 		rulesUrl: "https://www.boardgamegeek.com/boardgame/318702/tumbleweed",
 		gameOptions: [
 			HEXHEX_11,
 			HEXHEX_6
-		],
-		usersWithAccess: [
-			'SkudPaiSho',
-			'pronetowander',
-			'Samurai_Appa',
-			'Zapawa',
-			'alek'
 		]
 	}
 };
