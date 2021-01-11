@@ -118,7 +118,9 @@ TumbleweedGameManager.prototype.getWinner = function() {
 /* Required by Main */
 TumbleweedGameManager.prototype.getWinReason = function() {
 	var winnerScore = this.hostScore > this.guestScore ? this.hostScore : this.guestScore;
-	return " won the game with a score of " + winnerScore;
+	return " won the game with a score of " + winnerScore
+		+ "<br /><span>Host settlements: " + this.hostScore + "</span>"
+		+ "<br /><span>Guest settlements: " + this.guestScore + "</span>";
 };
 
 TumbleweedGameManager.prototype.getWinResultTypeCode = function() {

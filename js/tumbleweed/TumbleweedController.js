@@ -89,17 +89,19 @@ TumbleweedController.prototype.getDefaultHelpMessageText = function() {
 TumbleweedController.prototype.getAdditionalMessage = function() {
 	var msg = "";
 
-	if (this.gameNotation.moves.length <= 1) {
-		msg += "To begin a game, the Host places one of the Guest's pieces (red), and then one of their own. Then the Guest will choose to begin playing or swap the position of the pieces on the board.";
-		if (this.gameNotation.moves.length === 0) {
-			msg += getGameOptionsMessageHtml(GameType.Tumbleweed.gameOptions);
+	if (!this.theGame.getWinner()) {
+		if (this.gameNotation.moves.length <= 1) {
+			msg += "To begin a game, the Host places one of the Guest's pieces (red), and then one of their own. Then the Guest will choose to begin playing or swap the position of the pieces on the board.";
+			if (this.gameNotation.moves.length === 0) {
+				msg += getGameOptionsMessageHtml(GameType.Tumbleweed.gameOptions);
+			}
+		} else if (this.gameNotation.moves.length === 2) {
+			msg += "<br />Make the first move or choose to <span class='skipBonus' onclick='gameController.doSwap();'>swap initial pieces</span><br />";
+		} else if (this.gameNotation.moves.length > 2) {
+			msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
+			msg += "<br /><span>Host settlements: " + this.theGame.hostScore + "</span>";
+			msg += "<br /><span>Guest settlements: " + this.theGame.guestScore + "</span>";
 		}
-	} else if (this.gameNotation.moves.length === 2) {
-		msg += "<br />Make the first move or choose to <span class='skipBonus' onclick='gameController.doSwap();'>swap initial pieces</span><br />";
-	} else if (this.gameNotation.moves.length > 2) {
-		msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
-		msg += "<br /><span>Host settlements: " + this.theGame.hostScore + "</span>";
-		msg += "<br /><span>Guest settlements: " + this.theGame.guestScore + "</span>";
 	}
 
 	return msg;
