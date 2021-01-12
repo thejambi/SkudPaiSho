@@ -3332,14 +3332,23 @@ function buildDateFromTimestamp(timestampStr) {
   function getGameOptionsMessageHtml(options) {
 	  var msg = "<br /><br />";
   
-	  for (var i = 0; i < options.length; i++) {
-		  if (!gameOptionEnabled(options[i])) {
-			  if (!gameController.optionOkToShow
-					  || (gameController.optionOkToShow && gameController.optionOkToShow(options[i]))) {
-				  msg += "<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>&bull;&nbsp;Add game option: " + getGameOptionDescription(options[i]) + "</span><br />";
-			  }
-		  }
-	  }
+	  var optionsListed = false;
+	  if (options && options.length > 0) {
+		  msg += "<strong>Add Game Option:</strong><br />";
+		for (var i = 0; i < options.length; i++) {
+			if (!gameOptionEnabled(options[i])) {
+				if (!gameController.optionOkToShow
+						|| (gameController.optionOkToShow && gameController.optionOkToShow(options[i]))) {
+					msg += "&bull;&nbsp;<span class='skipBonus' onclick='addGameOption(\"" + options[i] + "\");'>" + getGameOptionDescription(options[i]) + "</span><br />";
+					optionsListed = true;
+				}
+			}
+		}
+	}
+
+	if (!optionsListed) {
+		msg = "<br /><br />";
+	}
   
 	  return msg;
   };

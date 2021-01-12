@@ -90,7 +90,7 @@ TumbleweedController.prototype.getDefaultHelpMessageText = function() {
 
 	var gameOptionsEnabled = getEnabledGameOptions();
 	if (gameOptionsEnabled.length > 0) {
-		msg += "<p>Game Options Enabled:";
+		msg += "<p><strong>Game Options Enabled:</strong>";
 		msg += "<br />";
 		for (var i = 0; i < gameOptionsEnabled.length; i++) {
 			msg += "<p>- ";
