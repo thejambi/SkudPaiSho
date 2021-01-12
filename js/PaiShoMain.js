@@ -2045,7 +2045,8 @@ var GameType = {
 		rulesUrl: "https://www.boardgamegeek.com/boardgame/318702/tumbleweed",
 		gameOptions: [
 			HEXHEX_11,
-			HEXHEX_6
+			HEXHEX_6,
+			NO_REINFORCEMENT
 		]
 	}
 };

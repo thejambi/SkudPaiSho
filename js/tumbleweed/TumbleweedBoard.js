@@ -302,11 +302,10 @@ TumbleweedBoard.prototype.setSettlePointsPossibleMoves = function(player) {
 	var self = this;
 	this.forEachBoardPoint(function(boardPoint) {
 		var sightCount = self.getSightCount(boardPoint, player);
-		if (boardPoint.getSettlementValue() > 0) {
-			debug("look");
-		}
 		if (sightCount > boardPoint.getSettlementValue()) {
-			boardPoint.addType(POSSIBLE_MOVE);
+			if (!gameOptionEnabled(NO_REINFORCEMENT) || (!boardPoint.hasSettlement() || boardPoint.getSettlementOwner() !== player)) {
+				boardPoint.addType(POSSIBLE_MOVE);
+			}
 		}
 	});
 };
