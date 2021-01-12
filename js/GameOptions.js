@@ -110,3 +110,7 @@ function gameOptionEnabled(optionName) {
 	return ggOptions.includes(optionName) || ggOptions.includes(legacyGameOptionsMap[optionName]);
 }
 
+function getEnabledGameOptions() {
+	return copyArray(ggOptions);
+}
+

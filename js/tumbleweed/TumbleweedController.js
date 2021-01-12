@@ -75,7 +75,7 @@ TumbleweedController.prototype.resetMove = function() {
 
 /* Required by Main */
 TumbleweedController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Tumbleweed</h4>"
+	var msg = "<h4>Tumbleweed</h4>"
 	+ "<p>Created by Michał Zapała in 2020, Tumbleweed belongs to the territory family of games such as Go.</p>"
 	+ "<p>The winner is the player that occupies the most spaces at the end of the game.</p>"
 	+ "<p>On a turn, you may settle in a space or pass your turn.</p>"
@@ -83,6 +83,20 @@ TumbleweedController.prototype.getDefaultHelpMessageText = function() {
 	+ "<ul><li>The number of pieces in the placed stack is the number of spaces occupied by the player in the space’s line of sight</li>"
 	+ "<li>If the space is occupied, the stack being placed must be larger than the stack already occupying the space</li></ul>"
 	+ "<p>The board begins with a neutral settlement of 2 in the center. This stack may be overtaken as any other stack.</p>";
+
+	var gameOptionsEnabled = getEnabledGameOptions();
+	if (gameOptionsEnabled.length > 0) {
+		msg += "<p>Game Options Enabled:";
+		msg += "<br />";
+		for (var i = 0; i < gameOptionsEnabled.length; i++) {
+			msg += "<div>";
+			msg += getGameOptionDescription(gameOptionsEnabled[i]);
+			msg += "</div>";
+		}
+		msg += "</p>";
+	}
+
+	return msg;
 };
 
 /* Required by Main */
@@ -314,7 +328,7 @@ TumbleweedController.prototype.completeMove = function() {
 
 	// Move all set. Add it to the notation!
 	this.gameNotation.addMove(move);
-	if (onlinePlayEnabled && this.gameSetupIsComplete()) {
+	if (onlinePlayEnabled && this.gameNotation.moves.length === TumbleweedController.getGameSetupCompleteMoveNumber()) {
 		createGameIfThatIsOk(this.getGameTypeId());
 	} else {
 		if (playingOnlineGame()) {
