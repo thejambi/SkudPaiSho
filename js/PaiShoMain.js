@@ -2396,7 +2396,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 	  }
 	  message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
 
-	  message += "<br /><br /><div><span class='skipBonus' onclick='show2020GameStats();'>** 2020 Completed Game Stats **</span></div><br />";
+	  message += "<br /><br /><div><span class='skipBonus' onclick='showGameStats();'>** Completed Game Stats **</span></div><br />";
 
 	  message += "<br /><br /><div><span class='skipBonus' onclick='showPreferences();'>Device Preferences</span></div><br />";
 
@@ -4088,6 +4088,50 @@ function show2020GameStats(showWins) {
 					}
 
 					showModal("2020 Completed Games Stats", message);
+				}
+			}
+		}
+	);
+}
+
+function showGameStats(showWins) {
+	onlinePlayEngine.getCompletedGameStats(
+		getLoginToken(), 
+		function(results) {
+			if (results) {
+				var resultData = {};
+				try {
+					resultData = JSON.parse(results);
+				} catch (error) {
+					debug("Error parsing info");
+					closeModal();
+					showModal("Error", "Error getting stats info.");
+				}
+		
+				debug(results);
+				debug(resultData);
+
+				if (resultData.stats) {
+
+					var message = getUsername() + "'s total completed games against other players:<br />";
+
+					var stats = resultData.stats;
+
+					for (var i = 0; i < stats.length; i++) {
+						var totalWins = stats[i].totalWins ? stats[i].totalWins : 0;
+						var winPercent = Math.round(totalWins / stats[i].totalGamesCompleted * 100);
+						if (showWins) {
+							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " wins, " + winPercent + "%)";
+						} else {
+							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted;
+						}
+					}
+
+					if (!showWins) {
+						message += "<br /><br /><span class='skipBonus' onclick='showGameStats(true);'>Show number of wins for each game</span>";
+					}
+
+					showModal("Completed Games Stats", message);
 				}
 			}
 		}
