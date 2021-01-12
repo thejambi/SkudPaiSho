@@ -302,8 +302,17 @@ TumbleweedBoard.prototype.setSettlePointsPossibleMoves = function(player) {
 	var self = this;
 	this.forEachBoardPoint(function(boardPoint) {
 		var sightCount = self.getSightCount(boardPoint, player);
-		if (sightCount > boardPoint.getSettlementValue()) {
-			if (!gameOptionEnabled(NO_REINFORCEMENT) || (!boardPoint.hasSettlement() || boardPoint.getSettlementOwner() !== player)) {
+		var sightCountRequiredToSettle = boardPoint.getSettlementValue() + 1;
+		if (gameOptionEnabled(TUMPLETORE)) {
+			sightCountRequiredToSettle = self.getSightCount(boardPoint, getOpponentName(player)) + 1;
+		}
+		if (
+			sightCount >= sightCountRequiredToSettle
+		) {
+			if (
+				(!gameOptionEnabled(NO_REINFORCEMENT) && !gameOptionEnabled(TUMPLETORE))
+				|| (!boardPoint.hasSettlement() || boardPoint.getSettlementOwner() !== player)
+			) {
 				boardPoint.addType(POSSIBLE_MOVE);
 			}
 		}
@@ -319,7 +328,14 @@ TumbleweedBoard.prototype.placeSettlement = function(player, notationPointString
 
 	var settlementValue = specificValue ? specificValue : 0;
 	if (settlementValue === 0) {
-		settlementValue = this.getSightCount(boardPoint, player);
+		var playerToCheckSightCount = player;
+		if (gameOptionEnabled(CRUMBLEWEED)) {
+			playerToCheckSightCount = getOpponentName(player);
+		}
+		settlementValue = this.getSightCount(boardPoint, playerToCheckSightCount);
+		if (gameOptionEnabled(RUMBLEWEED)) {
+			settlementValue++;
+		}
 	}
 	boardPoint.setSettlement(player, settlementValue);
 };
@@ -373,6 +389,18 @@ TumbleweedBoard.prototype.allSpacesSettled = function() {
 		}
 	});
 	return allSettled;
+};
+
+TumbleweedBoard.prototype.getPointWithStackOfSizeAtLeast = function(targetStackSize) {
+	var targetStackBoardPoint;
+
+	this.forEachBoardPoint(function(boardPoint) {
+		if (boardPoint.getSettlementValue() >= targetStackSize) {
+			targetStackBoardPoint = boardPoint;
+		}
+	});
+
+	return targetStackBoardPoint;
 };
 
 

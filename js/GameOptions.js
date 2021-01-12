@@ -50,12 +50,6 @@ var ADEVAR_GUEST_ROTATE = "AdevarBoardGuestRotation";
 /* Adevar */
 var ADEVAR_LITE = "LiteGame";
 
-/* Tumbleweed */
-var HEXHEX_11 = "hexhex11";
-var HEXHEX_6 = "hexhex6";
-var NO_REINFORCEMENT = "NoReinforcement";
-var CHOOSE_NEUTRAL_STACK_SPACE = "ChooseNeutralStackSpace";
-
 /* Game Option Legacy Map - These were stored as full names in database before current setup, must support */
 var legacyGameOptionsMap = {};
 legacyGameOptionsMap[OPTION_DOUBLE_TILES] = "Double Tiles";
@@ -92,11 +86,28 @@ legacyGameOptionsMap[ADEVAR_LITE] = "Lite - Beginner Game";
 var gameOptionDescriptions = copyObject(legacyGameOptionsMap);
 gameOptionDescriptions[SPECTATORS_CAN_PLAY] = "Allow Spectators to make moves";
 gameOptionDescriptions[SWAP_BISON_WITH_LEMUR] = "Trifle Preview: Lemur instead of Bison";
+
+/* Tumbleweed */
+var HEXHEX_11 = "hexhex11";
+var HEXHEX_6 = "hexhex6";
+var NO_REINFORCEMENT = "NoReinforcement";
+var CHOOSE_NEUTRAL_STACK_SPACE = "ChooseNeutralStackSpace";
+var RUMBLEWEED = "Rumbleweed";
+var CRUMBLEWEED = "Crumbleweed";
+var TUMBLE_6 = "Tumble6";
+var TUMBLESTONE = "Tumblestone";
 gameOptionDescriptions[HEXHEX_11] = "Board Size: 11 per side";
 gameOptionDescriptions[HEXHEX_6] = "Board Size: 6 per side";
 gameOptionDescriptions[NO_REINFORCEMENT] = "No Reinforcement";
 gameOptionDescriptions[CHOOSE_NEUTRAL_STACK_SPACE] = "Host places neutral stack";
-
+gameOptionDescriptions[RUMBLEWEED] = "\"Rumbleweed\" (beta)";
+gameOptionDescriptions[CRUMBLEWEED] = "\"Crumbleweed\" (beta)";
+gameOptionDescriptions[TUMBLESTONE] = "\"Tumblestone\"";
+gameOptionDescriptions[TUMBLE_6] = "Tumble-6 - First to create a 6 size settlement wins";
+var TUMPLETORE = "Tumpletore";
+gameOptionDescriptions[TUMPLETORE] = "\"Tumpletore\" (beta) - Settling based on control, not settlement value";
+var NO_SETUP_PHASE = "NoSetupPhase";
+gameOptionDescriptions[NO_SETUP_PHASE] = "No Setup Phase";
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {

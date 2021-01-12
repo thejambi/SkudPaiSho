@@ -14,7 +14,7 @@ function TumbleweedGameManager(actuator, ignoreActuate, isCopy) {
 TumbleweedGameManager.prototype.setup = function(ignoreActuate) {
 	this.board = new TumbleweedBoard();
 
-	if (!gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE)) {
+	if (!gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE) && !gameOptionEnabled(NO_SETUP_PHASE)) {
 		var neutralSettlementNotationPoint = "h8";
 		if (gameOptionEnabled(HEXHEX_11)) {
 			neutralSettlementNotationPoint = "k11";
@@ -62,7 +62,8 @@ TumbleweedGameManager.prototype.runNotationMove = function(move, withActuate, is
 
 	this.calculateScores();
 
-	if (this.passInSuccessionCount === 2 || this.board.allSpacesSettled()) {
+	if (this.passInSuccessionCount === 2 || this.board.allSpacesSettled()
+		|| (gameOptionEnabled(TUMBLE_6) && this.board.getPointWithStackOfSizeAtLeast(6))) {
 		// both players passed, end of game
 		this.endOfGame = true;
 	}
@@ -111,6 +112,9 @@ TumbleweedGameManager.prototype.hasEnded = function() {
 /* Required by Main */
 TumbleweedGameManager.prototype.getWinner = function() {
 	if (this.endOfGame) {
+		if (gameOptionEnabled(TUMBLE_6) && this.board.getPointWithStackOfSizeAtLeast(6)) {
+			return this.board.getPointWithStackOfSizeAtLeast(6).getSettlementOwner();
+		}
 		if (this.hostScore > this.guestScore) {
 			return HOST;
 		} else if (this.guestScore > this.hostScore) {
@@ -123,6 +127,9 @@ TumbleweedGameManager.prototype.getWinner = function() {
 
 /* Required by Main */
 TumbleweedGameManager.prototype.getWinReason = function() {
+	if (gameOptionEnabled(TUMBLE_6) && this.board.getPointWithStackOfSizeAtLeast(6)) {
+		return " won the game with a settlement of 6";
+	}
 	var winnerScore = this.hostScore > this.guestScore ? this.hostScore : this.guestScore;
 	return " won the game with a score of " + winnerScore
 		+ "<br /><span>Host settlements: " + this.hostScore + "</span>"

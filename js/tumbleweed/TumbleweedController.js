@@ -80,7 +80,11 @@ TumbleweedController.prototype.getDefaultHelpMessageText = function() {
 	+ "<p>The winner is the player that occupies the most spaces at the end of the game.</p>"
 	+ "<p>On a turn, you may settle in a space or pass your turn.</p>"
 	+ "<p>When settling a space, you place a stack of pieces on a space:"
-	+ "<ul><li>The number of pieces in the placed stack is the number of spaces occupied by the player in the space’s line of sight</li>"
+	+ "<ul><li>The number of pieces in the placed stack is the number of spaces occupied by the player in the space’s line of sight";
+	if (gameOptionEnabled(RUMBLEWEED)) {
+		msg += " (plus 1 for Rumbleweed rules)";
+	}
+	msg += "</li>"
 	+ "<li>If the space is occupied, the stack being placed must be larger than the stack already occupying the space</li></ul>"
 	+ "<p>The board begins with a neutral settlement of 2 in the center. This stack may be overtaken as any other stack.</p>";
 
@@ -89,9 +93,10 @@ TumbleweedController.prototype.getDefaultHelpMessageText = function() {
 		msg += "<p>Game Options Enabled:";
 		msg += "<br />";
 		for (var i = 0; i < gameOptionsEnabled.length; i++) {
-			msg += "<div>";
+			msg += "<p>- ";
 			msg += getGameOptionDescription(gameOptionsEnabled[i]);
-			msg += "</div>";
+			msg += "<br /><em>" + this.getGameOptionExplanation(gameOptionsEnabled[i]) + "</em>";
+			msg += "</p>";
 		}
 		msg += "</p>";
 	}
@@ -113,7 +118,7 @@ TumbleweedController.prototype.getAdditionalMessage = function() {
 			if (this.gameNotation.moves.length === 0) {
 				msg += getGameOptionsMessageHtml(GameType.Tumbleweed.gameOptions);
 			}
-		} else if (this.gameNotation.moves.length === TumbleweedController.getGameSetupCompleteMoveNumber()) {
+		} else if (this.gameNotation.moves.length === TumbleweedController.getGameSetupCompleteMoveNumber() && !gameOptionEnabled(NO_SETUP_PHASE)) {
 			msg += "<br />Make the first move or choose to <span class='skipBonus' onclick='gameController.doSwap();'>swap initial pieces</span><br />";
 		} else if (this.gameNotation.moves.length > TumbleweedController.getGameSetupCompleteMoveNumber()) {
 			msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
@@ -162,12 +167,15 @@ TumbleweedController.prototype.unplayedTileClicked = function(tilePileContainerD
 		if (this.gameNotation.moves.length < TumbleweedController.getGameSetupCompleteMoveNumber()) {
 			this.theGame.revealPossibleInitialPlacementPoints();
 			var forPlayer = GUEST;
-			if (this.gameNotation.moves.length === 1) {
+			if (this.gameNotation.moves.length === 1 || gameOptionEnabled(NO_SETUP_PHASE)) {
 				forPlayer = HOST;
 			} else if (gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE) && this.gameNotation.moves.length === 2) {
 				forPlayer = "NEUTRAL";
 			}
 			this.notationBuilder.initialPlacementForPlayer = forPlayer;
+		} else if (gameOptionEnabled(NO_SETUP_PHASE) && this.gameNotation.moves.length === 1) {
+			this.theGame.revealPossibleInitialPlacementPoints();
+			this.notationBuilder.initialPlacementForPlayer = GUEST;
 		} else {
 			this.theGame.revealPossibleSettlePoints(getCurrentPlayer());
 		}
@@ -194,12 +202,15 @@ TumbleweedController.prototype.pointClicked = function(htmlPoint) {
 		if (this.gameNotation.moves.length < TumbleweedController.getGameSetupCompleteMoveNumber()) {
 			this.theGame.revealPossibleInitialPlacementPoints(true);
 			var forPlayer = GUEST;
-			if (this.gameNotation.moves.length === 1) {
+			if (this.gameNotation.moves.length === 1 || gameOptionEnabled(NO_SETUP_PHASE)) {
 				forPlayer = HOST;
 			} else if (gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE) && this.gameNotation.moves.length === 2) {
 				forPlayer = "NEUTRAL";
 			}
 			this.notationBuilder.initialPlacementForPlayer = forPlayer;
+		} else if (gameOptionEnabled(NO_SETUP_PHASE) && this.gameNotation.moves.length === 1) {
+			this.theGame.revealPossibleInitialPlacementPoints(true);
+			this.notationBuilder.initialPlacementForPlayer = GUEST;
 		} else {
 			this.theGame.revealPossibleSettlePoints(getCurrentPlayer(), true);
 		}
@@ -280,12 +291,12 @@ TumbleweedController.prototype.getCurrentPlayer = function() {
 	if (this.gameNotation.moves.length < TumbleweedController.getGameSetupCompleteMoveNumber()) {
 		return HOST;
 	} else if (this.gameNotation.moves.length % 2 === 0) {
-		if (gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE)) {
+		if (gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE) || gameOptionEnabled(NO_SETUP_PHASE)) {
 			return HOST;
 		}
 		return GUEST;
 	} else {
-		if (gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE)) {
+		if (gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE) || gameOptionEnabled(NO_SETUP_PHASE)) {
 			return GUEST;
 		}
 		return HOST;
@@ -340,6 +351,9 @@ TumbleweedController.prototype.completeMove = function() {
 };
 
 TumbleweedController.getGameSetupCompleteMoveNumber = function() {
+	if (gameOptionEnabled(NO_SETUP_PHASE)) {
+		return 1;
+	}
 	return gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE) ? 3 : 2;
 };
 
@@ -349,8 +363,46 @@ TumbleweedController.prototype.optionOkToShow = function(option) {
 		return !gameOptionEnabled(HEXHEX_6);
 	} else if (option === HEXHEX_6) {
 		return !gameOptionEnabled(HEXHEX_11);
+	} else if (option === NO_REINFORCEMENT) {
+		return !gameOptionEnabled(TUMPLETORE);	// No Reinforcement is naturally built into Tumpletore
+	} else if (option === RUMBLEWEED) {
+		return !gameOptionEnabled(TUMPLETORE);
+	} else if (option === TUMPLETORE) {
+		return !gameOptionEnabled(RUMBLEWEED)
+			&& !gameOptionEnabled(TUMBLE_6);
+	} else if (option === TUMBLE_6) {
+		return !gameOptionEnabled(TUMPLETORE);
+	} else if (option === CRUMBLEWEED) {
+		return !gameOptionEnabled(TUMPLETORE);
+	} else if (option === NO_SETUP_PHASE) {
+		return !gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE);
+	} else if (option === CHOOSE_NEUTRAL_STACK_SPACE) {
+		return !gameOptionEnabled(NO_SETUP_PHASE);
 	} else {
 		return true;
+	}
+};
+
+TumbleweedController.prototype.getGameOptionExplanation = function(option) {
+	switch (option) {
+		case HEXHEX_11:
+			return "Play on a hexhex11 board, the full-sized board used for competitive games.";
+		case HEXHEX_6:
+			return "Play on a hexhex6 board for an even shorter game.";
+		case NO_REINFORCEMENT:
+			return "Settling in a space you occupy is not allowed.";
+		case CHOOSE_NEUTRAL_STACK_SPACE:
+			return "The Host chooses where to place the initial neutral settlement.";
+		case RUMBLEWEED:
+			return "When settling, build a settlement with a value of one more than the number of spaces you occupy in line of sight.";
+		case CRUMBLEWEED:
+			return "When settling, build a settlement with a value based on the number of spaces your opponent occupies in line of sight";
+		case TUMBLE_6:
+			return "Additional win condition: The first player to build a settlement of value 6 is the winner.";
+		case TUMPLETORE:
+			return "No settlement values are used. You may settle in a space where you have more pieces in line of sight than your opponent does.";
+		case NO_SETUP_PHASE:
+			return "Setup phase of neutral settlement placement and pie rule are skipped. Players may choose their initial settlement position, starting with the Host.";
 	}
 };
 

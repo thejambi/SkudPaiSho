@@ -2037,8 +2037,7 @@ var GameType = {
 		secretGameOptions: [
 			MORE_ATTACKERS
 		]
-	}
-	,
+	},
 	Tumbleweed: {
 		id: 13,
 		desc: "Tumbleweed (beta)",
@@ -2047,7 +2046,12 @@ var GameType = {
 			HEXHEX_11,
 			HEXHEX_6,
 			NO_REINFORCEMENT,
-			CHOOSE_NEUTRAL_STACK_SPACE
+			CHOOSE_NEUTRAL_STACK_SPACE,
+			RUMBLEWEED,
+			CRUMBLEWEED,
+			TUMBLE_6,
+			TUMPLETORE,
+			NO_SETUP_PHASE
 		]
 	}
 };

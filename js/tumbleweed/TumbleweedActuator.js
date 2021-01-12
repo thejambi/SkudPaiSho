@@ -147,13 +147,15 @@ TumbleweedActuator.prototype.addBoardPoint = function(rowDiv, boardPoint) {
 				theDiv.classList.add("bloomsRevealEffect");
 			}
 
-			theSpan.innerText = boardPoint.getSettlementValue();
-			theSpan.style.fontWeight = "bold";
-			theSpan.style.fontSize = "x-large";
-			theSpan.style.color = "black";
-			
-			if (boardPoint.getSettlementOwner() !== HOST && boardPoint.getSettlementOwner() !== GUEST) {
-				theSpan.style.color = "white";
+			if (!gameOptionEnabled(TUMPLETORE)) {
+				theSpan.innerText = boardPoint.getSettlementValue();
+				theSpan.style.fontWeight = "bold";
+				theSpan.style.fontSize = "x-large";
+				theSpan.style.color = "black";
+				
+				if (boardPoint.getSettlementOwner() !== HOST && boardPoint.getSettlementOwner() !== GUEST) {
+					theSpan.style.color = "white";
+				}
 			}
 		}
 	}
