@@ -2046,7 +2046,8 @@ var GameType = {
 		gameOptions: [
 			HEXHEX_11,
 			HEXHEX_6,
-			NO_REINFORCEMENT
+			NO_REINFORCEMENT,
+			CHOOSE_NEUTRAL_STACK_SPACE
 		]
 	}
 };

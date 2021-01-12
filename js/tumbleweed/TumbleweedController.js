@@ -90,14 +90,18 @@ TumbleweedController.prototype.getAdditionalMessage = function() {
 	var msg = "";
 
 	if (!this.theGame.getWinner()) {
-		if (this.gameNotation.moves.length <= 1) {
-			msg += "To begin a game, the Host places one of the Guest's pieces (red), and then one of their own. Then the Guest will choose to begin playing or swap the position of the pieces on the board.";
+		if (this.gameNotation.moves.length < TumbleweedController.getGameSetupCompleteMoveNumber()) {
+			msg += "To begin a game, the Host places one of the Guest's pieces (red), and then one of their own.";
+			if (gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE)) {
+				msg += "<br />The Host will then place a neutral settlement of value 2 on the board.";
+			}
+			msg += "<br />Then the Guest will choose to begin playing or swap the position of the pieces on the board.";
 			if (this.gameNotation.moves.length === 0) {
 				msg += getGameOptionsMessageHtml(GameType.Tumbleweed.gameOptions);
 			}
-		} else if (this.gameNotation.moves.length === 2) {
+		} else if (this.gameNotation.moves.length === TumbleweedController.getGameSetupCompleteMoveNumber()) {
 			msg += "<br />Make the first move or choose to <span class='skipBonus' onclick='gameController.doSwap();'>swap initial pieces</span><br />";
-		} else if (this.gameNotation.moves.length > 2) {
+		} else if (this.gameNotation.moves.length > TumbleweedController.getGameSetupCompleteMoveNumber()) {
 			msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
 			msg += "<br /><span>Host settlements: " + this.theGame.hostScore + "</span>";
 			msg += "<br /><span>Guest settlements: " + this.theGame.guestScore + "</span>";
@@ -125,7 +129,7 @@ TumbleweedController.prototype.unplayedTileClicked = function(tilePileContainerD
 		player = HOST;
 	}
 
-	if (player !== getCurrentPlayer() && this.gameNotation.moves.length >= 2) {
+	if (player !== getCurrentPlayer() && this.gameNotation.moves.length >= TumbleweedController.getGameSetupCompleteMoveNumber()) {
 		return;
 	}
 
@@ -141,11 +145,13 @@ TumbleweedController.prototype.unplayedTileClicked = function(tilePileContainerD
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
-		if (this.gameNotation.moves.length <= 1) {
+		if (this.gameNotation.moves.length < TumbleweedController.getGameSetupCompleteMoveNumber()) {
 			this.theGame.revealPossibleInitialPlacementPoints();
 			var forPlayer = GUEST;
 			if (this.gameNotation.moves.length === 1) {
 				forPlayer = HOST;
+			} else if (gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE) && this.gameNotation.moves.length === 2) {
+				forPlayer = "NEUTRAL";
 			}
 			this.notationBuilder.initialPlacementForPlayer = forPlayer;
 		} else {
@@ -171,11 +177,13 @@ TumbleweedController.prototype.pointClicked = function(htmlPoint) {
 	}
 
 	if (this.notationBuilder.status === BRAND_NEW) {
-		if (this.gameNotation.moves.length <= 1) {
+		if (this.gameNotation.moves.length < TumbleweedController.getGameSetupCompleteMoveNumber()) {
 			this.theGame.revealPossibleInitialPlacementPoints(true);
 			var forPlayer = GUEST;
 			if (this.gameNotation.moves.length === 1) {
 				forPlayer = HOST;
+			} else if (gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE) && this.gameNotation.moves.length === 2) {
+				forPlayer = "NEUTRAL";
 			}
 			this.notationBuilder.initialPlacementForPlayer = forPlayer;
 		} else {
@@ -255,11 +263,17 @@ TumbleweedController.prototype.getAiList = function() {
 
 /* Required by Main */
 TumbleweedController.prototype.getCurrentPlayer = function() {
-	if (this.gameNotation.moves.length <= 1) {
+	if (this.gameNotation.moves.length < TumbleweedController.getGameSetupCompleteMoveNumber()) {
 		return HOST;
 	} else if (this.gameNotation.moves.length % 2 === 0) {
+		if (gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE)) {
+			return HOST;
+		}
 		return GUEST;
 	} else {
+		if (gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE)) {
+			return GUEST;
+		}
 		return HOST;
 	}
 };
@@ -300,7 +314,7 @@ TumbleweedController.prototype.completeMove = function() {
 
 	// Move all set. Add it to the notation!
 	this.gameNotation.addMove(move);
-	if (onlinePlayEnabled && this.gameNotation.moves.length === 2) {
+	if (onlinePlayEnabled && this.gameSetupIsComplete()) {
 		createGameIfThatIsOk(this.getGameTypeId());
 	} else {
 		if (playingOnlineGame()) {
@@ -309,6 +323,10 @@ TumbleweedController.prototype.completeMove = function() {
 			finalizeMove();
 		}
 	}
+};
+
+TumbleweedController.getGameSetupCompleteMoveNumber = function() {
+	return gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE) ? 3 : 2;
 };
 
 /* Called by Main, not required */
@@ -323,19 +341,19 @@ TumbleweedController.prototype.optionOkToShow = function(option) {
 };
 
 TumbleweedController.prototype.doSwap = function() {
-	if (this.gameNotation.moves.length === 2) {
+	if (this.gameNotation.moves.length === TumbleweedController.getGameSetupCompleteMoveNumber()) {
 		this.notationBuilder.swap = true;
 		this.completeMove();
 	}
 };
 
 TumbleweedController.prototype.passTurn = function() {
-	if (this.gameNotation.moves.length > 2) {
+	if (this.gameNotation.moves.length > TumbleweedController.getGameSetupCompleteMoveNumber()) {
 		this.notationBuilder.passTurn = true;
 		this.completeMove();
 	}
 };
 
 TumbleweedController.prototype.readyToShowPlayAgainstAiOption = function() {
-	return this.gameNotation.moves.length === 2;
+	return this.gameNotation.moves.length === TumbleweedController.getGameSetupCompleteMoveNumber();
 };

@@ -28,6 +28,8 @@ TumbleweedNotationMove.prototype.analyzeMove = function() {
 		this.player = GUEST;
 	} else if (this.playerCode === 'H') {
 		this.player = HOST;
+	} else if (this.playerCode === "N") {
+		this.player = "NEUTRAL";
 	}
 
 	var moveText = parts[1];
@@ -43,8 +45,9 @@ TumbleweedNotationMove.prototype.analyzeMove = function() {
 		this.passTurn = true;
 	} else if (moveText === TumbleweedNotationVars.SWAP) {
 		this.swap = true;
-	} else if (moveText.includes(hostPlayerCode) || moveText.includes(guestPlayerCode)) {
-		this.initialPlacementForPlayer = getPlayerNameFromCode(moveText.substring(0,1));
+	} else if (moveText.includes(hostPlayerCode) || moveText.includes(guestPlayerCode) || moveText.includes("N")) {
+		var placementPlayerCode = moveText.substring(0,1);
+		this.initialPlacementForPlayer = placementPlayerCode === "N" ? "NEUTRAL" : getPlayerNameFromCode(placementPlayerCode);
 		this.deployPoint = moveText.substring(1);
 	} else {
 		this.deployPoint = moveText;
@@ -78,7 +81,8 @@ TumbleweedNotationBuilder.prototype.getNotationMove = function(moveNum, player) 
 	} else if (this.swap) {
 		notationLine += TumbleweedNotationVars.SWAP;
 	} else if (this.initialPlacementForPlayer) {
-		notationLine += getPlayerCodeFromName(this.initialPlacementForPlayer) + this.deployPoint;
+		var playerCode = this.initialPlacementForPlayer === "NEUTRAL" ? "N" : getPlayerCodeFromName(this.initialPlacementForPlayer);
+		notationLine += playerCode + this.deployPoint;
 	} else if (this.deployPoint) {
 		notationLine += this.deployPoint;
 	}
@@ -150,7 +154,10 @@ TumbleweedGameNotation.prototype.getNotationMoveFromBuilder = function(builder) 
 		moveNum = lastMove.moveNum;
 		if (lastMove.player === GUEST) {
 			moveNum++;
-		} else if (lastMove.initialPlacementForPlayer === HOST) {
+		} else if (
+				(gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE) && lastMove.initialPlacementForPlayer === "NEUTRAL") 
+				|| (!gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE) && lastMove.initialPlacementForPlayer === HOST)
+		) {
 			moveNum++;
 			player = GUEST;
 		} else if (lastMove.moveNum <= 1) {

@@ -54,6 +54,7 @@ var ADEVAR_LITE = "LiteGame";
 var HEXHEX_11 = "hexhex11";
 var HEXHEX_6 = "hexhex6";
 var NO_REINFORCEMENT = "NoReinforcement";
+var CHOOSE_NEUTRAL_STACK_SPACE = "ChooseNeutralStackSpace";
 
 /* Game Option Legacy Map - These were stored as full names in database before current setup, must support */
 var legacyGameOptionsMap = {};
@@ -94,6 +95,8 @@ gameOptionDescriptions[SWAP_BISON_WITH_LEMUR] = "Trifle Preview: Lemur instead o
 gameOptionDescriptions[HEXHEX_11] = "Board Size: 11 per side";
 gameOptionDescriptions[HEXHEX_6] = "Board Size: 6 per side";
 gameOptionDescriptions[NO_REINFORCEMENT] = "No Reinforcement";
+gameOptionDescriptions[CHOOSE_NEUTRAL_STACK_SPACE] = "Host places neutral stack";
+
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {

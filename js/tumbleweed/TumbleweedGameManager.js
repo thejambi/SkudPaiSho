@@ -14,13 +14,15 @@ function TumbleweedGameManager(actuator, ignoreActuate, isCopy) {
 TumbleweedGameManager.prototype.setup = function(ignoreActuate) {
 	this.board = new TumbleweedBoard();
 
-	var neutralSettlementNotationPoint = "h8";
-	if (gameOptionEnabled(HEXHEX_11)) {
-		neutralSettlementNotationPoint = "k11";
-	} else if (gameOptionEnabled(HEXHEX_6)) {
-		neutralSettlementNotationPoint = "f6";
+	if (!gameOptionEnabled(CHOOSE_NEUTRAL_STACK_SPACE)) {
+		var neutralSettlementNotationPoint = "h8";
+		if (gameOptionEnabled(HEXHEX_11)) {
+			neutralSettlementNotationPoint = "k11";
+		} else if (gameOptionEnabled(HEXHEX_6)) {
+			neutralSettlementNotationPoint = "f6";
+		}
+		this.board.createNeutralSettlement(neutralSettlementNotationPoint, 2);
 	}
-	this.board.createNeutralSettlement(neutralSettlementNotationPoint, 2);
 
 	this.passInSuccessionCount = 0;
 
@@ -45,7 +47,11 @@ TumbleweedGameManager.prototype.runNotationMove = function(move, withActuate, is
 	} else if (move.passTurn) {
 		this.passInSuccessionCount++;
 	} else if (move.initialPlacementForPlayer) {
-		this.board.placeSettlement(move.initialPlacementForPlayer, move.deployPoint, 1);
+		initialSettlementValue = 1;
+		if (move.initialPlacementForPlayer === "NEUTRAL") {
+			initialSettlementValue = 2;
+		}
+		this.board.placeSettlement(move.initialPlacementForPlayer, move.deployPoint, initialSettlementValue);
 	} else if (move.deployPoint) {
 		this.board.placeSettlement(move.player, move.deployPoint);
 	}
