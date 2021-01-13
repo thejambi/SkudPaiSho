@@ -394,9 +394,9 @@ TumbleweedController.prototype.getGameOptionExplanation = function(option) {
 		case CHOOSE_NEUTRAL_STACK_SPACE:
 			return "The Host chooses where to place the initial neutral settlement.";
 		case RUMBLEWEED:
-			return "When settling, build a settlement with a value of one more than the number of spaces you occupy in line of sight.";
+			return "When settling, select any space and build a settlement with a value of ONE MORE than the number of spaces you occupy in line of sight (even if there are no sights on it), as long as the settlement value increases.";
 		case CRUMBLEWEED:
-			return "When settling, build a settlement with a value based on the number of spaces your opponent occupies in line of sight";
+			return "When settling, build a settlement with a value based on the number of spaces your opponent occupies in line of sight.";
 		case TUMBLE_6:
 			return "Additional win condition: The first player to build a settlement of value 6 is the winner.";
 		case TUMPLETORE:
