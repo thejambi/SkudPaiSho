@@ -86,7 +86,7 @@ MeadowController.prototype.getDefaultHelpMessageText = function() {
 	+ "<h4>Gameplay</h4>"
 	+ "<ol>"
 	+ "<li>Each player owns 2 colors of stones. To start, the Host places 1 stone of either of his or her colors on any empty space.</li>"
-	+ "<li>From then on, starting with the Guest, the players take turns. On your turn, you must place 1 or 2 stones, in any combination of colors, onto any empty spaces. Then, all <em>smothered</em> enemy groups are captured, and then <em>overgrown</em> enemy groups are captured.</li>"
+	+ "<li>From then on, starting with the Guest, the players take turns. On your turn, you must place 1 or 2 stones onto any empty spaces (If you place 2, they must be different colors). Then, all <em>smothered</em> enemy groups are captured, and then <em>overgrown</em> enemy groups are captured.</li>"
 	+ "<li>The first player to have captured the set target number of stones and advancing your score-keeping stone all the way around the scoring track, wins.</li>"
 	+ "</ol>"
 	+ "<p>Read the official rules and more about the game <a href='https://www.nickbentley.games/meadow-rules-and-tips/' target='_blank'>here</a>.</p>";
@@ -190,6 +190,9 @@ MeadowController.prototype.pointClicked = function(htmlPoint, bloomId) {
 			} else {
 				// Half-move actuate
 				// Get move and run it, but don't add to gameNotation
+				if (this.selectedTilePileContainerDiv) {
+					this.selectedTilePileContainerDiv.classList.add('hexagonNoShow');
+				}
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 				this.theGame.runNotationMove(move, true, true);
 				refreshMessage();

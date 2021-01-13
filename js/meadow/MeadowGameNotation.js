@@ -45,7 +45,7 @@ MeadowNotationMove.prototype.analyzeMove = function() {
 };
 
 MeadowNotationMove.prototype.isValidNotation = function() {
-	return this.piece1;
+	return this.piece1 != this.piece2;
 };
 
 MeadowNotationMove.prototype.equals = function(otherMove) {
