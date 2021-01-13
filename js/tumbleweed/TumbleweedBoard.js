@@ -303,6 +303,9 @@ TumbleweedBoard.prototype.setSettlePointsPossibleMoves = function(player) {
 	this.forEachBoardPoint(function(boardPoint) {
 		var sightCount = self.getSightCount(boardPoint, player);
 		var sightCountRequiredToSettle = boardPoint.getSettlementValue() + 1;
+		if (gameOptionEnabled(RUMBLEWEED)) {
+			sightCountRequiredToSettle--;
+		}
 		if (gameOptionEnabled(TUMPLETORE)) {
 			sightCountRequiredToSettle = self.getSightCount(boardPoint, getOpponentName(player)) + 1;
 		}
