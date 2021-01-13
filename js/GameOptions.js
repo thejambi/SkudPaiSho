@@ -109,6 +109,10 @@ gameOptionDescriptions[TUMPLETORE] = "\"Tumpletore\" (beta) - Settling based on 
 var NO_SETUP_PHASE = "NoSetupPhase";
 gameOptionDescriptions[NO_SETUP_PHASE] = "No Setup Phase";
 
+/* Meadow */
+var DYNAMIC_GROUP_LIMIT = "DynamicGroupLimit";
+gameOptionDescriptions[DYNAMIC_GROUP_LIMIT] = "Group limit based on board size";
+
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
 		return gameOptionDescriptions[optionName];

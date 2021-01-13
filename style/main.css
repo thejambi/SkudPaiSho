@@ -1097,6 +1097,18 @@ input[type=submit] {
   background-color: var(--hex-score-host-background);
 }
 
+.meadowHexScoreHost {
+  background-color: #fe8492;
+  transform: scale(0.8);
+}
+.meadowHexScoreGuest {
+  background-color: #8bd0ff;
+  transform: scale(0.8);
+}
+.meadowHexScoreHost.meadowHexScoreGuest {
+  background-color: #c5aac9;
+}
+
 .bloomsH1 {
   background-color: #f9c851;
 }
@@ -1112,6 +1124,19 @@ input[type=submit] {
 }
 .scoreMix {
   background-color: #9a8245;
+}
+
+.meadowH1 {
+  background-color: #921715;
+}
+.meadowH2 {
+  background-color: #fe8492;
+}
+.meadowG1 {
+  background-color: #215d7f;
+}
+.meadowG2 {
+  background-color: #8bd0ff;
 }
 
 .bloomsTileContainer {

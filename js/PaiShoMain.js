@@ -2025,6 +2025,18 @@ var GameType = {
 			EIGHT_SIDED_BOARD
 		]
 	},
+	Meadow: {
+		id: 14,
+		desc: "Meadow",
+		rulesUrl: "https://www.nickbentley.games/meadow-rules-and-tips/",
+		gameOptions: [
+			SHORTER_GAME,
+			FOUR_SIDED_BOARD,
+			SIX_SIDED_BOARD,
+			EIGHT_SIDED_BOARD,
+			DYNAMIC_GROUP_LIMIT
+		]
+	},
 	Hexentafl: {
 		id: 11,
 		desc: "heXentafl",
@@ -2088,6 +2100,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Blooms.id:
 			controller = new BloomsController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Meadow.id:
+			controller = new MeadowController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Trifle.id:
 			if (gameDevOn || GameType.Trifle.usersWithAccess.includes(getUsername())) {
@@ -2869,7 +2884,7 @@ var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
   
   function closeGame() {
 	  if (gameDevOn) {
-		  setGameController(GameType.Tumbleweed.id);
+		  setGameController(GameType.Meadow.id);
 		  return;
 	  }
 	  var defaultGameTypeIds = [
