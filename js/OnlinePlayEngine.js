@@ -304,7 +304,6 @@ OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, 
         },
         function(data, status){
             if (status === 'success') {
-                // debug('Game win info updated.');
                 callback(data.trim());
             }
         }
@@ -323,7 +322,6 @@ OnlinePlayEngine.prototype.updateGameWinInfoAsTie = function(gameId, resultTypeC
         },
         function(data, status){
             if (status === 'success') {
-                // debug('Game win info updated.');
                 callback(data.trim());
             }
         }
@@ -334,7 +332,6 @@ OnlinePlayEngine.prototype.getGameTypeDesc = function(gameTypeId, callback) {
     $.get("backend/getGameTypeDesc.php?q="+gameTypeId, 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
@@ -390,7 +387,6 @@ OnlinePlayEngine.prototype.notifyUser = function(loginToken, userToNotify, callb
         }, 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
@@ -416,7 +412,6 @@ OnlinePlayEngine.prototype.updateEmailNotificationsSetting = function(userId, va
         }, 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
@@ -435,7 +430,6 @@ OnlinePlayEngine.prototype.addUserPreferenceValue = function(loginToken, prefTyp
         }, 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }

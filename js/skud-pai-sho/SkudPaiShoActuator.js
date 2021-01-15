@@ -24,7 +24,6 @@ SkudPaiShoActuator.prototype.setAnimationOn = function(isOn) {
 
 SkudPaiShoActuator.prototype.actuate = function(board, tileManager, moveToAnimate, moveAnimationBeginStep) {
 	var self = this;
-  debug("Game Actuated");
 	// debugStackTrace();
 	// self.printBoard(board);
 

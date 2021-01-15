@@ -33,8 +33,6 @@ AdevarActuator.prototype.actuate = function(board, tileManager, capturedTiles, m
 	var self = this;
 	this.orientalLilyDivs = [];
 
-	debug(moveToAnimate);
-
 	window.requestAnimationFrame(function () {
 		self.htmlify(board, tileManager, moveToAnimate, capturedTiles);
 	});
@@ -280,7 +278,6 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		}
 
 		if (this.animationOn && moveToAnimate && capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
-			debug("Captured " + capturedTile.code);
 			var theImgCaptured = document.createElement("img");
 			theImgCaptured.src = srcValue + capturedTile.getImageName() + ".png";
 			theImgCaptured.classList.add("underneath");
