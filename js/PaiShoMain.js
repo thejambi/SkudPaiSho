@@ -301,6 +301,9 @@ var confirmMoveKey = "confirmMove";
 
 	  buildBoardDesignsValues();
   
+	  if (QueryString.game && !QueryString.gameType) {
+		  QueryString.gameType = "1";
+	  }
 	  if (QueryString.gameType) {
 		  clearOptions();
 		  if (QueryString.gameOptions) {
@@ -715,13 +718,10 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 	  if (gameWatchIntervalValue) {
 		  clearInterval(gameWatchIntervalValue);
 		  gameWatchIntervalValue = null;
-		  debug("Interval cleared...");
 	  }
   }
   var REAL_TIME_GAME_WATCH_INTERVAL = 3000;
   function startWatchingGameRealTime() {
-	  debug("Starting to watch game");
-  
 	  // Setup game watching...
 	  clearGameChats();
   
@@ -1136,8 +1136,6 @@ var finalizeMove = function (moveAnimationBeginStep, ignoreNoEmail, okToUpdateWi
   }
   
 function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
-	debug(shortUrl);
-
 	var aiList = gameController.getAiList();
 
 	var messageText = "";
@@ -1398,7 +1396,6 @@ function yesJoinPrivateGame(privateGameId) {
 
 var submitMoveData = {};
 var submitMoveCallback = function submitMoveCallback() {
-	debug("Inside submitMoveCallback");
 	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
 	finalizeMove(submitMoveData.moveAnimationBeginStep, false, true);
 
@@ -1768,7 +1765,6 @@ var isUserInfoAvailableCallback = function isUserInfoAvailableCallback(data) {
 		// user info not available
 		showModal("Sign In", "Username or email unavailable.<br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
 	} else {
-		debug("Checkpoint");
 		document.getElementById("verificationCodeInput").disabled=false;
 		document.getElementById('verificationCodeSendResponse').innerHTML = "Sending code... <i class='fa fa-circle-o-notch fa-spin fa-fw'></i>";
 		onlinePlayEngine.sendVerificationCode(usernameBeingVerified, emailBeingVerified, sendVerificationCodeCallback);
@@ -2148,7 +2144,6 @@ function getGameControllerForGameType(gameTypeId) {
 	  gameController = getGameControllerForGameType(gameTypeId);
 	  if (!gameController) {
 		  gameController = getGameControllerForGameType(GameType.VagabondPaiSho.id);
-		  debug("Defaulting to use Vagabond Pai Sho.");
 		  showModal("Cannot Load Game", "This game is unavailable. Try Vagabond Pai Sho instead :)<br /><br />To know why the selected game is unavailable, ask in The Garden Gate Discord. Perhaps you have selected a new game that is coming soon!");
 		  successResult = false;
 	  }
@@ -2272,7 +2267,6 @@ function shouldSendJamboreeNoteChat(gameTypeId) {
   }
   
   function getLoginToken() {
-	  // debug("Using login token");
 	  return {
 		  userId: getUserId(),
 		  username: getUsername(),
@@ -3829,8 +3823,6 @@ function buildDateFromTimestamp(timestampStr) {
 			  showModal(modalTitle, "Error getting tournament info.");
 		  }
   
-		  debug(resultData);
-  
 		  message += "<div class='modalContentHeading'>Your Tournaments</div>";
   
 		  if (resultData.tournaments
@@ -3883,7 +3875,6 @@ function getUserGamePrefKeyName(preferenceKey) {
 }
 function getUserGamePreference(preferenceKey) {
 	if (gameController && gameController.getGameTypeId) {
-		debug(gameController.getGameTypeId());
 		var keyName = getUserGamePrefKeyName(preferenceKey);
 		return localStorage.getItem(keyName);
 	}
@@ -3964,7 +3955,6 @@ function buildPreferenceDropdownDiv(labelText, dropdownId, valuesObject, prefere
   
 /* Keyboard shortcuts */
 document.onkeyup = function(e) {
-	debug(e.which || e.keyCode);
 	if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 67) {
 		/* Ctrl + Alt + C */
 		closeGame();
@@ -4078,9 +4068,6 @@ function show2020GameStats(showWins) {
 					closeModal();
 					showModal("Error", "Error getting stats info.");
 				}
-		
-				debug(results);
-				debug(resultData);
 
 				if (resultData.stats) {
 
@@ -4122,9 +4109,6 @@ function showGameStats(showWins) {
 					closeModal();
 					showModal("Error", "Error getting stats info.");
 				}
-		
-				debug(results);
-				debug(resultData);
 
 				if (resultData.stats) {
 
