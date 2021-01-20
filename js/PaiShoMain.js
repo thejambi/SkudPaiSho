@@ -4147,21 +4147,8 @@ function showGameStats(showWins) {
 }
 
 function getShortUrl(url, callback) {
-	// var accessToken = 'ebedc9186c2eecb1a28b3d6aca8a3ceacb6ece63';
-	// var url = 'https://api-ssl.bitly.com/v3/shorten?access_token=' + accessToken + '&longUrl=' + encodeURIComponent(url);
-
-	// $.getJSON(
-	// 	url,
-	// 	{},
-	// 	function(response)
-	// 	{
-	// 		if(callback)
-	// 			callback(response.data.url);
-	// 	}
-	// 	);
-
 	if (onlinePlayEnabled) {
-		$.get("http://tinyurl.com/api-create.php?url="+url, function(shortUrl){
+		$.get("https://tinyurl.com/api-create.php?url="+url, function(shortUrl){
 			if (callback && shortUrl) {
 				callback(shortUrl);
 			}
