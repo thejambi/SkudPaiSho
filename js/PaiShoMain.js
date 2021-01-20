@@ -3192,7 +3192,7 @@ function onlineGameIsOldEnoughToBeQuit() {
 	var nowDate = new Date();
 	var difference = nowDate.getTime() - currentGameTimestampDate.getTime();
 	var daysDifference = difference / 1000 / 60 / 60 / 24;
-	return daysDifference >= 7 || usernameEquals('Zach');
+	return daysDifference >= 3 || usernameEquals('Zach');
 }
 
 function buildDateFromTimestamp(timestampStr) {
