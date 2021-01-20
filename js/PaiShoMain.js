@@ -2056,10 +2056,12 @@ var GameType = {
 			NO_REINFORCEMENT,
 			CHOOSE_NEUTRAL_STACK_SPACE,
 			RUMBLEWEED,
-			CRUMBLEWEED,
 			TUMBLE_6,
 			TUMPLETORE,
 			NO_SETUP_PHASE
+		],
+		secretGameOptions: [
+			CRUMBLEWEED
 		]
 	}
 };
@@ -3050,14 +3052,21 @@ var processChatCommands = function(chatMessage) {
 		  linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
   
 		  linkUrl = sandboxUrl + "?" + linkUrl;
-  
+
 		  debug("GameReplayLinkUrl: " + linkUrl);
-		  var message = "Here is the <a href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.";
+		  var message = "Here is the <a id='gameReplayLink' href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.";
 		  if (playingOnlineGame()) {
 			  message += "<br /><br />";
 			  message += "Here is the <a href=\"" + buildSpectateUrl() + "\" target='_blank'>spectate link</a> others can use to watch the game live and participate in the Game Chat.";
 		  }
 		  showModal("Game Links", message);
+
+		  getShortUrl(linkUrl, function(shortUrl){
+			  var linkTag = document.getElementById('gameReplayLink');
+			  if (linkTag) {
+				linkTag.setAttribute("href", shortUrl);
+			  }
+		  });
   }
   
   function buildSpectateUrl() {
@@ -4136,4 +4145,30 @@ function showGameStats(showWins) {
 		}
 	);
 }
+
+function getShortUrl(url, callback) {
+	// var accessToken = 'ebedc9186c2eecb1a28b3d6aca8a3ceacb6ece63';
+	// var url = 'https://api-ssl.bitly.com/v3/shorten?access_token=' + accessToken + '&longUrl=' + encodeURIComponent(url);
+
+	// $.getJSON(
+	// 	url,
+	// 	{},
+	// 	function(response)
+	// 	{
+	// 		if(callback)
+	// 			callback(response.data.url);
+	// 	}
+	// 	);
+
+	if (onlinePlayEnabled) {
+		$.get("http://tinyurl.com/api-create.php?url="+url, function(shortUrl){
+			if (callback && shortUrl) {
+				callback(shortUrl);
+			}
+		});
+	} else {
+		callback(url);
+	}
+}
+
 
