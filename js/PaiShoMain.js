@@ -30,6 +30,10 @@ var QueryString = function () {
 	}
 	return query_string;
   }();
+
+  if (QueryString.tu) {
+	redirectToTinyUrl(QueryString.tu);
+}
   
   var gameController;
   
@@ -270,6 +274,7 @@ var confirmMoveKey = "confirmMove";
 /* --- */
   
   window.requestAnimationFrame(function () {
+
 	  /* Online play is enabled! */
 	  onlinePlayEnabled = true;
 	  /* ----------------------- */
@@ -419,11 +424,18 @@ var confirmMoveKey = "confirmMove";
 		  showWelcomeTutorial();
 	  }
   
+	  if (QueryString.wg) {	/* `wg` for watch game id */
+	  	QueryString.watchGame = QueryString.wg;
+	  }
 	  if (QueryString.watchGame) {
 		  jumpToGame(QueryString.watchGame);
 	  }
   
 	  /* If a link to a private game, jump to the game. */
+	  if (QueryString.ig && QueryString.h) {	/* `ig` for invite game id, `h` for host username */
+		  QueryString.joinPrivateGame = QueryString.ig;
+		  QueryString.hostUserName = QueryString.h;
+	  }
 	  if (QueryString.joinPrivateGame) {
 		  jumpToGame(QueryString.joinPrivateGame);
 	  }
@@ -1350,7 +1362,7 @@ var createPrivateGameCallback = function createPrivateGameCallback(newGameId) {
 };
 
 function createInviteLinkUrl(newGameId) {
-	linkUrl = LZString.compressToEncodedURIComponent("joinPrivateGame=" + newGameId + "&hostUserName=" + getUsername());
+	linkUrl = LZString.compressToEncodedURIComponent("ig=" + newGameId + "&h=" + getUsername());
 	linkUrl = sandboxUrl + "?" + linkUrl;
 	return linkUrl;
 }
@@ -3071,7 +3083,7 @@ var processChatCommands = function(chatMessage) {
   
   function buildSpectateUrl() {
 	  if (gameId > 0) {
-		  linkUrl = LZString.compressToEncodedURIComponent("watchGame=" + gameId);
+		  linkUrl = LZString.compressToEncodedURIComponent("wg=" + gameId);
 		  linkUrl = sandboxUrl + "?" + linkUrl;
 		  return linkUrl;
 	  }
@@ -4146,16 +4158,32 @@ function showGameStats(showWins) {
 	);
 }
 
-function getShortUrl(url, callback) {
+function getShortUrl(urlToShorten, callback) {
+	return getTinyUrl(urlToShorten, function(tinyUrl){
+		if (tinyUrl.includes(url)) {
+			callback(tinyUrl);
+		} else {
+			var urlEnd = tinyUrl.substring(tinyUrl.indexOf(".com/")+5);
+			var encodedEnd = LZString.compressToEncodedURIComponent("tu=" + urlEnd);
+			callback(url + "?" + encodedEnd);
+		}
+	});
+}
+
+function getTinyUrl(urlToShorten, callback) {
 	if (onlinePlayEnabled) {
-		$.get("https://tinyurl.com/api-create.php?url="+url, function(shortUrl){
+		$.get("https://tinyurl.com/api-create.php?url="+urlToShorten, function(shortUrl){
 			if (callback && shortUrl) {
 				callback(shortUrl);
 			}
 		});
 	} else {
-		callback(url);
+		callback(urlToShorten);
 	}
+}
+
+function redirectToTinyUrl(tinyUrlSlug) {
+	window.location.replace("https://tinyurl.com/" + tinyUrlSlug);
 }
 
 
