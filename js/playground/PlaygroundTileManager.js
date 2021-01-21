@@ -15,9 +15,9 @@ function PlaygroundTileManager(forActuating) {
 	this.capturedTiles = [];
 
 	this.pilesByName = {};
-	this.pilesByName[PlaygroundNotationContstants.hostReservePile] = this.hostTileReserve;
-	this.pilesByName[PlaygroundNotationContstants.guestReservePile] = this.guestTileReserve;
-	this.pilesByName[PlaygroundNotationContstants.capturedPile] = this.capturedTiles;
+	this.pilesByName[PlaygroundNotationConstants.hostReservePile] = this.hostTileReserve;
+	this.pilesByName[PlaygroundNotationConstants.guestReservePile] = this.guestTileReserve;
+	this.pilesByName[PlaygroundNotationConstants.capturedPile] = this.capturedTiles;
 }
 
 PlaygroundTileManager.prototype.loadTileSet = function(ownerCode) {

@@ -441,3 +441,11 @@ PlaygroundController.prototype.cleanup = function() {
 	setPaiShoBoardOption(localStorage.getItem(paiShoBoardDesignTypeKey));
 };
 
+PlaygroundController.prototype.selectRandomTile = function(pileName) {
+	this.resetNotationBuilder();
+	var randomTileDiv = this.actuator.getRandomTilePileDiv(pileName);
+	if (randomTileDiv) {
+		randomTileDiv.click();
+	}
+};
+
