@@ -83,6 +83,12 @@ AdevarController.prototype.getDefaultHelpMessageText = function() {
 	message += "See the <a href='https://tinyurl.com/adevarrulebook' target='_blank'>Adevăr rules</a> for the full rules and more about the game.</p>";
 	message += "<p>Before the game, players each choose a Hidden Tile. The game is won when a player completes the objective given to them by their chosen Hidden Tile or captures their opponent’s Hidden Tile with their corresponding Second Face tile.</p>";
 	message += "<p>On a turn, players either move a tile on the board or call a new tile onto the board.</p>";
+	if (this.hoveredOverLily) {
+		message += "<p><img src='images/Adevar/monochrome/HOrientalLily.png' height=28px width=28px /> See the Oriental Lily garden objectives individually:"
+				+ "<br />Garden A: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 0);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 0);'>GUEST</span>"
+				+ "<br />Garden B: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 1);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 1);'>GUEST</span>"
+				+ "<br />Garden C: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 2);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 2);'>GUEST</span></p>";
+	}
 	return message;
 };
 
@@ -103,12 +109,12 @@ AdevarController.prototype.getAdditionalMessage = function() {
 		msg += getGameOptionsMessageHtml(GameType.Adevar.gameOptions);
 	}
 
-	if (this.hoveredOverLily) {
+	/* if (this.hoveredOverLily) {
 		msg += "<br />See the Oriental Lily garden objectives individually:"
 			+ "<br />Garden A: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 0);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 0);'>GUEST</span>"
 			+ "<br />Garden B: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 1);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 1);'>GUEST</span>"
 			+ "<br />Garden C: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 2);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 2);'>GUEST</span>";
-	}
+	} */
 
 	return msg;
 };
@@ -412,7 +418,11 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 			objective = "Have 2 Basic tiles in each Red Plot, and 3 Basic tiles in each White Plot";
 			break;
 		case AdevarTileCode.orientalLily:
-			objective = "Create one of the three Oriental Lily Garden formations with Basic tiles on your side of the board (see rules, or board highlights for Garden diagrams)."
+			objective = "Create one of the three Oriental Lily Garden formations with Basic tiles on your side of the board (see rules, or board highlights for Garden diagrams).";
+			objective += "<br />See the Oriental Lily garden objectives individually:"
+				+ "<br />Garden A: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 0);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 0);'>GUEST</span>"
+				+ "<br />Garden B: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 1);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 1);'>GUEST</span>"
+				+ "<br />Garden C: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 2);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 2);'>GUEST</span>";
 			this.showLilyHelp = true;
 			this.hoveredOverLily = true;
 			refreshMessage();
@@ -437,10 +447,10 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 			break;
 	}
 
-	if (!this.showLilyHelp && this.hoveredOverLily) {
+	/* if (!this.showLilyHelp && this.hoveredOverLily) {
 		this.hoveredOverLily = false;
 		refreshMessage();
-	}
+	} */
 
 	return hiddenTile.getName() + "'s Objective: " + objective;
 };
