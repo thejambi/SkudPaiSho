@@ -84,7 +84,7 @@ AdevarController.prototype.getDefaultHelpMessageText = function() {
 	message += "<p>Before the game, players each choose a Hidden Tile. The game is won when a player completes the objective given to them by their chosen Hidden Tile or captures their opponent’s Hidden Tile with their corresponding Second Face tile.</p>";
 	message += "<p>On a turn, players either move a tile on the board or call a new tile onto the board.</p>";
 	if (this.hoveredOverLily) {
-		message += "<p><img src='images/Adevar/monochrome/HOrientalLily.png' height=28px width=28px /> See the Oriental Lily garden objectives individually:"
+		message += "<p><img src='images/Adevar/" + localStorage.getItem(AdevarOptions.tileDesignTypeKey) + "/HOrientalLily.png' height=28px width=28px /> See the Oriental Lily garden objectives individually:"
 				+ "<br />Garden A: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 0);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 0);'>GUEST</span>"
 				+ "<br />Garden B: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 1);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 1);'>GUEST</span>"
 				+ "<br />Garden C: <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(HOST, 2);'>HOST</span> <span class='skipBonus' onclick='gameController.hideOrientalLilyHelp(); gameController.showOrientalLilyHelp(GUEST, 2);'>GUEST</span></p>";
