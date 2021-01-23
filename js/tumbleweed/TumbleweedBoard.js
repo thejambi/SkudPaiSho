@@ -374,6 +374,22 @@ TumbleweedBoard.prototype.countSettlements = function(player) {
 	return settlementCount;
 };
 
+TumbleweedBoard.prototype.countTotalControlledSpaces = function(player) {
+	var controlledSpacesCount = 0;
+	var opponent = getOpponentName(player);
+	var self = this;
+	this.forEachBoardPoint(function(boardPoint) {
+		if (!boardPoint.hasSettlement()) {
+			var playerSights = self.getSightCount(boardPoint, player);
+			var opponentSights = self.getSightCount(boardPoint, opponent);
+			if (playerSights > opponentSights) {
+				controlledSpacesCount++;
+			}
+		}
+	});
+	return controlledSpacesCount;
+};
+
 TumbleweedBoard.prototype.getAllPossiblePoints = function() {
 	var possiblePoints = [];
 	this.forEachBoardPoint(function(boardPoint) {

@@ -121,6 +121,9 @@ TumbleweedController.prototype.getAdditionalMessage = function() {
 		} else if (this.gameNotation.moves.length === TumbleweedController.getGameSetupCompleteMoveNumber() && !gameOptionEnabled(NO_SETUP_PHASE)) {
 			msg += "<br />Make the first move or choose to <span class='skipBonus' onclick='gameController.doSwap();'>swap initial pieces</span><br />";
 		} else if (this.gameNotation.moves.length > TumbleweedController.getGameSetupCompleteMoveNumber()) {
+			if (this.theGame.passInSuccessionCount === 1) {
+				msg += "<br />" + getOpponentName(this.getCurrentPlayer()) + " has passed. Passing now will end the game and total territory will be counted.";
+			}
 			msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
 			msg += "<br /><span>Host settlements: " + this.theGame.hostScore + "</span>";
 			msg += "<br /><span>Guest settlements: " + this.theGame.guestScore + "</span>";

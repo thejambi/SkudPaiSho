@@ -31,11 +31,11 @@ TumbleweedGameManager.prototype.setup = function(ignoreActuate) {
 	}
 };
 
-TumbleweedGameManager.prototype.actuate = function () {
+TumbleweedGameManager.prototype.actuate = function (move) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board);
+	this.actuator.actuate(this.board, move);
 };
 
 /* Required by Main */
@@ -69,7 +69,7 @@ TumbleweedGameManager.prototype.runNotationMove = function(move, withActuate, is
 	}
 
 	if (withActuate) {
-		this.actuate();
+		this.actuate(move);
 	}
 };
 
@@ -79,6 +79,14 @@ TumbleweedGameManager.prototype.calculateScores = function() {
 
 	debug("HOST Score: " + this.hostScore);
 	debug("GUEST Score: " + this.guestScore);
+};
+
+TumbleweedGameManager.prototype.calculateTotalControlledSpaces = function() {
+	this.hostTotalControlledScore = this.board.countTotalControlledSpaces(HOST);
+	this.guestTotalControlledSCore = this.board.countTotalControlledSpaces(GUEST);
+
+	this.hostTotalControlledScore += this.hostScore;
+	this.guestTotalControlledSCore += this.guestScore;
 };
 
 TumbleweedGameManager.prototype.revealPossibleInitialPlacementPoints = function(ignoreActuate) {
@@ -115,9 +123,10 @@ TumbleweedGameManager.prototype.getWinner = function() {
 		if (gameOptionEnabled(TUMBLE_6) && this.board.getPointWithStackOfSizeAtLeast(6)) {
 			return this.board.getPointWithStackOfSizeAtLeast(6).getSettlementOwner();
 		}
-		if (this.hostScore > this.guestScore) {
+		this.calculateTotalControlledSpaces();
+		if (this.hostTotalControlledScore > this.guestTotalControlledSCore) {
 			return HOST;
-		} else if (this.guestScore > this.hostScore) {
+		} else if (this.guestTotalControlledSCore > this.hostTotalControlledScore) {
 			return GUEST;
 		} else {
 			return "BOTH players";
@@ -130,10 +139,12 @@ TumbleweedGameManager.prototype.getWinReason = function() {
 	if (gameOptionEnabled(TUMBLE_6) && this.board.getPointWithStackOfSizeAtLeast(6)) {
 		return " won the game with a settlement of 6";
 	}
-	var winnerScore = this.hostScore > this.guestScore ? this.hostScore : this.guestScore;
+	var winnerScore = this.hostTotalControlledScore > this.guestTotalControlledSCore ? this.hostTotalControlledScore : this.guestTotalControlledSCore;
 	return " won the game with a score of " + winnerScore
 		+ "<br /><span>Host settlements: " + this.hostScore + "</span>"
-		+ "<br /><span>Guest settlements: " + this.guestScore + "</span>";
+		+ "<br /><span>Host total controlled: " + this.hostTotalControlledScore + "</span>"
+		+ "<br /><span>Guest settlements: " + this.guestScore + "</span>"
+		+ "<br /><span>Guest total controlled: " + this.guestTotalControlledSCore + "</span>";
 };
 
 TumbleweedGameManager.prototype.getWinResultTypeCode = function() {

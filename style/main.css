@@ -1288,6 +1288,12 @@ input[type=submit] {
   transform: scale(0.45);
 }
 
+.lastPlayed {
+  z-index: 999;
+  box-shadow: 0px 0px 8px 6px rgb(233, 199, 86);
+  transform: scale(0.9);
+}
+
 
 
 /* --- General Dark Mode Styles --- */

@@ -53,15 +53,15 @@ function TumbleweedActuator(gameContainer, isMobile, hostTilesContainerDivs, gue
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-TumbleweedActuator.prototype.actuate = function(board) {
+TumbleweedActuator.prototype.actuate = function(board, lastMove) {
 	var self = this;
 
 	window.requestAnimationFrame(function () {
-		self.htmlify(board);
+		self.htmlify(board, lastMove);
 	});
 };
 
-TumbleweedActuator.prototype.htmlify = function(board) {
+TumbleweedActuator.prototype.htmlify = function(board, lastMove) {
 	removeChildren(this.boardContainer);
 
 	var self = this;
@@ -73,7 +73,7 @@ TumbleweedActuator.prototype.htmlify = function(board) {
 
 		column.forEach(function(cell) {
 			if (cell) {
-				self.addBoardPoint(rowDiv, cell);
+				self.addBoardPoint(rowDiv, cell, lastMove);
 			}
 		});
 		self.boardContainer.appendChild(rowDiv);
@@ -83,7 +83,7 @@ TumbleweedActuator.prototype.htmlify = function(board) {
 		rowNum++;
 		column.forEach(function(cell) {
 			if (cell) {
-				self.addBoardPoint(rowDiv, cell);
+				self.addBoardPoint(rowDiv, cell, lastMove);
 			}
 		});
 		self.boardContainer.appendChild(rowDiv);
@@ -98,7 +98,7 @@ TumbleweedActuator.prototype.buildRowDiv = function(rowNum) {
 	return rowDiv;
 };
 
-TumbleweedActuator.prototype.addBoardPoint = function(rowDiv, boardPoint) {
+TumbleweedActuator.prototype.addBoardPoint = function(rowDiv, boardPoint, lastMove) {
 	// var theDiv = this.createBoardPointDiv(boardPoint);
 	var theDiv = document.createElement("div");
 
@@ -123,6 +123,9 @@ TumbleweedActuator.prototype.addBoardPoint = function(rowDiv, boardPoint) {
 		theDiv.classList.add("hexagon");
 
 		if (boardPoint.types.includes(TumbleweedBoardPoint.Types.normal)) {
+			if (lastMove && boardPoint.getNotationPointString() === lastMove.deployPoint) {
+				theDiv.classList.add("lastPlayed");
+			}
 			if (this.isMobile) {
 				theDiv.setAttribute("onclick", "gameController.pointClicked(this); showPointMessage(this);");
 			} else {
