@@ -67,8 +67,7 @@ var QueryString = function () {
 	  chujiblue: "Chu Ji Blue",
 	  chujimono: "Chu Ji Monochrome",
 	  azulejosmono: "Azulejos Monocromos",
-	  azulejosdemadera: "Azulejos de Madera",
-	  christmas: "Christmastime colors"
+	  azulejosdemadera: "Azulejos de Madera"
   };
   
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
@@ -115,8 +114,6 @@ var paiShoBoardDesignTypeValuesDefault = {
 	lightmode: "Old Default Light Mode",
 	darkmode: "Old Default Dark Mode",
 	adevar: "Adevăr",
-	christmas: "Christmas by Prof. Petruescu",
-	chujiholiday: "Chu Ji Holiday Board",
 	applycustomboard: "Add Custom Board from URL"
 };
 
@@ -1757,7 +1754,11 @@ function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed) {
 	} else {
 		/* Move needs to be confirmed. Finalize move and show confirm button. */
 		finalizeMove(submitMoveData.moveAnimationBeginStep);
-		showConfirmMoveButton();
+		if (gameController.undoMoveAllowed && !gameController.undoMoveAllowed()) {
+			callSubmitMove(moveAnimationBeginStep, true);
+		} else {
+			showConfirmMoveButton();
+		}
 	}
 }
 
