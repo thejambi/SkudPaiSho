@@ -186,7 +186,9 @@ TumbleweedBoard.prototype.getRandomOpenPoint = function() {
 TumbleweedBoard.prototype.forEachBoardPoint = function(forEachFunc) {
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
-			forEachFunc(boardPoint);
+			if (boardPoint.isType(TumbleweedBoardPoint.Types.normal)) {
+				forEachFunc(boardPoint);
+			}
 		});
 	});
 };
