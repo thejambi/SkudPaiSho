@@ -220,15 +220,15 @@ PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
 
 	var gameImgDir;
 	if (tile.gameType === GameType.SkudPaiSho) {
-		gameImgDir = "SkudPaiSho/" + skudTilesKey;
+		gameImgDir = "SkudPaiSho/" + getUserGamePreference(tileDesignTypeKey);
 	} else if (tile.gameType === GameType.VagabondPaiSho) {
-		gameImgDir = "Vagabond/" + localStorage.getItem(vagabondTileDesignTypeKey);
+		gameImgDir = "Vagabond/" + getUserGamePreference(vagabondTileDesignTypeKey);
 	} else if (tile.gameType === GameType.CapturePaiSho) {
 		gameImgDir = "Capture/" + getUserGamePreference(CapturePreferences.tileDesignKey);
 	} else if (tile.gameType === GameType.Playground) {
 		gameImgDir = "Playground";
 	} else if (tile.gameType === "Advr") {
-		gameImgDir = "Adevar/" + localStorage.getItem(AdevarOptions.tileDesignTypeKey);
+		gameImgDir = "Adevar/" + getUserGamePreference(AdevarOptions.tileDesignTypeKey);
 	} else if (tile.gameType === "Warfront") {
 		gameImgDir = "Warfront";
 	} else {
