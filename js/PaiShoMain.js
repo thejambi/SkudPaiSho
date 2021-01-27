@@ -2062,7 +2062,7 @@ var GameType = {
 	Tumbleweed: {
 		id: 13,
 		desc: "Tumbleweed (beta)",
-		rulesUrl: "https://www.boardgamegeek.com/boardgame/318702/tumbleweed",
+		rulesUrl: "https://www.youtube.com/watch?v=mjA_g3nwYW4",
 		gameOptions: [
 			HEXHEX_11,
 			HEXHEX_6,

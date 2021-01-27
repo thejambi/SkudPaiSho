@@ -88,6 +88,10 @@ TumbleweedController.prototype.getDefaultHelpMessageText = function() {
 	+ "<li>If the space is occupied, the stack being placed must be larger than the stack already occupying the space</li></ul>"
 	+ "<p>The board begins with a neutral settlement of 2 in the center. This stack may be overtaken as any other stack.</p>";
 
+	msg += "<p>- See Tumbleweed on <a href='https://www.boardgamegeek.com/boardgame/318702/tumbleweed' target='_blank'>BoardGameGeek</a>";
+	msg += "<br />- Watch a <a href='https://www.youtube.com/watch?v=mjA_g3nwYW4' target='_blank'>video explanation of the rules</a>";
+	msg += "</p>";
+
 	var gameOptionsEnabled = getEnabledGameOptions();
 	if (gameOptionsEnabled.length > 0) {
 		msg += "<p><strong>Game Options Enabled:</strong>";
