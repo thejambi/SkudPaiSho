@@ -2959,7 +2959,12 @@ var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
   /* Chat */
   var sendChatCallback = function sendChatCallback(result) {
 	  document.getElementById('sendChatMessageButton').innerHTML = "Send";
+	  var chatMsg = document.getElementById('chatMessageInput').value;
 	  document.getElementById('chatMessageInput').value = "";
+
+	  if (result && result === 'true') { 	// Did not send
+		  document.getElementById('chatMessageInput').value = "---Message did not send due to language--- " + chatMsg;
+	  }
   };
   
   var sendChat = function(chatMessageIfDifferentFromInput) {
