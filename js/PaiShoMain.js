@@ -2061,15 +2061,15 @@ var GameType = {
 	},
 	Tumbleweed: {
 		id: 13,
-		desc: "Tumbleweed (beta)",
+		desc: "Tumbleweed",
 		rulesUrl: "https://www.youtube.com/watch?v=mjA_g3nwYW4",
 		gameOptions: [
 			HEXHEX_11,
 			HEXHEX_6,
-			NO_REINFORCEMENT,
 			CHOOSE_NEUTRAL_STACK_SPACE,
-			RUMBLEWEED,
+			NO_REINFORCEMENT,
 			TUMBLE_6,
+			RUMBLEWEED,
 			TUMPLETORE,
 			NO_SETUP_PHASE
 		],
