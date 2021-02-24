@@ -2981,11 +2981,15 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 	  }, USER_TURN_GAME_WATCH_INTERVAL);
   }
   
-  /* Chat */
-  var sendChatCallback = function sendChatCallback(result) {
-	  document.getElementById('sendChatMessageButton').innerHTML = "Send";
-	  document.getElementById('chatMessageInput').value = "";
-  };
+var sendChatCallback = function sendChatCallback(result) {
+	document.getElementById('sendChatMessageButton').innerHTML = "Send";
+	var chatMsg = document.getElementById('chatMessageInput').value;
+	document.getElementById('chatMessageInput').value = "";
+
+	if (result && result === 'true') { 	// Did not send
+		document.getElementById('chatMessageInput').value = "---Message blocked by filter--- " + chatMsg;
+	}
+};
   
   var sendChat = function(chatMessageIfDifferentFromInput) {
 	  var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value).trim();
