@@ -97,11 +97,27 @@ AdevarActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, c
 		this.guestTilesContainer.appendChild(guestCapturedTilesContainer);
 	}
 
+	var prevTile = null;
 	tileManager.hostTiles.forEach(function(tile) {
+		if (getUsername() === 'SkudPaiSho' && prevTile && (prevTile.type !== tile.type
+				|| (prevTile.type === AdevarTileType.basic && prevTile.code !== tile.code))) {
+			var theP = document.createElement("br");
+			theP.style.clear = "both";
+			hostTileReserveContainer.appendChild(theP);
+		}
 		self.addTile(tile, hostTileReserveContainer);
+		prevTile = tile;
 	});
+	prevTile = null;
 	tileManager.guestTiles.forEach(function(tile) {
+		if (getUsername() === 'SkudPaiSho' && prevTile && (prevTile.type !== tile.type
+				|| (prevTile.type === AdevarTileType.basic && prevTile.code !== tile.code))) {
+			var theP = document.createElement("br");
+			theP.style.clear = "both";
+			guestTileReserveContainer.appendChild(theP);
+		}
 		self.addTile(tile, guestTileReserveContainer);
+		prevTile = tile;
 	});
 	if (showHostCapturedTiles) {
 		hostCapturedTiles.forEach(function(tile) {
