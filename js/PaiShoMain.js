@@ -264,8 +264,10 @@ var userTurnCountInterval;
 var gameContainerDiv = document.getElementById("game-container");
 
 var soundManager;
+/* Preference values should default to true */
 var animationsOnKey = "animationsOn";
 var confirmMoveKey = "confirmMove";
+var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 
 // var sendJoinGameChatMessage = false;
 /* --- */
@@ -2731,37 +2733,48 @@ var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
   var yesCreatePrivateGame = function yesCreatePrivateGame(gameTypeId) {
 	  onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), 'Y', getLoginToken(), createPrivateGameCallback);
   };
+
+function replaceWithLoadingText(element) {
+	element.innerHTML = getLoadingModalText();
+}
+
+function getCheckedValue(checkboxId) {
+	var element = document.getElementById(checkboxId);
+	return element && element.checked;
+}
   
-  var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHostedByUserCallback(results) {
-	  var gameTypeId = tempGameTypeId;
-	  if (!results) {
-		  // If a solitaire game, automatically create game, as it'll be automatically joined.
-		  if (gameController.isSolitaire()) {
-			  yesCreateGame(gameTypeId);
-		  } else {
-			  var message = "<div>Do you want to create a game for others to join?</div>";
-			  if (!gameController.isInviteOnly) {
-			  	message += "<br /><div class='clickableText' onclick='closeModal(); yesCreateGame(" + gameTypeId + ");'>Yes - create game</div>";
-			  }
-			  message += "<br /><div class='clickableText' onclick='closeModal(); yesCreatePrivateGame(" + gameTypeId + ");'>Yes - create a private game with a friend</div>";
-			  message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
-			  showModal("Create game?", message);
-		  }
-	  } else {
-		  finalizeMove();
-		  var message = "";
-		  if (userIsLoggedIn()) {
-			  message = "<div>You already have a public game waiting for an opponent. Do you want to create a private game for others to join?</div>";
-			  message += "<br /><div class='clickableText' onclick='closeModal(); yesCreatePrivateGame(" + gameTypeId + ");'>Yes - create a private game with a friend</div>";
-			  message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
-			  showModal("Create game?", message);
-		  } else {
-			  message = "You are not signed in. ";
-			  message += "<br /><br />You can still play the game locally, but it will not be saved online.";
-			  showModal("Game Not Created", message);
-		  }
-	  }
-  };
+var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHostedByUserCallback(results) {
+	var gameTypeId = tempGameTypeId;
+	if (!results) {
+		// If a solitaire game, automatically create game, as it'll be automatically joined.
+		if (gameController.isSolitaire()) {
+			yesCreateGame(gameTypeId);
+		} else {
+			var message = "<div>Do you want to create a game for others to join?</div>";
+			var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
+			message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> (Coming soon) Ranked game (Player rankings will be affected and - coming soon - publicly available game)</label></div>";
+			if (!gameController.isInviteOnly) {
+				message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreateGame(" + gameTypeId + ", getCheckedValue(\"createRankedGameCheckbox\")); closeModal();'>Yes - create game</div>";
+			}
+			message += "<br /><div class='clickableText' onclick='closeModal(); yesCreatePrivateGame(" + gameTypeId + ");'>Yes - create a private game with a friend</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
+			showModal("Create game?", message);
+		}
+	} else {
+		finalizeMove();
+		var message = "";
+		if (userIsLoggedIn()) {
+			message = "<div>You already have a public game waiting for an opponent. Do you want to create a private game for others to join?</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal(); yesCreatePrivateGame(" + gameTypeId + ");'>Yes - create a private game with a friend</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
+			showModal("Create game?", message);
+		} else {
+			message = "You are not signed in. ";
+			message += "<br /><br />You can still play the game locally, but it will not be saved online.";
+			showModal("Game Not Created", message);
+		}
+	}
+};
   
   var tempGameTypeId;
   function createGameIfThatIsOk(gameTypeId) {
@@ -4087,6 +4100,17 @@ function showPreferences() {
 	message += "<div><input id='confirmMoveBeforeSubmittingCheckbox' type='checkbox' onclick='toggleConfirmMovePreference();' " + checkedValue + "'><label for='confirmMoveBeforeSubmittingCheckbox'> Confirm move before submitting?</label></div>";
 
 	showModal("Device Preferences", message);
+}
+
+function getBooleanPreference(key, defaultValue) {
+	if (defaultValue && defaultValue.toString() === "true") {
+		return localStorage.getItem(key) !== "true";
+	} else {
+		return localStorage.getItem(key) !== "false";
+	}
+}
+function toggleBooleanPreference(key) {
+	localStorage.setItem(key, !getBooleanPreference(key));
 }
 
 function show2020GameStats(showWins) {
