@@ -2081,11 +2081,10 @@ var GameType = {
 	},
 	FirePaiSho: {
 		id: 15,
-		desc: "Fire Pai Sho",
+		desc: "Fire Pai Sho (beta - local only)",
 		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/",
 		gameOptions: [
-			NO_HARMONY_VISUAL_AIDS,
-			ADEVAR_ROTATE
+			NO_HARMONY_VISUAL_AIDS
 		]
 	},
 };
