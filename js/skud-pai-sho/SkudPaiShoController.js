@@ -77,7 +77,7 @@ SkudPaiShoController.prototype.resetMove = function() {
 };
 
 SkudPaiShoController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Skud Pai Sho</h4> <p>Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p> <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p> <p>Select tiles or points on the board to learn more, and read through the <a href='https://skudpaisho.com/site/games/skud-pai-sho/' target='_blank'>rules page</a> for the full rules.</p>";
+	return "<h4>Skud Pai Sho</h4> <p>Skud Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p> <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p> <p>Select tiles or points on the board to learn more, and read through the <a href='https://skudpaisho.com/site/games/skud-pai-sho/' target='_blank'>rules page</a> for the full rules.</p>";
 };
 
 SkudPaiShoController.prototype.getAdditionalMessage = function() {
