@@ -2076,7 +2076,16 @@ var GameType = {
 		secretGameOptions: [
 			CRUMBLEWEED
 		]
-	}
+	},
+	FirePaiSho: {
+		id: 15,
+		desc: "Fire Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/",
+		gameOptions: [
+			NO_HARMONY_VISUAL_AIDS,
+			ADEVAR_ROTATE
+		]
+	},
 };
 
 function getGameControllerForGameType(gameTypeId) {
@@ -2130,6 +2139,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Tumbleweed.id:
 			controller = new TumbleweedController(gameContainerDiv, isMobile);
+			break;
+		case GameType.FirePaiSho.id:
+			controller = new FirePaiShoController(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
@@ -2959,12 +2971,7 @@ var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
   /* Chat */
   var sendChatCallback = function sendChatCallback(result) {
 	  document.getElementById('sendChatMessageButton').innerHTML = "Send";
-	  var chatMsg = document.getElementById('chatMessageInput').value;
 	  document.getElementById('chatMessageInput').value = "";
-
-	  if (result && result === 'true') { 	// Did not send
-		  document.getElementById('chatMessageInput').value = "---Message blocked by filter--- " + chatMsg;
-	  }
   };
   
   var sendChat = function(chatMessageIfDifferentFromInput) {

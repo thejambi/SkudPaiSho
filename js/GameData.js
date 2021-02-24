@@ -97,6 +97,47 @@ var LION_TURTLE = "Lion Turtle";
 var WHITE_LOTUS = "White Lotus";
 var ORCHID = "Orchid";
 
+function getTileNameFromCode(code) {
+  if (code === "W3") {
+    return "White 3 Jasmine";
+  }
+  else if (code === "W4") {
+    return "White 4 Lily";
+  }
+  else if (code === "W5") {
+    return "White 5 White Jade";
+  }
+  else if (code === "R3") {
+    return "Red 3 Rose";
+  }
+  else if (code === "R4") {
+    return "Red 4 Chrysanthemum";
+  }
+  else if (code === "R5") {
+    return "Red 5 Rhododendron";
+  }
+  else if (code === "R") {
+    return "Rock";
+  }
+  else if (code === "B") {
+    return "Boat";
+  }
+  else if (code === "K") {
+    return "Knotweed";
+  }
+  else if (code === "W") {
+    return "Wheel";
+  }
+  else if (code === "O") {
+    return "Orchid";
+  }
+  else if (code === "L") {
+    return "White Lotus";
+  }
+  else {
+    return "unkown tile code";
+  }
+}
 
 /* Helpful methods, polyfills, etc */
 function TwoWayMap(map) {

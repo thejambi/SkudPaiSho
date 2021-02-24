@@ -2,8 +2,8 @@
 var sin45 = cos45 = Math.sin(Math.PI / 4);
 
 /* Used in Adevar Board Rotate */
-var sin135 = Math.sin(Math.PI / 4);
-var cos135 = -Math.sin(Math.PI / 4);
+var sin135 = Math.sin(3 * Math.PI / 4);
+var cos135 = Math.cos(3 * Math.PI / 4);
 
 function createDivWithClass(className) {
 	var div = document.createElement("div");
