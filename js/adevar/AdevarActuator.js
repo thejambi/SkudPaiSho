@@ -33,8 +33,6 @@ AdevarActuator.prototype.actuate = function(board, tileManager, capturedTiles, m
 	var self = this;
 	this.orientalLilyDivs = [];
 
-	debug(moveToAnimate);
-
 	window.requestAnimationFrame(function () {
 		self.htmlify(board, tileManager, moveToAnimate, capturedTiles);
 	});
@@ -99,11 +97,27 @@ AdevarActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, c
 		this.guestTilesContainer.appendChild(guestCapturedTilesContainer);
 	}
 
+	var prevTile = null;
 	tileManager.hostTiles.forEach(function(tile) {
+		if (getUsername() === 'SkudPaiSho' && prevTile && (prevTile.type !== tile.type
+				|| (prevTile.type === AdevarTileType.basic && prevTile.code !== tile.code))) {
+			var theP = document.createElement("br");
+			theP.style.clear = "both";
+			hostTileReserveContainer.appendChild(theP);
+		}
 		self.addTile(tile, hostTileReserveContainer);
+		prevTile = tile;
 	});
+	prevTile = null;
 	tileManager.guestTiles.forEach(function(tile) {
+		if (getUsername() === 'SkudPaiSho' && prevTile && (prevTile.type !== tile.type
+				|| (prevTile.type === AdevarTileType.basic && prevTile.code !== tile.code))) {
+			var theP = document.createElement("br");
+			theP.style.clear = "both";
+			guestTileReserveContainer.appendChild(theP);
+		}
 		self.addTile(tile, guestTileReserveContainer);
+		prevTile = tile;
 	});
 	if (showHostCapturedTiles) {
 		hostCapturedTiles.forEach(function(tile) {
@@ -280,7 +294,6 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		}
 
 		if (this.animationOn && moveToAnimate && capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
-			debug("Captured " + capturedTile.code);
 			var theImgCaptured = document.createElement("img");
 			theImgCaptured.src = srcValue + capturedTile.getImageName() + ".png";
 			theImgCaptured.classList.add("underneath");
@@ -362,8 +375,21 @@ AdevarActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimat
 	}, pieceAnimationLength);
 };
 
-AdevarActuator.prototype.showOrientalLilyHighlights = function() {
-	this.orientalLilyDivs.forEach(function(theDiv) {
+AdevarActuator.prototype.showOrientalLilyHighlights = function(player, gardenIndex) {
+	var gardenDivs = this.orientalLilyDivs;
+	if (player && gardenIndex >= 0) {
+		var numberOffset = 1;
+		if (player === GUEST) {
+			numberOffset = 4;
+		}
+		gardenDivs = [];
+		this.orientalLilyDivs.forEach(function(lilyDiv){
+			if (lilyDiv.classList.contains("adevar_highlight" + (numberOffset + gardenIndex))) {
+				gardenDivs.push(lilyDiv);
+			}
+		});
+	}
+	gardenDivs.forEach(function(theDiv) {
 		theDiv.classList.add("adevar_highlightOn");
 	});
 };

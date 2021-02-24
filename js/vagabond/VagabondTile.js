@@ -7,7 +7,8 @@ var VagabondTileCodes = {
 	Chrysanthemum: 'C',
 	FireLily: 'F',
 	Dragon: 'D',
-	Lotus: 'L'
+	Lotus: 'L',
+	FlyingLemur: 'Y'
 }
 
 function VagabondTile(code, ownerCode) {
@@ -37,6 +38,8 @@ VagabondTile.prototype.getMoveDistance = function() {
 		return 1;
 	} else if (this.code === 'S') {
 		return 6;
+	} else if (this.code === VagabondTileCodes.FlyingLemur) {
+		return 5;
 	}
 
 	return 0;
@@ -48,8 +51,9 @@ VagabondTile.prototype.isFlowerTile = function() {
 };
 
 VagabondTile.prototype.hasCaptureAbility = function() {
-	// Must be D, W, S
-	return this.code === 'D' || this.code === 'W' || this.code === 'S';
+	// Must be D, W, S, or FlyingLemur
+	return this.code === 'D' || this.code === 'W' || this.code === 'S'
+		|| this.code === VagabondTileCodes.FlyingLemur;
 };
 
 VagabondTile.prototype.getName = function() {
@@ -78,6 +82,8 @@ VagabondTile.getTileName = function(tileCode) {
 		name = "Fire Lily";
 	} else if (tileCode === 'D') {
 		name = "White Dragon";
+	} else if (tileCode === VagabondTileCodes.FlyingLemur) {
+		name = "Flying Lemur";
 	}
 
 	return name;

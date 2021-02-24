@@ -14,6 +14,7 @@
   --hexentafld-bakcground: #000;
   --input-background: #1b1b19;
   --input-color: #faf8ef;
+  --replayControlsColor: #cac8bf;
 }
 
 [data-theme="dark"] {
@@ -254,6 +255,7 @@ div.tab .alertTab, div.tab .alertTab.active {
   z-index: 103;
   background-color: #444;
   border-top: var(--replay-controls-border-top);
+  color: var(--replayControlsColor);
 }
 
 #replayControls .center {
@@ -293,6 +295,7 @@ div.tab .alertTab, div.tab .alertTab.active {
   border: 1px solid #ccc;
   border-radius: 3px;
   background-color: var(--replay-button-background);
+  color: var(--color);
   display: block;
   float: left;
   text-align: center;
@@ -304,6 +307,13 @@ div.tab .alertTab, div.tab .alertTab.active {
 }
 .replayButton:active {
   background-color: #bbb;
+}
+
+#confirmMoveButton .replayButton {
+  width: 211px;
+  color: var(--body-background-color);
+  background-color: var(--color);
+  box-shadow: 0px 0px 4px 1px var(--color);
 }
 
 .board-container {
@@ -582,7 +592,7 @@ figure > div {
 }
 
 .drained {
-  opacity: 0.6;
+  opacity: 0.75;
 }
 
 .possibleMove {
@@ -590,7 +600,7 @@ figure > div {
 }
 
 .possibleMove img {
-  opacity: 0.8;
+  opacity: 0.6;
 }
 
 .selectedFromPile {
@@ -1087,6 +1097,18 @@ input[type=submit] {
   background-color: var(--hex-score-host-background);
 }
 
+.meadowHexScoreHost {
+  background-color: #fe8492;
+  transform: scale(0.8);
+}
+.meadowHexScoreGuest {
+  background-color: #8bd0ff;
+  transform: scale(0.8);
+}
+.meadowHexScoreHost.meadowHexScoreGuest {
+  background-color: #c5aac9;
+}
+
 .bloomsH1 {
   background-color: #f9c851;
 }
@@ -1102,6 +1124,19 @@ input[type=submit] {
 }
 .scoreMix {
   background-color: #9a8245;
+}
+
+.meadowH1 {
+  background-color: #921715;
+}
+.meadowH2 {
+  background-color: #fe8492;
+}
+.meadowG1 {
+  background-color: #215d7f;
+}
+.meadowG2 {
+  background-color: #8bd0ff;
 }
 
 .bloomsTileContainer {
@@ -1217,6 +1252,48 @@ input[type=submit] {
   transform: rotate(270deg);
   color: black;
 }
+
+/* Tumbleweed */
+
+.boardHexhex6 {
+  width: 612px;
+  margin: -18px 0 0 -25px;
+  transform: scale(0.9);
+}
+.boardHexhex6bottomMargin {
+  margin-bottom: -20px;
+}
+
+.boardHexhex8 {
+  width: 910px;
+  margin: -65px 0 0 -119px;
+  transform: scale(0.78);
+}
+.boardHexhex8bottomMargin {
+  margin-bottom: -60px;
+}
+
+.boardHexhex11 {
+  width: 1500px;
+  margin: -198px 0 0 -331px;
+  transform: scale(0.55);
+}
+.boardHexhex11bottomMargin {
+  margin-bottom: -210px;
+}
+
+.boardHexhex12 {
+  width: 1500px;
+  margin: -190px 0 0 -416px;
+  transform: scale(0.45);
+}
+
+.lastPlayed {
+  z-index: 999;
+  box-shadow: 0px 0px 8px 6px rgb(233, 199, 86);
+  transform: scale(0.9);
+}
+
 
 
 /* --- General Dark Mode Styles --- */
@@ -1454,6 +1531,33 @@ textarea {
   width: 160vw;
   margin: -20vw 0 0 -31vw;
   transform: scale(0.65);
+}
+
+.boardHexhex6 {
+  width: 110vw;
+  margin: 1vw 0 0 -5vw;
+  transform: scale(0.95);
+}
+.boardHexhex6bottomMargin {
+  margin-bottom: 0vw;
+}
+
+.boardHexhex8 {
+  width: 160vw;
+  margin: -14vw 0 0 -25vw;
+  transform: scale(0.72);
+}
+.boardHexhex8bottomMargin {
+  margin-bottom: -15vw;
+}
+
+.boardHexhex11 {
+  width: 195vw;
+  margin: -38vw 0 0 -47vw;
+  transform: scale(0.51);
+}
+.boardHexhex11bottomMargin {
+  margin-bottom: -40vw;
 }
 
 .blooms12sidedBoard {

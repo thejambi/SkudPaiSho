@@ -49,12 +49,12 @@ PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 		var tile = this.tileManager.grabTile(move.tileOwner, move.tileType, move.sourcePileName);
 		var capturedTile = this.board.placeTile(tile, move.endPoint);
 		if (capturedTile) {
-			this.tileManager.pilesByName[PlaygroundNotationContstants.capturedPile].push(capturedTile);
+			this.tileManager.pilesByName[PlaygroundNotationConstants.capturedPile].push(capturedTile);
 		}
 	} else if (move.moveType === MOVE) {
 		var capturedTile = this.board.moveTile(move.startPoint, move.endPoint);
 		if (capturedTile) {
-			this.tileManager.pilesByName[PlaygroundNotationContstants.capturedPile].push(capturedTile);
+			this.tileManager.pilesByName[PlaygroundNotationConstants.capturedPile].push(capturedTile);
 		}
 	} else if (move.moveType === PlaygroundMoveType.hideTileLibraries) {
 		this.actuateOptions.showTileLibrary = false;

@@ -31,6 +31,10 @@ VagabondController.prototype.completeSetup = function() {
 	this.peekAtOpponentMoves = getUserGamePreference(this.peekAtOpponentMovesPrefKey) === "true";
 	debug("Peeky?: " + this.peekAtOpponentMoves);
 	debug("!this.peek...: " + !this.peekAtOpponentMoves);
+
+	if (gameOptionEnabled(SWAP_BISON_WITH_LEMUR)) {
+		VagabondController.setTileDesignsPreference("delion");
+	}
 };
 
 VagabondController.prototype.resetGameManager = function() {
@@ -55,10 +59,16 @@ VagabondController.prototype.getNewGameNotation = function() {
 };
 
 VagabondController.getHostTilesContainerDivs = function() {
+	if (gameOptionEnabled(SWAP_BISON_WITH_LEMUR)) {
+		return '<div class="HC"></div> <div class="H' + VagabondTileCodes.FlyingLemur + '"></div> <div class="HB"></div> <div class="HW"></div> <br class="clear" /> <div class="HF"></div> <div class="HD"></div> <div class="H_empty"></div> <div class="HL"></div>';
+	}
 	return '<div class="HC"></div> <div class="HS"></div> <div class="HB"></div> <div class="HW"></div> <br class="clear" /> <div class="HF"></div> <div class="HD"></div> <div class="H_empty"></div> <div class="HL"></div>';
 }
 
 VagabondController.getGuestTilesContainerDivs = function() {
+	if (gameOptionEnabled(SWAP_BISON_WITH_LEMUR)) {
+		return '<div class="GC"></div> <div class="G' + VagabondTileCodes.FlyingLemur + '"></div> <div class="GB"></div> <div class="GW"></div> <br class="clear" /> <div class="GF"></div> <div class="GD"></div> <div class="G_empty"></div> <div class="GL"></div>';
+	}
 	return '<div class="GC"></div> <div class="GS"></div> <div class="GB"></div> <div class="GW"></div> <br class="clear" /> <div class="GF"></div> <div class="GD"></div> <div class="G_empty"></div> <div class="GL"></div>';
 };
 
@@ -308,6 +318,11 @@ VagabondController.prototype.getTheMessage = function(tile, ownerName) {
 		heading = "White Lotus";
 		message.push("Flower Tile");
 		message.push("Can move 1 space");
+	} else if (tileCode === VagabondTileCodes.FlyingLemur) {
+		message.push("Deployed on the Temples - the points inside of the small red triangles in the corners of the board");
+		message.push("Can move up to five spaces, turning any number of times, and can move over other tiles");
+		message.push("Cannot move through or off of a space that is adjacent to an opponent's Chrysanthemum tile");
+		message.push("Can capture other tiles");
 	} else if (tileCode === 'S') {
 		heading = "Sky Bison";
 		// message.push("Deployed on the point inside of the small red triangles in the corners of the board");
