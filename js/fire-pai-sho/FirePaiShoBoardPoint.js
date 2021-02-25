@@ -1,19 +1,5 @@
 // Board Point
 
-var NON_PLAYABLE = "Non-Playable";
-var NEUTRAL = "Neutral";
-
-var GATE = "Gate";
-
-
-var POSSIBLE_MOVE = "Possible Move";
-var OPEN_GATE = "OPEN GATE";
-
-var thinDot = "·";
-var thickDot = "•";
-var whiteDot = "◦";
-var gateDot = "⟡";
-
 function FirePaiShoBoardPoint() {
 	this.types = [];
 	this.row = -1;
