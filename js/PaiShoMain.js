@@ -1212,7 +1212,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
 			}
 
 			var newPlayerRatings = {};
-			if (currentGameData.isRankedGame) {
+			if (currentGameData.isRankedGame && currentGameData.hostUsername !== currentGameData.guestUsername) {
 				newPlayerRatings = Elo.getNewPlayerRatings(currentGameData.hostRating, currentGameData.guestRating, hostResultCode);
 			}
 
