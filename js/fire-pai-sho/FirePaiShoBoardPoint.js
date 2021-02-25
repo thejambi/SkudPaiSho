@@ -1,5 +1,7 @@
 // Board Point
 
+var CENTER = "Center";
+
 function FirePaiShoBoardPoint() {
 	this.types = [];
 	this.row = -1;
@@ -219,6 +221,15 @@ FirePaiShoBoardPoint.whiteNeutral = function() {
 	var point = new FirePaiShoBoardPoint();
 	point.addType(WHITE);
 	point.addType(NEUTRAL);
+
+	return point;
+};
+
+FirePaiShoBoardPoint.center = function() {
+	var point = new FirePaiShoBoardPoint();
+	point.addType(RED);
+	point.addType(WHITE);
+	point.addType(CENTER);
 
 	return point;
 };

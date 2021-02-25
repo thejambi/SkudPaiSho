@@ -163,7 +163,7 @@ FirePaiShoBoard.prototype.brandNew = function () {
 		FirePaiShoBoardPoint.redWhite(),
 		FirePaiShoBoardPoint.redWhite(),
 		FirePaiShoBoardPoint.redWhite(),
-		FirePaiShoBoardPoint.redWhite(),
+		FirePaiShoBoardPoint.center(),
 		FirePaiShoBoardPoint.redWhite(),
 		FirePaiShoBoardPoint.redWhite(),
 		FirePaiShoBoardPoint.redWhite(),
@@ -402,9 +402,16 @@ FirePaiShoBoard.prototype.putTileOnPoint = function(tile, notationPoint) {
 };
 
 FirePaiShoBoard.prototype.canPlaceFlower = function(boardPoint, tile) {
-	//If it is in red or white without being on the border, i.e. properly in the garden, can't play there
-	if ((boardPoint.types.includes(RED) && !boardPoint.types.includes(WHITE) && !boardPoint.types.includes(NEUTRAL))
-	|| (boardPoint.types.includes(WHITE) && !boardPoint.types.includes(RED) && !boardPoint.types.includes(NEUTRAL))){
+
+	//If it is properly in red without being center
+	if (boardPoint.types.includes(RED) && !boardPoint.types.includes(NEUTRAL)){
+		
+		return false;
+	}
+
+	//if it is properly in white without being center
+	if (boardPoint.types.includes(WHITE) && !boardPoint.types.includes(NEUTRAL)){
+		
 		return false;
 	}
 	
@@ -1851,6 +1858,19 @@ FirePaiShoBoard.prototype.setGuestGateOpen = function() {
 	}
 };
 
+FirePaiShoBoard.prototype.revealFirstMovePlacement = function() {
+
+	this.cells.forEach(function(row) {
+		row.forEach(function(boardPoint) {
+
+			if (boardPoint.types.includes(CENTER)) {
+				boardPoint.addType(POSSIBLE_MOVE);
+			}
+			
+		});
+	});
+};
+
 FirePaiShoBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 	var self = this;
 
@@ -1877,6 +1897,8 @@ FirePaiShoBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 		});
 	});
 };
+
+
 
 FirePaiShoBoard.prototype.revealBoatBonusPoints = function(boardPoint) {
 	if (!boardPoint.hasTile()) {
