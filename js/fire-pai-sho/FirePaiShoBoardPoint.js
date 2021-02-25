@@ -8,6 +8,7 @@ var GATE = "Gate";
 
 var POSSIBLE_MOVE = "Possible Move";
 var OPEN_GATE = "OPEN GATE";
+var CENTER = "Center";
 
 var thinDot = "·";
 var thickDot = "•";
@@ -233,6 +234,15 @@ FirePaiShoBoardPoint.whiteNeutral = function() {
 	var point = new FirePaiShoBoardPoint();
 	point.addType(WHITE);
 	point.addType(NEUTRAL);
+
+	return point;
+};
+
+FirePaiShoBoardPoint.center = function() {
+	var point = new FirePaiShoBoardPoint();
+	point.addType(RED);
+	point.addType(WHITE);
+	point.addType(CENTER);
 
 	return point;
 };
