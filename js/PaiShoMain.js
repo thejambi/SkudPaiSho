@@ -1392,18 +1392,19 @@ function createInviteLinkUrl(newGameId) {
 	return linkUrl;
 }
 
-function askToJoinGame(gameId, hostUsername) {
+function askToJoinGame(gameId, hostUsername, rankedGameInd) {
 	/* Set up QueryString as if joining through game invite link to trigger asking */
 	QueryString.joinPrivateGame = gameId.toString();
 	QueryString.hostUserName = hostUsername;
 	QueryString.allowJoiningOwnGame = true;
+	QueryString.rankedGameInd = rankedGameInd;
 	jumpToGame(gameId);
 }
 
 function askToJoinPrivateGame(privateGameId, hostUserName, rankedGameInd) {
 	if (userIsLoggedIn()) {
 		var message = "Do you want to join this game hosted by " + hostUserName + "?";
-		if (rankedGameInd === 'y') {
+		if (rankedGameInd === 'y' || rankedGameInd === 'Y') {
 			message += "<br /><br /><strong> This is a ranked game.</strong>";
 		}
 		message += "<br /><br />";
@@ -2582,7 +2583,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 			  closeModal();
 			  showModal("Cannot Join Game", "You are already playing a game against that user, so you will have to finish that game first.");
 		  } else {
-			askToJoinGame(gameSeek.gameId, gameSeek.hostUsername);
+			askToJoinGame(gameSeek.gameId, gameSeek.hostUsername, gameSeek.rankedGame);
 		  }
 	  } else {
 		  // No results, means ok to join game
