@@ -434,6 +434,7 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 	  if (QueryString.ig && QueryString.h) {	/* `ig` for invite game id, `h` for host username */
 		  QueryString.joinPrivateGame = QueryString.ig;
 		  QueryString.hostUserName = QueryString.h;
+		  QueryString.rankedGameInd = QueryString.r;
 	  }
 	  if (QueryString.joinPrivateGame) {
 		  jumpToGame(QueryString.joinPrivateGame);
@@ -505,7 +506,7 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 
 	/* Ask to join invite link game if present */
 	if (QueryString.joinPrivateGame) {
-		askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
+		askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName, QueryString.rankedGameInd);
 	}
 };
   
@@ -1382,7 +1383,11 @@ var createPrivateGameCallback = function createPrivateGameCallback(newGameId) {
 };
 
 function createInviteLinkUrl(newGameId) {
-	linkUrl = LZString.compressToEncodedURIComponent("ig=" + newGameId + "&h=" + getUsername());
+	var urlParamStr = "ig=" + newGameId + "&h=" + getUsername();
+	if (!getBooleanPreference(createNonRankedGamePreferredKey)) {
+		urlParamStr += "&r=y";
+	}
+	linkUrl = LZString.compressToEncodedURIComponent(urlParamStr);
 	linkUrl = sandboxUrl + "?" + linkUrl;
 	return linkUrl;
 }
@@ -1395,9 +1400,12 @@ function askToJoinGame(gameId, hostUsername) {
 	jumpToGame(gameId);
 }
 
-function askToJoinPrivateGame(privateGameId, hostUserName) {
+function askToJoinPrivateGame(privateGameId, hostUserName, rankedGameInd) {
 	if (userIsLoggedIn()) {
 		var message = "Do you want to join this game hosted by " + hostUserName + "?";
+		if (rankedGameInd === 'y') {
+			message += "<br /><br /><strong> This is a ranked game.</strong>";
+		}
 		message += "<br /><br />";
 		message += "<div class='clickableText' onclick='closeModal(); yesJoinPrivateGame(" + privateGameId + ");'>Yes - join game</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
@@ -2107,6 +2115,11 @@ var GameType = {
 		gameOptions: [
 			NO_HARMONY_VISUAL_AIDS
 		]
+		// ,
+		// usersWithAccess: [
+		// 	'SkudPaiSho',
+		// 	'adder'
+		// ]
 	},
 };
 
@@ -2261,7 +2274,7 @@ function getGameControllerForGameType(gameTypeId) {
 
 		  /* Ask to join invite link game if present */
 		  if (QueryString.joinPrivateGame && gameId && gameId.toString() === QueryString.joinPrivateGame) {
-			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
+			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName, QueryString.rankedGameInd);
 			  /* Once we ask after jumping into a game, we won't need to ask again */
 			  QueryString.joinPrivateGame = null;
 		  }
@@ -2661,7 +2674,9 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 				hostId: row[3],
 				hostUsername: row[4],
 				hostOnline: parseInt(row[5]),
-				gameOptions: parseGameOptions(row[6])
+				gameOptions: parseGameOptions(row[6]),
+				hostRating: parseInt(row[7]),
+				rankedGame: row[8]
 			};
 			gameSeekList.push(gameSeek);
 		}
@@ -2685,7 +2700,11 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 					gameTypeHeading = gameSeek.gameTypeDesc;
 					message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
 				}
-				message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
+				message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername;
+				if (gameSeek.rankedGame) {
+					message += " (" + gameSeek.hostRating + ")"
+				}
+				message += "</div>";
 				for (var i = 0; i < gameSeek.gameOptions.length; i++) {
 					message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></div>"
 				}

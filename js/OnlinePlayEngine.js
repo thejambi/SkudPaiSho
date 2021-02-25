@@ -160,7 +160,7 @@ OnlinePlayEngine.prototype.joinGameSeek = function(gameId, loginToken, callback)
 };
 
 OnlinePlayEngine.prototype.getGameSeeks = function(callback) {
-    $.get("backend/getGameSeeks.php", 
+    $.get("backend/getGameSeeks2.php", 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
