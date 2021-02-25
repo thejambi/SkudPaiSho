@@ -594,53 +594,59 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 	  }
   }
   
-  function updateCurrentGameTitle(isOpponentOnline) {
-	  if (!currentGameData.guestUsername || !currentGameData.hostUsername) {
-		  setResponseText(" ");
-		  return;
-	  }
-	  /* --- */
-  
-	  var opponentOnlineIconText = userOfflineIcon;
-	  if (isOpponentOnline) {
-		  opponentOnlineIconText = userOnlineIcon;
-	  }
-  
-	  var currentPlayer = getCurrentPlayer();
-  
-	  // Build HOST username
-	  var hostUsernameTag = "";
-	  if (currentPlayer === HOST && !gameController.theGame.getWinner()) {
-		  hostUsernameTag = "<span class='currentPlayerUsername'>";
-	  } else {
-		  hostUsernameTag = "<span>";
-	  }
-	  if (usernameEquals(currentGameData.guestUsername)) {
-		  hostUsernameTag += opponentOnlineIconText;
-	  }
-	  hostUsernameTag += currentGameData.hostUsername;
-	  hostUsernameTag += "</span>";
-  
-	  var guestUsernameTag = "";
-	  if (currentPlayer === GUEST && !gameController.theGame.getWinner()) {
-		  guestUsernameTag = "<span class='currentPlayerUsername'>";
-	  } else {
-		  guestUsernameTag = "<span>";
-	  }
-	  if (usernameEquals(currentGameData.hostUsername)) {
-		  guestUsernameTag += opponentOnlineIconText;
-	  }
-	  guestUsernameTag += currentGameData.guestUsername;
-	  guestUsernameTag += "</span>";
-  
-	  var title = "<span>";
-	  title += hostUsernameTag;
-	  title += " vs. ";
-	  title += guestUsernameTag;
-	  title += "</span>";
-  
-	  setResponseText(title);
-  }
+function updateCurrentGameTitle(isOpponentOnline) {
+	if (!currentGameData.guestUsername || !currentGameData.hostUsername) {
+		setResponseText(" ");
+		return;
+	}
+	/* --- */
+
+	var opponentOnlineIconText = userOfflineIcon;
+	if (isOpponentOnline) {
+		opponentOnlineIconText = userOnlineIcon;
+	}
+
+	var currentPlayer = getCurrentPlayer();
+
+	// Build HOST username
+	var hostUsernameTag = "";
+	if (currentPlayer === HOST && !gameController.theGame.getWinner()) {
+		hostUsernameTag = "<span class='currentPlayerUsername'>";
+	} else {
+		hostUsernameTag = "<span>";
+	}
+	if (usernameEquals(currentGameData.guestUsername)) {
+		hostUsernameTag += opponentOnlineIconText;
+	}
+	hostUsernameTag += currentGameData.hostUsername;
+	if (currentGameData.isRankedGame) {
+		hostUsernameTag += " (" + currentGameData.hostRating + ")";
+	}
+	hostUsernameTag += "</span>";
+
+	var guestUsernameTag = "";
+	if (currentPlayer === GUEST && !gameController.theGame.getWinner()) {
+		guestUsernameTag = "<span class='currentPlayerUsername'>";
+	} else {
+		guestUsernameTag = "<span>";
+	}
+	if (usernameEquals(currentGameData.hostUsername)) {
+		guestUsernameTag += opponentOnlineIconText;
+	}
+	guestUsernameTag += currentGameData.guestUsername;
+	if (currentGameData.isRankedGame) {
+		guestUsernameTag += " (" + currentGameData.guestRating + ")";
+	}
+	guestUsernameTag += "</span>";
+
+	var title = "<span>";
+	title += hostUsernameTag;
+	title += " vs. ";
+	title += guestUsernameTag;
+	title += "</span>";
+
+	setResponseText(title);
+}
   
   var lastChatTimestamp = '1970-01-01 00:00:00';
   
@@ -1190,17 +1196,32 @@ function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
 		// Save winner
 		if (okToUpdateWinInfo && playingOnlineGame()) {
 			var winnerUsername;
+			/*
+				Host win: 1
+				Guest win: 0
+				Draw: 0.5
+			*/
+			var hostResultCode = 0.5;
 			if (gameController.theGame.getWinner() === HOST) {
 				winnerUsername = currentGameData.hostUsername;
+				hostResultCode = 1;
 			} else if (gameController.theGame.getWinner() === GUEST) {
 				winnerUsername = currentGameData.guestUsername;
+				hostResultCode = 0;
+			}
+
+			var newPlayerRatings = {};
+			if (currentGameData.isRankedGame) {
+				newPlayerRatings = Elo.getNewPlayerRatings(currentGameData.hostRating, currentGameData.guestRating, hostResultCode);
 			}
 
 			if (!winnerUsername) {
 				// A tie.. special case
-				onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
+				onlinePlayEngine.updateGameWinInfoAsTie(gameId, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback, 
+					currentGameData.isRankedGame, newPlayerRatings.hostRating, newPlayerRatings.guestRating, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
 			} else {
-				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback);
+				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback, 
+				currentGameData.isRankedGame, newPlayerRatings.hostRating, newPlayerRatings.guestRating, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
 			}
 		}
 
@@ -2078,7 +2099,15 @@ var GameType = {
 		secretGameOptions: [
 			CRUMBLEWEED
 		]
-	}
+	},
+	FirePaiSho: {
+		id: 15,
+		desc: "Fire Pai Sho (beta - local only)",
+		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/",
+		gameOptions: [
+			NO_HARMONY_VISUAL_AIDS
+		]
+	},
 };
 
 function getGameControllerForGameType(gameTypeId) {
@@ -2132,6 +2161,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Tumbleweed.id:
 			controller = new TumbleweedController(gameContainerDiv, isMobile);
+			break;
+		case GameType.FirePaiSho.id:
+			controller = new FirePaiShoController(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
@@ -2217,6 +2249,9 @@ function getGameControllerForGameType(gameTypeId) {
 		  currentGameData.hostUsername = myGame.hostUsername;
 		  currentGameData.guestUsername = myGame.guestUsername;
 		  currentGameData.lastUpdatedTimestamp = myGame.timestamp;
+		  currentGameData.isRankedGame = myGame.rankedGame;
+		  currentGameData.hostRating = myGame.hostRating;
+		  currentGameData.guestRating = myGame.guestRating;
   
 		  hostEmail = myGame.hostUsername;
 		  guestEmail = myGame.guestUsername;
@@ -2277,7 +2312,10 @@ function shouldSendJamboreeNoteChat(gameTypeId) {
 			  gameOptions:parseGameOptions(row[8]),
 			  winnerUsername:row[9],
 			  resultId:parseInt(row[10]),
-			  timestamp:row[11]
+			  timestamp:row[11],
+			  hostRating: parseInt(row[12]),
+			  guestRating: parseInt(row[13]),
+			  rankedGame: row[14]
 		  };
 		  myGamesList.push(myGame);
 	  }
@@ -2714,12 +2752,12 @@ var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
 };
   
   /* Creating a public game */
-  var yesCreateGame = function yesCreateGame(gameTypeId) {
-	  onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), '', getLoginToken(), createGameCallback);
+  var yesCreateGame = function yesCreateGame(gameTypeId, rankedGame) {
+	  onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), '', getLoginToken(), createGameCallback, rankedGame);
   };
   
-  var yesCreatePrivateGame = function yesCreatePrivateGame(gameTypeId) {
-	  onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), 'Y', getLoginToken(), createPrivateGameCallback);
+  var yesCreatePrivateGame = function yesCreatePrivateGame(gameTypeId, rankedGame) {
+	  onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), 'Y', getLoginToken(), createPrivateGameCallback, rankedGame);
   };
 
 function replaceWithLoadingText(element) {
@@ -2740,11 +2778,11 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 		} else {
 			var message = "<div>Do you want to create a game for others to join?</div>";
 			var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
-			message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> (Coming soon) Ranked game (Player rankings will be affected and - coming soon - publicly available game)</label></div>";
+			message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - coming soon - publicly available game)</label></div>";
 			if (!gameController.isInviteOnly) {
 				message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreateGame(" + gameTypeId + ", getCheckedValue(\"createRankedGameCheckbox\")); closeModal();'>Yes - create game</div>";
 			}
-			message += "<br /><div class='clickableText' onclick='closeModal(); yesCreatePrivateGame(" + gameTypeId + ");'>Yes - create a private game with a friend</div>";
+			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", getCheckedValue(\"createRankedGameCheckbox\")); closeModal();'>Yes - create a private game with a friend</div>";
 			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
 			showModal("Create game?", message);
 		}
@@ -2753,7 +2791,9 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 		var message = "";
 		if (userIsLoggedIn()) {
 			message = "<div>You already have a public game waiting for an opponent. Do you want to create a private game for others to join?</div>";
-			message += "<br /><div class='clickableText' onclick='closeModal(); yesCreatePrivateGame(" + gameTypeId + ");'>Yes - create a private game with a friend</div>";
+			var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
+			message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> (Coming soon) Ranked game (Player rankings will be affected and - coming soon - publicly available game)</label></div>";
+			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", getCheckedValue(\"createRankedGameCheckbox\")); closeModal();'>Yes - create a private game with a friend</div>";
 			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
 			showModal("Create game?", message);
 		} else {
@@ -2969,16 +3009,15 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 	  }, USER_TURN_GAME_WATCH_INTERVAL);
   }
   
-  /* Chat */
-  var sendChatCallback = function sendChatCallback(result) {
-	  document.getElementById('sendChatMessageButton').innerHTML = "Send";
-	  var chatMsg = document.getElementById('chatMessageInput').value;
-	  document.getElementById('chatMessageInput').value = "";
+var sendChatCallback = function sendChatCallback(result) {
+	document.getElementById('sendChatMessageButton').innerHTML = "Send";
+	var chatMsg = document.getElementById('chatMessageInput').value;
+	document.getElementById('chatMessageInput').value = "";
 
-	  if (result && result === 'true') { 	// Did not send
-		  document.getElementById('chatMessageInput').value = "---Message blocked by filter--- " + chatMsg;
-	  }
-  };
+	if (result && result === 'true') { 	// Did not send
+		document.getElementById('chatMessageInput').value = "---Message blocked by filter--- " + chatMsg;
+	}
+};
   
   var sendChat = function(chatMessageIfDifferentFromInput) {
 	  var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value).trim();

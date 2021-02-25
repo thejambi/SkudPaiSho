@@ -119,7 +119,7 @@ OnlinePlayEngine.prototype.logOnlineStatus = function(loginToken, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, optionsString, isPrivateIndicator, loginToken, callback) {
+OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, optionsString, isPrivateIndicator, loginToken, callback, rankedGame) {
     $.post("backend/createGame.php",
         {
             t: gameTypeId, 
@@ -130,7 +130,8 @@ OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, o
             deviceId: loginToken.deviceId,
             options: optionsString,
             isPrivateIndicator: isPrivateIndicator,
-            isWeb: 1
+            isWeb: 1,
+            rankedGame: rankedGame
         },
         function(data, status){
             if (status === 'success') {
@@ -291,8 +292,9 @@ OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, login
     );
 };
 
-OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, resultTypeCode, loginToken, callback) {
-    $.post("backend/updateGameWinInfo.php",
+OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, resultTypeCode, loginToken, callback, 
+        updateRatings, hostRating, guestRating, gameTypeId, hostUsername, guestUsername) {
+    $.post("backend/updateGameWinInfoNew.php",
         {
             gameId: gameId,
             winnerUsername: winnerUsername,
@@ -300,7 +302,13 @@ OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, 
             userId: loginToken.userId,
             username: loginToken.username,
             userEmail: loginToken.userEmail, 
-            deviceId: loginToken.deviceId
+            deviceId: loginToken.deviceId,
+            updateRatings: updateRatings,
+            hostRating: hostRating,
+            guestRating: guestRating,
+            gameTypeId: gameTypeId,
+            hostUsername: hostUsername,
+            guestUsername: guestUsername
         },
         function(data, status){
             if (status === 'success') {
@@ -310,15 +318,22 @@ OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, 
     );
 };
 
-OnlinePlayEngine.prototype.updateGameWinInfoAsTie = function(gameId, resultTypeCode, loginToken, callback) {
-    $.post("backend/updateGameWinInfoAsTie.php",
+OnlinePlayEngine.prototype.updateGameWinInfoAsTie = function(gameId, resultTypeCode, loginToken, callback, 
+        updateRatings, hostRating, guestRating, gameTypeId, hostUsername, guestUsername) {
+    $.post("backend/updateGameWinInfoAsTieNew.php",
         {
             gameId: gameId,
             resultTypeCode: resultTypeCode, 
             userId: loginToken.userId,
             username: loginToken.username,
             userEmail: loginToken.userEmail, 
-            deviceId: loginToken.deviceId
+            deviceId: loginToken.deviceId,
+            updateRatings: updateRatings,
+            hostRating: hostRating,
+            guestRating: guestRating,
+            gameTypeId: gameTypeId,
+            hostUsername: hostUsername,
+            guestUsername: guestUsername
         },
         function(data, status){
             if (status === 'success') {
