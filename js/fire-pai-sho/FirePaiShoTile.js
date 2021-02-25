@@ -1,10 +1,5 @@
 /* Skud Pai Sho Tile */
 
-var RED = "Red";
-var WHITE = "White";
-
-var tileId = 1;
-
 function FirePaiShoTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
