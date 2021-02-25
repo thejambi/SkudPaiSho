@@ -594,53 +594,59 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 	  }
   }
   
-  function updateCurrentGameTitle(isOpponentOnline) {
-	  if (!currentGameData.guestUsername || !currentGameData.hostUsername) {
-		  setResponseText(" ");
-		  return;
-	  }
-	  /* --- */
-  
-	  var opponentOnlineIconText = userOfflineIcon;
-	  if (isOpponentOnline) {
-		  opponentOnlineIconText = userOnlineIcon;
-	  }
-  
-	  var currentPlayer = getCurrentPlayer();
-  
-	  // Build HOST username
-	  var hostUsernameTag = "";
-	  if (currentPlayer === HOST && !gameController.theGame.getWinner()) {
-		  hostUsernameTag = "<span class='currentPlayerUsername'>";
-	  } else {
-		  hostUsernameTag = "<span>";
-	  }
-	  if (usernameEquals(currentGameData.guestUsername)) {
-		  hostUsernameTag += opponentOnlineIconText;
-	  }
-	  hostUsernameTag += currentGameData.hostUsername;
-	  hostUsernameTag += "</span>";
-  
-	  var guestUsernameTag = "";
-	  if (currentPlayer === GUEST && !gameController.theGame.getWinner()) {
-		  guestUsernameTag = "<span class='currentPlayerUsername'>";
-	  } else {
-		  guestUsernameTag = "<span>";
-	  }
-	  if (usernameEquals(currentGameData.hostUsername)) {
-		  guestUsernameTag += opponentOnlineIconText;
-	  }
-	  guestUsernameTag += currentGameData.guestUsername;
-	  guestUsernameTag += "</span>";
-  
-	  var title = "<span>";
-	  title += hostUsernameTag;
-	  title += " vs. ";
-	  title += guestUsernameTag;
-	  title += "</span>";
-  
-	  setResponseText(title);
-  }
+function updateCurrentGameTitle(isOpponentOnline) {
+	if (!currentGameData.guestUsername || !currentGameData.hostUsername) {
+		setResponseText(" ");
+		return;
+	}
+	/* --- */
+
+	var opponentOnlineIconText = userOfflineIcon;
+	if (isOpponentOnline) {
+		opponentOnlineIconText = userOnlineIcon;
+	}
+
+	var currentPlayer = getCurrentPlayer();
+
+	// Build HOST username
+	var hostUsernameTag = "";
+	if (currentPlayer === HOST && !gameController.theGame.getWinner()) {
+		hostUsernameTag = "<span class='currentPlayerUsername'>";
+	} else {
+		hostUsernameTag = "<span>";
+	}
+	if (usernameEquals(currentGameData.guestUsername)) {
+		hostUsernameTag += opponentOnlineIconText;
+	}
+	hostUsernameTag += currentGameData.hostUsername;
+	if (currentGameData.isRankedGame) {
+		hostUsernameTag += " (" + currentGameData.hostRating + ")";
+	}
+	hostUsernameTag += "</span>";
+
+	var guestUsernameTag = "";
+	if (currentPlayer === GUEST && !gameController.theGame.getWinner()) {
+		guestUsernameTag = "<span class='currentPlayerUsername'>";
+	} else {
+		guestUsernameTag = "<span>";
+	}
+	if (usernameEquals(currentGameData.hostUsername)) {
+		guestUsernameTag += opponentOnlineIconText;
+	}
+	guestUsernameTag += currentGameData.guestUsername;
+	if (currentGameData.isRankedGame) {
+		guestUsernameTag += " (" + currentGameData.guestRating + ")";
+	}
+	guestUsernameTag += "</span>";
+
+	var title = "<span>";
+	title += hostUsernameTag;
+	title += " vs. ";
+	title += guestUsernameTag;
+	title += "</span>";
+
+	setResponseText(title);
+}
   
   var lastChatTimestamp = '1970-01-01 00:00:00';
   
