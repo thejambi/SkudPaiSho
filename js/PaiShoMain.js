@@ -1982,7 +1982,8 @@ var GameType = {
 		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
 		gameOptions: [
 			ADEVAR_LITE
-		]
+		],
+		noRankedGames: true
 	},
 	CapturePaiSho: {
 		id: 3,
@@ -2000,7 +2001,8 @@ var GameType = {
 			RELEASE_CAPTIVE_TILES,
 			BONUS_MOVEMENT_5,
 			BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES
-		]
+		],
+		noRankedGames: true
 	},
 	SolitairePaiSho: {
 		id: 4,
@@ -2042,7 +2044,8 @@ var GameType = {
 			'Korron',
 			'vescucci',
 			'geebung02'
-		]
+		],
+		noRankedGames: true
 	},
 	Playground: {
 		id: 7,
@@ -2053,7 +2056,8 @@ var GameType = {
 			VAGABOND_ROTATE,
 			ADEVAR_ROTATE,
 			SPECTATORS_CAN_PLAY
-		]
+		],
+		noRankedGames: true
 	},
 	Blooms: {
 		id: 9,
@@ -2115,7 +2119,8 @@ var GameType = {
 		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/",
 		gameOptions: [
 			NO_HARMONY_VISUAL_AIDS
-		]
+		],
+		noRankedGames: true
 		// ,
 		// usersWithAccess: [
 		// 	'SkudPaiSho',
@@ -2774,7 +2779,7 @@ var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
   /* Creating a public game */
   var yesCreateGame = function yesCreateGame(gameTypeId, rankedGame) {
 	  var rankedInd = 'n';
-	  if (rankedGame) {
+	  if (rankedGame && !getGameTypeEntryFromId(gameTypeId).noRankedGames) {
 		rankedInd = 'y';
 	  }
 	  onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), '', getLoginToken(), createGameCallback, rankedInd);
@@ -2782,7 +2787,7 @@ var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
   
   var yesCreatePrivateGame = function yesCreatePrivateGame(gameTypeId, rankedGame) {
 	var rankedInd = 'n';
-	if (rankedGame) {
+	if (rankedGame && !getGameTypeEntryFromId(gameTypeId).noRankedGames) {
 	  rankedInd = 'y';
 	}
 	  onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), 'Y', getLoginToken(), createPrivateGameCallback, rankedInd);
@@ -2805,8 +2810,10 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 			yesCreateGame(gameTypeId);
 		} else {
 			var message = "<div>Do you want to create a game for others to join?</div>";
-			var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
-			message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - coming soon - publicly available game)</label></div>";
+			if (!getGameTypeEntryFromId(gameTypeId).noRankedGames) {
+				var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
+				message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - coming soon - publicly viewable game)</label></div>";
+			}
 			if (!gameController.isInviteOnly) {
 				message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create game</div>";
 			}
@@ -2819,8 +2826,10 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 		var message = "";
 		if (userIsLoggedIn()) {
 			message = "<div>You already have a public game waiting for an opponent. Do you want to create a private game for others to join?</div>";
-			var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
-			message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> (Coming soon) Ranked game (Player rankings will be affected and - coming soon - publicly available game)</label></div>";
+			if (!getGameTypeEntryFromId(gameTypeId).noRankedGames) {
+				var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
+				message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> (Coming soon) Ranked game (Player rankings will be affected and - coming soon - publicly available game)</label></div>";
+			}
 			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create a private game with a friend</div>";
 			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
 			showModal("Create game?", message);
