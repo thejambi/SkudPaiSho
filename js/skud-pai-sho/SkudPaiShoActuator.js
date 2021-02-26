@@ -24,7 +24,6 @@ SkudPaiShoActuator.prototype.setAnimationOn = function(isOn) {
 
 SkudPaiShoActuator.prototype.actuate = function(board, tileManager, moveToAnimate, moveAnimationBeginStep) {
 	var self = this;
-  debug("Game Actuated");
 	// debugStackTrace();
 	// self.printBoard(board);
 
@@ -139,7 +138,9 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		theDiv.classList.add("activePoint");
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
-		} else if (boardPoint.betweenHarmony && !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
+		} else if (boardPoint.betweenHarmony 
+				&& !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)
+				&& getUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey) !== "true") {
 			var boatRemovingPointClassesToAddAfterAnimation = [];
 			if (isAnimationPointOfBoatRemovingAccentTile) {
 				boatRemovingPointClassesToAddAfterAnimation.push("betweenHarmony");
@@ -201,7 +202,9 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		var srcValue = getSkudTilesSrcPath();
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 
-		if (boardPoint.tile.harmonyOwners && !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
+		if (boardPoint.tile.harmonyOwners 
+				&& !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)
+				&& getUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey) !== "true") {
 			if (this.animationOn && (flags.didBonusMove || flags.wasArranged)) {
 				setTimeout(function() {//Delay harmony outline until after a piece has moved
 					for (var i = 0; i < boardPoint.tile.harmonyOwners.length; i++) {

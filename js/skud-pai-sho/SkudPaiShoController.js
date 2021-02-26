@@ -1,7 +1,7 @@
 /* Skud Pai Sho specific UI interaction logic */
 
 function SkudPaiShoController(gameContainer, isMobile) {
-	this.actuator = new SkudPaiShoActuator(gameContainer, isMobile, this.isAnimationsEnabled());
+	this.actuator = new SkudPaiShoActuator(gameContainer, isMobile, isAnimationsOn());
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -13,7 +13,7 @@ function SkudPaiShoController(gameContainer, isMobile) {
 	this.isPaiShoGame = true;
 }
 
-SkudPaiShoController.animationsEnabledKey = "AnimationsEnabled";
+SkudPaiShoController.hideHarmonyAidsKey = "HideHarmonyAids";
 
 SkudPaiShoController.prototype.getGameTypeId = function() {
 	return GameType.SkudPaiSho.id;
@@ -77,7 +77,7 @@ SkudPaiShoController.prototype.resetMove = function() {
 };
 
 SkudPaiShoController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Skud Pai Sho</h4> <p>Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p> <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p> <p>Select tiles or points on the board to learn more, and read through the <a href='https://skudpaisho.com/site/games/skud-pai-sho/' target='_blank'>rules page</a> for the full rules.</p>";
+	return "<h4>Skud Pai Sho</h4> <p>Skud Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p> <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p> <p>Select tiles or points on the board to learn more, and read through the <a href='https://skudpaisho.com/site/games/skud-pai-sho/' target='_blank'>rules page</a> for the full rules.</p>";
 };
 
 SkudPaiShoController.prototype.getAdditionalMessage = function() {
@@ -721,7 +721,7 @@ SkudPaiShoController.prototype.getAdditionalHelpTabDiv = function() {
 
 	settingsDiv.appendChild(document.createElement("br"));
 
-	settingsDiv.appendChild(this.buildToggleAnimationsDiv());
+	settingsDiv.appendChild(this.buildToggleHarmonyAidsDiv());
 
 	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
@@ -736,31 +736,23 @@ SkudPaiShoController.buildTileDesignDropdownDiv = function(alternateLabelText) {
 							});
 };
 
-SkudPaiShoController.prototype.buildToggleAnimationsDiv = function() {
+SkudPaiShoController.prototype.buildToggleHarmonyAidsDiv = function() {
 	var div = document.createElement("div");
-	var onOrOff = this.isAnimationsEnabled() ? "on" : "off";
-	div.innerHTML = "Move animations are " + onOrOff + ": <span class='skipBonus' onclick='gameController.toggleAnimations();'>toggle</span>";
+	var onOrOff = getUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey) !== "true" ? "on" : "off";
+	div.innerHTML = "Harmony aids are " + onOrOff + ": <span class='skipBonus' onclick='gameController.toggleHarmonyAids();'>toggle</span>";
+	if (gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
+		div.innerHTML += " (Will not affect games with " + NO_HARMONY_VISUAL_AIDS + " game option)";
+	}
 	return div;
 };
 
-SkudPaiShoController.prototype.toggleAnimations = function() {
-	if (this.isAnimationsEnabled()) {
-		setUserGamePreference(SkudPaiShoController.animationsEnabledKey, "false");
-		this.actuator.setAnimationOn(false);
-	} else {
-		setUserGamePreference(SkudPaiShoController.animationsEnabledKey, "true");
-		this.actuator.setAnimationOn(true);
-	}
+SkudPaiShoController.prototype.toggleHarmonyAids = function() {
+	setUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey, 
+		getUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey) !== "true");
 	clearMessage();
-};
-
-SkudPaiShoController.prototype.isAnimationsEnabled = function() {
-	/* Check !== false to default to on */
-	return getUserGamePreference(SkudPaiShoController.animationsEnabledKey) !== "false";
+	this.callActuate();
 };
 
 SkudPaiShoController.prototype.setAnimationsOn = function(isAnimationsOn) {
-	if (isAnimationsOn !== this.isAnimationsEnabled()) {
-		this.toggleAnimations();
-	}
+	this.actuator.setAnimationOn(isAnimationsOn);
 };

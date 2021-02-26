@@ -6,12 +6,14 @@ function AdevarActuator(gameContainer, isMobile, enableAnimations) {
 
 	this.animationOn = enableAnimations;
 
+	this.orientalLilyDivs = [];
+
 	var containers = setupPaiShoBoard(
 		this.gameContainer, 
 		AdevarController.getHostTilesContainerDivs(),
 		AdevarController.getGuestTilesContainerDivs(), 
 		true, 
-		ADEVAR_ROTATE,
+		AdevarOptions.viewAsGuest ? ADEVAR_GUEST_ROTATE : ADEVAR_ROTATE,
 		true
 	);
 
@@ -29,8 +31,7 @@ AdevarActuator.prototype.setAnimationOn = function(isOn) {
 
 AdevarActuator.prototype.actuate = function(board, tileManager, capturedTiles, moveToAnimate) {
 	var self = this;
-
-	debug(moveToAnimate);
+	this.orientalLilyDivs = [];
 
 	window.requestAnimationFrame(function () {
 		self.htmlify(board, tileManager, moveToAnimate, capturedTiles);
@@ -96,11 +97,27 @@ AdevarActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, c
 		this.guestTilesContainer.appendChild(guestCapturedTilesContainer);
 	}
 
+	var prevTile = null;
 	tileManager.hostTiles.forEach(function(tile) {
+		if (getUsername() === 'SkudPaiSho' && prevTile && (prevTile.type !== tile.type
+				|| (prevTile.type === AdevarTileType.basic && prevTile.code !== tile.code))) {
+			var theP = document.createElement("br");
+			theP.style.clear = "both";
+			hostTileReserveContainer.appendChild(theP);
+		}
 		self.addTile(tile, hostTileReserveContainer);
+		prevTile = tile;
 	});
+	prevTile = null;
 	tileManager.guestTiles.forEach(function(tile) {
+		if (getUsername() === 'SkudPaiSho' && prevTile && (prevTile.type !== tile.type
+				|| (prevTile.type === AdevarTileType.basic && prevTile.code !== tile.code))) {
+			var theP = document.createElement("br");
+			theP.style.clear = "both";
+			guestTileReserveContainer.appendChild(theP);
+		}
 		self.addTile(tile, guestTileReserveContainer);
+		prevTile = tile;
 	});
 	if (showHostCapturedTiles) {
 		hostCapturedTiles.forEach(function(tile) {
@@ -196,7 +213,11 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 	
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
-		theDiv.classList.add("adevarPointRotate");
+		if (AdevarOptions.viewAsGuest) {
+			theDiv.classList.add("adevarGuestPointRotate");
+		} else {
+			theDiv.classList.add("adevarPointRotate");
+		}
 
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
@@ -211,6 +232,13 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		}
 	}
 
+	if (boardPoint.gardenHighlightNumbers.length > 0) {
+		boardPoint.gardenHighlightNumbers.forEach(function(number) {
+			theDiv.classList.add("adevar_highlight" + number);
+		});
+		this.orientalLilyDivs.push(theDiv);
+	}
+
 	if (boardPoint.hasTile()) {
 		theDiv.classList.add("hasTile");
 		
@@ -223,6 +251,12 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		var srcValue = this.getTileSrcPath(boardPoint.tile);
 
 		var tileMoved = boardPoint.tile;
+
+		var showMovedTileDuringAnimation = this.animationOn && moveToAnimate && moveToAnimate.moveTileResults && moveToAnimate.moveTileResults.tileMoved
+											&& isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row);
+		if (showMovedTileDuringAnimation) {
+			tileMoved = moveToAnimate.moveTileResults.tileMoved;
+		}
 
 		if (this.animationOn && moveToAnimate && moveToAnimate.moveTileResults && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)
 				&& moveToAnimate.moveTileResults.tileMoved !== moveToAnimate.moveTileResults.tileInEndPoint) {
@@ -251,8 +285,15 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 
 		var capturedTile = this.getCapturedTileFromMoveToAnimate(moveToAnimate);
 
+		if (showMovedTileDuringAnimation) {
+			setTimeout(function() {
+				requestAnimationFrame(function(){
+					theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
+				});
+			}, pieceAnimationLength);
+		}
+
 		if (this.animationOn && moveToAnimate && capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
-			debug("Captured " + capturedTile.code);
 			var theImgCaptured = document.createElement("img");
 			theImgCaptured.src = srcValue + capturedTile.getImageName() + ".png";
 			theImgCaptured.classList.add("underneath");
@@ -315,8 +356,13 @@ AdevarActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimat
 
 	var left = (x - ox);
 	var top = (y - oy);
-	theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
-	theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
+	if (AdevarOptions.viewAsGuest) {
+		theImg.style.left = ((left * -cos135 - top * -sin135) * pointSizeMultiplierX) + unitString;
+		theImg.style.top = ((top * -cos135 + left * -sin135) * pointSizeMultiplierY) + unitString;
+	} else {
+		theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
+		theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
+	}
 
 	requestAnimationFrame(function() {
 		theImg.style.left = "0px";
@@ -327,5 +373,30 @@ AdevarActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimat
 			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
 		});
 	}, pieceAnimationLength);
+};
+
+AdevarActuator.prototype.showOrientalLilyHighlights = function(player, gardenIndex) {
+	var gardenDivs = this.orientalLilyDivs;
+	if (player && gardenIndex >= 0) {
+		var numberOffset = 1;
+		if (player === GUEST) {
+			numberOffset = 4;
+		}
+		gardenDivs = [];
+		this.orientalLilyDivs.forEach(function(lilyDiv){
+			if (lilyDiv.classList.contains("adevar_highlight" + (numberOffset + gardenIndex))) {
+				gardenDivs.push(lilyDiv);
+			}
+		});
+	}
+	gardenDivs.forEach(function(theDiv) {
+		theDiv.classList.add("adevar_highlightOn");
+	});
+};
+
+AdevarActuator.prototype.hideOrientalLilyHighlights = function() {
+	this.orientalLilyDivs.forEach(function(theDiv) {
+		theDiv.classList.remove("adevar_highlightOn");
+	});
 };
 

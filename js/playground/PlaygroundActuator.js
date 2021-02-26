@@ -18,6 +18,8 @@ function PlaygroundActuator(gameContainer, isMobile, enableAnimations) {
 	this.boardContainer = containers.boardContainer;
 	this.hostTilesContainer = containers.hostTilesContainer;
 	this.guestTilesContainer = containers.guestTilesContainer;
+
+	this.tileContainerTileDivs = {};
 }
 
 PlaygroundActuator.hostTeamTilesDivId = "hostTilesContainer";
@@ -30,6 +32,8 @@ PlaygroundActuator.prototype.setAnimationOn = function(isOn) {
 PlaygroundActuator.prototype.actuate = function(board, tileManager, actuateOptions, moveToAnimate) {
 	var self = this;
 	this.actuateOptions = actuateOptions;
+
+	this.tileContainerTileDivs = {};
 
 	debug(moveToAnimate);
 
@@ -63,6 +67,16 @@ PlaygroundActuator.prototype.htmlify = function(board, tileManager, moveToAnimat
 		var hostReserveLabel = document.createElement("span");
 		hostReserveLabel.innerText = "--Host Tile Reserve--";
 		hostTileReserveContainer.appendChild(hostReserveLabel);
+		if (tileManager.hostTileReserve.length > 1) {
+			hostTileReserveContainer.appendChild(document.createElement("br"));
+			var drawRandomLink = document.createElement("span");
+			drawRandomLink.onclick = function(){
+				gameController.selectRandomTile(PlaygroundNotationConstants.hostReservePile);
+			};
+			drawRandomLink.classList.add("skipBonus");
+			drawRandomLink.innerText = "Select Random";
+			hostTileReserveContainer.appendChild(drawRandomLink);
+		}
 		hostTileReserveContainer.appendChild(document.createElement("br"));
 		this.hostTilesContainer.appendChild(hostTileReserveContainer);
 
@@ -72,6 +86,16 @@ PlaygroundActuator.prototype.htmlify = function(board, tileManager, moveToAnimat
 		var guestReserveLabel = document.createElement("span");
 		guestReserveLabel.innerText = "--Guest Tile Reserve--";
 		guestTileReserveContainer.appendChild(guestReserveLabel);
+		if (tileManager.guestTileReserve.length > 1) {
+			guestTileReserveContainer.appendChild(document.createElement("br"));
+			var drawRandomLink = document.createElement("span");
+			drawRandomLink.onclick = function(){
+				gameController.selectRandomTile(PlaygroundNotationConstants.guestReservePile);
+			};
+			drawRandomLink.classList.add("skipBonus");
+			drawRandomLink.innerText = "Select Random";
+			guestTileReserveContainer.appendChild(drawRandomLink);
+		}
 		guestTileReserveContainer.appendChild(document.createElement("br"));
 		this.guestTilesContainer.appendChild(guestTileReserveContainer);
 
@@ -108,22 +132,22 @@ PlaygroundActuator.prototype.htmlify = function(board, tileManager, moveToAnimat
 	// Go through tile piles and display
 	if (this.actuateOptions.showTileReserve) {
 		tileManager.hostTileReserve.forEach(function(tile) {
-			self.addTile(tile, hostTileReserveContainer, PlaygroundNotationContstants.hostReservePile);
+			self.addTile(tile, hostTileReserveContainer, PlaygroundNotationConstants.hostReservePile);
 		});
 		tileManager.guestTileReserve.forEach(function(tile) {
-			self.addTile(tile, guestTileReserveContainer, PlaygroundNotationContstants.guestReservePile);
+			self.addTile(tile, guestTileReserveContainer, PlaygroundNotationConstants.guestReservePile);
 		});
 		tileManager.capturedTiles.forEach(function(tile) {
-			self.addTile(tile, capturedTileContainer, PlaygroundNotationContstants.capturedPile);
+			self.addTile(tile, capturedTileContainer, PlaygroundNotationConstants.capturedPile);
 		});
 	}
 
 	if (this.actuateOptions.showTileLibrary) {
 		tileManager.hostTileLibrary.forEach(function(tile) {
-			self.addTile(tile, hostTileLibraryContainer, PlaygroundNotationContstants.hostLibraryPile);
+			self.addTile(tile, hostTileLibraryContainer, PlaygroundNotationConstants.hostLibraryPile);
 		});
 		tileManager.guestTileLibrary.forEach(function(tile) {
-			self.addTile(tile, guestTileLibraryContainer, PlaygroundNotationContstants.guestLibraryPile);
+			self.addTile(tile, guestTileLibraryContainer, PlaygroundNotationConstants.guestLibraryPile);
 		});
 	}
 };
@@ -184,6 +208,11 @@ PlaygroundActuator.prototype.addTile = function(tile, tileContainer, pileName) {
 	}
 
 	tileContainer.appendChild(theDiv);
+
+	if (!this.tileContainerTileDivs[pileName]) {
+		this.tileContainerTileDivs[pileName] = [];
+	}
+	this.tileContainerTileDivs[pileName].push(theDiv);
 };
 
 PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
@@ -191,17 +220,19 @@ PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
 
 	var gameImgDir;
 	if (tile.gameType === GameType.SkudPaiSho) {
-		gameImgDir = "SkudPaiSho/" + skudTilesKey;
+		gameImgDir = "SkudPaiSho/" + getUserGamePreference(tileDesignTypeKey);
 	} else if (tile.gameType === GameType.VagabondPaiSho) {
-		gameImgDir = "Vagabond/" + localStorage.getItem(vagabondTileDesignTypeKey);
+		gameImgDir = "Vagabond/" + getUserGamePreference(vagabondTileDesignTypeKey);
 	} else if (tile.gameType === GameType.CapturePaiSho) {
-		gameImgDir = "Capture";
+		gameImgDir = "Capture/" + getUserGamePreference(CapturePreferences.tileDesignKey);
 	} else if (tile.gameType === GameType.Playground) {
 		gameImgDir = "Playground";
 	} else if (tile.gameType === "Advr") {
-		gameImgDir = "Adevar/" + localStorage.getItem(AdevarOptions.tileDesignTypeKey);
+		gameImgDir = "Adevar/" + getUserGamePreference(AdevarOptions.tileDesignTypeKey);
 	} else if (tile.gameType === "Warfront") {
 		gameImgDir = "Warfront";
+	} else {
+		gameImgDir = tile.gameType;
 	}
 	if (gameImgDir) {
 		srcValue = srcValue + gameImgDir + "/";
@@ -344,5 +375,7 @@ PlaygroundActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	}, pieceAnimationLength);
 };
 
-
+PlaygroundActuator.prototype.getRandomTilePileDiv = function(pileName) {
+	return peekRandomFromArray(this.tileContainerTileDivs[pileName]);
+};
 

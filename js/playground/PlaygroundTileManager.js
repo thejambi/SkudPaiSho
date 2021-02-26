@@ -15,9 +15,9 @@ function PlaygroundTileManager(forActuating) {
 	this.capturedTiles = [];
 
 	this.pilesByName = {};
-	this.pilesByName[PlaygroundNotationContstants.hostReservePile] = this.hostTileReserve;
-	this.pilesByName[PlaygroundNotationContstants.guestReservePile] = this.guestTileReserve;
-	this.pilesByName[PlaygroundNotationContstants.capturedPile] = this.capturedTiles;
+	this.pilesByName[PlaygroundNotationConstants.hostReservePile] = this.hostTileReserve;
+	this.pilesByName[PlaygroundNotationConstants.guestReservePile] = this.guestTileReserve;
+	this.pilesByName[PlaygroundNotationConstants.capturedPile] = this.capturedTiles;
 }
 
 PlaygroundTileManager.prototype.loadTileSet = function(ownerCode) {
@@ -102,6 +102,24 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Warfront", "Warfront_Lotus", ownerCode));
 	tiles.push(new PlaygroundTile("Warfront", "Warfront_SiegeEngine", ownerCode));
 	tiles.push(new PlaygroundTile("Warfront", "Warfront_Soldier", ownerCode));
+
+	// Chess
+	tiles.push(new PlaygroundTile("Chess", "Chess_K", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_Q", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_R", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_N", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_B", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_P", ownerCode));
+
+	// Other from Sirstotes
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Water", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Earth", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Fire", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Air", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_RedLotus", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Oasis", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Library", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Temple", ownerCode));
 
 	return tiles;
 };

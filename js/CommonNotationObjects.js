@@ -2,6 +2,7 @@
 
 var GUEST = "GUEST";
 var HOST = "HOST";
+var OTHER_PLAYER = "OTHER";
 
 // Turn actions ----------------
 var PLANTING = "Planting";

@@ -140,6 +140,9 @@ SkudPaiShoGameManager.prototype.buildPlantingGameLogText = function(move, tile) 
 		+ move.player + ' Planted ' + tile.getName() + ' at ' + move.endPoint.pointText;
 };
 SkudPaiShoGameManager.prototype.buildArrangingGameLogText = function(move, moveResults) {
+	if (!moveResults) {
+		return "Invalid Move :(";
+	}
 	this.gameLogText = move.moveNum + move.playerCode + '. '
 		+ move.player + ' moved ' + moveResults.movedTile.getName() + ' ' + move.moveTextOnly;
 	if (moveResults.capturedTile) {

@@ -1,7 +1,7 @@
 /* Playground specific UI interaction logic */
 
 function PlaygroundController(gameContainer, isMobile) {
-	this.actuator = new PlaygroundActuator(gameContainer, isMobile, this.isAnimationsEnabled());
+	this.actuator = new PlaygroundActuator(gameContainer, isMobile, isAnimationsOn());
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -20,10 +20,34 @@ function PlaygroundController(gameContainer, isMobile) {
 	new AdevarOptions(); // Just to initialize tiles to show up
 }
 
-PlaygroundController.animationsEnabledKey = "AnimationsEnabled";
+PlaygroundController.playgroundBoardDesign = "playgroundBoardDesign";
 
 PlaygroundController.prototype.getGameTypeId = function() {
 	return GameType.Playground.id;
+};
+
+PlaygroundController.prototype.completeSetup = function() {
+	/* Initialize Playground specific preferences */
+	if (!getUserGamePreference(CapturePreferences.tileDesignKey)
+			|| !CapturePreferences.tileDesignTypeValues[getUserGamePreference(CapturePreferences.tileDesignKey)]) {
+		setUserGamePreference(CapturePreferences.tileDesignKey, "original");
+	}
+
+	if (!getUserGamePreference(tileDesignTypeKey)) {
+		setUserGamePreference(tileDesignTypeKey, "tgggyatso");
+	}
+
+	if (!getUserGamePreference(vagabondTileDesignTypeKey)) {
+		setUserGamePreference(vagabondTileDesignTypeKey, "delion");
+	}
+
+	if (!getUserGamePreference(AdevarOptions.tileDesignTypeKey)) {
+		setUserGamePreference(AdevarOptions.tileDesignTypeKey, "classic");
+	}
+
+	if (getUserGamePreference(PlaygroundController.playgroundBoardDesign)) {
+		setPaiShoBoardOption(getUserGamePreference(PlaygroundController.playgroundBoardDesign), true);
+	}
 };
 
 PlaygroundController.prototype.resetGameManager = function() {
@@ -123,17 +147,25 @@ PlaygroundController.prototype.getAdditionalHelpTabDiv = function() {
 	heading.innerText = "Pai Sho Playground Preferences:";
 
 	settingsDiv.appendChild(heading);
-	settingsDiv.appendChild(SkudPaiShoController.buildTileDesignDropdownDiv("Skud Pai Sho Tile Designs"));
+	settingsDiv.appendChild(buildPreferenceDropdownDiv("Skud Pai Sho Tile Designs", "skudPaiShoDesignsDropdown", tileDesignTypeValues, tileDesignTypeKey));
 	settingsDiv.appendChild(document.createElement("br"));
-	settingsDiv.appendChild(VagabondController.buildTileDesignDropdownDiv("Vagabond Tile Designs"));
+	settingsDiv.appendChild(buildPreferenceDropdownDiv("Vagabond Tile Designs", "vagabondPaiShoDesignsDropdown", VagabondController.tileDesignTypeValues, vagabondTileDesignTypeKey));
 	settingsDiv.appendChild(document.createElement("br"));
-	settingsDiv.appendChild(AdevarOptions.buildTileDesignDropdownDiv("Adevăr Tile Designs"));
+	settingsDiv.appendChild(buildPreferenceDropdownDiv("Adevăr Tile Designs", "adevarDesignsDropdown", AdevarOptions.tileDesignTypeValues, AdevarOptions.tileDesignTypeKey));
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(buildPreferenceDropdownDiv("Capture Tile Designs", "capturePaiShoDesignsDropdown", CapturePreferences.tileDesignTypeValues, CapturePreferences.tileDesignKey));
 
 	settingsDiv.appendChild(document.createElement("br"));
-	settingsDiv.appendChild(this.buildToggleAnimationsDiv());
+	settingsDiv.appendChild(buildPreferenceDropdownDiv("Playground Board", "playgroundBoardDropdown", paiShoBoardDesignTypeValues, PlaygroundController.playgroundBoardDesign));
 
 	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
+};
+
+PlaygroundController.prototype.gamePreferenceSet = function(preferenceKey) {
+	if (preferenceKey === PlaygroundController.playgroundBoardDesign) {
+		setPaiShoBoardOption(getUserGamePreference(PlaygroundController.playgroundBoardDesign), true);
+	}
 };
 
 PlaygroundController.prototype.startOnlineGame = function() {
@@ -186,6 +218,11 @@ PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
 	
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
+		return;
+	}
+
+	if (playingOnlineGame() && !iAmPlayerInCurrentOnlineGame() && !gameOptionEnabled(SPECTATORS_CAN_PLAY)) {
+		debug("Player not allowed to play.");
 		return;
 	}
 
@@ -253,6 +290,8 @@ PlaygroundController.prototype.getCurrentPlayingPlayer = function() {
 			return HOST;
 		} else if (usernameEquals(currentGameData.guestUsername)) {
 			return GUEST;
+		} else if (gameOptionEnabled(SPECTATORS_CAN_PLAY)) {
+			return getUsername();
 		}
 	} else {
 		return this.currentPlayingPlayer;
@@ -266,6 +305,11 @@ PlaygroundController.prototype.pointClicked = function(htmlPoint) {
 	
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
+		return;
+	}
+
+	if (playingOnlineGame() && !iAmPlayerInCurrentOnlineGame() && !gameOptionEnabled(SPECTATORS_CAN_PLAY)) {
+		debug("Player not allowed to play.");
 		return;
 	}
 
@@ -401,26 +445,19 @@ PlaygroundController.prototype.getSkipToIndex = function(currentMoveIndex) {
 	return currentMoveIndex;
 };
 
-PlaygroundController.prototype.buildToggleAnimationsDiv = function() {
-	var div = document.createElement("div");
-	var onOrOff = this.isAnimationsEnabled() ? "on" : "off";
-	div.innerHTML = "Move animations are " + onOrOff + ": <span class='skipBonus' onclick='gameController.toggleAnimations();'>toggle</span>";
-	return div;
+PlaygroundController.prototype.setAnimationsOn = function(isAnimationsOn) {
+	this.actuator.setAnimationOn(isAnimationsOn);
 };
 
-PlaygroundController.prototype.toggleAnimations = function() {
-	if (this.isAnimationsEnabled()) {
-		setUserGamePreference(VagabondController.animationsEnabledKey, "false");
-		this.actuator.setAnimationOn(false);
-	} else {
-		setUserGamePreference(VagabondController.animationsEnabledKey, "true");
-		this.actuator.setAnimationOn(true);
+PlaygroundController.prototype.cleanup = function() {
+	setPaiShoBoardOption(localStorage.getItem(paiShoBoardDesignTypeKey));
+};
+
+PlaygroundController.prototype.selectRandomTile = function(pileName) {
+	this.resetNotationBuilder();
+	var randomTileDiv = this.actuator.getRandomTilePileDiv(pileName);
+	if (randomTileDiv) {
+		randomTileDiv.click();
 	}
-	clearMessage();
-};
-
-PlaygroundController.prototype.isAnimationsEnabled = function() {
-	/* Check !== false to default to on */
-	return getUserGamePreference(PlaygroundController.animationsEnabledKey) !== "false";
 };
 

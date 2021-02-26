@@ -1080,12 +1080,6 @@ TrifleBoard.prototype.moveTile = function(player, notationPointStart, notationPo
 
 	var capturedTiles = [];
 
-	// if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)) {
-	// 	debug("Bad move bears");
-	// 	showBadMoveModal();
-	// 	return false;
-	// }
-
 	/* If movement path is needed, get that */
 	var movementPath = null;
 	var tileInfo = TrifleTiles[boardPointStart.tile.code];
@@ -1128,13 +1122,10 @@ TrifleBoard.prototype.moveTile = function(player, notationPointStart, notationPo
 	this.setPointFlags();
 
 	/* Process abilities after moving a tile */
-	if (capturedTiles.length > 0) {
-		this.applyWhenCapturingTrigger(tile, tileInfo, boardPointEnd, capturedTiles);
-	}
-	this.applyZoneAbilityToTile(boardPointEnd);
-	this.applyBoardScanAbilities();
 
-	this.applyWhenLandsTriggers(tile, tileInfo, boardPointEnd, capturedTiles);
+	/* Follow Order of Abilities and Triggers in Trifle documentation */
+	
+	this.processAbilities(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles);
 
 	return {
 		movedTile: tile,
@@ -1142,6 +1133,49 @@ TrifleBoard.prototype.moveTile = function(player, notationPointStart, notationPo
 		endPoint: boardPointEnd,
 		capturedTiles: capturedTiles
 	}
+};
+
+/**
+ * Process abilities on the board after a tile is moved or placed/deployed.
+ * `boardPointStart` will probably be null for when a tile is placed.
+ */
+TrifleBoard.prototype.processAbilities = function(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles) {
+
+	var abilitiesToActivate = [];
+
+	/* 
+	- Get abilities that should be active/activated
+	- Activate/process them (if already active, skip)
+	- Save ongoing active abilities
+
+	Triggers to look at:
+	- When Tile Moves From Within Zone
+	- When Tile Captures
+	- When Tile Lands In Zone
+	- While Tile is In Line of Sight
+	- While Inside of Temple
+	- While Outside of Temple
+	... Oh, yeah, it's all of them.. but in that order!
+
+	Actually no, abilities will fire in order based on ability type.
+	*/
+	
+	abilitiesToActivate = abilitiesToActivate.concat(this.getWhenLandsAbilitiesTriggered(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles));
+
+
+	this.applyWhenLandsTriggers(tile, tileInfo, boardPointEnd, capturedTiles);
+
+	if (capturedTiles.length > 0) {
+		this.applyWhenCapturingTrigger(tile, tileInfo, boardPointEnd, capturedTiles);
+	}
+
+	/* Old abilities... */
+	this.applyZoneAbilityToTile(boardPointEnd);
+	this.applyBoardScanAbilities();
+};
+
+TrifleBoard.prototype.getWhenLandsAbilitiesTriggered = function(movingTile, movingTileInfo, boardPointStart, boardPointEnd, capturedTiles) {
+	//
 };
 
 TrifleBoard.prototype.applyWhenLandsTriggers = function(tile, tileInfo, boardPointEnd, capturedTiles) {
@@ -1674,26 +1708,34 @@ TrifleBoard.prototype.tileMovementIsImmobilizedByTileZoneAbility = function(zone
 		zoneAbility.type === ZoneAbility.immobilizesTiles
 		&& this.pointTileZoneContainsPoint(tilePoint, movementStartPoint)
 		&& this.abilityIsActive(tilePoint, tilePoint.tile, TrifleTiles[tilePoint.tile.code], zoneAbility)
-		) {
-		if (zoneAbility.targetTileCodes) {
-			if (zoneAbility.targetTileCodes.includes(tileBeingMoved.code)) {
-				isImmobilized = true;
-			}
-		} else if (zoneAbility.targetTeams) {
+	) {
+		if (zoneAbility.targetTeams) {
 			if (
 				(zoneAbility.targetTeams.includes(TileTeam.enemy)
 					&& tilePoint.tile.ownerName !== tileBeingMoved.ownerName)
-				|| 
+				||
 				(zoneAbility.targetTeams.includes(TileTeam.friendly)
 					&& tilePoint.tile.ownerName === tileBeingMoved.ownerName)
 			) {
-				isImmobilized = true;
+				if (zoneAbility.targetTileCodes) {
+					if (zoneAbility.targetTileCodes.includes(tileBeingMoved.code)) {
+						isImmobilized = true;
+					}
+				} else if (zoneAbility.targetTileTypes) {
+					if (arrayIncludesOneOf(tileBeingMovedInfo.types, zoneAbility.targetTileTypes)) {
+						if (zoneAbility.targetTileIdentifiers) {
+							if (tileBeingMovedInfo.identifiers 
+									&& arrayIncludesOneOf(tileBeingMovedInfo.identifiers, zoneAbility.targetTileIdentifiers)) {
+								isImmobilized = true;
+							}
+						} else {
+							isImmobilized = true;
+						}
+					}
+				}
 			}
-		} else {
-			isImmobilized = true;
 		}
 	}
-
 
 	return isImmobilized;
 };
@@ -1891,7 +1933,7 @@ TrifleBoard.prototype.tileZonedOutOfSpace = function(tile, movementInfo, targetP
 	return isZonedOut;
 };
 
-TrifleBoard.prototype.tileZonedOutOfSpaceByZoneAbility = function(tileCode, ownerName, targetPoint) {
+TrifleBoard.prototype.tileZonedOutOfSpaceByZoneAbility = function(tileCode, ownerName, targetPoint, originPoint) {
 	var isZonedOut = false;
 
 	var tileOwnerCode = getPlayerCodeFromName(ownerName);
@@ -1910,20 +1952,20 @@ TrifleBoard.prototype.tileZonedOutOfSpaceByZoneAbility = function(tileCode, owne
 				if (
 					(
 						zoneAbilityInfo.type === ZoneAbility.restrictMovementWithinZone
-					) && (
+					) && (	// Zone ability target team matches
 						(zoneAbilityInfo.targetTeams.includes(TileTeam.friendly)
 							&& tileOwnerCode === checkBoardPoint.tile.ownerCode)
 						|| (zoneAbilityInfo.targetTeams.includes(TileTeam.enemy)
 							&& tileOwnerCode !== checkBoardPoint.tile.ownerCode)
 					) && (
-						(
+						(	// Zone ability target tile types matches, if present
 							zoneAbilityInfo.targetTileTypes 
 							&& (
 								arrayIncludesOneOf(zoneAbilityInfo.targetTileTypes, tileInfo.types)
 								|| zoneAbilityInfo.targetTileTypes.includes(TileCategory.allTileTypes)
 							)
 						)
-						|| (
+						|| (	// OR zone ability target tiles matches, if present
 							zoneAbilityInfo.targetTileCodes 
 							&& zoneAbilityInfo.targetTileCodes.includes(tileCode)
 						)
@@ -1931,6 +1973,11 @@ TrifleBoard.prototype.tileZonedOutOfSpaceByZoneAbility = function(tileCode, owne
 						self.pointTileZoneContainsPoint(checkBoardPoint, targetPoint)
 					) && (
 						abilityIsActive
+					) && (	// If deploy (no originPoint) or tile origin was inside zone and movement is unable to escape zone, allow it to move farther away from center
+						!originPoint
+						|| (
+							true
+						)
 					)
 				) {
 					isZonedOut = true;
@@ -2023,7 +2070,7 @@ TrifleBoard.prototype.setDeployPointsPossibleMoves = function(player, tileCode) 
 			this.forEachBoardPoint(function(boardPoint) {
 				if (!boardPoint.hasTile()
 						&& !boardPoint.isType(GATE)
-						&& !self.tileZonedOutOfSpaceByZoneAbility(tileCode, player, boardPoint)) {
+						&& !self.tileZonedOutOfSpaceByZoneAbility(tileCode, player, boardPoint, null)) {
 					boardPoint.addType(POSSIBLE_MOVE);
 				}
 			});
@@ -2095,6 +2142,7 @@ TrifleBoard.prototype.setPointAsPossibleMovement = function(targetPoint, tileBei
 
 	/* Enforce BoardPresenceAbility.drawOpponentTilesInLineOfSight */
 	var movementOk = this.movementPassesLineOfSightTest(targetPoint, tileBeingMoved, originPoint);
+	/* var movementOk = this.movementAllowedByAffectingAbilities(targetPoint, tileBeingMoved, originPoint, currentMovementPath); */
 
 	// Future... movementOk = movementOk && this.movementcheckmethod(...)
 
@@ -2109,28 +2157,49 @@ TrifleBoard.prototype.setPointAsPossibleMovement = function(targetPoint, tileBei
 	return movementOk;
 };
 
+/* TrifleBoard.prototype.movementAllowedByAffectingAbilities = function(targetPoint, tileBeingMoved, originPoint, currentMovementPath) {
+	var movementOk = true;
+
+	// Check for abilities that hinder the movement and verify movement to targetPoint is allowed
+
+	// LureTiles
+	movementOk = movementOk && this.lureTilesCheck(targetPoint, tileBeingMoved, originPoint, currentMovementPath);
+
+	return movementOk;
+}; */
+
+/* TrifleBoard.prototype.lureTilesCheck = function(targetPoint, tileBeingMoved, originPoint, currentMovementPath) {
+	// Is a LureTiles ability active on the board?
+}; */
+
 TrifleBoard.prototype.movementPassesLineOfSightTest = function(targetPoint, tileBeingMoved, originPoint) {
 	var pointsToMoveTowards = [];
 	var movementPassesLineOfSightTest = true;
 	var lineOfSightPoints = this.getPointsForTilesInLineOfSight(originPoint);
 	var self = this;
 	lineOfSightPoints.forEach(function(lineOfSightPoint) {
-		if (lineOfSightPoint.hasTile() && lineOfSightPoint.tile.ownerName !== tileBeingMoved.ownerName) {
+		if (lineOfSightPoint.hasTile()) {
 			var lineOfSightTileInfo = TrifleTiles[lineOfSightPoint.tile.code];
-			if (TrifleTileInfo.tileHasDrawOpponentTilesInLineOfSightAbility(lineOfSightTileInfo)) {
-				pointsToMoveTowards.push(lineOfSightPoint);
-				/* Movement OK if:
-					- Target Point is in line of sight of affecting tile
-					- Tile will be closer to affecting tile than it was where it started
-					- Tile be closer to where it started than the affecting tile was (did not move past the affecting tile) */
-				movementPassesLineOfSightTest = self.targetPointIsInLineOfSightOfThesePoints(targetPoint, [lineOfSightPoint])
-					&& self.targetPointIsCloserToThesePointsThanOriginPointIs(targetPoint, [lineOfSightPoint], originPoint)
-					&& self.getDistanceBetweenPoints(originPoint, targetPoint) < self.getDistanceBetweenPoints(originPoint, lineOfSightPoint);
-				if (!movementPassesLineOfSightTest) {
-					return false;
-				}
-			}
+			// todo... ability active? etc...
+			/* While Tiles in Line of Sight trigger */
 		}
+
+		// if (lineOfSightPoint.hasTile() && lineOfSightPoint.tile.ownerName !== tileBeingMoved.ownerName) {
+		// 	var lineOfSightTileInfo = TrifleTiles[lineOfSightPoint.tile.code];
+		// 	if (TrifleTileInfo.tileHasDrawTilesInLineOfSightAbility(lineOfSightTileInfo)) {
+		// 		pointsToMoveTowards.push(lineOfSightPoint);
+		// 		/* Movement OK if:
+		// 			- Target Point is in line of sight of affecting tile
+		// 			- Tile will be closer to affecting tile than it was where it started
+		// 			- Tile be closer to where it started than the affecting tile was (did not move past the affecting tile) */
+		// 		movementPassesLineOfSightTest = self.targetPointIsInLineOfSightOfThesePoints(targetPoint, [lineOfSightPoint])
+		// 			&& self.targetPointIsCloserToThesePointsThanOriginPointIs(targetPoint, [lineOfSightPoint], originPoint)
+		// 			&& self.getDistanceBetweenPoints(originPoint, targetPoint) < self.getDistanceBetweenPoints(originPoint, lineOfSightPoint);
+		// 		if (!movementPassesLineOfSightTest) {
+		// 			return false;
+		// 		}
+		// 	}
+		// }
 	});
 
 	return movementPassesLineOfSightTest;

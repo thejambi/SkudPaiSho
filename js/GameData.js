@@ -25,6 +25,7 @@ var specialFlowerLimitedRule = false; // NOT UI READY, DO NOT SET TO TRUE. Canno
 
 var skudTilesKey = "standard";
 var paiShoBoardKey = "default";
+var customBoardUrl = null;
 
 var debugOn = false;
 var gameDevOn = false;
@@ -144,6 +145,15 @@ function copyArray(arr) {
     }
 	}
 	return copyArr;
+}
+
+function copyObject(mainObject) {
+  var objectCopy = {}; // objectCopy will store a copy of the mainObject
+  var key;
+  for (key in mainObject) {
+    objectCopy[key] = mainObject[key]; // copies each property to the objectCopy object
+  }
+  return objectCopy;
 }
 
 // Array shuffle
