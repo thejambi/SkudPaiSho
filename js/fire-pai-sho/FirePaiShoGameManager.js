@@ -256,6 +256,11 @@ FirePaiShoGameManager.prototype.revealPossiblePlacementPoints = function(tile) {
 	this.actuate();
 };
 
+FirePaiShoGameManager.prototype.revealFirstMovePlacement = function(tile) {
+	this.board.revealFirstMovePlacement();
+	this.actuate();
+};
+
 FirePaiShoGameManager.prototype.revealBoatBonusPoints = function(boardPoint) {
 	this.board.revealBoatBonusPoints(boardPoint);
 	this.actuate();

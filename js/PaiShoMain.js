@@ -434,6 +434,7 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 	  if (QueryString.ig && QueryString.h) {	/* `ig` for invite game id, `h` for host username */
 		  QueryString.joinPrivateGame = QueryString.ig;
 		  QueryString.hostUserName = QueryString.h;
+		  QueryString.rankedGameInd = QueryString.r;
 	  }
 	  if (QueryString.joinPrivateGame) {
 		  jumpToGame(QueryString.joinPrivateGame);
@@ -505,7 +506,7 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 
 	/* Ask to join invite link game if present */
 	if (QueryString.joinPrivateGame) {
-		askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
+		askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName, QueryString.rankedGameInd);
 	}
 };
   
@@ -1211,7 +1212,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
 			}
 
 			var newPlayerRatings = {};
-			if (currentGameData.isRankedGame) {
+			if (currentGameData.isRankedGame && currentGameData.hostUsername !== currentGameData.guestUsername) {
 				newPlayerRatings = Elo.getNewPlayerRatings(currentGameData.hostRating, currentGameData.guestRating, hostResultCode);
 			}
 
@@ -1382,22 +1383,30 @@ var createPrivateGameCallback = function createPrivateGameCallback(newGameId) {
 };
 
 function createInviteLinkUrl(newGameId) {
-	linkUrl = LZString.compressToEncodedURIComponent("ig=" + newGameId + "&h=" + getUsername());
+	var urlParamStr = "ig=" + newGameId + "&h=" + getUsername();
+	if (!getBooleanPreference(createNonRankedGamePreferredKey)) {
+		urlParamStr += "&r=y";
+	}
+	linkUrl = LZString.compressToEncodedURIComponent(urlParamStr);
 	linkUrl = sandboxUrl + "?" + linkUrl;
 	return linkUrl;
 }
 
-function askToJoinGame(gameId, hostUsername) {
+function askToJoinGame(gameId, hostUsername, rankedGameInd) {
 	/* Set up QueryString as if joining through game invite link to trigger asking */
 	QueryString.joinPrivateGame = gameId.toString();
 	QueryString.hostUserName = hostUsername;
 	QueryString.allowJoiningOwnGame = true;
+	QueryString.rankedGameInd = rankedGameInd;
 	jumpToGame(gameId);
 }
 
-function askToJoinPrivateGame(privateGameId, hostUserName) {
+function askToJoinPrivateGame(privateGameId, hostUserName, rankedGameInd) {
 	if (userIsLoggedIn()) {
 		var message = "Do you want to join this game hosted by " + hostUserName + "?";
+		if (rankedGameInd === 'y' || rankedGameInd === 'Y') {
+			message += "<br /><br /><strong> This is a ranked game.</strong>";
+		}
 		message += "<br /><br />";
 		message += "<div class='clickableText' onclick='closeModal(); yesJoinPrivateGame(" + privateGameId + ");'>Yes - join game</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
@@ -1973,7 +1982,8 @@ var GameType = {
 		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
 		gameOptions: [
 			ADEVAR_LITE
-		]
+		],
+		noRankedGames: true
 	},
 	CapturePaiSho: {
 		id: 3,
@@ -1991,7 +2001,8 @@ var GameType = {
 			RELEASE_CAPTIVE_TILES,
 			BONUS_MOVEMENT_5,
 			BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES
-		]
+		],
+		noRankedGames: true
 	},
 	SolitairePaiSho: {
 		id: 4,
@@ -2033,7 +2044,8 @@ var GameType = {
 			'Korron',
 			'vescucci',
 			'geebung02'
-		]
+		],
+		noRankedGames: true
 	},
 	Playground: {
 		id: 7,
@@ -2044,7 +2056,8 @@ var GameType = {
 			VAGABOND_ROTATE,
 			ADEVAR_ROTATE,
 			SPECTATORS_CAN_PLAY
-		]
+		],
+		noRankedGames: true
 	},
 	Blooms: {
 		id: 9,
@@ -2106,7 +2119,13 @@ var GameType = {
 		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/",
 		gameOptions: [
 			NO_HARMONY_VISUAL_AIDS
-		]
+		],
+		noRankedGames: true
+		// ,
+		// usersWithAccess: [
+		// 	'SkudPaiSho',
+		// 	'adder'
+		// ]
 	},
 };
 
@@ -2261,7 +2280,7 @@ function getGameControllerForGameType(gameTypeId) {
 
 		  /* Ask to join invite link game if present */
 		  if (QueryString.joinPrivateGame && gameId && gameId.toString() === QueryString.joinPrivateGame) {
-			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName);
+			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName, QueryString.rankedGameInd);
 			  /* Once we ask after jumping into a game, we won't need to ask again */
 			  QueryString.joinPrivateGame = null;
 		  }
@@ -2569,7 +2588,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 			  closeModal();
 			  showModal("Cannot Join Game", "You are already playing a game against that user, so you will have to finish that game first.");
 		  } else {
-			askToJoinGame(gameSeek.gameId, gameSeek.hostUsername);
+			askToJoinGame(gameSeek.gameId, gameSeek.hostUsername, gameSeek.rankedGame);
 		  }
 	  } else {
 		  // No results, means ok to join game
@@ -2661,7 +2680,9 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 				hostId: row[3],
 				hostUsername: row[4],
 				hostOnline: parseInt(row[5]),
-				gameOptions: parseGameOptions(row[6])
+				gameOptions: parseGameOptions(row[6]),
+				hostRating: parseInt(row[7]),
+				rankedGame: row[8]
 			};
 			gameSeekList.push(gameSeek);
 		}
@@ -2685,7 +2706,11 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 					gameTypeHeading = gameSeek.gameTypeDesc;
 					message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
 				}
-				message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername + "</div>";
+				message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername;
+				if (gameSeek.rankedGame) {
+					message += " (" + gameSeek.hostRating + ")"
+				}
+				message += "</div>";
 				for (var i = 0; i < gameSeek.gameOptions.length; i++) {
 					message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></div>"
 				}
@@ -2753,11 +2778,19 @@ var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
   
   /* Creating a public game */
   var yesCreateGame = function yesCreateGame(gameTypeId, rankedGame) {
-	  onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), '', getLoginToken(), createGameCallback, rankedGame);
+	  var rankedInd = 'n';
+	  if (rankedGame && !getGameTypeEntryFromId(gameTypeId).noRankedGames) {
+		rankedInd = 'y';
+	  }
+	  onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), '', getLoginToken(), createGameCallback, rankedInd);
   };
   
   var yesCreatePrivateGame = function yesCreatePrivateGame(gameTypeId, rankedGame) {
-	  onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), 'Y', getLoginToken(), createPrivateGameCallback, rankedGame);
+	var rankedInd = 'n';
+	if (rankedGame && !getGameTypeEntryFromId(gameTypeId).noRankedGames) {
+	  rankedInd = 'y';
+	}
+	  onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), 'Y', getLoginToken(), createPrivateGameCallback, rankedInd);
   };
 
 function replaceWithLoadingText(element) {
@@ -2777,12 +2810,14 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 			yesCreateGame(gameTypeId);
 		} else {
 			var message = "<div>Do you want to create a game for others to join?</div>";
-			var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
-			message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - coming soon - publicly available game)</label></div>";
-			if (!gameController.isInviteOnly) {
-				message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreateGame(" + gameTypeId + ", getCheckedValue(\"createRankedGameCheckbox\")); closeModal();'>Yes - create game</div>";
+			if (!getGameTypeEntryFromId(gameTypeId).noRankedGames) {
+				var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
+				message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - coming soon - publicly viewable game)</label></div>";
 			}
-			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", getCheckedValue(\"createRankedGameCheckbox\")); closeModal();'>Yes - create a private game with a friend</div>";
+			if (!gameController.isInviteOnly) {
+				message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create game</div>";
+			}
+			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create a private game with a friend</div>";
 			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
 			showModal("Create game?", message);
 		}
@@ -2791,9 +2826,11 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 		var message = "";
 		if (userIsLoggedIn()) {
 			message = "<div>You already have a public game waiting for an opponent. Do you want to create a private game for others to join?</div>";
-			var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
-			message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> (Coming soon) Ranked game (Player rankings will be affected and - coming soon - publicly available game)</label></div>";
-			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", getCheckedValue(\"createRankedGameCheckbox\")); closeModal();'>Yes - create a private game with a friend</div>";
+			if (!getGameTypeEntryFromId(gameTypeId).noRankedGames) {
+				var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
+				message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> (Coming soon) Ranked game (Player rankings will be affected and - coming soon - publicly available game)</label></div>";
+			}
+			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create a private game with a friend</div>";
 			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
 			showModal("Create game?", message);
 		} else {

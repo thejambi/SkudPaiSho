@@ -332,7 +332,12 @@ FirePaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.plantedFlowerType = tileCode;
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
+		if (this.gameNotation.moves.length === 0)
+		{
+			this.theGame.revealFirstMovePlacement();
+		} else{
 		this.theGame.revealPossiblePlacementPoints(tile);
+		}
 
 	} else if (this.notationBuilder.status === READY_FOR_BONUS) {
 
