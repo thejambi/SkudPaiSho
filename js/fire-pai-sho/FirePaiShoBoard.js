@@ -1,4 +1,4 @@
-/* Skud Pai Sho Board */
+/* Fire Pai Sho Board */
 
 function FirePaiShoBoard() {
 	this.size = new RowAndColumn(17, 17);
@@ -411,7 +411,7 @@ FirePaiShoBoard.prototype.placeTile = function(tile, notationPoint, tileManager,
 	}
 };
 
-SkudPaiShoBoard.prototype.flagAllBoostedTiles = function() {
+FirePaiShoBoard.prototype.flagAllBoostedTiles = function() {
 	// Tile boost updating
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
