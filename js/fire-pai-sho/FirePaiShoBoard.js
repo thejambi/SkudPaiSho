@@ -949,13 +949,6 @@ FirePaiShoBoard.prototype.moveTile = function(player, notationPointStart, notati
 		return false;
 	}
 
-	//Restore tile of moved away from knotweed
-	if (tile.boosted){
-		debug("Tile is boosted and has moved. Checking to see if if it needs restoration.")
-		this.restoreTileIfNeeded(boardPointEnd);
-	}
-
-	
 	/////////////////Update boosting
 	// Tile boost updating
 	for (var row = 0; row < this.cells.length; row++) {
