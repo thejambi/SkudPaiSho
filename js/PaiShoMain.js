@@ -1599,12 +1599,6 @@ function getGatePointMessage() {
 	return msg;
 }
 
-function getFireGatePointMessage() {
-	var msg = "<h4>Gate</h4>";
-	msg += '<p>This point is a Gate. Tiles may not be played or moved here, and harmonies cannot pass though a gate.</p>';
-	return msg;
-}
-
 function userHasGameAccess() {
 	var gameTypeId = gameController.getGameTypeId && gameController.getGameTypeId();
 	return gameTypeId 
