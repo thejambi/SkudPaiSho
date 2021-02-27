@@ -551,6 +551,7 @@ AdevarGameManager.prototype.hasBlackOrchidWin = function(player) {
 
 	/* Objective: Have more tiles in each plot (except opponent's starting Neutral Plot) than opponent */
 	return this.board.playerHasMoreBasicTilesInEachNonOwnedPlot(player);
+	// return this.board.playerHasMoreBasicTilesInEachNonOwnedNonRedPlot(player);
 };
 
 AdevarGameManager.prototype.playerHasWhiteLotusWin = function(player) {

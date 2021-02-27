@@ -147,23 +147,31 @@ AdevarTile.prototype.getMoveDistance = function() {
 
 AdevarTile.prototype.canCapture = function(targetTile) {
 	if (this.ownerName !== targetTile.ownerName) {
+		// Basic tiles capture
 		if (this.type === AdevarTileType.basic
 				&& targetTile.type === AdevarTileType.basic
 				&& targetTile.code !== this.code) {
 			return true;
-		} else if (this.code === AdevarTileCode.foxglove
-				&& targetTile.type === AdevarTileType.reflection) {
+		// Reflection captures SF
+		}else if (this.type === AdevarTileType.reflection
+				&& targetTile.type === AdevarTileType.secondFace){
 			return true;
-		} else if (this.type === AdevarTileType.reflection
-				&& targetTile.type === AdevarTileType.secondFace) {
+		// Foxglove captures Reflection	
+		}else if (this.code === AdevarTileCode.foxglove
+				&& targetTile.type === AdevarTileType.reflection){
 			return true;
-		} else if (this.type === AdevarTileType.secondFace
-				&& targetTile.type === AdevarTileType.vanguard) {
+		// SF captures Vanguard
+		}else if (this.type === AdevarTileType.secondFace
+				&& targetTile.type === AdevarTileType.vanguard){
 			return true;
-		} else if (this.type === AdevarTileType.secondFace
-				&& targetTile.type === AdevarTileType.hiddenTile
-				&& AdevarTile.hiddenTileMatchesSecondFace(targetTile, this)) {
+		// SF can't capture HT if there are Vanguard adjacent to the HT
+		}else if (this.type === AdevarTileType.secondFace
+			&& targetTile.type === AdevarTileType.hiddenTile){
 			return true;
+		// White Lotus SF captures White Lotus
+		}else if (this.code === AdevarTileCode.whiteLotusSF
+				&& targetTile.code === AdevarTileCode.whiteLotus){
+		return true;
 		}
 	}
 
