@@ -114,6 +114,8 @@ FirePaiShoController.prototype.getDefaultHelpMessageText = function() {
 FirePaiShoController.prototype.getAdditionalMessage = function() {
 	var msg = "";
 
+	msg += "<p>Host reserve tiles: " + this.theGame.tileManager.hostReserveTiles.length + "<br>Guest reserve tiles: " + this.theGame.tileManager.guestReserveTiles.length + "</p>";
+
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
 			if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
@@ -493,7 +495,6 @@ FirePaiShoController.prototype.pointClicked = function(htmlPoint) {
 				}
 			}
 		} else {
-			//DO NOTHING IF IT IS AN ILLEGAL MOVE
 			//this.theGame.hidePossibleMovePoints();
 			//this.notationBuilder.status = READY_FOR_BONUS;
 		}
@@ -513,9 +514,10 @@ FirePaiShoController.prototype.pointClicked = function(htmlPoint) {
 				finalizeMove(1);
 			}
 		} else {
-			//DO NOTHING IF IT IS AN ILLEGAL MOVE
-			//this.theGame.hidePossibleMovePoints();
-			//this.notationBuilder.status = READY_FOR_BONUS;
+			//IF IT AS IN ILLEGAL MOVE, LET THE BOAT CHOOSE ITS PLACEMENT AGAIN
+			this.theGame.hidePossibleMovePoints();
+			this.notationBuilder.status = WAITING_FOR_BONUS_ENDPOINT;
+			this.theGame.revealPossiblePlacementPoints(this.currentlyDrawnReserve);
 		}
 	}
 };
@@ -595,7 +597,7 @@ FirePaiShoController.prototype.getPointMessage = function(htmlPoint) {
 	} else if (boardPoint.isType(WHITE)) {
 		message.push(getWhitePointMessage());
 	} else if (boardPoint.isType(GATE)) {
-		message.push(getGatePointMessage());
+		message.push(getFireGatePointMessage());
 	}
 
 	return {
@@ -695,14 +697,14 @@ FirePaiShoController.prototype.getHelpMessageForTile = function(tile) {
 		} else if (tileCode === 'L') {
 			heading = "Special Flower: White Lotus";
 			message.push("Can move up to 2 spaces");
-			message.push("Forms Harmony with all Basic Flower Tiles of either player");
+			message.push("Forms Harmony with all non-Lotus Flower Tiles of either player");
 			if (!lotusNoCapture && !simplest) {
 				message.push("Can be captured by any Flower Tile");
 			}
 		} else if (tileCode === 'O') {
 			heading = "Special Flower: Orchid";
 			message.push("Can move up to 6 spaces");
-			message.push("Traps opponent's surrounding Blooming Flower Tiles so they cannot move");
+			message.push("Forms no natural harmonies of its own, but can form harmony using the special powers of other tiles.");
 			if (!simplest) {
 				message.push("Can capture Flower Tiles if you have a Blooming White Lotus");
 			}
@@ -797,7 +799,7 @@ FirePaiShoController.prototype.startAiGame = function(finalizeMove) {
 };
 
 FirePaiShoController.prototype.getAiList = function() {
-	return [new SkudAIv1()];
+	return [];
 };
 
 FirePaiShoController.prototype.getCurrentPlayer = function() {
