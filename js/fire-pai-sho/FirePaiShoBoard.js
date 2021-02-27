@@ -376,6 +376,23 @@ FirePaiShoBoard.prototype.placeTile = function(tile, notationPoint, tileManager,
 	}
 
 	// Things to do after a tile is placed
+	////////// Tile boost updating
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var bp = this.cells[row][col];
+			if (bp.hasTile()) {
+				bp.tile.boosted = false;
+			}
+		}
+	}
+	// Find Orchid tiles, then check surrounding opposite-player Basic Flower tiles and flag them
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var bp = this.cells[row][col];
+			this.boostTilesSurroundingPointIfNeeded(bp);
+		}
+	}
+	/////////////
 	var newHarmony = this.hasNewHarmony(tile.ownerName);
 	this.analyzeHarmonies();
 
@@ -391,6 +408,25 @@ FirePaiShoBoard.prototype.placeTile = function(tile, notationPoint, tileManager,
 			newHarmony: newHarmony,
 			movedTile: tile
 		};
+	}
+};
+
+SkudPaiShoBoard.prototype.flagAllBoostedTiles = function() {
+	// Tile boost updating
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var bp = this.cells[row][col];
+			if (bp.hasTile()) {
+				bp.tile.boosted = false;
+			}
+		}
+	}
+	// Find Orchid tiles, then check surrounding opposite-player Basic Flower tiles and flag them
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var bp = this.cells[row][col];
+			this.boostTilesSurroundingPointIfNeeded(bp);
+		}
 	}
 };
 
@@ -913,15 +949,24 @@ FirePaiShoBoard.prototype.moveTile = function(player, notationPointStart, notati
 		return false;
 	}
 
-	//Restore tile of moved away from knotweed
-	if (tile.boosted){
-		debug("Tile is boosted and has moved. Checking to see if if it needs restoration.")
-		this.restoreTileIfNeeded(boardPointEnd);
+	/////////////////Update boosting
+	// Tile boost updating
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var bp = this.cells[row][col];
+			if (bp.hasTile()) {
+				bp.tile.boosted = false;
+			}
+		}
 	}
-
 	
-	//Boost tile if needed
-	this.boostTileIfNeeded(boardPointEnd, tile);
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var bp = this.cells[row][col];
+			this.boostTilesSurroundingPointIfNeeded(bp);
+		}
+	}
+	/////////////////////////
 
 	// Check for harmonies
 	var newHarmony = this.hasNewHarmony(player);

@@ -1599,6 +1599,12 @@ function getGatePointMessage() {
 	return msg;
 }
 
+function getFireGatePointMessage() {
+	var msg = "<h4>Gate</h4>";
+	msg += '<p>This point is a Gate. Tiles may not be played or moved here, and harmonies cannot pass though a gate.</p>';
+	return msg;
+}
+
 function userHasGameAccess() {
 	var gameTypeId = gameController.getGameTypeId && gameController.getGameTypeId();
 	return gameTypeId 
@@ -2119,7 +2125,7 @@ var GameType = {
 	FirePaiSho: {
 		id: 15,
 		desc: "Fire Pai Sho (beta - local only)",
-		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/",
+		rulesUrl: "https://drive.google.com/file/d/1C3A5Mx0P8vrpKc-X5QbRHuLt27yoMqBj/view?usp=sharing",
 		gameOptions: [
 			NO_HARMONY_VISUAL_AIDS
 		],
