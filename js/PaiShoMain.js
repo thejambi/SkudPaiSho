@@ -2195,43 +2195,58 @@ function getGameControllerForGameType(gameTypeId) {
 	return controller;
 }
 
-  function setGameController(gameTypeId, keepGameOptions) {
-	  setGameLogText('');
-	  var successResult = true;
-	  
-	  hideConfirmMoveButton();
-	 
-	  // Previous game controller cleanup
-	  if (gameController) {
-		  gameController.cleanup();
-	  }
-  
-	  if (!keepGameOptions) {
-		  clearOptions();
-	  }
-  
-	  // Forget current game info
-	  forgetCurrentGameInfo();
-  
-	  gameController = getGameControllerForGameType(gameTypeId);
-	  if (!gameController) {
-		  gameController = getGameControllerForGameType(GameType.VagabondPaiSho.id);
-		  showModal("Cannot Load Game", "This game is unavailable. Try Vagabond Pai Sho instead :)<br /><br />To know why the selected game is unavailable, ask in The Garden Gate Discord. Perhaps you have selected a new game that is coming soon!");
-		  successResult = false;
-	  }
-	  if (gameController.completeSetup) {
-		  gameController.completeSetup();
-	  }
-  
-	  isInReplay = false;
-	  
-	  // New game stuff:
-	  currentGameData.gameTypeId = gameTypeId;
-	  defaultHelpMessageText = null;
-	  clearMessage();
-	  refreshMessage();
-	  return successResult;
-  }
+function showDefaultGameOpenedMessage(show) {
+	if (show) {
+		document.getElementById('defaultGameMessage').classList.remove('gone');
+	} else {
+		document.getElementById('defaultGameMessage').classList.add('gone');
+	}
+}
+
+function setGameController(gameTypeId, keepGameOptions) {
+	setGameLogText('');
+	var successResult = true;
+
+	hideConfirmMoveButton();
+
+	// Previous game controller cleanup
+	if (gameController) {
+		gameController.cleanup();
+	}
+
+	if (!keepGameOptions) {
+		clearOptions();
+	}
+
+	// Forget current game info
+	forgetCurrentGameInfo();
+
+	showDefaultGameOpenedMessage(false);
+
+	gameController = getGameControllerForGameType(gameTypeId);
+	if (!gameController) {
+		gameController = getGameControllerForGameType(GameType.VagabondPaiSho.id);
+		showModal("Cannot Load Game", "This game is unavailable. Try Vagabond Pai Sho instead :)<br /><br />To know why the selected game is unavailable, ask in The Garden Gate Discord. Perhaps you have selected a new game that is coming soon!");
+		successResult = false;
+	}
+	if (gameController.completeSetup) {
+		gameController.completeSetup();
+	}
+
+	var gameTitleElements = document.getElementsByClassName('game-title-text');
+	for (i = 0; i < gameTitleElements.length; i++) {
+		gameTitleElements[i].innerText = getGameTypeEntryFromId(gameTypeId).desc;
+	};
+
+	isInReplay = false;
+
+	// New game stuff:
+	currentGameData.gameTypeId = gameTypeId;
+	defaultHelpMessageText = null;
+	clearMessage();
+	refreshMessage();
+	return successResult;
+}
   
   var jumpToGameCallback = function jumpToGameCallback(results) {
 	  if (results) {
@@ -2987,7 +3002,7 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
   
   function closeGame() {
 	  if (gameDevOn) {
-		  setGameController(GameType.Meadow.id);
+		  setGameController(GameType.Trifle.id);
 		  return;
 	  }
 	  var defaultGameTypeIds = [
@@ -2996,6 +3011,7 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 		  GameType.Adevar.id
 	  ]
 	  setGameController(defaultGameTypeIds[randomIntFromInterval(0,defaultGameTypeIds.length-1)]);
+	  showDefaultGameOpenedMessage(true);
   }
   
   function getSidenavNewGameEntryForGameType(gameType) {
@@ -3368,27 +3384,28 @@ function buildDateFromTimestamp(timestampStr) {
 		  }, 3000);
   }
   
-  function continueTutorial() {
-	  var tutContent = document.getElementById('tutorialContent');
-  
-	  if (tutContent) {
-		  var div1 = document.createElement("div");
-		  div1.innerHTML = "<p>Welcome to <em>The Garden Gate</em>, a place to play a variety of Pai Sho games and more against other players online.</p>";
-		  div1.innerHTML += "<p>You can sign in (or sign up) by entering your username and verifying your email address.</p>";
-		  div1.innerHTML += "<p>Use options in the side menu (select the <strong class='stretchText'>&nbsp;&#8801&nbsp;</strong> at the top left) to create a new game, join games set up by other players, or to view any of your games that are in progress. You can have any number of online games in progress at once.</p>";
-		  div1.innerHTML += "<p>Also in the side menu you can find links to the rules for all of the games you can play here.</p>";
-		  if (!userIsLoggedIn()) {
-			  div1.innerHTML += "<p><span class='skipBonus' onclick='loginClicked();'>Sign in</span> now to get started.</p>";
-		  }
-		  // div1.classList.add('tutContentMessage');
-		  div1.classList.add('tutContentFadeIn');
-		  tutContent.appendChild(div1);
-  
-		  localStorage.setItem(welcomeTutorialDismissedKey, "true");
-	  }
-  
-	  tutorialInProgress = false;
-  }
+function continueTutorial() {
+	var tutContent = document.getElementById('tutorialContent');
+
+	if (tutContent) {
+		var div1 = document.createElement("div");
+		div1.innerHTML = "<p>Welcome to <em>The Garden Gate</em>, a place to play a variety of Pai Sho games and more against other players online.</p>";
+		div1.innerHTML += "<p>You can sign in (or sign up) by entering your username and verifying your email address.</p>";
+		div1.innerHTML += "<p>Use options in the <strong class='stretchText'>&nbsp;&#8801&nbsp;</strong>side menu to create a new game, join another player's game, or to view your games that are in progress. You can have any number of online games in progress at once.</p>";
+		div1.innerHTML += "<p>See the <i class='fa fa-plus-circle' aria-hidden='true'></i> New Game menu to try and learn more about any of the games you can play here.</p>";
+
+		if (!userIsLoggedIn()) {
+			div1.innerHTML += "<p><span class='skipBonus' onclick='loginClicked();'>Sign in</span> now to get started.</p>";
+		}
+		// div1.classList.add('tutContentMessage');
+		div1.classList.add('tutContentFadeIn');
+		tutContent.appendChild(div1);
+
+		localStorage.setItem(welcomeTutorialDismissedKey, "true");
+	}
+
+	tutorialInProgress = false;
+}
   
   function iOSShake() {
 	  // If undo move is allowed, ask user if they wanna
