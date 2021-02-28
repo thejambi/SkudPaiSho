@@ -369,6 +369,8 @@ TrifleBoard.prototype.placeTile = function(tile, notationPoint) {
 
 	var boardPoint = this.getPointFromNotationPoint(notationPoint);
 
+	this.processAbilities(tile, tileInfo, null, boardPoint, []);
+
 	if (boardPoint.hasTile() && boardPoint.tile.code === tile.code) {
 		this.applyZoneAbilityToTile(boardPoint);
 	}
@@ -1160,6 +1162,34 @@ TrifleBoard.prototype.processAbilities = function(tile, tileInfo, boardPointStar
 	Actually no, abilities will fire in order based on ability type.
 	*/
 	
+	var boardStateAbilityTriggerBrains = {};
+	boardStateAbilityTriggerBrains[AbilityTrigger.whileInsideTemple] = new WhileInsideTempleAbilityTriggerBrain(this);
+	boardStateAbilityTriggerBrains[AbilityTrigger.whileOutsideTemple] = new WhileOutsideTempleAbilityTriggerBrain(this);
+
+	
+
+	this.forEachBoardPointWithTile(function(pointWithTile) {
+		var tile = pointWithTile.tile;
+		var tileInfo = TrifleTiles[tile.code];
+		if (tileInfo.abilities) {
+			tileInfo.abilities.forEach(function(tileAbilityInfo) {
+				if (tileAbilityInfo.triggeringBoardStates && tileAbilityInfo.triggeringBoardStates.length) {
+					tileAbilityInfo.triggeringBoardStates.forEach(function(triggeringState) {
+						var brain = boardStateAbilityTriggerBrains[triggeringState];
+						if (brain && brain.isAbilityActive) {
+							if (brain.isAbilityActive(pointWithTile, tile, tileInfo)) {
+								abilitiesToActivate.push(new TrifleAbility(tileAbilityInfo, tile, tileInfo));
+							}
+						}
+					});
+				}
+			});
+		}
+	});
+
+	boardStateAbilityTriggerBrains.forEach(function(triggerBrain) {
+		abilitiesToActivate = abilitiesToActivate.concat(triggerBrain.getTriggeredAbilities());
+	});
 	abilitiesToActivate = abilitiesToActivate.concat(this.getWhenLandsAbilitiesTriggered(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles));
 
 
