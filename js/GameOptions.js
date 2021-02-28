@@ -49,6 +49,7 @@ var ADEVAR_GUEST_ROTATE = "AdevarBoardGuestRotation";
 
 /* Adevar */
 var ADEVAR_LITE = "LiteGame";
+var BLACK_ORCHID_BUFF = "TempObjective";
 
 /* Game Option Legacy Map - These were stored as full names in database before current setup, must support */
 var legacyGameOptionsMap = {};
@@ -81,6 +82,7 @@ legacyGameOptionsMap[VAGABOND_ROTATE] = "Vagabond Board Rotation";
 legacyGameOptionsMap[ADEVAR_ROTATE] = "Adevar Board Rotation";
 legacyGameOptionsMap[ADEVAR_GUEST_ROTATE] = "Adevar Board Guest Rotation";
 legacyGameOptionsMap[ADEVAR_LITE] = "Lite - Beginner Game";
+legacyGameOptionsMap[BLACK_ORCHID_BUFF] = "Test experimental Black Orchid change";
 
 /* Game Option Descriptions - Game Options must have nice names :) */
 var gameOptionDescriptions = copyObject(legacyGameOptionsMap);
