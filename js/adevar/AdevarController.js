@@ -107,7 +107,7 @@ AdevarController.prototype.getAdditionalMessage = function() {
 		}
 
 		if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
-			msg += "The Black Orchid is currently the least picked HT, and frankly could use some improvement. This changes the objective to require a greater than <em> or equal</em> number of tiles in each plot.";
+			msg += "The Black Orchid is currently the least picked HT, and frankly could use some improvement. This changes the objective to require a greater than <em> or equal</em> number of tiles in each plot excluding Open Plots players start in.";
 		}
 
 		msg += getGameOptionsMessageHtml(GameType.Adevar.gameOptions);
@@ -435,7 +435,7 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 			objective = "Capture at least 2 of each of your opponent’s Basic tile types, and have at least 1 of each of your Basic tile types be captured";
 			break;
 		case AdevarTileCode.whiteRose:
-			objective = "Call a Gate completely in your opponent's starting Neutral Plot";
+			objective = "Call a Gate completely in your opponent's starting Open Plot";
 			break;
 		case AdevarTileCode.whiteLotus:
 			objective = "Form a \"Harmony Ring\" similar to Skud Pai Sho using Basic tiles (Lilac - Zinnia - Foxglove order for Harmony Circle)";
@@ -444,7 +444,11 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 			objective = "Have at least one total Basic tile in each of the 8 Plots on the board";
 			break;
 		case AdevarTileCode.blackOrchid:
-			objective = "Have more Basic tiles in each plot, except for the starting North and South Neutral Plots, than your opponent";
+			if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
+				objective = "Have as many or more Basic tiles in each plot, except for the starting North and South Open Plots, than your opponent";
+			} else {
+				objective = "Have more Basic tiles in each plot, except for the starting North and South Open Plots, than your opponent";
+			}
 			break;
 		default:
 			objective = "Unknown";
@@ -490,7 +494,7 @@ AdevarController.prototype.getPointMessage = function(htmlPoint) {
 		} else if ([AdevarBoardPointType.EAST_WHITE_PLOT, AdevarBoardPointType.WEST_WHITE_PLOT].includes(plotType)) {
 			message.push("A player may have up to three Basic tiles in each White plot at a time");
 		} else {
-			message.push("Neutral plots have no Basic tile limit");
+			message.push("Open plots have no Basic tile limit");
 		}
 	});
 
