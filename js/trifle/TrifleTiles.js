@@ -146,7 +146,8 @@ var Ability = {
 	protectFromCapture: "protectFromCapture",
 	grantBonusMovement: "grantBonusMovement",
 	lureTiles: "lureTiles",
-	drawTilesAlongLineOfSight: "drawTilesAlongLineOfSight"
+	drawTilesAlongLineOfSight: "drawTilesAlongLineOfSight",
+	cancelZone: "cancelZone"
 };
 
 var AbilityType = {
@@ -368,7 +369,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		]
 	} */
 
-	TrifleTiles[TrifleTileCodes.SkyBison] = { /* Done */
+	TrifleTiles[TrifleTileCodes.SkyBison] = {
 		types: [TileType.animal],
 		identifiers: [TileIdentifier.air],
 		deployTypes: [ DeployType.temple ],
@@ -382,16 +383,24 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		territorialZone: {
 			size: 6,
 			abilities: [
-				{
-					type: ZoneAbility.canceledWhenInTemple
-				},
+				// {
+				// 	type: ZoneAbility.canceledWhenInTemple
+				// },
 				{
 					type: ZoneAbility.restrictMovementWithinZone,
 					targetTeams: [ TileTeam.enemy ],
 					targetTileCodes: [ TrifleTileCodes.SkyBison ]
 				}
 			]
-		}
+		},
+		abilities: [
+			{
+				// TODO - Test/implement
+				type: Ability.cancelZone,
+				triggeringBoardStates: [AbilityTrigger.whileInsideTemple],
+				targetTileTypes: [TileCategory.thisTile]
+			}
+		]
 	};
 
 	TrifleTiles[TrifleTileCodes.Chrysanthemum] = {
@@ -579,7 +588,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 			}, */
 			{
 				type: Ability.drawTilesAlongLineOfSight,
-				triggeringBoardState: [AbilityTrigger.whileTileInLineOfSight],
+				triggeringBoardStates: [AbilityTrigger.whileTileInLineOfSight],
 				activationConditions: [AbilityTrigger.whileOutsideTemple],
 				targetTeams: [TileTeam.enemy]
 			}
@@ -670,7 +679,7 @@ TrifleTileInfo.defineTrifleTiles = function() {
 		abilities: [
 			{
 				type: Ability.removeEffects,
-				triggeringBoardState: AbilityTrigger.whileTileInLineOfSight,
+				triggeringBoardStates: [AbilityTrigger.whileTileInLineOfSight],
 				targetEffectTypes: [AbilityType.protection],
 				targetTileTypes: [TileCategory.allTileTypes]
 			}

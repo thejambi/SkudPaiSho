@@ -1,4 +1,4 @@
-/* Game Options */
+/* Game Options - Scroll down for new game options setup */
 var OPTION_DOUBLE_TILES = "DoubleTiles";
 var OPTION_INSANE_TILES = "InsaneTiles";
 
@@ -49,7 +49,6 @@ var ADEVAR_GUEST_ROTATE = "AdevarBoardGuestRotation";
 
 /* Adevar */
 var ADEVAR_LITE = "LiteGame";
-var BLACK_ORCHID_BUFF = "TempObjective";
 
 /* Game Option Legacy Map - These were stored as full names in database before current setup, must support */
 var legacyGameOptionsMap = {};
@@ -82,7 +81,8 @@ legacyGameOptionsMap[VAGABOND_ROTATE] = "Vagabond Board Rotation";
 legacyGameOptionsMap[ADEVAR_ROTATE] = "Adevar Board Rotation";
 legacyGameOptionsMap[ADEVAR_GUEST_ROTATE] = "Adevar Board Guest Rotation";
 legacyGameOptionsMap[ADEVAR_LITE] = "Lite - Beginner Game";
-legacyGameOptionsMap[BLACK_ORCHID_BUFF] = "Test experimental Black Orchid change";
+
+/* New Game Options Setup */
 
 /* Game Option Descriptions - Game Options must have nice names :) */
 var gameOptionDescriptions = copyObject(legacyGameOptionsMap);
@@ -114,6 +114,10 @@ gameOptionDescriptions[NO_SETUP_PHASE] = "No Setup Phase";
 /* Meadow */
 var DYNAMIC_GROUP_LIMIT = "DynamicGroupLimit";
 gameOptionDescriptions[DYNAMIC_GROUP_LIMIT] = "Group limit based on board size";
+
+/* Adevar */
+var BLACK_ORCHID_BUFF = "BlackOrchidBuff";
+gameOptionDescriptions[BLACK_ORCHID_BUFF] = "Test experimental Black Orchid change";
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {

@@ -80,7 +80,7 @@ AdevarController.prototype.getDefaultHelpMessageText = function() {
 	}
 
 	var message = "<h4>Adevăr Pai Sho</h4> <p>Adevăr Pai Sho is a game of strategy, deception, and wit as players sneakily accomplish their hidden objective and take down their opponent's Hidden Tile. Be careful when achieving your objective, because trying to win could be the very thing that makes you lose! ";
-	message += "See the <a href='https://tinyurl.com/adevarrulebook' target='_blank'>Adevăr rules</a> for the full rules and more about the game.</p>";
+	message += "See the <a href='https://tinyurl.com/adevarrulebook' target='_blank'>Adevăr rules</a> and <a href='https://tinyurl.com/AdevarQuickGuideDoc' target='_blank'>Adevăr Quick Guide</a> for the full rules and more about the game.</p>";
 	message += "<p>Before the game, players each choose a Hidden Tile. The game is won when a player completes the objective given to them by their chosen Hidden Tile or captures their opponent’s Hidden Tile with their corresponding Second Face tile.</p>";
 	message += "<p>On a turn, players either move a tile on the board or call a new tile onto the board.</p>";
 	if (this.hoveredOverLily) {
