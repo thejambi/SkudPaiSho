@@ -106,6 +106,10 @@ AdevarController.prototype.getAdditionalMessage = function() {
 			msg += "<br /><strong>Adevăr Lite</strong> is a <em>training wheels</em> mode for beginners to learn the game - players play with their Hidden Tiles revealed and win by accomplishing their chosen Hidden Tile objective.<br />";
 		}
 
+		if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
+			msg += "The Black Orchid is currently the least picked HT, and frankly could use some improvement. This changes the objective to require a greater than <em> or equal</em> number of tiles in each plot.";
+		}
+
 		msg += getGameOptionsMessageHtml(GameType.Adevar.gameOptions);
 	}
 

@@ -385,10 +385,10 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 	this.board.countTilesInPlots();
 
 	if (hiddenTileCaptured) {
-		this.setWinByHiddenTileCaptureForPlayer(move.player);
-	} else {
-		this.checkWinForPlayer(move.player, hiddenTileCaptured);
-	}
+        this.setWinByHiddenTileCaptureForPlayer(move.player);
+    } else if (move.moveType !== AdevarMoveType.chooseHiddenTile) {
+        this.checkWinForPlayer(move.player, hiddenTileCaptured);
+    }
 
 	if (this.endGameWinners.length > 0) {
 		this.gameLogText += ". " + this.endGameWinners[0] + this.gameWinReason;
@@ -550,7 +550,12 @@ AdevarGameManager.prototype.hasBlackOrchidWin = function(player) {
 	// return this.board.playerHasGateInOpponentNeutralPlot(player);
 
 	/* Objective: Have more tiles in each plot (except opponent's starting Neutral Plot) than opponent */
-	return this.board.playerHasMoreBasicTilesInEachNonOwnedPlot(player);
+	if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
+		return this.board.playerHasEqualOrMoreBasicTilesInEachNonOwnedPlot(player);
+	}
+	else {
+		return this.board.playerHasMoreBasicTilesInEachNonOwnedPlot(player);
+	}
 	// return this.board.playerHasMoreBasicTilesInEachNonOwnedNonRedPlot(player);
 };
 

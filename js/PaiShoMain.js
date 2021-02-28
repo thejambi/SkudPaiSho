@@ -1981,7 +1981,8 @@ var GameType = {
 		desc: "Adevăr Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
 		gameOptions: [
-			ADEVAR_LITE
+			ADEVAR_LITE,
+			BLACK_ORCHID_BUFF
 		],
 		noRankedGames: true
 	},
