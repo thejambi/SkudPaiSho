@@ -648,3 +648,22 @@ OnlinePlayEngine.prototype.getCompletedGameStats = function(loginToken, callback
         }
     );
 };
+
+OnlinePlayEngine.prototype.getGameRankings = function(loginToken, callback) {
+    $.post("backend/getPlayerGameRatings.php",
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId
+        },
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            } else {
+                callFailed();
+            }
+        }
+    );
+};
+
