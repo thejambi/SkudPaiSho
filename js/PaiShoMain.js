@@ -3384,27 +3384,28 @@ function buildDateFromTimestamp(timestampStr) {
 		  }, 3000);
   }
   
-  function continueTutorial() {
-	  var tutContent = document.getElementById('tutorialContent');
-  
-	  if (tutContent) {
-		  var div1 = document.createElement("div");
-		  div1.innerHTML = "<p>Welcome to <em>The Garden Gate</em>, a place to play a variety of Pai Sho games and more against other players online.</p>";
-		  div1.innerHTML += "<p>You can sign in (or sign up) by entering your username and verifying your email address.</p>";
-		  div1.innerHTML += "<p>Use options in the side menu (select the <strong class='stretchText'>&nbsp;&#8801&nbsp;</strong> at the top left) to create a new game, join games set up by other players, or to view any of your games that are in progress. You can have any number of online games in progress at once.</p>";
-		  div1.innerHTML += "<p>Also in the side menu you can find links to the rules for all of the games you can play here.</p>";
-		  if (!userIsLoggedIn()) {
-			  div1.innerHTML += "<p><span class='skipBonus' onclick='loginClicked();'>Sign in</span> now to get started.</p>";
-		  }
-		  // div1.classList.add('tutContentMessage');
-		  div1.classList.add('tutContentFadeIn');
-		  tutContent.appendChild(div1);
-  
-		  localStorage.setItem(welcomeTutorialDismissedKey, "true");
-	  }
-  
-	  tutorialInProgress = false;
-  }
+function continueTutorial() {
+	var tutContent = document.getElementById('tutorialContent');
+
+	if (tutContent) {
+		var div1 = document.createElement("div");
+		div1.innerHTML = "<p>Welcome to <em>The Garden Gate</em>, a place to play a variety of Pai Sho games and more against other players online.</p>";
+		div1.innerHTML += "<p>You can sign in (or sign up) by entering your username and verifying your email address.</p>";
+		div1.innerHTML += "<p>Use options in the <strong class='stretchText'>&nbsp;&#8801&nbsp;</strong>side menu to create a new game, join another player's game, or to view your games that are in progress. You can have any number of online games in progress at once.</p>";
+		div1.innerHTML += "<p>See the <i class='fa fa-plus-circle' aria-hidden='true'></i> New Game menu to try and learn more about any of the games you can play here.</p>";
+
+		if (!userIsLoggedIn()) {
+			div1.innerHTML += "<p><span class='skipBonus' onclick='loginClicked();'>Sign in</span> now to get started.</p>";
+		}
+		// div1.classList.add('tutContentMessage');
+		div1.classList.add('tutContentFadeIn');
+		tutContent.appendChild(div1);
+
+		localStorage.setItem(welcomeTutorialDismissedKey, "true");
+	}
+
+	tutorialInProgress = false;
+}
   
   function iOSShake() {
 	  // If undo move is allowed, ask user if they wanna
