@@ -2195,43 +2195,58 @@ function getGameControllerForGameType(gameTypeId) {
 	return controller;
 }
 
-  function setGameController(gameTypeId, keepGameOptions) {
-	  setGameLogText('');
-	  var successResult = true;
-	  
-	  hideConfirmMoveButton();
-	 
-	  // Previous game controller cleanup
-	  if (gameController) {
-		  gameController.cleanup();
-	  }
-  
-	  if (!keepGameOptions) {
-		  clearOptions();
-	  }
-  
-	  // Forget current game info
-	  forgetCurrentGameInfo();
-  
-	  gameController = getGameControllerForGameType(gameTypeId);
-	  if (!gameController) {
-		  gameController = getGameControllerForGameType(GameType.VagabondPaiSho.id);
-		  showModal("Cannot Load Game", "This game is unavailable. Try Vagabond Pai Sho instead :)<br /><br />To know why the selected game is unavailable, ask in The Garden Gate Discord. Perhaps you have selected a new game that is coming soon!");
-		  successResult = false;
-	  }
-	  if (gameController.completeSetup) {
-		  gameController.completeSetup();
-	  }
-  
-	  isInReplay = false;
-	  
-	  // New game stuff:
-	  currentGameData.gameTypeId = gameTypeId;
-	  defaultHelpMessageText = null;
-	  clearMessage();
-	  refreshMessage();
-	  return successResult;
-  }
+function showDefaultGameOpenedMessage(show) {
+	if (show) {
+		document.getElementById('defaultGameMessage').classList.remove('gone');
+	} else {
+		document.getElementById('defaultGameMessage').classList.add('gone');
+	}
+}
+
+function setGameController(gameTypeId, keepGameOptions) {
+	setGameLogText('');
+	var successResult = true;
+
+	hideConfirmMoveButton();
+
+	// Previous game controller cleanup
+	if (gameController) {
+		gameController.cleanup();
+	}
+
+	if (!keepGameOptions) {
+		clearOptions();
+	}
+
+	// Forget current game info
+	forgetCurrentGameInfo();
+
+	showDefaultGameOpenedMessage(false);
+
+	gameController = getGameControllerForGameType(gameTypeId);
+	if (!gameController) {
+		gameController = getGameControllerForGameType(GameType.VagabondPaiSho.id);
+		showModal("Cannot Load Game", "This game is unavailable. Try Vagabond Pai Sho instead :)<br /><br />To know why the selected game is unavailable, ask in The Garden Gate Discord. Perhaps you have selected a new game that is coming soon!");
+		successResult = false;
+	}
+	if (gameController.completeSetup) {
+		gameController.completeSetup();
+	}
+
+	var gameTitleElements = document.getElementsByClassName('game-title-text');
+	for (i = 0; i < gameTitleElements.length; i++) {
+		gameTitleElements[i].innerText = getGameTypeEntryFromId(gameTypeId).desc;
+	};
+
+	isInReplay = false;
+
+	// New game stuff:
+	currentGameData.gameTypeId = gameTypeId;
+	defaultHelpMessageText = null;
+	clearMessage();
+	refreshMessage();
+	return successResult;
+}
   
   var jumpToGameCallback = function jumpToGameCallback(results) {
 	  if (results) {
@@ -2987,7 +3002,7 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
   
   function closeGame() {
 	  if (gameDevOn) {
-		  setGameController(GameType.Meadow.id);
+		  setGameController(GameType.Trifle.id);
 		  return;
 	  }
 	  var defaultGameTypeIds = [
@@ -2996,6 +3011,7 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 		  GameType.Adevar.id
 	  ]
 	  setGameController(defaultGameTypeIds[randomIntFromInterval(0,defaultGameTypeIds.length-1)]);
+	  showDefaultGameOpenedMessage(true);
   }
   
   function getSidenavNewGameEntryForGameType(gameType) {
