@@ -114,6 +114,8 @@ FirePaiShoController.prototype.getDefaultHelpMessageText = function() {
 FirePaiShoController.prototype.getAdditionalMessage = function() {
 	var msg = "";
 
+	msg += "<p>Host reserve tiles: " + this.theGame.tileManager.hostReserveTiles.length + "<br>Guest reserve tiles: " + this.theGame.tileManager.guestReserveTiles.length + "</p>";
+
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
 			if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
@@ -135,45 +137,51 @@ FirePaiShoController.prototype.getAdditionalMessage = function() {
 
 FirePaiShoController.getTileNameFromCode = function(code) {
 	if (code === "W3") {
-	  return "White 3 Jasmine";
+		return "White 3 Jasmine";
 	}
 	else if (code === "W4") {
-	  return "White 4 Lily";
+		return "White 4 Lily";
 	}
 	else if (code === "W5") {
-	  return "White 5 White Jade";
+		return "White 5 White Jade";
 	}
 	else if (code === "R3") {
-	  return "Red 3 Rose";
+		return "Red 3 Rose";
 	}
 	else if (code === "R4") {
-	  return "Red 4 Chrysanthemum";
+		return "Red 4 Chrysanthemum";
 	}
 	else if (code === "R5") {
-	  return "Red 5 Rhododendron";
+		return "Red 5 Rhododendron";
 	}
 	else if (code === "R") {
-	  return "Rock";
+		return "Rock";
 	}
 	else if (code === "B") {
-	  return "Boat";
+		return "Boat";
 	}
 	else if (code === "K") {
-	  return "Knotweed";
+		return "Knotweed";
 	}
 	else if (code === "W") {
-	  return "Wheel";
+		return "Wheel";
 	}
 	else if (code === "O") {
-	  return "Orchid";
+		return "Orchid";
 	}
 	else if (code === "L") {
-	  return "White Lotus";
+		return "White Lotus";
 	}
 	else {
-	  return "unkown tile code";
+		return "unkown tile code";
 	}
-  }
+};
+
+FirePaiShoController.getFireGatePointMessage = function() {
+	var msg = "<h4>Gate</h4>";
+	msg += '<p>This point is a Gate. Tiles may not be played or moved here, and harmonies cannot pass though a gate.</p>';
+	return msg;
+}
 
 FirePaiShoController.prototype.getExtraHarmonyBonusHelpText = function() {
 
@@ -493,7 +501,6 @@ FirePaiShoController.prototype.pointClicked = function(htmlPoint) {
 				}
 			}
 		} else {
-			//DO NOTHING IF IT IS AN ILLEGAL MOVE
 			//this.theGame.hidePossibleMovePoints();
 			//this.notationBuilder.status = READY_FOR_BONUS;
 		}
@@ -513,9 +520,10 @@ FirePaiShoController.prototype.pointClicked = function(htmlPoint) {
 				finalizeMove(1);
 			}
 		} else {
-			//DO NOTHING IF IT IS AN ILLEGAL MOVE
-			//this.theGame.hidePossibleMovePoints();
-			//this.notationBuilder.status = READY_FOR_BONUS;
+			//IF IT AS IN ILLEGAL MOVE, LET THE BOAT CHOOSE ITS PLACEMENT AGAIN
+			this.theGame.hidePossibleMovePoints();
+			this.notationBuilder.status = WAITING_FOR_BONUS_ENDPOINT;
+			this.theGame.revealPossiblePlacementPoints(this.currentlyDrawnReserve);
 		}
 	}
 };
@@ -595,7 +603,7 @@ FirePaiShoController.prototype.getPointMessage = function(htmlPoint) {
 	} else if (boardPoint.isType(WHITE)) {
 		message.push(getWhitePointMessage());
 	} else if (boardPoint.isType(GATE)) {
-		message.push(getGatePointMessage());
+		message.push(FirePaiShoController.getFireGatePointMessage());
 	}
 
 	return {
@@ -695,14 +703,14 @@ FirePaiShoController.prototype.getHelpMessageForTile = function(tile) {
 		} else if (tileCode === 'L') {
 			heading = "Special Flower: White Lotus";
 			message.push("Can move up to 2 spaces");
-			message.push("Forms Harmony with all Basic Flower Tiles of either player");
+			message.push("Forms Harmony with all non-Lotus Flower Tiles of either player");
 			if (!lotusNoCapture && !simplest) {
 				message.push("Can be captured by any Flower Tile");
 			}
 		} else if (tileCode === 'O') {
 			heading = "Special Flower: Orchid";
 			message.push("Can move up to 6 spaces");
-			message.push("Traps opponent's surrounding Blooming Flower Tiles so they cannot move");
+			message.push("Forms no natural harmonies of its own, but can form harmony using the special powers of other tiles.");
 			if (!simplest) {
 				message.push("Can capture Flower Tiles if you have a Blooming White Lotus");
 			}
@@ -797,7 +805,7 @@ FirePaiShoController.prototype.startAiGame = function(finalizeMove) {
 };
 
 FirePaiShoController.prototype.getAiList = function() {
-	return [new SkudAIv1()];
+	return [];
 };
 
 FirePaiShoController.prototype.getCurrentPlayer = function() {

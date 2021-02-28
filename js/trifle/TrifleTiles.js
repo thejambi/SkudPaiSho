@@ -93,9 +93,9 @@ var MovementType = {
 };
 
 var MovementRestriction = {
-	restrictedByOpponentTileZones: "restrictedByOpponentTileZones",
+	// restrictedByOpponentTileZones: "restrictedByOpponentTileZones",
 	// immobilizedByAdjacentOpponentTile: "immobilizedByAdjacentOpponentTile", // unused
-	immobilizedByOpponentTileZones: "immobilizedByOpponentTileZones",
+	// immobilizedByOpponentTileZones: "immobilizedByOpponentTileZones",
 	mustPreserveDirection: "mustPreserveDirection"
 };
 

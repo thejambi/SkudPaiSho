@@ -2012,7 +2012,8 @@ var GameType = {
 		gameOptions: [
 			OPTION_DOUBLE_TILES,
 			OPTION_INSANE_TILES
-		]
+		],
+		noRankedGames: true
 	},
 	CoopSolitaire: {
 		id: 6,
@@ -2022,7 +2023,8 @@ var GameType = {
 			LESS_TILES,
 			OPTION_DOUBLE_TILES,
 			OPTION_INSANE_TILES
-		]
+		],
+		noRankedGames: true
 	},
 	OvergrowthPaiSho: {
 		id: 8,
@@ -2032,7 +2034,8 @@ var GameType = {
 			LESS_TILES,
 			OPTION_FULL_TILES,
 			FULL_POINTS_SCORING
-		]
+		],
+		noRankedGames: true
 	},
 	Trifle: {
 		id: 10,
@@ -2117,7 +2120,7 @@ var GameType = {
 	FirePaiSho: {
 		id: 15,
 		desc: "Fire Pai Sho (beta - local only)",
-		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/",
+		rulesUrl: "https://drive.google.com/file/d/1C3A5Mx0P8vrpKc-X5QbRHuLt27yoMqBj/view?usp=sharing",
 		gameOptions: [
 			NO_HARMONY_VISUAL_AIDS
 		],
@@ -2480,9 +2483,9 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 	  }
 	  message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
 
-	  message += "<br /><br /><div><span class='skipBonus' onclick='showGameStats();'>** Completed Game Stats **</span></div><br />";
-
-	  message += "<br /><br /><div><span class='skipBonus' onclick='showPreferences();'>Device Preferences</span></div><br />";
+	  message += "<br /><hr /><div><span class='skipBonus' onclick='showGameStats();'>Completed Game Stats</span></div>";
+	  message += "<br /><div><span class='skipBonus' onclick='viewGameRankingsClicked();'><i class='fa fa-tachometer' aria-hidden='true'></i> Game Rankings</span></div>";
+	  message += "<br /><div><span class='skipBonus' onclick='showPreferences();'>Device Preferences</span></div><br />";
 
 	  message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
 	  // message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
