@@ -2,7 +2,7 @@
 
 function FirePaiShoController(gameContainer, isMobile) {
 	this.actuator = new FirePaiShoActuator(gameContainer, isMobile, isAnimationsOn());
-
+	this.gameContainer = gameContainer;
 	this.resetGameManager();
 	this.resetNotationBuilder();
 	this.resetGameNotation();
@@ -12,6 +12,14 @@ function FirePaiShoController(gameContainer, isMobile) {
 
 	this.isPaiShoGame = true;
 }
+
+FirePaiShoController.prototype.createActuator = function() {
+	this.actuator = new FirePaiShoActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	if (this.theGame) {
+		this.theGame.updateActuator(this.actuator);
+	}
+};
+
 
 FirePaiShoController.hideHarmonyAidsKey = "HideHarmonyAids";
 
@@ -869,6 +877,7 @@ FirePaiShoController.prototype.toggleBoardRotation = function() {
 	setUserGamePreference(FirePaiShoController.boardRotationKey, 
 		getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true");
 	clearMessage();
+	this.createActuator();
 	this.callActuate();
 };
 

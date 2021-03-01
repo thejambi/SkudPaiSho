@@ -6,14 +6,17 @@ function FirePaiShoActuator(gameContainer, isMobile, enableAnimations) {
 
 	this.animationOn = enableAnimations;
 
-	var containers = setupPaiShoBoard(
-		this.gameContainer,
-		FirePaiShoController.getHostTilesContainerDivs(),
-		FirePaiShoController.getGuestTilesContainerDivs(),
-		(getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true"),
-		(getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true") ? ADEVAR_ROTATE : false,
-		false
-	);
+var rotateFacingRedGardens = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true";
+var rotateType = rotateFacingRedGardens ? ADEVAR_ROTATE : null;
+var containers = setupPaiShoBoard(
+        this.gameContainer,
+        FirePaiShoController.getHostTilesContainerDivs(),
+        FirePaiShoController.getGuestTilesContainerDivs(),
+        rotateFacingRedGardens,
+        rotateType,
+        false
+    );
+
 
 	this.boardContainer = containers.boardContainer;
 	this.hostTilesContainer = containers.hostTilesContainer;

@@ -12,6 +12,11 @@ function FirePaiShoGameManager(actuator, ignoreActuate, isCopy) {
 	this.endGameWinners = [];
 }
 
+
+FirePaiShoGameManager.prototype.updateActuator = function(newActuator) {
+	this.actuator = newActuator;
+};
+
 // Set up the game
 FirePaiShoGameManager.prototype.setup = function (ignoreActuate) {
 	this.board = new FirePaiShoBoard();
