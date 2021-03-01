@@ -2037,6 +2037,21 @@ var GameType = {
 		],
 		noRankedGames: true
 	},
+	FirePaiSho: {
+		id: 15,
+		desc: "Fire Pai Sho",
+		rulesUrl: "https://drive.google.com/file/d/1C3A5Mx0P8vrpKc-X5QbRHuLt27yoMqBj/view?usp=sharing",
+		gameOptions: [
+			NO_HARMONY_VISUAL_AIDS,
+			OPTION_DOUBLE_ACCENT_TILES,
+			HIDE_RESERVE_TILES
+		],
+		noRankedGames: true,	// Can take out when testing done, game ready to enable ranked games
+		usersWithAccess: [
+			'SkudPaiSho',
+			'adder'
+		]
+	},
 	Trifle: {
 		id: 10,
 		desc: "Pai and Sho's Trifle",
@@ -2116,23 +2131,7 @@ var GameType = {
 		secretGameOptions: [
 			CRUMBLEWEED
 		]
-	},
-	FirePaiSho: {
-		id: 15,
-		desc: "Fire Pai Sho (beta - local only)",
-		rulesUrl: "https://drive.google.com/file/d/1C3A5Mx0P8vrpKc-X5QbRHuLt27yoMqBj/view?usp=sharing",
-		gameOptions: [
-			NO_HARMONY_VISUAL_AIDS,
-			OPTION_DOUBLE_ACCENT_TILES,
-			HIDE_RESERVE_TILES
-		],
-		noRankedGames: true
-		// ,
-		// usersWithAccess: [
-		// 	'SkudPaiSho',
-		// 	'adder'
-		// ]
-	},
+	}
 };
 
 function getGameControllerForGameType(gameTypeId) {
