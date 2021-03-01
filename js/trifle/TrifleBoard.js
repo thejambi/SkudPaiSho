@@ -11,7 +11,7 @@ Trifle.Board = function() {
 	this.hostBannerPlayed = false;
 	this.guestBannerPlayed = false;
 
-	this.brainFactory = new BrainFactory();
+	this.brainFactory = new Trifle.BrainFactory();
 }
 
 Trifle.Board.prototype.brandNew = function () {
@@ -1176,7 +1176,7 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 						var brain = self.brainFactory.createTriggerBrain(triggeringState);
 						if (brain && brain.isAbilityActive) {
 							if (brain.isAbilityActive(pointWithTile, tile, tileInfo)) {
-								abilitiesToActivate.push(new TrifleAbility(tileAbilityInfo, tile, tileInfo, brain));
+								abilitiesToActivate.push(new Trifle.Ability(tileAbilityInfo, tile, tileInfo, brain));
 							}
 						}
 					});

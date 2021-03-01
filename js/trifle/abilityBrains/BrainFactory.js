@@ -1,22 +1,22 @@
 
-function BrainFactory() {
+Trifle.BrainFactory = function() {
 
 }
 
-BrainFactory.prototype.createTriggerBrain = function(abilityTrigger, board) {
+Trifle.BrainFactory.prototype.createTriggerBrain = function(abilityTrigger, board) {
     switch(abilityTrigger) {
         case Trifle.AbilityTrigger.whileInsideTemple:
-            return new WhileInsideTempleAbilityTriggerBrain(board);
+            return new Trifle.WhileInsideTempleAbilityTriggerBrain(board);
         case Trifle.AbilityTrigger.whileOutsideTemple:
-            return new WhileOutsideTempleAbilityTriggerBrain(board);
+            return new Trifle.WhileOutsideTempleAbilityTriggerBrain(board);
     }
 };
 
-BrainFactory.prototype.createAbilityBrain = function(abilityTrigger, board) {
+Trifle.BrainFactory.prototype.createAbilityBrain = function(abilityTrigger, board) {
     switch(abilityTrigger) {
         case Trifle.AbilityTrigger.whenCaptured:
-            return new WhenCapturedAbilityTriggerBrain(board);
+            return new Trifle.WhenCapturedAbilityTriggerBrain(board);
         case Trifle.AbilityTrigger.whenCapturing:
-            return new WhenCapturingAbilityTriggerBrain(board);
+            return new Trifle.WhenCapturingAbilityTriggerBrain(board);
     }
 };

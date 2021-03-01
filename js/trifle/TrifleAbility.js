@@ -1,7 +1,7 @@
 
 
 
-function TrifleAbility(tileAbilityInfo, tile, tileInfo, triggerBrain) {
+Trifle.Ability = function(tileAbilityInfo, tile, tileInfo, triggerBrain) {
     this.abilityType = tileAbilityInfo.type;
     this.abilityInfo = tileAbilityInfo;
     this.tile = tile;
@@ -12,11 +12,11 @@ function TrifleAbility(tileAbilityInfo, tile, tileInfo, triggerBrain) {
     this.boardChanged = false;
 }
 
-TrifleAbility.prototype.activateAbility = function() {
+Trifle.Ability.prototype.activateAbility = function() {
     // Get AbilityBrain
     
 };
 
-TrifleAbility.prototype.boardChangedAfterActivation = function() {
+Trifle.Ability.prototype.boardChangedAfterActivation = function() {
     return this.boardChanged;
 };

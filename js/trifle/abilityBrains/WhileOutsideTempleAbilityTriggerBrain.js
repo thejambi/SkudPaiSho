@@ -1,8 +1,8 @@
 
-function WhileOutsideTempleAbilityTriggerBrain(board) {
+Trifle.WhileOutsideTempleAbilityTriggerBrain = function(board) {
 	this.board = board;
 }
 
-WhileOutsideTempleAbilityTriggerBrain.prototype.isAbilityActive = function(pointWithTile, tile, tileInfo) {
+Trifle.WhileOutsideTempleAbilityTriggerBrain.prototype.isAbilityActive = function(pointWithTile, tile, tileInfo) {
 	return !pointWithTile.isType(TEMPLE);
 };
