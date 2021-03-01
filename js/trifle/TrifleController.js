@@ -1,6 +1,8 @@
 /* Trifle specific UI interaction logic */
 
-function TrifleController(gameContainer, isMobile) {
+function Trifle() {}
+
+Trifle.Controller = function(gameContainer, isMobile) {
 	this.actuator = new TrifleActuator(gameContainer, isMobile);
 
 	this.resetGameManager();
@@ -13,52 +15,52 @@ function TrifleController(gameContainer, isMobile) {
 	this.isPaiShoGame = true;
 }
 
-TrifleController.userIsTrifleDeveloper = function() {
+Trifle.Controller.userIsTrifleDeveloper = function() {
 	return usernameIsOneOf(
 		);
 };
 
-TrifleController.prototype.getGameTypeId = function() {
+Trifle.Controller.prototype.getGameTypeId = function() {
 	return GameType.Trifle.id;
 };
 
-TrifleController.prototype.resetGameManager = function() {
-	this.theGame = new TrifleGameManager(this.actuator);
+Trifle.Controller.prototype.resetGameManager = function() {
+	this.theGame = new Trifle.GameManager(this.actuator);
 };
 
-TrifleController.prototype.resetNotationBuilder = function() {
+Trifle.Controller.prototype.resetNotationBuilder = function() {
 	var offerDraw = false;
 	if (this.notationBuilder) {
 		offerDraw = this.notationBuilder.offerDraw;
 	}
-	this.notationBuilder = new TrifleNotationBuilder();
+	this.notationBuilder = new Trifle.NotationBuilder();
 	if (offerDraw) {
 		this.notationBuilder.offerDraw = true;
 	}
 	this.checkingOutOpponentTileOrNotMyTurn = false;
 };
 
-TrifleController.prototype.resetGameNotation = function() {
+Trifle.Controller.prototype.resetGameNotation = function() {
 	this.gameNotation = this.getNewGameNotation();
 };
 
-TrifleController.prototype.getNewGameNotation = function() {
-	return new TrifleGameNotation();
+Trifle.Controller.prototype.getNewGameNotation = function() {
+	return new Trifle.GameNotation();
 };
 
-TrifleController.getHostTilesContainerDivs = function() {
+Trifle.Controller.getHostTilesContainerDivs = function() {
 	return '';
 }
 
-TrifleController.getGuestTilesContainerDivs = function() {
+Trifle.Controller.getGuestTilesContainerDivs = function() {
 	return '';
 };
 
-TrifleController.prototype.callActuate = function() {
+Trifle.Controller.prototype.callActuate = function() {
 	this.theGame.actuate();
 };
 
-TrifleController.prototype.resetMove = function() {
+Trifle.Controller.prototype.resetMove = function() {
 	this.notationBuilder.offerDraw = false;
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// Remove last move
@@ -70,11 +72,11 @@ TrifleController.prototype.resetMove = function() {
 	rerunAll();
 };
 
-TrifleController.prototype.getDefaultHelpMessageText = function() {
+Trifle.Controller.prototype.getDefaultHelpMessageText = function() {
 	return "<h4>Trifle</h4> <p> <p>Trifle is inspired by Vagabond Pai Sho, the Pai Sho variant seen in the fanfiction story <a href='https://skudpaisho.com/site/more/fanfiction-recommendations/' target='_blank'>Gambler and Trifle (download here)</a>.</p> <p><strong>You win</strong> if you capture your opponent's Banner tile.</p> <p><strong>On a turn</strong>, you may either deploy a tile or move a tile.</p> <p><strong>You can't capture Flower/Banner tiles</strong> until your Banner has been deployed.<br /> <strong>You can't capture Non-Flower/Banner tiles</strong> until both players' Banner tiles have been deployed.</p> <p><strong>Hover</strong> over any tile to see how it works.</p> </p> <p>Select tiles to learn more or <a href='https://skudpaisho.com/site/games/trifle-pai-sho/' target='_blank'>view the rules</a>.</p>";
 };
 
-TrifleController.prototype.getAdditionalMessage = function() {
+Trifle.Controller.prototype.getAdditionalMessage = function() {
 	var msg = "";
 	
 	if (this.gameNotation.moves.length === 0) {
@@ -106,18 +108,18 @@ TrifleController.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
-TrifleController.prototype.gameHasEndedInDraw = function() {
+Trifle.Controller.prototype.gameHasEndedInDraw = function() {
 	return this.theGame.gameHasEndedInDraw;
 };
 
-TrifleController.prototype.acceptDraw = function() {
+Trifle.Controller.prototype.acceptDraw = function() {
 	if (myTurn()) {
 		this.promptToAcceptDraw = true;
 		refreshMessage();
 	}
 };
 
-TrifleController.prototype.confirmAcceptDraw = function() {
+Trifle.Controller.prototype.confirmAcceptDraw = function() {
 	if (myTurn()) {
 		this.resetNotationBuilder();
 		this.notationBuilder.moveType = DRAW_ACCEPT;
@@ -135,21 +137,21 @@ TrifleController.prototype.confirmAcceptDraw = function() {
 	}
 };
 
-TrifleController.prototype.offerDraw = function() {
+Trifle.Controller.prototype.offerDraw = function() {
 	if (myTurn()) {
 		this.notationBuilder.offerDraw = true;
 		refreshMessage();
 	}
 };
 
-TrifleController.prototype.removeDrawOffer = function() {
+Trifle.Controller.prototype.removeDrawOffer = function() {
 	if (myTurn()) {
 		this.notationBuilder.offerDraw = false;
 		refreshMessage();
 	}
 };
 
-TrifleController.prototype.unplayedTileClicked = function(tileDiv) {
+Trifle.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 	this.promptToAcceptDraw = false;
 
 	if (this.theGame.hasEnded() && this.notationBuilder.status !== READY_FOR_BONUS) {
@@ -173,7 +175,7 @@ TrifleController.prototype.unplayedTileClicked = function(tileDiv) {
 	}
 
 	if (this.theGame.playersAreSelectingTeams()) {
-		var selectedTile = new TrifleTile(tileCode, playerCode);
+		var selectedTile = new Trifle.Tile(tileCode, playerCode);
 		if (tileDiv.classList.contains("selectedFromPile")) {
 			debug("You picked one for the team!");
 			var teamIsNowFull = this.theGame.addTileToTeam(selectedTile);
@@ -204,7 +206,7 @@ TrifleController.prototype.unplayedTileClicked = function(tileDiv) {
 	}
 }
 
-TrifleController.prototype.pointClicked = function(htmlPoint) {
+Trifle.Controller.prototype.pointClicked = function(htmlPoint) {
 	this.promptToAcceptDraw = false;
 
 	if (this.theGame.hasEnded()) {
@@ -249,7 +251,7 @@ TrifleController.prototype.pointClicked = function(htmlPoint) {
 	}
 };
 
-TrifleController.prototype.completeMove = function() {
+Trifle.Controller.prototype.completeMove = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 	this.theGame.runNotationMove(move);
 	this.gameNotation.addMove(move);
@@ -264,7 +266,7 @@ TrifleController.prototype.completeMove = function() {
 	}
 };
 
-TrifleController.prototype.skipHarmonyBonus = function() {
+Trifle.Controller.prototype.skipHarmonyBonus = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 	this.gameNotation.addMove(move);
 	if (playingOnlineGame()) {
@@ -274,12 +276,12 @@ TrifleController.prototype.skipHarmonyBonus = function() {
 	}
 }
 
-TrifleController.prototype.getTheMessage = function(tile, ownerName) {
+Trifle.Controller.prototype.getTheMessage = function(tile, ownerName) {
 	var message = [];
 
 	var tileCode = tile.code;
 
-	var heading = TrifleTile.getTileName(tileCode);
+	var heading = Trifle.Tile.getTileName(tileCode);
 
 	if (tileCode === 'L') {
 		heading = "White Lotus";
@@ -325,11 +327,11 @@ TrifleController.prototype.getTheMessage = function(tile, ownerName) {
 	}
 }
 
-TrifleController.prototype.getTileMessage = function(tileDiv) {
+Trifle.Controller.prototype.getTileMessage = function(tileDiv) {
 	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 
-	var tile = new TrifleTile(divName.substring(1), divName.charAt(0));
+	var tile = new Trifle.Tile(divName.substring(1), divName.charAt(0));
 
 	var ownerName = HOST;
 	if (divName.startsWith('G')) {
@@ -339,7 +341,7 @@ TrifleController.prototype.getTileMessage = function(tileDiv) {
 	return this.getTheMessage(tile, ownerName);
 }
 
-TrifleController.prototype.getPointMessage = function(htmlPoint) {
+Trifle.Controller.prototype.getPointMessage = function(htmlPoint) {
 	var npText = htmlPoint.getAttribute("name");
 
 	var notationPoint = new NotationPoint(npText);
@@ -353,19 +355,19 @@ TrifleController.prototype.getPointMessage = function(htmlPoint) {
 	}
 }
 
-TrifleController.prototype.playAiTurn = function(finalizeMove) {
+Trifle.Controller.prototype.playAiTurn = function(finalizeMove) {
 	// 
 };
 
-TrifleController.prototype.startAiGame = function(finalizeMove) {
+Trifle.Controller.prototype.startAiGame = function(finalizeMove) {
 	// 
 };
 
-TrifleController.prototype.getAiList = function() {
+Trifle.Controller.prototype.getAiList = function() {
 	return [];
 }
 
-TrifleController.prototype.getCurrentPlayer = function() {
+Trifle.Controller.prototype.getCurrentPlayer = function() {
 	if (currentMoveIndex % 2 === 0) {	// To get right player during replay...
 		return HOST;
 	} else {
@@ -373,15 +375,15 @@ TrifleController.prototype.getCurrentPlayer = function() {
 	}
 };
 
-TrifleController.prototype.cleanup = function() {
+Trifle.Controller.prototype.cleanup = function() {
 	// document.querySelector(".svgContainer").classList.remove("TrifleBoardRotate");
 };
 
-TrifleController.prototype.isSolitaire = function() {
+Trifle.Controller.prototype.isSolitaire = function() {
 	return false;
 };
 
-TrifleController.prototype.setGameNotation = function(newGameNotation) {
+Trifle.Controller.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 };
 

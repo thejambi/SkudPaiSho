@@ -2171,7 +2171,7 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Trifle.id:
 			if (gameDevOn || GameType.Trifle.usersWithAccess.includes(getUsername())) {
-				controller = new TrifleController(gameContainerDiv, isMobile);
+				controller = new Trifle.Controller(gameContainerDiv, isMobile);
 			} else {
 				closeGame();
 			}
