@@ -2121,7 +2121,9 @@ var GameType = {
 		desc: "Fire Pai Sho (beta - local only)",
 		rulesUrl: "https://drive.google.com/file/d/1C3A5Mx0P8vrpKc-X5QbRHuLt27yoMqBj/view?usp=sharing",
 		gameOptions: [
-			NO_HARMONY_VISUAL_AIDS
+			NO_HARMONY_VISUAL_AIDS,
+			OPTION_DOUBLE_ACCENT_TILES,
+			HIDE_RESERVE_TILES
 		],
 		noRankedGames: true
 		// ,

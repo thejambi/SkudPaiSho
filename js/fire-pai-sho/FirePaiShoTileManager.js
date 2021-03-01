@@ -14,6 +14,8 @@ function FirePaiShoTileManager(forActuating) {
 	/* Used to have 2 of each Ancient Oasis tile available, but now just one.
 	This is to support old games if someone chose two of something. */
 	this.additionalAncientOasisCount = 0;
+
+	this.currentlyDrawnReserve = null;
 }
 FirePaiShoTileManager.prototype.loadLibrary = function(ownerCode) {
 	var tiles = [];
@@ -33,6 +35,21 @@ FirePaiShoTileManager.prototype.loadLibrary = function(ownerCode) {
 	return tiles;
 }
 
+FirePaiShoTileManager.prototype.doubleAccentTiles = function() {
+	
+	this.hostReserveTiles.push(new FirePaiShoTile('R', 'H'));
+	this.hostReserveTiles.push(new FirePaiShoTile('W', 'H'));
+	this.hostReserveTiles.push(new FirePaiShoTile('K', 'H'));
+	this.hostReserveTiles.push(new FirePaiShoTile('B', 'H'));
+
+	this.guestReserveTiles.push(new FirePaiShoTile('R', 'G'));
+	this.guestReserveTiles.push(new FirePaiShoTile('W', 'G'));
+	this.guestReserveTiles.push(new FirePaiShoTile('K', 'G'));
+	this.guestReserveTiles.push(new FirePaiShoTile('B', 'G'));
+}
+
+
+
 FirePaiShoTileManager.prototype.loadReserve = function(ownerCode) {
 	var tiles = [];
 
@@ -44,11 +61,20 @@ FirePaiShoTileManager.prototype.loadReserve = function(ownerCode) {
 	tiles.push(new FirePaiShoTile("W4", ownerCode));
 	tiles.push(new FirePaiShoTile("W5", ownerCode));
 
-	//2 of each accent
+	var double = false;
+	if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)){
+		double = true;
+	}
+
+	//1 of each accent
 	tiles.push(new FirePaiShoTile('R', ownerCode));
+	if (double) {tiles.push(new FirePaiShoTile('R', ownerCode));}
 	tiles.push(new FirePaiShoTile('W', ownerCode));
+	if (double) {tiles.push(new FirePaiShoTile('W', ownerCode));}
 	tiles.push(new FirePaiShoTile('K', ownerCode));
+	if (double) {tiles.push(new FirePaiShoTile('K', ownerCode));}
 	tiles.push(new FirePaiShoTile('B', ownerCode));
+	if (double) {tiles.push(new FirePaiShoTile('B', ownerCode));}
 
 	return tiles;
 
@@ -383,8 +409,15 @@ FirePaiShoTileManager.prototype.drawReserveTile = function(playerName) {
 	var tilePile = this.getReservePile(playerName);
 	if (tilePile.length > 0) {
 		var tile = tilePile[Math.floor(Math.random()*tilePile.length)];
-		return this.peekTile(playerName, tile.code, this.tileId, true);
+		tile = this.peekTile(playerName, tile.code, this.tileId, true);
+		this.currentlyDrawnReserve = tile;
+		return tile;
 	}
+};
+
+FirePaiShoTileManager.prototype.clearDrawnReserveTile = function() {
+	this.currentlyDrawnReserve = null;
+
 };
 
 FirePaiShoTileManager.prototype.getReservePile = function(playerNameOrCode) {

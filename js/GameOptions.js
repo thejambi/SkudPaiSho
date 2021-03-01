@@ -113,6 +113,11 @@ gameOptionDescriptions[NO_SETUP_PHASE] = "No Setup Phase";
 var DYNAMIC_GROUP_LIMIT = "DynamicGroupLimit";
 gameOptionDescriptions[DYNAMIC_GROUP_LIMIT] = "Group limit based on board size";
 
+/* Fire */
+var HIDE_RESERVE_TILES = "HideReserveTiles";
+gameOptionDescriptions[HIDE_RESERVE_TILES] = "Hide reserve tiles";
+
+
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
 		return gameOptionDescriptions[optionName];

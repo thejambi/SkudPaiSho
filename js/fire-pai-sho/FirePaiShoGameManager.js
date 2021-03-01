@@ -326,3 +326,7 @@ FirePaiShoGameManager.prototype.getCopy = function() {
 FirePaiShoGameManager.prototype.drawReserveTileFromTileManager = function(playerName) {
 	return this.tileManager.drawReserveTile(playerName);
 };
+
+FirePaiShoGameManager.prototype.clearDrawnReserveTile = function() {
+	return this.tileManager.clearDrawnReserveTile();
+};
