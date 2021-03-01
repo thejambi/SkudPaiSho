@@ -1,6 +1,6 @@
 // Tile
 
-function TrifleTile(code, ownerCode) {
+Trifle.Tile = function(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -14,15 +14,15 @@ function TrifleTile(code, ownerCode) {
 	this.selectedFromPile = false;
 }
 
-TrifleTile.prototype.getImageName = function() {
+Trifle.Tile.prototype.getImageName = function() {
 	return this.ownerCode + "" + this.code;
 };
 
-TrifleTile.prototype.canMove = function(first_argument) {
+Trifle.Tile.prototype.canMove = function(first_argument) {
 	return !(this.code === 'C' || this.code === 'F');
 };
 
-TrifleTile.prototype.getMoveDistance = function() {
+Trifle.Tile.prototype.getMoveDistance = function() {
 	if (this.code === 'L' || this.code === 'B') {
 		return 1;
 	} else if (this.code === 'S') {
@@ -32,26 +32,26 @@ TrifleTile.prototype.getMoveDistance = function() {
 	return 0;
 };
 
-TrifleTile.prototype.isFlowerTile = function() {
+Trifle.Tile.prototype.isFlowerTile = function() {
 	// Must be L, C, F
 	return this.code === 'L' || this.code === 'C' || this.code === 'F';
 };
 
-TrifleTile.prototype.hasCaptureAbility = function() {
+Trifle.Tile.prototype.hasCaptureAbility = function() {
 	// Must be D, W, S
 	return this.code === 'D' || this.code === 'W' || this.code === 'S';
 };
 
-TrifleTile.prototype.getName = function() {
-	return TrifleTile.getTileName(this.code);
+Trifle.Tile.prototype.getName = function() {
+	return Trifle.Tile.getTileName(this.code);
 };
 
-TrifleTile.prototype.getCopy = function() {
-	return new TrifleTile(this.code, this.ownerCode);
+Trifle.Tile.prototype.getCopy = function() {
+	return new Trifle.Tile(this.code, this.ownerCode);
 };
 
 
-TrifleTile.getTileName = function(tileCode) {
+Trifle.Tile.getTileName = function(tileCode) {
 	var name = "";
 	
 	if (tileCode === 'L') {
@@ -69,8 +69,8 @@ TrifleTile.getTileName = function(tileCode) {
 	} else if (tileCode === 'D') {
 		name = "White Dragon";
 	} else {
-		Object.keys(TrifleTileCodes).forEach(function(key,index) {
-			if (TrifleTileCodes[key] === tileCode) {
+		Object.keys(Trifle.TileCodes).forEach(function(key,index) {
+			if (Trifle.TileCodes[key] === tileCode) {
 				name = key;
 			}
 		});
@@ -79,7 +79,7 @@ TrifleTile.getTileName = function(tileCode) {
 	return name;
 };
 
-TrifleTile.getTeamLimitForTile = function(tileCode) {
+Trifle.Tile.getTeamLimitForTile = function(tileCode) {
 	var tileData = TrifleTiles[tileCode];
 	if (tileData) {
 		if (tileData.teamLimit) {
