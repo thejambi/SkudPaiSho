@@ -1,10 +1,10 @@
 // Board Point
 
 var AdevarBoardPointType = {
-	NORTH_NEUTRAL_PLOT: "Northern Neutral Plot",
-	EAST_NEUTRAL_PLOT: "Eastern Neutral Plot",
-	SOUTH_NEUTRAL_PLOT: "Southern Neutral Plot",
-	WEST_NEUTRAL_PLOT: "Western Neutral Plot",
+	NORTH_NEUTRAL_PLOT: "Northern Open Plot",
+	EAST_NEUTRAL_PLOT: "Eastern Open Plot",
+	SOUTH_NEUTRAL_PLOT: "Southern Open Plot",
+	WEST_NEUTRAL_PLOT: "Western Open Plot",
 	NORTH_RED_PLOT: "Northern Red Plot",
 	SOUTH_RED_PLOT: "Southern Red Plot",
 	WEST_WHITE_PLOT: "Western White Plot",

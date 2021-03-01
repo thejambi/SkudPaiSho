@@ -780,6 +780,18 @@ input[type=submit] {
   display: none;
 }
 
+#game-title-container {
+  display: block;
+  margin: 0 0 -5px 0;
+}
+#game-title-heading {
+  margin: 6px 0 0 6px;
+}
+#defaultGameMessage {
+  max-width: 580px;
+  margin-left: 6px;
+}
+
 /* Modal - from W3Schools Modal How-To */
 
 /* The Modal (background) */
