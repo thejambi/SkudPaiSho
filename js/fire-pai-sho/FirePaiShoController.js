@@ -11,7 +11,6 @@ function FirePaiShoController(gameContainer, isMobile) {
 	this.guestAccentTiles = [];
 
 	this.isPaiShoGame = true;
-	this.isInviteOnly = true;
 }
 
 FirePaiShoController.prototype.createActuator = function() {
