@@ -2046,11 +2046,7 @@ var GameType = {
 			OPTION_DOUBLE_ACCENT_TILES,
 			HIDE_RESERVE_TILES
 		],
-		noRankedGames: true,	// Can take out when testing done, game ready to enable ranked games
-		usersWithAccess: [
-			'SkudPaiSho',
-			'adder'
-		]
+		noRankedGames: true	// Can take out when testing done, game ready to enable ranked games
 	},
 	Trifle: {
 		id: 10,
