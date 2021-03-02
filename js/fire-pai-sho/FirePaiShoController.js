@@ -21,13 +21,17 @@ FirePaiShoController.prototype.createActuator = function() {
 	}
 };
 
-
 FirePaiShoController.hideHarmonyAidsKey = "HideHarmonyAids";
 
 FirePaiShoController.boardRotationKey = "BoardRotation";
 
 FirePaiShoController.prototype.getGameTypeId = function() {
 	return GameType.FirePaiSho.id;
+};
+
+FirePaiShoController.prototype.completeSetup = function() {
+	this.createActuator();
+	this.callActuate();
 };
 
 FirePaiShoController.prototype.resetGameManager = function() {
@@ -861,7 +865,7 @@ FirePaiShoController.prototype.buildToggleHarmonyAidsDiv = function() {
 
 FirePaiShoController.prototype.buildBoardRotateDiv = function() {
 	var div = document.createElement("div");
-	var orientation = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true" ? "Adêvar" : "Skud";
+	var orientation = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true" ? "Adevăr" : "Skud";
 	div.innerHTML = "Board orientation: " + orientation + ": <span class='skipBonus' onclick='gameController.toggleBoardRotation();'>toggle</span>";
 	return div;
 };
@@ -880,6 +884,7 @@ FirePaiShoController.prototype.toggleBoardRotation = function() {
 	clearMessage();
 	this.createActuator();
 	this.callActuate();
+	refreshMessage();
 };
 
 FirePaiShoController.prototype.setAnimationsOn = function(isAnimationsOn) {
