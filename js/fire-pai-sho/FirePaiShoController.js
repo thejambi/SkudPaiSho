@@ -2,7 +2,7 @@
 
 function FirePaiShoController(gameContainer, isMobile) {
 	this.actuator = new FirePaiShoActuator(gameContainer, isMobile, isAnimationsOn());
-
+	this.gameContainer = gameContainer;
 	this.resetGameManager();
 	this.resetNotationBuilder();
 	this.resetGameNotation();
@@ -11,13 +11,26 @@ function FirePaiShoController(gameContainer, isMobile) {
 	this.guestAccentTiles = [];
 
 	this.isPaiShoGame = true;
-	this.currentlyDrawnReserve = null;
 }
+
+FirePaiShoController.prototype.createActuator = function() {
+	this.actuator = new FirePaiShoActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	if (this.theGame) {
+		this.theGame.updateActuator(this.actuator);
+	}
+};
 
 FirePaiShoController.hideHarmonyAidsKey = "HideHarmonyAids";
 
+FirePaiShoController.boardRotationKey = "BoardRotation";
+
 FirePaiShoController.prototype.getGameTypeId = function() {
 	return GameType.FirePaiSho.id;
+};
+
+FirePaiShoController.prototype.completeSetup = function() {
+	this.createActuator();
+	this.callActuate();
 };
 
 FirePaiShoController.prototype.resetGameManager = function() {
@@ -36,44 +49,12 @@ FirePaiShoController.prototype.getNewGameNotation = function() {
 	return new FirePaiShoGameNotation();
 };
 
-PlaygroundController.getHostTilesContainerDivs = function() {
+FirePaiShoController.getHostTilesContainerDivs = function() {
 	return '';
 };
 
-PlaygroundController.getGuestTilesContainerDivs = function() {
+FirePaiShoController.getGuestTilesContainerDivs = function() {
 	return '';
-};
-
-FirePaiShoController.getHostLibraryTilesContainerDivs = function() {
-	var divs = '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HL"></div> <div class="HO"></div>';
-	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
-		divs += '<br class="clear" /> <div class="HM"></div> <div class="HP"></div> <div class="HT"></div>';
-	}
-	return divs;
-};
-
-FirePaiShoController.getGuestLibraryTilesContainerDivs = function() {
-	var divs = '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
-	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
-		divs += '<br class="clear" /> <div class="GM"></div> <div class="GP"></div> <div class="GT"></div>';
-	}
-	return divs;
-};
-
-FirePaiShoController.getHostReserveTilesContainerDivs = function() {
-	var divs = '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HL"></div> <div class="HO"></div>';
-	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
-		divs += '<br class="clear" /> <div class="HM"></div> <div class="HP"></div> <div class="HT"></div>';
-	}
-	return divs;
-};
-
-FirePaiShoController.getGuestReserveTilesContainerDivs = function() {
-	var divs = '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
-	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
-		divs += '<br class="clear" /> <div class="GM"></div> <div class="GP"></div> <div class="GT"></div>';
-	}
-	return divs;
 };
 
 FirePaiShoController.prototype.callActuate = function() {
@@ -118,21 +99,22 @@ FirePaiShoController.prototype.getAdditionalMessage = function() {
 
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-			if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting ALL of your Accent Tiles. <br />";
-			} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting 8 of your Accent Tiles. <br />";
-			} else {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting your 4 Accent Tiles. <br />";
+				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting Start Online Game below.<br />";
 			}
-		}
 
 		if (!playingOnlineGame()) {
 			msg += getGameOptionsMessageHtml(GameType.FirePaiSho.gameOptions);
+			if (onlinePlayEnabled && this.gameNotation.moves.length === 0) {
+				msg += "<br><span class='skipBonus' onClick='gameController.startOnlineGame()'>Start Online Game</span><br />";
+			}
 		}
-	} 
+	}
 
 	return msg;
+};
+
+FirePaiShoController.prototype.startOnlineGame = function() {
+	createGameIfThatIsOk(GameType.FirePaiSho.id);
 };
 
 FirePaiShoController.getTileNameFromCode = function(code) {
@@ -461,7 +443,6 @@ FirePaiShoController.prototype.pointClicked = function(htmlPoint) {
 				
 				var tile = this.theGame.drawReserveTileFromTileManager(getCurrentPlayer());
 				tile.selectedFromPile = true;
-				this.currentlyDrawnReserve = tile;
 				//TK STILL NEED TO MAKE THIS TILE DISPLAY SOMEWHERE....
 				// Bonus Plant! Can be any tile
 				var tileCode = tile.code;
@@ -493,7 +474,7 @@ FirePaiShoController.prototype.pointClicked = function(htmlPoint) {
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 
 				this.gameNotation.addMove(move);
-				this.currentlyDrawnReserve = null;
+				this.theGame.clearDrawnReserveTile();
 				if (playingOnlineGame()) {
 					callSubmitMove(1);
 				} else {
@@ -513,7 +494,7 @@ FirePaiShoController.prototype.pointClicked = function(htmlPoint) {
 			this.notationBuilder.boatBonusPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 			this.gameNotation.addMove(move);
-			this.currentlyDrawnReserve = null;
+			this.theGame.clearDrawnReserveTile();
 			if (playingOnlineGame()) {
 				callSubmitMove(1);
 			} else {
@@ -844,7 +825,7 @@ FirePaiShoController.prototype.getAdditionalHelpTabDiv = function() {
 	var settingsDiv = document.createElement("div");
 
 	var heading = document.createElement("h4");
-	heading.innerText = "Skud Pai Sho Preferences:";
+	heading.innerText = "Fire Pai Sho Preferences:";
 
 	settingsDiv.appendChild(heading);
 	settingsDiv.appendChild(FirePaiShoController.buildTileDesignDropdownDiv());
@@ -854,6 +835,11 @@ FirePaiShoController.prototype.getAdditionalHelpTabDiv = function() {
 	settingsDiv.appendChild(this.buildToggleHarmonyAidsDiv());
 
 	settingsDiv.appendChild(document.createElement("br"));
+
+	settingsDiv.appendChild(this.buildBoardRotateDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+
 	return settingsDiv;
 };
 
@@ -876,11 +862,28 @@ FirePaiShoController.prototype.buildToggleHarmonyAidsDiv = function() {
 	return div;
 };
 
+FirePaiShoController.prototype.buildBoardRotateDiv = function() {
+	var div = document.createElement("div");
+	var orientation = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true" ? "Adevăr" : "Skud";
+	div.innerHTML = "Board orientation: " + orientation + ": <span class='skipBonus' onclick='gameController.toggleBoardRotation();'>toggle</span>";
+	return div;
+};
+
 FirePaiShoController.prototype.toggleHarmonyAids = function() {
 	setUserGamePreference(FirePaiShoController.hideHarmonyAidsKey, 
 		getUserGamePreference(FirePaiShoController.hideHarmonyAidsKey) !== "true");
 	clearMessage();
 	this.callActuate();
+};
+
+
+FirePaiShoController.prototype.toggleBoardRotation = function() {
+	setUserGamePreference(FirePaiShoController.boardRotationKey, 
+		getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true");
+	clearMessage();
+	this.createActuator();
+	this.callActuate();
+	refreshMessage();
 };
 
 FirePaiShoController.prototype.setAnimationsOn = function(isAnimationsOn) {
