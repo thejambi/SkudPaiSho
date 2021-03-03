@@ -1384,7 +1384,7 @@ var createPrivateGameCallback = function createPrivateGameCallback(newGameId) {
 
 function createInviteLinkUrl(newGameId) {
 	var urlParamStr = "ig=" + newGameId + "&h=" + getUsername();
-	if (!getBooleanPreference(createNonRankedGamePreferredKey)) {
+	if (!getBooleanPreference(createNonRankedGamePreferredKey) && !getGameTypeEntryFromId(currentGameData.gameTypeId).noRankedGames) {
 		urlParamStr += "&r=y";
 	}
 	linkUrl = LZString.compressToEncodedURIComponent(urlParamStr);
