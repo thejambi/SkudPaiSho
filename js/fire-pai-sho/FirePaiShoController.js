@@ -70,23 +70,12 @@ FirePaiShoController.prototype.resetMove = function() {
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// Remove last move
 		this.gameNotation.removeLastMove();
-		if (this.gameNotation.moves.length === 3) {
-			this.gameNotation.removeLastMove();	// Special case for automatic Host first move
-		}
+
 	} else if (this.notationBuilder.status === READY_FOR_BONUS) {
 		// Just rerun
 	}
 
-	/**
-	if (this.gameNotation.moves.length <= 1) {
-		// Choosing Accent Tiles
-		if (getCurrentPlayer() === GUEST) {
-			this.guestAccentTiles = [];
-		} else if (getCurrentPlayer() === HOST) {
-			this.hostAccentTiles = [];
-		}
-	}
-	*/
+
 };
 
 FirePaiShoController.prototype.undoMoveAllowed = function() {
