@@ -408,7 +408,7 @@ FirePaiShoTileManager.prototype.drawReserveTile = function(playerName) {
 	//console.log("About to draw a random tile from the pile of " + playerName);
 	var tilePile = this.getReservePile(playerName);
 	if (tilePile.length > 0) {
-		var tile = tilePile[Math.floor(Math.random()*tilePile.length)];
+		var tile = tilePile[Math.floor(getRandomizer().random()*tilePile.length)];
 		tile = this.peekTile(playerName, tile.code, this.tileId, true);
 		this.currentlyDrawnReserve = tile;
 		return tile;
