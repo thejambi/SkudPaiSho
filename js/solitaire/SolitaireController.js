@@ -35,6 +35,10 @@ SolitaireController.prototype.resetGameManager = function() {
 	this.theGame = new SolitaireGameManager(this.actuator);
 };
 
+SolitaireController.prototype.getMoveNumber = function() {
+	return this.gameNotation.moves.length;
+};
+
 SolitaireController.prototype.resetNotationBuilder = function() {
 	this.notationBuilder = new SolitaireNotationBuilder();
 };

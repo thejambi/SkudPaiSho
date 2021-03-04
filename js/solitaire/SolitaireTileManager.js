@@ -137,7 +137,7 @@ SolitaireTileManager.prototype.loadOneOfEach = function(ownerCode) {
 // For Solitaire
 SolitaireTileManager.prototype.drawRandomTile = function() {
 	if (this.tiles.length > 0) {
-		var tile = this.tiles[Math.floor(Math.random()*this.tiles.length)];
+		var tile = this.tiles[Math.floor(getRandomizer().random()*this.tiles.length)];
 		return this.peekTile(this.playerCode, tile.code);
 	}
 };
