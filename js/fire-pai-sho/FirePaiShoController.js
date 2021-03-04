@@ -20,13 +20,17 @@ FirePaiShoController.prototype.createActuator = function() {
 	}
 };
 
-
 FirePaiShoController.hideHarmonyAidsKey = "HideHarmonyAids";
 
 FirePaiShoController.boardRotationKey = "BoardRotation";
 
 FirePaiShoController.prototype.getGameTypeId = function() {
 	return GameType.FirePaiSho.id;
+};
+
+FirePaiShoController.prototype.completeSetup = function() {
+	this.createActuator();
+	this.callActuate();
 };
 
 FirePaiShoController.prototype.resetGameManager = function() {
@@ -39,6 +43,11 @@ FirePaiShoController.prototype.resetNotationBuilder = function() {
 
 FirePaiShoController.prototype.resetGameNotation = function() {
 	this.gameNotation = this.getNewGameNotation();
+};
+
+FirePaiShoController.prototype.getMoveNumber = function() {
+	/* Function needed to support randomizer */
+	return this.gameNotation.moves.length;
 };
 
 FirePaiShoController.prototype.getNewGameNotation = function() {
@@ -81,7 +90,8 @@ FirePaiShoController.prototype.resetMove = function() {
 };
 
 FirePaiShoController.prototype.undoMoveAllowed = function() {
-	return false;
+	// Returning false here will automatically submit the move, bypassing the confirm button when callSubmitMove is called
+	return true;
 }
 
 FirePaiShoController.prototype.getDefaultHelpMessageText = function() {
@@ -860,7 +870,7 @@ FirePaiShoController.prototype.buildToggleHarmonyAidsDiv = function() {
 
 FirePaiShoController.prototype.buildBoardRotateDiv = function() {
 	var div = document.createElement("div");
-	var orientation = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true" ? "Adêvar" : "Skud";
+	var orientation = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true" ? "Adevăr" : "Skud";
 	div.innerHTML = "Board orientation: " + orientation + ": <span class='skipBonus' onclick='gameController.toggleBoardRotation();'>toggle</span>";
 	return div;
 };
@@ -879,6 +889,7 @@ FirePaiShoController.prototype.toggleBoardRotation = function() {
 	clearMessage();
 	this.createActuator();
 	this.callActuate();
+	refreshMessage();
 };
 
 FirePaiShoController.prototype.setAnimationsOn = function(isAnimationsOn) {
