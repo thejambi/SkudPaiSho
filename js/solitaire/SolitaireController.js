@@ -39,6 +39,10 @@ SolitaireController.prototype.getMoveNumber = function() {
 	return this.gameNotation.moves.length;
 };
 
+SolitaireController.prototype.undoMoveAllowed = function() {
+	return false;
+}
+
 SolitaireController.prototype.resetNotationBuilder = function() {
 	this.notationBuilder = new SolitaireNotationBuilder();
 };
