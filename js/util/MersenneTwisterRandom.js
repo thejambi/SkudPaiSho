@@ -196,3 +196,12 @@ var MersenneTwister = function(seed) {
   } 
   
   /* These real versions are due to Isaku Wada, 2002/01/09 added */
+
+
+function getRandomizer() {
+  if (playingOnlineGame() && gameController && gameController.getMoveNumber) {
+    return new MersenneTwister(gameId + gameController.getMoveNumber());
+  }
+  return new MersenneTwister();
+}
+

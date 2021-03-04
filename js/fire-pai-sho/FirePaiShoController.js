@@ -45,6 +45,11 @@ FirePaiShoController.prototype.resetGameNotation = function() {
 	this.gameNotation = this.getNewGameNotation();
 };
 
+FirePaiShoController.prototype.getMoveNumber = function() {
+	/* Function needed to support randomizer */
+	return this.gameNotation.moves.length;
+};
+
 FirePaiShoController.prototype.getNewGameNotation = function() {
 	return new FirePaiShoGameNotation();
 };
@@ -85,7 +90,8 @@ FirePaiShoController.prototype.resetMove = function() {
 };
 
 FirePaiShoController.prototype.undoMoveAllowed = function() {
-	return false;
+	// Returning false here will automatically submit the move, bypassing the confirm button when callSubmitMove is called
+	return true;
 }
 
 FirePaiShoController.prototype.getDefaultHelpMessageText = function() {
