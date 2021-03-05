@@ -444,11 +444,11 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 			objective = "Have at least one total Basic tile in each of the 8 Plots on the board";
 			break;
 		case AdevarTileCode.blackOrchid:
-			if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
+		//	if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
 				objective = "Have as many or more Basic tiles in each plot, except for the starting North and South Open Plots, than your opponent";
-			} else {
-				objective = "Have more Basic tiles in each plot, except for the starting North and South Open Plots, than your opponent";
-			}
+		//	} else {
+		//		objective = "Have more Basic tiles in each plot, except for the starting North and South Open Plots, than your opponent";
+		//	}
 			break;
 		default:
 			objective = "Unknown";
