@@ -3,15 +3,15 @@
 var STANDARD = "Standard";
 var RESTRICTED_BY_OPPONENT_TILE_ZONE = "Restricted by opponent tile zone";
 
-function TrifleTileManager() {
-	TrifleTileInfo.initializeTrifleData();
+Trifle.TileManager = function() {
+	Trifle.TileInfo.initializeTrifleData();
 	this.hostTeam = [];
 	this.guestTeam = [];
 	this.hostTiles = [];
 	this.guestTiles = [];
 }
 
-TrifleTileManager.prototype.grabTile = function(player, tileCode) {
+Trifle.TileManager.prototype.grabTile = function(player, tileCode) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -33,7 +33,7 @@ TrifleTileManager.prototype.grabTile = function(player, tileCode) {
 	return tile;
 };
 
-TrifleTileManager.prototype.peekTile = function(player, tileCode, tileId) {
+Trifle.TileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -62,7 +62,7 @@ TrifleTileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	return tile;
 };
 
-TrifleTileManager.prototype.removeSelectedTileFlags = function() {
+Trifle.TileManager.prototype.removeSelectedTileFlags = function() {
 	this.hostTiles.forEach(function(tile) {
 		tile.selectedFromPile = false;
 	});
@@ -71,7 +71,7 @@ TrifleTileManager.prototype.removeSelectedTileFlags = function() {
 	});
 };
 
-TrifleTileManager.prototype.unselectTiles = function(player) {
+Trifle.TileManager.prototype.unselectTiles = function(player) {
 	var tilePile = this.getPlayerTilePile(player);
 
 	tilePile.forEach(function(tile) {
@@ -79,30 +79,30 @@ TrifleTileManager.prototype.unselectTiles = function(player) {
 	});
 }
 
-TrifleTileManager.prototype.putTileBack = function(tile) {
+Trifle.TileManager.prototype.putTileBack = function(tile) {
 	var player = tile.ownerName;
 	var tilePile = this.getPlayerTilePile(player);
 
 	tilePile.push(tile);
 };
 
-TrifleTileManager.prototype.getTeamSize = function() {
+Trifle.TileManager.prototype.getTeamSize = function() {
 	return 11;
 };
 
-TrifleTileManager.prototype.hostTeamIsFull = function() {
+Trifle.TileManager.prototype.hostTeamIsFull = function() {
 	return this.playerTeamIsFull(HOST);
 };
 
-TrifleTileManager.prototype.guestTeamIsFull = function() {
+Trifle.TileManager.prototype.guestTeamIsFull = function() {
 	return this.playerTeamIsFull(GUEST);
 };
 
-TrifleTileManager.prototype.playerTeamIsFull = function(player) {
+Trifle.TileManager.prototype.playerTeamIsFull = function(player) {
 	return this.getPlayerTeam(player).length >= this.getTeamSize();
 };
 
-TrifleTileManager.prototype.playerTeamHasBanner = function(player) {
+Trifle.TileManager.prototype.playerTeamHasBanner = function(player) {
 	var team = this.getPlayerTeam(player);
 	for (var i = 0; i < team.length; i++) {
 		var tileInfo = TrifleTiles[team[i].code];
@@ -113,11 +113,11 @@ TrifleTileManager.prototype.playerTeamHasBanner = function(player) {
 	return false;
 };
 
-TrifleTileManager.prototype.tileInfoIsBanner = function(tileInfo) {
-	return tileInfo && tileInfo.types.includes(TileType.banner);
+Trifle.TileManager.prototype.tileInfoIsBanner = function(tileInfo) {
+	return tileInfo && tileInfo.types.includes(Trifle.TileType.banner);
 };
 
-TrifleTileManager.prototype.addToTeamIfOk = function(tile) {
+Trifle.TileManager.prototype.addToTeamIfOk = function(tile) {
 	var addOk = false;
 	var player = tile.ownerName;
 	if (!this.playerTeamIsFull(player)) {
@@ -135,7 +135,7 @@ TrifleTileManager.prototype.addToTeamIfOk = function(tile) {
 		}
 
 		var howManyAlreadyInTeam = this.countOfThisTileInTeam(tile.code, tile.ownerName);
-		addOk = addOk && howManyAlreadyInTeam < TrifleTile.getTeamLimitForTile(tile.code);
+		addOk = addOk && howManyAlreadyInTeam < Trifle.Tile.getTeamLimitForTile(tile.code);
 
 		if (addOk) {
 			this.getPlayerTeam(tile.ownerName).push(tile);
@@ -146,7 +146,7 @@ TrifleTileManager.prototype.addToTeamIfOk = function(tile) {
 	return addOk;
 };
 
-TrifleTileManager.prototype.removeTileFromTeam = function(tile) {
+Trifle.TileManager.prototype.removeTileFromTeam = function(tile) {
 	if (this.countOfThisTileInTeam(tile.code, tile.ownerName) > 0) {
 		var playerTeam = this.getPlayerTeam(tile.ownerName);
 		playerTeam.splice(playerTeam.indexOf(tile), 1);
@@ -154,7 +154,7 @@ TrifleTileManager.prototype.removeTileFromTeam = function(tile) {
 	}
 };
 
-TrifleTileManager.prototype.countOfThisTileInTeam = function(tileCode, ownerName) {
+Trifle.TileManager.prototype.countOfThisTileInTeam = function(tileCode, ownerName) {
 	var count = 0;
 	var ownerTeam = this.getPlayerTeam(ownerName);
 
@@ -166,7 +166,7 @@ TrifleTileManager.prototype.countOfThisTileInTeam = function(tileCode, ownerName
 	return count;
 };
 
-TrifleTileManager.prototype.getPlayerTeam = function(player) {
+Trifle.TileManager.prototype.getPlayerTeam = function(player) {
 	var playerTeam = this.hostTeam;
 	if (player === GUEST) {
 		playerTeam = this.guestTeam;
@@ -174,7 +174,7 @@ TrifleTileManager.prototype.getPlayerTeam = function(player) {
 	return playerTeam;
 };
 
-TrifleTileManager.prototype.getPlayerTilePile = function(player) {
+Trifle.TileManager.prototype.getPlayerTilePile = function(player) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
@@ -182,8 +182,8 @@ TrifleTileManager.prototype.getPlayerTilePile = function(player) {
 	return tilePile;
 };
 
-TrifleTileManager.prototype.getCopy = function() {
-	var copy = new TrifleTileManager();
+Trifle.TileManager.prototype.getCopy = function() {
+	var copy = new Trifle.TileManager();
 
 	// copy this.hostTiles and this.guestTiles
 	

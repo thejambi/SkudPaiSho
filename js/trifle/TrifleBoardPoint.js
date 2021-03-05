@@ -15,7 +15,7 @@ var thickDot = "•";
 var whiteDot = "◦";
 var gateDot = "⟡";
 
-function TrifleBoardPoint() {
+Trifle.BoardPoint = function() {
 	this.types = [];
 	this.row = -1;
 	this.col = -1;
@@ -24,13 +24,13 @@ function TrifleBoardPoint() {
 	this.possibleMovementPaths = [];
 }
 
-TrifleBoardPoint.prototype.addType = function(type) {
+Trifle.BoardPoint.prototype.addType = function(type) {
 	if (!this.types.includes(type)) {
 		this.types.push(type);
 	}
 };
 
-TrifleBoardPoint.prototype.removeType = function(type) {
+Trifle.BoardPoint.prototype.removeType = function(type) {
 	for (var i = 0; i < this.types.length; i++) {
 		if (this.types[i] === type) {
 			this.types.splice(i, 1);
@@ -38,7 +38,7 @@ TrifleBoardPoint.prototype.removeType = function(type) {
 	}
 };
 
-// TrifleBoardPoint.prototype.getConsoleDisplay = function() {
+// Trifle.BoardPoint.prototype.getConsoleDisplay = function() {
 // 	if (this.tile) {
 // 		return this.tile.getConsoleDisplay();
 // 	} else {
@@ -75,63 +75,63 @@ TrifleBoardPoint.prototype.removeType = function(type) {
 // 	}
 // };
 
-TrifleBoardPoint.prototype.putTile = function(tile) {
+Trifle.BoardPoint.prototype.putTile = function(tile) {
 	this.tile = tile;
 };
 
-TrifleBoardPoint.prototype.hasTile = function() {
+Trifle.BoardPoint.prototype.hasTile = function() {
 	if (this.tile) {
 		return true;
 	}
 	return false;
 };
 
-TrifleBoardPoint.prototype.isType = function(type) {
+Trifle.BoardPoint.prototype.isType = function(type) {
 	return this.types.includes(type);
 };
 
-TrifleBoardPoint.prototype.setPossibleForMovementType = function(movementInfo) {
-	var movementTypeToAdd = TrifleBoardPoint.getMovementType(movementInfo);
+Trifle.BoardPoint.prototype.setPossibleForMovementType = function(movementInfo) {
+	var movementTypeToAdd = Trifle.BoardPoint.getMovementType(movementInfo);
 	if (!this.possibleMoveTypes.includes(movementTypeToAdd)) {
 		this.possibleMoveTypes.push(movementTypeToAdd);
 	}
 };
-TrifleBoardPoint.prototype.isPossibleForMovementType = function(movementInfo) {
-	var movementTypeToCheck = TrifleBoardPoint.getMovementType(movementInfo);
+Trifle.BoardPoint.prototype.isPossibleForMovementType = function(movementInfo) {
+	var movementTypeToCheck = Trifle.BoardPoint.getMovementType(movementInfo);
 	return this.possibleMoveTypes.includes(movementTypeToCheck);
 };
-TrifleBoardPoint.prototype.clearPossibleMovementTypes = function() {
+Trifle.BoardPoint.prototype.clearPossibleMovementTypes = function() {
 	this.possibleMoveTypes = [];
 	this.moveDistanceRemaining = {};
 };
-TrifleBoardPoint.prototype.clearPossibleMovementPaths = function() {
+Trifle.BoardPoint.prototype.clearPossibleMovementPaths = function() {
 	this.possibleMovementPaths = [];
 };
-TrifleBoardPoint.prototype.addPossibleMovementPath = function(movementPath) {
+Trifle.BoardPoint.prototype.addPossibleMovementPath = function(movementPath) {
 	this.possibleMovementPaths.push(movementPath);
 };
-TrifleBoardPoint.prototype.getOnlyPossibleMovementPath = function() {
+Trifle.BoardPoint.prototype.getOnlyPossibleMovementPath = function() {
 	if (this.possibleMovementPaths && this.possibleMovementPaths.length === 1) {
 		return this.possibleMovementPaths[0];
 	}
 };
-TrifleBoardPoint.prototype.setMoveDistanceRemaining = function(movementInfo, distanceRemaining) {
-	var movementType = TrifleBoardPoint.getMovementType(movementInfo);
+Trifle.BoardPoint.prototype.setMoveDistanceRemaining = function(movementInfo, distanceRemaining) {
+	var movementType = Trifle.BoardPoint.getMovementType(movementInfo);
 	this.moveDistanceRemaining[movementType] = distanceRemaining;
 };
-TrifleBoardPoint.prototype.getMoveDistanceRemaining = function(movementInfo) {
-	var movementType = TrifleBoardPoint.getMovementType(movementInfo);
+Trifle.BoardPoint.prototype.getMoveDistanceRemaining = function(movementInfo) {
+	var movementType = Trifle.BoardPoint.getMovementType(movementInfo);
 	return this.moveDistanceRemaining[movementType];
 };
-TrifleBoardPoint.getMovementType = function(movementInfo) {
+Trifle.BoardPoint.getMovementType = function(movementInfo) {
 	return movementInfo.title ? movementInfo.title : movementInfo.type;
 };
 
-TrifleBoardPoint.prototype.isOpenGate = function() {
+Trifle.BoardPoint.prototype.isOpenGate = function() {
 	return !this.hasTile() && this.types.includes(GATE);
 };
 
-TrifleBoardPoint.prototype.removeTile = function() {
+Trifle.BoardPoint.prototype.removeTile = function() {
 	var theTile = this.tile;
 
 	this.tile = null;
@@ -139,19 +139,19 @@ TrifleBoardPoint.prototype.removeTile = function() {
 	return theTile;
 };
 
-TrifleBoardPoint.prototype.drainTile = function() {
+Trifle.BoardPoint.prototype.drainTile = function() {
 	if (this.tile) {
 		this.tile.drain();
 	}
 };
 
-TrifleBoardPoint.prototype.restoreTile = function() {
+Trifle.BoardPoint.prototype.restoreTile = function() {
 	if (this.tile) {
 		this.tile.restore();
 	}
 };
 
-TrifleBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
+Trifle.BoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	// Validate this point's ability to hold given tile
 
 	if (this.isType(NON_PLAYABLE)) {
@@ -183,7 +183,7 @@ TrifleBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	return false;
 };
 
-TrifleBoardPoint.prototype.betweenPlayerHarmony = function(player) {
+Trifle.BoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	if (player === GUEST) {
 		return this.betweenHarmonyGuest;
 	} else if (player === HOST) {
@@ -192,8 +192,8 @@ TrifleBoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	return false;
 };
 
-TrifleBoardPoint.prototype.getCopy = function() {
-	var copy = new TrifleBoardPoint();
+Trifle.BoardPoint.prototype.getCopy = function() {
+	var copy = new Trifle.BoardPoint();
 
 	// this.types
 	for (var i = 0; i < this.types.length; i++) {
@@ -217,44 +217,44 @@ TrifleBoardPoint.prototype.getCopy = function() {
 
 // Point makers
 
-TrifleBoardPoint.neutral = function() {
-	var point = new TrifleBoardPoint();
+Trifle.BoardPoint.neutral = function() {
+	var point = new Trifle.BoardPoint();
 	point.addType(NEUTRAL);
 
 	return point;
 };
 
-TrifleBoardPoint.gate = function() {
-	var point = new TrifleBoardPoint();
+Trifle.BoardPoint.gate = function() {
+	var point = new Trifle.BoardPoint();
 	point.addType(GATE);
 
 	return point;
 };
 
-TrifleBoardPoint.red = function() {
-	var point = new TrifleBoardPoint();
+Trifle.BoardPoint.red = function() {
+	var point = new Trifle.BoardPoint();
 	point.addType(RED);
 
 	return point;
 };
 
-TrifleBoardPoint.white = function() {
-	var point = new TrifleBoardPoint();
+Trifle.BoardPoint.white = function() {
+	var point = new Trifle.BoardPoint();
 	point.addType(WHITE);
 
 	return point;
 };
 
-TrifleBoardPoint.redWhite = function() {
-	var point = new TrifleBoardPoint();
+Trifle.BoardPoint.redWhite = function() {
+	var point = new Trifle.BoardPoint();
 	point.addType(RED);
 	point.addType(WHITE);
 
 	return point;
 };
 
-TrifleBoardPoint.redWhiteNeutral = function() {
-	var point = new TrifleBoardPoint();
+Trifle.BoardPoint.redWhiteNeutral = function() {
+	var point = new Trifle.BoardPoint();
 	point.addType(RED);
 	point.addType(WHITE);
 	point.addType(NEUTRAL);
@@ -262,16 +262,16 @@ TrifleBoardPoint.redWhiteNeutral = function() {
 	return point;
 };
 
-TrifleBoardPoint.redNeutral = function() {
-	var point = new TrifleBoardPoint();
+Trifle.BoardPoint.redNeutral = function() {
+	var point = new Trifle.BoardPoint();
 	point.addType(RED);
 	point.addType(NEUTRAL);
 
 	return point;
 };
 
-TrifleBoardPoint.whiteNeutral = function() {
-	var point = new TrifleBoardPoint();
+Trifle.BoardPoint.whiteNeutral = function() {
+	var point = new Trifle.BoardPoint();
 	point.addType(WHITE);
 	point.addType(NEUTRAL);
 

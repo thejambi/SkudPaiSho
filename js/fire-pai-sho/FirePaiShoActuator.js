@@ -6,18 +6,21 @@ function FirePaiShoActuator(gameContainer, isMobile, enableAnimations) {
 
 	this.animationOn = enableAnimations;
 
-	var containers = setupPaiShoBoard(
-		this.gameContainer,
-		FirePaiShoController.getHostLibraryTilesContainerDivs(),
-		FirePaiShoController.getGuestLibraryTilesContainerDivs(),
-		true,
-		ADEVAR_ROTATE,
-		false
-	);
+var rotateFacingRedGardens = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true";
+var rotateType = rotateFacingRedGardens ? ADEVAR_ROTATE : null;
+var containers = setupPaiShoBoard(
+        this.gameContainer,
+        FirePaiShoController.getHostTilesContainerDivs(),
+        FirePaiShoController.getGuestTilesContainerDivs(),
+        rotateFacingRedGardens,
+        rotateType,
+        false
+    );
+
 
 	this.boardContainer = containers.boardContainer;
-	this.hostLibraryTilesContainer = containers.hostLibraryTilesContainer;
-	this.guestLibraryTilesContainer = containers.guestLibraryTilesContainer;
+	this.hostTilesContainer = containers.hostTilesContainer;
+	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
 FirePaiShoActuator.prototype.setAnimationOn = function(isOn) {
@@ -41,13 +44,6 @@ FirePaiShoActuator.prototype.actuate = function(board, tileManager, moveToAnimat
 FirePaiShoActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, moveAnimationBeginStep) {
 	this.clearContainer(this.boardContainer);
 
-	if (moveToAnimate && moveToAnimate.moveType === ARRANGING) {
-		var cell = board.cells[moveToAnimate.endPoint.rowAndColumn.row][moveToAnimate.endPoint.rowAndColumn.col];
-		if (cell.hasTile() && cell.tile.code === "O") {
-			moveToAnimate.isOrchidMove = true;
-		}
-	}
-
 	var self = this;
 
 	board.cells.forEach(function(column) {
@@ -61,9 +57,8 @@ FirePaiShoActuator.prototype.htmlify = function(board, tileManager, moveToAnimat
 	var fullTileSet = new FirePaiShoTileManager(true);
 
 
-
-
-
+	this.clearTileContainer();
+/**
 	// Go through tile piles and clear containers
 	fullTileSet.hostTiles.forEach(function(tile) {
 		self.clearTileContainer(tile);
@@ -71,31 +66,77 @@ FirePaiShoActuator.prototype.htmlify = function(board, tileManager, moveToAnimat
 	fullTileSet.guestTiles.forEach(function(tile) {
 		self.clearTileContainer(tile);
 	});
+*/
+	// Host Tile Library
+	var hostTileLibraryContainer = document.createElement("span");
+	hostTileLibraryContainer.classList.add("tileLibrary");
+	var hostLibraryLabel = document.createElement("span");
+	hostLibraryLabel.innerText = "~Host Tile Library~";
+	hostTileLibraryContainer.appendChild(hostLibraryLabel);
+	hostTileLibraryContainer.appendChild(document.createElement("br"));
+	this.hostTilesContainer.appendChild(hostTileLibraryContainer);
 
-	// Go through tile piles and display
+	if (!gameOptionEnabled(HIDE_RESERVE_TILES)){
+		// Host Tile Reserve
+		var hostTileReserveContainer = document.createElement("span");
+		hostTileReserveContainer.classList.add("tileLibrary");
+		var hostReserveLabel = document.createElement("span");
+		hostReserveLabel.innerText = "~Host Tile Reserve~";
+		hostTileReserveContainer.appendChild(hostReserveLabel);
+		hostTileReserveContainer.appendChild(document.createElement("br"));
+		this.hostTilesContainer.appendChild(hostTileReserveContainer);
+	}
 
-//	hostLibraryTilesContainer.classList.add("tileLibrary");
-//	var hostLibraryLabel = document.createElement("span");
-//	hostLibraryLabel.innerText = "--Host Tile Library--";
-//	hostLibraryTilesContainer.appendChild(hostLibraryLabel);
-//	hostLibraryTilesContainer.appendChild(document.createElement("br"));
+	// Guest Tile Library
+	var guestTileLibraryContainer = document.createElement("span");
+	guestTileLibraryContainer.classList.add("tileLibrary");
+	var guestLibraryLabel = document.createElement("span");
+	guestLibraryLabel.innerText = "~Guest Tile Library~";
+	guestTileLibraryContainer.appendChild(guestLibraryLabel);
+	guestTileLibraryContainer.appendChild(document.createElement("br"));
+	this.guestTilesContainer.appendChild(guestTileLibraryContainer);
+
+
+	if (!gameOptionEnabled(HIDE_RESERVE_TILES)){
+		// Guest Tile Reserve
+		var guestTileReserveContainer = document.createElement("span");
+		guestTileReserveContainer.classList.add("tileLibrary");
+		var guestReserveLabel = document.createElement("span");
+		guestReserveLabel.innerText = "~Guest Tile Reserve~";
+		guestTileReserveContainer.appendChild(guestReserveLabel);
+		guestTileReserveContainer.appendChild(document.createElement("br"));
+		this.guestTilesContainer.appendChild(guestTileReserveContainer);
+	}
+
+	if (gameOptionEnabled(HIDE_RESERVE_TILES)){
+		// Drawn Tile
+		var drawnTileContainer = document.createElement("span");
+		drawnTileContainer.classList.add("tileLibrary");
+		var drawnTileLabel = document.createElement("span");
+		drawnTileLabel.innerText = "~Currently Drawn Reserve Tile~";
+		drawnTileContainer.appendChild(drawnTileLabel);
+		drawnTileContainer.appendChild(document.createElement("br"));
+		this.guestTilesContainer.appendChild(drawnTileContainer);
+	}
 
 	tileManager.hostLibraryTiles.forEach(function(tile) {
-		self.addTile(tile, this.hostLibraryTilesContainer);
+		self.addTile(tile, hostTileLibraryContainer, true);
 	});
-
-//	tileManager.hostReserveTiles.forEach(function(tile) {
-//		self.addTile(tile, this.hostReserveTilesContainer);
-//	});
-
-
 	tileManager.guestLibraryTiles.forEach(function(tile) {
-		self.addTile(tile, this.guestLibraryTilesContainer);
+		self.addTile(tile, guestTileLibraryContainer, true);
 	});
-//	tileManager.guestReserveTiles.forEach(function(tile) {
-//		self.addTile(tile, this.guestReserveTilesContainer);
-//	});
 
+	if (!gameOptionEnabled(HIDE_RESERVE_TILES)){
+		tileManager.hostReserveTiles.forEach(function(tile) {
+			self.addTile(tile, hostTileReserveContainer, false);
+		});
+		tileManager.guestReserveTiles.forEach(function(tile) {
+			self.addTile(tile, guestTileReserveContainer, false);
+		});
+	} else {
+		if (tileManager.currentlyDrawnReserve !== null)
+		self.addTile(tileManager.currentlyDrawnReserve, drawnTileContainer, false)
+	}
 
 };
 
@@ -105,14 +146,19 @@ FirePaiShoActuator.prototype.clearContainer = function (container) {
 	}
 };
 
-FirePaiShoActuator.prototype.clearTileContainer = function (tile) {
-	var container = document.querySelector("." + tile.getImageName());
-	while (container.firstChild) {
-		container.removeChild(container.firstChild);
+FirePaiShoActuator.prototype.clearTileContainer = function () {
+	this.clearContainer(hostTilesContainer);
+	this.clearContainer(guestTilesContainer);
+/**	var container = document.querySelector("." + tile.getImageName());
+	if (container) {
+		while (container.firstChild) {
+			container.removeChild(container.firstChild);
+		}
 	}
+	*/
 };
 
-FirePaiShoActuator.prototype.addTile = function(tile, mainContainer) {
+FirePaiShoActuator.prototype.addTile = function(tile, mainContainer, clickable) {
 	var self = this;
 
 	var container = document.querySelector("." + tile.getImageName());
@@ -137,14 +183,24 @@ FirePaiShoActuator.prototype.addTile = function(tile, mainContainer) {
 	theDiv.setAttribute("id", tile.id);
 
 	if (this.mobile) {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
-	} else {
-		theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
-		theDiv.setAttribute("onmouseover", "showTileMessage(this);");
-		theDiv.setAttribute("onmouseout", "clearMessage();");
+		if (clickable) {
+			theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		} else {//not clickable, for reserve tiles
+			theDiv.setAttribute("showTileMessage(this);");
+		}
+	} else { //desktop
+		if (clickable) {
+			theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
+			theDiv.setAttribute("onmouseover", "showTileMessage(this);");
+			theDiv.setAttribute("onmouseout", "clearMessage();");
+		} else {//not clickable, for reserve tiles
+			theDiv.setAttribute("onmouseover", "showTileMessage(this);");
+			theDiv.setAttribute("onmouseout", "clearMessage();");
+			
+		}
 	}
 
-	container.appendChild(theDiv);
+	mainContainer.appendChild(theDiv);
 };
 
 FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep) {
@@ -161,7 +217,9 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
 		//ADEVAR ROTATE
-		theDiv.classList.add("adevarPointRotate");
+		if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true"){
+			theDiv.classList.add("adevarPointRotate");
+		}
 //	theDiv.classList.add("vagabondPointRotate");
 
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
@@ -368,17 +426,23 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		unitString = "vw";
 	}
 
-	// SKUD ROTATION
-//	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
-//	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+	
+
 
 //console.log("I'm hitting the point in the code where the rotation happens.");
-	//ADEVAR ROTATION
+	
 
-	var left = (x - ox);
-	var top = (y - oy);
-	theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
-	theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
+	if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true") {
+		//ADEVAR ROTATION
+		var left = (x - ox);
+		var top = (y - oy);
+		theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
+		theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
+	} else {
+		// SKUD ROTATION
+		theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+		theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+	}
 
 	//VAGABOND ROTATION
 //	var left = (x - ox);
