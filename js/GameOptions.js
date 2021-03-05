@@ -120,8 +120,8 @@ var HIDE_RESERVE_TILES = "HideReserveTiles";
 gameOptionDescriptions[HIDE_RESERVE_TILES] = "Hide reserve tiles";
 
 /* Adevar */
-var BLACK_ORCHID_BUFF = "BlackOrchidBuff";
-gameOptionDescriptions[BLACK_ORCHID_BUFF] = "Test experimental Black Orchid change";
+//var BLACK_ORCHID_BUFF = "BlackOrchidBuff";
+//gameOptionDescriptions[BLACK_ORCHID_BUFF] = "Test experimental Black Orchid change";
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
