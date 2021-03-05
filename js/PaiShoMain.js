@@ -1080,8 +1080,8 @@ function refreshMessage() {
 
 	getGameMessageElement().innerHTML = message;
 
-	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn()) ||
-		gameController.isSolitaire()) {
+	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn() && !gameController.theGame.getWinner()) 
+			|| gameController.isSolitaire()) {
 		showResetMoveMessage();
 	}
 }
