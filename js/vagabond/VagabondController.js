@@ -4,7 +4,7 @@ function VagabondController(gameContainer, isMobile) {
 	/* Set default preferences */
 	if (!localStorage.getItem(vagabondTileDesignTypeKey)
 			|| !VagabondController.tileDesignTypeValues[localStorage.getItem(vagabondTileDesignTypeKey)]) {
-		localStorage.setItem(vagabondTileDesignTypeKey, "delion");
+		localStorage.setItem(vagabondTileDesignTypeKey, "tggvagabond");
 	}
 
 	this.actuator = new VagabondActuator(gameContainer, isMobile, this.isAnimationsEnabled());
@@ -33,7 +33,7 @@ VagabondController.prototype.completeSetup = function() {
 	debug("!this.peek...: " + !this.peekAtOpponentMoves);
 
 	if (gameOptionEnabled(SWAP_BISON_WITH_LEMUR)) {
-		VagabondController.setTileDesignsPreference("delion");
+		VagabondController.setTileDesignsPreference("tggvagabond");
 	}
 };
 
@@ -515,11 +515,13 @@ VagabondController.prototype.isAnimationsEnabled = function() {
 
 /* Vagabond tile designs */
 VagabondController.tileDesignTypeValues = {
-	delion: "The Garden Gate Designs",
+	tggvagabond: "The Garden Gate Designs",
 	tggclassic: "TGG Classic",
 	tgggyatso: "Gyatso TGG Classic",
+	tggkoiwheel: "TGG Koi-Wheel",
 	vescuccikoiwheel: "Vescucci Koi-Wheel",
 	vescuccikoiwheelrustic: "Rustic Vescucci Koi-Wheel",
+	tggoriginal: "The Garden Gate Designs Original",
 	chujired: "Chuji Red",
 	classic: "Classic Pai Sho Project",
 	water: "Water themed Garden Gate Designs",
