@@ -27,7 +27,7 @@ var skudTilesKey = "standard";
 var paiShoBoardKey = "default";
 var customBoardUrl = null;
 
-var debugOn = true;
+var debugOn = false;
 var gameDevOn = false;
 
 /* Set to true if building for iOS, else set to false */
