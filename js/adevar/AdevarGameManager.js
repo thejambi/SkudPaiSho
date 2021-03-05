@@ -550,12 +550,12 @@ AdevarGameManager.prototype.hasBlackOrchidWin = function(player) {
 	// return this.board.playerHasGateInOpponentNeutralPlot(player);
 
 	/* Objective: Have more tiles in each plot (except opponent's starting Neutral Plot) than opponent */
-	if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
+	//if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
 		return this.board.playerHasEqualOrMoreBasicTilesInEachNonOwnedPlot(player);
-	}
-	else {
-		return this.board.playerHasMoreBasicTilesInEachNonOwnedPlot(player);
-	}
+//	}
+//	else {
+//		return this.board.playerHasMoreBasicTilesInEachNonOwnedPlot(player);
+//	}
 	// return this.board.playerHasMoreBasicTilesInEachNonOwnedNonRedPlot(player);
 };
 

@@ -116,8 +116,8 @@ var DYNAMIC_GROUP_LIMIT = "DynamicGroupLimit";
 gameOptionDescriptions[DYNAMIC_GROUP_LIMIT] = "Group limit based on board size";
 
 /* Adevar */
-var BLACK_ORCHID_BUFF = "BlackOrchidBuff";
-gameOptionDescriptions[BLACK_ORCHID_BUFF] = "Test experimental Black Orchid change";
+//var BLACK_ORCHID_BUFF = "BlackOrchidBuff";
+//gameOptionDescriptions[BLACK_ORCHID_BUFF] = "Test experimental Black Orchid change";
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
