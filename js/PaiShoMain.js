@@ -513,16 +513,16 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 	}
 };
   
-  function initialVerifyLogin() {
-	  if (onlinePlayEnabled) {
-		  onlinePlayEngine.verifyLogin(getUserId(),
-			  getUsername(),
-			  getUserEmail(),
-			  getDeviceId(),
-			  initialVerifyLoginCallback
-		  );
-	  }
-  }
+function initialVerifyLogin() {
+	if (onlinePlayEnabled) {
+		onlinePlayEngine.verifyLogin(getUserId(),
+			getUsername(),
+			getUserEmail(),
+			getDeviceId(),
+			initialVerifyLoginCallback
+		);
+	}
+}
   
 var verifyLoginCallback = function verifyLoginCallback(response) {
 	if (response === "Results exist") {
@@ -1776,16 +1776,17 @@ function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, 
 	};
 }
   
-  function closeModal() {
-	  document.getElementById('myMainModal').style.display = "none";
-	  tutorialInProgress = false;
-  }
+function closeModal() {
+	document.getElementById('myMainModal').style.display = "none";
+	tutorialInProgress = false;
+}
   
 function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed) {
 	submitMoveData = {
 		moveAnimationBeginStep: moveAnimationBeginStep
 	};
 	if (moveIsConfirmed || !isMoveConfirmationRequired()) {	/* Move should be processed */
+		// GameClock.stopGameClock
 		onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback);
 	} else {
 		/* Move needs to be confirmed. Finalize move and show confirm button. */
