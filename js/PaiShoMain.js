@@ -51,6 +51,7 @@ var QueryString = function () {
 	  pixelsho2: "Pixel Sho v2 Tiles",
 	  xiangqi: "Xiangqi Style",
 	  minimalist: "TGG Minimalist",
+	  chujimono: "Chu Ji Canon Tiles",
 	  chujired: "Chu Ji Red",
 	  azulejos: "Azulejos by Cannoli",
 	  standard: "Pai Sho Project Tiles",
@@ -64,8 +65,7 @@ var QueryString = function () {
 	  vescuccicolored2: "Vescucci Alt Colors 2",
 	  water: "Water-Themed Vescucci Tiles",
 	  earth: "Earth-Themed Vescucci Tiles",
-	  chujiblue: "Chu Ji Blue",
-	  chujimono: "Chu Ji Monochrome",
+	  chujiblue: "Chu Ji Canon - Blue",
 	  azulejosmono: "Azulejos Monocromos",
 	  azulejosdemadera: "Azulejos de Madera"
   };
@@ -492,6 +492,9 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 		startWatchingNumberOfGamesWhereUserTurn();
 		appCaller.alertAppLoaded();
 		userIsSignedInOk = true;
+
+		/* Temporary TheGameCrafter Set Announcement */
+		OnboardingFunctions.showTheGameCrafterSetAnnouncement();
 	} else {
 		// Cannot verify user login, forget all current stuff.
 		if (getUsername()) {
@@ -510,33 +513,33 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 	}
 };
   
-  function initialVerifyLogin() {
-	  if (onlinePlayEnabled) {
-		  onlinePlayEngine.verifyLogin(getUserId(),
-			  getUsername(),
-			  getUserEmail(),
-			  getDeviceId(),
-			  initialVerifyLoginCallback
-		  );
-	  }
-  }
+function initialVerifyLogin() {
+	if (onlinePlayEnabled) {
+		onlinePlayEngine.verifyLogin(getUserId(),
+			getUsername(),
+			getUserEmail(),
+			getDeviceId(),
+			initialVerifyLoginCallback
+		);
+	}
+}
   
-  var verifyLoginCallback = function verifyLoginCallback(response) {
-				  if (response === "Results exist") {
-					  // ok
-					  userIsSignedInOk = true;
-				  } else {
-					  // Cannot verify user login, forget all current stuff.
-					  if (getUsername()) {
-						  // showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
-						//   showModal("Signed Out", "Sorry you were unexpectedly signed out :( <br /><br />Please sign in again to keep playing.");
-						showOnlinePlayPausedModal();
-						onlinePlayPaused = true;
-					  }
-					//   forgetCurrentGameInfo();
-					//   forgetOnlinePlayInfo();
-				  }
-			  };
+var verifyLoginCallback = function verifyLoginCallback(response) {
+	if (response === "Results exist") {
+		// ok
+		userIsSignedInOk = true;
+	} else {
+		// Cannot verify user login, forget all current stuff.
+		if (getUsername()) {
+			// showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
+			//   showModal("Signed Out", "Sorry you were unexpectedly signed out :( <br /><br />Please sign in again to keep playing.");
+			showOnlinePlayPausedModal();
+			onlinePlayPaused = true;
+		}
+		//   forgetCurrentGameInfo();
+		//   forgetOnlinePlayInfo();
+	}
+};
   
   function verifyLogin() {
 	  if (onlinePlayEnabled) {
@@ -574,26 +577,27 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 	  previousCountOfGamesWhereUserTurn = countOfGamesWhereUserTurn;
   }
   
-  var getGameNotationCallback = function getGameNotationCallback(newGameNotation) {
-	  if (gameWatchIntervalValue && newGameNotation !== lastKnownGameNotation) {
-		  // gameController.gameNotation.setNotationText(newGameNotation);
-		  gameController.setGameNotation(decodeURIComponent(newGameNotation));
-		  rerunAll(true);
-		  lastKnownGameNotation = newGameNotation;
-		  showReplayControls();	// TODO Put this somewhere better where it's called less often.
-	  }
-  };
+var getGameNotationCallback = function getGameNotationCallback(newGameNotation) {
+	if (gameWatchIntervalValue && newGameNotation !== lastKnownGameNotation) {
+		gameController.setGameNotation(decodeURIComponent(newGameNotation));
+		rerunAll(true);
+		lastKnownGameNotation = newGameNotation;
+		showReplayControls();
+
+		// GameClock.loadGameClock();
+	}
+};
   
-  function usernameEquals(otherUsername) {
-	  return otherUsername && getUsername() && otherUsername.toLowerCase() === getUsername().toLowerCase();
-  }
-  
-  function setResponseText(text) {
-	  var responseDiv = document.getElementById("response");
-	  if (responseDiv) {
-		  responseDiv.innerHTML = text;
-	  }
-  }
+function usernameEquals(otherUsername) {
+	return otherUsername && getUsername() && otherUsername.toLowerCase() === getUsername().toLowerCase();
+}
+
+function setResponseText(text) {
+	var responseDiv = document.getElementById("response");
+	if (responseDiv) {
+		responseDiv.innerHTML = text;
+	}
+}
   
 function updateCurrentGameTitle(isOpponentOnline) {
 	if (!currentGameData.guestUsername || !currentGameData.hostUsername) {
@@ -1080,8 +1084,8 @@ function refreshMessage() {
 
 	getGameMessageElement().innerHTML = message;
 
-	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn()) ||
-		gameController.isSolitaire()) {
+	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn() && !gameController.theGame.getWinner()) 
+			|| gameController.isSolitaire()) {
 		showResetMoveMessage();
 	}
 }
@@ -1772,16 +1776,17 @@ function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, 
 	};
 }
   
-  function closeModal() {
-	  document.getElementById('myMainModal').style.display = "none";
-	  tutorialInProgress = false;
-  }
+function closeModal() {
+	document.getElementById('myMainModal').style.display = "none";
+	tutorialInProgress = false;
+}
   
 function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed) {
 	submitMoveData = {
 		moveAnimationBeginStep: moveAnimationBeginStep
 	};
 	if (moveIsConfirmed || !isMoveConfirmationRequired()) {	/* Move should be processed */
+		// GameClock.stopGameClock
 		onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback);
 	} else {
 		/* Move needs to be confirmed. Finalize move and show confirm button. */
@@ -1981,8 +1986,8 @@ var GameType = {
 		desc: "Adevăr Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
 		gameOptions: [
-			ADEVAR_LITE,
-			BLACK_ORCHID_BUFF
+			ADEVAR_LITE
+			//BLACK_ORCHID_BUFF
 		],
 		noRankedGames: true
 	},
@@ -2245,68 +2250,62 @@ function setGameController(gameTypeId, keepGameOptions) {
 	return successResult;
 }
   
-  var jumpToGameCallback = function jumpToGameCallback(results) {
-	  if (results) {
-		  populateMyGamesList(results);
-  
-		  var myGame = myGamesList[0];
-  
-		  clearOptions();
-		  if (myGame.gameOptions) {
-			  for (var i = 0; i < myGame.gameOptions.length; i++) {
-				  addOption(myGame.gameOptions[i]);
-			  }
-		  }
-		  var gameControllerSuccess = setGameController(myGame.gameTypeId, true);
-  
-		  if (!gameControllerSuccess) {
-			  return;
-		  }
-  
-		  // Is user even playing this game? This could be used to "watch" games
-		  var userIsPlaying = usernameEquals(myGame.hostUsername) ||
-		  usernameEquals(myGame.guestUsername);
-  
-		  gameId = myGame.gameId;
-		  currentGameOpponentUsername = null;
-		  var opponentUsername;
-  
-		  if (userIsPlaying) {
-			  if (usernameEquals(myGame.hostUsername)) {
-				  opponentUsername = myGame.guestUsername;
-			  } else {
-				  opponentUsername = myGame.hostUsername;
-			  }
-  
-			  currentGameOpponentUsername = opponentUsername;
-		  }
-  
-		  currentGameData.hostUsername = myGame.hostUsername;
-		  currentGameData.guestUsername = myGame.guestUsername;
-		  currentGameData.lastUpdatedTimestamp = myGame.timestamp;
-		  currentGameData.isRankedGame = myGame.rankedGame;
-		  currentGameData.hostRating = myGame.hostRating;
-		  currentGameData.guestRating = myGame.guestRating;
-  
-		  hostEmail = myGame.hostUsername;
-		  guestEmail = myGame.guestUsername;
-  
-		  startWatchingGameRealTime();
-		  updateFooter();
+var jumpToGameCallback = function jumpToGameCallback(results) {
+	if (results) {
+		populateMyGamesList(results);
 
-		  /* Ask to join invite link game if present */
-		  if (QueryString.joinPrivateGame && gameId && gameId.toString() === QueryString.joinPrivateGame) {
-			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName, QueryString.rankedGameInd);
-			  /* Once we ask after jumping into a game, we won't need to ask again */
-			  QueryString.joinPrivateGame = null;
-		  }
+		var myGame = myGamesList[0];
 
-		//   if (sendJoinGameChatMessage && shouldSendJamboreeNoteChat(myGame.gameTypeId)) {
-		// 	  sendJoinGameChatMessage = false;
-		// 		sendChat(buildJoinGameChatMessage());
-		//   }
-	  }
-  };
+		clearOptions();
+		if (myGame.gameOptions) {
+			for (var i = 0; i < myGame.gameOptions.length; i++) {
+				addOption(myGame.gameOptions[i]);
+			}
+		}
+		var gameControllerSuccess = setGameController(myGame.gameTypeId, true);
+
+		if (!gameControllerSuccess) {
+			return;
+		}
+
+		// Is user even playing this game? This could be used to "watch" games
+		var userIsPlaying = usernameEquals(myGame.hostUsername) ||
+			usernameEquals(myGame.guestUsername);
+
+		gameId = myGame.gameId;
+		currentGameOpponentUsername = null;
+		var opponentUsername;
+
+		if (userIsPlaying) {
+			if (usernameEquals(myGame.hostUsername)) {
+				opponentUsername = myGame.guestUsername;
+			} else {
+				opponentUsername = myGame.hostUsername;
+			}
+			currentGameOpponentUsername = opponentUsername;
+		}
+
+		currentGameData.hostUsername = myGame.hostUsername;
+		currentGameData.guestUsername = myGame.guestUsername;
+		currentGameData.lastUpdatedTimestamp = myGame.timestamp;
+		currentGameData.isRankedGame = myGame.rankedGame;
+		currentGameData.hostRating = myGame.hostRating;
+		currentGameData.guestRating = myGame.guestRating;
+
+		hostEmail = myGame.hostUsername;
+		guestEmail = myGame.guestUsername;
+
+		startWatchingGameRealTime();
+		updateFooter();
+
+		/* Ask to join invite link game if present */
+		if (QueryString.joinPrivateGame && gameId && gameId.toString() === QueryString.joinPrivateGame) {
+			askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName, QueryString.rankedGameInd);
+			/* Once we ask after jumping into a game, we won't need to ask again */
+			QueryString.joinPrivateGame = null;
+		}
+	}
+};
 
 function buildJoinGameChatMessage() {
 	return "[Jamboree Note] Game joined at " + new Date().toString();

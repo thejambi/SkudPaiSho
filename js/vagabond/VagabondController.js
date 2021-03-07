@@ -516,11 +516,12 @@ VagabondController.prototype.isAnimationsEnabled = function() {
 /* Vagabond tile designs */
 VagabondController.tileDesignTypeValues = {
 	tggvagabond: "The Garden Gate Designs",
-	tggoriginal: "The Garden Gate Designs Original",
 	tggclassic: "TGG Classic",
 	tgggyatso: "Gyatso TGG Classic",
+	tggkoiwheel: "TGG Koi-Wheel",
 	vescuccikoiwheel: "Vescucci Koi-Wheel",
 	vescuccikoiwheelrustic: "Rustic Vescucci Koi-Wheel",
+	tggoriginal: "The Garden Gate Designs Original",
 	chujired: "Chuji Red",
 	classic: "Classic Pai Sho Project",
 	water: "Water themed Garden Gate Designs",
