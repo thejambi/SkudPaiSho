@@ -51,6 +51,7 @@ var QueryString = function () {
 	  pixelsho2: "Pixel Sho v2 Tiles",
 	  xiangqi: "Xiangqi Style",
 	  minimalist: "TGG Minimalist",
+	  chujimono: "Chu Ji Canon Tiles",
 	  chujired: "Chu Ji Red",
 	  azulejos: "Azulejos by Cannoli",
 	  standard: "Pai Sho Project Tiles",
@@ -64,8 +65,7 @@ var QueryString = function () {
 	  vescuccicolored2: "Vescucci Alt Colors 2",
 	  water: "Water-Themed Vescucci Tiles",
 	  earth: "Earth-Themed Vescucci Tiles",
-	  chujiblue: "Chu Ji Blue",
-	  chujimono: "Chu Ji Monochrome",
+	  chujiblue: "Chu Ji Canon - Blue",
 	  azulejosmono: "Azulejos Monocromos",
 	  azulejosdemadera: "Azulejos de Madera"
   };
