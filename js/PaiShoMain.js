@@ -441,16 +441,16 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 	  }
   });
   
-  function usernameIsOneOf(theseNames) {
-	  if (theseNames && theseNames.length) {
-		  for (var i = 0; i < theseNames.length; i++) {
-			  if (getUsername() === theseNames[i]) {
-				  return true;
-			  }
-		  }
-	  }
-	  return false;
-  }
+function usernameIsOneOf(theseNames) {
+	if (theseNames && theseNames.length) {
+		for (var i = 0; i < theseNames.length; i++) {
+			if (getUsername().toLowerCase() === theseNames[i].toLowerCase()) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
   
   function showReplayControls() {
 	  if (window.navigator.onLine) {
@@ -762,8 +762,18 @@ function gameWatchPulse() {
 		onlinePlayEngine.updateGameClock(gameId, GameClock.getCurrentGameClockJsonString(), getLoginToken(), emptyCallback);
 
 		if (GameClock.currentClockIsOutOfTime()) {
+			var hostResultCode = 0.5;
+			if (getCurrentPlayer() === HOST) {
+				hostResultCode = 0;
+			} else if (getCurrentPlayer() === GUEST) {
+				hostResultCode = 1;
+			}
+			var newPlayerRatings = {};
+			if (currentGameData.isRankedGame && currentGameData.hostUsername !== currentGameData.guestUsername) {
+				newPlayerRatings = Elo.getNewPlayerRatings(currentGameData.hostRating, currentGameData.guestRating, hostResultCode);
+			}
 			onlinePlayEngine.updateGameWinInfo(gameId, getOnlineGameOpponentUsername(), 11, getLoginToken(), emptyCallback, 
-				false, null, null, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
+				currentGameData.isRankedGame, newPlayerRatings.hostRating, newPlayerRatings.guestRating, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
 		}
 	}
 }
@@ -1258,7 +1268,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
 					currentGameData.isRankedGame, newPlayerRatings.hostRating, newPlayerRatings.guestRating, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
 			} else {
 				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback, 
-				currentGameData.isRankedGame, newPlayerRatings.hostRating, newPlayerRatings.guestRating, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
+					currentGameData.isRankedGame, newPlayerRatings.hostRating, newPlayerRatings.guestRating, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
 			}
 		}
 
