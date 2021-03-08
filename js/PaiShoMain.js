@@ -242,7 +242,7 @@ var onlinePlayEngine = new OnlinePlayEngine();
 var appCaller;
 
 var gameId = -1;
-var lastKnownGameNotation = "";
+var lastKnownGameNotation = null;
 var gameWatchIntervalValue;
 var currentGameOpponentUsername;
 var currentGameData = new Object();
@@ -444,7 +444,7 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 function usernameIsOneOf(theseNames) {
 	if (theseNames && theseNames.length) {
 		for (var i = 0; i < theseNames.length; i++) {
-			if (getUsername().toLowerCase() === theseNames[i].toLowerCase()) {
+			if (getUsername() && getUsername().toLowerCase() === theseNames[i].toLowerCase()) {
 				return true;
 			}
 		}
@@ -1984,7 +1984,7 @@ function userIsLoggedIn() {
 	  }
   
 	  gameId = -1;
-	  lastKnownGameNotation = "";
+	  lastKnownGameNotation = null;
 	  if (gameWatchIntervalValue) {
 		  clearInterval(gameWatchIntervalValue);
 		  gameWatchIntervalValue = null;

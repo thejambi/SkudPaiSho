@@ -207,13 +207,17 @@ GameClock.userHasGameClockAccess = function() {
 GameClock.startClock = function(player) {
     if (GameClock.userHasGameClockAccess()) {
         if (GameClock.currentClock) {
-            GameClock.currentClock.startTimer(player,
-                function(hostSecondsRemaining, guestSecondsRemaining) {
-                    GameClock.setGameClockText("Game Clock | Host: " + GameClock.formatSecondsToMinutes(hostSecondsRemaining)
-                        + " vs Guest: " + GameClock.formatSecondsToMinutes(guestSecondsRemaining));
-                }
-            );
-            GameClock.currentClock.isTicking = true;
+            GameClock.setGameClockText("Game Clock | Host: " + GameClock.formatSecondsToMinutes(GameClock.currentClock.hostRemainingSeconds)
+                        + " vs Guest: " + GameClock.formatSecondsToMinutes(GameClock.currentClock.guestRemainingSeconds));
+            if (!GameClock.aPlayerIsOutOfTime() && !gameController.theGame.getWinner()) {
+                GameClock.currentClock.startTimer(player,
+                    function(hostSecondsRemaining, guestSecondsRemaining) {
+                        GameClock.setGameClockText("Game Clock | Host: " + GameClock.formatSecondsToMinutes(hostSecondsRemaining)
+                            + " vs Guest: " + GameClock.formatSecondsToMinutes(guestSecondsRemaining));
+                    }
+                );
+                GameClock.currentClock.isTicking = true;
+            }
         }
     }
 };
@@ -255,6 +259,11 @@ GameClock.currentClockIsTicking = function() {
 
 GameClock.currentClockIsOutOfTime = function() {
     return GameClock.currentClock && GameClock.currentClock.currentTimer.secondsRemaining <= 0;
+};
+
+GameClock.aPlayerIsOutOfTime = function() {
+    return GameClock.currentClock 
+        && (GameClock.currentClock.hostRemainingSeconds <= 0 || GameClock.currentClock.guestRemainingSeconds <= 0);
 };
 
 GameClock.getCurrentGameClockJsonString = function() {
