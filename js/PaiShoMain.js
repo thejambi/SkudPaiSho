@@ -1819,8 +1819,10 @@ function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed) {
 	};
 	if (moveIsConfirmed || !isMoveConfirmationRequired()) {	/* Move should be processed */
 		GameClock.stopGameClock();
-		onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
-			GameClock.getCurrentGameClockJsonString());
+		if (!GameClock.currentClockIsOutOfTime()) {
+			onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
+				GameClock.getCurrentGameClockJsonString());
+		}
 	} else {
 		/* Move needs to be confirmed. Finalize move and show confirm button. */
 		finalizeMove(submitMoveData.moveAnimationBeginStep);
