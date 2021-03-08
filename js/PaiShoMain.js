@@ -594,6 +594,7 @@ var getGameNotationAndClockCallback = function getGameNotationAndClockCallback(n
 				lastKnownGameNotation = newGameData.notation;
 				showReplayControls();
 				if (myTurn()) {
+					GameClock.loadGameClock(GameClock.buildGameClockInstance(newGameData.clock));
 					GameClock.startClock(getCurrentPlayer());
 				}
 			}
