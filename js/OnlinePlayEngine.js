@@ -119,8 +119,9 @@ OnlinePlayEngine.prototype.logOnlineStatus = function(loginToken, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, optionsString, isPrivateIndicator, loginToken, callback, rankedGame) {
-    $.post("backend/createGame.php",
+OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, optionsString, isPrivateIndicator, loginToken, callback, 
+        rankedGame, gameClockJson) {
+    $.post("backend/createGameV2.php",
         {
             t: gameTypeId, 
             q: gameNotationText,
@@ -131,7 +132,8 @@ OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, o
             options: optionsString,
             isPrivateIndicator: isPrivateIndicator,
             isWeb: 1,
-            rankedGame: rankedGame
+            rankedGame: rankedGame,
+            gameClockJson: gameClockJson
         },
         function(data, status){
             if (status === 'success') {
@@ -160,7 +162,7 @@ OnlinePlayEngine.prototype.joinGameSeek = function(gameId, loginToken, callback)
 };
 
 OnlinePlayEngine.prototype.getGameSeeks = function(callback) {
-    $.get("backend/getGameSeeks2.php", 
+    $.get("backend/getGameSeeksV2.php", 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -200,7 +202,7 @@ OnlinePlayEngine.prototype.getCurrentGamesForUserNew = function(loginToken, call
 };
 
 OnlinePlayEngine.prototype.getPastGamesForUserNew = function(loginToken, callback) {
-    $.post("backend/getPastGamesForUserNew.php",
+    $.post("backend/getPastGamesForUserV2.php",
         {
             userId: loginToken.userId,
             username: loginToken.username,
@@ -234,7 +236,7 @@ OnlinePlayEngine.prototype.getPreviouslyActiveGameId = function(loginToken, game
 };
 
 OnlinePlayEngine.prototype.getGameInfo = function(userId, gameId, callback) {
-    $.get("backend/getGameInfo.php?userId="+userId+"&gameId="+gameId+"&isWeb=1", 
+    $.get("backend/getGameInfoV2.php?userId="+userId+"&gameId="+gameId+"&isWeb=1", 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -263,6 +265,16 @@ OnlinePlayEngine.prototype.getGameNotation = function(gameId, callback) {
     );
 };
 
+OnlinePlayEngine.prototype.getGameNotationAndClock = function(gameId, callback) {
+    $.get("backend/getGameNotationAndClock.php?q="+gameId, 
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
 OnlinePlayEngine.prototype.checkIfUserOnline = function(username, callback) {
     $.get("backend/checkIfUserOnline.php?u="+username, 
         function(data, status){
@@ -273,8 +285,9 @@ OnlinePlayEngine.prototype.checkIfUserOnline = function(username, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, loginToken, gameTypeName, callback) {
-    $.post("backend/updateGameNotation.php",
+OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, loginToken, gameTypeName, callback,
+        gameClockJson) {
+    $.post("backend/updateGameNotationV2.php",
         {
             id: gameId,
             t: gameNotationText,
@@ -282,7 +295,27 @@ OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, login
             username: loginToken.username,
             userEmail: loginToken.userEmail, 
             deviceId: loginToken.deviceId,
-            gameTypeName: gameTypeName
+            gameTypeName: gameTypeName,
+            gameClockJson: gameClockJson
+        },
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.updateGameClock = function(gameId, gameClockJson, loginToken, callback) {
+    $.post("backend/updateGameValue.php",
+        {
+            id: gameId,
+            type: 6,
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId,
+            value: gameClockJson
         },
         function(data, status){
             if (status === 'success') {
