@@ -2792,7 +2792,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 	}
 
 	if (!gameSeeksDisplayed) {
-		message = "No games available to join. You should start one!";
+		message = "No games available to join. You can create a new game, or join <a href='https://discord.gg/dStDZx7' target='_blank'>Join the Discord</a> to find people to play with!";
 	}
 
 	message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
