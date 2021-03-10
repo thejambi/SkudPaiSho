@@ -445,7 +445,7 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 			break;
 		case AdevarTileCode.blackOrchid:
 		//	if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
-				objective = "Have as many or more Basic tiles in each plot, except for the starting North and South Open Plots, than your opponent";
+				objective = "Have as many or more Basic tiles in each plot, except for the starting North and South Open Plots, than your opponent. You must have at least 1/2 a tile in those Plots.";
 		//	} else {
 		//		objective = "Have more Basic tiles in each plot, except for the starting North and South Open Plots, than your opponent";
 		//	}
