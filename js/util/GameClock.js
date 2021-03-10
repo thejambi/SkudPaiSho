@@ -201,7 +201,14 @@ GameClock.loadGameClock = function(newClock) {
 };
 
 GameClock.userHasGameClockAccess = function() {
-    return usernameIsOneOf(['SkudPaiSho','Zach','Dallin','Pronetowander']);
+    return usernameIsOneOf(
+        [
+            'SkudPaiSho',
+            'Zach',
+            'Dallin',
+            'Pronetowander',
+            'vitheguy'
+        ]);
 };
 
 GameClock.startClock = function(player) {
