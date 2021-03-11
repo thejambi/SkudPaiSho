@@ -406,7 +406,6 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 						theImg.style.transform = "scale(2)";
 						theImg.style.zIndex = 98; // Show new pieces above others
 						requestAnimationFrame(function() {
-							debug(boardPoint.tile.code + " scale reset");
 							theImg.style.transform = "scale(1)";
 						});
 					}
@@ -417,7 +416,6 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 					theImg.style.transform = "scale(2)";
 					theImg.style.zIndex = 98; // Show new pieces above others
 					requestAnimationFrame(function() {
-						debug(boardPoint.tile.code + " scale reset");
 						theImg.style.transform = "scale(1)";
 					});
 				}
