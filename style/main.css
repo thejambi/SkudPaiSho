@@ -630,6 +630,18 @@ figure > div {
   box-shadow: 0px 0px 8px 4px #77A2E6;
 }
 
+.tileBetweenHarmonyHOST {
+  box-shadow: 0px 0px 2px 1px #6CC ;
+}
+
+.tileBetweenHarmonyGUEST {
+  box-shadow: 0px 0px 2px 1px #87f;
+}
+
+.tileBetweenHarmonyHOST.tileBetweenHarmonyGUEST{
+  box-shadow: 0px 0px 2px 1px #77A2E6;
+}
+
 
 .betweenHarmony {
   margin: 16px;
