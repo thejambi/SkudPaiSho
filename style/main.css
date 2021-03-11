@@ -595,6 +595,12 @@ figure > div {
   opacity: 0.75;
 }
 
+.boosted
+{
+  box-shadow: 0px 0px 6px 3px #fff;
+  filter: saturate(175%);
+}
+
 .possibleMove {
   box-shadow: 0px 0px 24px 2px #421;
 }

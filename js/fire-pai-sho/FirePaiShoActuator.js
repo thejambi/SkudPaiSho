@@ -170,7 +170,7 @@ FirePaiShoActuator.prototype.addTile = function(tile, mainContainer, clickable) 
 
 	if (tile.selectedFromPile) {
 		theDiv.classList.add("selectedFromPile");
-		theDiv.classList.add("boosted");
+		theDiv.classList.add("drained");
 	}
 
 	var theImg = document.createElement("img");

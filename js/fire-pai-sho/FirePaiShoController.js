@@ -438,8 +438,7 @@ FirePaiShoController.prototype.pointClicked = function(htmlPoint) {
 				
 				var tile = this.theGame.drawReserveTileFromTileManager(getCurrentPlayer());
 				tile.selectedFromPile = true;
-				//TK STILL NEED TO MAKE THIS TILE DISPLAY SOMEWHERE....
-				// Bonus Plant! Can be any tile
+				
 				var tileCode = tile.code;
 				//console.log("Was ready for a bonus tile and now you selected one: " + tileCode + "and if it's an accent tile: " + tile.accentType);
 				

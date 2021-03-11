@@ -118,11 +118,14 @@ gameOptionDescriptions[DYNAMIC_GROUP_LIMIT] = "Group limit based on board size";
 /* Fire */
 var HIDE_RESERVE_TILES = "HideReserveTiles";
 gameOptionDescriptions[HIDE_RESERVE_TILES] = "Hide reserve tiles";
+var MIDLINE_OPENER = "MidlineOpener";
+gameOptionDescriptions[MIDLINE_OPENER] = "Guest midline plant";
+var ETHEREAL_ACCENT_TILES = "EtherealAccentTiles";
+gameOptionDescriptions[ETHEREAL_ACCENT_TILES] = "Ethereal accent tiles";
 
 /* Adevar */
 var BLACK_ORCHID_BUFF = "BlackOrchidBuff";
 gameOptionDescriptions[BLACK_ORCHID_BUFF] = "Test experimental Black Orchid change";
-
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
 		return gameOptionDescriptions[optionName];
