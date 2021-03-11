@@ -1115,16 +1115,22 @@ AdevarBoard.prototype.playerHasEqualOrMoreBasicTilesInEachNonOwnedPlot = functio
 		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][player] >= this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][opponent]
 		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] >= this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][opponent]
 		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_NEUTRAL_PLOT][player] >= this.basicTilePlotCounts[AdevarBoardPointType.EAST_NEUTRAL_PLOT][opponent]
-		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_NEUTRAL_PLOT][player] >= this.basicTilePlotCounts[AdevarBoardPointType.WEST_NEUTRAL_PLOT][opponent];
+		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_NEUTRAL_PLOT][player] >= this.basicTilePlotCounts[AdevarBoardPointType.WEST_NEUTRAL_PLOT][opponent]
+		&& this.basicTilePlotCounts[AdevarBoardPointType.NORTH_RED_PLOT][player] >= .5
+		&& this.basicTilePlotCounts[AdevarBoardPointType.SOUTH_RED_PLOT][player] >= .5
+		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][player] >= .5
+		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] >= .5
+		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_NEUTRAL_PLOT][player] >= .5
+		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_NEUTRAL_PLOT][player] >= .5;
 };
 
-AdevarBoard.prototype.playerHasMoreBasicTilesInEachNonOwnedNonRedPlot = function(player) {
+/*AdevarBoard.prototype.playerHasMoreBasicTilesInEachNonOwnedNonRedPlot = function(player) {
 	var opponent = getOpponentName(player);
 	return this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.EAST_WHITE_PLOT][opponent]
 		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.WEST_WHITE_PLOT][opponent]
 		&& this.basicTilePlotCounts[AdevarBoardPointType.EAST_NEUTRAL_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.EAST_NEUTRAL_PLOT][opponent]
 		&& this.basicTilePlotCounts[AdevarBoardPointType.WEST_NEUTRAL_PLOT][player] > this.basicTilePlotCounts[AdevarBoardPointType.WEST_NEUTRAL_PLOT][opponent];
-};
+};*/
 
 AdevarBoard.prototype.playerHasTileOfTypeAtPoint = function(player, notationPoint, tileType) {
 	var point = notationPoint.rowAndColumn;

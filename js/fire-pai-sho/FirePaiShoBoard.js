@@ -678,7 +678,6 @@ FirePaiShoBoard.prototype.canPlaceBoat = function(boardPoint) {
 };
 
 FirePaiShoBoard.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint, ignoreCheck) {
-	 debug("extra boat point:");
 	 debug(extraBoatPoint);
 	var rowAndCol = notationPoint.rowAndColumn;
 	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];

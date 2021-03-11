@@ -126,6 +126,9 @@ gameOptionDescriptions[ETHEREAL_ACCENT_TILES] = "Ethereal accent tiles";
 /* Adevar */
 var BLACK_ORCHID_BUFF = "BlackOrchidBuff";
 gameOptionDescriptions[BLACK_ORCHID_BUFF] = "Test experimental Black Orchid change";
+//var BLACK_ORCHID_BUFF = "BlackOrchidBuff";
+//gameOptionDescriptions[BLACK_ORCHID_BUFF] = "Test experimental Black Orchid change";
+
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
 		return gameOptionDescriptions[optionName];
