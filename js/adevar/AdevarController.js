@@ -106,9 +106,9 @@ AdevarController.prototype.getAdditionalMessage = function() {
 			msg += "<br /><strong>Adevăr Lite</strong> is a <em>training wheels</em> mode for beginners to learn the game - players play with their Hidden Tiles revealed and win by accomplishing their chosen Hidden Tile objective.<br />";
 		}
 
-		if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
-			msg += "The Black Orchid is currently the least picked HT, and frankly could use some improvement. This changes the objective to require a greater than <em> or equal</em> number of tiles in each plot excluding Open Plots players start in.";
-		}
+	//	if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
+	//		msg += "The Black Orchid is currently the least picked HT, and frankly could use some improvement. This changes the objective to require a greater than <em> or equal</em> number of tiles in each plot.";
+	//	}
 
 		msg += getGameOptionsMessageHtml(GameType.Adevar.gameOptions);
 	}
@@ -444,11 +444,11 @@ AdevarController.prototype.buildHiddenTileObjectiveMessage = function(hiddenTile
 			objective = "Have at least one total Basic tile in each of the 8 Plots on the board";
 			break;
 		case AdevarTileCode.blackOrchid:
-			if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
-				objective = "Have as many or more Basic tiles in each plot, except for the starting North and South Open Plots, than your opponent";
-			} else {
-				objective = "Have more Basic tiles in each plot, except for the starting North and South Open Plots, than your opponent";
-			}
+		//	if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
+				objective = "Have as many or more Basic tiles in each plot, except for the starting North and South Open Plots, than your opponent. You must have at least 1/2 a tile in those Plots.";
+		//	} else {
+		//		objective = "Have more Basic tiles in each plot, except for the starting North and South Open Plots, than your opponent";
+		//	}
 			break;
 		default:
 			objective = "Unknown";

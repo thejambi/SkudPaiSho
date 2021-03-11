@@ -47,12 +47,13 @@ var QueryString = function () {
 	  hlowenew: "Modern Tiles",
 	  vescucci: "Vescucci Tiles",
 	  vescuccicolor: "Classy Vescucci",
+	  minimalist: "TGG Minimalist",
+	  chujimono: "Chu Ji Canon Tiles",
+	  chujired: "Chu Ji Red",
+	  azulejos: "Azulejos by Cannoli",
 	  pixelsho: "Pixel Sho v1 Tiles",
 	  pixelsho2: "Pixel Sho v2 Tiles",
 	  xiangqi: "Xiangqi Style",
-	  minimalist: "TGG Minimalist",
-	  chujired: "Chu Ji Red",
-	  azulejos: "Azulejos by Cannoli",
 	  standard: "Pai Sho Project Tiles",
 	  tggproject2: "TGG Project Alt Colors",
 	  rusticgyatso: "Rustic Gyatso TGG Project Tiles",
@@ -64,8 +65,7 @@ var QueryString = function () {
 	  vescuccicolored2: "Vescucci Alt Colors 2",
 	  water: "Water-Themed Vescucci Tiles",
 	  earth: "Earth-Themed Vescucci Tiles",
-	  chujiblue: "Chu Ji Blue",
-	  chujimono: "Chu Ji Monochrome",
+	  chujiblue: "Chu Ji Canon - Blue",
 	  azulejosmono: "Azulejos Monocromos",
 	  azulejosdemadera: "Azulejos de Madera"
   };
@@ -242,7 +242,7 @@ var onlinePlayEngine = new OnlinePlayEngine();
 var appCaller;
 
 var gameId = -1;
-var lastKnownGameNotation = "";
+var lastKnownGameNotation = null;
 var gameWatchIntervalValue;
 var currentGameOpponentUsername;
 var currentGameData = new Object();
@@ -441,16 +441,16 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 	  }
   });
   
-  function usernameIsOneOf(theseNames) {
-	  if (theseNames && theseNames.length) {
-		  for (var i = 0; i < theseNames.length; i++) {
-			  if (getUsername() === theseNames[i]) {
-				  return true;
-			  }
-		  }
-	  }
-	  return false;
-  }
+function usernameIsOneOf(theseNames) {
+	if (theseNames && theseNames.length) {
+		for (var i = 0; i < theseNames.length; i++) {
+			if (getUsername() && getUsername().toLowerCase() === theseNames[i].toLowerCase()) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
   
   function showReplayControls() {
 	  if (window.navigator.onLine) {
@@ -492,6 +492,9 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 		startWatchingNumberOfGamesWhereUserTurn();
 		appCaller.alertAppLoaded();
 		userIsSignedInOk = true;
+
+		/* Temporary TheGameCrafter Set Announcement */
+		OnboardingFunctions.showTheGameCrafterSetAnnouncement();
 	} else {
 		// Cannot verify user login, forget all current stuff.
 		if (getUsername()) {
@@ -510,90 +513,113 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 	}
 };
   
-  function initialVerifyLogin() {
-	  if (onlinePlayEnabled) {
-		  onlinePlayEngine.verifyLogin(getUserId(),
-			  getUsername(),
-			  getUserEmail(),
-			  getDeviceId(),
-			  initialVerifyLoginCallback
-		  );
-	  }
-  }
+function initialVerifyLogin() {
+	if (onlinePlayEnabled) {
+		onlinePlayEngine.verifyLogin(getUserId(),
+			getUsername(),
+			getUserEmail(),
+			getDeviceId(),
+			initialVerifyLoginCallback
+		);
+	}
+}
   
-  var verifyLoginCallback = function verifyLoginCallback(response) {
-				  if (response === "Results exist") {
-					  // ok
-					  userIsSignedInOk = true;
-				  } else {
-					  // Cannot verify user login, forget all current stuff.
-					  if (getUsername()) {
-						  // showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
-						//   showModal("Signed Out", "Sorry you were unexpectedly signed out :( <br /><br />Please sign in again to keep playing.");
-						showOnlinePlayPausedModal();
-						onlinePlayPaused = true;
-					  }
-					//   forgetCurrentGameInfo();
-					//   forgetOnlinePlayInfo();
-				  }
-			  };
+var verifyLoginCallback = function verifyLoginCallback(response) {
+	if (response === "Results exist") {
+		// ok
+		userIsSignedInOk = true;
+	} else {
+		// Cannot verify user login, forget all current stuff.
+		if (getUsername()) {
+			// showModal("Signed Out :(", "If you were signed out unexpectedly, please send Skud this secret message via Discord: " + LZString.compressToEncodedURIComponent("Response:" + response + " LoginToken: " + JSON.stringify(getLoginToken())), true);
+			//   showModal("Signed Out", "Sorry you were unexpectedly signed out :( <br /><br />Please sign in again to keep playing.");
+			showOnlinePlayPausedModal();
+			onlinePlayPaused = true;
+		}
+		//   forgetCurrentGameInfo();
+		//   forgetOnlinePlayInfo();
+	}
+};
   
-  function verifyLogin() {
-	  if (onlinePlayEnabled) {
-		  onlinePlayEngine.verifyLogin(getUserId(),
-			  getUsername(),
-			  getUserEmail(),
-			  getDeviceId(),
-			  verifyLoginCallback
-		  );
-	  }
-  }
-  
-  var previousCountOfGamesWhereUserTurn = 0;
-  
-  function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
-	  var text = "Sign In";
-	  var numMovesText = "";
-	  if (userIsLoggedIn() && onlinePlayEnabled) {
-		  text = "My Games";
-		  // document.title = "Skud Pai Sho";
-		  document.title = "The Garden Gate";
-		  if (parseInt(countOfGamesWhereUserTurn)) {
-			  numMovesText = " (" + countOfGamesWhereUserTurn + ")";
-			  text += numMovesText;
-			  // document.title = "(" + countOfGamesWhereUserTurn + ") Skud Pai Sho";
-			  document.title = "(" + countOfGamesWhereUserTurn + ") The Garden Gate";
-		  }
-	  }
-	  document.getElementById('accountHeaderLinkText').innerText = text;
-	  document.getElementById('myGamesNumberMyTurn').innerText = numMovesText;
-  
-	  if (countOfGamesWhereUserTurn > previousCountOfGamesWhereUserTurn) {
-		  notifyThisMessage("The Garden Gate: It's your turn!");
-	  }
-	  previousCountOfGamesWhereUserTurn = countOfGamesWhereUserTurn;
-  }
-  
-  var getGameNotationCallback = function getGameNotationCallback(newGameNotation) {
-	  if (gameWatchIntervalValue && newGameNotation !== lastKnownGameNotation) {
-		  // gameController.gameNotation.setNotationText(newGameNotation);
-		  gameController.setGameNotation(decodeURIComponent(newGameNotation));
-		  rerunAll(true);
-		  lastKnownGameNotation = newGameNotation;
-		  showReplayControls();	// TODO Put this somewhere better where it's called less often.
-	  }
-  };
-  
-  function usernameEquals(otherUsername) {
-	  return otherUsername && getUsername() && otherUsername.toLowerCase() === getUsername().toLowerCase();
-  }
-  
-  function setResponseText(text) {
-	  var responseDiv = document.getElementById("response");
-	  if (responseDiv) {
-		  responseDiv.innerHTML = text;
-	  }
-  }
+function verifyLogin() {
+	if (onlinePlayEnabled) {
+		onlinePlayEngine.verifyLogin(getUserId(),
+			getUsername(),
+			getUserEmail(),
+			getDeviceId(),
+			verifyLoginCallback
+		);
+	}
+}
+
+var previousCountOfGamesWhereUserTurn = 0;
+
+function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
+	var text = "Sign In";
+	var numMovesText = "";
+	if (userIsLoggedIn() && onlinePlayEnabled) {
+		text = "My Games";
+		document.title = "The Garden Gate";
+		if (parseInt(countOfGamesWhereUserTurn)) {
+			numMovesText = " (" + countOfGamesWhereUserTurn + ")";
+			text += numMovesText;
+			document.title = "(" + countOfGamesWhereUserTurn + ") The Garden Gate";
+		}
+	}
+	document.getElementById('accountHeaderLinkText').innerText = text;
+	document.getElementById('myGamesNumberMyTurn').innerText = numMovesText;
+
+	if (countOfGamesWhereUserTurn > previousCountOfGamesWhereUserTurn) {
+		notifyThisMessage("The Garden Gate: It's your turn!");
+	}
+	previousCountOfGamesWhereUserTurn = countOfGamesWhereUserTurn;
+}
+
+var getGameNotationCallback = function getGameNotationCallback(newGameNotation) {
+	if (gameWatchIntervalValue && newGameNotation !== lastKnownGameNotation) {
+		gameController.setGameNotation(decodeURIComponent(newGameNotation));
+		rerunAll(true);
+		lastKnownGameNotation = newGameNotation;
+		showReplayControls();
+	}
+};
+
+var getGameNotationAndClockCallback = function getGameNotationAndClockCallback(newGameDataJsonString) {
+	if (newGameDataJsonString) {
+		try {
+			newGameData = JSON.parse(htmlDecode(newGameDataJsonString));
+			if (newGameData.notation !== lastKnownGameNotation) {
+				gameController.setGameNotation(decodeURIComponent(newGameData.notation));
+				rerunAll(true);
+				lastKnownGameNotation = newGameData.notation;
+				showReplayControls();
+				if (myTurn()) {
+					GameClock.loadGameClock(GameClock.buildGameClockInstance(newGameData.clock));
+					GameClock.startClock(getCurrentPlayer());
+				}
+			}
+
+			if (!myTurn()) {
+				GameClock.loadGameClock(GameClock.buildGameClockInstance(newGameData.clock));
+				GameClock.startClock(getCurrentPlayer());
+			}
+		} catch(error) {
+			debug("Error parsing game notation and clock data");
+			debug(error);
+		}
+	}
+};
+
+function usernameEquals(otherUsername) {
+	return otherUsername && getUsername() && otherUsername.toLowerCase() === getUsername().toLowerCase();
+}
+
+function setResponseText(text) {
+	var responseDiv = document.getElementById("response");
+	if (responseDiv) {
+		responseDiv.innerHTML = text;
+	}
+}
   
 function updateCurrentGameTitle(isOpponentOnline) {
 	if (!currentGameData.guestUsername || !currentGameData.hostUsername) {
@@ -714,50 +740,70 @@ function updateCurrentGameTitle(isOpponentOnline) {
 	  }
   };
   
-  function getTimestampString(timestampStr) {
-	  var dte = new Date(timestampStr + " UTC");
+function getTimestampString(timestampStr) {
+	var dte = new Date(timestampStr + " UTC");
 
-	  var localeStr = dte.toLocaleString();
-	  if (localeStr.toLowerCase().includes("invalid")) {
+	var localeStr = dte.toLocaleString();
+	if (localeStr.toLowerCase().includes("invalid")) {
 		return timestampStr + " UTC";
-	  }
-	  return localeStr;
-  }
+	}
+	return localeStr;
+}
   
-  function gameWatchPulse() {
-	  onlinePlayEngine.getGameNotation(gameId, getGameNotationCallback);
-  
-	  onlinePlayEngine.checkIfUserOnline(currentGameOpponentUsername, checkIfUserOnlineCallback);
-  
-	  onlinePlayEngine.getNewChatMessages(gameId, lastChatTimestamp, getNewChatMessagesCallback);
-  }
-  
-  function clearGameWatchInterval() {
-	  if (gameWatchIntervalValue) {
-		  clearInterval(gameWatchIntervalValue);
-		  gameWatchIntervalValue = null;
-	  }
-  }
-  var REAL_TIME_GAME_WATCH_INTERVAL = 3000;
-  function startWatchingGameRealTime() {
-	  // Setup game watching...
-	  clearGameChats();
-  
-	  /* Setup chat heading message with link to previously active game */
-	  // TODO
-	  // onlinePlayEngine
-  
-	  // First pulse
-	  gameWatchPulse();
-  
-	  clearGameWatchInterval();
-  
-	  gameWatchIntervalValue = setInterval(function() {
-		if (!onlinePlayPaused) {
-		  gameWatchPulse();
+function gameWatchPulse() {
+	onlinePlayEngine.getGameNotationAndClock(gameId, getGameNotationAndClockCallback);
+
+	onlinePlayEngine.checkIfUserOnline(currentGameOpponentUsername, checkIfUserOnlineCallback);
+
+	onlinePlayEngine.getNewChatMessages(gameId, lastChatTimestamp, getNewChatMessagesCallback);
+
+	if (myTurn() && GameClock.currentClockIsTicking()) {
+		GameClock.currentClock.updateSecondsRemaining();
+		onlinePlayEngine.updateGameClock(gameId, GameClock.getCurrentGameClockJsonString(), getLoginToken(), emptyCallback);
+
+		if (GameClock.currentClockIsOutOfTime()) {
+			var hostResultCode = 0.5;
+			if (getCurrentPlayer() === HOST) {
+				hostResultCode = 0;
+			} else if (getCurrentPlayer() === GUEST) {
+				hostResultCode = 1;
+			}
+			var newPlayerRatings = {};
+			if (currentGameData.isRankedGame && currentGameData.hostUsername !== currentGameData.guestUsername) {
+				newPlayerRatings = Elo.getNewPlayerRatings(currentGameData.hostRating, currentGameData.guestRating, hostResultCode);
+			}
+			onlinePlayEngine.updateGameWinInfo(gameId, getOnlineGameOpponentUsername(), 11, getLoginToken(), emptyCallback, 
+				currentGameData.isRankedGame, newPlayerRatings.hostRating, newPlayerRatings.guestRating, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
 		}
-	  }, REAL_TIME_GAME_WATCH_INTERVAL);
-  }
+	}
+}
+
+function clearGameWatchInterval() {
+	if (gameWatchIntervalValue) {
+		clearInterval(gameWatchIntervalValue);
+		gameWatchIntervalValue = null;
+	}
+}
+var REAL_TIME_GAME_WATCH_INTERVAL = 3000;
+function startWatchingGameRealTime() {
+	// Setup game watching...
+	clearGameChats();
+
+	/* Setup chat heading message with link to previously active game */
+	// TODO
+	// onlinePlayEngine
+
+	// First pulse
+	gameWatchPulse();
+
+	clearGameWatchInterval();
+
+	gameWatchIntervalValue = setInterval(function() {
+		if (!onlinePlayPaused) {
+			gameWatchPulse();
+		}
+	}, REAL_TIME_GAME_WATCH_INTERVAL);
+}
   
 /* Pai Sho Board Switches */
 function setPaiShoBoardOption(newPaiShoBoardKey, isTemporary) {
@@ -1080,8 +1126,8 @@ function refreshMessage() {
 
 	getGameMessageElement().innerHTML = message;
 
-	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn()) ||
-		gameController.isSolitaire()) {
+	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn() && !gameController.theGame.getWinner()) 
+			|| gameController.isSolitaire()) {
 		showResetMoveMessage();
 	}
 }
@@ -1222,7 +1268,7 @@ function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
 					currentGameData.isRankedGame, newPlayerRatings.hostRating, newPlayerRatings.guestRating, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
 			} else {
 				onlinePlayEngine.updateGameWinInfo(gameId, winnerUsername, gameController.theGame.getWinResultTypeCode(), getLoginToken(), emptyCallback, 
-				currentGameData.isRankedGame, newPlayerRatings.hostRating, newPlayerRatings.guestRating, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
+					currentGameData.isRankedGame, newPlayerRatings.hostRating, newPlayerRatings.guestRating, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
 			}
 		}
 
@@ -1772,17 +1818,21 @@ function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, 
 	};
 }
   
-  function closeModal() {
-	  document.getElementById('myMainModal').style.display = "none";
-	  tutorialInProgress = false;
-  }
+function closeModal() {
+	document.getElementById('myMainModal').style.display = "none";
+	tutorialInProgress = false;
+}
   
 function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed) {
 	submitMoveData = {
 		moveAnimationBeginStep: moveAnimationBeginStep
 	};
 	if (moveIsConfirmed || !isMoveConfirmationRequired()) {	/* Move should be processed */
-		onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback);
+		GameClock.stopGameClock();
+		if (!GameClock.currentClockIsOutOfTime()) {
+			onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
+				GameClock.getCurrentGameClockJsonString());
+		}
 	} else {
 		/* Move needs to be confirmed. Finalize move and show confirm button. */
 		finalizeMove(submitMoveData.moveAnimationBeginStep);
@@ -1934,7 +1984,7 @@ function userIsLoggedIn() {
 	  }
   
 	  gameId = -1;
-	  lastKnownGameNotation = "";
+	  lastKnownGameNotation = null;
 	  if (gameWatchIntervalValue) {
 		  clearInterval(gameWatchIntervalValue);
 		  gameWatchIntervalValue = null;
@@ -1981,8 +2031,8 @@ var GameType = {
 		desc: "Adevăr Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
 		gameOptions: [
-			ADEVAR_LITE,
-			BLACK_ORCHID_BUFF
+			ADEVAR_LITE
+			//BLACK_ORCHID_BUFF
 		],
 		noRankedGames: true
 	},
@@ -2205,6 +2255,7 @@ function setGameController(gameTypeId, keepGameOptions) {
 	var successResult = true;
 
 	hideConfirmMoveButton();
+	GameClock.clearCurrentClock();
 
 	// Previous game controller cleanup
 	if (gameController) {
@@ -2245,68 +2296,64 @@ function setGameController(gameTypeId, keepGameOptions) {
 	return successResult;
 }
   
-  var jumpToGameCallback = function jumpToGameCallback(results) {
-	  if (results) {
-		  populateMyGamesList(results);
-  
-		  var myGame = myGamesList[0];
-  
-		  clearOptions();
-		  if (myGame.gameOptions) {
-			  for (var i = 0; i < myGame.gameOptions.length; i++) {
-				  addOption(myGame.gameOptions[i]);
-			  }
-		  }
-		  var gameControllerSuccess = setGameController(myGame.gameTypeId, true);
-  
-		  if (!gameControllerSuccess) {
-			  return;
-		  }
-  
-		  // Is user even playing this game? This could be used to "watch" games
-		  var userIsPlaying = usernameEquals(myGame.hostUsername) ||
-		  usernameEquals(myGame.guestUsername);
-  
-		  gameId = myGame.gameId;
-		  currentGameOpponentUsername = null;
-		  var opponentUsername;
-  
-		  if (userIsPlaying) {
-			  if (usernameEquals(myGame.hostUsername)) {
-				  opponentUsername = myGame.guestUsername;
-			  } else {
-				  opponentUsername = myGame.hostUsername;
-			  }
-  
-			  currentGameOpponentUsername = opponentUsername;
-		  }
-  
-		  currentGameData.hostUsername = myGame.hostUsername;
-		  currentGameData.guestUsername = myGame.guestUsername;
-		  currentGameData.lastUpdatedTimestamp = myGame.timestamp;
-		  currentGameData.isRankedGame = myGame.rankedGame;
-		  currentGameData.hostRating = myGame.hostRating;
-		  currentGameData.guestRating = myGame.guestRating;
-  
-		  hostEmail = myGame.hostUsername;
-		  guestEmail = myGame.guestUsername;
-  
-		  startWatchingGameRealTime();
-		  updateFooter();
+var jumpToGameCallback = function jumpToGameCallback(results) {
+	if (results) {
+		populateMyGamesList(results);
 
-		  /* Ask to join invite link game if present */
-		  if (QueryString.joinPrivateGame && gameId && gameId.toString() === QueryString.joinPrivateGame) {
-			  askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName, QueryString.rankedGameInd);
-			  /* Once we ask after jumping into a game, we won't need to ask again */
-			  QueryString.joinPrivateGame = null;
-		  }
+		var myGame = myGamesList[0];
 
-		//   if (sendJoinGameChatMessage && shouldSendJamboreeNoteChat(myGame.gameTypeId)) {
-		// 	  sendJoinGameChatMessage = false;
-		// 		sendChat(buildJoinGameChatMessage());
-		//   }
-	  }
-  };
+		clearOptions();
+		if (myGame.gameOptions) {
+			for (var i = 0; i < myGame.gameOptions.length; i++) {
+				addOption(myGame.gameOptions[i]);
+			}
+		}
+		var gameControllerSuccess = setGameController(myGame.gameTypeId, true);
+
+		if (!gameControllerSuccess) {
+			return;
+		}
+
+		// Is user even playing this game? This could be used to "watch" games
+		var userIsPlaying = usernameEquals(myGame.hostUsername) ||
+			usernameEquals(myGame.guestUsername);
+
+		gameId = myGame.gameId;
+		currentGameOpponentUsername = null;
+		var opponentUsername;
+
+		if (userIsPlaying) {
+			if (usernameEquals(myGame.hostUsername)) {
+				opponentUsername = myGame.guestUsername;
+			} else {
+				opponentUsername = myGame.hostUsername;
+			}
+			currentGameOpponentUsername = opponentUsername;
+		}
+
+		currentGameData.hostUsername = myGame.hostUsername;
+		currentGameData.guestUsername = myGame.guestUsername;
+		currentGameData.lastUpdatedTimestamp = myGame.timestamp;
+		currentGameData.isRankedGame = myGame.rankedGame;
+		currentGameData.hostRating = myGame.hostRating;
+		currentGameData.guestRating = myGame.guestRating;
+		currentGameData.gameClock = myGame.gameClock;
+		GameClock.loadGameClock(currentGameData.gameClock);
+
+		hostEmail = myGame.hostUsername;
+		guestEmail = myGame.guestUsername;
+
+		startWatchingGameRealTime();
+		updateFooter();
+
+		/* Ask to join invite link game if present */
+		if (QueryString.joinPrivateGame && gameId && gameId.toString() === QueryString.joinPrivateGame) {
+			askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName, QueryString.rankedGameInd);
+			/* Once we ask after jumping into a game, we won't need to ask again */
+			QueryString.joinPrivateGame = null;
+		}
+	}
+};
 
 function buildJoinGameChatMessage() {
 	return "[Jamboree Note] Game joined at " + new Date().toString();
@@ -2330,31 +2377,35 @@ function shouldSendJamboreeNoteChat(gameTypeId) {
 	  }
   }
   
-  function populateMyGamesList(results) {
-	  var resultRows = results.split('\n');
-	  myGamesList = [];
-	  for (var index in resultRows) {
-		  var row = resultRows[index].split('|||');
-		  var myGame = {
-			  gameId:parseInt(row[0]),
-			  gameTypeId:parseInt(row[1]),
-			  gameTypeDesc:row[2],
-			  hostUsername:row[3],
-			  hostOnline:parseInt(row[4]),
-			  guestUsername:row[5],
-			  guestOnline:parseInt(row[6]),
-			  isUserTurn:parseInt(row[7]),
-			  gameOptions:parseGameOptions(row[8]),
-			  winnerUsername:row[9],
-			  resultId:parseInt(row[10]),
-			  timestamp:row[11],
-			  hostRating: parseInt(row[12]),
-			  guestRating: parseInt(row[13]),
-			  rankedGame: row[14]
-		  };
-		  myGamesList.push(myGame);
-	  }
-  }
+function populateMyGamesList(results) {
+	var resultRows = results.split('\n');
+	myGamesList = [];
+	for (var index in resultRows) {
+		var row = resultRows[index].split('|||');
+		var myGame = {
+			gameId: parseInt(row[0]),
+			gameTypeId: parseInt(row[1]),
+			gameTypeDesc: row[2],
+			hostUsername: row[3],
+			hostOnline: parseInt(row[4]),
+			guestUsername: row[5],
+			guestOnline: parseInt(row[6]),
+			isUserTurn: parseInt(row[7]),
+			gameOptions: parseGameOptions(row[8]),
+			winnerUsername: row[9],
+			resultId: parseInt(row[10]),
+			timestamp: row[11],
+			hostRating: parseInt(row[12]),
+			guestRating: parseInt(row[13]),
+			rankedGame: row[14],
+			gameClock: row[15]
+		};
+		if (myGame.gameClock) {
+			myGame.gameClock = GameClock.decodeGameClock(myGame.gameClock);
+		}
+		myGamesList.push(myGame);
+	}
+}
   
   function getLoginToken() {
 	  return {
@@ -2662,21 +2713,21 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 	  closeModal();
   }
   
-  function gameOptionsSupportedForGameSeek(gameSeek) {
-	  var gameOptionsSupported = false;
-	  Object.keys(GameType).forEach(function(key,index) {
-		  var gameType = GameType[key];
-		  if (gameType.id === gameSeek.gameTypeId && gameType.gameOptions) {
-			  var allSupportedGameOptions = gameType.gameOptions;
-			  if (gameType.secretGameOptions) {
-				  allSupportedGameOptions = allSupportedGameOptions.concat(gameType.secretGameOptions);
-			  }
-			  gameOptionsSupported = arrayIncludesAll(allSupportedGameOptions, gameSeek.gameOptions);
-			  return gameOptionsSupported;
-		  }
-	  });
-	  return gameOptionsSupported;
-  }
+function gameOptionsSupportedForGameSeek(gameSeek) {
+	var gameOptionsSupported = false;
+	Object.keys(GameType).forEach(function(key, index) {
+		var gameType = GameType[key];
+		if (gameType.id === gameSeek.gameTypeId && gameType.gameOptions) {
+			var allSupportedGameOptions = gameType.gameOptions;
+			if (gameType.secretGameOptions) {
+				allSupportedGameOptions = allSupportedGameOptions.concat(gameType.secretGameOptions);
+			}
+			gameOptionsSupported = arrayIncludesAll(allSupportedGameOptions, gameSeek.gameOptions);
+			return gameOptionsSupported;
+		}
+	});
+	return gameOptionsSupported;
+}
   
 var getGameSeeksCallback = function getGameSeeksCallback(results) {
 	var message = "";
@@ -2698,8 +2749,12 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 				hostOnline: parseInt(row[5]),
 				gameOptions: parseGameOptions(row[6]),
 				hostRating: parseInt(row[7]),
-				rankedGame: row[8]
+				rankedGame: row[8],
+				gameClock: row[9]
 			};
+			if (gameSeek.gameClock) {
+				gameSeek.gameClock = GameClock.decodeGameClock(gameSeek.gameClock);
+			}
 			gameSeekList.push(gameSeek);
 		}
 		var gameTypeHeading = "";
@@ -2737,7 +2792,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 	}
 
 	if (!gameSeeksDisplayed) {
-		message = "No games available to join. You should start one!";
+		message = "No games available to join. You can create a new game, or join <a href='https://discord.gg/dStDZx7' target='_blank'>Join the Discord</a> to find people to play with!";
 	}
 
 	message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
@@ -2792,22 +2847,32 @@ var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
 	}
 };
   
-  /* Creating a public game */
-  var yesCreateGame = function yesCreateGame(gameTypeId, rankedGame) {
-	  var rankedInd = 'n';
-	  if (rankedGame && !getGameTypeEntryFromId(gameTypeId).noRankedGames) {
-		rankedInd = 'y';
-	  }
-	  onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), '', getLoginToken(), createGameCallback, rankedInd);
-  };
-  
-  var yesCreatePrivateGame = function yesCreatePrivateGame(gameTypeId, rankedGame) {
+/* Creating a public game */
+var yesCreateGame = function yesCreateGame(gameTypeId, rankedGame) {
 	var rankedInd = 'n';
 	if (rankedGame && !getGameTypeEntryFromId(gameTypeId).noRankedGames) {
-	  rankedInd = 'y';
+		rankedInd = 'y';
 	}
-	  onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), 'Y', getLoginToken(), createPrivateGameCallback, rankedInd);
-  };
+	var gameClockJson = null;
+	if (GameClock.currentClock && GameClock.currentClock.getJsonObjectString) {
+		gameClockJson = GameClock.currentClock.getJsonObjectString();
+	}
+	onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), '', getLoginToken(), createGameCallback,
+		rankedInd, gameClockJson);
+};
+  
+var yesCreatePrivateGame = function yesCreatePrivateGame(gameTypeId, rankedGame) {
+	var rankedInd = 'n';
+	if (rankedGame && !getGameTypeEntryFromId(gameTypeId).noRankedGames) {
+		rankedInd = 'y';
+	}
+	var gameClockJson = null;
+	if (GameClock.currentClock && GameClock.currentClock.getJsonObjectString) {
+		gameClockJson = GameClock.currentClock.getJsonObjectString();
+	}
+	onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), 'Y', getLoginToken(), createPrivateGameCallback,
+		rankedInd, gameClockJson);
+};
 
 function replaceWithLoadingText(element) {
 	element.innerHTML = getLoadingModalText();
@@ -2828,14 +2893,27 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 			var message = "<div>Do you want to create a game for others to join?</div>";
 			if (!getGameTypeEntryFromId(gameTypeId).noRankedGames) {
 				var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
-				message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - coming soon - publicly viewable game)</label></div>";
+				message += "<br /><div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - coming soon - publicly viewable game)</label></div>";
 			}
+
+			if (GameClock.userHasGameClockAccess()) {
+				message += "<br /><div id='timeControlsDropdownContainer'></div>";
+			}
+
 			if (!gameController.isInviteOnly) {
 				message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create game</div>";
 			}
 			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create a private game with a friend</div>";
 			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
 			showModal("Create game?", message);
+			if (GameClock.userHasGameClockAccess()) {
+				setTimeout(function() {
+					var timeControlsDiv = document.getElementById("timeControlsDropdownContainer");
+					if (timeControlsDiv) {
+						timeControlsDiv.appendChild(GameClock.getTimeControlsDropdown());
+					}
+				}, 50);
+			}
 		}
 	} else {
 		finalizeMove();
@@ -2844,7 +2922,10 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 			message = "<div>You already have a public game waiting for an opponent. Do you want to create a private game for others to join?</div>";
 			if (!getGameTypeEntryFromId(gameTypeId).noRankedGames) {
 				var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
-				message += "<div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> (Coming soon) Ranked game (Player rankings will be affected and - coming soon - publicly available game)</label></div>";
+				message += "<br /><div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - coming soon - publicly available game)</label></div>";
+			}
+			if (GameClock.userHasGameClockAccess()) {
+				message += "<br /><div id='timeControlsDropdownContainer'></div>";
 			}
 			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create a private game with a friend</div>";
 			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
@@ -2853,6 +2934,14 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 			message = "You are not signed in. ";
 			message += "<br /><br />You can still play the game locally, but it will not be saved online.";
 			showModal("Game Not Created", message);
+			if (GameClock.userHasGameClockAccess()) {
+				setTimeout(function() {
+					var timeControlsDiv = document.getElementById("timeControlsDropdownContainer");
+					if (timeControlsDiv) {
+						timeControlsDiv.appendChild(GameClock.getTimeControlsDropdown());
+					}
+				}, 50);
+			}
 		}
 	}
 };
@@ -3284,32 +3373,32 @@ var processChatCommands = function(chatMessage) {
 	  }
   }
 
-  function quitInactiveOnlineGame() {
+function quitInactiveOnlineGame() {
 	if (iAmPlayerInCurrentOnlineGame()
-			&& !gameController.theGame.getWinner()
-			&& (currentGameData.hostUsername === currentGameData.guestUsername
-				|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
+		&& !gameController.theGame.getWinner()
+		&& (currentGameData.hostUsername === currentGameData.guestUsername
+			|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
 	) {
 		onlinePlayEngine.updateGameWinInfoAsTie(gameId, 10, getLoginToken(), quitOnlineGameCallback);
 	}
-  }
+}
   
-  function quitOnlineGameClicked() {
-	  var message = "";
-	  if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame() 
-			  && !gameController.theGame.getWinner()
-			  && (currentGameData.hostUsername === currentGameData.guestUsername
-				  || (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
-		) {
-		  message = "<div>Are you sure you want to quit and end this inactive game? The game will end and will appear as Inactive in your Completed Games list.</div>";
-		  message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - quit current game</div>";
-		  message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
-	  } else {
-		  message = "When playing an unfinished inactive online game, this is where you can quit or leave a game if you wish to do so.";
-	  }
-  
-	  showModal("Quit Current Online Game", message);
-  }
+function quitOnlineGameClicked() {
+	var message = "";
+	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame()
+		&& !gameController.theGame.getWinner()
+		&& (currentGameData.hostUsername === currentGameData.guestUsername
+			|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
+	) {
+		message = "<div>Are you sure you want to quit and end this inactive game? The game will end and will appear as Inactive in your Completed Games list.</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - quit current game</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+	} else {
+		message = "When playing an unfinished inactive online game, this is where you can quit or leave a game if you wish to do so.";
+	}
+
+	showModal("Quit Current Online Game", message);
+}
 
 function onlineGameIsOldEnoughToBeQuit() {
 	var currentGameTimestampDate = buildDateFromTimestamp(currentGameData.lastUpdatedTimestamp);
@@ -4032,60 +4121,60 @@ function buildPreferenceDropdownDiv(labelText, dropdownId, valuesObject, prefere
 				});
 };
   
-  function setGameLogText(text) {
-	  var newText = '';
-	  if (text) {
-		  newText = text;
-	  }
-	  document.getElementById('gameLogText').innerText = newText;
-  }
+function setGameLogText(text) {
+	var newText = '';
+	if (text) {
+		newText = text;
+	}
+	document.getElementById('gameLogText').innerText = newText;
+}
   
   
   
   
   
   
-  /* Notifications work */
-  function requestNotificationPermission() {
-	  if (Notification.permission !== "denied") {
-		  Notification.requestPermission().then(function (permission) {
-			  // If the user accepts, let's create a notification
-			  if (permission === "granted") {
-				  debug("Notifications granted");
-			  }
-		  });
-	  }
-  }
+/* Notifications work */
+function requestNotificationPermission() {
+	if (Notification.permission !== "denied") {
+		Notification.requestPermission().then(function(permission) {
+			// If the user accepts, let's create a notification
+			if (permission === "granted") {
+				debug("Notifications granted");
+			}
+		});
+	}
+}
   
-  function notifyMe() {
-	  notifyThisMessage("It's your turn, bub");
-  }
-  
-  function notifyThisMessage(message) {
-	  // Let's check if the browser supports notifications
-	  // if (!("Notification" in window)) {
-	  //   alert("This browser does not support desktop notification");
-	  // } else.....
-  
-	  // Let's check whether notification permissions have already been granted
-	  if (!document.hasFocus() && Notification.permission === "granted") {
+function notifyMe() {
+	notifyThisMessage("It's your turn, bub");
+}
+
+function notifyThisMessage(message) {
+	// Let's check if the browser supports notifications
+	// if (!("Notification" in window)) {
+	//   alert("This browser does not support desktop notification");
+	// } else.....
+
+	// Let's check whether notification permissions have already been granted
+	if (!document.hasFocus() && Notification.permission === "granted") {
 		// If it's okay let's create a notification
 		var notification = new Notification(message);
-	  }
-  
-	  // Otherwise, we need to ask the user for permission
-	  // else if (Notification.permission !== "denied") {
-	  //   Notification.requestPermission().then(function (permission) {
-	  // 	// If the user accepts, let's create a notification
-	  // 	if (permission === "granted") {
-	  // 	  var notification = new Notification(message);
-	  // 	}
-	  //   });
-	  // }
-  
-	  // At last, if the user has denied notifications, and you
-	  // want to be respectful there is no need to bother them any more.
 	}
+
+	// Otherwise, we need to ask the user for permission
+	// else if (Notification.permission !== "denied") {
+	//   Notification.requestPermission().then(function (permission) {
+	// 	// If the user accepts, let's create a notification
+	// 	if (permission === "granted") {
+	// 	  var notification = new Notification(message);
+	// 	}
+	//   });
+	// }
+
+	// At last, if the user has denied notifications, and you
+	// want to be respectful there is no need to bother them any more.
+}
   
 /* Keyboard shortcuts */
 document.onkeyup = function(e) {

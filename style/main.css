@@ -266,9 +266,13 @@ div.tab .alertTab, div.tab .alertTab.active {
   padding: 4px;
 }
 
-#replayControls .gameLogText {
+#replayControls .gameLogText, #replayControls .replayControlsAdditionalContent {
   width: 38%;
   float: left;
+}
+
+.gameClockContainer {
+  font-weight: bold;
 }
 
 .replayControlsCloseButton {
@@ -1401,7 +1405,7 @@ textarea {
   }
 
   /* Show gameLogText above replay controls */
-  #replayControls .gameLogText {
+  #replayControls .gameLogText, #replayControls .replayControlsAdditionalContent {
     margin-left: auto;
     margin-right: auto;
     text-align: center;
