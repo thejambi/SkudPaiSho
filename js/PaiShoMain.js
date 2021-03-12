@@ -494,7 +494,7 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 		userIsSignedInOk = true;
 
 		/* Temporary TheGameCrafter Set Announcement */
-		OnboardingFunctions.showTheGameCrafterSetAnnouncement();
+		OnboardingFunctions.showTheGameCrafterCrowdSaleAnnouncement();
 	} else {
 		// Cannot verify user login, forget all current stuff.
 		if (getUsername()) {
