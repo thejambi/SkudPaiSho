@@ -1164,6 +1164,18 @@ AdevarBoard.prototype.markOrientalLilyObjectivePoints = function() {
 	});
 };
 
+AdevarBoard.prototype.getPlayerSFTileThatIsNotThisOne = function(sfTile) {
+	var otherSfTile = null;
+	this.forEachBoardPointWithTile(function(boardPointWithTile) {
+		if (boardPointWithTile.tile.type === AdevarTileType.secondFace
+				&& boardPointWithTile.tile.ownerName === sfTile.ownerName
+				&& boardPointWithTile.tile !== sfTile) {
+			otherSfTile = boardPointWithTile.removeTile();
+		}
+	});
+	return otherSfTile;
+};
+
 AdevarBoard.prototype.getCopy = function() {
 	var copyBoard = new AdevarBoard();
 
