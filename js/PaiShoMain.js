@@ -3495,48 +3495,48 @@ function continueTutorial() {
 	tutorialInProgress = false;
 }
   
-  function iOSShake() {
-	  // If undo move is allowed, ask user if they wanna
-	  if ((playingOnlineGame() && !myTurn() && !gameController.theGame.getWinner())
-		  || (!playingOnlineGame())) {
-		  var message = "<br /><div class='clickableText' onclick='resetMove(); closeModal();'>Yes, undo move</div>";
-		  message += "<br /><div class='clickableText' onclick='closeModal();'>Cancel</div>";
+function iOSShake() {
+	// If undo move is allowed, ask user if they wanna
+	if ((playingOnlineGame() && !myTurn() && !gameController.theGame.getWinner())
+		|| (!playingOnlineGame())) {
+		var message = "<br /><div class='clickableText' onclick='resetMove(); closeModal();'>Yes, undo move</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal();'>Cancel</div>";
+
+		showModal("Undo move?", message);
+	}
+}
+
+function saveDeviceTokenIfNeeded() {
+	var deviceToken = localStorage.getItem(deviceTokenKey);
+	if ((ios || QueryString.appType === 'ios') && deviceToken && userIsLoggedIn()) {
+		onlinePlayEngine.addUserPreferenceValue(getLoginToken(), 3, deviceToken, emptyCallback);
+	}
+}
   
-		  showModal("Undo move?", message);
-	  }
-  }
-  
-  function saveDeviceTokenIfNeeded() {
-	  var deviceToken = localStorage.getItem(deviceTokenKey);
-	  if ((ios || QueryString.appType === 'ios') && deviceToken && userIsLoggedIn()) {
-		  onlinePlayEngine.addUserPreferenceValue(getLoginToken(), 3, deviceToken, emptyCallback);
-	  }
-  }
-  
-  function setDeviceToken(deviceToken) {
-	  localStorage.setItem(deviceTokenKey, deviceToken);
-	  saveDeviceTokenIfNeeded();
-  }
-  
-  function openShop() {
-	  openLink("https://skudpaisho.com/site/buying-pai-sho/");
-  }
-  
-  /* Options */
-  var ggOptions = [];
-  
-  function addOption(option) {
-	  ggOptions.push(option);
-  }
-  
-  function clearOptions() {
-	  ggOptions = [];
-  }
-  
-  function addOptionFromInput() {
-	  addGameOption(document.getElementById('optionAddInput').value);
-	  closeModal();
-  }
+function setDeviceToken(deviceToken) {
+	localStorage.setItem(deviceTokenKey, deviceToken);
+	saveDeviceTokenIfNeeded();
+}
+
+function openShop() {
+	openLink("https://skudpaisho.com/site/buying-pai-sho/");
+}
+
+/* Options */
+var ggOptions = [];
+
+function addOption(option) {
+	ggOptions.push(option);
+}
+
+function clearOptions() {
+	ggOptions = [];
+}
+
+function addOptionFromInput() {
+	addGameOption(document.getElementById('optionAddInput').value);
+	closeModal();
+}
   
 function promptAddOption() {
 	var message = "";
