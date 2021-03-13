@@ -32,6 +32,11 @@ GameClock.Clock = function(controls, hostRemainingSeconds, guestRemainingSeconds
 GameClock.Clock.prototype.startTimer = function(player, tickCallback) {
     this.currentTimerPlayer = player;
     this.currentTimer = new GameClock.Timer();
+
+    this.currentTimer.outOfTimeCallback = function() {
+        refreshMessage();
+    };
+    
     var secondsLeft = player === HOST ? this.hostRemainingSeconds : this.guestRemainingSeconds;
     this.currentTimer.setSecondsRemaining(secondsLeft);
     tickCallback(this.hostRemainingSeconds, this.guestRemainingSeconds);
@@ -191,7 +196,7 @@ GameClock.getTimeControlsDropdown = function() {
 };
 
 GameClock.loadGameClock = function(newClock) {
-    if (GameClock.userHasGameClockAccess()) {
+    // if (GameClock.userHasGameClockAccess()) {
         if (newClock) {
             if (GameClock.currentClock) {
                 GameClock.stopGameClock();
@@ -200,7 +205,7 @@ GameClock.loadGameClock = function(newClock) {
                 GameClock.currentClock = newClock;
             }
         }
-    }
+    // }
 };
 
 GameClock.userHasGameClockAccess = function() {
@@ -215,7 +220,7 @@ GameClock.userHasGameClockAccess = function() {
 };
 
 GameClock.startClock = function(player) {
-    if (GameClock.userHasGameClockAccess()) {
+    // if (GameClock.userHasGameClockAccess()) {
         if (GameClock.currentClock) {
             GameClock.setGameClockText("Game Clock | Host: " + GameClock.formatSecondsToMinutes(GameClock.currentClock.hostRemainingSeconds)
                         + " vs Guest: " + GameClock.formatSecondsToMinutes(GameClock.currentClock.guestRemainingSeconds));
@@ -229,7 +234,7 @@ GameClock.startClock = function(player) {
                 GameClock.currentClock.isTicking = true;
             }
         }
-    }
+    // }
 };
 
 GameClock.clearCurrentClock = function() {
@@ -268,12 +273,22 @@ GameClock.currentClockIsTicking = function() {
 };
 
 GameClock.currentClockIsOutOfTime = function() {
-    return GameClock.currentClock && GameClock.currentClock.currentTimer.secondsRemaining <= 0;
+    return GameClock.currentClock 
+        && (!GameClock.currentClock.currentTimer
+            || GameClock.currentClock.currentTimer.secondsRemaining <= 0);
 };
 
 GameClock.aPlayerIsOutOfTime = function() {
     return GameClock.currentClock 
         && (GameClock.currentClock.hostRemainingSeconds <= 0 || GameClock.currentClock.guestRemainingSeconds <= 0);
+};
+
+GameClock.playerIsOutOfTime = function(player) {
+    if (player === HOST) {
+        return GameClock.currentClock && GameClock.currentClock.hostRemainingSeconds <= 0;
+    } else {
+        return GameClock.currentClock && GameClock.currentClock.guestRemainingSeconds <= 0;
+    }
 };
 
 GameClock.getCurrentGameClockJsonString = function() {
@@ -284,11 +299,11 @@ GameClock.getCurrentGameClockJsonString = function() {
 };
 
 GameClock.setGameClockText = function(text) {
-    if (GameClock.userHasGameClockAccess()) {
+    // if (GameClock.userHasGameClockAccess()) {
         var newText = '';
         if (text) {
             newText = text;
         }
         document.getElementById('gameClockContainer').innerText = newText;
-    }
+    // }
 };

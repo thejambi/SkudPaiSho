@@ -637,7 +637,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 
 	// Build HOST username
 	var hostUsernameTag = "";
-	if (currentPlayer === HOST && !gameController.theGame.getWinner()) {
+	if (currentPlayer === HOST && !getGameWinner()) {
 		hostUsernameTag = "<span class='currentPlayerUsername'>";
 	} else {
 		hostUsernameTag = "<span>";
@@ -652,7 +652,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 	hostUsernameTag += "</span>";
 
 	var guestUsernameTag = "";
-	if (currentPlayer === GUEST && !gameController.theGame.getWinner()) {
+	if (currentPlayer === GUEST && !getGameWinner()) {
 		guestUsernameTag = "<span class='currentPlayerUsername'>";
 	} else {
 		guestUsernameTag = "<span>";
@@ -1088,9 +1088,9 @@ function getAdditionalMessage() {
 
 	msg += gameController.getAdditionalMessage();
 
-	if (gameController.theGame.getWinner()) {
+	if (getGameWinner()) {
 		// There is a winner!
-		msg += " <strong>" + gameController.theGame.getWinner() + gameController.theGame.getWinReason() + "</strong>";
+		msg += " <strong>" + getGameWinner() + getGameWinReason() + "</strong>";
 	} else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
 		msg += "Game has ended in a draw.";
 	}
@@ -1126,7 +1126,7 @@ function refreshMessage() {
 
 	getGameMessageElement().innerHTML = message;
 
-	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn() && !gameController.theGame.getWinner()) 
+	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn() && !getGameWinner()) 
 			|| gameController.isSolitaire()) {
 		showResetMoveMessage();
 	}
@@ -1175,29 +1175,47 @@ var finalizeMove = function (moveAnimationBeginStep, ignoreNoEmail, okToUpdateWi
   	}
 }
   
-  function showSubmitMoveForm(url) {
-	  // Move has completed, so need to send to "current player"
-	  /* Commenting out - 20181022
-	  var toEmail = getCurrentPlayerEmail();
-  
-	  var fromEmail = getUserEmail();
-  
-	  var bodyMessage = getEmailBody(url);
-  
-	  $('#fromEmail').attr("value", fromEmail);
-	  $('#toEmail').attr("value", toEmail);
-	  $('#message').attr("value", bodyMessage);
-	  $('#contactform').removeClass('gone');
-	  */
-  }
-  
-  function getNoUserEmailMessage() {
-	  return "<span class='skipBonus' onclick='loginClicked(); finalizeMove();'>Sign in</span> to play games with others online. <br />";
-  }
-  
-  function playingOnlineGame() {
-	  return onlinePlayEnabled && gameId > 0;
-  }
+function showSubmitMoveForm(url) {
+	// Move has completed, so need to send to "current player"
+	/* Commenting out - 20181022
+	var toEmail = getCurrentPlayerEmail();
+ 
+	var fromEmail = getUserEmail();
+ 
+	var bodyMessage = getEmailBody(url);
+ 
+	$('#fromEmail').attr("value", fromEmail);
+	$('#toEmail').attr("value", toEmail);
+	$('#message').attr("value", bodyMessage);
+	$('#contactform').removeClass('gone');
+	*/
+}
+
+function getNoUserEmailMessage() {
+	return "<span class='skipBonus' onclick='loginClicked(); finalizeMove();'>Sign in</span> to play games with others online. <br />";
+}
+
+function playingOnlineGame() {
+	return onlinePlayEnabled && gameId > 0;
+}
+
+function getGameWinner() {
+	if (GameClock.playerIsOutOfTime(HOST)) {
+		return GUEST;
+	} else if (GameClock.playerIsOutOfTime(GUEST)) {
+		return HOST;
+	} else {
+		return gameController.theGame.getWinner();
+	}
+}
+
+function getGameWinReason() {
+	if (GameClock.aPlayerIsOutOfTime()) {
+		return " won the game due to opponent running out of time";
+	} else {
+		return gameController.theGame.getWinReason();
+	}
+}
   
 function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
 	var aiList = gameController.getAiList();
@@ -1237,9 +1255,9 @@ function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
 		messageText += activeAi.getMessage();
 	}
 
-	if (gameController.theGame.getWinner()) {
+	if (getGameWinner()) {
 		// There is a winner!
-		messageText += "<br /><strong>" + gameController.theGame.getWinner() + gameController.theGame.getWinReason() + "</strong>";
+		messageText += "<br /><strong>" + getGameWinner() + getGameWinReason() + "</strong>";
 		// Save winner
 		if (okToUpdateWinInfo && playingOnlineGame()) {
 			var winnerUsername;
@@ -1249,10 +1267,10 @@ function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
 				Draw: 0.5
 			*/
 			var hostResultCode = 0.5;
-			if (gameController.theGame.getWinner() === HOST) {
+			if (getGameWinner() === HOST) {
 				winnerUsername = currentGameData.hostUsername;
 				hostResultCode = 1;
-			} else if (gameController.theGame.getWinner() === GUEST) {
+			} else if (getGameWinner() === GUEST) {
 				winnerUsername = currentGameData.guestUsername;
 				hostResultCode = 0;
 			}
@@ -1831,7 +1849,7 @@ function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed) {
 		GameClock.stopGameClock();
 		if (!GameClock.currentClockIsOutOfTime()) {
 			onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
-				GameClock.getCurrentGameClockJsonString());
+				GameClock.getCurrentGameClockJsonString(), currentGameData.resultId);
 		}
 	} else {
 		/* Move needs to be confirmed. Finalize move and show confirm button. */
@@ -2339,6 +2357,7 @@ var jumpToGameCallback = function jumpToGameCallback(results) {
 		currentGameData.isRankedGame = myGame.rankedGame;
 		currentGameData.hostRating = myGame.hostRating;
 		currentGameData.guestRating = myGame.guestRating;
+		currentGameData.resultId = myGame.resultId;
 		currentGameData.gameClock = myGame.gameClock;
 		GameClock.loadGameClock(currentGameData.gameClock);
 
@@ -3377,7 +3396,7 @@ var processChatCommands = function(chatMessage) {
 
 function quitInactiveOnlineGame() {
 	if (iAmPlayerInCurrentOnlineGame()
-		&& !gameController.theGame.getWinner()
+		&& !getGameWinner()
 		&& (currentGameData.hostUsername === currentGameData.guestUsername
 			|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
 	) {
@@ -3388,7 +3407,7 @@ function quitInactiveOnlineGame() {
 function quitOnlineGameClicked() {
 	var message = "";
 	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame()
-		&& !gameController.theGame.getWinner()
+		&& !getGameWinner()
 		&& (currentGameData.hostUsername === currentGameData.guestUsername
 			|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
 	) {
@@ -3497,7 +3516,7 @@ function continueTutorial() {
   
 function iOSShake() {
 	// If undo move is allowed, ask user if they wanna
-	if ((playingOnlineGame() && !myTurn() && !gameController.theGame.getWinner())
+	if ((playingOnlineGame() && !myTurn() && !getGameWinner())
 		|| (!playingOnlineGame())) {
 		var message = "<br /><div class='clickableText' onclick='resetMove(); closeModal();'>Yes, undo move</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>Cancel</div>";
