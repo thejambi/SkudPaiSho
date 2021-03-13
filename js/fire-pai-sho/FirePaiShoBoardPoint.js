@@ -70,6 +70,13 @@ FirePaiShoBoardPoint.prototype.hasTile = function() {
 	return false;
 };
 
+FirePaiShoBoardPoint.prototype.hasFlowerTile = function() {
+	if (this.tile && (this.tile.type !== ACCENT_TILE)) {
+		return true;
+	}
+	return false;
+};
+
 FirePaiShoBoardPoint.prototype.isType = function(type) {
 	return this.types.includes(type);
 };
