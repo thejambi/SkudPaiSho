@@ -111,7 +111,7 @@ GameClock.Timer.prototype.startCountdown = function(tickCallback) {
 
 GameClock.Timer.prototype.stopTimer = function() {
     clearTimeout(this.countdownTimeoutId);
-    debug("Timer stopped. Seconds left: " + this.secondsRemaining);
+    // debug("Timer stopped. Seconds left: " + this.secondsRemaining);
     return this.secondsRemaining;
 };
 
@@ -121,7 +121,10 @@ GameClock.Timer.prototype.tickTimer = function(secondsPassed, tickCallback) {
         this.startCountdown(tickCallback);
     } else {
         this.stopTimer();
-        debug("Out of time!");
+        // debug("Out of time!");
+        if (this.outOfTimeCallback) {
+            this.outOfTimeCallback();
+        }
     }
     tickCallback(this.secondsRemaining);
 };
