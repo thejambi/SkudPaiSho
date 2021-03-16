@@ -3414,7 +3414,7 @@ function quitOnlineGameClicked() {
 			|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
 	) {
 		message = "<div>Are you sure you want to quit and end this inactive game? The game will appear as Inactive in your Completed Games list, but will become active again when your opponent plays.</div>";
-		message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - quit current game</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - mark current game inactive</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
 	} else {
 		message = "When playing an unfinished inactive online game, this is where you can mark the game inactive to hide it from your My Games list.";
