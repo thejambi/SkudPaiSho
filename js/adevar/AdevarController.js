@@ -61,6 +61,9 @@ AdevarController.prototype.undoMoveAllowed = function() {
 	return !this.theGame.getWinner()
 		&& !this.theGame.disableUndo;
 };
+AdevarController.prototype.automaticallySubmitMoveRequired = function() {
+	return !this.undoMoveAllowed();
+};
 
 AdevarController.prototype.resetMove = function() {
 	if (this.notationBuilder.status === BRAND_NEW) {

@@ -1854,7 +1854,7 @@ function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed) {
 	} else {
 		/* Move needs to be confirmed. Finalize move and show confirm button. */
 		finalizeMove(submitMoveData.moveAnimationBeginStep);
-		if (gameController.undoMoveAllowed && !gameController.undoMoveAllowed()) {
+		if (gameController.automaticallySubmitMoveRequired && gameController.automaticallySubmitMoveRequired()) {
 			callSubmitMove(moveAnimationBeginStep, true);
 		} else {
 			showConfirmMoveButton();
