@@ -3417,7 +3417,7 @@ function quitOnlineGameClicked() {
 		message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - quit current game</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
 	} else {
-		message = "When playing an unfinished inactive online game, this is where you can quit or leave a game if you wish to do so.";
+		message = "When playing an unfinished inactive online game, this is where you can mark the game inactive to hide it from your My Games list.";
 	}
 
 	showModal("Quit Current Online Game", message);
