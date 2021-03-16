@@ -3413,7 +3413,7 @@ function quitOnlineGameClicked() {
 		&& (currentGameData.hostUsername === currentGameData.guestUsername
 			|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
 	) {
-		message = "<div>Are you sure you want to quit and end this inactive game? The game will end and will appear as Inactive in your Completed Games list.</div>";
+		message = "<div>Are you sure you want to quit and end this inactive game? The game will appear as Inactive in your Completed Games list, but will become active again when your opponent plays.</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - quit current game</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
 	} else {
@@ -3424,11 +3424,12 @@ function quitOnlineGameClicked() {
 }
 
 function onlineGameIsOldEnoughToBeQuit() {
-	var currentGameTimestampDate = buildDateFromTimestamp(currentGameData.lastUpdatedTimestamp);
+	return true;
+	/* var currentGameTimestampDate = buildDateFromTimestamp(currentGameData.lastUpdatedTimestamp);
 	var nowDate = new Date();
 	var difference = nowDate.getTime() - currentGameTimestampDate.getTime();
 	var daysDifference = difference / 1000 / 60 / 60 / 24;
-	return daysDifference >= 3 || usernameEquals('Zach');
+	return daysDifference >= 3 || usernameEquals('Zach'); */
 }
 
 function buildDateFromTimestamp(timestampStr) {
