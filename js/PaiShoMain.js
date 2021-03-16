@@ -1379,9 +1379,11 @@ function showResetMoveMessage() {
 }
 
 function resetMove() {
-	gameController.resetMove();
+	var rerunHandledByController = gameController.resetMove();
 
-	rerunAll();
+	if (!rerunHandledByController) {
+		rerunAll();
+	}
 	hideConfirmMoveButton();
 	// $('#contactform').addClass('gone');
 }
