@@ -39,7 +39,7 @@ Trifle.TileCodes = {
 	BoarQPine: 'BoarQPine',
 	CherryBlossom: "CherryBlossom",
 	Sunflower: "Sunflower",
-	MoonFlower: "Moon Flower",
+	MoonFlower: "MoonFlower",
 	Chamomile: "Chamomile",
 	/* Fire */
 	FireBanner: "FireBanner",
@@ -634,7 +634,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			abilities: [
 				{
 					type: Trifle.Ability.grantBonusMovement,
-					triggeringAction: Trifle.AbilityTrigger.whenTileMovesFromWithinZone,
+					triggeringActions: [Trifle.AbilityTrigger.whenTileMovesFromWithinZone],
 					// ...
 				}
 			]
@@ -700,7 +700,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			{
 				type: Trifle.Ability.protectFromCapture,
 				targetTileTypes: [Trifle.TileCategory.thisTile],
-				triggeringAction: Trifle.AbilityTrigger.whenCapturing,
+				triggeringActions: [Trifle.AbilityTrigger.whenCapturing],
 				// triggerTargetTileType: [Trifle.TileType.flower],	// Idea: For example - ability could trigger when capturing a Flower - It'd be better to create a Trigger object that contains all the trigger info
 				duration: 1,
 				tileTypesProtectedFrom: [Trifle.TileCategory.allTileTypes]
@@ -856,7 +856,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			abilities: [
 				{
 					type: Trifle.Ability.captureTiles,
-					triggeringAction: Trifle.AbilityTrigger.whenTileLandsInZone,
+					triggeringActions: [Trifle.AbilityTrigger.whenTileLandsInZone],
 					targetTileTypes: [Trifle.TileCategory.landingTile]
 				}
 			]

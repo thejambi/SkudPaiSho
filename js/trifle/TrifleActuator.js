@@ -16,7 +16,8 @@ function TrifleActuator(gameContainer, isMobile) {
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-TrifleActuator.imagePath = "images/Trifle/standard/";
+// TrifleActuator.imagePath = "images/Trifle/standard/";
+TrifleActuator.imagePath = "images/Trifle/chuji/";
 TrifleActuator.hostTeamTilesDivId = "hostTilesContainer";
 TrifleActuator.guestTeamTilesDivId = "guestTilesContainer";
 

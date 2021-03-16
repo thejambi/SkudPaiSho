@@ -1173,9 +1173,26 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 			tileInfo.abilities.forEach(function(tileAbilityInfo) {
 				if (tileAbilityInfo.triggeringBoardStates && tileAbilityInfo.triggeringBoardStates.length) {
 					tileAbilityInfo.triggeringBoardStates.forEach(function(triggeringState) {
-						var brain = self.brainFactory.createTriggerBrain(triggeringState);
+						var brain = self.brainFactory.createTriggerBrain(triggeringState, self);
 						if (brain && brain.isAbilityActive) {
 							if (brain.isAbilityActive(pointWithTile, tile, tileInfo)) {
+								abilitiesToActivate.push(new Trifle.Ability(tileAbilityInfo, tile, tileInfo, brain));
+							}
+						}
+					});
+				}
+
+				if (tileAbilityInfo.triggeringActions && targetTileInfo.triggeringActions.length) {
+					tileAbilityInfo.triggeringActions.forEach(function(triggeringAction) {
+						var brain = self.brainFactory.createTriggerBrain(triggeringAction, self);
+						if (brain && brain.isAbilityActive) {
+							if (brain.isAbilityActive(pointWithTile, tile, tileInfo,
+								{
+									boardPointStart: boardPointStart,
+									boardPointEnd: boardPointEnd,
+									capturedTiles: capturedTiles
+								}
+							)) {
 								abilitiesToActivate.push(new Trifle.Ability(tileAbilityInfo, tile, tileInfo, brain));
 							}
 						}
@@ -1196,7 +1213,10 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 		}
 	});
 
-	if (!boardHasChanged) {
+	if (boardHasChanged) {
+		// Need to re-process abilities...
+		this.processAbilities(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles);
+	} else {
 		/* --- */
 
 		this.applyWhenLandsTriggers(tile, tileInfo, boardPointEnd, capturedTiles);
