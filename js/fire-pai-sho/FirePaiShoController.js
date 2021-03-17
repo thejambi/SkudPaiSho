@@ -113,7 +113,7 @@ FirePaiShoController.prototype.undoMoveAllowed = function() {
 	Can undo move if no harmony formed.
 	Can undo _only_ placing the bonus tile.
 	*/
-	return !this.notationBuilder.bonusTileCode;
+	return !this.notationBuilder.bonusTileCode && this.lastNotationBuilder;
 }
 
 FirePaiShoController.prototype.getDefaultHelpMessageText = function() {
