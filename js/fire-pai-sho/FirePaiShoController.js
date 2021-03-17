@@ -38,7 +38,9 @@ FirePaiShoController.prototype.resetGameManager = function() {
 };
 
 FirePaiShoController.prototype.resetNotationBuilder = function() {
-	this.lastNotationBuilder = this.notationBuilder;
+	if (this.notationBuilder && this.notationBuilder.status !== BRAND_NEW) {
+		this.lastNotationBuilder = this.notationBuilder;
+	}
 	this.notationBuilder = new FirePaiShoNotationBuilder();
 };
 
@@ -113,7 +115,10 @@ FirePaiShoController.prototype.undoMoveAllowed = function() {
 	Can undo move if no harmony formed.
 	Can undo _only_ placing the bonus tile.
 	*/
-	return !this.notationBuilder.bonusTileCode && this.lastNotationBuilder;
+	// return !this.notationBuilder.bonusTileCode && this.lastNotationBuilder;
+
+	return this.notationBuilder.status === BRAND_NEW
+			&& this.lastNotationBuilder && this.lastNotationBuilder.endPoint;
 }
 
 FirePaiShoController.prototype.getDefaultHelpMessageText = function() {
