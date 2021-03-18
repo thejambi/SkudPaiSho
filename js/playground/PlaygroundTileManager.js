@@ -121,6 +121,9 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Library", ownerCode));
 	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Temple", ownerCode));
 
+	// Other
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_Ginseng", ownerCode));
+
 	return tiles;
 };
 
