@@ -481,10 +481,10 @@ function usernameIsOneOf(theseNames) {
 	onlinePlayPaused = false;
   }
 
-  function showOnlinePlayPausedModal() {
-	  closeGame();
+function showOnlinePlayPausedModal() {
+	closeGame();
 	showModal("Online Play Paused", "Sorry, something was wrong and online play is currently paused. Take a break for some tea!<br /><br />You may attempt to <span class='skipBonus' onclick='resumeOnlinePlay(); closeModal();'>resume online play</span>.", true);
-  }
+}
 
 var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 	if (response === "Results exist") {
@@ -1995,35 +1995,35 @@ function userIsLoggedIn() {
 		getDeviceId();
 }
   
-  function forgetCurrentGameInfo() {
-	  clearAiPlayers();
-  
-	  if (gameWatchIntervalValue) {
-		  clearInterval(gameWatchIntervalValue);
-		  gameWatchIntervalValue = null;
-	  }
-  
-	  gameId = -1;
-	  lastKnownGameNotation = null;
-	  if (gameWatchIntervalValue) {
-		  clearInterval(gameWatchIntervalValue);
-		  gameWatchIntervalValue = null;
-	  }
-	  currentGameOpponentUsername = null;
-	  currentGameData = new Object();
-	  currentMoveIndex = 0;
-	  pauseRun();
-  
-	  // Change user to host
-	  hostEmail = getUserEmail();
-	  guestEmail = null;
-  
-	  updateFooter();
-  
-	  document.getElementById('chatMessagesDisplay').innerHTML = "";
-  
-	  updateCurrentGameTitle();
-  }
+function forgetCurrentGameInfo() {
+	clearAiPlayers();
+
+	if (gameWatchIntervalValue) {
+		clearInterval(gameWatchIntervalValue);
+		gameWatchIntervalValue = null;
+	}
+
+	gameId = -1;
+	lastKnownGameNotation = null;
+	if (gameWatchIntervalValue) {
+		clearInterval(gameWatchIntervalValue);
+		gameWatchIntervalValue = null;
+	}
+	currentGameOpponentUsername = null;
+	currentGameData = new Object();
+	currentMoveIndex = 0;
+	pauseRun();
+
+	// Change user to host
+	hostEmail = getUserEmail();
+	guestEmail = null;
+
+	updateFooter();
+
+	document.getElementById('chatMessagesDisplay').innerHTML = "";
+
+	updateCurrentGameTitle();
+}
   
 var GameType = {
 	SkudPaiSho: {
@@ -2390,15 +2390,16 @@ function shouldSendJamboreeNoteChat(gameTypeId) {
 	return gameTypeId === GameType.Adevar.id;
 }
   
-  function jumpToGame(gameIdChosen) {
-	  if (!onlinePlayEnabled) {
-		  return;
-	  }
-	  clearGameWatchInterval();
-	  if (!onlinePlayPaused) {
+function jumpToGame(gameIdChosen) {
+	if (!onlinePlayEnabled) {
+		return;
+	}
+	clearGameWatchInterval();
+	forgetCurrentGameInfo();
+	if (!onlinePlayPaused) {
 		onlinePlayEngine.getGameInfo(getUserId(), gameIdChosen, jumpToGameCallback);
-	  }
-  }
+	}
+}
   
 function populateMyGamesList(results) {
 	var resultRows = results.split('\n');
