@@ -61,6 +61,9 @@ AdevarController.prototype.undoMoveAllowed = function() {
 	return !this.theGame.getWinner()
 		&& !this.theGame.disableUndo;
 };
+AdevarController.prototype.automaticallySubmitMoveRequired = function() {
+	return !this.undoMoveAllowed();
+};
 
 AdevarController.prototype.resetMove = function() {
 	if (this.notationBuilder.status === BRAND_NEW) {
@@ -380,7 +383,7 @@ AdevarController.prototype.buildOtherTileMessages = function(tile) {
 		messages.push("Gate tiles are called onto the board next to your Basic tiles");
 	} else if (tile.type === AdevarTileType.reflection) {
 		messages.push("Water's Reflection Tile");
-		messages.push("Can move up to 7 spaces");
+		messages.push("Can move up to 5 spaces");
 		messages.push("Can capture Second Face tiles");
 		messages.push("Can be captured by Foxglove tiles");
 		messages.push("Returned to tile reserve when captured and can be called back to the board through a Gate tile");
