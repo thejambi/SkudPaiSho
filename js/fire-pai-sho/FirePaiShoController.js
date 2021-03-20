@@ -38,7 +38,10 @@ FirePaiShoController.prototype.resetGameManager = function() {
 };
 
 FirePaiShoController.prototype.resetNotationBuilder = function() {
-	this.notationBuilder = new FirePaiShoNotationBuilder();	// Will be ... FirePaiShoNotationBuilder
+	if (this.notationBuilder && this.notationBuilder.status !== BRAND_NEW) {
+		this.lastNotationBuilder = this.notationBuilder;
+	}
+	this.notationBuilder = new FirePaiShoNotationBuilder();
 };
 
 FirePaiShoController.prototype.resetGameNotation = function() {
@@ -67,20 +70,55 @@ FirePaiShoController.prototype.callActuate = function() {
 };
 
 FirePaiShoController.prototype.resetMove = function() {
-	if (this.notationBuilder.status === BRAND_NEW) {
+	if (this.notationBuilder.status === BRAND_NEW 
+			&& this.lastNotationBuilder && this.lastNotationBuilder.bonusEndPoint) {
+		/* Only undo the bonus placement - Need to get the last move and keep the first half */
+
+		// Now recreate the first part of the move...
+		var newNotationBuilder = new FirePaiShoNotationBuilder();
+		newNotationBuilder.moveType = this.lastNotationBuilder.moveType;
+		newNotationBuilder.plantedFlowerType = this.lastNotationBuilder.plantedFlowerType;
+		newNotationBuilder.startPoint = this.lastNotationBuilder.startPoint;
+		newNotationBuilder.endPoint = this.lastNotationBuilder.endPoint;
+
+		newNotationBuilder.bonusTileCode = this.lastNotationBuilder.bonusTileCode;
+		newNotationBuilder.bonusTile = this.lastNotationBuilder.bonusTile;
+
+		// New notation builder is ready. Remove last move and rerun.
+		this.gameNotation.removeLastMove();
+		rerunAll();
+
+		this.notationBuilder = newNotationBuilder;
+
+		var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+		this.theGame.hidePossibleMovePoints(false, move);
+		this.theGame.runNotationMove(move);
+
+		this.showHarmonyBonusMessage();
+		this.theGame.revealPossiblePlacementPoints(this.notationBuilder.bonusTile);
+		this.notationBuilder.status = WAITING_FOR_BONUS_ENDPOINT;
+
+		this.callActuate();
+		return true;
+	} else if (this.notationBuilder.status === BRAND_NEW
+			&& this.lastNotationBuilder && !this.lastNotationBuilder.bonusEndPoint) {
 		// Remove last move
 		this.gameNotation.removeLastMove();
-
 	} else if (this.notationBuilder.status === READY_FOR_BONUS) {
 		// Just rerun
 	}
 
-
 };
 
 FirePaiShoController.prototype.undoMoveAllowed = function() {
-	// Returning false here will automatically submit the move, bypassing the confirm button when callSubmitMove is called
-	return true;
+	/* 
+	Can undo move if no harmony formed.
+	Can undo _only_ placing the bonus tile.
+	*/
+	// return !this.notationBuilder.bonusTileCode && this.lastNotationBuilder;
+
+	return this.notationBuilder.status === BRAND_NEW
+			&& this.lastNotationBuilder && this.lastNotationBuilder.endPoint;
 }
 
 FirePaiShoController.prototype.getDefaultHelpMessageText = function() {
@@ -354,7 +392,7 @@ FirePaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 			//this.showHarmonyBonusMessage();
 		} else {
 			this.theGame.hidePossibleMovePoints();
-			this.notationBuilder = new FirePaiShoNotationBuilder();
+			this.resetNotationBuilder();
 	}
 };
 
@@ -436,13 +474,17 @@ FirePaiShoController.prototype.pointClicked = function(htmlPoint) {
 			} else {
 				this.notationBuilder.status = READY_FOR_BONUS;
 				
-				var tile = this.theGame.drawReserveTileFromTileManager(getCurrentPlayer());
+				var tile = this.notationBuilder.bonusTileCode;	// <-- Just don't want to redraw if any undo changes cause this code to run
+				if (!tile) {
+					tile = this.theGame.drawReserveTileFromTileManager(getCurrentPlayer());
+				}
 				tile.selectedFromPile = true;
 				
 				var tileCode = tile.code;
 				//console.log("Was ready for a bonus tile and now you selected one: " + tileCode + "and if it's an accent tile: " + tile.accentType);
 				
 				this.notationBuilder.bonusTileCode = tileCode;
+				this.notationBuilder.bonusTile = tile;	// Keep track of for undoing
 				this.showHarmonyBonusMessage();
 				this.theGame.revealPossiblePlacementPoints(tile);
 				this.notationBuilder.status = WAITING_FOR_BONUS_ENDPOINT;
@@ -451,7 +493,7 @@ FirePaiShoController.prototype.pointClicked = function(htmlPoint) {
 
 			//console.log("And that was totally NOT a legit move.");
 			this.theGame.hidePossibleMovePoints();
-			this.notationBuilder = new FirePaiShoNotationBuilder();
+			this.resetNotationBuilder();
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {

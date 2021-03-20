@@ -578,7 +578,7 @@ Trifle.Board.prototype.effectIsDisabledByRemoveEffectsAbility = function(targetP
 	var self = this;
 	if (checkTileInfo.abilities && checkTileInfo.abilities.length > 0) {
 		checkTileInfo.abilities.forEach(function(checkAbilityInfo) {
-			if (checkAbilityInfo.type === Trifle.Ability.removeEffects) {
+			if (checkAbilityInfo.type === Trifle.AbilityName.removeEffects) {
 				if (checkAbilityInfo.targetEffectTypes
 						&& arrayIncludesOneOf(checkAbilityInfo.targetEffectTypes, AbilityTypes[abilityGrantingEffect.type])) {
 					if (checkAbilityInfo.triggeringBoardState && checkAbilityInfo.triggeringBoardState === Trifle.AbilityTrigger.whileTileInLineOfSight) {
@@ -1145,7 +1145,7 @@ Trifle.Board.prototype.moveTile = function(player, notationPointStart, notationP
  */
 Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles) {
 
-	var abilitiesToActivate = [];
+	var abilitiesToActivate = {};
 
 	/* 
 	- Get abilities that should be active/activated
@@ -1166,20 +1166,59 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 
 	var self = this;
 
+	debug("Here we go... Looking for abilities to activate...");
+
 	this.forEachBoardPointWithTile(function(pointWithTile) {
 		var tile = pointWithTile.tile;
 		var tileInfo = TrifleTiles[tile.code];
 		if (tileInfo.abilities) {
 			tileInfo.abilities.forEach(function(tileAbilityInfo) {
+				var allTriggerConditionsMet = true;
+
+				var triggerBrainMap = {};
+
 				if (tileAbilityInfo.triggeringBoardStates && tileAbilityInfo.triggeringBoardStates.length) {
 					tileAbilityInfo.triggeringBoardStates.forEach(function(triggeringState) {
-						var brain = self.brainFactory.createTriggerBrain(triggeringState);
+						var brain = self.brainFactory.createTriggerBrain(triggeringState, self);
 						if (brain && brain.isAbilityActive) {
 							if (brain.isAbilityActive(pointWithTile, tile, tileInfo)) {
-								abilitiesToActivate.push(new Trifle.Ability(tileAbilityInfo, tile, tileInfo, brain));
+								triggerBrainMap[triggeringState] = brain;
+							} else {
+								allTriggerConditionsMet = false;
 							}
 						}
 					});
+				}
+
+				if (tileAbilityInfo.triggeringActions && targetTileInfo.triggeringActions.length) {
+					tileAbilityInfo.triggeringActions.forEach(function(triggeringAction) {
+						var brain = self.brainFactory.createTriggerBrain(triggeringAction, self);
+						if (brain && brain.isAbilityActive) {
+							if (brain.isAbilityActive(pointWithTile, tile, tileInfo,
+								{
+									boardPointStart: boardPointStart,
+									boardPointEnd: boardPointEnd,
+									capturedTiles: capturedTiles
+								}
+							)) {
+								triggerBrainMap[triggeringAction] = brain;
+							} else {
+								allTriggerConditionsMet = false;
+							}
+						}
+					});
+				}
+
+				if (allTriggerConditionsMet) {
+					var abilityObject = new Trifle.Ability(tileAbilityInfo, tile, tileInfo, triggerBrainMap);
+
+					var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
+
+					if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
+						abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
+					} else {
+						abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
+					}
 				}
 			});
 		}
@@ -1188,15 +1227,20 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 
 	// TODO: How to order ability activation?
 	var boardHasChanged = false;
-	abilitiesToActivate.forEach(function(ability) {
-		ability.activateAbility();	// ??????
-		if (ability.boardChangedAfterActivation()) {
-			boardHasChanged = true;
-			return;
-		}
+	Object.values(abilitiesToActivate).forEach(function(abilityList) {
+		abilityList.forEach(function(ability) {
+			ability.activateAbility();	// ??????
+			if (ability.boardChangedAfterActivation()) {
+				boardHasChanged = true;
+				return;
+			}
+		});
 	});
 
-	if (!boardHasChanged) {
+	if (boardHasChanged) {
+		// Need to re-process abilities...
+		this.processAbilities(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles);
+	} else {
 		/* --- */
 
 		this.applyWhenLandsTriggers(tile, tileInfo, boardPointEnd, capturedTiles);
@@ -1239,7 +1283,7 @@ Trifle.Board.prototype.applyWhenLandsInZoneTriggers = function(tile, tileInfo, b
 };
 
 Trifle.Board.prototype.processAbility = function(ability, context) {
-	if (ability.type === Trifle.Ability.captureTiles) {
+	if (ability.type === Trifle.AbilityName.captureTiles) {
 		if (ability.triggeringAction === Trifle.AbilityTrigger.whenTileLandsInZone) {
 			if (ability.targetTileTypes.includes(Trifle.TileCategory.landingTile)
 					&& this.tileCanBeCaptured(context.pointWithZone.tile.ownerName, context.pointOfLandingTile)) {
@@ -1864,7 +1908,7 @@ Trifle.Board.prototype.tileHasActiveCaptureProtectionFromCapturingTile = functio
 		if (durationAbilityEntry.targetTile === tile) {	// OR target TileTypeMatches tile
 			debug("Yes, for this tile");
 			var capturingTileInfo = TrifleTiles[capturingTile.code];
-			if (durationAbilityEntry.ability.type === Trifle.Ability.protectFromCapture) {
+			if (durationAbilityEntry.ability.type === Trifle.AbilityName.protectFromCapture) {
 				if ((durationAbilityEntry.ability.tileTypesProtectedFrom
 					&& arrayIncludesOneOf(durationAbilityEntry.ability.tileTypesProtectedFrom, capturingTileInfo.types))
 					||

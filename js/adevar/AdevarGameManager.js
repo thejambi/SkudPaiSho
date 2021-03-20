@@ -306,6 +306,15 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 					this.tileManager.removeRemainingTilesOfType(move.player, AdevarTileType.secondFace, this.secondFaceTilesPlayed[move.player]);
 				}
 			}
+
+			if (this.secondFaceTilesOnBoardCount[move.player] >= 2) {
+				// SF already on board, must move back to hand
+				var existingSFTile = this.board.getPlayerSFTileThatIsNotThisOne(tile);
+				if (existingSFTile) {
+					this.tileManager.putTileBack(existingSFTile);
+					this.secondFaceTilesOnBoardCount[move.player]--;
+				}
+			}
 		}
 
 		if (placeTileResults.capturedTile && placeTileResults.capturedTile.type === AdevarTileType.reflection) {
@@ -459,8 +468,7 @@ AdevarGameManager.prototype.revealAllPointsAsPossible = function() {
 
 AdevarGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
 	if (tile.type !== AdevarTileType.secondFace
-		|| (tile.type === AdevarTileType.secondFace && this.secondFaceTilesOnBoardCount[tile.ownerName] < 1
-				&& this.opponentNonMatchingHTNotRevealed(tile))
+		|| (tile.type === AdevarTileType.secondFace && this.opponentNonMatchingHTNotRevealed(tile))
 	) {
 		this.board.setPossibleDeployPoints(tile);
 	}

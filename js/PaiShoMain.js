@@ -481,10 +481,10 @@ function usernameIsOneOf(theseNames) {
 	onlinePlayPaused = false;
   }
 
-  function showOnlinePlayPausedModal() {
-	  closeGame();
+function showOnlinePlayPausedModal() {
+	closeGame();
 	showModal("Online Play Paused", "Sorry, something was wrong and online play is currently paused. Take a break for some tea!<br /><br />You may attempt to <span class='skipBonus' onclick='resumeOnlinePlay(); closeModal();'>resume online play</span>.", true);
-  }
+}
 
 var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 	if (response === "Results exist") {
@@ -494,7 +494,7 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 		userIsSignedInOk = true;
 
 		/* Temporary TheGameCrafter Set Announcement */
-		OnboardingFunctions.showTheGameCrafterSetAnnouncement();
+		OnboardingFunctions.showTheGameCrafterCrowdSaleAnnouncement();
 	} else {
 		// Cannot verify user login, forget all current stuff.
 		if (getUsername()) {
@@ -637,7 +637,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 
 	// Build HOST username
 	var hostUsernameTag = "";
-	if (currentPlayer === HOST && !gameController.theGame.getWinner()) {
+	if (currentPlayer === HOST && !getGameWinner()) {
 		hostUsernameTag = "<span class='currentPlayerUsername'>";
 	} else {
 		hostUsernameTag = "<span>";
@@ -652,7 +652,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 	hostUsernameTag += "</span>";
 
 	var guestUsernameTag = "";
-	if (currentPlayer === GUEST && !gameController.theGame.getWinner()) {
+	if (currentPlayer === GUEST && !getGameWinner()) {
 		guestUsernameTag = "<span class='currentPlayerUsername'>";
 	} else {
 		guestUsernameTag = "<span>";
@@ -1088,9 +1088,9 @@ function getAdditionalMessage() {
 
 	msg += gameController.getAdditionalMessage();
 
-	if (gameController.theGame.getWinner()) {
+	if (getGameWinner()) {
 		// There is a winner!
-		msg += " <strong>" + gameController.theGame.getWinner() + gameController.theGame.getWinReason() + "</strong>";
+		msg += " <strong>" + getGameWinner() + getGameWinReason() + "</strong>";
 	} else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
 		msg += "Game has ended in a draw.";
 	}
@@ -1126,7 +1126,7 @@ function refreshMessage() {
 
 	getGameMessageElement().innerHTML = message;
 
-	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn() && !gameController.theGame.getWinner()) 
+	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn() && !getGameWinner()) 
 			|| gameController.isSolitaire()) {
 		showResetMoveMessage();
 	}
@@ -1175,29 +1175,47 @@ var finalizeMove = function (moveAnimationBeginStep, ignoreNoEmail, okToUpdateWi
   	}
 }
   
-  function showSubmitMoveForm(url) {
-	  // Move has completed, so need to send to "current player"
-	  /* Commenting out - 20181022
-	  var toEmail = getCurrentPlayerEmail();
-  
-	  var fromEmail = getUserEmail();
-  
-	  var bodyMessage = getEmailBody(url);
-  
-	  $('#fromEmail').attr("value", fromEmail);
-	  $('#toEmail').attr("value", toEmail);
-	  $('#message').attr("value", bodyMessage);
-	  $('#contactform').removeClass('gone');
-	  */
-  }
-  
-  function getNoUserEmailMessage() {
-	  return "<span class='skipBonus' onclick='loginClicked(); finalizeMove();'>Sign in</span> to play games with others online. <br />";
-  }
-  
-  function playingOnlineGame() {
-	  return onlinePlayEnabled && gameId > 0;
-  }
+function showSubmitMoveForm(url) {
+	// Move has completed, so need to send to "current player"
+	/* Commenting out - 20181022
+	var toEmail = getCurrentPlayerEmail();
+ 
+	var fromEmail = getUserEmail();
+ 
+	var bodyMessage = getEmailBody(url);
+ 
+	$('#fromEmail').attr("value", fromEmail);
+	$('#toEmail').attr("value", toEmail);
+	$('#message').attr("value", bodyMessage);
+	$('#contactform').removeClass('gone');
+	*/
+}
+
+function getNoUserEmailMessage() {
+	return "<span class='skipBonus' onclick='loginClicked(); finalizeMove();'>Sign in</span> to play games with others online. <br />";
+}
+
+function playingOnlineGame() {
+	return onlinePlayEnabled && gameId > 0;
+}
+
+function getGameWinner() {
+	if (GameClock.playerIsOutOfTime(HOST)) {
+		return GUEST;
+	} else if (GameClock.playerIsOutOfTime(GUEST)) {
+		return HOST;
+	} else {
+		return gameController.theGame.getWinner();
+	}
+}
+
+function getGameWinReason() {
+	if (GameClock.aPlayerIsOutOfTime()) {
+		return " won the game due to opponent running out of time";
+	} else {
+		return gameController.theGame.getWinReason();
+	}
+}
   
 function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
 	var aiList = gameController.getAiList();
@@ -1237,9 +1255,9 @@ function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
 		messageText += activeAi.getMessage();
 	}
 
-	if (gameController.theGame.getWinner()) {
+	if (getGameWinner()) {
 		// There is a winner!
-		messageText += "<br /><strong>" + gameController.theGame.getWinner() + gameController.theGame.getWinReason() + "</strong>";
+		messageText += "<br /><strong>" + getGameWinner() + getGameWinReason() + "</strong>";
 		// Save winner
 		if (okToUpdateWinInfo && playingOnlineGame()) {
 			var winnerUsername;
@@ -1249,10 +1267,10 @@ function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
 				Draw: 0.5
 			*/
 			var hostResultCode = 0.5;
-			if (gameController.theGame.getWinner() === HOST) {
+			if (getGameWinner() === HOST) {
 				winnerUsername = currentGameData.hostUsername;
 				hostResultCode = 1;
-			} else if (gameController.theGame.getWinner() === GUEST) {
+			} else if (getGameWinner() === GUEST) {
 				winnerUsername = currentGameData.guestUsername;
 				hostResultCode = 0;
 			}
@@ -1361,9 +1379,11 @@ function showResetMoveMessage() {
 }
 
 function resetMove() {
-	gameController.resetMove();
+	var rerunHandledByController = gameController.resetMove();
 
-	rerunAll();
+	if (!rerunHandledByController) {
+		rerunAll();
+	}
 	hideConfirmMoveButton();
 	// $('#contactform').addClass('gone');
 }
@@ -1831,12 +1851,12 @@ function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed) {
 		GameClock.stopGameClock();
 		if (!GameClock.currentClockIsOutOfTime()) {
 			onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
-				GameClock.getCurrentGameClockJsonString());
+				GameClock.getCurrentGameClockJsonString(), currentGameData.resultId);
 		}
 	} else {
 		/* Move needs to be confirmed. Finalize move and show confirm button. */
 		finalizeMove(submitMoveData.moveAnimationBeginStep);
-		if (gameController.undoMoveAllowed && !gameController.undoMoveAllowed()) {
+		if (gameController.automaticallySubmitMoveRequired && gameController.automaticallySubmitMoveRequired()) {
 			callSubmitMove(moveAnimationBeginStep, true);
 		} else {
 			showConfirmMoveButton();
@@ -1975,35 +1995,35 @@ function userIsLoggedIn() {
 		getDeviceId();
 }
   
-  function forgetCurrentGameInfo() {
-	  clearAiPlayers();
-  
-	  if (gameWatchIntervalValue) {
-		  clearInterval(gameWatchIntervalValue);
-		  gameWatchIntervalValue = null;
-	  }
-  
-	  gameId = -1;
-	  lastKnownGameNotation = null;
-	  if (gameWatchIntervalValue) {
-		  clearInterval(gameWatchIntervalValue);
-		  gameWatchIntervalValue = null;
-	  }
-	  currentGameOpponentUsername = null;
-	  currentGameData = new Object();
-	  currentMoveIndex = 0;
-	  pauseRun();
-  
-	  // Change user to host
-	  hostEmail = getUserEmail();
-	  guestEmail = null;
-  
-	  updateFooter();
-  
-	  document.getElementById('chatMessagesDisplay').innerHTML = "";
-  
-	  updateCurrentGameTitle();
-  }
+function forgetCurrentGameInfo() {
+	clearAiPlayers();
+
+	if (gameWatchIntervalValue) {
+		clearInterval(gameWatchIntervalValue);
+		gameWatchIntervalValue = null;
+	}
+
+	gameId = -1;
+	lastKnownGameNotation = null;
+	if (gameWatchIntervalValue) {
+		clearInterval(gameWatchIntervalValue);
+		gameWatchIntervalValue = null;
+	}
+	currentGameOpponentUsername = null;
+	currentGameData = new Object();
+	currentMoveIndex = 0;
+	pauseRun();
+
+	// Change user to host
+	hostEmail = getUserEmail();
+	guestEmail = null;
+
+	updateFooter();
+
+	document.getElementById('chatMessagesDisplay').innerHTML = "";
+
+	updateCurrentGameTitle();
+}
   
 var GameType = {
 	SkudPaiSho: {
@@ -2339,6 +2359,7 @@ var jumpToGameCallback = function jumpToGameCallback(results) {
 		currentGameData.isRankedGame = myGame.rankedGame;
 		currentGameData.hostRating = myGame.hostRating;
 		currentGameData.guestRating = myGame.guestRating;
+		currentGameData.resultId = myGame.resultId;
 		currentGameData.gameClock = myGame.gameClock;
 		GameClock.loadGameClock(currentGameData.gameClock);
 
@@ -2369,15 +2390,16 @@ function shouldSendJamboreeNoteChat(gameTypeId) {
 	return gameTypeId === GameType.Adevar.id;
 }
   
-  function jumpToGame(gameIdChosen) {
-	  if (!onlinePlayEnabled) {
-		  return;
-	  }
-	  clearGameWatchInterval();
-	  if (!onlinePlayPaused) {
+function jumpToGame(gameIdChosen) {
+	if (!onlinePlayEnabled) {
+		return;
+	}
+	clearGameWatchInterval();
+	forgetCurrentGameInfo();
+	if (!onlinePlayPaused) {
 		onlinePlayEngine.getGameInfo(getUserId(), gameIdChosen, jumpToGameCallback);
-	  }
-  }
+	}
+}
   
 function populateMyGamesList(results) {
 	var resultRows = results.split('\n');
@@ -3377,7 +3399,7 @@ var processChatCommands = function(chatMessage) {
 
 function quitInactiveOnlineGame() {
 	if (iAmPlayerInCurrentOnlineGame()
-		&& !gameController.theGame.getWinner()
+		&& !getGameWinner()
 		&& (currentGameData.hostUsername === currentGameData.guestUsername
 			|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
 	) {
@@ -3388,26 +3410,27 @@ function quitInactiveOnlineGame() {
 function quitOnlineGameClicked() {
 	var message = "";
 	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame()
-		&& !gameController.theGame.getWinner()
+		&& !getGameWinner()
 		&& (currentGameData.hostUsername === currentGameData.guestUsername
 			|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
 	) {
-		message = "<div>Are you sure you want to quit and end this inactive game? The game will end and will appear as Inactive in your Completed Games list.</div>";
-		message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - quit current game</div>";
+		message = "<div>Are you sure you want to quit and end this inactive game? The game will appear as Inactive in your Completed Games list, but will become active again when your opponent plays.</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - mark current game inactive</div>";
 		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
 	} else {
-		message = "When playing an unfinished inactive online game, this is where you can quit or leave a game if you wish to do so.";
+		message = "When playing an unfinished inactive online game, this is where you can mark the game inactive to hide it from your My Games list.";
 	}
 
 	showModal("Quit Current Online Game", message);
 }
 
 function onlineGameIsOldEnoughToBeQuit() {
-	var currentGameTimestampDate = buildDateFromTimestamp(currentGameData.lastUpdatedTimestamp);
+	return true;
+	/* var currentGameTimestampDate = buildDateFromTimestamp(currentGameData.lastUpdatedTimestamp);
 	var nowDate = new Date();
 	var difference = nowDate.getTime() - currentGameTimestampDate.getTime();
 	var daysDifference = difference / 1000 / 60 / 60 / 24;
-	return daysDifference >= 3 || usernameEquals('Zach');
+	return daysDifference >= 3 || usernameEquals('Zach'); */
 }
 
 function buildDateFromTimestamp(timestampStr) {
@@ -3495,68 +3518,76 @@ function continueTutorial() {
 	tutorialInProgress = false;
 }
   
-  function iOSShake() {
-	  // If undo move is allowed, ask user if they wanna
-	  if ((playingOnlineGame() && !myTurn() && !gameController.theGame.getWinner())
-		  || (!playingOnlineGame())) {
-		  var message = "<br /><div class='clickableText' onclick='resetMove(); closeModal();'>Yes, undo move</div>";
-		  message += "<br /><div class='clickableText' onclick='closeModal();'>Cancel</div>";
+function iOSShake() {
+	// If undo move is allowed, ask user if they wanna
+	if ((playingOnlineGame() && !myTurn() && !getGameWinner())
+		|| (!playingOnlineGame())) {
+		var message = "<br /><div class='clickableText' onclick='resetMove(); closeModal();'>Yes, undo move</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal();'>Cancel</div>";
+
+		showModal("Undo move?", message);
+	}
+}
+
+function saveDeviceTokenIfNeeded() {
+	var deviceToken = localStorage.getItem(deviceTokenKey);
+	if ((ios || QueryString.appType === 'ios') && deviceToken && userIsLoggedIn()) {
+		onlinePlayEngine.addUserPreferenceValue(getLoginToken(), 3, deviceToken, emptyCallback);
+	}
+}
   
-		  showModal("Undo move?", message);
-	  }
-  }
+function setDeviceToken(deviceToken) {
+	localStorage.setItem(deviceTokenKey, deviceToken);
+	saveDeviceTokenIfNeeded();
+}
+
+function openShop() {
+	openLink("https://skudpaisho.com/site/buying-pai-sho/");
+}
+
+/* Options */
+var ggOptions = [];
+
+function addOption(option) {
+	ggOptions.push(option);
+}
+
+function clearOptions() {
+	ggOptions = [];
+}
+
+function addOptionFromInput() {
+	addGameOption(document.getElementById('optionAddInput').value);
+	closeModal();
+}
   
-  function saveDeviceTokenIfNeeded() {
-	  var deviceToken = localStorage.getItem(deviceTokenKey);
-	  if ((ios || QueryString.appType === 'ios') && deviceToken && userIsLoggedIn()) {
-		  onlinePlayEngine.addUserPreferenceValue(getLoginToken(), 3, deviceToken, emptyCallback);
-	  }
-  }
-  
-  function setDeviceToken(deviceToken) {
-	  localStorage.setItem(deviceTokenKey, deviceToken);
-	  saveDeviceTokenIfNeeded();
-  }
-  
-  function openShop() {
-	  openLink("https://skudpaisho.com/site/buying-pai-sho/");
-  }
-  
-  /* Options */
-  var ggOptions = [];
-  
-  function addOption(option) {
-	  ggOptions.push(option);
-  }
-  
-  function clearOptions() {
-	  ggOptions = [];
-  }
-  
-  function addOptionFromInput() {
-	  addGameOption(document.getElementById('optionAddInput').value);
-	  closeModal();
-  }
-  
-  function promptAddOption() {
-	  var message = "";
-	  if (usernameIsOneOf(['SkudPaiSho'])) {
-		  message = "<br /><input type='text' id='optionAddInput' name='optionAddInput' />";
-		  message += "<br /><div class='clickableText' onclick='addOptionFromInput()'>Add</div>";
-  
-		  if (ggOptions.length > 0) {
-			  message += "<br />";
-			  for (var i = 0; i < ggOptions.length; i++) {
-				  message += "<div>";
-				  message += ggOptions[i];
-				  message += "</div>";
-			  }
-			  message += "<br /><div class='clickableText' onclick='clearOptions()'>Clear Options</div>";
-		  }
-  
-		  showModal("Secrets", message);
-	  }
-  }
+function promptAddOption() {
+	var message = "";
+	// if (usernameIsOneOf(['SkudPaiSho'])) {
+	// 	message = "<br /><input type='text' id='optionAddInput' name='optionAddInput' />";
+	// 	message += "<br /><div class='clickableText' onclick='addOptionFromInput()'>Add</div>";
+
+	// 	if (ggOptions.length > 0) {
+	// 		message += "<br />";
+	// 		for (var i = 0; i < ggOptions.length; i++) {
+	// 			message += "<div>";
+	// 			message += ggOptions[i];
+	// 			message += "</div>";
+	// 		}
+	// 		message += "<br /><div class='clickableText' onclick='clearOptions()'>Clear Options</div>";
+	// 	}
+
+	// 	showModal("Secrets", message);
+	// } else 
+	if (usernameIsOneOf(['SkudPaiSho','Adevar'])) {
+		message = "Enter list of names:";
+		message += "<br /><textarea rows = '11' cols = '40' name = 'description' id='giveawayNamesTextbox'></textarea>";
+		message += "<br /><div class='clickableText' onclick='Giveaway.doIt()'>Choose name</div>";
+		message += "<br /><div id='giveawayResults'>:)</div>";
+
+		showModal("Giveaway Winner Chooser!", message);
+	}
+}
   
   function addGameOption(option) {
 	  addOption(option);

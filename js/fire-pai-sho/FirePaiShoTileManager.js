@@ -362,8 +362,8 @@ FirePaiShoTileManager.prototype.getPlayerWithMoreAccentTiles = function() {
 	}
 
 	var guestCount = 0;
-	for (var i = 0; i < this.guestTiles.length; i++) {
-		if (this.guestTiles[i].type === ACCENT_TILE) {
+	for (var i = 0; i < this.guestLibraryTiles.length; i++) {
+		if (this.guestLibraryTiles[i].type === ACCENT_TILE) {
 			guestCount++;
 		}
 	}
