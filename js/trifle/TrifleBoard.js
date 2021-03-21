@@ -8,6 +8,8 @@ Trifle.Board = function() {
 	this.tilePresenceAbilities = [];
 	this.activeDurationAbilities = [];
 
+	this.abilityManager = new Trifle.AbilityManager(this);
+
 	this.hostBannerPlayed = false;
 	this.guestBannerPlayed = false;
 
@@ -1177,34 +1179,44 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 
 				var triggerBrainMap = {};
 
+				var triggerContext = {
+					board: self,
+					tile: tile,
+					tileInfo: tileInfo,
+					tileAbilityInfo: tileAbilityInfo,
+					lastTurnAction: {
+						boardPointStart: boardPointStart,
+						boardPointEnd: boardPointEnd,
+						capturedTiles: capturedTiles
+					}
+				};
+
 				if (tileAbilityInfo.triggeringBoardStates && tileAbilityInfo.triggeringBoardStates.length) {
 					tileAbilityInfo.triggeringBoardStates.forEach(function(triggeringState) {
-						var brain = self.brainFactory.createTriggerBrain(triggeringState, self);
-						if (brain && brain.isAbilityActive) {
-							if (brain.isAbilityActive(pointWithTile, tile, tileInfo)) {
+						var brain = self.brainFactory.createTriggerBrain(triggeringState, triggerContext);
+						if (brain && brain.isTriggerMet) {
+							if (brain.isTriggerMet(pointWithTile, tile, tileInfo)) {
 								triggerBrainMap[triggeringState] = brain;
 							} else {
 								allTriggerConditionsMet = false;
 							}
+						} else {
+							allTriggerConditionsMet = false;
 						}
 					});
 				}
 
 				if (tileAbilityInfo.triggeringActions && targetTileInfo.triggeringActions.length) {
 					tileAbilityInfo.triggeringActions.forEach(function(triggeringAction) {
-						var brain = self.brainFactory.createTriggerBrain(triggeringAction, self);
-						if (brain && brain.isAbilityActive) {
-							if (brain.isAbilityActive(pointWithTile, tile, tileInfo,
-								{
-									boardPointStart: boardPointStart,
-									boardPointEnd: boardPointEnd,
-									capturedTiles: capturedTiles
-								}
-							)) {
+						var brain = self.brainFactory.createTriggerBrain(triggeringAction, triggerContext);
+						if (brain && brain.isTriggerMet) {
+							if (brain.isTriggerMet(pointWithTile, tile, tileInfo)) {
 								triggerBrainMap[triggeringAction] = brain;
 							} else {
 								allTriggerConditionsMet = false;
 							}
+						} else {
+							allTriggerConditionsMet = false;
 						}
 					});
 				}
@@ -1229,7 +1241,10 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 	var boardHasChanged = false;
 	Object.values(abilitiesToActivate).forEach(function(abilityList) {
 		abilityList.forEach(function(ability) {
-			ability.activateAbility();	// ??????
+			var abilityIsReadyToActivate = self.abilityManager.addNewAbility(ability);
+			if (abilityIsReadyToActivate) {
+				ability.activateAbility();
+			}
 			if (ability.boardChangedAfterActivation()) {
 				boardHasChanged = true;
 				return;
@@ -1243,15 +1258,15 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 	} else {
 		/* --- */
 
-		this.applyWhenLandsTriggers(tile, tileInfo, boardPointEnd, capturedTiles);
+		// this.applyWhenLandsTriggers(tile, tileInfo, boardPointEnd, capturedTiles);
 
-		if (capturedTiles.length > 0) {
-			this.applyWhenCapturingTrigger(tile, tileInfo, boardPointEnd, capturedTiles);
-		}
+		// if (capturedTiles.length > 0) {
+		// 	this.applyWhenCapturingTrigger(tile, tileInfo, boardPointEnd, capturedTiles);
+		// }
 
-		/* Old abilities... */
-		this.applyZoneAbilityToTile(boardPointEnd);
-		this.applyBoardScanAbilities();
+		// /* Old abilities... */
+		// this.applyZoneAbilityToTile(boardPointEnd);
+		// this.applyBoardScanAbilities();
 	}
 };
 

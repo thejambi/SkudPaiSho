@@ -159,9 +159,10 @@ Trifle.AbilityTrigger = {
 	whenCapturing: "whenCapturing",
 	whenTileLandsInZone: "whenTileLandsInZone",
 	whenTileMovesFromWithinZone: "whenTileMovesFromWithinZone",
-	whileTileInLineOfSight: "whileTileInLineOfSight",
+	whileTargetTileInLineOfSight: "whileTargetTileInLineOfSight",
 	whileOutsideTemple: "whileOutsideTemple",
-	whileInsideTemple: "whileInsideTemple"
+	whileInsideTemple: "whileInsideTemple",
+	whileOnBoard: "whileOnBoard"
 };
 
 Trifle.TileTeam = {
@@ -503,10 +504,11 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		],
 		abilities: [
 			{
-				// TODO! There is no ZoneAbility.grantBonusTileMovement!
-				type: Trifle.ZoneAbility.grantBonusTileMovement,
-				// amount: 1,
-				// targetTileTypes: [Trifle.TileType.flower]
+				type: Trifle.AbilityName.grantBonusMovement,
+				amount: 1,
+				triggeringBoardStates: [Trifle.AbilityTrigger.whileOnBoard],
+				targetTileTypes: [Trifle.TileType.flower],
+				targtTileTeams: [Trifle.TileTeam.friendly]
 			}
 		]
 	};
@@ -588,7 +590,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			}, */
 			{
 				type: Trifle.AbilityName.drawTilesAlongLineOfSight,
-				triggeringBoardStates: [Trifle.AbilityTrigger.whileTileInLineOfSight],
+				triggeringBoardStates: [Trifle.AbilityTrigger.whileTargetTileInLineOfSight],
 				activationConditions: [Trifle.AbilityTrigger.whileOutsideTemple],
 				targetTeams: [Trifle.TileTeam.enemy]
 			}
@@ -679,7 +681,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		abilities: [
 			{
 				type: Trifle.AbilityName.removeEffects,
-				triggeringBoardStates: [Trifle.AbilityTrigger.whileTileInLineOfSight],
+				triggeringBoardStates: [Trifle.AbilityTrigger.whileTargetTileInLineOfSight],
 				targetEffectTypes: [Trifle.AbilityType.protection],
 				targetTileTypes: [Trifle.TileCategory.allTileTypes]
 			}

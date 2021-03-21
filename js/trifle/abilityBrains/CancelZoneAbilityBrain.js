@@ -4,5 +4,13 @@ Trifle.CancelZoneAbilityBrain = function(abilityObject) {
 }
 
 Trifle.CancelZoneAbilityBrain.prototype.activateAbility = function() {
-	debug("Whaaaaat do I do?");
+	debug("Cancel Zone ability activating...");
+	// Attach ability to target tile
+	// Get target tiles
+	var targetTiles = this.abilityObject.targetTiles;
+
+	debug("Target Tiles:");
+	debug(targetTiles);
+
+	
 };
