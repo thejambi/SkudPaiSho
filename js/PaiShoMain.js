@@ -2052,28 +2052,21 @@ var GameType = {
 		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
 		gameOptions: [
 			ADEVAR_LITE
-			//BLACK_ORCHID_BUFF
 		],
 		noRankedGames: true
 	},
-	CapturePaiSho: {
-		id: 3,
-		desc: "Capture Pai Sho",
-		rulesUrl: "https://skudpaisho.com/site/games/capture-pai-sho/",
-		gameOptions: []
-	},
-	StreetPaiSho: {
-		id: 5,
-		desc: "Street Pai Sho",
-		rulesUrl: "https://skudpaisho.com/site/games/street-pai-sho/",
+	FirePaiSho: {
+		id: 15,
+		desc: "Fire Pai Sho",
+		rulesUrl: "https://drive.google.com/file/d/1C3A5Mx0P8vrpKc-X5QbRHuLt27yoMqBj/view?usp=sharing",
 		gameOptions: [
-			FORMAL_WIN_CONDITION,
-			ORIGINAL_BOARD_SETUP,
-			RELEASE_CAPTIVE_TILES,
-			BONUS_MOVEMENT_5,
-			BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES
+			NO_HARMONY_VISUAL_AIDS,
+			OPTION_DOUBLE_ACCENT_TILES,
+			HIDE_RESERVE_TILES,
+			MIDLINE_OPENER,
+			ETHEREAL_ACCENT_TILES
 		],
-		noRankedGames: true
+		noRankedGames: true	// Can take out when testing done, game ready to enable ranked games
 	},
 	SolitairePaiSho: {
 		id: 4,
@@ -2107,18 +2100,16 @@ var GameType = {
 		],
 		noRankedGames: true
 	},
-	FirePaiSho: {
-		id: 15,
-		desc: "Fire Pai Sho",
-		rulesUrl: "https://drive.google.com/file/d/1C3A5Mx0P8vrpKc-X5QbRHuLt27yoMqBj/view?usp=sharing",
-		gameOptions: [
-			NO_HARMONY_VISUAL_AIDS,
-			OPTION_DOUBLE_ACCENT_TILES,
-			HIDE_RESERVE_TILES,
-			MIDLINE_OPENER,
-			ETHEREAL_ACCENT_TILES
-		],
-		noRankedGames: true	// Can take out when testing done, game ready to enable ranked games
+	Undergrowth: {
+		id: 16,
+		desc: "Undergrowth Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/undergrowth-pai-sho/",
+		gameOptions: [],
+		noRankedGames: true,
+		usersWithAccess: [
+			'SkudPaiSho',
+			'Cannoli'
+		]
 	},
 	Trifle: {
 		id: 10,
@@ -2131,6 +2122,25 @@ var GameType = {
 			'Korron',
 			'vescucci',
 			'geebung02'
+		],
+		noRankedGames: true
+	},
+	CapturePaiSho: {
+		id: 3,
+		desc: "Capture Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/capture-pai-sho/",
+		gameOptions: []
+	},
+	StreetPaiSho: {
+		id: 5,
+		desc: "Street Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/street-pai-sho/",
+		gameOptions: [
+			FORMAL_WIN_CONDITION,
+			ORIGINAL_BOARD_SETUP,
+			RELEASE_CAPTIVE_TILES,
+			BONUS_MOVEMENT_5,
+			BONUS_MOVEMENT_BASED_ON_NUM_CAPTIVES
 		],
 		noRankedGames: true
 	},
@@ -2231,6 +2241,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.OvergrowthPaiSho.id:
 			controller = new OvergrowthController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Undergrowth.id:
+			controller = new Undergrowth.Controller(gameContainerDiv, isMobile);
 			break;
 		case GameType.Blooms.id:
 			controller = new BloomsController(gameContainerDiv, isMobile);
@@ -3112,7 +3125,8 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
   
   function closeGame() {
 	  if (gameDevOn) {
-		  setGameController(GameType.Trifle.id);
+		//   setGameController(GameType.Trifle.id);
+		setGameController(GameType.Undergrowth.id);
 		  return;
 	  }
 	  var defaultGameTypeIds = [
