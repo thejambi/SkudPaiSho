@@ -132,7 +132,7 @@ Undergrowth.Controller.prototype.pointClicked = function(htmlPoint) {
 			// Move all set. Add it to the notation!
 			this.gameNotation.addMove(move);
 			if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-				createGameIfThatIsOk(GameType.UndergrowthPaiSho.id);
+				createGameIfThatIsOk(GameType.Undergrowth.id);
 			} else {
 				if (playingOnlineGame()) {
 					callSubmitMove();
