@@ -3222,11 +3222,6 @@ var processChatCommands = function(chatMessage) {
 		new AdevarOptions();
 		AdevarOptions.commenceSpoopy();
 	}
-
-	if (chatMessage.toLowerCase().includes('spaceship')) {
-		new AdevarOptions();
-		AdevarOptions.blastOffToSpace();
-	}
 };
   
   document.getElementById('chatMessageInput').onkeypress = function(e){
