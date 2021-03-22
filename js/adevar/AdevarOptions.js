@@ -22,6 +22,7 @@ AdevarOptions.tileDesignTypeValues = {
 	icy: "Adevar Icy",
 	irl: "Adevar TGG Red Oak & Walnut",
 	chuji: "Chuji"
+	// space: "Adevar In Space!"
 };
 
 AdevarOptions.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
@@ -55,4 +56,9 @@ AdevarOptions.buildToggleViewAsGuestDiv = function() {
 AdevarOptions.commenceSpoopy = function() {
 	AdevarOptions.tileDesignTypeValues['spoopy'] = "Adevar Spoopy";
 	AdevarOptions.setTileDesignsPreference('spoopy');
+};
+
+AdevarOptions.blastOffToSpace = function() {
+	AdevarOptions.tileDesignTypeValues['sapce'] = "Adevar In Space!";
+	AdevarOptions.setTileDesignsPreference('space');
 };
