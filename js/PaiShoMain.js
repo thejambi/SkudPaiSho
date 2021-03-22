@@ -2108,7 +2108,9 @@ var GameType = {
 		noRankedGames: true,
 		usersWithAccess: [
 			'SkudPaiSho',
-			'Cannoli'
+			'Cannoli',
+			'Adevar',
+			'markdwagner'
 		]
 	},
 	Trifle: {

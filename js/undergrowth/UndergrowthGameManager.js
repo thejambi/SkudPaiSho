@@ -40,7 +40,7 @@ Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate) 
 		// Just placing tile on board
 		var tile = this.tileManager.grabTile(move.player, move.plantedFlowerType);
 
-		this.board.placeTile(tile, move.endPoint);
+		var capturedTiles = this.board.placeTile(tile, move.endPoint);
 	}
 
 	if (withActuate) {
@@ -48,10 +48,10 @@ Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate) 
 	}
 
 	this.endGameWinners = [];
-	// For Solitaire: end game when all tiles have been played
+	// End game when all tiles have been played
 	var noTilesLeft = this.tileManager.noMoreTilesLeft();
 	if (noTilesLeft) {
-		this.endGameWinners.push(this.board.harmonyManager.getWinningPlayer());
+		this.endGameWinners.push(this.board.getPlayerWithMostTilesOnBoard());
 	}
 
 	return bonusAllowed;
@@ -80,9 +80,11 @@ Undergrowth.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuat
 	}
 };
 
-Undergrowth.GameManager.prototype.setAllLegalPointsOpen = function(player, tile, ignoreActuate) {
-	if (!this.board.setHarmonyPointsOpen(tile, player)) {
-		this.board.setAllPossiblePointsOpen(tile, player);
+Undergrowth.GameManager.prototype.setAllLegalPointsOpen = function(player, tile, numMoves, ignoreActuate) {
+	if (numMoves < 4) {
+		this.board.setOpenGatePossibleMoves();
+	} else {
+		this.board.setHarmonyPointsOpen(tile, player);
 	}
 	
 	if (!ignoreActuate) {
@@ -136,9 +138,9 @@ Undergrowth.GameManager.prototype.getWinner = function() {
 Undergrowth.GameManager.prototype.getWinReason = function() {
 	var msg = "";
 	if (this.getWinner()) {
-		msg += " won the game!";
+		msg += " won the game with more tiles on the board!";
 	}
-	return msg + "<br /><br />" + this.board.harmonyManager.getScoreSummaryText();
+	return msg;
 };
 
 Undergrowth.GameManager.prototype.getScoreSummary = function() {

@@ -100,7 +100,7 @@ Undergrowth.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.plantedFlowerType = tileCode;
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
-		this.theGame.setAllLegalPointsOpen(getCurrentPlayer(), tile);
+		this.theGame.setAllLegalPointsOpen(getCurrentPlayer(), tile, this.gameNotation.moves.length);
 	} else {
 		this.theGame.hidePossibleMovePoints();
 		this.notationBuilder = new Undergrowth.NotationBuilder();

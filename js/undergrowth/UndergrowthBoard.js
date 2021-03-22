@@ -34,7 +34,7 @@ Undergrowth.Board.prototype.captureTilesWithAtLeastTwoDisharmonies = function() 
 
 	var self = this;
 	this.forEachBoardPointWithTile(function(boardPointWithTile) {
-		var tileClashes = self.getTileClashes(boardPointWithTile.tile, new RowAndColumn(boardPointWithTile.row, boardPointWithTile.col));
+		var tileClashes = self.getTileClashes(boardPointWithTile.tile, boardPointWithTile);
 		if (tileClashes.length >= 2) {
 			pointsToCapture.push(boardPointWithTile);
 		}
@@ -164,7 +164,7 @@ Undergrowth.Board.prototype.analyzeHarmonies = function () {
 				var tileHarmonies = this.getTileHarmonies(boardPoint.tile, new RowAndColumn(row, col));
 				this.harmonyManager.addHarmonies(tileHarmonies);
 
-				var tileClashes = this.getTileClashes(boardPoint.tile, new RowAndColumn(row, col));
+				var tileClashes = this.getTileClashes(boardPoint.tile, boardPoint);
 				this.harmonyManager.addClashes(tileClashes);
 
 				boardPoint.tile.inHarmony = tileHarmonies.length > 0;
@@ -270,27 +270,33 @@ Undergrowth.Board.prototype.getHarmonyDown = function (tile, endRowCol) {
 	}
 };
 
-Undergrowth.Board.prototype.getTileClashes = function (tile, rowAndCol) {
+Undergrowth.Board.prototype.getTileClashes = function (tile, boardPoint) {
 	var tileHarmonies = [];
 
-	var leftHarmony = this.getClashLeft(tile, rowAndCol);
-	if (leftHarmony) {
-		tileHarmonies.push(leftHarmony);
-	}
+	if (!boardPoint.isType(GATE)) {
 
-	var rightHarmony = this.getClashRight(tile, rowAndCol);
-	if (rightHarmony) {
-		tileHarmonies.push(rightHarmony);
-	}
+		var rowAndCol = new RowAndColumn(boardPoint.row, boardPoint.col)
 
-	var upHarmony = this.getClashUp(tile, rowAndCol);
-	if (upHarmony) {
-		tileHarmonies.push(upHarmony);
-	}
+		var leftHarmony = this.getClashLeft(tile, rowAndCol);
+		if (leftHarmony) {
+			tileHarmonies.push(leftHarmony);
+		}
 
-	var downHarmony = this.getClashDown(tile, rowAndCol);
-	if (downHarmony) {
-		tileHarmonies.push(downHarmony);
+		var rightHarmony = this.getClashRight(tile, rowAndCol);
+		if (rightHarmony) {
+			tileHarmonies.push(rightHarmony);
+		}
+
+		var upHarmony = this.getClashUp(tile, rowAndCol);
+		if (upHarmony) {
+			tileHarmonies.push(upHarmony);
+		}
+
+		var downHarmony = this.getClashDown(tile, rowAndCol);
+		if (downHarmony) {
+			tileHarmonies.push(downHarmony);
+		}
+
 	}
 
 	return tileHarmonies;
@@ -306,7 +312,7 @@ Undergrowth.Board.prototype.getClashLeft = function (tile, endRowCol) {
 
 	if (colToCheck >= 0) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
-		if (tile.clashesWith(checkPoint.tile)) {
+		if (!checkPoint.isType(GATE) && tile.clashesWith(checkPoint.tile)) {
 			var harmony = new Undergrowth.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
@@ -323,7 +329,7 @@ Undergrowth.Board.prototype.getClashRight = function (tile, endRowCol) {
 
 	if (colToCheck <= 16) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
-		if (tile.clashesWith(checkPoint.tile)) {
+		if (!checkPoint.isType(GATE) && tile.clashesWith(checkPoint.tile)) {
 			var harmony = new Undergrowth.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
@@ -340,7 +346,7 @@ Undergrowth.Board.prototype.getClashUp = function (tile, endRowCol) {
 
 	if (rowToCheck >= 0) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
-		if (tile.clashesWith(checkPoint.tile)) {
+		if (!checkPoint.isType(GATE) && tile.clashesWith(checkPoint.tile)) {
 			var harmony = new Undergrowth.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
@@ -357,7 +363,7 @@ Undergrowth.Board.prototype.getClashDown = function (tile, endRowCol) {
 
 	if (rowToCheck <= 16) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
-		if (tile.clashesWith(checkPoint.tile)) {
+		if (!checkPoint.isType(GATE) && tile.clashesWith(checkPoint.tile)) {
 			var harmony = new Undergrowth.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
@@ -416,6 +422,33 @@ Undergrowth.Board.prototype.setHarmonyPointsOpen = function(tile) {
 	}
 
 	return possibleMovesFound;
+};
+
+Undergrowth.Board.prototype.setOpenGatePossibleMoves = function() {
+	this.forEachBoardPoint(function(boardPoint) {
+		if (boardPoint.isType(GATE) && !boardPoint.hasTile()) {
+			boardPoint.addType(POSSIBLE_MOVE);
+		}
+	});
+};
+
+Undergrowth.Board.prototype.getPlayerWithMostTilesOnBoard = function() {
+	var hostCount = 0;
+	var guestCount = 0;
+
+	this.forEachBoardPointWithTile(function(boardPointWithTile) {
+		if (boardPointWithTile.tile.ownerName === HOST) {
+			hostCount++;
+		} else if (boardPointWithTile.tile.ownerName === GUEST) {
+			guestCount++;
+		} 
+	});
+
+	if (hostCount > guestCount) {
+		return HOST;
+	} else if (guestCount > hostCount) {
+		return GUEST;
+	}
 };
 
 Undergrowth.Board.prototype.getCopy = function () {
