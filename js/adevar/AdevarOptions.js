@@ -59,6 +59,6 @@ AdevarOptions.commenceSpoopy = function() {
 };
 
 AdevarOptions.blastOffToSpace = function() {
-	AdevarOptions.tileDesignTypeValues['sapce'] = "Adevar In Space!";
+	AdevarOptions.tileDesignTypeValues['space'] = "Adevar In Space!";
 	AdevarOptions.setTileDesignsPreference('space');
 };
