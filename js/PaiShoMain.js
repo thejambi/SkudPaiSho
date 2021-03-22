@@ -2985,212 +2985,212 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 	}
 };
   
-  var tempGameTypeId;
-  function createGameIfThatIsOk(gameTypeId) {
-	  tempGameTypeId = gameTypeId;
-	  if (playingOnlineGame()) {
-		  callSubmitMove();
-	  } else if (userIsLoggedIn() && window.navigator.onLine && !onlinePlayPaused) {
-		  onlinePlayEngine.getCurrentGameSeeksHostedByUser(getUserId(), gameTypeId, getCurrentGameSeeksHostedByUserCallback);
-	  } else {
-		  finalizeMove();
-	  }
-  }
-  
-  function handleNewGlobalChatMessages(results) {
-	  var resultRows = results.split('\n');
-  
-	  chatMessageList = [];
-	  var newChatMessagesHtml = "";
-  
-	  // var actuallyLoadMessages = true;
-  
-	  // if (lastGlobalChatTimestamp === '1970-01-01 00:00:00') {
-	  // 	// just loading timestamp of latest message...
-	  // 	actuallyLoadMessages = false;
-	  // }
-  
-	  // // So actuallyLoadMessages only turns false once...
-	  // lastGlobalChatTimestamp = '1970-01-02 00:00:00';
-  
-	  for (var index in resultRows) {
-		  var row = resultRows[index].split('|||');
-		  var chatMessage = {
-			  timestamp:row[0],
-			  username:row[1],
-			  message:row[2]
-		  };
-		  chatMessageList.push(chatMessage);
-		  lastGlobalChatTimestamp = chatMessage.timestamp;
-	  }
-  
-	  // if (actuallyLoadMessages) {
-  
-		  for (var index in chatMessageList) {
-			  var chatMessage = chatMessageList[index];
-			  newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
-		  }
-  
-		  /* Prepare to add chat content and keep scrolled to bottom */
-		  var chatMessagesDisplay = document.getElementById('globalChatMessagesDisplay');
-		  // allow 1px inaccuracy by adding 1
-		  var isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
-		  var newElement = document.createElement("div");
-		  newElement.innerHTML = newChatMessagesHtml;
-		  chatMessagesDisplay.appendChild(newElement);
-		  // scroll to bottom if isScrolledToBottom
-		  if(isScrolledToBottom) {
-			  chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
-		  }
-	  // }
-  }
-  
-  var getNewGlobalChatsCallback = function getNewGlobalChatsCallback(results) {
-	  if (results != "") {
-		  handleNewGlobalChatMessages(results);
-	  }
-  };
-  
-  var lastGlobalChatTimestamp = '1970-01-01 00:00:00';
-  function fetchGlobalChats() {
-	  onlinePlayEngine.getNewChatMessages(0, lastGlobalChatTimestamp, getNewGlobalChatsCallback);
-  }
-  
-  var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(results) {
-	  if (results != "") {
-		  handleNewGlobalChatMessages(results);
-	  }
-  };
-  
-  /* This is AKA Display Links tab content */
-  function resetGlobalChats() {
-	  // Clear all global chats..
+var tempGameTypeId;
+function createGameIfThatIsOk(gameTypeId) {
+	tempGameTypeId = gameTypeId;
+	if (playingOnlineGame()) {
+		callSubmitMove();
+	} else if (userIsLoggedIn() && window.navigator.onLine && !onlinePlayPaused) {
+		onlinePlayEngine.getCurrentGameSeeksHostedByUser(getUserId(), gameTypeId, getCurrentGameSeeksHostedByUserCallback);
+	} else {
+		finalizeMove();
+	}
+}
+
+function handleNewGlobalChatMessages(results) {
+	var resultRows = results.split('\n');
+
+	chatMessageList = [];
+	var newChatMessagesHtml = "";
+
+	// var actuallyLoadMessages = true;
+
+	// if (lastGlobalChatTimestamp === '1970-01-01 00:00:00') {
+	// 	// just loading timestamp of latest message...
+	// 	actuallyLoadMessages = false;
+	// }
+
+	// // So actuallyLoadMessages only turns false once...
+	// lastGlobalChatTimestamp = '1970-01-02 00:00:00';
+
+	for (var index in resultRows) {
+		var row = resultRows[index].split('|||');
+		var chatMessage = {
+			timestamp: row[0],
+			username: row[1],
+			message: row[2]
+		};
+		chatMessageList.push(chatMessage);
+		lastGlobalChatTimestamp = chatMessage.timestamp;
+	}
+
+	// if (actuallyLoadMessages) {
+
+	for (var index in chatMessageList) {
+		var chatMessage = chatMessageList[index];
+		newChatMessagesHtml += "<div class='chatMessage'><strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
+	}
+
+	/* Prepare to add chat content and keep scrolled to bottom */
+	var chatMessagesDisplay = document.getElementById('globalChatMessagesDisplay');
+	// allow 1px inaccuracy by adding 1
+	var isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
+	var newElement = document.createElement("div");
+	newElement.innerHTML = newChatMessagesHtml;
+	chatMessagesDisplay.appendChild(newElement);
+	// scroll to bottom if isScrolledToBottom
+	if (isScrolledToBottom) {
+		chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
+	}
+	// }
+}
+
+var getNewGlobalChatsCallback = function getNewGlobalChatsCallback(results) {
+	if (results != "") {
+		handleNewGlobalChatMessages(results);
+	}
+};
+
+var lastGlobalChatTimestamp = '1970-01-01 00:00:00';
+function fetchGlobalChats() {
+	onlinePlayEngine.getNewChatMessages(0, lastGlobalChatTimestamp, getNewGlobalChatsCallback);
+}
+
+var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(results) {
+	if (results != "") {
+		handleNewGlobalChatMessages(results);
+	}
+};
+
+/* This is AKA Display Links tab content */
+function resetGlobalChats() {
+	// Clear all global chats..
 	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/dStDZx7' target='_blank'>Discord server</a>.<hr />";
-  }
-  
-  function fetchInitialGlobalChats() {
+}
+
+function fetchInitialGlobalChats() {
 	//   resetGlobalChats();
-  
-	  // Fetch global chats..
+
+	// Fetch global chats..
 	//   onlinePlayEngine.getInitialGlobalChatMessages(getInitialGlobalChatsCallback);
-  }
-  
-  // var callLogOnlineStatusPulse = function callLogOnlineStatusPulse() {
-  // 	logOnlineStatusIntervalValue = setTimeout(function() {
-  // 		debug("inside timeout call");
-  // 		logOnlineStatusPulse();
-  // 	}, 5000);
-  // 	debug("timeout set");
-  // }
-  
-  function logOnlineStatusPulse() {
-	  onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
-	  verifyLogin();
-	  // fetchGlobalChats();
-  }
-  
-  var LOG_ONLINE_STATUS_INTERVAL = 5000;
-  function startLoggingOnlineStatus() {
-	  onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
-  
-	  // fetchInitialGlobalChats();
-  
-	  clearLogOnlineStatusInterval();
-  
-	  logOnlineStatusIntervalValue = setInterval(function() {
-		  if (!onlinePlayPaused) {
-		  	logOnlineStatusPulse();
-		  }
-	  }, LOG_ONLINE_STATUS_INTERVAL);
-  }
-  
-  function clearLogOnlineStatusInterval() {
-	  if (logOnlineStatusIntervalValue) {
-		  clearInterval(logOnlineStatusIntervalValue);
-		  logOnlineStatusIntervalValue = null;
-	  }
-  }
-  
-  function setSidenavNewGameSection() {
-	  var message = "";
-  
-	  Object.keys(GameType).forEach(function(key,index) {
-		  message += getSidenavNewGameEntryForGameType(GameType[key]);
-	  });
-  
-	  document.getElementById("sidenavNewGameSection").innerHTML = message;
-  }
-  
-  function randomIntFromInterval(min, max) {
-	  return Math.floor(Math.random() * (max - min + 1) + min);
-  }
-  
-  function closeGame() {
-	  if (gameDevOn) {
+}
+
+// var callLogOnlineStatusPulse = function callLogOnlineStatusPulse() {
+// 	logOnlineStatusIntervalValue = setTimeout(function() {
+// 		debug("inside timeout call");
+// 		logOnlineStatusPulse();
+// 	}, 5000);
+// 	debug("timeout set");
+// }
+
+function logOnlineStatusPulse() {
+	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
+	verifyLogin();
+	// fetchGlobalChats();
+}
+
+var LOG_ONLINE_STATUS_INTERVAL = 5000;
+function startLoggingOnlineStatus() {
+	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
+
+	// fetchInitialGlobalChats();
+
+	clearLogOnlineStatusInterval();
+
+	logOnlineStatusIntervalValue = setInterval(function() {
+		if (!onlinePlayPaused) {
+			logOnlineStatusPulse();
+		}
+	}, LOG_ONLINE_STATUS_INTERVAL);
+}
+
+function clearLogOnlineStatusInterval() {
+	if (logOnlineStatusIntervalValue) {
+		clearInterval(logOnlineStatusIntervalValue);
+		logOnlineStatusIntervalValue = null;
+	}
+}
+
+function setSidenavNewGameSection() {
+	var message = "";
+
+	Object.keys(GameType).forEach(function(key, index) {
+		message += getSidenavNewGameEntryForGameType(GameType[key]);
+	});
+
+	document.getElementById("sidenavNewGameSection").innerHTML = message;
+}
+
+function randomIntFromInterval(min, max) {
+	return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function closeGame() {
+	if (gameDevOn) {
 		//   setGameController(GameType.Trifle.id);
 		setGameController(GameType.Undergrowth.id);
-		  return;
-	  }
-	  var defaultGameTypeIds = [
-		  GameType.SkudPaiSho.id,
-		  GameType.VagabondPaiSho.id,
-		  GameType.Adevar.id
-	  ]
-	  setGameController(defaultGameTypeIds[randomIntFromInterval(0,defaultGameTypeIds.length-1)]);
-	  showDefaultGameOpenedMessage(true);
-  }
-  
-  function getSidenavNewGameEntryForGameType(gameType) {
-	  return "<div class='sidenavEntry'><span class='sidenavLink skipBonus' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink sidenavLink'>Rules</a></div>";
-  }
-  
-  function getNewGameEntryForGameType(gameType) {
-	  if (
-		  gameDevOn 
-		  || !gameType.usersWithAccess
-		  || gameType.usersWithAccess.includes(getUsername())
-		  ) {
-		  return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
-	  }
-	  return "";
-  }
-  
-  function newGameClicked() {
-	  var message = "";
-  
-	  Object.keys(GameType).forEach(function(key,index) {
-		  message += getNewGameEntryForGameType(GameType[key]);
-	  });
-  
-	  showModal("New Game", message);
-  }
-  
-  var getCountOfGamesWhereUserTurnCallback = function getCountOfGamesWhereUserTurnCallback(count) {
-	  setAccountHeaderLinkText(count);
-	  appCaller.setCountOfGamesWhereUserTurn(count);
-  };
-  
-  function loadNumberOfGamesWhereUserTurn() {
-	  if (onlinePlayEnabled && userIsLoggedIn()) {
-		  onlinePlayEngine.getCountOfGamesWhereUserTurn(getUserId(), getCountOfGamesWhereUserTurnCallback);
-	  }
-  }
-  
-  var USER_TURN_GAME_WATCH_INTERVAL = 6000;
-  function startWatchingNumberOfGamesWhereUserTurn() {
-	  loadNumberOfGamesWhereUserTurn();
-  
-	  if (userTurnCountInterval) {
-		  clearInterval(userTurnCountInterval);
-		  userTurnCountInterval = null;
-	  }
-  
-	  userTurnCountInterval = setInterval(function() {
-		  if (!onlinePlayPaused) {
-		  	loadNumberOfGamesWhereUserTurn();
-		  }
-	  }, USER_TURN_GAME_WATCH_INTERVAL);
-  }
+		return;
+	}
+	var defaultGameTypeIds = [
+		GameType.SkudPaiSho.id,
+		GameType.VagabondPaiSho.id,
+		GameType.Adevar.id
+	]
+	setGameController(defaultGameTypeIds[randomIntFromInterval(0, defaultGameTypeIds.length - 1)]);
+	showDefaultGameOpenedMessage(true);
+}
+
+function getSidenavNewGameEntryForGameType(gameType) {
+	return "<div class='sidenavEntry'><span class='sidenavLink skipBonus' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink sidenavLink'>Rules</a></div>";
+}
+
+function getNewGameEntryForGameType(gameType) {
+	if (
+		gameDevOn
+		|| !gameType.usersWithAccess
+		|| gameType.usersWithAccess.includes(getUsername())
+	) {
+		return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
+	}
+	return "";
+}
+
+function newGameClicked() {
+	var message = "";
+
+	Object.keys(GameType).forEach(function(key, index) {
+		message += getNewGameEntryForGameType(GameType[key]);
+	});
+
+	showModal("New Game", message);
+}
+
+var getCountOfGamesWhereUserTurnCallback = function getCountOfGamesWhereUserTurnCallback(count) {
+	setAccountHeaderLinkText(count);
+	appCaller.setCountOfGamesWhereUserTurn(count);
+};
+
+function loadNumberOfGamesWhereUserTurn() {
+	if (onlinePlayEnabled && userIsLoggedIn()) {
+		onlinePlayEngine.getCountOfGamesWhereUserTurn(getUserId(), getCountOfGamesWhereUserTurnCallback);
+	}
+}
+
+var USER_TURN_GAME_WATCH_INTERVAL = 6000;
+function startWatchingNumberOfGamesWhereUserTurn() {
+	loadNumberOfGamesWhereUserTurn();
+
+	if (userTurnCountInterval) {
+		clearInterval(userTurnCountInterval);
+		userTurnCountInterval = null;
+	}
+
+	userTurnCountInterval = setInterval(function() {
+		if (!onlinePlayPaused) {
+			loadNumberOfGamesWhereUserTurn();
+		}
+	}, USER_TURN_GAME_WATCH_INTERVAL);
+}
   
 var sendChatCallback = function sendChatCallback(result) {
 	document.getElementById('sendChatMessageButton').innerHTML = "Send";
@@ -3202,19 +3202,19 @@ var sendChatCallback = function sendChatCallback(result) {
 	}
 };
   
-  var sendChat = function(chatMessageIfDifferentFromInput) {
-	  var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value).trim();
-	  if (chatMessageIfDifferentFromInput) {
-		  chatMessage = chatMessageIfDifferentFromInput;
-	  }
-	  chatMessage = chatMessage.replace(/\n/g, ' ');	// Convert newlines to spaces.
-	  if (chatMessage) {
-		  document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
-		  onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, sendChatCallback);
-	  }
+var sendChat = function(chatMessageIfDifferentFromInput) {
+	var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value).trim();
+	if (chatMessageIfDifferentFromInput) {
+		chatMessage = chatMessageIfDifferentFromInput;
+	}
+	chatMessage = chatMessage.replace(/\n/g, ' ');	// Convert newlines to spaces.
+	if (chatMessage) {
+		document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
+		onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, sendChatCallback);
+	}
 
-	  processChatCommands(chatMessage);
-  }
+	processChatCommands(chatMessage);
+}
 
 var processChatCommands = function(chatMessage) {
 	/* Secret easter eggs... */
@@ -3224,194 +3224,194 @@ var processChatCommands = function(chatMessage) {
 	}
 };
   
-  document.getElementById('chatMessageInput').onkeypress = function(e){
-	   var code = (e.keyCode ? e.keyCode : e.which);
-		if(code == 13) {
-		  sendChat();
-		}
-  };
-  
-  var sendGlobalChatCallback = function sendGlobalChatCallback(result) {
-	  document.getElementById('sendGlobalChatMessageButton').innerHTML = "Send";
-	  document.getElementById('globalChatMessageInput').value = "";
-  };
-  
-  var sendGlobalChat = function() {
-	  var chatMessage = htmlEscape(document.getElementById('globalChatMessageInput').value).trim();
-	  chatMessage = chatMessage.replace(/\n/g, ' ');	// Convert newlines to spaces.
-	  if (chatMessage) {
-		  document.getElementById('sendGlobalChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
-		  onlinePlayEngine.sendChat(0, getLoginToken(), chatMessage, sendGlobalChatCallback);
-	  }
-  }
-  
-  /* document.getElementById('globalChatMessageInput').onkeypress = function(e){
-	   var code = (e.keyCode ? e.keyCode : e.which);
-		if(code == 13) {
-		  sendGlobalChat();
-		}
-  }; */
-  
-  function htmlEscape(str) {
-	  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
-  }
-  
-  function openTab(evt, tabIdName) {
-	  var i, tabcontent, tablinks;
-	  tabcontent = document.getElementsByClassName("tabcontent");
-	  for (i = 0; i < tabcontent.length; i++) {
-		  tabcontent[i].style.display = "none";
-	  }
-	  tablinks = document.getElementsByClassName("tablinks");
-	  for (i = 0; i < tablinks.length; i++) {
-		  tablinks[i].classList.remove("active");
-	  }
-	  document.getElementById(tabIdName).style.display = "block";
-	  evt.currentTarget.classList.add("active");
-  }
-  
-  function showGameNotationModal() {
-	  var message = "";
-  
-	  message += "<div class='coordinatesNotation'>";
-	  message += gameController.gameNotation.getNotationForEmail().replace(/\[BR\]/g,'<br />');
-	  message += "</div><br />";
-  
-	  showModal("Game Notation", message);
-  }
-  
-  function showGameReplayLink() {
-	  // if (currentGameData.hostUsername && currentGameData.guestUsername) {
-		  var notation = gameController.getNewGameNotation();
-		  for (var i = 0; i < currentMoveIndex; i++) {
-			  notation.addMove(gameController.gameNotation.moves[i]);
-		  }
-		//   rerunAll();	// Seems like this shouldn't be here.
-  
-		  var linkUrl = "";
-  
-		  if (currentGameData && currentGameData.gameTypeId) {
-			  linkUrl += "gameType=" + currentGameData.gameTypeId + "&";
-		  }
-		  linkUrl += "host=" + currentGameData.hostUsername + "&";
-		  linkUrl += "guest=" + currentGameData.guestUsername + "&";
-  
-		  linkUrl += "game=" + notation.notationTextForUrl();
-  
-		  if (ggOptions.length > 0) {
-			  linkUrl += "&gameOptions=" + JSON.stringify(ggOptions);
-		  }
-  
-		  linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
-  
-		  linkUrl = sandboxUrl + "?" + linkUrl;
+document.getElementById('chatMessageInput').onkeypress = function(e) {
+	var code = (e.keyCode ? e.keyCode : e.which);
+	if (code == 13) {
+		sendChat();
+	}
+};
 
-		  debug("GameReplayLinkUrl: " + linkUrl);
-		  var message = "Here is the <a id='gameReplayLink' href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.";
-		  if (playingOnlineGame()) {
-			  message += "<br /><br />";
-			  message += "Here is the <a href=\"" + buildSpectateUrl() + "\" target='_blank'>spectate link</a> others can use to watch the game live and participate in the Game Chat.";
-		  }
-		  showModal("Game Links", message);
+var sendGlobalChatCallback = function sendGlobalChatCallback(result) {
+	document.getElementById('sendGlobalChatMessageButton').innerHTML = "Send";
+	document.getElementById('globalChatMessageInput').value = "";
+};
 
-		  getShortUrl(linkUrl, function(shortUrl){
-			  var linkTag = document.getElementById('gameReplayLink');
-			  if (linkTag) {
-				linkTag.setAttribute("href", shortUrl);
-			  }
-		  });
-  }
-  
-  function buildSpectateUrl() {
-	  if (gameId > 0) {
-		  linkUrl = LZString.compressToEncodedURIComponent("wg=" + gameId);
-		  linkUrl = sandboxUrl + "?" + linkUrl;
-		  return linkUrl;
+var sendGlobalChat = function() {
+	var chatMessage = htmlEscape(document.getElementById('globalChatMessageInput').value).trim();
+	chatMessage = chatMessage.replace(/\n/g, ' ');	// Convert newlines to spaces.
+	if (chatMessage) {
+		document.getElementById('sendGlobalChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
+		onlinePlayEngine.sendChat(0, getLoginToken(), chatMessage, sendGlobalChatCallback);
+	}
+}
+
+/* document.getElementById('globalChatMessageInput').onkeypress = function(e){
+	 var code = (e.keyCode ? e.keyCode : e.which);
+	  if(code == 13) {
+		sendGlobalChat();
 	  }
-  }
-  
-  function showPrivacyPolicy() {
-	  var message = "";
-	  message += "<ul>";
-	  message += "<li>All online games (and associated chat conversations) are recorded and may be available to view by others.</li>";
-	  message += "<li>Usernames will be shown publicly to other players and anyone viewing game replays.</li>";
-	  message += "<li>Email addresses will never be purposefully shared with other players.</li>";
-	  message += "</ul>";
-	  showModal("Privacy Policy", message);
-  }
-  
-  function dismissChatAlert() {
-	  document.getElementById('chatTab').classList.remove('alertTab');
-  }
-  
-  function goai() {
-	  if (gameController.getAiList().length > 1) {
-		  setAiIndex(0);
-		  setTimeout(function() {
-			  setAiIndex(1);
-		  }, 2000);
-	  }
-  }
-  
-  /* Sidenav */
-  function openNav() {
-	  // When the user clicks anywhere outside of the modal, close it
-	  window.onclick = function(event) {
-		  if (event.target !== document.getElementById("mySidenav")
-			  && event.target !== document.getElementById("sidenavMenuButton")
-			  && event.target !== document.getElementById("siteHeading")) {
-			  closeNav();
-		  }
-	  };
-	  // document.getElementById("mySidenav").style.width = "250px";
-	  document.getElementById("mySidenav").classList.add("sideNavOpen");
-  }
-  
-  function closeNav() {
-	  // document.getElementById("mySidenav").style.width = "0";
-	  document.getElementById("mySidenav").classList.remove("sideNavOpen");
-  }
-  
-  function aboutClicked() {
-	  var message = "<div><em>The Garden Gate</em> is a place to play various fan-made <em>Pai Sho</em> games and other games, too. A Pai Sho game is a game played on a board for the fictional game of Pai Sho as seen in Avatar: The Last Airbender. <a href='https://skudpaisho.com/site/' target='_blank'>Learn more</a>.</div>";
-	  message += "<hr /><div> Modern Skud Pai Sho tile designs by Hector Lowe<br /> ©2017 | Used with permission<br /> <a href='http://hector-lowe.com/' target='_blank'>www.hector-lowe.com</a> </div> <div class='license'><a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'><img alt='Creative Commons License' style='border-width:0' src='https://i.creativecommons.org/l/by-nc/3.0/us/88x31.png' /></a>&nbsp;All other content of this work is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'>Creative Commons Attribution-NonCommercial 3.0 United States License</a>.</div> <br /> <div><span class='skipBonus' onclick='showPrivacyPolicy();'>Privacy policy</span></div>";
-	  showModal("About", message);
-  }
-  
-  function getOnlineGameOpponentUsername() {
-	  var opponentUsername = "";
-	  if (playingOnlineGame()) {
-		  if (usernameEquals(currentGameData.hostUsername)) {
-			  opponentUsername = currentGameData.guestUsername;
-		  } else if (usernameEquals(currentGameData.guestUsername)) {
-			  opponentUsername = currentGameData.hostUsername;
-		  }
-	  }
-	  return opponentUsername;
-  }
-  
-  function quitOnlineGameCallback() {
-	  if (currentGameData) {
-		  setGameController(currentGameData.gameTypeId);
-	  } else {
-		  closeGame();
-	  }
-  }
-  
-  function iAmPlayerInCurrentOnlineGame() {
-	  return usernameEquals(currentGameData.hostUsername) || usernameEquals(currentGameData.guestUsername);
-  }
-  
-  function quitOnlineGame() {
-	  // TODO eventually make it so if guest never made a move, then player only "leaves" game instead of updating the game result, so it returns to being an available game seek.
-	  if (gameController.guestNeverMoved && gameController.guestNeverMoved()) {
-		  // Guest never moved, only leave game. TODO
-	  }// else {....}
-  
-	  if (iAmPlayerInCurrentOnlineGame()) {
-		  onlinePlayEngine.updateGameWinInfoAsTie(gameId, 8, getLoginToken(), quitOnlineGameCallback);
-	  }
-  }
+}; */
+
+function htmlEscape(str) {
+	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+
+function openTab(evt, tabIdName) {
+	var i, tabcontent, tablinks;
+	tabcontent = document.getElementsByClassName("tabcontent");
+	for (i = 0; i < tabcontent.length; i++) {
+		tabcontent[i].style.display = "none";
+	}
+	tablinks = document.getElementsByClassName("tablinks");
+	for (i = 0; i < tablinks.length; i++) {
+		tablinks[i].classList.remove("active");
+	}
+	document.getElementById(tabIdName).style.display = "block";
+	evt.currentTarget.classList.add("active");
+}
+
+function showGameNotationModal() {
+	var message = "";
+
+	message += "<div class='coordinatesNotation'>";
+	message += gameController.gameNotation.getNotationForEmail().replace(/\[BR\]/g, '<br />');
+	message += "</div><br />";
+
+	showModal("Game Notation", message);
+}
+
+function showGameReplayLink() {
+	// if (currentGameData.hostUsername && currentGameData.guestUsername) {
+	var notation = gameController.getNewGameNotation();
+	for (var i = 0; i < currentMoveIndex; i++) {
+		notation.addMove(gameController.gameNotation.moves[i]);
+	}
+	//   rerunAll();	// Seems like this shouldn't be here.
+
+	var linkUrl = "";
+
+	if (currentGameData && currentGameData.gameTypeId) {
+		linkUrl += "gameType=" + currentGameData.gameTypeId + "&";
+	}
+	linkUrl += "host=" + currentGameData.hostUsername + "&";
+	linkUrl += "guest=" + currentGameData.guestUsername + "&";
+
+	linkUrl += "game=" + notation.notationTextForUrl();
+
+	if (ggOptions.length > 0) {
+		linkUrl += "&gameOptions=" + JSON.stringify(ggOptions);
+	}
+
+	linkUrl = LZString.compressToEncodedURIComponent(linkUrl);
+
+	linkUrl = sandboxUrl + "?" + linkUrl;
+
+	debug("GameReplayLinkUrl: " + linkUrl);
+	var message = "Here is the <a id='gameReplayLink' href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.";
+	if (playingOnlineGame()) {
+		message += "<br /><br />";
+		message += "Here is the <a href=\"" + buildSpectateUrl() + "\" target='_blank'>spectate link</a> others can use to watch the game live and participate in the Game Chat.";
+	}
+	showModal("Game Links", message);
+
+	getShortUrl(linkUrl, function(shortUrl) {
+		var linkTag = document.getElementById('gameReplayLink');
+		if (linkTag) {
+			linkTag.setAttribute("href", shortUrl);
+		}
+	});
+}
+
+function buildSpectateUrl() {
+	if (gameId > 0) {
+		linkUrl = LZString.compressToEncodedURIComponent("wg=" + gameId);
+		linkUrl = sandboxUrl + "?" + linkUrl;
+		return linkUrl;
+	}
+}
+
+function showPrivacyPolicy() {
+	var message = "";
+	message += "<ul>";
+	message += "<li>All online games (and associated chat conversations) are recorded and may be available to view by others.</li>";
+	message += "<li>Usernames will be shown publicly to other players and anyone viewing game replays.</li>";
+	message += "<li>Email addresses will never be purposefully shared with other players.</li>";
+	message += "</ul>";
+	showModal("Privacy Policy", message);
+}
+
+function dismissChatAlert() {
+	document.getElementById('chatTab').classList.remove('alertTab');
+}
+
+function goai() {
+	if (gameController.getAiList().length > 1) {
+		setAiIndex(0);
+		setTimeout(function() {
+			setAiIndex(1);
+		}, 2000);
+	}
+}
+
+/* Sidenav */
+function openNav() {
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function(event) {
+		if (event.target !== document.getElementById("mySidenav")
+			&& event.target !== document.getElementById("sidenavMenuButton")
+			&& event.target !== document.getElementById("siteHeading")) {
+			closeNav();
+		}
+	};
+	// document.getElementById("mySidenav").style.width = "250px";
+	document.getElementById("mySidenav").classList.add("sideNavOpen");
+}
+
+function closeNav() {
+	// document.getElementById("mySidenav").style.width = "0";
+	document.getElementById("mySidenav").classList.remove("sideNavOpen");
+}
+
+function aboutClicked() {
+	var message = "<div><em>The Garden Gate</em> is a place to play various fan-made <em>Pai Sho</em> games and other games, too. A Pai Sho game is a game played on a board for the fictional game of Pai Sho as seen in Avatar: The Last Airbender. <a href='https://skudpaisho.com/site/' target='_blank'>Learn more</a>.</div>";
+	message += "<hr /><div> Modern Skud Pai Sho tile designs by Hector Lowe<br /> ©2017 | Used with permission<br /> <a href='http://hector-lowe.com/' target='_blank'>www.hector-lowe.com</a> </div> <div class='license'><a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'><img alt='Creative Commons License' style='border-width:0' src='https://i.creativecommons.org/l/by-nc/3.0/us/88x31.png' /></a>&nbsp;All other content of this work is licensed under a <a rel='license' href='http://creativecommons.org/licenses/by-nc/3.0/us/'>Creative Commons Attribution-NonCommercial 3.0 United States License</a>.</div> <br /> <div><span class='skipBonus' onclick='showPrivacyPolicy();'>Privacy policy</span></div>";
+	showModal("About", message);
+}
+
+function getOnlineGameOpponentUsername() {
+	var opponentUsername = "";
+	if (playingOnlineGame()) {
+		if (usernameEquals(currentGameData.hostUsername)) {
+			opponentUsername = currentGameData.guestUsername;
+		} else if (usernameEquals(currentGameData.guestUsername)) {
+			opponentUsername = currentGameData.hostUsername;
+		}
+	}
+	return opponentUsername;
+}
+
+function quitOnlineGameCallback() {
+	if (currentGameData) {
+		setGameController(currentGameData.gameTypeId);
+	} else {
+		closeGame();
+	}
+}
+
+function iAmPlayerInCurrentOnlineGame() {
+	return usernameEquals(currentGameData.hostUsername) || usernameEquals(currentGameData.guestUsername);
+}
+
+function quitOnlineGame() {
+	// TODO eventually make it so if guest never made a move, then player only "leaves" game instead of updating the game result, so it returns to being an available game seek.
+	if (gameController.guestNeverMoved && gameController.guestNeverMoved()) {
+		// Guest never moved, only leave game. TODO
+	}// else {....}
+
+	if (iAmPlayerInCurrentOnlineGame()) {
+		onlinePlayEngine.updateGameWinInfoAsTie(gameId, 8, getLoginToken(), quitOnlineGameCallback);
+	}
+}
 
 function quitInactiveOnlineGame() {
 	if (iAmPlayerInCurrentOnlineGame()
