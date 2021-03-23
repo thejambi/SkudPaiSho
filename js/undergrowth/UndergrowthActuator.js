@@ -1,8 +1,10 @@
 // Actuator
 
-Undergrowth.Actuator = function(gameContainer, isMobile) {
+Undergrowth.Actuator = function(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
+
+	this.animationOn = enableAnimations;
 
 	var containers = setupPaiShoBoard(
 		this.gameContainer, 
@@ -16,15 +18,26 @@ Undergrowth.Actuator = function(gameContainer, isMobile) {
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-Undergrowth.Actuator.prototype.actuate = function(board, theGame) {
+Undergrowth.Actuator.prototype.setAnimationOn = function(isOn) {
+	this.animationOn = isOn;
+};
+
+Undergrowth.Actuator.prototype.actuate = function(board, theGame, moveToAnimate, moveAnimationBeginStep) {
 	var self = this;
 
+	if (!moveAnimationBeginStep) {
+		moveAnimationBeginStep = 0;
+	}
+
+	debug("Move to animate:");
+	debug(moveToAnimate);
+
 	window.requestAnimationFrame(function() {
-		self.htmlify(board, theGame);
+		self.htmlify(board, theGame, moveToAnimate, moveAnimationBeginStep);
 	});
 };
 
-Undergrowth.Actuator.prototype.htmlify = function(board, theGame) {
+Undergrowth.Actuator.prototype.htmlify = function(board, theGame, moveToAnimate, moveAnimationBeginStep) {
 	this.clearContainer(this.boardContainer);
 
 	var self = this;
@@ -32,7 +45,7 @@ Undergrowth.Actuator.prototype.htmlify = function(board, theGame) {
 	board.cells.forEach(function(column) {
 		column.forEach(function(cell) {
 			if (cell) {
-				self.addBoardPoint(cell);
+				self.addBoardPoint(cell, moveToAnimate, moveAnimationBeginStep);
 			}
 		});
 	});
@@ -104,7 +117,7 @@ Undergrowth.Actuator.prototype.addTile = function(tile, mainContainer) {
 	container.appendChild(theDiv);
 };
 
-Undergrowth.Actuator.prototype.addBoardPoint = function(boardPoint) {
+Undergrowth.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep) {
 	var self = this;
 
 	var theDiv = createBoardPointDiv(boardPoint);
@@ -137,6 +150,12 @@ Undergrowth.Actuator.prototype.addBoardPoint = function(boardPoint) {
 		
 		var theImg = document.createElement("img");
 
+		var flags = {};
+		
+		if (moveToAnimate) {
+			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags);
+		}
+
 		var srcValue = getSkudTilesSrcPath();
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 		
@@ -148,6 +167,13 @@ Undergrowth.Actuator.prototype.addBoardPoint = function(boardPoint) {
 		}
 		
 		theDiv.appendChild(theImg);
+	} else {
+		if (moveToAnimate) {
+			var theImg = document.createElement("img");
+			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep,
+				theImg,
+				{});
+		}
 	}
 
 	this.boardContainer.appendChild(theDiv);
@@ -157,5 +183,70 @@ Undergrowth.Actuator.prototype.addBoardPoint = function(boardPoint) {
 		theBr.classList.add("clear");
 		this.boardContainer.appendChild(theBr);
 	}
+};
+
+Undergrowth.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags) {
+	if (!this.animationOn) {
+		return;
+	}
+
+	var x = boardPoint.col, 
+		y = boardPoint.row, 
+		ox = x, 
+		oy = y;
+
+	var ax = x, 
+		ay = y;
+
+	if (moveAnimationBeginStep === 0) {
+		if (moveToAnimate.moveType === PLANTING) {
+			if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
+				if (piecePlaceAnimation === 1) {
+					theImg.style.transform = "scale(2)";
+					theImg.style.zIndex = 99; // Show new pieces above others
+					requestAnimationFrame(function() {
+						theImg.style.transform = "scale(1)";
+					});
+				}
+			}
+		}
+	}
+
+	if (moveToAnimate.endPoint2 && isSamePoint(moveToAnimate.endPoint2, ox, oy)) {
+		theImg.style.visibility = "hidden";
+		if (piecePlaceAnimation === 1) {
+			theImg.style.transform = "scale(2)";
+		}
+	}
+
+	var pointSizeMultiplierX = 34;
+	var pointSizeMultiplierY = pointSizeMultiplierX;
+	var unitString = "px";
+
+	/* For small screen size using dynamic vw units */
+	if (window.innerWidth <= 612) {
+		pointSizeMultiplierX = 5.5555;
+		pointSizeMultiplierY = 5.611;
+		unitString = "vw";
+	}
+
+	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+
+	ax = ((ax - ox) * pointSizeMultiplierX);
+	ay = ((ay - oy) * pointSizeMultiplierY);
+	requestAnimationFrame(function() {
+		theImg.style.left = ax+unitString;
+		theImg.style.top = ay+unitString;
+		// theImg.style.transform = "scale(1)";	// This will size back to normal while moving after "picked up" scale
+	});
+	setTimeout(function() {
+		requestAnimationFrame(function() {
+			theImg.style.left = "0px";
+			theImg.style.top = "0px";
+			theImg.style.visibility = "visible";
+			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
+		});
+	}, moveAnimationBeginStep === 0 ? pieceAnimationLength : 0);
 };
 

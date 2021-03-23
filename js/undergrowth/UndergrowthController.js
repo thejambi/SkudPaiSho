@@ -3,7 +3,7 @@
 function Undergrowth() {};
 
 Undergrowth.Controller = function(gameContainer, isMobile) {
-	this.actuator = new Undergrowth.Actuator(gameContainer, isMobile);
+	this.actuator = new Undergrowth.Actuator(gameContainer, isMobile, isAnimationsOn());
 
 	this.resetGameNotation();	// First
 
@@ -65,9 +65,7 @@ Undergrowth.Controller.prototype.getAdditionalMessage = function() {
 	if (this.gameNotation.moves.length === 0) {
 		// msg += getGameOptionsMessageHtml(GameType.Undergrowth.gameOptions);
 	}
-	if (!this.theGame.getWinner()) {
-		msg += "<br /><strong>" + this.theGame.getScoreSummary() + "</strong>";
-	}
+	msg += "<br /><strong>" + this.theGame.getScoreSummary() + "</strong>";
 
 	if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE
 			|| this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
@@ -77,7 +75,7 @@ Undergrowth.Controller.prototype.getAdditionalMessage = function() {
 		if (this.theGame.passInSuccessionCount === 1) {
 			msg += "<br />" + getOpponentName(this.getCurrentPlayer()) + " has passed. Passing now will end the game.";
 		}
-		if (this.gameNotation.moves.length > 2) {
+		if (this.gameNotation.moves.length > 2 && myTurn()) {
 			msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
 		}
 	}
@@ -99,13 +97,17 @@ Undergrowth.Controller.prototype.skipSecondTile = function() {
 
 Undergrowth.Controller.prototype.completeMove = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-	this.theGame.runNotationMove(move);
 	this.gameNotation.addMove(move);
 
+	var moveAnimationBeginStep = 0;
+	if (this.notationBuilder.endPoint) {
+		moveAnimationBeginStep = 1;
+	}
+
 	if (playingOnlineGame()) {
-		callSubmitMove();
+		callSubmitMove(moveAnimationBeginStep);
 	} else {
-		finalizeMove();
+		finalizeMove(moveAnimationBeginStep);
 	}
 };
 
@@ -177,7 +179,7 @@ Undergrowth.Controller.prototype.pointClicked = function(htmlPoint) {
 			this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 			
 			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-			this.theGame.runNotationMove(move);
+			this.theGame.runNotationMove(move, true);
 
 			if (this.gameNotation.moves.length === 0) {
 				this.gameNotation.addMove(move);
@@ -292,7 +294,4 @@ Undergrowth.Controller.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 };
 
-Undergrowth.Controller.prototype.replayEnded = function() {
-	this.theGame.actuate();
-};
 

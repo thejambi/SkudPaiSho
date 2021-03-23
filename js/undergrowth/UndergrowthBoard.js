@@ -21,16 +21,17 @@ Undergrowth.Board.prototype.placeTile = function (tile, notationPoint) {
 	this.boardHelper.putTileOnPoint(tile, notationPoint, this.cells);
 	this.analyzeHarmonies();
 
-	var capturedTiles = this.captureTilesWithAtLeastTwoDisharmonies();
+	var capturedTilesInfo = this.captureTilesWithAtLeastTwoDisharmonies();
 
 	this.analyzeHarmonies();
 
-	return capturedTiles;
+	return capturedTilesInfo;
 };
 
 Undergrowth.Board.prototype.captureTilesWithAtLeastTwoDisharmonies = function() {
 	var pointsToCapture = [];
-	var capturedTiles = [];
+
+	capturedTilesInfo = [];
 
 	var self = this;
 	this.forEachBoardPointWithTile(function(boardPointWithTile) {
@@ -41,10 +42,13 @@ Undergrowth.Board.prototype.captureTilesWithAtLeastTwoDisharmonies = function() 
 	});
 
 	pointsToCapture.forEach(function(pointToCaptureFrom) {
-		capturedTiles.push(pointToCaptureFrom.removeTile());
+		capturedTilesInfo.push({
+			boardPoint: pointToCaptureFrom,
+			capturedTile: pointToCaptureFrom.removeTile()
+		})
 	});
 
-	return capturedTiles;
+	return capturedTilesInfo;
 };
 
 Undergrowth.Board.prototype.forEachBoardPoint = function(forEachFunc) {
@@ -443,23 +447,29 @@ Undergrowth.Board.prototype.hasOpenGates = function() {
 	return openGateFound;
 };
 
-Undergrowth.Board.prototype.getPlayerWithMostTilesOnBoard = function() {
-	var hostCount = 0;
-	var guestCount = 0;
-
-	this.forEachBoardPointWithTile(function(boardPointWithTile) {
-		if (boardPointWithTile.tile.ownerName === HOST) {
-			hostCount++;
-		} else if (boardPointWithTile.tile.ownerName === GUEST) {
-			guestCount++;
-		} 
-	});
+Undergrowth.Board.prototype.getPlayerWithMostTilesInOrTouchingCentralGardens = function() {
+	var hostCount = this.getNumberOfTilesTouchingCentralGardensForPlayer(HOST);
+	var guestCount = this.getNumberOfTilesTouchingCentralGardensForPlayer(GUEST);
 
 	if (hostCount > guestCount) {
 		return HOST;
 	} else if (guestCount > hostCount) {
 		return GUEST;
 	}
+};
+
+Undergrowth.Board.prototype.getNumberOfTilesTouchingCentralGardensForPlayer = function(playerName) {
+	var count = 0;
+
+	this.forEachBoardPointWithTile(function(boardPointWithTile) {
+		if (boardPointWithTile.isType(RED) || boardPointWithTile.isType(WHITE)) {
+			if (boardPointWithTile.tile.ownerName === playerName) {
+				count++;
+			}
+		}
+	});
+
+	return count;
 };
 
 Undergrowth.Board.prototype.getCopy = function () {

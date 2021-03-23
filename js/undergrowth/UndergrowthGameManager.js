@@ -23,15 +23,15 @@ Undergrowth.GameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-Undergrowth.GameManager.prototype.actuate = function() {
+Undergrowth.GameManager.prototype.actuate = function(move, moveAnimationBeginStep) {
 	if (this.isCopy) {
 		return;
 	}
 
-	this.actuator.actuate(this.board, this);
+	this.actuator.actuate(this.board, this, move, moveAnimationBeginStep);
 };
 
-Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate) {
+Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep) {
 	debug("Running Move: " + move.fullMoveText);
 
 	var errorFound = false;
@@ -42,11 +42,17 @@ Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate) 
 	} else if (move.moveType === PLANTING) {
 		// Just placing tile on board
 		var tile = this.tileManager.grabTile(move.player, move.plantedFlowerType);
-		var capturedTiles = this.board.placeTile(tile, move.endPoint);
+		var capturedTilesInfo = this.board.placeTile(tile, move.endPoint);
+
+		move.plantedTile1 = tile;
+		move.capturedTiles1Info = capturedTilesInfo;
 
 		if (move.plantedFlowerType2 && move.endPoint2) {
 			var tile = this.tileManager.grabTile(move.player, move.plantedFlowerType2);
-			var capturedTiles2 = this.board.placeTile(tile, move.endPoint2);
+			var capturedTiles2Info = this.board.placeTile(tile, move.endPoint2);
+
+			move.plantedTile2 = tile;
+			move.capturedTiles2Info = capturedTiles2Info;
 		}
 	}
 
@@ -55,14 +61,14 @@ Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate) 
 	}
 
 	if (withActuate) {
-		this.actuate();
+		this.actuate(move, moveAnimationBeginStep);
 	}
 
 	this.endGameWinners = [];
 	// End game when all tiles have been played
 	var noTilesLeft = this.tileManager.noMoreTilesLeft();
 	if (noTilesLeft || this.passInSuccessionCount === 2) {
-		this.endGameWinners.push(this.board.getPlayerWithMostTilesOnBoard());
+		this.endGameWinners.push(this.board.getPlayerWithMostTilesInOrTouchingCentralGardens());
 	}
 
 	return bonusAllowed;
@@ -149,16 +155,16 @@ Undergrowth.GameManager.prototype.getWinner = function() {
 Undergrowth.GameManager.prototype.getWinReason = function() {
 	var msg = "";
 	if (this.getWinner()) {
-		msg += " won the game with more tiles on the board!";
+		msg += " won the game with more tiles touching the Central Gardens!";
 	}
 	return msg;
 };
 
 Undergrowth.GameManager.prototype.getScoreSummary = function() {
-	return "";
-	/* var tilesLeft = this.tileManager.guestTiles.length;
 	return "<br />"
-		+ this.board.harmonyManager.getScoreSummaryText(); */
+		+ "Host Central Tiles: " + this.board.getNumberOfTilesTouchingCentralGardensForPlayer(HOST)
+		+ "<br />"
+		+ "Guest Central Tiles: " + this.board.getNumberOfTilesTouchingCentralGardensForPlayer(GUEST);
 };
 
 Undergrowth.GameManager.prototype.getWinResultTypeCode = function() {
