@@ -169,10 +169,19 @@ Undergrowth.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimat
 		theDiv.appendChild(theImg);
 	} else {
 		if (moveToAnimate) {
-			var theImg = document.createElement("img");
-			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep,
-				theImg,
-				{});
+			var capturedStepInfo = this.getPointCapturedMoveStepInfo(boardPoint, moveToAnimate);
+			if (capturedStepInfo 
+					&& capturedStepInfo.capturedTileInfo 
+					&& capturedStepInfo.capturedTileInfo.capturedTile) {
+				var theImgCaptured = document.createElement("img");
+				var srcValue = getSkudTilesSrcPath();
+				theImgCaptured.src = srcValue + capturedStepInfo.capturedTileInfo.capturedTile.getImageName() + ".png";
+				theDiv.appendChild(theImgCaptured);
+				this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep, theImgCaptured, {
+					capturedStepInfo: capturedStepInfo,
+					theDiv: theDiv
+				});
+			}
 		}
 	}
 
@@ -183,6 +192,35 @@ Undergrowth.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimat
 		theBr.classList.add("clear");
 		this.boardContainer.appendChild(theBr);
 	}
+};
+
+Undergrowth.Actuator.prototype.getPointCapturedMoveStepInfo = function(boardPoint, moveToAnimate) {
+	var capturedStepInfo;
+	if (moveToAnimate.capturedTiles1Info && moveToAnimate.capturedTiles1Info.length) {
+		moveToAnimate.capturedTiles1Info.forEach(function(capturedTileInfo) {
+			if (capturedTileInfo.boardPoint.row === boardPoint.row
+				&& capturedTileInfo.boardPoint.col === boardPoint.col) {
+				capturedStepInfo = {
+					step: 1,
+					capturedTileInfo: capturedTileInfo
+				}
+			}
+		});
+	}
+
+	if (moveToAnimate.capturedTiles2Info && moveToAnimate.capturedTiles2Info.length) {
+		moveToAnimate.capturedTiles2Info.forEach(function(capturedTileInfo) {
+			if (capturedTileInfo.boardPoint.row === boardPoint.row
+					&& capturedTileInfo.boardPoint.col === boardPoint.col) {
+				capturedStepInfo = {
+					step: 2,
+					capturedTileInfo: capturedTileInfo
+				};
+			}
+		});
+	}
+
+	return capturedStepInfo;
 };
 
 Undergrowth.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags) {
@@ -198,6 +236,27 @@ Undergrowth.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveTo
 	var ax = x, 
 		ay = y;
 
+	var forCapturedTile = false;
+	var classesToAdd = [];
+	var isBetweenHarmony = false;
+	var addBhHost = false;
+	var addBhGuest = false;
+	if (flags.capturedStepInfo) {
+		forCapturedTile = true;
+		if (flags.theDiv.classList.contains("betweenHarmony")) {
+			isBetweenHarmony = true;
+			flags.theDiv.classList.remove("betweenHarmony");
+			if (flags.theDiv.classList.contains("bhHost")) {
+				addBhHost = true;
+				flags.theDiv.classList.remove("bhHost");
+			}
+			if (flags.theDiv.classList.contains("bhGuest")) {
+				addBhGuest = true;
+				flags.theDiv.classList.remove("bhGuest");
+			}
+		}
+	}
+
 	if (moveAnimationBeginStep === 0) {
 		if (moveToAnimate.moveType === PLANTING) {
 			if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
@@ -209,6 +268,24 @@ Undergrowth.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveTo
 					});
 				}
 			}
+		}
+
+		/* Animate captured tile */
+		if (forCapturedTile && flags.capturedStepInfo.step === 1) {
+			requestAnimationFrame(function() {
+				theImg.style.transform = "scale(0)";
+				if (isBetweenHarmony) {
+					setTimeout(function() {
+						flags.theDiv.classList.add("betweenHarmony");
+						if (addBhHost) {
+							flags.theDiv.classList.add("bhHost");
+						}
+						if (addBhGuest) {
+							flags.theDiv.classList.add("bhGuest");
+						}
+					}, pieceAnimationLength);
+				}
+			});
 		}
 	}
 
@@ -235,6 +312,7 @@ Undergrowth.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveTo
 
 	ax = ((ax - ox) * pointSizeMultiplierX);
 	ay = ((ay - oy) * pointSizeMultiplierY);
+
 	requestAnimationFrame(function() {
 		theImg.style.left = ax+unitString;
 		theImg.style.top = ay+unitString;
@@ -246,6 +324,21 @@ Undergrowth.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveTo
 			theImg.style.top = "0px";
 			theImg.style.visibility = "visible";
 			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
+
+			if (forCapturedTile) {
+				theImg.style.transform = "scale(0)";	// Captured tiles go away
+				if (isBetweenHarmony) {
+					setTimeout(function() {
+						flags.theDiv.classList.add("betweenHarmony");
+						if (addBhHost) {
+							flags.theDiv.classList.add("bhHost");
+						}
+						if (addBhGuest) {
+							flags.theDiv.classList.add("bhGuest");
+						}
+					}, pieceAnimationLength);
+				}
+			}
 		});
 	}, moveAnimationBeginStep === 0 ? pieceAnimationLength : 0);
 };
