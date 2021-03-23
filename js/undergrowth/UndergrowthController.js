@@ -57,7 +57,16 @@ Undergrowth.Controller.prototype.resetMove = function() {
 };
 
 Undergrowth.Controller.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Undergrowth Pai Sho</h4> <p>A placement game based on the Skud Pai Sho harmony system. Read the <a href='https://skudpaisho.com/site/games/undergrowth-pai-sho/' target='_blank'>rules page</a> to get started.</p>";
+	return "<h4>Undergrowth Pai Sho</h4> <p>A placement game based on the Skud Pai Sho harmony system. Read the <a href='https://skudpaisho.com/site/games/undergrowth-pai-sho/' target='_blank'>rules page</a> to get started. Summary of the rules are below.</p>"
+	+ "<p>Two tiles are placed each turn, except the Host's first turn, where only one tile is placed.</p>"
+	+ "<p>First, Gates are filled. Then tiles are placed elsewhere on the board.</p>"
+	+ "<p>When placing a tile onto the board, tiles are placed on any point where a) the tile forms Harmony with the player’s own tile(s) and b) the placed tile does not interrupt an existing Harmony or Disharmony on the board.</p>"
+	+ "<p>After a tile is placed, remove any tile with two or more Disharmonies from the board.</p>"
+	+ "<p>A player may also pass if they have no available moves.</p>"
+	+ "<p>After the last piece is played or both players pass in succession, the game ends. The player with the most tiles in or touching the Central Gardens on the board wins.</p>"
+	+ "<p>Same/alike tiles form Disharmony with each other.</p>"
+	+ "<p>Tiles in Gates do not form Disharmony.</p>"
+	+ "<p>The Orchid harmonizes with all friendly Flower Tiles, but also forms Disharmony with everything at the same time.</p>";
 };
 
 Undergrowth.Controller.prototype.getAdditionalMessage = function() {
