@@ -69,7 +69,7 @@ Undergrowth.Controller.prototype.getAdditionalMessage = function() {
 
 	if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE
 			|| this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
-		if (this.theGame.tileManager.playerIsOutOfTiles(getcurrentPlayer())) {
+		if (this.theGame.tileManager.playerIsOutOfTiles(getCurrentPlayer())) {
 			msg += "<br />Place second tile or <span class='clickableText' onclick='gameController.skipSecondTile();'>skip</span>";
 		} else {
 			msg += "<br />Place second tile";
