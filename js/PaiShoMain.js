@@ -2105,13 +2105,7 @@ var GameType = {
 		desc: "Undergrowth Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/undergrowth-pai-sho/",
 		gameOptions: [],
-		noRankedGames: true,
-		usersWithAccess: [
-			'SkudPaiSho',
-			'Cannoli',
-			'Adevar',
-			'markdwagner'
-		]
+		noRankedGames: true
 	},
 	Trifle: {
 		id: 10,

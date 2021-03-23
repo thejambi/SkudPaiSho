@@ -74,7 +74,10 @@ Undergrowth.Controller.prototype.getAdditionalMessage = function() {
 	if (this.gameNotation.moves.length === 0) {
 		// msg += getGameOptionsMessageHtml(GameType.Undergrowth.gameOptions);
 	}
-	msg += "<strong>" + this.theGame.getScoreSummary() + "</strong>";
+
+	if (!this.theGame.getWinner()) {
+		msg += "<strong>" + this.theGame.getScoreSummary() + "</strong>";
+	}
 
 	if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE
 			|| this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
