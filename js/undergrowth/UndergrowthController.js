@@ -88,7 +88,7 @@ Undergrowth.Controller.prototype.getAdditionalMessage = function() {
 		if (this.theGame.passInSuccessionCount === 1) {
 			msg += "<br />" + getOpponentName(this.getCurrentPlayer()) + " has passed. Passing now will end the game.";
 		}
-		if (this.gameNotation.moves.length > 2 && myTurn()) {
+		if (this.gameNotation.moves.length > 2 && myTurn() && !this.theGame.getWinner()) {
 			msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
 		}
 	}
