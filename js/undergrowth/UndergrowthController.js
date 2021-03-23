@@ -30,7 +30,7 @@ Undergrowth.Controller.prototype.resetGameNotation = function() {
 };
 
 Undergrowth.Controller.prototype.getNewGameNotation = function() {
-	return new UndergrowthGameNotation();
+	return new Undergrowth.GameNotation();
 };
 
 Undergrowth.Controller.getHostTilesContainerDivs = function() {
@@ -100,7 +100,13 @@ Undergrowth.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.plantedFlowerType = tileCode;
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
-		this.theGame.setAllLegalPointsOpen(getCurrentPlayer(), tile, this.gameNotation.moves.length);
+		this.theGame.setAllLegalPointsOpen(getCurrentPlayer(), tile);
+	} else if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE) {
+		tile.selectedFromPile = true;
+		this.notationBuilder.plantedFlowerType2 = tileCode;
+		this.notationBuilder.status = Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT;
+
+		this.theGame.setAllLegalPointsOpen(getCurrentPlayer(), tile);
 	} else {
 		this.theGame.hidePossibleMovePoints();
 		this.notationBuilder = new Undergrowth.NotationBuilder();
@@ -121,28 +127,43 @@ Undergrowth.Controller.prototype.pointClicked = function(htmlPoint) {
 
 	if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
-			// They're trying to move there! And they can! Exciting!
-			// Need the notation!
 			this.theGame.hidePossibleMovePoints();
 			this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 			
 			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 			this.theGame.runNotationMove(move);
 
-			// Move all set. Add it to the notation!
-			this.gameNotation.addMove(move);
-			if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-				createGameIfThatIsOk(GameType.Undergrowth.id);
-			} else {
-				if (playingOnlineGame()) {
-					callSubmitMove();
+			if (this.gameNotation.moves.length === 0) {
+				this.gameNotation.addMove(move);
+				if (onlinePlayEnabled) {
+					createGameIfThatIsOk(GameType.Undergrowth.id);
 				} else {
 					finalizeMove();
 				}
+			} else {
+				this.notationBuilder.status = Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE;
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
 			this.notationBuilder = new Undergrowth.NotationBuilder();
+		}
+	} else if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
+		if (boardPoint.isType(POSSIBLE_MOVE)) {
+			this.theGame.hidePossibleMovePoints();
+			this.notationBuilder.endPoint2 = new NotationPoint(htmlPoint.getAttribute("name"));
+			
+			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+			this.theGame.runNotationMove(move);
+			this.gameNotation.addMove(move);
+			
+			if (playingOnlineGame()) {
+				callSubmitMove();
+			} else {
+				finalizeMove();
+			}
+		} else {
+			this.theGame.hidePossibleMovePoints();
+			this.notationBuilder.status = Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE;
 		}
 	}
 };

@@ -432,6 +432,17 @@ Undergrowth.Board.prototype.setOpenGatePossibleMoves = function() {
 	});
 };
 
+Undergrowth.Board.prototype.hasOpenGates = function() {
+	var openGateFound = false;
+	this.forEachBoardPoint(function(boardPoint) {
+		if (boardPoint.isType(GATE) && !boardPoint.hasTile()) {
+			openGateFound = true;
+			return;
+		}
+	});
+	return openGateFound;
+};
+
 Undergrowth.Board.prototype.getPlayerWithMostTilesOnBoard = function() {
 	var hostCount = 0;
 	var guestCount = 0;

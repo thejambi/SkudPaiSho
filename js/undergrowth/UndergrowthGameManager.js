@@ -39,8 +39,12 @@ Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate) 
 	if (move.moveType === PLANTING) {
 		// Just placing tile on board
 		var tile = this.tileManager.grabTile(move.player, move.plantedFlowerType);
-
 		var capturedTiles = this.board.placeTile(tile, move.endPoint);
+
+		if (move.plantedFlowerType2 && move.endPoint2) {
+			var tile = this.tileManager.grabTile(move.player, move.plantedFlowerType2);
+			var capturedTiles2 = this.board.placeTile(tile, move.endPoint2);
+		}
 	}
 
 	if (withActuate) {
@@ -80,8 +84,8 @@ Undergrowth.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuat
 	}
 };
 
-Undergrowth.GameManager.prototype.setAllLegalPointsOpen = function(player, tile, numMoves, ignoreActuate) {
-	if (numMoves < 4) {
+Undergrowth.GameManager.prototype.setAllLegalPointsOpen = function(player, tile, ignoreActuate) {
+	if (this.board.hasOpenGates()) {
 		this.board.setOpenGatePossibleMoves();
 	} else {
 		this.board.setHarmonyPointsOpen(tile, player);
