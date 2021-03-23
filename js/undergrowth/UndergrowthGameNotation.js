@@ -1,4 +1,7 @@
-// Coop Solitaire Notation
+
+Undergrowth.NotationVars = {
+	PASS_TURN: "-"
+};
 
 Undergrowth.NotationMove = function(text) {
 	this.fullMoveText = text;
@@ -35,7 +38,10 @@ Undergrowth.NotationMove.prototype.analyzeMove = function() {
 	var char0 = moveText.charAt(0);
 	this.moveType = PLANTING;
 
-	if (this.moveType === PLANTING) {
+	if (moveText === Undergrowth.NotationVars.PASS_TURN) {
+		this.passTurn = true;
+		this.moveType = Undergrowth.NotationVars.PASS_TURN;
+	} else if (this.moveType === PLANTING) {
 		var char1 = moveText.charAt(1);
 		this.plantedFlowerType = char0;
 		if (char1 !== '(') {
@@ -101,6 +107,8 @@ Undergrowth.NotationBuilder = function() {
 	this.boatBonusPoint;
 
 	this.status = BRAND_NEW;
+
+	this.passTurn = false;
 }
 
 Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE = "Waiting for second move";
@@ -114,6 +122,8 @@ Undergrowth.NotationBuilder.prototype.getNotationMove = function(moveNum, player
 		if (this.plantedFlowerType2 && this.endPoint2) {
 			notationLine += "+" + this.plantedFlowerType2 + "(" + this.endPoint2.pointText + ")";
 		}
+	} else if (this.moveType === Undergrowth.NotationVars.PASS_TURN) {
+		notationLine += Undergrowth.NotationVars.PASS_TURN;
 	}
 	
 	return new Undergrowth.NotationMove(notationLine);

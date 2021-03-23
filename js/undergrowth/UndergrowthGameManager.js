@@ -12,8 +12,9 @@ Undergrowth.GameManager = function(actuator, ignoreActuate, isCopy) {
 
 // Set up the game
 Undergrowth.GameManager.prototype.setup = function (ignoreActuate) {
-
 	this.board = new Undergrowth.Board();
+
+	this.passInSuccessionCount = 0;
 
 	// Update the actuator
 	if (!ignoreActuate) {
@@ -36,7 +37,9 @@ Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate) 
 	var errorFound = false;
 	var bonusAllowed = false;
 
-	if (move.moveType === PLANTING) {
+	if (move.moveType === Undergrowth.NotationVars.PASS_TURN) {
+		this.passInSuccessionCount++;
+	} else if (move.moveType === PLANTING) {
 		// Just placing tile on board
 		var tile = this.tileManager.grabTile(move.player, move.plantedFlowerType);
 		var capturedTiles = this.board.placeTile(tile, move.endPoint);
@@ -47,6 +50,10 @@ Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate) 
 		}
 	}
 
+	if (move.moveType !== Undergrowth.NotationVars.PASS_TURN) {
+		this.passInSuccessionCount = 0;
+	}
+
 	if (withActuate) {
 		this.actuate();
 	}
@@ -54,7 +61,7 @@ Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate) 
 	this.endGameWinners = [];
 	// End game when all tiles have been played
 	var noTilesLeft = this.tileManager.noMoreTilesLeft();
-	if (noTilesLeft) {
+	if (noTilesLeft || this.passInSuccessionCount === 2) {
 		this.endGameWinners.push(this.board.getPlayerWithMostTilesOnBoard());
 	}
 

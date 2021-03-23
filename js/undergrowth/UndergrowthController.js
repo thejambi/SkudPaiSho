@@ -73,9 +73,24 @@ Undergrowth.Controller.prototype.getAdditionalMessage = function() {
 			|| this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
 		msg += "<br />Place second tile or <span class='clickableText' onclick='gameController.skipSecondTile();'>skip</span>";
 		msg += getResetMoveText();
+	} else {
+		if (this.theGame.passInSuccessionCount === 1) {
+			msg += "<br />" + getOpponentName(this.getCurrentPlayer()) + " has passed. Passing now will end the game.";
+		}
+		if (this.gameNotation.moves.length > 2) {
+			msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
+		}
 	}
 
 	return msg;
+};
+
+Undergrowth.Controller.prototype.passTurn = function() {
+	if (this.gameNotation.moves.length > 2) {
+		this.notationBuilder.passTurn = true;
+		this.notationBuilder.moveType = Undergrowth.NotationVars.PASS_TURN;
+		this.completeMove();
+	}
 };
 
 Undergrowth.Controller.prototype.skipSecondTile = function() {
@@ -136,7 +151,11 @@ Undergrowth.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 		this.theGame.setAllLegalPointsOpen(getCurrentPlayer(), tile);
 	} else {
 		this.theGame.hidePossibleMovePoints();
-		this.notationBuilder = new Undergrowth.NotationBuilder();
+		if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
+			this.notationBuilder = new Undergrowth.NotationBuilder();
+		} else if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
+			this.notationBuilder.status = Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE;
+		}
 	}
 };
 
