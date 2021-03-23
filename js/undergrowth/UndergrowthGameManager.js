@@ -157,7 +157,7 @@ Undergrowth.GameManager.prototype.getWinReason = function() {
 	if (this.getWinner()) {
 		msg += " won the game with more tiles touching the Central Gardens!";
 	}
-	return msg;
+	return msg + this.getScoreSummary();
 };
 
 Undergrowth.GameManager.prototype.getScoreSummary = function() {

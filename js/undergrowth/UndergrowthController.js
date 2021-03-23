@@ -65,11 +65,15 @@ Undergrowth.Controller.prototype.getAdditionalMessage = function() {
 	if (this.gameNotation.moves.length === 0) {
 		// msg += getGameOptionsMessageHtml(GameType.Undergrowth.gameOptions);
 	}
-	msg += "<br /><strong>" + this.theGame.getScoreSummary() + "</strong>";
+	msg += "<strong>" + this.theGame.getScoreSummary() + "</strong>";
 
 	if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE
 			|| this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
-		msg += "<br />Place second tile or <span class='clickableText' onclick='gameController.skipSecondTile();'>skip</span>";
+		if (this.theGame.tileManager.playerIsOutOfTiles(getcurrentPlayer())) {
+			msg += "<br />Place second tile or <span class='clickableText' onclick='gameController.skipSecondTile();'>skip</span>";
+		} else {
+			msg += "<br />Place second tile";
+		}
 		msg += getResetMoveText();
 	} else {
 		if (this.theGame.passInSuccessionCount === 1) {
@@ -190,7 +194,11 @@ Undergrowth.Controller.prototype.pointClicked = function(htmlPoint) {
 				}
 			} else {
 				this.notationBuilder.status = Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE;
-				refreshMessage();
+				if (this.theGame.tileManager.playerIsOutOfTiles(getCurrentPlayer())) {
+					this.completeMove();
+				} else {
+					refreshMessage();
+				}
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();

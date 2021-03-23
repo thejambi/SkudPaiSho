@@ -54,6 +54,14 @@ Undergrowth.TileManager.prototype.noMoreTilesLeft = function() {
 	return this.hostTiles.length === 0 && this.guestTiles.length === 0;
 };
 
+Undergrowth.TileManager.prototype.aPlayerHasNoMoreTilesLeft = function() {
+	return this.hostTiles.length === 0 || this.guestTiles.length === 0;
+};
+
+Undergrowth.TileManager.prototype.playerIsOutOfTiles = function(playerName) {
+	return this.getTilePile(playerName).length === 0;
+};
+
 Undergrowth.TileManager.prototype.getCopy = function() {
 	var copy = new Undergrowth.TileManager();
 
