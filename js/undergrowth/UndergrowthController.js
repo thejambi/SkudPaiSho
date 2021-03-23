@@ -57,7 +57,7 @@ Undergrowth.Controller.prototype.resetMove = function() {
 };
 
 Undergrowth.Controller.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Undergrowth Pai Sho</h4> <p>A placement game based on the Skud Pai Sho harmony system.</p>";
+	return "<h4>Undergrowth Pai Sho</h4> <p>A placement game based on the Skud Pai Sho harmony system. Read the <a href='https://skudpaisho.com/site/games/undergrowth-pai-sho/' target='_blank'>rules page</a> to get started.</p>";
 };
 
 Undergrowth.Controller.prototype.getAdditionalMessage = function() {
