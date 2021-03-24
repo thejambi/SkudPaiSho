@@ -68,7 +68,13 @@ Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate, 
 	// End game when all tiles have been played
 	var noTilesLeft = this.tileManager.noMoreTilesLeft();
 	if (noTilesLeft || this.passInSuccessionCount === 2) {
-		this.endGameWinners.push(this.board.getPlayerWithMostTilesInOrTouchingCentralGardens());
+		var winnerPlayer = this.board.getPlayerWithMostTilesInOrTouchingCentralGardens();
+		if (winnerPlayer) {
+			this.endGameWinners.push(winnerPlayer);
+		} else {
+			this.endGameWinners.push(HOST);
+			this.endGameWinners.push(GUEST);
+		}
 	}
 
 	return bonusAllowed;
@@ -149,6 +155,8 @@ Undergrowth.GameManager.prototype.playerHasNotPlayedEitherSpecialTile = function
 Undergrowth.GameManager.prototype.getWinner = function() {
 	if (this.endGameWinners.length === 1) {
 		return this.endGameWinners[0];
+	} else if (this.endGameWinners.length > 1) {
+		return "BOTH players";
 	}
 };
 
@@ -170,6 +178,8 @@ Undergrowth.GameManager.prototype.getScoreSummary = function() {
 Undergrowth.GameManager.prototype.getWinResultTypeCode = function() {
 	if (this.endGameWinners.length === 1) {
 		return 1;
+	} else if (this.endGameWinners.length > 1) {
+		return 4;	// Tie
 	}
 };
 
