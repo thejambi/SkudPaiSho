@@ -3121,8 +3121,7 @@ function randomIntFromInterval(min, max) {
 
 function closeGame() {
 	if (gameDevOn) {
-		//   setGameController(GameType.Trifle.id);
-		setGameController(GameType.Undergrowth.id);
+		setGameController(GameType.Trifle.id);
 		return;
 	}
 	var defaultGameTypeIds = [

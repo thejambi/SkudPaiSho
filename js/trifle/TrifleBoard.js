@@ -5,7 +5,7 @@ Trifle.Board = function() {
 	this.cells = this.brandNew();
 
 	this.winners = [];
-	this.tilePresenceAbilities = [];
+	// this.tilePresenceAbilities = [];
 	this.activeDurationAbilities = [];
 
 	this.abilityManager = new Trifle.AbilityManager(this);
@@ -374,227 +374,6 @@ Trifle.Board.prototype.placeTile = function(tile, notationPoint) {
 	var boardPoint = this.getPointFromNotationPoint(notationPoint);
 
 	this.processAbilities(tile, tileInfo, null, boardPoint, []);
-
-	if (boardPoint.hasTile() && boardPoint.tile.code === tile.code) {
-		this.applyZoneAbilityToTile(boardPoint);
-	}
-
-	this.applyBoardScanAbilities();
-	this.applyWhenLandsTriggers(tile, tileInfo, boardPoint, []);
-};
-
-Trifle.Board.prototype.setTilePresenceAbilitiesForPlayer = function(boardPoint, playerName, tileInfo) {
-	if (tileInfo && tileInfo.abilities) {
-		var self = this;
-		tileInfo.abilities.forEach(function(abilityInfo) {
-			if (self.abilityIsActive(boardPoint, boardPoint.tile, tileInfo, abilityInfo)) {
-				self.tilePresenceAbilities.push({
-					playerName: playerName,
-					abilityInfo: abilityInfo
-				});
-			}
-		});
-	}
-};
-
-Trifle.Board.prototype.abilityIsActive = function(boardPoint, tile, tileInfo, abilityInfo) {
-	/* Abilities defalt to active unless disabled */
-	var abilityIsActive = true;
-
-	/* What are the ways an ability can be disabled/activated?
-	 */
-
-	var self = this;
-	this.forEachBoardPointWithTile(function(checkBoardPoint) {
-		var checkTileInfo = TrifleTiles[checkBoardPoint.tile.code];
-
-		/* Check tile zones that can disable abilities */
-		var zoneInfo = Trifle.TileInfo.getTerritorialZone(checkTileInfo);
-		if (zoneInfo && zoneInfo.abilities) {
-			zoneInfo.abilities.forEach(function(zoneAbilityInfo) {
-				if (
-					zoneAbilityInfo.type === Trifle.ZoneAbility.removesTileAbilities
-					&& (
-						(zoneAbilityInfo.targetTeams.includes(Trifle.TileTeam.friendly)
-							&& tile.ownerCode === checkBoardPoint.tile.ownerCode)
-						|| (zoneAbilityInfo.targetTeams.includes(Trifle.TileTeam.enemy)
-							&& tile.ownerCode !== checkBoardPoint.tile.ownerCode)
-					) && (
-						(
-							zoneAbilityInfo.targetTileTypes 
-							&& (
-								arrayIncludesOneOf(zoneAbilityInfo.targetTileTypes, tileInfo.types)
-								|| zoneAbilityInfo.targetTileTypes.includes(Trifle.TileCategory.allTileTypes)
-							)
-						)
-						|| (
-							zoneAbilityInfo.targetTileCodes 
-							&& zoneAbilityInfo.targetTileCodes.includes(tile.code)
-						)
-					) && self.pointTileZoneContainsPoint(checkBoardPoint, boardPoint)
-				) {
-					abilityIsActive = false;
-					debug("Ability disabled for tile: " + tile.code + " by tile: " + checkBoardPoint.tile.code);
-				}
-			});
-		}
-
-		/* Check RemoveEffects abilities - Moving check to a "isEffectActive" method */
-		// abilityIsActive = abilityIsActive && !self.effectIsDisabledByRemoveEffectsAbility(boardPoint, tile, tileInfo, abilityInfo, checkBoardPoint, checkTileInfo);
-	});
-
-	if (abilityInfo.triggeringBoardState) {
-		abilityIsActive = false;	// Defaults to inactive unless activated by triggering board state, which we'll check.... now.
-		switch (abilityInfo.triggeringBoardState) {
-
-		}
-	}
-
-
-	return abilityIsActive;
-};
-
-Trifle.Board.prototype.applyZoneAbilityToTile = function(boardPoint) {
-	var tileInfo = TrifleTiles[boardPoint.tile.code];
-	var tile = boardPoint.tile;
-	zone = Trifle.TileInfo.getTerritorialZone(tileInfo);
-	if (zone) {
-		tile.activeZone = {
-			size: zone.size
-		}
-		if (zone.abilities) {
-			zone.abilities.forEach(function(ability) {
-				if (ability.type === Trifle.ZoneAbility.canceledWhenInTemple) {
-					tile.activeZone.canceled = boardPoint.isType(TEMPLE);
-				}
-			});
-		}
-	}
-};
-
-Trifle.Board.prototype.applyBoardScanAbilities = function() {
-	var self = this;
-	/* Clear all */
-	this.forEachBoardPoint(function(boardPoint) {
-		if (boardPoint.hasTile()) {
-			boardPoint.tile.protected = false;
-		}
-	});
-	
-	this.tilePresenceAbilities = [];
-	this.forEachBoardPointWithTile(function(boardPoint) {
-		var tileInfo = TrifleTiles[boardPoint.tile.code];
-		self.setTilePresenceAbilitiesForPlayer(boardPoint, boardPoint.tile.ownerName, tileInfo);
-		self.applyZoneProtectionAbilityForBoardPoint(boardPoint);
-	});
-};
-
-Trifle.Board.prototype.applyZoneProtectionAbilityForBoardPoint = function(boardPoint) {
-	var tileInfo = TrifleTiles[boardPoint.tile.code];
-	var zoneInfo = Trifle.TileInfo.getTerritorialZone(tileInfo);
-	if (zoneInfo && zoneInfo.abilities) {
-		var self = this;
-		zoneInfo.abilities.forEach(function(zoneAbility) {
-			if (self.abilityIsActive(boardPoint, boardPoint.tile, tileInfo, zoneAbility)
-					&& zoneAbility.type === Trifle.ZoneAbility.protectFriendlyTilesFromCapture) {
-				self.applyProtectFriendlyTilesFromCaptureAbility(boardPoint, zoneInfo, zoneAbility);
-			}
-		});
-	}
-};
-Trifle.Board.prototype.applyProtectFriendlyTilesFromCaptureAbility = function(boardPoint, zoneInfo, zoneAbility) {
-	var self = this;
-	if (zoneAbility && zoneAbility.targetTileTypes) {
-		this.forEachBoardPoint(function(targetPoint) {
-			if (targetPoint.hasTile() && targetPoint.tile.ownerName === boardPoint.tile.ownerName) {
-				var targetTileInfo = TrifleTiles[targetPoint.tile.code];
-				if (Trifle.TileInfo.tileIsOneOfTheseTypes(targetTileInfo, zoneAbility.targetTileTypes)) {
-					var distanceAway = self.getDistanceBetweenPoints(boardPoint, targetPoint);
-					if (distanceAway <= zoneInfo.size) {
-						if (self.isEffectActive(targetPoint, targetTileInfo, boardPoint, zoneAbility)) {
-							targetPoint.tile.protected = true;
-							debug("I protected tile: " + targetPoint.tile);
-						}
-					}
-				}
-			}
-		});
-	}
-};
-
-Trifle.Board.prototype.isEffectActive = function(targetPoint, targetTileInfo, boardPointOfTileGrantingEffect, abilityGrantingEffect) {
-	/* Effects defalt to active unless disabled */
-	var effectIsActive = true;
-
-	var self = this;
-	this.forEachBoardPointWithTile(function(checkBoardPoint) {
-		var checkTile = checkBoardPoint.tile;
-		var checkTileInfo = TrifleTiles[checkBoardPoint.tile.code];
-
-		/* Check tile zones that can disable effects */
-		/* var zoneInfo = Trifle.TileInfo.getTerritorialZone(checkTileInfo);
-		if (zoneInfo && zoneInfo.abilities) {
-			zoneInfo.abilities.forEach(function(zoneAbilityInfo) {
-				if (
-					zoneAbilityInfo.type === Trifle.ZoneAbility.removesTileAbilities
-					&& (
-						(zoneAbilityInfo.targetTeams.includes(Trifle.TileTeam.friendly)
-							&& tile.ownerCode === checkBoardPoint.tile.ownerCode)
-						|| (zoneAbilityInfo.targetTeams.includes(Trifle.TileTeam.enemy)
-							&& tile.ownerCode !== checkBoardPoint.tile.ownerCode)
-					) && (
-						(
-							zoneAbilityInfo.targetTileTypes 
-							&& (
-								arrayIncludesOneOf(zoneAbilityInfo.targetTileTypes, tileInfo.types)
-								|| zoneAbilityInfo.targetTileTypes.includes(Trifle.TileCategory.allTileTypes)
-							)
-						)
-						|| (
-							zoneAbilityInfo.targetTileCodes 
-							&& zoneAbilityInfo.targetTileCodes.includes(tile.code)
-						)
-					) && self.pointTileZoneContainsPoint(checkBoardPoint, boardPoint)
-				) {
-					effectIsActive = false;
-					debug("Ability disabled for tile: " + tile.code + " by tile: " + checkBoardPoint.tile.code);
-				}
-			});
-		} */
-
-		/* Check RemoveEffects abilities */
-		effectIsActive = effectIsActive && !self.effectIsDisabledByRemoveEffectsAbility(targetPoint, targetTileInfo, boardPointOfTileGrantingEffect, abilityGrantingEffect, checkBoardPoint, checkTileInfo);
-	});
-
-	// if (abilityInfo.triggeringBoardState) {
-	// 	effectIsActive = false;	// Defaults to inactive unless activated by triggering board state, which we'll check.... now.
-	// 	switch (abilityInfo.triggeringBoardState) {
-	// 	}
-	// }
-
-	return effectIsActive;
-};
-
-Trifle.Board.prototype.effectIsDisabledByRemoveEffectsAbility = function(targetPoint, targetTileInfo, boardPointOfTileGrantingEffect, abilityGrantingEffect, checkBoardPoint, checkTileInfo) {
-	var effectIsDisabled = false;
-	var self = this;
-	if (checkTileInfo.abilities && checkTileInfo.abilities.length > 0) {
-		checkTileInfo.abilities.forEach(function(checkAbilityInfo) {
-			if (checkAbilityInfo.type === Trifle.AbilityName.removeEffects) {
-				if (checkAbilityInfo.targetEffectTypes
-						&& arrayIncludesOneOf(checkAbilityInfo.targetEffectTypes, AbilityTypes[abilityGrantingEffect.type])) {
-					if (checkAbilityInfo.triggeringBoardState && checkAbilityInfo.triggeringBoardState === Trifle.AbilityTrigger.whileTileInLineOfSight) {
-						if (self.targetPointIsInLineOfSightOfThesePoints(targetPoint, [checkBoardPoint])) {
-							effectIsDisabled = true;
-							debug(checkBoardPoint.tile.code + " has disabled effect granted by " + boardPointOfTileGrantingEffect.tile.code);
-						}
-					}
-				}
-			}
-		});
-	}
-
-	return effectIsDisabled;
 };
 
 Trifle.Board.prototype.getDistanceBetweenPoints = function(bp1, bp2) {
@@ -678,37 +457,6 @@ Trifle.Board.prototype.getAdjacentRowAndCols = function(rowAndCol) {
 Trifle.Board.prototype.getAdjacentPoints = function(boardPointStart) {
 	return this.getAdjacentRowAndCols(boardPointStart);
 };
-
-/* Old method: Trifle.Board.prototype.getAdjacentPointsPotentialPossibleMoves = function(boardPointStart, movementInfo) {
-	var potentialMovePoints = [];
-
-	if (boardPointStart.row > 0) {
-		var adjacentPoint = this.cells[boardPointStart.row - 1][boardPointStart.col];
-		if (!adjacentPoint.isType(NON_PLAYABLE) && !adjacentPoint.isPossibleForMovementType(movementInfo)) {
-			potentialMovePoints.push(adjacentPoint);
-		}
-	}
-	if (boardPointStart.row < paiShoBoardMaxRowOrCol) {
-		var adjacentPoint = this.cells[boardPointStart.row + 1][boardPointStart.col];
-		if (!adjacentPoint.isType(NON_PLAYABLE) && !adjacentPoint.isPossibleForMovementType(movementInfo)) {
-			potentialMovePoints.push(adjacentPoint);
-		}
-	}
-	if (boardPointStart.col > 0) {
-		var adjacentPoint = this.cells[boardPointStart.row][boardPointStart.col - 1];
-		if (!adjacentPoint.isType(NON_PLAYABLE) && !adjacentPoint.isPossibleForMovementType(movementInfo)) {
-			potentialMovePoints.push(adjacentPoint);
-		}
-	}
-	if (boardPointStart.col < paiShoBoardMaxRowOrCol) {
-		var adjacentPoint = this.cells[boardPointStart.row][boardPointStart.col + 1];
-		if (!adjacentPoint.isType(NON_PLAYABLE) && !adjacentPoint.isPossibleForMovementType(movementInfo)) {
-			potentialMovePoints.push(adjacentPoint);
-		}
-	}
-
-	return potentialMovePoints;
-}; */
 
 Trifle.Board.prototype.getAdjacentPointsPotentialPossibleMoves = function(pointAlongTheWay, originPoint, mustPreserveDirection, movementInfo) {
 	var potentialMovePoints = [];
@@ -1236,78 +984,14 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 		}
 	});
 	
+	this.abilityManager.setReadyAbilities(abilitiesToActivate);
 
-	// TODO: How to order ability activation?
-	var boardHasChanged = false;
-	Object.values(abilitiesToActivate).forEach(function(abilityList) {
-		abilityList.forEach(function(ability) {
-			var abilityIsReadyToActivate = self.abilityManager.addNewAbility(ability);
-			if (abilityIsReadyToActivate) {
-				ability.activateAbility();
-			}
-			if (ability.boardChangedAfterActivation()) {
-				boardHasChanged = true;
-				return;
-			}
-		});
-	});
+	var abilityActivationFlags = this.abilityManager.activateReadyAbilities();
 
-	if (boardHasChanged) {
-		// Need to re-process abilities...
+	if (abilityActivationFlags.boardHasChanged) {
+		// Need to re-process abilities... 
+		// Pass in some sort of context from the activation flags???
 		this.processAbilities(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles);
-	} else {
-		/* --- */
-
-		// this.applyWhenLandsTriggers(tile, tileInfo, boardPointEnd, capturedTiles);
-
-		// if (capturedTiles.length > 0) {
-		// 	this.applyWhenCapturingTrigger(tile, tileInfo, boardPointEnd, capturedTiles);
-		// }
-
-		// /* Old abilities... */
-		// this.applyZoneAbilityToTile(boardPointEnd);
-		// this.applyBoardScanAbilities();
-	}
-};
-
-Trifle.Board.prototype.applyWhenLandsTriggers = function(tile, tileInfo, boardPointEnd, capturedTiles) {
-	this.applyWhenLandsInZoneTriggers(tile, tileInfo, boardPointEnd, capturedTiles);
-	// Other When Lands triggers could go here...
-};
-
-Trifle.Board.prototype.applyWhenLandsInZoneTriggers = function(tile, tileInfo, boardPointEnd, capturedTiles) {
-	// Get all zones landed in. Get all abilities that trigger.
-	var self = this;
-
-	var pointsOfZonesLandedIn = this.getZonesPointIsWithin(boardPointEnd);
-	
-	pointsOfZonesLandedIn.forEach(function(pointWithZone) {
-		debug("Zone landed in: " + pointWithZone.tile.code);
-		var zoneTileInfo = TrifleTiles[pointWithZone.tile.code];
-		var context = {
-			pointOfLandingTile: boardPointEnd,
-			pointWithZone: pointWithZone
-		};
-		var triggeredAbilities = Trifle.TileInfo.getZoneAbilitiesWithAbilityTrigger(zoneTileInfo, Trifle.AbilityTrigger.whenTileLandsInZone);
-		triggeredAbilities.forEach(function(triggeredAbility) {
-			debug("Triggered ability found: ");
-			debug(triggeredAbility);
-			self.processAbility(triggeredAbility, context);
-		});
-	});
-};
-
-Trifle.Board.prototype.processAbility = function(ability, context) {
-	if (ability.type === Trifle.AbilityName.captureTiles) {
-		if (ability.triggeringAction === Trifle.AbilityTrigger.whenTileLandsInZone) {
-			if (ability.targetTileTypes.includes(Trifle.TileCategory.landingTile)
-					&& this.tileCanBeCaptured(context.pointWithZone.tile.ownerName, context.pointOfLandingTile)) {
-				this.tilesCapturedByTriggeredAbility.push(context.pointOfLandingTile.removeTile());
-				debug("Tile captured by triggered ability: ");
-				debug(this.tilesCapturedByTriggeredAbility);
-				// TODO apply "WhenCapturedTrigger"
-			}
-		}
 	}
 };
 
@@ -1323,81 +1007,9 @@ Trifle.Board.prototype.getZonesPointIsWithin = function(boardPoint) {
 	return pointsOfZones;
 };
 
-Trifle.Board.prototype.applyWhenCapturingTrigger = function(tile, tileInfo, boardPointOfTile, capturedTiles) {
-	var triggeredAbilities = Trifle.TileInfo.getAbilitiesWithAbilityTrigger(tileInfo, Trifle.AbilityTrigger.whenCapturing);
-	
-	var self = this;
-	triggeredAbilities.forEach(function(triggeredAbility) {
-		// Verify any other trigger criteria here...
-		debug("When capturing trigger.. triggered");
-
-		var targetTiles = self.determineWhenCapturingTargetTiles(tile, tileInfo, triggeredAbility, boardPointOfTile, capturedTiles);
-		var targetTileTypes = self.determineWhenCapturingTargetTileTypes(tile, tileInfo, triggeredAbility, boardPointOfTile, capturedTiles);
-		
-		if (triggeredAbility.duration && triggeredAbility.duration > 0) {
-			targetTiles.forEach(function(targetTile) {
-				self.activateAbility(tile, targetTile, null, triggeredAbility);
-			});
-			targetTileTypes.forEach(function(targetTileType) {
-				self.activateAbility(tile, null, targetTileType, triggeredAbility);
-			});
-		}
-	});
-};
-
-Trifle.Board.prototype.determineWhenCapturingTargetTiles = function(tile, tileInfo, triggeredAbility, boardPointOfTile, capturedTiles) {
-	/* Currently supports TargetTileType: Trifle.TileCategory.thisTile */
-	var targetTiles = [];
-	if (triggeredAbility.targetTileTypes && triggeredAbility.targetTileTypes.includes(Trifle.TileCategory.thisTile)) {
-		targetTiles.push(tile);
-	}
-	return targetTiles;
-};
-
-Trifle.Board.prototype.determineWhenCapturingTargetTileTypes = function(tile, tileInfo, triggeredAbility, boardPointOfTile, capturedTiles) {
-	return [];
-};
-
 Trifle.Board.prototype.setPointFlags = function() {
 	
 };
-
-/* Trifle.Board.prototype.canCapture = function(boardPointStart, boardPointEnd) {
-	var tile = boardPointStart.tile;
-	var otherTile = boardPointEnd.tile;
-
-	if (tile.ownerName === otherTile.ownerName) {
-		return false;	// Cannot capture own tile
-	}
-
-	if (otherTile.protected) {
-		return false;	// Cannot capture protected tiles
-	}
-
-	// Is tile even a tile that can capture at all?
-	if (!tile.hasCaptureAbility()) {
-		debug(tile.getName() + " cannot capture anything.");
-		return false;
-	}
-
-	// TODO Check if tile is protected from capture...
-	//
-
-	var playerLotusPlayed = this.hostBannerPlayed;
-	var otherLotusPlayed = this.guestBannerPlayed;
-	if (tile.ownerName === GUEST) {
-		playerLotusPlayed = this.guestBannerPlayed;
-		otherLotusPlayed = this.hostBannerPlayed;
-	}
-
-	// Okay, so the tile is a tile that is able to capture things... 
-	// Can the player capture Flower Tiles? (if they've played Lotus)
-	if (otherTile.isFlowerTile()) {
-		return playerLotusPlayed;
-	} else {
-		return playerLotusPlayed && otherLotusPlayed;
-	}
-}; */
 
 Trifle.Board.prototype.inLineWithAdjacentFlowerTileWithNothingBetween = function(bp, bp2) {
 	var flowerPoint;
@@ -1554,7 +1166,7 @@ Trifle.Board.prototype.getBonusMovementInfo = function(originPoint) {
 	var playerName = originPoint.tile.ownerName;
 	var tileInfo = TrifleTiles[originPoint.tile.code];
 	var bonusMovementInfo = {};
-	this.tilePresenceAbilities.forEach(function(ability) {
+	/* this.tilePresenceAbilities.forEach(function(ability) {
 		if (ability.playerName === playerName) {
 			if (ability.abilityInfo.type === Trifle.BoardPresenceAbility.increaseFriendlyTileMovementDistance) {
 				if (
@@ -1573,7 +1185,7 @@ Trifle.Board.prototype.getBonusMovementInfo = function(originPoint) {
 				}
 			}
 		}
-	});
+	}); */
 	if (bonusMovementInfo.type) {
 		return bonusMovementInfo;
 	}
@@ -2025,6 +1637,10 @@ Trifle.Board.prototype.tileZonedOutOfSpace = function(tile, movementInfo, target
 	return isZonedOut;
 };
 
+Trifle.Board.prototype.tileZoneIsActive = function(tile) {
+	return !this.abilityManager.abilityTargetingTileExists(Trifle.AbilityName.cancelZone, tile);
+};
+
 Trifle.Board.prototype.tileZonedOutOfSpaceByZoneAbility = function(tileCode, ownerName, targetPoint, originPoint) {
 	var isZonedOut = false;
 
@@ -2040,7 +1656,8 @@ Trifle.Board.prototype.tileZonedOutOfSpaceByZoneAbility = function(tileCode, own
 		var zoneInfo = Trifle.TileInfo.getTerritorialZone(checkTileInfo);
 		if (zoneInfo && zoneInfo.abilities) {
 			zoneInfo.abilities.forEach(function(zoneAbilityInfo) {
-				var abilityIsActive = self.abilityIsActive(checkBoardPoint, checkBoardPoint.tile, checkTileInfo, zoneAbilityInfo);
+				var abilityIsActive = self.tileZoneIsActive(checkBoardPoint.tile);
+						// && self.abilityIsActive(checkBoardPoint, checkBoardPoint.tile, checkTileInfo, zoneAbilityInfo);
 				if (
 					(
 						zoneAbilityInfo.type === Trifle.ZoneAbility.restrictMovementWithinZone
@@ -2338,10 +1955,14 @@ Trifle.Board.prototype.oneOfTheseZonesContainsPoints = function(pointsWithZones,
 };
 
 Trifle.Board.prototype.pointTileZoneContainsPoint = function(pointWithZone, targetPoint) {
+	var tileInfo = TrifleTiles[pointWithZone.tile.code];
+	var tile = pointWithZone.tile;
+	var zone = Trifle.TileInfo.getTerritorialZone(tileInfo);
+
 	return pointWithZone.hasTile() 
-			&& pointWithZone.tile.activeZone 
-			&& !pointWithZone.tile.activeZone.canceled 
-			&& this.getDistanceBetweenPoints(pointWithZone, targetPoint) <= pointWithZone.tile.activeZone.size;
+			&& zone
+			&& this.tileZoneIsActive(tile)
+			&& this.getDistanceBetweenPoints(pointWithZone, targetPoint) <= zone.size;
 };
 
 Trifle.Board.prototype.pointIsWithinZoneOfOneOfTheseTiles = function(targetPoint, tileCodes, zoneOwner) {

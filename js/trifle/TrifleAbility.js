@@ -8,6 +8,7 @@ Trifle.Ability = function(tileAbilityInfo, tile, tileInfo, triggerBrainMap) {
 	this.sourceTileInfo = tileInfo;
 	this.triggerBrainMap = triggerBrainMap;
 
+	this.targetTiles = [];
 	this.setTargetTiles();
 
 	debug("New Ability created! " + this.abilityType + " from tile " + this.sourceTile.code);
@@ -21,6 +22,12 @@ Trifle.Ability.prototype.activateAbility = function() {
 
 	this.abilityBrain = Trifle.BrainFactory.createAbilityBrain(this.abilityType, this);
 	this.abilityActivatedResults = this.abilityBrain.activateAbility();
+};
+
+Trifle.Ability.prototype.deactivate = function() {
+	// What needed to do?
+	debug("Deactivating ability: ");
+	debug(this);
 };
 
 Trifle.Ability.prototype.boardChangedAfterActivation = function() {
@@ -56,4 +63,8 @@ Trifle.Ability.prototype.appearsToBeTheSameAs = function(otherAbility) {
 		&& this.abilityType === otherAbility.abilityType
 		&& this.sourceTile.id === otherAbility.sourceTile.id
 		&& this.targetTiles.equals(otherAbility.targetTiles);
+};
+
+Trifle.Ability.prototype.targetsTile = function(tile) {
+	return this.targetTiles.includes(tile);
 };
