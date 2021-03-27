@@ -429,9 +429,11 @@ AdevarGameManager.prototype.buildDeployGameLogText = function(move, calledTile) 
 
 AdevarGameManager.prototype.buildMoveGameLogText = function(move) {
 	this.gameLogText = this.getGameLogTextStart(move);
-	this.gameLogText += move.player + " moved " + AdevarTile.getTileName(move.moveTileResults.tileMoved.code);
-	if (move.moveTileResults.capturedTile) {
-		this.gameLogText += " and captured " + AdevarTile.getTileName(move.moveTileResults.capturedTile.code);
+	if (move.moveTileResults.tileMoved) {
+		this.gameLogText += move.player + " moved " + AdevarTile.getTileName(move.moveTileResults.tileMoved.code);
+		if (move.moveTileResults.capturedTile) {
+			this.gameLogText += " and captured " + AdevarTile.getTileName(move.moveTileResults.capturedTile.code);
+		}
 	}
 };
 
