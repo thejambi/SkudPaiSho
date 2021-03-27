@@ -492,9 +492,6 @@ var initialVerifyLoginCallback = function initialVerifyLoginCallback(response) {
 		startWatchingNumberOfGamesWhereUserTurn();
 		appCaller.alertAppLoaded();
 		userIsSignedInOk = true;
-
-		/* Temporary TheGameCrafter Set Announcement */
-		OnboardingFunctions.showTheGameCrafterCrowdSaleAnnouncement();
 	} else {
 		// Cannot verify user login, forget all current stuff.
 		if (getUsername()) {
