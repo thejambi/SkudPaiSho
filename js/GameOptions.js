@@ -123,6 +123,10 @@ gameOptionDescriptions[MIDLINE_OPENER] = "Guest midline plant";
 var ETHEREAL_ACCENT_TILES = "EtherealAccentTiles";
 gameOptionDescriptions[ETHEREAL_ACCENT_TILES] = "Ethereal accent tiles";
 
+/* Skud */
+var DIAGONAL_MOVEMENT = "DiagonalMovementAllowed";	// April Fools 2021
+gameOptionDescriptions[DIAGONAL_MOVEMENT] = "Diagonal Movement Allowed";
+
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {

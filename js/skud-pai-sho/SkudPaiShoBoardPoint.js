@@ -150,6 +150,16 @@ SkudPaiShoBoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	return false;
 };
 
+SkudPaiShoBoardPoint.prototype.setMoveDistanceRemaining = function(movementInfo, distanceRemaining) {
+	this.moveDistanceRemaining = distanceRemaining;
+};
+SkudPaiShoBoardPoint.prototype.getMoveDistanceRemaining = function(movementInfo) {
+	return this.moveDistanceRemaining;
+};
+SkudPaiShoBoardPoint.prototype.clearPossibleMovementTypes = function() {
+	this.moveDistanceRemaining = null;
+};
+
 SkudPaiShoBoardPoint.prototype.getCopy = function() {
 	var copy = new SkudPaiShoBoardPoint();
 
