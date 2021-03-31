@@ -21,9 +21,19 @@ Undergrowth.Board.prototype.placeTile = function (tile, notationPoint) {
 	this.boardHelper.putTileOnPoint(tile, notationPoint, this.cells);
 	this.analyzeHarmonies();
 
-	var capturedTilesInfo = this.captureTilesWithAtLeastTwoDisharmonies();
+	var capturedTilesInfo = [];
 
+	var lastCapturedTilesInfo = this.captureTilesWithAtLeastTwoDisharmonies();
 	this.analyzeHarmonies();
+
+	/* Captured tiles may cause addititional disharmonies to form, which can cause other tiles to be captured. */
+	while (lastCapturedTilesInfo.length > 0) {
+		capturedTilesInfo = capturedTilesInfo.concat(lastCapturedTilesInfo);
+
+		lastCapturedTilesInfo = this.captureTilesWithAtLeastTwoDisharmonies();
+
+		this.analyzeHarmonies();
+	}
 
 	return capturedTilesInfo;
 };
