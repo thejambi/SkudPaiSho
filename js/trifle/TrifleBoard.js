@@ -929,6 +929,7 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 
 				var triggerContext = {
 					board: self,
+					pointWithTile: pointWithTile,
 					tile: tile,
 					tileInfo: tileInfo,
 					tileAbilityInfo: tileAbilityInfo,
@@ -1369,26 +1370,7 @@ Trifle.Board.prototype.setMovePointsAnywhere = function(boardPointStart, movemen
 
 Trifle.Board.prototype.tileMovementIsImmobilized = function(tile, movementInfo, boardPointStart) {
 	return this.tileMovementIsImmobilizedByMovementRestriction(tile, movementInfo, boardPointStart)
-		|| this.tileMovementIsImmobilizedByZoneAbility(tile, movementInfo, boardPointStart);
-};
-
-Trifle.Board.prototype.tileMovementIsImmobilizedByZoneAbility = function(tileBeingMoved, movementInfo, boardPointStart) {
-	var isImmobilized = false;
-	var tileBeingMovedInfo = TrifleTiles[tileBeingMoved.code];
-	var self = this;
-	this.forEachBoardPointWithTile(function(boardPoint) {
-		var zoneInfo = Trifle.TileInfo.getTerritorialZone(TrifleTiles[boardPoint.tile.code]);
-		if (zoneInfo && zoneInfo.abilities) {
-			zoneInfo.abilities.forEach(function(zoneAbility) {
-				if (
-					self.tileMovementIsImmobilizedByTileZoneAbility(zoneAbility, boardPoint, tileBeingMoved, tileBeingMovedInfo, boardPointStart)
-					) {
-					isImmobilized = true;
-				}
-			});
-		}
-	});
-	return isImmobilized;
+		|| this.abilityManager.abilityTargetingTileExists(Trifle.AbilityName.immobilizeTiles, tile);
 };
 
 Trifle.Board.prototype.tileMovementIsImmobilizedByTileZoneAbility = function(zoneAbility, tilePoint, tileBeingMoved, tileBeingMovedInfo, movementStartPoint) {

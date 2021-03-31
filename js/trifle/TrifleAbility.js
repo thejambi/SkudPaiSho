@@ -35,21 +35,19 @@ Trifle.Ability.prototype.boardChangedAfterActivation = function() {
 };
 
 Trifle.Ability.prototype.setTargetTiles = function() {
-	this.targetTiles = [];
+	this.targetTiles = null;
 
 	var self = this;
 
-	if (this.abilityInfo.targetTileTypes
-			&& this.abilityInfo.targetTileTypes.includes(Trifle.TileCategory.thisTile)) {
-		Object.values(this.triggerBrainMap).forEach(function(triggerBrain) {
-			if (triggerBrain.getThisTile) {
-				var theThisTile = triggerBrain.getThisTile();
-				if (!self.targetTiles.includes(theThisTile)) {
-					self.targetTiles.push(theThisTile);
-				}
+	Object.values(this.triggerBrainMap).forEach(function(triggerBrain) {
+		if (triggerBrain.targetTiles && triggerBrain.targetTiles.length) {
+			if (self.targetTiles === null) {
+				self.targetTiles = triggerBrain.targetTiles;
+			} else {
+				self.targetTiles = arrayIntersection(self.targetTiles, triggerBrain.targetTiles);
 			}
-		});
-	}
+		}
+	});
 	// support other target tile types.......
 
 	debug("Target Tiles:");

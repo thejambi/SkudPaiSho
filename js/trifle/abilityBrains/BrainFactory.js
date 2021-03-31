@@ -15,6 +15,8 @@ Trifle.BrainFactory.prototype.createTriggerBrain = function(abilityTrigger, trig
 			return new Trifle.WhenCapturedTriggerBrain(triggerContext);
 		case Trifle.AbilityTrigger.whenCapturing:
 			return new Trifle.WhenCapturingTriggerBrain(triggerContext);
+		case Trifle.AbilityTrigger.whileTargetTileIsAdjacent:
+			return new Trifle.WhileTargetTileIsAdjacentTriggerBrain(triggerContext);
 	}
 };
 
@@ -22,6 +24,8 @@ Trifle.BrainFactory.createAbilityBrain = function(abilityName, abilityObject) {
 	switch(abilityName) {
 		case Trifle.AbilityName.cancelZone:
 			return new Trifle.CancelZoneAbilityBrain(abilityObject);
+		case Trifle.AbilityName.immobilizeTiles:
+			return new Trifle.ImmobilizeTilesAbilityBrain(abilityObject);
 	}
 };
 
