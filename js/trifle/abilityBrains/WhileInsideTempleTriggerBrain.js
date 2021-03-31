@@ -5,10 +5,10 @@ Trifle.WhileInsideTempleTriggerBrain = function(triggerContext) {
 	this.targetTiles = [];
 }
 
-Trifle.WhileInsideTempleTriggerBrain.prototype.isTriggerMet = function(pointWithTile, tile, tileInfo) {
+Trifle.WhileInsideTempleTriggerBrain.prototype.isTriggerMet = function() {
 	this.targetTiles = [];
 	
-	var isInsideTemple = pointWithTile.isType(TEMPLE);
+	var isInsideTemple = this.triggerContext.pointWithTile.isType(TEMPLE);
 	if (isInsideTemple) {
 		this.thisTile = this.triggerContext.tile;
 		this.targetTiles.push(this.thisTile);
@@ -17,6 +17,4 @@ Trifle.WhileInsideTempleTriggerBrain.prototype.isTriggerMet = function(pointWith
 	return isInsideTemple;
 };
 
-Trifle.WhileInsideTempleTriggerBrain.prototype.getThisTile = function() {
-	return this.thisTile;
-};
+

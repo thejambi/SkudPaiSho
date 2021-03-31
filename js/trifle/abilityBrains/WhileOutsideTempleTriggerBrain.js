@@ -4,6 +4,6 @@ Trifle.WhileOutsideTempleTriggerBrain = function(triggerContext) {
 	this.triggerContext = triggerContext;
 }
 
-Trifle.WhileOutsideTempleTriggerBrain.prototype.isTriggerMet = function(pointWithTile, tile, tileInfo) {
-	return !pointWithTile.isType(TEMPLE);
+Trifle.WhileOutsideTempleTriggerBrain.prototype.isTriggerMet = function() {
+	return !this.triggerContext.pointWithTile.isType(TEMPLE);
 };

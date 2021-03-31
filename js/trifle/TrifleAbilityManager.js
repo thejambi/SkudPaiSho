@@ -112,4 +112,19 @@ Trifle.AbilityManager.prototype.abilityTargetingTileExists = function(abilityNam
 	return targetsTile;
 };
 
+Trifle.AbilityManager.prototype.tickDurationAbilities = function() {
+	// TODO: Something like this old tick code did:
+	/* for (var i = this.activeDurationAbilities.length - 1; i >= 0; i--) {
+		var durationAbilityDetails = this.activeDurationAbilities[i];
+		var durationAbilityInfo = durationAbilityDetails.ability;
+		durationAbilityInfo.remainingDuration -= 0.5;
+		if (durationAbilityInfo.remainingDuration <= 0) {
+			durationAbilityInfo.active = false;
+			this.activeDurationAbilities.splice(i, 1);
+			debug("Ability deactivated!");
+			debug(durationAbilityInfo);
+		}
+	} */
+};
+
 

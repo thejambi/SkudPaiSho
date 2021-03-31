@@ -164,7 +164,8 @@ Trifle.AbilityTrigger = {
 	whileOutsideTemple: "whileOutsideTemple",
 	whileInsideTemple: "whileInsideTemple",
 	whileOnBoard: "whileOnBoard",
-	whileTargetTileIsAdjacent: "whileTargetTileIsAdjacent"
+	whileTargetTileIsAdjacent: "whileTargetTileIsAdjacent",
+	whenLandsAdjacentToTargetTile: "whenLandsAdjacentToTargetTile"
 };
 
 Trifle.TileTeam = {
@@ -904,6 +905,12 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				targetTeams: [Trifle.TileTeam.enemy],
 				targetTileTypes: [Trifle.TileType.animal],
 				targetTileIdentifiers: [Trifle.TileIdentifier.air]
+			},
+			{
+				type: Trifle.AbilityName.captureTiles,
+				triggeringActions: [Trifle.AbilityTrigger.whenLandsAdjacentToTargetTile],
+				targetTeams: [Trifle.TileTeam.enemy, Trifle.TileTeam.friendly],
+				targetTileTypes: [Trifle.TileType.flower, Trifle.TileType.animal]
 			}
 		]
 	};

@@ -9,6 +9,7 @@ Trifle.Ability = function(tileAbilityInfo, tile, tileInfo, triggerBrainMap) {
 	this.triggerBrainMap = triggerBrainMap;
 
 	this.targetTiles = [];
+	this.targetTilePoints = [];
 	this.setTargetTiles();
 
 	debug("New Ability created! " + this.abilityType + " from tile " + this.sourceTile.code);
@@ -43,8 +44,10 @@ Trifle.Ability.prototype.setTargetTiles = function() {
 		if (triggerBrain.targetTiles && triggerBrain.targetTiles.length) {
 			if (self.targetTiles === null) {
 				self.targetTiles = triggerBrain.targetTiles;
+				self.targetTilePoints = triggerBrain.targetTilePoints;
 			} else {
 				self.targetTiles = arrayIntersection(self.targetTiles, triggerBrain.targetTiles);
+				self.targetTilePoints = arrayIntersection(self.targetTilePoints, triggerBrain.targetTilePoints);
 			}
 		}
 	});

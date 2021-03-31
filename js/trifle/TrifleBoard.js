@@ -5,7 +5,7 @@ Trifle.Board = function() {
 	this.cells = this.brandNew();
 
 	this.winners = [];
-	// this.tilePresenceAbilities = [];
+
 	this.activeDurationAbilities = [];
 
 	this.abilityManager = new Trifle.AbilityManager(this);
@@ -893,7 +893,7 @@ Trifle.Board.prototype.moveTile = function(player, notationPointStart, notationP
  * Process abilities on the board after a tile is moved or placed/deployed.
  * `boardPointStart` will probably be null for when a tile is placed.
  */
-Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles) {
+Trifle.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles) {
 
 	var abilitiesToActivate = {};
 
@@ -934,6 +934,8 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 					tileInfo: tileInfo,
 					tileAbilityInfo: tileAbilityInfo,
 					lastTurnAction: {
+						tileMovedOrPlaced: tileMovedOrPlaced,
+						tileMovedOrPlacedInfo: tileMovedOrPlacedInfo,
 						boardPointStart: boardPointStart,
 						boardPointEnd: boardPointEnd,
 						capturedTiles: capturedTiles
@@ -944,7 +946,7 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 					tileAbilityInfo.triggeringBoardStates.forEach(function(triggeringState) {
 						var brain = self.brainFactory.createTriggerBrain(triggeringState, triggerContext);
 						if (brain && brain.isTriggerMet) {
-							if (brain.isTriggerMet(pointWithTile, tile, tileInfo)) {
+							if (brain.isTriggerMet()) {
 								triggerBrainMap[triggeringState] = brain;
 							} else {
 								allTriggerConditionsMet = false;
@@ -955,11 +957,11 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 					});
 				}
 
-				if (tileAbilityInfo.triggeringActions && targetTileInfo.triggeringActions.length) {
+				if (tileAbilityInfo.triggeringActions && tileAbilityInfo.triggeringActions.length) {
 					tileAbilityInfo.triggeringActions.forEach(function(triggeringAction) {
 						var brain = self.brainFactory.createTriggerBrain(triggeringAction, triggerContext);
 						if (brain && brain.isTriggerMet) {
-							if (brain.isTriggerMet(pointWithTile, tile, tileInfo)) {
+							if (brain.isTriggerMet()) {
 								triggerBrainMap[triggeringAction] = brain;
 							} else {
 								allTriggerConditionsMet = false;
@@ -992,7 +994,7 @@ Trifle.Board.prototype.processAbilities = function(tile, tileInfo, boardPointSta
 	if (abilityActivationFlags.boardHasChanged) {
 		// Need to re-process abilities... 
 		// Pass in some sort of context from the activation flags???
-		this.processAbilities(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles);
+		this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles);
 	}
 };
 
@@ -2013,6 +2015,9 @@ Trifle.Board.prototype.activateAbility = function(tileOwningAbility, targetTile,
 };
 
 Trifle.Board.prototype.tickDurationAbilities = function() {
+	this.abilityManager.tickDurationAbilities();
+
+	/* old: */
 	for (var i = this.activeDurationAbilities.length - 1; i >= 0; i--) {
 		var durationAbilityDetails = this.activeDurationAbilities[i];
 		var durationAbilityInfo = durationAbilityDetails.ability;
