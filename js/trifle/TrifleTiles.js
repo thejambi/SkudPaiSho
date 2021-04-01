@@ -387,9 +387,6 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		territorialZone: {
 			size: 6,
 			abilities: [
-				// {
-				// 	type: ZoneAbility.canceledWhenInTemple
-				// },
 				{
 					type: Trifle.ZoneAbility.restrictMovementWithinZone,
 					targetTeams: [ Trifle.TileTeam.enemy ],
@@ -884,7 +881,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	};
 
 
-	TrifleTiles[Trifle.TileCodes.MessengerHawk] = {	/* DONE */
+	TrifleTiles[Trifle.TileCodes.MessengerHawk] = {
 		types: [Trifle.TileType.animal],
 		deployTypes: [Trifle.DeployType.anywhere, Trifle.DeployType.temple],
 		movements: [
@@ -892,23 +889,32 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				type: Trifle.MovementType.anywhere,
 			}
 		], // Ability testing
+		territorialZone: {
+			size: 5
+		},
 		abilities: [
-			{
+			/* {
 				type: Trifle.AbilityName.immobilizeTiles,
 				triggeringBoardStates: [Trifle.AbilityTrigger.whileTargetTileIsAdjacent],
 				targetTeams: [Trifle.TileTeam.enemy],
 				targetTileTypes: [Trifle.TileType.traveler]
-			},
-			{
+			}, */
+			/* {
 				type: Trifle.AbilityName.cancelZone,
 				triggeringBoardStates: [Trifle.AbilityTrigger.whileTargetTileIsAdjacent],
 				targetTeams: [Trifle.TileTeam.enemy],
 				targetTileTypes: [Trifle.TileType.animal],
 				targetTileIdentifiers: [Trifle.TileIdentifier.air]
-			},
-			{
+			}, */
+			/* {
 				type: Trifle.AbilityName.captureTiles,
 				triggeringActions: [Trifle.AbilityTrigger.whenLandsAdjacentToTargetTile],
+				targetTeams: [Trifle.TileTeam.enemy, Trifle.TileTeam.friendly],
+				targetTileTypes: [Trifle.TileType.flower, Trifle.TileType.animal]
+			}, */
+			{
+				type: Trifle.AbilityName.captureTiles,
+				triggeringActions: [Trifle.AbilityTrigger.whenTargetTileMovesFromWithinZone],
 				targetTeams: [Trifle.TileTeam.enemy, Trifle.TileTeam.friendly],
 				targetTileTypes: [Trifle.TileType.flower, Trifle.TileType.animal]
 			}
