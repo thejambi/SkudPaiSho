@@ -2029,6 +2029,7 @@ var GameType = {
 		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/",
 		gameOptions: [
 			DIAGONAL_MOVEMENT,
+			EVERYTHING_CAPTURE,
 			OPTION_INFORMAL_START,
 			OPTION_DOUBLE_ACCENT_TILES,
 			OPTION_ANCIENT_OASIS_EXPANSION,

@@ -1060,6 +1060,10 @@ SkudPaiShoBoard.prototype.orchidVulnerable = function(orchidTile) {
 };
 
 SkudPaiShoBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) {
+	if (gameOptionEnabled(EVERYTHING_CAPTURE)) {
+		return true;
+	}
+
 	var tile = boardPointStart.tile;
 	var otherTile = boardPointEnd.tile;
 

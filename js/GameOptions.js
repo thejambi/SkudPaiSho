@@ -126,6 +126,8 @@ gameOptionDescriptions[ETHEREAL_ACCENT_TILES] = "Ethereal accent tiles";
 /* Skud */
 var DIAGONAL_MOVEMENT = "DiagonalMovement";	// April Fools 2021
 gameOptionDescriptions[DIAGONAL_MOVEMENT] = "Diagonal Movement";
+var EVERYTHING_CAPTURE = "EverythingCapture";	// April Fools 2021
+gameOptionDescriptions[EVERYTHING_CAPTURE] = "Everything Captures Everything";
 
 
 function getGameOptionDescription(optionName) {
