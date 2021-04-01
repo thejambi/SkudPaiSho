@@ -884,6 +884,10 @@ SkudPaiShoBoard.prototype.moveTile = function(player, notationPointStart, notati
 	// Check for tile "trapped" by opponent Orchid
 	this.flagAllTrappedAndDrainedTiles();
 
+	if (gameOptionEnabled(EVERYTHING_CAPTURE)) {
+		this.refreshRockRowAndCols();
+	}
+
 	// Check for harmonies
 	var newHarmony = this.hasNewHarmony(player, tile, startRowCol, endRowCol);
 
