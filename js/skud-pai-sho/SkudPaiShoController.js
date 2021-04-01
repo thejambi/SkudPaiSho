@@ -118,6 +118,9 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 		msg += "Plant a Basic Flower Tile.";
 	} else if (!gameOptionEnabled(OPTION_INFORMAL_START) && this.gameNotation.moves.length === 4) {
 		msg += "Now, make the first move of the game.";
+	} else if (this.gameNotation.moves.length > 2
+			&& (gameOptionEnabled(DIAGONAL_MOVEMENT) || gameOptionEnabled(EVERYTHING_CAPTURE))) {
+		msg += "<em>April Fools! I hope you get some entertainment out of the Diagonal Movement and Everything Captures Everything game options today :)&nbsp;</em>";
 	}
 
 	return msg;
