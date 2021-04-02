@@ -1938,6 +1938,17 @@ Trifle.Board.prototype.oneOfTheseZonesContainsPoints = function(pointsWithZones,
 	return zoneContainingPointsFound;
 };
 
+Trifle.Board.prototype.getZonePoints = function(pointWithZone) {
+	var zonePoints = [];
+	var self = this;
+	this.forEachBoardPoint(function(boardPoint) {
+		if (self.pointTileZoneContainsPoint(pointWithZone, boardPoint)) {
+			zonePoints.push(boardPoint);
+		}
+	});
+	return zonePoints;
+};
+
 Trifle.Board.prototype.pointTileZoneContainsPoint = function(pointWithZone, targetPoint) {
 	var tileInfo = TrifleTiles[pointWithZone.tile.code];
 	var tile = pointWithZone.tile;

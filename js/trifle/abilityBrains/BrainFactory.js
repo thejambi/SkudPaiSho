@@ -9,6 +9,10 @@ Trifle.BrainFactory.prototype.createTriggerBrain = function(abilityTrigger, trig
 			return new Trifle.WhileInsideTempleTriggerBrain(triggerContext);
 		case Trifle.AbilityTrigger.whileOutsideTemple:
 			return new Trifle.WhileOutsideTempleTriggerBrain(triggerContext);
+		case Trifle.AbilityTrigger.whileTargetTileIsAdjacent:
+			return new Trifle.WhileTargetTileIsAdjacentTriggerBrain(triggerContext);
+		case Trifle.AbilityTrigger.whileTargetTileIsInZone:
+			return new Trifle.WhileTargetTileIsInZoneTriggerBrain(triggerContext);
 		case Trifle.AbilityTrigger.whenTargetTileLandsInZone:
 			return new Trifle.WhenTargetTileLandsInZoneTriggerBrain(triggerContext);
 		case Trifle.AbilityTrigger.whenTargetTileMovesFromWithinZone:
@@ -17,8 +21,6 @@ Trifle.BrainFactory.prototype.createTriggerBrain = function(abilityTrigger, trig
 			return new Trifle.WhenCapturedTriggerBrain(triggerContext);
 		case Trifle.AbilityTrigger.whenCapturing:
 			return new Trifle.WhenCapturingTriggerBrain(triggerContext);
-		case Trifle.AbilityTrigger.whileTargetTileIsAdjacent:
-			return new Trifle.WhileTargetTileIsAdjacentTriggerBrain(triggerContext);
 		case Trifle.AbilityTrigger.whenLandsAdjacentToTargetTile:
 			return new Trifle.WhenLandsAdjacentToTargetTileTriggerBrain(triggerContext);
 	}
