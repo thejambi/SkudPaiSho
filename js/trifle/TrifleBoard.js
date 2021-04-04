@@ -986,6 +986,64 @@ Trifle.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedO
 			});
 		}
 	});
+
+	capturedTiles.forEach(function(capturedTile) {
+		var tile = capturedTile;
+		var tileInfo = TrifleTiles[tile.code];
+
+		if (tileInfo.abilities) {
+			tileInfo.abilities.forEach(function(tileAbilityInfo) {
+				/* Check that ability trigger is "When Captured By Target Tile" - or in future, any other triggers that apply to captured tiles */
+				if (tileAbilityInfo.triggeringActions && tileAbilityInfo.triggeringActions.length === 1
+					&& tileAbilityInfo.triggeringActions.includes(Trifle.AbilityTrigger.whenCapturedByTargetTile)) {
+
+					var allTriggerConditionsMet = true;
+
+					var triggerBrainMap = {};
+
+					var triggerContext = {
+						board: self,
+						pointWithTile: null,
+						tile: tile,
+						tileInfo: tileInfo,
+						tileAbilityInfo: tileAbilityInfo,
+						lastTurnAction: {
+							tileMovedOrPlaced: tileMovedOrPlaced,
+							tileMovedOrPlacedInfo: tileMovedOrPlacedInfo,
+							boardPointStart: boardPointStart,
+							boardPointEnd: boardPointEnd,
+							capturedTiles: capturedTiles
+						}
+					};
+
+					tileAbilityInfo.triggeringActions.forEach(function(triggeringAction) {
+						var brain = self.brainFactory.createTriggerBrain(triggeringAction, triggerContext);
+						if (brain && brain.isTriggerMet) {
+							if (brain.isTriggerMet()) {
+								triggerBrainMap[triggeringAction] = brain;
+							} else {
+								allTriggerConditionsMet = false;
+							}
+						} else {
+							allTriggerConditionsMet = false;
+						}
+					});
+
+					if (allTriggerConditionsMet) {
+						var abilityObject = new Trifle.Ability(tileAbilityInfo, tile, tileInfo, triggerBrainMap);
+
+						var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
+
+						if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
+							abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
+						} else {
+							abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
+						}
+					}
+				}
+			});
+		}
+	});
 	
 	this.abilityManager.setReadyAbilities(abilitiesToActivate);
 

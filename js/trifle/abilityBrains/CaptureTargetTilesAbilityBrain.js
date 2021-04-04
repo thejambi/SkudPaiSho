@@ -1,9 +1,9 @@
 
-Trifle.CaptureTilesAbilityBrain = function(abilityObject) {
+Trifle.CaptureTargetTilesAbilityBrain = function(abilityObject) {
 	this.abilityObject = abilityObject;
 }
 
-Trifle.CaptureTilesAbilityBrain.prototype.activateAbility = function() {
+Trifle.CaptureTargetTilesAbilityBrain.prototype.activateAbility = function() {
 	debug("Capture Tiles ability activating...");
 	// Attach ability to target tile
 	// Get target tiles

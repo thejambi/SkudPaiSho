@@ -3,6 +3,7 @@ Trifle.WhileTargetTileIsAdjacentTriggerBrain = function(triggerContext) {
 	this.board = triggerContext.board;
 	this.triggerContext = triggerContext;
 	this.targetTiles = [];
+	this.targetTilePoints = [];
 }
 
 Trifle.WhileTargetTileIsAdjacentTriggerBrain.prototype.isTriggerMet = function() {
@@ -18,6 +19,7 @@ Trifle.WhileTargetTileIsAdjacentTriggerBrain.prototype.isTriggerMet = function()
 			var triggerHelper = new Trifle.TriggerHelper(self.triggerContext, adjacentPoint);
 			if (triggerHelper.tileIsTargeted()) {
 				self.targetTiles.push(adjacentPoint.tile);
+				self.targetTilePoints.push(adjacentPoint.tile);
 			}
 		}
 	});
