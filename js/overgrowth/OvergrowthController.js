@@ -29,6 +29,10 @@ OvergrowthController.prototype.resetGameManager = function() {
 	}
 };
 
+OvergrowthController.prototype.getMoveNumber = function() {
+	return this.gameNotation.moves.length;
+};
+
 OvergrowthController.prototype.resetNotationBuilder = function() {
 	this.notationBuilder = new OvergrowthNotationBuilder();
 };
