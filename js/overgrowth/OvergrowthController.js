@@ -250,7 +250,7 @@ OvergrowthController.prototype.setGameNotation = function(newGameNotation) {
 	}
 	this.resetGameManager();
 	this.gameNotation.setNotationText(newGameNotation);
-	this.theGame.drawRandomTile();
+	this.theGame.drawRandomTile(true);
 	this.theGame.actuate();
 };
 
