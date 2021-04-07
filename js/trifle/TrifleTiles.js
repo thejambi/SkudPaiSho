@@ -69,8 +69,18 @@ Trifle.TileIdentifier = {
 Trifle.TileCategory = {
 	thisTile: "thisTile",
 	allTileTypes: "allTileTypes",
-	landingTile: "landingTile"
+	landingTile: "landingTile",
+	surroundingTiles: "surroundingTiles"
 };
+
+Trifle.TargetType = {
+	thisTile: "thisTile",			// 
+	allTileTypes: "allTileTypes",	//
+	landingTile: "landingTile",		//
+	allTiles: "allTiles",
+	triggerTargetTiles: "triggerTargetTiles",
+	surroundingTiles: "surroundingTiles"
+}
 
 Trifle.DeployType = {
 	anywhere: "anywhere",
@@ -155,15 +165,16 @@ Trifle.AbilityType = {
 	protection: "protection"
 };
 
-Trifle.AbilityTrigger = {
+Trifle.AbilityTriggerType = {
 	whenCapturedByTargetTile: "whenCapturedByTargetTile",
 	whenCapturingTargetTile: "whenCapturingTargetTile",
 	whenTargetTileLandsInZone: "whenTargetTileLandsInZone",
 	whenTargetTileMovesFromWithinZone: "whenTargetTileMovesFromWithinZone",
 	whileTargetTileIsInLineOfSight: "whileTargetTileIsInLineOfSight",
-	whileOutsideTemple: "whileOutsideTemple",
-	whileInsideTemple: "whileInsideTemple",
-	whileOnBoard: "whileOnBoard",
+	whileOutsideTemple: "whileOutsideTemple",	// Todo change to whileTargetTileOutsideTemple?
+	whileInsideTemple: "whileInsideTemple",		// ^
+	whileTargetTileIsOnBoard: "whileTargetTileIsOnBoard",
+	whileOnBoard: "whileOnBoard",	// Remove?
 	whileTargetTileIsAdjacent: "whileTargetTileIsAdjacent",
 	whenLandsAdjacentToTargetTile: "whenLandsAdjacentToTargetTile",
 	whileTargetTileIsInZone: "whileTargetTileIsInZone"
@@ -398,8 +409,14 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		abilities: [
 			{
 				type: Trifle.AbilityName.cancelZone,
-				triggeringBoardStates: [Trifle.AbilityTrigger.whileInsideTemple],
-				targetTileTypes: [Trifle.TileCategory.thisTile]
+				triggeringBoardStates: [Trifle.AbilityTriggerType.whileInsideTemple],
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileInsideTemple,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			}
 		]
 	};
@@ -426,14 +443,14 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		abilities: [
 			{
 				type: Trifle.AbilityName.immobilizeTiles,
-				triggeringBoardStates: [Trifle.AbilityTrigger.whileTargetTileIsAdjacent],
+				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsAdjacent],
 				targetTeams: [Trifle.TileTeam.enemy],
 				targetTileTypes: [Trifle.TileType.animal],
 				targetTileIdentifiers: [Trifle.TileIdentifier.air]
 			},
 			{
 				type: Trifle.AbilityName.cancelZone,
-				triggeringBoardStates: [Trifle.AbilityTrigger.whileTargetTileIsAdjacent],
+				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsAdjacent],
 				targetTeams: [Trifle.TileTeam.enemy],
 				targetTileTypes: [Trifle.TileType.animal],
 				targetTileIdentifiers: [Trifle.TileIdentifier.air]
@@ -522,7 +539,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			{
 				type: Trifle.AbilityName.grantBonusMovement,
 				amount: 1,
-				triggeringBoardStates: [Trifle.AbilityTrigger.whileOnBoard],
+				triggeringBoardStates: [Trifle.AbilityTriggerType.whileOnBoard],
 				targetTileTypes: [Trifle.TileType.flower],
 				targtTileTeams: [Trifle.TileTeam.friendly]
 			}
@@ -601,13 +618,13 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		abilities: [
 			/* {
 				type: Trifle.BoardPresenceAbility.drawTilesInLineOfSight,
-				conditionalBoardStates: [Trifle.AbilityTrigger.whileTileIsOutsideTemple],
+				conditionalBoardStates: [Trifle.AbilityTriggerType.whileTileIsOutsideTemple],
 				targetTeams: [Trifle.TileTeam.enemy]
 			}, */
 			{
 				type: Trifle.AbilityName.drawTilesAlongLineOfSight,
-				triggeringBoardStates: [Trifle.AbilityTrigger.whileTargetTileIsInLineOfSight],
-				activationConditions: [Trifle.AbilityTrigger.whileOutsideTemple],
+				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight],
+				activationConditions: [Trifle.AbilityTriggerType.whileOutsideTemple],
 				targetTeams: [Trifle.TileTeam.enemy]
 			}
 		]
@@ -622,7 +639,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			},
 			{
 				type: Trifle.BoardPresenceAbility.spawnAdditionalCopies,
-				triggeringAction: : Trifle.AbilityTrigger.whenCapturedByTargetTile,
+				triggeringAction: : Trifle.AbilityTriggerType.whenCapturedByTargetTile,
 				amount: 2,
 				location: SpawnLocation.adjacent
 			}
@@ -652,7 +669,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			abilities: [
 				{
 					type: Trifle.AbilityName.grantBonusMovement,
-					triggeringActions: [Trifle.AbilityTrigger.whenTargetTileMovesFromWithinZone],
+					triggeringActions: [Trifle.AbilityTriggerType.whenTargetTileMovesFromWithinZone],
 					// ...
 				}
 			]
@@ -697,7 +714,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		abilities: [
 			{
 				type: Trifle.AbilityName.removeEffects,
-				triggeringBoardStates: [Trifle.AbilityTrigger.whileTargetTileIsInLineOfSight],
+				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight],
 				targetEffectTypes: [Trifle.AbilityType.protection],
 				targetTileTypes: [Trifle.TileCategory.allTileTypes]
 			}
@@ -718,7 +735,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			{
 				type: Trifle.AbilityName.protectFromCapture,
 				targetTileTypes: [Trifle.TileCategory.thisTile],
-				triggeringActions: [Trifle.AbilityTrigger.whenCapturingTargetTile],
+				triggeringActions: [Trifle.AbilityTriggerType.whenCapturingTargetTile],
 				// triggerTargetTileType: [Trifle.TileType.flower],	// Idea: For example - ability could trigger when capturing a Flower - It'd be better to create a Trigger object that contains all the trigger info
 				duration: 1,
 				tileTypesProtectedFrom: [Trifle.TileCategory.allTileTypes]
@@ -874,7 +891,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			abilities: [
 				{
 					type: Trifle.AbilityName.captureTargetTiles,
-					triggeringActions: [Trifle.AbilityTrigger.whenTargetTileLandsInZone],
+					triggeringActions: [Trifle.AbilityTriggerType.whenTargetTileLandsInZone],
 					targetTileTypes: [Trifle.TileCategory.landingTile]
 				}
 			]
@@ -896,39 +913,44 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		abilities: [
 			/* {
 				type: Trifle.AbilityName.immobilizeTiles,
-				triggeringBoardStates: [Trifle.AbilityTrigger.whileTargetTileIsAdjacent],
+				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsAdjacent],
 				targetTeams: [Trifle.TileTeam.enemy],
 				targetTileTypes: [Trifle.TileType.traveler]
 			}, */
 			/* {
 				type: Trifle.AbilityName.cancelZone,
-				triggeringBoardStates: [Trifle.AbilityTrigger.whileTargetTileIsAdjacent],
+				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsAdjacent],
 				targetTeams: [Trifle.TileTeam.enemy],
 				targetTileTypes: [Trifle.TileType.animal],
 				targetTileIdentifiers: [Trifle.TileIdentifier.air]
 			}, */
 			/* {
 				type: Trifle.AbilityName.captureTargetTiles,
-				triggeringActions: [Trifle.AbilityTrigger.whenLandsAdjacentToTargetTile],
+				triggeringActions: [Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile],
 				targetTeams: [Trifle.TileTeam.enemy, Trifle.TileTeam.friendly],
 				targetTileTypes: [Trifle.TileType.flower, Trifle.TileType.animal]
 			}, */
 			/* {
 				type: Trifle.AbilityName.captureTargetTiles,
-				triggeringActions: [Trifle.AbilityTrigger.whenTargetTileMovesFromWithinZone],
+				triggeringActions: [Trifle.AbilityTriggerType.whenTargetTileMovesFromWithinZone],
 				targetTeams: [Trifle.TileTeam.enemy, Trifle.TileTeam.friendly],
 				targetTileTypes: [Trifle.TileType.flower, Trifle.TileType.animal]
 			} */
 			/* {
 				type: Trifle.AbilityName.immobilizeTiles,
-				triggeringBoardStates: [Trifle.AbilityTrigger.whileTargetTileIsInLineOfSight],
+				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight],
 				targetTeams: [Trifle.TileTeam.enemy]
 			} */
 			{
-				type: Trifle.AbilityName.captureTargetTiles,
-				triggeringActions: [Trifle.AbilityTrigger.whenCapturedByTargetTile],
-				targetTeams: [Trifle.TileTeam.enemy, Trifle.TileTeam.friendly],
-				targetTileTypes: [Trifle.TileType.flower, Trifle.TileType.animal]
+				type: Trifle.AbilityName.immobilizeTiles,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsOnBoard,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					}
+				],
+				targetTypes: [Trifle.TargetType.allTiles],
+				targetTeams: [Trifle.TileTeam.enemy]
 			}
 		]
 	};
@@ -974,17 +996,28 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		abilities: [
 			{
 				type: Trifle.AbilityName.immobilizeTiles,
-				triggeringBoardStates: [Trifle.AbilityTrigger.whileTargetTileIsAdjacent],
-				targetTeams: [Trifle.TileTeam.enemy],
-				targetTileTypes: [Trifle.TileType.animal],
-				targetTileIdentifiers: [Trifle.TileIdentifier.air]
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent,
+						targetTeams: [Trifle.TileTeam.enemy],
+						targetTileTypes: [Trifle.TileType.animal],
+						targetTileIdentifiers: [Trifle.TileIdentifier.air]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			},
 			{
 				type: Trifle.AbilityName.cancelZone,
-				triggeringBoardStates: [Trifle.AbilityTrigger.whileTargetTileIsAdjacent],
-				targetTeams: [Trifle.TileTeam.enemy],
-				targetTileTypes: [Trifle.TileType.animal],
-				targetTileIdentifiers: [Trifle.TileIdentifier.air]
+				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsAdjacent],
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent,
+						targetTeams: [Trifle.TileTeam.enemy],
+						targetTileTypes: [Trifle.TileType.animal],
+						targetTileIdentifiers: [Trifle.TileIdentifier.air]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			}
 		]
 	};

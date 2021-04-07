@@ -104,7 +104,7 @@ Trifle.AbilityManager.prototype.abilityTargetingTileExists = function(abilityNam
 	var targetsTile = false;
 	this.abilities.forEach(function(ability) {
 		if (ability.abilityType === abilityName
-				&& ability.targetsTile(tile)) {
+				&& ability.abilityTargetsTile(tile)) {
 			targetsTile = true;
 			return;
 		}

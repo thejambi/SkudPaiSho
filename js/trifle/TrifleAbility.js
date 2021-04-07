@@ -1,27 +1,61 @@
 
 
 
-Trifle.Ability = function(tileAbilityInfo, tile, tileInfo, triggerBrainMap) {
-	this.abilityType = tileAbilityInfo.type;
-	this.abilityInfo = tileAbilityInfo;
-	this.sourceTile = tile;
-	this.sourceTileInfo = tileInfo;
-	this.triggerBrainMap = triggerBrainMap;
+Trifle.Ability = function(abilityContext) {
+	this.board = abilityContext.board;
+	this.abilityType = abilityContext.tileAbilityInfo.type;
+	this.abilityInfo = abilityContext.tileAbilityInfo;
+	this.sourceTile = abilityContext.tile;
+	this.sourceTileInfo = abilityContext.tileInfo;
+	this.triggerBrainMap = abilityContext.triggerBrainMap;
 
-	this.targetTiles = [];
-	this.targetTilePoints = [];
-	this.setTargetTiles();
+	this.triggerTargetTiles = [];
+	this.triggerTargetTilePoints = [];
+	this.setTriggerTargetTiles();
+
+	this.abilityTargetTiles = [];
+	this.abilityTargetTilePoints = [];
+	this.setAbilityTargetTiles();
+
+	this.abilityBrain = Trifle.BrainFactory.createAbilityBrain(this.abilityType, this);
+	// this.abilityTargetTiles = this.abilityBrain.getTargetTiles();
+	// this.abilityTargetTilePoints = this.abilityBrain.getTargetTilePoints();
 
 	debug("New Ability created! " + this.abilityType + " from tile " + this.sourceTile.code);
 	this.boardChanged = false;
 }
+
+Trifle.Ability.prototype.setAbilityTargetTiles = function() {
+	this.targetBrains = [];
+	
+	this.abilityTargetTiles = [];
+	this.abilityTargetTilePoints = [];
+
+	var self = this;
+
+	if (this.abilityInfo.targetTypes && this.abilityInfo.targetTypes.length) {
+		this.abilityInfo.targetTypes.forEach(function(targetType) {
+			var targetBrain = Trifle.BrainFactory.createTargetBrain(targetType, self);
+
+			self.targetBrains.push(targetBrain);
+
+			self.abilityTargetTiles = self.abilityTargetTiles.concat(targetBrain.targetTiles);
+			self.abilityTargetTilePoints = self.abilityTargetTilePoints.concat(targetBrain.targetTilePoints);
+		});
+	} else {
+		debug("--- TILE ABILITY DOES NOT HAVE TARGET TYPES---");
+		debug(this.sourceTile);
+	}
+
+	
+	// TODO all this ^^^^^
+};
 
 Trifle.Ability.prototype.activateAbility = function() {
 	// Get AbilityBrain
 	debug("Activating ability!");
 	debug(this);
 
-	this.abilityBrain = Trifle.BrainFactory.createAbilityBrain(this.abilityType, this);
 	this.abilityActivatedResults = this.abilityBrain.activateAbility();
 };
 
@@ -35,37 +69,41 @@ Trifle.Ability.prototype.boardChangedAfterActivation = function() {
 	return this.boardChanged;
 };
 
-Trifle.Ability.prototype.setTargetTiles = function() {
-	this.targetTiles = null;
+Trifle.Ability.prototype.setTriggerTargetTiles = function() {
+	this.triggerTargetTiles = null;
 
 	var self = this;
 
 	Object.values(this.triggerBrainMap).forEach(function(triggerBrain) {
 		if (triggerBrain.targetTiles && triggerBrain.targetTiles.length) {
-			if (self.targetTiles === null) {
-				self.targetTiles = triggerBrain.targetTiles;
-				self.targetTilePoints = triggerBrain.targetTilePoints;
+			// TODO split tiles vs points?
+			if (self.triggerTargetTiles === null) {
+				self.triggerTargetTiles = triggerBrain.targetTiles;
+				self.triggerTargetTilePoints = triggerBrain.targetTilePoints;
 			} else {
-				self.targetTiles = arrayIntersection(self.targetTiles, triggerBrain.targetTiles);
-				self.targetTilePoints = arrayIntersection(self.targetTilePoints, triggerBrain.targetTilePoints);
+				self.triggerTargetTiles = arrayIntersection(self.triggerTargetTiles, triggerBrain.targetTiles);
+				self.triggerTargetTilePoints = arrayIntersection(self.triggerTargetTilePoints, triggerBrain.targetTilePoints);
 			}
 		}
 	});
-	// support other target tile types.......
+
+	if (!this.triggerTargetTiles) {
+		this.triggerTargetTiles = [];
+	}
 
 	debug("Target Tiles:");
-	debug(this.targetTiles);
-
-	return this.targetTiles;
+	debug(this.triggerTargetTiles);
 };
 
 Trifle.Ability.prototype.appearsToBeTheSameAs = function(otherAbility) {
 	return otherAbility 
 		&& this.abilityType === otherAbility.abilityType
 		&& this.sourceTile.id === otherAbility.sourceTile.id
-		&& this.targetTiles.equals(otherAbility.targetTiles);
+		&& this.triggerTargetTiles.equals(otherAbility.targetTiles);
 };
 
-Trifle.Ability.prototype.targetsTile = function(tile) {
-	return this.targetTiles.includes(tile);
+Trifle.Ability.prototype.abilityTargetsTile = function(tile) {
+	return this.abilityTargetTiles.includes(tile);
 };
+
+

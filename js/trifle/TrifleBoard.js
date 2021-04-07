@@ -942,12 +942,31 @@ Trifle.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedO
 					}
 				};
 
-				if (tileAbilityInfo.triggeringBoardStates && tileAbilityInfo.triggeringBoardStates.length) {
+				var triggers = tileAbilityInfo.triggers;
+				if (triggers && triggers.length) {
+					triggers.forEach(function(triggerInfo) {
+						if (Trifle.TriggerHelper.hasInfo(triggerInfo)) {
+							triggerContext.currentTrigger = triggerInfo;
+							var brain = self.brainFactory.createTriggerBrain(triggerInfo, triggerContext);
+							if (brain && brain.isTriggerMet) {
+								if (brain.isTriggerMet()) {
+									triggerBrainMap[triggerInfo.triggerType] = brain;
+								} else {
+									allTriggerConditionsMet = false;
+								}
+							} else {
+								allTriggerConditionsMet = false;
+							}
+						}
+					});
+				}
+
+				/* if (tileAbilityInfo.triggeringBoardStates && tileAbilityInfo.triggeringBoardStates.length) {
 					tileAbilityInfo.triggeringBoardStates.forEach(function(triggeringState) {
-						var brain = self.brainFactory.createTriggerBrain(triggeringState, triggerContext);
+						var brain = self.brainFactory.createTriggerBrain(triggeringAction, triggerContext);
 						if (brain && brain.isTriggerMet) {
 							if (brain.isTriggerMet()) {
-								triggerBrainMap[triggeringState] = brain;
+								triggerBrainMap[triggeringAction] = brain;
 							} else {
 								allTriggerConditionsMet = false;
 							}
@@ -970,10 +989,18 @@ Trifle.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedO
 							allTriggerConditionsMet = false;
 						}
 					});
-				}
+				} */
 
 				if (allTriggerConditionsMet) {
-					var abilityObject = new Trifle.Ability(tileAbilityInfo, tile, tileInfo, triggerBrainMap);
+					var abilityContext = {
+						board: self,
+						pointWithTile: pointWithTile,
+						tile: tile,
+						tileInfo: tileInfo,
+						tileAbilityInfo: tileAbilityInfo,
+						triggerBrainMap: triggerBrainMap
+					}
+					var abilityObject = new Trifle.Ability(abilityContext);
 
 					var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
 
@@ -995,7 +1022,7 @@ Trifle.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedO
 			tileInfo.abilities.forEach(function(tileAbilityInfo) {
 				/* Check that ability trigger is "When Captured By Target Tile" - or in future, any other triggers that apply to captured tiles */
 				if (tileAbilityInfo.triggeringActions && tileAbilityInfo.triggeringActions.length === 1
-					&& tileAbilityInfo.triggeringActions.includes(Trifle.AbilityTrigger.whenCapturedByTargetTile)) {
+					&& tileAbilityInfo.triggeringActions.includes(Trifle.AbilityTriggerType.whenCapturedByTargetTile)) {
 
 					var allTriggerConditionsMet = true;
 
@@ -1016,7 +1043,26 @@ Trifle.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedO
 						}
 					};
 
-					tileAbilityInfo.triggeringActions.forEach(function(triggeringAction) {
+					var triggers = tileAbilityInfo.triggers;
+					if (triggers && triggers.length) {
+						triggers.forEach(function(triggerInfo) {
+							if (Trifle.TriggerHelper.hasInfo(triggerInfo)) {
+								triggerContext.currentTrigger = triggerInfo;
+								var brain = self.brainFactory.createTriggerBrain(triggerInfo, triggerContext);
+								if (brain && brain.isTriggerMet) {
+									if (brain.isTriggerMet()) {
+										triggerBrainMap[triggerInfo.triggerType] = brain;
+									} else {
+										allTriggerConditionsMet = false;
+									}
+								} else {
+									allTriggerConditionsMet = false;
+								}
+							}
+						});
+					}
+
+					/* tileAbilityInfo.triggeringActions.forEach(function(triggeringAction) {
 						var brain = self.brainFactory.createTriggerBrain(triggeringAction, triggerContext);
 						if (brain && brain.isTriggerMet) {
 							if (brain.isTriggerMet()) {
@@ -1039,7 +1085,7 @@ Trifle.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedO
 						} else {
 							abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
 						}
-					}
+					} */
 				}
 			});
 		}

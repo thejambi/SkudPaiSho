@@ -4,6 +4,7 @@ Trifle.TriggerHelper = function(triggerContext, possibleTargetTilePoint) {
 	this.possibleTargetTilePoint = possibleTargetTilePoint;
 	this.possibleTargetTileInfo = TrifleTiles[this.possibleTargetTilePoint.tile.code];
 	this.abilityInfo = this.triggerContext.tileAbilityInfo;
+	this.triggerInfo = this.triggerContext.currentTrigger;
 };
 
 Trifle.TriggerHelper.prototype.tileIsTargeted = function() {
@@ -14,12 +15,12 @@ Trifle.TriggerHelper.prototype.tileIsTargeted = function() {
 };
 
 Trifle.TriggerHelper.prototype.targetTeamsCheck = function() {
-	if (this.abilityInfo.targetTeams) {
+	if (this.triggerInfo.targetTeams) {
 		var possibleTargetTileOwner = this.possibleTargetTilePoint.tile.ownerName;
 
-		var isFriendlyTargetedTile = this.abilityInfo.targetTeams.includes(Trifle.TileTeam.friendly)
+		var isFriendlyTargetedTile = this.triggerInfo.targetTeams.includes(Trifle.TileTeam.friendly)
 				&& possibleTargetTileOwner === this.triggerContext.tile.ownerName;
-		var isEnemyTargetedTile = this.abilityInfo.targetTeams.includes(Trifle.TileTeam.enemy)
+		var isEnemyTargetedTile = this.triggerInfo.targetTeams.includes(Trifle.TileTeam.enemy)
 				&& possibleTargetTileOwner !== this.triggerContext.tile.ownerName;
 
 		debug("Target teams check: ");
@@ -31,26 +32,40 @@ Trifle.TriggerHelper.prototype.targetTeamsCheck = function() {
 };
 
 Trifle.TriggerHelper.prototype.targetTileTypesCheck = function() {
-	if (this.abilityInfo.targetTileTypes) {
-		return this.abilityInfo.targetTileTypes.includes(Trifle.TileCategory.allTileTypes)
-			|| arrayIncludesOneOf(this.possibleTargetTileInfo.types, this.abilityInfo.targetTileTypes);
+	if (this.triggerInfo.targetTileTypes) {
+		return this.triggerInfo.targetTileTypes.includes(Trifle.TileCategory.allTileTypes)
+			|| arrayIncludesOneOf(this.possibleTargetTileInfo.types, this.triggerInfo.targetTileTypes)
+			|| (this.triggerInfo.targetTileTypes.includes(Trifle.TileCategory.thisTile)
+				&& this.possibleTargetTilePoint.tile === this.triggerContext.tile);
 	} else {
 		return true;
 	}
 };
 
 Trifle.TriggerHelper.prototype.targetTileIdentifiersCheck = function() {
-	if (this.abilityInfo.targetTileIdentifiers && this.possibleTargetTileInfo.identifiers) {
-		return arrayIncludesOneOf(this.abilityInfo.targetTileIdentifiers, this.possibleTargetTileInfo.identifiers);
+	if (this.triggerInfo.targetTileIdentifiers && this.possibleTargetTileInfo.identifiers) {
+		return arrayIncludesOneOf(this.triggerInfo.targetTileIdentifiers, this.possibleTargetTileInfo.identifiers);
 	} else {
 		return true;
 	}
 };
 
 Trifle.TriggerHelper.prototype.targetTileNamesCheck = function() {
-	if (this.abilityInfo.targetTileCodes) {
-		return arrayIncludesOneOf(this.abilityInfo.targetTileCodes, [this.possibleTargetTilePoint.tile.code]);
+	if (this.triggerInfo.targetTileCodes) {
+		return arrayIncludesOneOf(this.triggerInfo.targetTileCodes, [this.possibleTargetTilePoint.tile.code]);
 	} else {
 		return true;
 	}
+};
+
+Trifle.TriggerHelper.hasInfo = function(triggerInfo) {
+	// Could be used to validate trigger info...
+	var looksValid = triggerInfo.triggerType;
+
+	if (!looksValid) {
+		debug("Trigger info does not look valid: ");
+		debug(triggerInfo);
+	}
+
+	return looksValid;
 };
