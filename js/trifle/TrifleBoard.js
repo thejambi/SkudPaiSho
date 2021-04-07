@@ -1616,7 +1616,9 @@ Trifle.Board.prototype.targetPointHasTileTileThatCanBeCaptured = function(tile, 
 };
 
 Trifle.Board.prototype.tileHasActiveCaptureProtectionFromCapturingTile = function(tile, capturingTile) {
-	var tileHasActiveCaptureProtection = false;
+	return this.abilityManager.abilityTargetingTileExists(Trifle.AbilityName.protectFromCapture, tile);
+
+	/* var tileHasActiveCaptureProtection = false;
 	this.activeDurationAbilities.forEach(function(durationAbilityEntry) {
 		debug("Active Duration Ability: ");
 		debug(durationAbilityEntry);
@@ -1639,7 +1641,7 @@ Trifle.Board.prototype.tileHasActiveCaptureProtectionFromCapturingTile = functio
 			}
 		}
 	});
-	return tileHasActiveCaptureProtection;
+	return tileHasActiveCaptureProtection; */
 };
 
 Trifle.Board.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, targetPoint) {

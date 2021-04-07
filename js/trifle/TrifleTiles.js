@@ -443,17 +443,27 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		abilities: [
 			{
 				type: Trifle.AbilityName.immobilizeTiles,
-				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsAdjacent],
-				targetTeams: [Trifle.TileTeam.enemy],
-				targetTileTypes: [Trifle.TileType.animal],
-				targetTileIdentifiers: [Trifle.TileIdentifier.air]
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent,
+						targetTeams: [Trifle.TileTeam.enemy],
+						targetTileTypes: [Trifle.TileType.animal],
+						targetTileIdentifiers: [Trifle.TileIdentifier.air]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			},
 			{
 				type: Trifle.AbilityName.cancelZone,
-				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsAdjacent],
-				targetTeams: [Trifle.TileTeam.enemy],
-				targetTileTypes: [Trifle.TileType.animal],
-				targetTileIdentifiers: [Trifle.TileIdentifier.air]
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent,
+						targetTeams: [Trifle.TileTeam.enemy],
+						targetTileTypes: [Trifle.TileType.animal],
+						targetTileIdentifiers: [Trifle.TileIdentifier.air]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			}
 		]
 	};
@@ -496,7 +506,20 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 					targetTileTypes: [Trifle.TileType.flower, Trifle.TileType.banner]
 				}
 			]
-		}
+		},
+		abilities: [
+			{
+				type: Trifle.AbilityName.protectFromCapture,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent,
+						targetTeams: [Trifle.TileTeam.friendly],
+						targetTileTypes: [Trifle.TileType.flower, Trifle.TileType.banner]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			}
+		]
 	};
 
 	TrifleTiles[Trifle.TileCodes.FireLily] = { /* Done */
@@ -536,13 +559,13 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			}
 		],
 		abilities: [
-			{
+			/* {
 				type: Trifle.AbilityName.grantBonusMovement,
 				amount: 1,
 				triggeringBoardStates: [Trifle.AbilityTriggerType.whileOnBoard],
 				targetTileTypes: [Trifle.TileType.flower],
 				targtTileTeams: [Trifle.TileTeam.friendly]
-			}
+			} */
 		]
 	};
 
@@ -990,34 +1013,6 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 					Trifle.MoveDirection.straight
 				],
 				captureTypes: [Trifle.CaptureType.all]
-			}
-		],
-		// Ability testing...
-		abilities: [
-			{
-				type: Trifle.AbilityName.immobilizeTiles,
-				triggers: [
-					{
-						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent,
-						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Trifle.TileType.animal],
-						targetTileIdentifiers: [Trifle.TileIdentifier.air]
-					}
-				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles]
-			},
-			{
-				type: Trifle.AbilityName.cancelZone,
-				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsAdjacent],
-				triggers: [
-					{
-						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent,
-						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Trifle.TileType.animal],
-						targetTileIdentifiers: [Trifle.TileIdentifier.air]
-					}
-				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			}
 		]
 	};

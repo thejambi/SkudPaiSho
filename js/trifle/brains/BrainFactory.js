@@ -33,11 +33,13 @@ Trifle.BrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, 
 Trifle.BrainFactory.createAbilityBrain = function(abilityName, abilityObject) {
 	switch(abilityName) {
 		case Trifle.AbilityName.cancelZone:
-			return new Trifle.CancelZoneAbilityBrain(abilityObject);
+			return new Trifle.SimpleOngoingAbilityBrain(abilityObject);
 		case Trifle.AbilityName.immobilizeTiles:
-			return new Trifle.ImmobilizeTilesAbilityBrain(abilityObject);
+			return new Trifle.SimpleOngoingAbilityBrain(abilityObject);
 		case Trifle.AbilityName.captureTargetTiles:
 			return new Trifle.CaptureTargetTilesAbilityBrain(abilityObject);
+		case Trifle.AbilityName.protectFromCapture:
+			return new Trifle.SimpleOngoingAbilityBrain(abilityObject);
 	}
 };
 
