@@ -2118,7 +2118,8 @@ var GameType = {
 			'abacadaren',
 			'Korron',
 			'vescucci',
-			'geebung02'
+			'geebung02',
+			'sirstotes'
 		],
 		noRankedGames: true
 	},
