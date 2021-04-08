@@ -3,7 +3,7 @@
 function Undergrowth() {};
 
 Undergrowth.Controller = function(gameContainer, isMobile) {
-	this.actuator = new Undergrowth.Actuator(gameContainer, isMobile);
+	this.actuator = new Undergrowth.Actuator(gameContainer, isMobile, isAnimationsOn());
 
 	this.resetGameNotation();	// First
 
@@ -14,7 +14,7 @@ Undergrowth.Controller = function(gameContainer, isMobile) {
 }
 
 Undergrowth.Controller.prototype.getGameTypeId = function() {
-	return GameType.UndergrowthPaiSho.id;
+	return GameType.Undergrowth.id;
 };
 
 Undergrowth.Controller.prototype.resetGameManager = function() {
@@ -30,7 +30,7 @@ Undergrowth.Controller.prototype.resetGameNotation = function() {
 };
 
 Undergrowth.Controller.prototype.getNewGameNotation = function() {
-	return new UndergrowthGameNotation();
+	return new Undergrowth.GameNotation();
 };
 
 Undergrowth.Controller.getHostTilesContainerDivs = function() {
@@ -48,23 +48,83 @@ Undergrowth.Controller.prototype.callActuate = function() {
 };
 
 Undergrowth.Controller.prototype.resetMove = function() {
-	// Remove last move
-	this.gameNotation.removeLastMove();
+	if (this.notationBuilder.status === BRAND_NEW) {
+		// Remove last move
+		this.gameNotation.removeLastMove();
+	} else if (this.notationBuilder.status === READY_FOR_BONUS) {
+		// Just rerun
+	}
 };
 
 Undergrowth.Controller.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Undergrowth Pai Sho</h4> <p>A placement game based on the Skud Pai Sho harmony system.</p>";
+	return "<h4>Undergrowth Pai Sho</h4> <p>A placement game based on the Skud Pai Sho harmony system. Read the <a href='https://skudpaisho.com/site/games/undergrowth-pai-sho/' target='_blank'>rules page</a> to get started. Summary of the rules are below.</p>"
+	+ "<p>Two tiles are placed each turn, except the Host's first turn, where only one tile is placed.</p>"
+	+ "<p>First, Gates are filled. Then tiles are placed elsewhere on the board.</p>"
+	+ "<p>When placing a tile onto the board, tiles are placed on any point where a) the tile forms Harmony with the player’s own tile(s) and b) the placed tile does not interrupt an existing Harmony or Disharmony on the board.</p>"
+	+ "<p>After a tile is placed, remove any tile with two or more Disharmonies from the board.</p>"
+	+ "<p>A player may also pass if they have no available moves.</p>"
+	+ "<p>After the last piece is played or both players pass in succession, the game ends. The player with the most tiles in or touching the Central Gardens on the board wins.</p>"
+	+ "<p>Same/alike tiles form Disharmony with each other.</p>"
+	+ "<p>Tiles in Gates do not form Disharmony.</p>"
+	+ "<p>The Orchid harmonizes with all friendly Flower Tiles, but also forms Disharmony with everything at the same time.</p>";
 };
 
 Undergrowth.Controller.prototype.getAdditionalMessage = function() {
 	var msg = "";
 	if (this.gameNotation.moves.length === 0) {
-		// msg += getGameOptionsMessageHtml(GameType.UndergrowthPaiSho.gameOptions);
+		// msg += getGameOptionsMessageHtml(GameType.Undergrowth.gameOptions);
 	}
+
 	if (!this.theGame.getWinner()) {
-		msg += "<br /><strong>" + this.theGame.getScoreSummary() + "</strong>";
+		msg += "<strong>" + this.theGame.getScoreSummary() + "</strong>";
 	}
+
+	if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE
+			|| this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
+		if (this.theGame.tileManager.playerIsOutOfTiles(getCurrentPlayer())) {
+			msg += "<br />Place second tile or <span class='clickableText' onclick='gameController.skipSecondTile();'>skip</span>";
+		} else {
+			msg += "<br />Place second tile";
+		}
+		msg += getResetMoveText();
+	} else {
+		if (this.theGame.passInSuccessionCount === 1) {
+			msg += "<br />" + getOpponentName(this.getCurrentPlayer()) + " has passed. Passing now will end the game.";
+		}
+		if (this.gameNotation.moves.length > 2 && myTurn() && !this.theGame.getWinner()) {
+			msg += "<br /><span class='skipBonus' onclick='gameController.passTurn();'>Pass turn</span><br />";
+		}
+	}
+
 	return msg;
+};
+
+Undergrowth.Controller.prototype.passTurn = function() {
+	if (this.gameNotation.moves.length > 2) {
+		this.notationBuilder.passTurn = true;
+		this.notationBuilder.moveType = Undergrowth.NotationVars.PASS_TURN;
+		this.completeMove();
+	}
+};
+
+Undergrowth.Controller.prototype.skipSecondTile = function() {
+	this.completeMove();
+};
+
+Undergrowth.Controller.prototype.completeMove = function() {
+	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+	this.gameNotation.addMove(move);
+
+	var moveAnimationBeginStep = 0;
+	if (this.notationBuilder.endPoint) {
+		moveAnimationBeginStep = 1;
+	}
+
+	if (playingOnlineGame()) {
+		callSubmitMove(moveAnimationBeginStep);
+	} else {
+		finalizeMove(moveAnimationBeginStep);
+	}
 };
 
 Undergrowth.Controller.prototype.unplayedTileClicked = function(tileDiv) {
@@ -101,9 +161,19 @@ Undergrowth.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
 		this.theGame.setAllLegalPointsOpen(getCurrentPlayer(), tile);
+	} else if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE) {
+		tile.selectedFromPile = true;
+		this.notationBuilder.plantedFlowerType2 = tileCode;
+		this.notationBuilder.status = Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT;
+
+		this.theGame.setAllLegalPointsOpen(getCurrentPlayer(), tile);
 	} else {
 		this.theGame.hidePossibleMovePoints();
-		this.notationBuilder = new Undergrowth.NotationBuilder();
+		if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
+			this.notationBuilder = new Undergrowth.NotationBuilder();
+		} else if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
+			this.notationBuilder.status = Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE;
+		}
 	}
 };
 
@@ -121,28 +191,40 @@ Undergrowth.Controller.prototype.pointClicked = function(htmlPoint) {
 
 	if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
-			// They're trying to move there! And they can! Exciting!
-			// Need the notation!
 			this.theGame.hidePossibleMovePoints();
 			this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 			
 			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-			this.theGame.runNotationMove(move);
+			this.theGame.runNotationMove(move, true);
 
-			// Move all set. Add it to the notation!
-			this.gameNotation.addMove(move);
-			if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-				createGameIfThatIsOk(GameType.Undergrowth.id);
-			} else {
-				if (playingOnlineGame()) {
-					callSubmitMove();
+			if (this.gameNotation.moves.length === 0) {
+				this.gameNotation.addMove(move);
+				if (onlinePlayEnabled) {
+					createGameIfThatIsOk(GameType.Undergrowth.id);
 				} else {
 					finalizeMove();
+				}
+			} else {
+				this.notationBuilder.status = Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE;
+				if (this.theGame.tileManager.playerIsOutOfTiles(getCurrentPlayer())) {
+					this.completeMove();
+				} else {
+					refreshMessage();
 				}
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
 			this.notationBuilder = new Undergrowth.NotationBuilder();
+		}
+	} else if (this.notationBuilder.status === Undergrowth.NotationBuilder.WAITING_FOR_SECOND_ENDPOINT) {
+		if (boardPoint.isType(POSSIBLE_MOVE)) {
+			this.theGame.hidePossibleMovePoints();
+			this.notationBuilder.endPoint2 = new NotationPoint(htmlPoint.getAttribute("name"));
+			
+			this.completeMove();
+		} else {
+			this.theGame.hidePossibleMovePoints();
+			this.notationBuilder.status = Undergrowth.NotationBuilder.WAITING_FOR_SECOND_MOVE;
 		}
 	}
 };
@@ -232,7 +314,4 @@ Undergrowth.Controller.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 };
 
-Undergrowth.Controller.prototype.replayEnded = function() {
-	this.theGame.actuate();
-};
 

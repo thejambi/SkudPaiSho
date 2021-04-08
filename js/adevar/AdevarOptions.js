@@ -21,7 +21,8 @@ AdevarOptions.tileDesignTypeValues = {
 	// spoopy: "Adevar Spoopy",
 	icy: "Adevar Icy",
 	irl: "Adevar TGG Red Oak & Walnut",
-	chuji: "Chuji"
+	chuji: "Chuji by Sirstotes",
+	space: "Adevar In Space! by Sirstotes"
 };
 
 AdevarOptions.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
@@ -56,3 +57,4 @@ AdevarOptions.commenceSpoopy = function() {
 	AdevarOptions.tileDesignTypeValues['spoopy'] = "Adevar Spoopy";
 	AdevarOptions.setTileDesignsPreference('spoopy');
 };
+

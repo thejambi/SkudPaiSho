@@ -16,8 +16,8 @@ function OvergrowthGameManager(actuator, ignoreActuate, isCopy, existingDrawnTil
 	this.endGameWinners = [];
 }
 
-OvergrowthGameManager.prototype.drawRandomTile = function() {
-	if (this.mustFetchNewRandomTile()) {
+OvergrowthGameManager.prototype.drawRandomTile = function(forceDrawNew) {
+	if (this.mustFetchNewRandomTile() || forceDrawNew) {
 		var newDrawnTile = this.drawRandomTileFromTileManager(getCurrentPlayer());
 		if (newDrawnTile) {
 			this.lastDrawnTile = this.drawnTile;

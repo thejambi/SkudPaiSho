@@ -21,30 +21,44 @@ Undergrowth.Board.prototype.placeTile = function (tile, notationPoint) {
 	this.boardHelper.putTileOnPoint(tile, notationPoint, this.cells);
 	this.analyzeHarmonies();
 
-	var capturedTiles = this.captureTilesWithAtLeastTwoDisharmonies();
+	var capturedTilesInfo = [];
 
+	var lastCapturedTilesInfo = this.captureTilesWithAtLeastTwoDisharmonies();
 	this.analyzeHarmonies();
 
-	return capturedTiles;
+	/* Captured tiles may cause addititional disharmonies to form, which can cause other tiles to be captured. */
+	while (lastCapturedTilesInfo.length > 0) {
+		capturedTilesInfo = capturedTilesInfo.concat(lastCapturedTilesInfo);
+
+		lastCapturedTilesInfo = this.captureTilesWithAtLeastTwoDisharmonies();
+
+		this.analyzeHarmonies();
+	}
+
+	return capturedTilesInfo;
 };
 
 Undergrowth.Board.prototype.captureTilesWithAtLeastTwoDisharmonies = function() {
 	var pointsToCapture = [];
-	var capturedTiles = [];
+
+	capturedTilesInfo = [];
 
 	var self = this;
 	this.forEachBoardPointWithTile(function(boardPointWithTile) {
-		var tileClashes = self.getTileClashes(boardPointWithTile.tile, new RowAndColumn(boardPointWithTile.row, boardPointWithTile.col));
+		var tileClashes = self.getTileClashes(boardPointWithTile.tile, boardPointWithTile);
 		if (tileClashes.length >= 2) {
 			pointsToCapture.push(boardPointWithTile);
 		}
 	});
 
 	pointsToCapture.forEach(function(pointToCaptureFrom) {
-		capturedTiles.push(pointToCaptureFrom.removeTile());
+		capturedTilesInfo.push({
+			boardPoint: pointToCaptureFrom,
+			capturedTile: pointToCaptureFrom.removeTile()
+		})
 	});
 
-	return capturedTiles;
+	return capturedTilesInfo;
 };
 
 Undergrowth.Board.prototype.forEachBoardPoint = function(forEachFunc) {
@@ -161,10 +175,10 @@ Undergrowth.Board.prototype.analyzeHarmonies = function () {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var boardPoint = this.cells[row][col];
 			if (boardPoint.hasTile()) {
-				var tileHarmonies = this.getTileHarmonies(boardPoint.tile, new RowAndColumn(row, col));
+				var tileHarmonies = this.getTileHarmonies(boardPoint.tile, boardPoint);
 				this.harmonyManager.addHarmonies(tileHarmonies);
 
-				var tileClashes = this.getTileClashes(boardPoint.tile, new RowAndColumn(row, col));
+				var tileClashes = this.getTileClashes(boardPoint.tile, boardPoint);
 				this.harmonyManager.addClashes(tileClashes);
 
 				boardPoint.tile.inHarmony = tileHarmonies.length > 0;
@@ -176,25 +190,25 @@ Undergrowth.Board.prototype.analyzeHarmonies = function () {
 	this.markSpacesBetweenHarmonies();
 };
 
-Undergrowth.Board.prototype.getTileHarmonies = function (tile, rowAndCol) {
+Undergrowth.Board.prototype.getTileHarmonies = function (tile, boardPoint) {
 	var tileHarmonies = [];
 
-	var leftHarmony = this.getHarmonyLeft(tile, rowAndCol);
+	var leftHarmony = this.getHarmonyLeft(tile, boardPoint);
 	if (leftHarmony) {
 		tileHarmonies.push(leftHarmony);
 	}
 
-	var rightHarmony = this.getHarmonyRight(tile, rowAndCol);
+	var rightHarmony = this.getHarmonyRight(tile, boardPoint);
 	if (rightHarmony) {
 		tileHarmonies.push(rightHarmony);
 	}
 
-	var upHarmony = this.getHarmonyUp(tile, rowAndCol);
+	var upHarmony = this.getHarmonyUp(tile, boardPoint);
 	if (upHarmony) {
 		tileHarmonies.push(upHarmony);
 	}
 
-	var downHarmony = this.getHarmonyDown(tile, rowAndCol);
+	var downHarmony = this.getHarmonyDown(tile, boardPoint);
 	if (downHarmony) {
 		tileHarmonies.push(downHarmony);
 	}
@@ -202,95 +216,105 @@ Undergrowth.Board.prototype.getTileHarmonies = function (tile, rowAndCol) {
 	return tileHarmonies;
 };
 
-Undergrowth.Board.prototype.getHarmonyLeft = function (tile, endRowCol) {
-	var colToCheck = endRowCol.col - 1;
+Undergrowth.Board.prototype.getHarmonyLeft = function (tile, boardPoint) {
+	var colToCheck = boardPoint.col - 1;
 
-	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile()
-			&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
+	while (colToCheck >= 0 && !this.cells[boardPoint.row][colToCheck].hasTile()
+			&& !this.cells[boardPoint.row][colToCheck].isType(GATE)) {
 		colToCheck--;
 	}
 
 	if (colToCheck >= 0) {
-		var checkPoint = this.cells[endRowCol.row][colToCheck];
-		if (tile.formsHarmonyWith(checkPoint.tile)) {
-			var harmony = new Undergrowth.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+		var checkPoint = this.cells[boardPoint.row][colToCheck];
+		if (tile.formsHarmonyWith(checkPoint.tile)
+				&& !(checkPoint.isType(GATE) && boardPoint.isType(GATE))) {
+			var harmony = new Undergrowth.Harmony(tile, boardPoint, checkPoint.tile, new RowAndColumn(boardPoint.row, colToCheck));
 			return harmony;
 		}
 	}
 };
 
-Undergrowth.Board.prototype.getHarmonyRight = function (tile, endRowCol) {
-	var colToCheck = endRowCol.col + 1;
+Undergrowth.Board.prototype.getHarmonyRight = function (tile, boardPoint) {
+	var colToCheck = boardPoint.col + 1;
 
-	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile()
-			&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
+	while (colToCheck <= 16 && !this.cells[boardPoint.row][colToCheck].hasTile()
+			&& !this.cells[boardPoint.row][colToCheck].isType(GATE)) {
 		colToCheck++;
 	}
 
 	if (colToCheck <= 16) {
-		var checkPoint = this.cells[endRowCol.row][colToCheck];
-		if (tile.formsHarmonyWith(checkPoint.tile)) {
-			var harmony = new Undergrowth.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+		var checkPoint = this.cells[boardPoint.row][colToCheck];
+		if (tile.formsHarmonyWith(checkPoint.tile)
+				&& !(checkPoint.isType(GATE) && boardPoint.isType(GATE))) {
+			var harmony = new Undergrowth.Harmony(tile, boardPoint, checkPoint.tile, new RowAndColumn(boardPoint.row, colToCheck));
 			return harmony;
 		}
 	}
 };
 
-Undergrowth.Board.prototype.getHarmonyUp = function (tile, endRowCol) {
-	var rowToCheck = endRowCol.row - 1;
+Undergrowth.Board.prototype.getHarmonyUp = function (tile, boardPoint) {
+	var rowToCheck = boardPoint.row - 1;
 
-	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile()
-			&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
+	while (rowToCheck >= 0 && !this.cells[rowToCheck][boardPoint.col].hasTile()
+			&& !this.cells[rowToCheck][boardPoint.col].isType(GATE)) {
 		rowToCheck--;
 	}
 
 	if (rowToCheck >= 0) {
-		var checkPoint = this.cells[rowToCheck][endRowCol.col];
-		if (tile.formsHarmonyWith(checkPoint.tile)) {
-			var harmony = new Undergrowth.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+		var checkPoint = this.cells[rowToCheck][boardPoint.col];
+		if (tile.formsHarmonyWith(checkPoint.tile)
+				&& !(checkPoint.isType(GATE) && boardPoint.isType(GATE))) {
+			var harmony = new Undergrowth.Harmony(tile, boardPoint, checkPoint.tile, new RowAndColumn(rowToCheck, boardPoint.col));
 			return harmony;
 		}
 	}
 };
 
-Undergrowth.Board.prototype.getHarmonyDown = function (tile, endRowCol) {
-	var rowToCheck = endRowCol.row + 1;
+Undergrowth.Board.prototype.getHarmonyDown = function (tile, boardPoint) {
+	var rowToCheck = boardPoint.row + 1;
 
-	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile()
-			&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
+	while (rowToCheck <= 16 && !this.cells[rowToCheck][boardPoint.col].hasTile()
+			&& !this.cells[rowToCheck][boardPoint.col].isType(GATE)) {
 		rowToCheck++;
 	}
 
 	if (rowToCheck <= 16) {
-		var checkPoint = this.cells[rowToCheck][endRowCol.col];
-		if (tile.formsHarmonyWith(checkPoint.tile)) {
-			var harmony = new Undergrowth.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+		var checkPoint = this.cells[rowToCheck][boardPoint.col];
+		if (tile.formsHarmonyWith(checkPoint.tile)
+				&& !(checkPoint.isType(GATE) && boardPoint.isType(GATE))) {
+			var harmony = new Undergrowth.Harmony(tile, boardPoint, checkPoint.tile, new RowAndColumn(rowToCheck, boardPoint.col));
 			return harmony;
 		}
 	}
 };
 
-Undergrowth.Board.prototype.getTileClashes = function (tile, rowAndCol) {
+Undergrowth.Board.prototype.getTileClashes = function (tile, boardPoint) {
 	var tileHarmonies = [];
 
-	var leftHarmony = this.getClashLeft(tile, rowAndCol);
-	if (leftHarmony) {
-		tileHarmonies.push(leftHarmony);
-	}
+	if (!boardPoint.isType(GATE)) {
 
-	var rightHarmony = this.getClashRight(tile, rowAndCol);
-	if (rightHarmony) {
-		tileHarmonies.push(rightHarmony);
-	}
+		var rowAndCol = new RowAndColumn(boardPoint.row, boardPoint.col)
 
-	var upHarmony = this.getClashUp(tile, rowAndCol);
-	if (upHarmony) {
-		tileHarmonies.push(upHarmony);
-	}
+		var leftHarmony = this.getClashLeft(tile, rowAndCol);
+		if (leftHarmony) {
+			tileHarmonies.push(leftHarmony);
+		}
 
-	var downHarmony = this.getClashDown(tile, rowAndCol);
-	if (downHarmony) {
-		tileHarmonies.push(downHarmony);
+		var rightHarmony = this.getClashRight(tile, rowAndCol);
+		if (rightHarmony) {
+			tileHarmonies.push(rightHarmony);
+		}
+
+		var upHarmony = this.getClashUp(tile, rowAndCol);
+		if (upHarmony) {
+			tileHarmonies.push(upHarmony);
+		}
+
+		var downHarmony = this.getClashDown(tile, rowAndCol);
+		if (downHarmony) {
+			tileHarmonies.push(downHarmony);
+		}
+
 	}
 
 	return tileHarmonies;
@@ -306,7 +330,7 @@ Undergrowth.Board.prototype.getClashLeft = function (tile, endRowCol) {
 
 	if (colToCheck >= 0) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
-		if (tile.clashesWith(checkPoint.tile)) {
+		if (!checkPoint.isType(GATE) && tile.clashesWith(checkPoint.tile)) {
 			var harmony = new Undergrowth.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
@@ -323,7 +347,7 @@ Undergrowth.Board.prototype.getClashRight = function (tile, endRowCol) {
 
 	if (colToCheck <= 16) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
-		if (tile.clashesWith(checkPoint.tile)) {
+		if (!checkPoint.isType(GATE) && tile.clashesWith(checkPoint.tile)) {
 			var harmony = new Undergrowth.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
@@ -340,7 +364,7 @@ Undergrowth.Board.prototype.getClashUp = function (tile, endRowCol) {
 
 	if (rowToCheck >= 0) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
-		if (tile.clashesWith(checkPoint.tile)) {
+		if (!checkPoint.isType(GATE) && tile.clashesWith(checkPoint.tile)) {
 			var harmony = new Undergrowth.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
@@ -357,7 +381,7 @@ Undergrowth.Board.prototype.getClashDown = function (tile, endRowCol) {
 
 	if (rowToCheck <= 16) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
-		if (tile.clashesWith(checkPoint.tile)) {
+		if (!checkPoint.isType(GATE) && tile.clashesWith(checkPoint.tile)) {
 			var harmony = new Undergrowth.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
@@ -416,6 +440,50 @@ Undergrowth.Board.prototype.setHarmonyPointsOpen = function(tile) {
 	}
 
 	return possibleMovesFound;
+};
+
+Undergrowth.Board.prototype.setOpenGatePossibleMoves = function() {
+	this.forEachBoardPoint(function(boardPoint) {
+		if (boardPoint.isType(GATE) && !boardPoint.hasTile()) {
+			boardPoint.addType(POSSIBLE_MOVE);
+		}
+	});
+};
+
+Undergrowth.Board.prototype.hasOpenGates = function() {
+	var openGateFound = false;
+	this.forEachBoardPoint(function(boardPoint) {
+		if (boardPoint.isType(GATE) && !boardPoint.hasTile()) {
+			openGateFound = true;
+			return;
+		}
+	});
+	return openGateFound;
+};
+
+Undergrowth.Board.prototype.getPlayerWithMostTilesInOrTouchingCentralGardens = function() {
+	var hostCount = this.getNumberOfTilesTouchingCentralGardensForPlayer(HOST);
+	var guestCount = this.getNumberOfTilesTouchingCentralGardensForPlayer(GUEST);
+
+	if (hostCount > guestCount) {
+		return HOST;
+	} else if (guestCount > hostCount) {
+		return GUEST;
+	}
+};
+
+Undergrowth.Board.prototype.getNumberOfTilesTouchingCentralGardensForPlayer = function(playerName) {
+	var count = 0;
+
+	this.forEachBoardPointWithTile(function(boardPointWithTile) {
+		if (boardPointWithTile.isType(RED) || boardPointWithTile.isType(WHITE)) {
+			if (boardPointWithTile.tile.ownerName === playerName) {
+				count++;
+			}
+		}
+	});
+
+	return count;
 };
 
 Undergrowth.Board.prototype.getCopy = function () {

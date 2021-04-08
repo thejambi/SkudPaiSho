@@ -235,6 +235,13 @@ if (!Array.prototype.includes) {
   };
 }
 
+function arrayIntersection(array1, array2) {
+  var filteredArray = array1.filter(function(n) {
+    return array2.indexOf(n) !== -1;
+  });
+  return filteredArray;
+}
+
 if (!String.prototype.startsWith) {
     String.prototype.startsWith = function(searchString, position){
       position = position || 0;

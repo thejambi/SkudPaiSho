@@ -29,6 +29,10 @@ OvergrowthController.prototype.resetGameManager = function() {
 	}
 };
 
+OvergrowthController.prototype.getMoveNumber = function() {
+	return this.gameNotation.moves.length;
+};
+
 OvergrowthController.prototype.resetNotationBuilder = function() {
 	this.notationBuilder = new OvergrowthNotationBuilder();
 };
@@ -246,7 +250,7 @@ OvergrowthController.prototype.setGameNotation = function(newGameNotation) {
 	}
 	this.resetGameManager();
 	this.gameNotation.setNotationText(newGameNotation);
-	this.theGame.drawRandomTile();
+	this.theGame.drawRandomTile(true);
 	this.theGame.actuate();
 };
 

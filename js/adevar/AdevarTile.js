@@ -60,6 +60,30 @@ var AdevarTileNames = {
 	blackOrchidSF: "Black Orchid Second Face"
 };
 
+var AdevarInSpaceAlternateNames = {
+	blankHiddenTile: "Hidden Tile",
+	lilac: "A-3 \"Lilac\"",
+	zinnia: "P-4 \"Zinnia\"",
+	foxglove: "S-5 \"Foxglove\"",
+	gate: "Space-Gate Station",
+	vanguard: "Vanguard Moon",
+	reflection: "Reflection Comet",
+	iris: "Saturn: Mission \"Iris\"",
+	irisSF: "Saturn's Dark Side: \"Iris\"",
+	orientalLily: "Venus: Mission \"Oriental Lily\"",
+	orientalLilySF: "Venus's Dark Side: \"Oriental Lily\"",
+	echeveria: "Mars: Mission \"Echeveria\"",
+	echeveriaSF: "Mars' Dark Side: \"Echeveria\"",
+	whiteLotus: "Earth: Mission \"White Lotus\"",
+	whiteLotusSF: "Earth's Dark Side: \"White Lotus\"",
+	birdOfParadise: "Uranus: Mission \"Bird Of Paradise\"",
+	birdOfParadiseSF: "Uranus' Dark Side: \"Bird Of Paradise\"",
+	whiteRose: "Mercury: Mission \"White Rose\"",
+	whiteRoseSF: "Mercury's Dark Side: \"White Rose\"",
+	blackOrchid: "Jupiter: Mission \"Black Orchid\"",
+	blackOrchidSF: "Jupiter's Dark Side: \"Black Orchid\""
+};
+
 function AdevarTile(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
@@ -204,5 +228,11 @@ AdevarTile.getTileCodeKey = function(tileCode) {
 };
 
 AdevarTile.getTileName = function(tileCode) {
-	return AdevarTileNames[AdevarTile.getTileCodeKey(tileCode)];
+	var tileName = AdevarTileNames[AdevarTile.getTileCodeKey(tileCode)];
+
+	if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
+		tileName = AdevarInSpaceAlternateNames[AdevarTile.getTileCodeKey(tileCode)];
+	}
+
+	return tileName;
 };

@@ -1,10 +1,10 @@
 
-Trifle.CancelZoneAbilityBrain = function(abilityObject) {
+Trifle.ImmobilizeTilesAbilityBrain = function(abilityObject) {
 	this.abilityObject = abilityObject;
 }
 
-Trifle.CancelZoneAbilityBrain.prototype.activateAbility = function() {
-	debug("Cancel Zone ability activating...");
+Trifle.ImmobilizeTilesAbilityBrain.prototype.activateAbility = function() {
+	debug("Immobilize Tiles ability activating...");
 	// Attach ability to target tile
 	// Get target tiles
 	var targetTiles = this.abilityObject.targetTiles;
