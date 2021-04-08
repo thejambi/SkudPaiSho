@@ -340,7 +340,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 
 	/* Vagabond Tiles */
 
-	TrifleTiles[Trifle.TileCodes.SkyBison] = {	/* DONE */
+	TrifleTiles[Trifle.TileCodes.SkyBison] = {	/* Done */
 		types: [Trifle.TileType.animal],
 		identifiers: [Trifle.TileIdentifier.air],
 		deployTypes: [ Trifle.DeployType.temple ],
@@ -376,7 +376,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	TrifleTiles[Trifle.TileCodes.Chrysanthemum] = {	/* DONE */
+	TrifleTiles[Trifle.TileCodes.Chrysanthemum] = {	/* Done */
 		types: [Trifle.TileType.flower],
 		deployTypes: [Trifle.DeployType.anywhere],
 		abilities: [
@@ -532,7 +532,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	TrifleTiles[Trifle.TileCodes.Firefly] = {
+	TrifleTiles[Trifle.TileCodes.Firefly] = {	/* Done */
 		types: [Trifle.TileType.animal],
 		identifiers: [Trifle.TileIdentifier.air],
 		deployTypes: [Trifle.DeployType.temple],
@@ -561,23 +561,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	/* TODO TrifleTiles[Trifle.TileCodes.Dandelion] = {
-		types: [Trifle.TileType.flower],
-		deployTypes: [Trifle.DeployType.adjacentToTemple],
-		abilities: [
-			{
-				type: Trifle.BoardPresenceAbility.canBeCapturedByFriendlyTiles
-			},
-			{
-				type: Trifle.BoardPresenceAbility.spawnAdditionalCopies,
-				triggeringAction: : Trifle.AbilityTriggerType.whenCapturedByTargetTile,
-				amount: 2,
-				location: SpawnLocation.adjacent
-			}
-		]
-	}; */
-
-	TrifleTiles[Trifle.TileCodes.Edelweiss] = {
+	TrifleTiles[Trifle.TileCodes.Edelweiss] = {	// TODO
 		types: [Trifle.TileType.flower],
 		deployTypes: [Trifle.DeployType.anywhere],
 		territorialZone: {
@@ -592,33 +576,42 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		}
 	};
 
-	TrifleTiles[Trifle.TileCodes.NobleRhubarb] = {
+	TrifleTiles[Trifle.TileCodes.NobleRhubarb] = {	/* Done */
 		types: [Trifle.TileType.flower],
 		deployTypes: [Trifle.DeployType.anywhere],
-		territorialZone: {
-			size: 1,
-			abilities: [
-				{
-					type: Trifle.AbilityName.grantBonusMovement,
-					triggeringActions: [Trifle.AbilityTriggerType.whenTargetTileMovesFromWithinZone],
-					// ...
-				}
-			]
-		}
+		abilities: [
+			{
+				type: Trifle.AbilityName.grantBonusMovement,
+				bonusMovement: {
+					type: Trifle.MovementType.standard,
+					distance: 2
+				},
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent,
+						targetTeams: [Trifle.TileTeam.friendly],
+						targetTypes: [Trifle.TileType.animal]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			}
+		]
 	};
 
-	TrifleTiles[Trifle.TileCodes.Lavender] = {
+	TrifleTiles[Trifle.TileCodes.Lavender] = {	/* Done */
 		types: [Trifle.TileType.flower],
 		deployTypes: [Trifle.DeployType.anywhere],
-		territorialZone: {
-			size: 1,
-			abilities: [
-				{
-					type: Trifle.ZoneAbility.immobilizesTiles,
-					targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy]
-				}
-			]
-		}
+		abilities: [
+			{
+				type: Trifle.AbilityName.immobilizeTiles,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			}
+		]
 	};
 
 	TrifleTiles[Trifle.TileCodes.WaterBanner] = {
@@ -989,6 +982,22 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 						targetTileTypes: [ Trifle.TileType.flower ]
 					}
 				]
+			}
+		]
+	}; */
+
+	/* TODO TrifleTiles[Trifle.TileCodes.Dandelion] = {
+		types: [Trifle.TileType.flower],
+		deployTypes: [Trifle.DeployType.adjacentToTemple],
+		abilities: [
+			{
+				type: Trifle.BoardPresenceAbility.canBeCapturedByFriendlyTiles
+			},
+			{
+				type: Trifle.BoardPresenceAbility.spawnAdditionalCopies,
+				triggeringAction: : Trifle.AbilityTriggerType.whenCapturedByTargetTile,
+				amount: 2,
+				location: SpawnLocation.adjacent
 			}
 		]
 	}; */
