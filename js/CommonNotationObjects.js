@@ -2,6 +2,7 @@
 
 var GUEST = "GUEST";
 var HOST = "HOST";
+var OTHER_PLAYER = "OTHER";
 
 // Turn actions ----------------
 var PLANTING = "Planting";
@@ -25,9 +26,9 @@ function RowAndColumn(row, col) {
 	this.row = row;
 	this.col = col;
 
-	var x = col - 8;
-	var y = 8 - row;
-	this.notationPointString = x + "," + y;
+	this.x = col - 8;
+	this.y = 8 - row;
+	this.notationPointString = this.x + "," + this.y;
 }
 
 RowAndColumn.prototype.samesies = function(other) {

@@ -14,6 +14,7 @@
   --hexentafld-bakcground: #000;
   --input-background: #1b1b19;
   --input-color: #faf8ef;
+  --replayControlsColor: #cac8bf;
 }
 
 [data-theme="dark"] {
@@ -254,6 +255,7 @@ div.tab .alertTab, div.tab .alertTab.active {
   z-index: 103;
   background-color: #444;
   border-top: var(--replay-controls-border-top);
+  color: var(--replayControlsColor);
 }
 
 #replayControls .center {
@@ -264,9 +266,13 @@ div.tab .alertTab, div.tab .alertTab.active {
   padding: 4px;
 }
 
-#replayControls .gameLogText {
+#replayControls .gameLogText, #replayControls .replayControlsAdditionalContent {
   width: 38%;
   float: left;
+}
+
+.gameClockContainer {
+  font-weight: bold;
 }
 
 .replayControlsCloseButton {
@@ -293,6 +299,7 @@ div.tab .alertTab, div.tab .alertTab.active {
   border: 1px solid #ccc;
   border-radius: 3px;
   background-color: var(--replay-button-background);
+  color: var(--color);
   display: block;
   float: left;
   text-align: center;
@@ -304,6 +311,13 @@ div.tab .alertTab, div.tab .alertTab.active {
 }
 .replayButton:active {
   background-color: #bbb;
+}
+
+#confirmMoveButton .replayButton {
+  width: 211px;
+  color: var(--body-background-color);
+  background-color: var(--color);
+  box-shadow: 0px 0px 4px 1px var(--color);
 }
 
 .board-container {
@@ -481,6 +495,32 @@ figure > div {
   transform: rotate(225deg);
 }
 
+.adevarGuestBoardRotate {
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+
+  z-index:0;
+}
+
+.adevarGuestPointRotate {
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.rotate180 {
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
 .pointContainer {
   /*padding: 16px;*/
   padding: 17px;
@@ -556,7 +596,13 @@ figure > div {
 }
 
 .drained {
-  opacity: 0.6;
+  opacity: 0.75;
+}
+
+.boosted
+{
+  box-shadow: 0px 0px 6px 3px #fff;
+  filter: saturate(175%);
 }
 
 .possibleMove {
@@ -564,7 +610,7 @@ figure > div {
 }
 
 .possibleMove img {
-  opacity: 0.8;
+  opacity: 0.6;
 }
 
 .selectedFromPile {
@@ -582,6 +628,18 @@ figure > div {
 }
 .HOSTharmony.GUESTharmony {
   box-shadow: 0px 0px 8px 4px #77A2E6;
+}
+
+.tileBetweenHarmonyHOST {
+  box-shadow: 0px 0px 2px 1px #6CC ;
+}
+
+.tileBetweenHarmonyGUEST {
+  box-shadow: 0px 0px 2px 1px #87f;
+}
+
+.tileBetweenHarmonyHOST.tileBetweenHarmonyGUEST{
+  box-shadow: 0px 0px 2px 1px #77A2E6;
 }
 
 
@@ -609,6 +667,11 @@ figure > div {
   display: inline-block;
   float: left;
   margin-top: 12px;
+}
+
+.tileLibraryNoMargin {
+  display: inline-block;
+  float: left;
 }
 
 .tilePileContainer div div {
@@ -737,6 +800,18 @@ input[type=submit] {
 
 #onlinePlayTest {
   display: none;
+}
+
+#game-title-container {
+  display: block;
+  margin: 0 0 -5px 0;
+}
+#game-title-heading {
+  margin: 6px 0 0 6px;
+}
+#defaultGameMessage {
+  max-width: 580px;
+  margin-left: 6px;
 }
 
 /* Modal - from W3Schools Modal How-To */
@@ -1056,6 +1131,18 @@ input[type=submit] {
   background-color: var(--hex-score-host-background);
 }
 
+.meadowHexScoreHost {
+  background-color: #fe8492;
+  transform: scale(0.8);
+}
+.meadowHexScoreGuest {
+  background-color: #8bd0ff;
+  transform: scale(0.8);
+}
+.meadowHexScoreHost.meadowHexScoreGuest {
+  background-color: #c5aac9;
+}
+
 .bloomsH1 {
   background-color: #f9c851;
 }
@@ -1071,6 +1158,19 @@ input[type=submit] {
 }
 .scoreMix {
   background-color: #9a8245;
+}
+
+.meadowH1 {
+  background-color: #921715;
+}
+.meadowH2 {
+  background-color: #fe8492;
+}
+.meadowG1 {
+  background-color: #215d7f;
+}
+.meadowG2 {
+  background-color: #8bd0ff;
 }
 
 .bloomsTileContainer {
@@ -1187,12 +1287,87 @@ input[type=submit] {
   color: black;
 }
 
+/* Tumbleweed */
+
+.boardHexhex6 {
+  width: 612px;
+  margin: -18px 0 0 -25px;
+  transform: scale(0.9);
+}
+.boardHexhex6bottomMargin {
+  margin-bottom: -20px;
+}
+
+.boardHexhex8 {
+  width: 910px;
+  margin: -65px 0 0 -119px;
+  transform: scale(0.78);
+}
+.boardHexhex8bottomMargin {
+  margin-bottom: -60px;
+}
+
+.boardHexhex11 {
+  width: 1500px;
+  margin: -198px 0 0 -331px;
+  transform: scale(0.55);
+}
+.boardHexhex11bottomMargin {
+  margin-bottom: -210px;
+}
+
+.boardHexhex12 {
+  width: 1500px;
+  margin: -190px 0 0 -416px;
+  transform: scale(0.45);
+}
+
+.lastPlayed {
+  z-index: 999;
+  box-shadow: 0px 0px 8px 6px rgb(233, 199, 86);
+  transform: scale(0.9);
+}
+
+
 
 /* --- General Dark Mode Styles --- */
 input,
 textarea {
   background: var(--input-background);
   color: var(--input-color);
+  border: 1px solid #cac8bf;
+}
+
+/** --- Adevar --- */
+.adevar_highlightOn.adevar_highlight1 {
+  box-shadow: 0px 0px 8px 4px #de6;
+}
+.adevar_highlightOn.adevar_highlight2 {
+  box-shadow: 0px 0px 8px 4px rgb(102, 204, 187);
+}
+.adevar_highlightOn.adevar_highlight3 {
+  box-shadow: 0px 0px 8px 4px #87f;
+}
+
+.adevar_highlightOn.adevar_highlight2.adevar_highlight3 {
+  box-shadow: 0px 0px 8px 4px #77A2E6;
+}
+
+.adevar_highlightOn.adevar_highlight4 {
+  box-shadow: 0px 0px 8px 4px rgb(108, 117, 50);
+}
+.adevar_highlightOn.adevar_highlight5 {
+  box-shadow: 0px 0px 8px 4px rgb(52, 112, 102);
+}
+.adevar_highlightOn.adevar_highlight6 {
+  box-shadow: 0px 0px 8px 4px rgb(54, 46, 100);
+}
+.adevar_highlightOn.adevar_highlight5.adevar_highlight6 {
+  box-shadow: 0px 0px 8px 4px #3f4d7a;
+}
+
+.adevar_highlightOn {
+  transition: box-shadow 0.5s;
 }
 
 
@@ -1248,7 +1423,7 @@ textarea {
   }
 
   /* Show gameLogText above replay controls */
-  #replayControls .gameLogText {
+  #replayControls .gameLogText, #replayControls .replayControlsAdditionalContent {
     margin-left: auto;
     margin-right: auto;
     text-align: center;
@@ -1392,6 +1567,33 @@ textarea {
   transform: scale(0.65);
 }
 
+.boardHexhex6 {
+  width: 110vw;
+  margin: 1vw 0 0 -5vw;
+  transform: scale(0.95);
+}
+.boardHexhex6bottomMargin {
+  margin-bottom: 0vw;
+}
+
+.boardHexhex8 {
+  width: 160vw;
+  margin: -14vw 0 0 -25vw;
+  transform: scale(0.72);
+}
+.boardHexhex8bottomMargin {
+  margin-bottom: -15vw;
+}
+
+.boardHexhex11 {
+  width: 195vw;
+  margin: -38vw 0 0 -47vw;
+  transform: scale(0.51);
+}
+.boardHexhex11bottomMargin {
+  margin-bottom: -40vw;
+}
+
 .blooms12sidedBoard {
   transform: scale(0.3);
 }
@@ -1439,7 +1641,7 @@ textarea {
   height: 5.047vw;
 }
 
-
+}
 
 
 @media only screen and (max-width: 450px) {

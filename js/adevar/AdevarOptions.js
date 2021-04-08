@@ -5,6 +5,11 @@ function AdevarOptions() {
 		|| !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
 		AdevarOptions.setTileDesignsPreference("classic", true);
 	}
+
+	AdevarOptions.viewAsGuest = false;
+	if (currentGameData && currentGameData.gameTypeId === GameType.Adevar.id && usernameEquals(currentGameData.guestUsername)) {
+		AdevarOptions.viewAsGuest = true;
+	}
 }
 
 AdevarOptions.tileDesignTypeKey = "adevarTileDesignTypeKey";
@@ -13,7 +18,10 @@ AdevarOptions.tileDesignTypeKey = "adevarTileDesignTypeKey";
 AdevarOptions.tileDesignTypeValues = {
 	classic: "Adevar Classic",
 	monochrome: "Adevar Monochrome",
-	spoopy: "Adevar Spoopy"
+	// spoopy: "Adevar Spoopy",
+	icy: "Adevar Icy",
+	irl: "Adevar TGG Red Oak & Walnut",
+	chuji: "Chuji"
 };
 
 AdevarOptions.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
@@ -30,4 +38,21 @@ AdevarOptions.buildTileDesignDropdownDiv = function(alternateLabelText) {
 							function() {
 								AdevarOptions.setTileDesignsPreference(this.value);
 							});
+};
+
+AdevarOptions.buildToggleViewAsGuestDiv = function() {
+	var div = document.createElement("div");
+	var message = "Viewing board as Host";
+	var linkText = "View as Guest";
+	if (AdevarOptions.viewAsGuest) {
+		message = "Viewing board as Guest";
+		linkText = "View as Host";
+	}
+	div.innerHTML = message + ": <span class='skipBonus' onclick='gameController.toggleViewAsGuest();'>" + linkText + "</span>";
+	return div;
+};
+
+AdevarOptions.commenceSpoopy = function() {
+	AdevarOptions.tileDesignTypeValues['spoopy'] = "Adevar Spoopy";
+	AdevarOptions.setTileDesignsPreference('spoopy');
 };

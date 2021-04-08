@@ -18,7 +18,7 @@ OnlinePlayEngine.callCallback = function(data, status, callback) {
 
 /* Calls callback with userId values that match username or emailAddress. */
 OnlinePlayEngine.prototype.isUserInfoAvailable = function(username, emailAddress, callback) {
-    $.get("isUserInfoAvailable.php?u=" + username + "&e=" + emailAddress, 
+    $.get("backend/isUserInfoAvailable.php?u=" + username + "&e=" + emailAddress, 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -28,7 +28,7 @@ OnlinePlayEngine.prototype.isUserInfoAvailable = function(username, emailAddress
 };
 
 OnlinePlayEngine.prototype.userInfoExists = function(username, emailAddress, callback) {
-    $.get("userInfoExists.php?u=" + username + "&e=" + emailAddress, 
+    $.get("backend/userInfoExists.php?u=" + username + "&e=" + emailAddress, 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -38,7 +38,7 @@ OnlinePlayEngine.prototype.userInfoExists = function(username, emailAddress, cal
 };
 
 OnlinePlayEngine.prototype.verifyLogin = function(userId, username, userEmail, deviceId, callback) {
-    $.post("verifyLogin.php", 
+    $.post("backend/verifyLogin.php", 
         {
             userId: userId, 
             username: username, 
@@ -54,7 +54,7 @@ OnlinePlayEngine.prototype.verifyLogin = function(userId, username, userEmail, d
 };
 
 OnlinePlayEngine.prototype.sendVerificationCode = function(username, userEmail, callback) {
-    $.post("sendVerificationCode.php",
+    $.post("backend/sendVerificationCode.php",
         {
             username: username,
             toEmail: userEmail,
@@ -67,7 +67,7 @@ OnlinePlayEngine.prototype.sendVerificationCode = function(username, userEmail, 
 };
 
 OnlinePlayEngine.prototype.getVerificationCode = function(callback) {
-    $.get("getVerificationCode.php", 
+    $.get("backend/getVerificationCode.php", 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -77,7 +77,7 @@ OnlinePlayEngine.prototype.getVerificationCode = function(callback) {
 };
 
 OnlinePlayEngine.prototype.createUser = function(username, emailAddress, callback) {
-    $.post("createUser.php",
+    $.post("backend/createUser.php",
         {
             u: username,
             e: emailAddress
@@ -91,7 +91,7 @@ OnlinePlayEngine.prototype.createUser = function(username, emailAddress, callbac
 };
 
 OnlinePlayEngine.prototype.createDeviceIdForUser = function(userId, callback) {
-    $.post("createDeviceIdForUser.php",
+    $.post("backend/createDeviceIdForUser.php",
         {
             u: userId
         },
@@ -104,7 +104,7 @@ OnlinePlayEngine.prototype.createDeviceIdForUser = function(userId, callback) {
 };
 
 OnlinePlayEngine.prototype.logOnlineStatus = function(loginToken, callback) {
-    $.post("logOnlineStatus.php",
+    $.post("backend/logOnlineStatus.php",
         {
             userId: loginToken.userId,
             username: loginToken.username,
@@ -119,8 +119,9 @@ OnlinePlayEngine.prototype.logOnlineStatus = function(loginToken, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, optionsString, isPrivateIndicator, loginToken, callback) {
-    $.post("createGame.php",
+OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, optionsString, isPrivateIndicator, loginToken, callback, 
+        rankedGame, gameClockJson) {
+    $.post("backend/createGameV2.php",
         {
             t: gameTypeId, 
             q: gameNotationText,
@@ -130,7 +131,9 @@ OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, o
             deviceId: loginToken.deviceId,
             options: optionsString,
             isPrivateIndicator: isPrivateIndicator,
-            isWeb: 1
+            isWeb: 1,
+            rankedGame: rankedGame,
+            gameClockJson: gameClockJson
         },
         function(data, status){
             if (status === 'success') {
@@ -141,7 +144,7 @@ OnlinePlayEngine.prototype.createGame = function(gameTypeId, gameNotationText, o
 };
 
 OnlinePlayEngine.prototype.joinGameSeek = function(gameId, loginToken, callback) {
-    $.post("joinGameSeek.php",
+    $.post("backend/joinGameSeek.php",
         {
             gameId: gameId,
             userId: loginToken.userId,
@@ -159,7 +162,7 @@ OnlinePlayEngine.prototype.joinGameSeek = function(gameId, loginToken, callback)
 };
 
 OnlinePlayEngine.prototype.getGameSeeks = function(callback) {
-    $.get("getGameSeeks.php", 
+    $.get("backend/getGameSeeksV2.php", 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -171,7 +174,7 @@ OnlinePlayEngine.prototype.getGameSeeks = function(callback) {
 };
 
 OnlinePlayEngine.prototype.getCurrentGameSeeksHostedByUser = function(userId, gameTypeId, callback) {
-    $.get("getCurrentGameSeeksHostedByUser.php?userId="+userId+"&gameTypeId="+gameTypeId, 
+    $.get("backend/getCurrentGameSeeksHostedByUser.php?userId="+userId+"&gameTypeId="+gameTypeId, 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -181,7 +184,7 @@ OnlinePlayEngine.prototype.getCurrentGameSeeksHostedByUser = function(userId, ga
 };
 
 OnlinePlayEngine.prototype.getCurrentGamesForUserNew = function(loginToken, callback) {
-    $.post("getCurrentGamesForUserNew.php",
+    $.post("backend/getCurrentGamesForUserNew.php",
         {
             userId: loginToken.userId,
             username: loginToken.username,
@@ -199,7 +202,7 @@ OnlinePlayEngine.prototype.getCurrentGamesForUserNew = function(loginToken, call
 };
 
 OnlinePlayEngine.prototype.getPastGamesForUserNew = function(loginToken, callback) {
-    $.post("getPastGamesForUserNew.php",
+    $.post("backend/getPastGamesForUserV2.php",
         {
             userId: loginToken.userId,
             username: loginToken.username,
@@ -215,7 +218,7 @@ OnlinePlayEngine.prototype.getPastGamesForUserNew = function(loginToken, callbac
 };
 
 OnlinePlayEngine.prototype.getPreviouslyActiveGameId = function(loginToken, gameId, opponentUsername, callback) {
-    $.post("getPreviouslyActiveGameId.php",
+    $.post("backend/getPreviouslyActiveGameId.php",
         {
             userId: loginToken.userId,
             username: loginToken.username,
@@ -233,7 +236,7 @@ OnlinePlayEngine.prototype.getPreviouslyActiveGameId = function(loginToken, game
 };
 
 OnlinePlayEngine.prototype.getGameInfo = function(userId, gameId, callback) {
-    $.get("getGameInfo.php?userId="+userId+"&gameId="+gameId+"&isWeb=1", 
+    $.get("backend/getGameInfoV2.php?userId="+userId+"&gameId="+gameId+"&isWeb=1", 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -243,7 +246,7 @@ OnlinePlayEngine.prototype.getGameInfo = function(userId, gameId, callback) {
 };
 
 OnlinePlayEngine.prototype.getCountOfGamesWhereUserTurn = function(userId, callback) {
-    $.get("getCountOfGamesWhereUserTurn.php?userId="+userId, 
+    $.get("backend/getCountOfGamesWhereUserTurn.php?userId="+userId, 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -253,7 +256,17 @@ OnlinePlayEngine.prototype.getCountOfGamesWhereUserTurn = function(userId, callb
 };
 
 OnlinePlayEngine.prototype.getGameNotation = function(gameId, callback) {
-    $.get("getGameNotation.php?q="+gameId, 
+    $.get("backend/getGameNotation.php?q="+gameId, 
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.getGameNotationAndClock = function(gameId, callback) {
+    $.get("backend/getGameNotationAndClock.php?q="+gameId, 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -263,7 +276,7 @@ OnlinePlayEngine.prototype.getGameNotation = function(gameId, callback) {
 };
 
 OnlinePlayEngine.prototype.checkIfUserOnline = function(username, callback) {
-    $.get("checkIfUserOnline.php?u="+username, 
+    $.get("backend/checkIfUserOnline.php?u="+username, 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -272,8 +285,9 @@ OnlinePlayEngine.prototype.checkIfUserOnline = function(username, callback) {
     );
 };
 
-OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, loginToken, gameTypeName, callback) {
-    $.post("updateGameNotation.php",
+OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, loginToken, gameTypeName, callback,
+        gameClockJson, gameResultId) {
+    $.post("backend/updateGameNotationV3.php",
         {
             id: gameId,
             t: gameNotationText,
@@ -281,7 +295,9 @@ OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, login
             username: loginToken.username,
             userEmail: loginToken.userEmail, 
             deviceId: loginToken.deviceId,
-            gameTypeName: gameTypeName
+            gameTypeName: gameTypeName,
+            gameClockJson: gameClockJson,
+            gameResultId: gameResultId
         },
         function(data, status){
             if (status === 'success') {
@@ -291,8 +307,28 @@ OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, login
     );
 };
 
-OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, resultTypeCode, loginToken, callback) {
-    $.post("updateGameWinInfo.php",
+OnlinePlayEngine.prototype.updateGameClock = function(gameId, gameClockJson, loginToken, callback) {
+    $.post("backend/updateGameValue.php",
+        {
+            id: gameId,
+            type: 6,
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId,
+            value: gameClockJson
+        },
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, resultTypeCode, loginToken, callback, 
+        updateRatings, hostRating, guestRating, gameTypeId, hostUsername, guestUsername) {
+    $.post("backend/updateGameWinInfoNew.php",
         {
             gameId: gameId,
             winnerUsername: winnerUsername,
@@ -300,30 +336,41 @@ OnlinePlayEngine.prototype.updateGameWinInfo = function(gameId, winnerUsername, 
             userId: loginToken.userId,
             username: loginToken.username,
             userEmail: loginToken.userEmail, 
-            deviceId: loginToken.deviceId
+            deviceId: loginToken.deviceId,
+            updateRatings: updateRatings,
+            hostRating: hostRating,
+            guestRating: guestRating,
+            gameTypeId: gameTypeId,
+            hostUsername: hostUsername,
+            guestUsername: guestUsername
         },
         function(data, status){
             if (status === 'success') {
-                // debug('Game win info updated.');
                 callback(data.trim());
             }
         }
     );
 };
 
-OnlinePlayEngine.prototype.updateGameWinInfoAsTie = function(gameId, resultTypeCode, loginToken, callback) {
-    $.post("updateGameWinInfoAsTie.php",
+OnlinePlayEngine.prototype.updateGameWinInfoAsTie = function(gameId, resultTypeCode, loginToken, callback, 
+        updateRatings, hostRating, guestRating, gameTypeId, hostUsername, guestUsername) {
+    $.post("backend/updateGameWinInfoAsTieNew.php",
         {
             gameId: gameId,
             resultTypeCode: resultTypeCode, 
             userId: loginToken.userId,
             username: loginToken.username,
             userEmail: loginToken.userEmail, 
-            deviceId: loginToken.deviceId
+            deviceId: loginToken.deviceId,
+            updateRatings: updateRatings,
+            hostRating: hostRating,
+            guestRating: guestRating,
+            gameTypeId: gameTypeId,
+            hostUsername: hostUsername,
+            guestUsername: guestUsername
         },
         function(data, status){
             if (status === 'success') {
-                // debug('Game win info updated.');
                 callback(data.trim());
             }
         }
@@ -331,18 +378,17 @@ OnlinePlayEngine.prototype.updateGameWinInfoAsTie = function(gameId, resultTypeC
 };
 
 OnlinePlayEngine.prototype.getGameTypeDesc = function(gameTypeId, callback) {
-    $.get("getGameTypeDesc.php?q="+gameTypeId, 
+    $.get("backend/getGameTypeDesc.php?q="+gameTypeId, 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
     );
-}
+};
 
 OnlinePlayEngine.prototype.sendChat = function(gameId, loginToken, chatMessage, callback) {
-    $.post("sendChatMessage.php", 
+    $.post("backend/sendChatMessage.php", 
         {
             gameId: gameId, 
             userId: loginToken.userId,
@@ -360,7 +406,7 @@ OnlinePlayEngine.prototype.sendChat = function(gameId, loginToken, chatMessage, 
 };
 
 OnlinePlayEngine.prototype.getNewChatMessages = function(gameId, lastChatTimestamp, callback) {
-    $.get("getNewChatMessages.php?g="+gameId + "&t=" + encodeURIComponent(lastChatTimestamp), 
+    $.get("backend/getNewChatMessages.php?g="+gameId + "&t=" + encodeURIComponent(lastChatTimestamp), 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -370,7 +416,7 @@ OnlinePlayEngine.prototype.getNewChatMessages = function(gameId, lastChatTimesta
 };
 
 OnlinePlayEngine.prototype.getInitialGlobalChatMessages = function(callback) {
-    $.get("getInitialGlobalChatMessages.php?", 
+    $.get("backend/getInitialGlobalChatMessages.php?", 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -380,7 +426,7 @@ OnlinePlayEngine.prototype.getInitialGlobalChatMessages = function(callback) {
 };
 
 OnlinePlayEngine.prototype.notifyUser = function(loginToken, userToNotify, callback) {
-    $.post("notifyUser.php", 
+    $.post("backend/notifyUser.php", 
         {
             userId: loginToken.userId,
             username: loginToken.username,
@@ -390,7 +436,6 @@ OnlinePlayEngine.prototype.notifyUser = function(loginToken, userToNotify, callb
         }, 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
@@ -398,7 +443,7 @@ OnlinePlayEngine.prototype.notifyUser = function(loginToken, userToNotify, callb
 };
 
 OnlinePlayEngine.prototype.getEmailNotificationsSetting = function(userId, callback) {
-    $.get("getEmailNotificationsSetting.php?userId="+userId, 
+    $.get("backend/getEmailNotificationsSetting.php?userId="+userId, 
         function(data, status){
             if (status === 'success') {
                 callback(data.trim());
@@ -409,14 +454,13 @@ OnlinePlayEngine.prototype.getEmailNotificationsSetting = function(userId, callb
 
 // TODO change to 'updatePreference' and pass in the preference type id
 OnlinePlayEngine.prototype.updateEmailNotificationsSetting = function(userId, value, callback) {
-    $.post("updateEmailNotificationsSetting.php", 
+    $.post("backend/updateEmailNotificationsSetting.php", 
         {
             userId: userId, 
             value: value
         }, 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
@@ -424,7 +468,7 @@ OnlinePlayEngine.prototype.updateEmailNotificationsSetting = function(userId, va
 };
 
 OnlinePlayEngine.prototype.addUserPreferenceValue = function(loginToken, prefTypeId, value, callback) {
-    $.post("addUserPreferenceValue.php", 
+    $.post("backend/addUserPreferenceValue.php", 
         {
             userId: loginToken.userId,
             username: loginToken.username,
@@ -435,7 +479,6 @@ OnlinePlayEngine.prototype.addUserPreferenceValue = function(loginToken, prefTyp
         }, 
         function(data, status){
             if (status === 'success') {
-                debug(data.trim());
                 callback(data.trim());
             }
         }
@@ -445,7 +488,7 @@ OnlinePlayEngine.prototype.addUserPreferenceValue = function(loginToken, prefTyp
 /* Tournaments */
 
 OnlinePlayEngine.prototype.getCurrentTournaments = function(loginToken, callback) { 
-    $.get("getCurrentTournaments.php?u="+loginToken.userId, 
+    $.get("backend/getCurrentTournaments.php?u="+loginToken.userId, 
         function(data, status){
             OnlinePlayEngine.callCallback(data, status, callback);
         }
@@ -453,7 +496,7 @@ OnlinePlayEngine.prototype.getCurrentTournaments = function(loginToken, callback
 };
 
 OnlinePlayEngine.prototype.getTournamentInfo = function(tournamentId, callback) {
-    $.get("getTournamentInfo.php?t="+tournamentId, 
+    $.get("backend/getTournamentInfo.php?t="+tournamentId, 
         function(data, status){
             OnlinePlayEngine.callCallback(data, status, callback);
         }
@@ -461,7 +504,7 @@ OnlinePlayEngine.prototype.getTournamentInfo = function(tournamentId, callback) 
 };
 
 OnlinePlayEngine.prototype.getManageTournamentsInfo = function(loginToken, callback) {
-    $.post("getManageTournamentsInfo.php",
+    $.post("backend/getManageTournamentsInfo.php",
         {
             userId: loginToken.userId,
             username: loginToken.username,
@@ -475,7 +518,7 @@ OnlinePlayEngine.prototype.getManageTournamentsInfo = function(loginToken, callb
 };
 
 OnlinePlayEngine.prototype.getManageTournamentInfo = function(loginToken, tournamentId, callback) {
-    $.post("getManageTournamentInfo.php",
+    $.post("backend/getManageTournamentInfo.php",
         {
             userId: loginToken.userId,
             username: loginToken.username,
@@ -490,7 +533,7 @@ OnlinePlayEngine.prototype.getManageTournamentInfo = function(loginToken, tourna
 };
 
 OnlinePlayEngine.prototype.submitTournamentSignup = function(loginToken, tournamentId, callback) {
-    $.post("submitTournamentSignup.php",
+    $.post("backend/submitTournamentSignup.php",
         {
             userId: loginToken.userId,
             username: loginToken.username,
@@ -505,7 +548,7 @@ OnlinePlayEngine.prototype.submitTournamentSignup = function(loginToken, tournam
 };
 
 OnlinePlayEngine.prototype.createTournament = function(loginToken, name, forumUrl, details, callback) {
-    $.post("createTournament.php",
+    $.post("backend/createTournament.php",
         {
             userId: loginToken.userId,
             username: loginToken.username,
@@ -522,7 +565,7 @@ OnlinePlayEngine.prototype.createTournament = function(loginToken, name, forumUr
 };
 
 OnlinePlayEngine.prototype.createNewRound = function(loginToken, tournamentId, roundName, roundDetails, callback) {
-    $.post("createNewRound.php",
+    $.post("backend/createNewRound.php",
         {
             userId: loginToken.userId,
             username: loginToken.username,
@@ -539,7 +582,7 @@ OnlinePlayEngine.prototype.createNewRound = function(loginToken, tournamentId, r
 };
 
 OnlinePlayEngine.prototype.changeTournamentPlayerStatus = function(loginToken, tournamentId, usernameToChange, newTournamentPlayerStatusId, callback) {
-    $.post("tournamentManagementFunctions.php",
+    $.post("backend/tournamentManagementFunctions.php",
         {
             function: "changeTournamentPlayerStatus",
             userId: loginToken.userId,
@@ -557,7 +600,7 @@ OnlinePlayEngine.prototype.changeTournamentPlayerStatus = function(loginToken, t
 };
 
 OnlinePlayEngine.prototype.changeTournamentStatus = function(loginToken, tournamentId, newTournamentStatusId, callback) {
-    $.post("tournamentManagementFunctions.php",
+    $.post("backend/tournamentManagementFunctions.php",
         {
             function: "changeTournamentStatus",
             userId: loginToken.userId,
@@ -574,7 +617,7 @@ OnlinePlayEngine.prototype.changeTournamentStatus = function(loginToken, tournam
 };
 
 OnlinePlayEngine.prototype.createTournamentRoundMatch = function(loginToken, roundId, gameTypeId, hostUsername, guestUsername, options, callback) {
-    $.post("createTournamentRoundMatch.php",
+    $.post("backend/createTournamentRoundMatch.php",
         {
             userId: loginToken.userId,
             username: loginToken.username,
@@ -588,6 +631,72 @@ OnlinePlayEngine.prototype.createTournamentRoundMatch = function(loginToken, rou
         },
         function(data, status){
             OnlinePlayEngine.callCallback(data, status, callback);
+        }
+    );
+};
+
+/* Other */
+
+OnlinePlayEngine.prototype.getActiveGamesCount = function(callback) {
+    $.get("backend/getActiveGamesCount.php?", 
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.get2020CompletedGameStats = function(loginToken, callback) {
+    $.post("backend/get2020GameStatsForUser.php",
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId
+        },
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            } else {
+                callFailed();
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.getCompletedGameStats = function(loginToken, callback) {
+    $.post("backend/getCompletedGameStatsForUser.php",
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId
+        },
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            } else {
+                callFailed();
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.getGameRankings = function(loginToken, callback) {
+    $.post("backend/getPlayerGameRatings.php",
+        {
+            userId: loginToken.userId,
+            username: loginToken.username,
+            userEmail: loginToken.userEmail, 
+            deviceId: loginToken.deviceId
+        },
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            } else {
+                callFailed();
+            }
         }
     );
 };

@@ -125,6 +125,30 @@ SkudPaiShoHarmony.prototype.getDirectionForTile = function(tile) {
 	}
 };
 
+SkudPaiShoHarmony.prototype.crossesMidline = function() {
+	var rowHigh = this.tile1Pos.row;
+	var rowLow = this.tile2Pos.row;
+	if (this.tile1Pos.row < this.tile2Pos.row) {
+		rowHigh = this.tile2Pos.row;
+		rowLow = this.tile1Pos.row;
+	}
+
+	if (rowHigh !== rowLow) {
+		return rowHigh > 8 && rowLow < 8 && this.tile1Pos.col !== 8;
+	}
+
+	var colHigh = this.tile1Pos.col;
+	var colLow = this.tile2Pos.col;
+	if (this.tile1Pos.col < this.tile2Pos.col) {
+		colHigh = this.tile2Pos.col;
+		colLow = this.tile1Pos.col;
+	}
+
+	if (colHigh !== colLow) {
+		return colHigh > 8 && colLow < 8 && this.tile1Pos.row !== 8;
+	}
+};
+
 SkudPaiShoHarmony.prototype.crossesCenter = function() {
 	var rowHigh = this.tile1Pos.row;
 	var rowLow = this.tile2Pos.row;
@@ -239,14 +263,29 @@ SkudPaiShoHarmonyManager.prototype.getPlayerWithMostHarmonies = function() {
 };
 
 SkudPaiShoHarmonyManager.prototype.getPlayerWithMostHarmoniesCrossingMidlines = function() {
-	var hostCount = this.getNumCrossingCenterForPlayer(HOST);
-	var guestCount = this.getNumCrossingCenterForPlayer(GUEST);
+	var hostCount = this.getNumCrossingMidlinesForPlayer(HOST);
+	var guestCount = this.getNumCrossingMidlinesForPlayer(GUEST);
+
+	debug("Host harmonies crossing midlines: " + hostCount);
+	debug("Guest harmonies crossing midlines: " + guestCount);
 
 	if (guestCount > hostCount) {
 		return GUEST;
 	} else if (hostCount > guestCount) {
 		return HOST;
 	}
+};
+
+SkudPaiShoHarmonyManager.prototype.getNumCrossingMidlinesForPlayer = function(player) {
+	var count = 0;
+	for (var i = 0; i < this.harmonies.length; i++) {
+		if (this.harmonies[i].hasOwner(player)) {
+			if (this.harmonies[i].crossesMidline()) {
+				count++;
+			}
+		}
+	}
+	return count;
 };
 
 SkudPaiShoHarmonyManager.prototype.getNumCrossingCenterForPlayer = function(player) {

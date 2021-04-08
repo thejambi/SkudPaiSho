@@ -8,7 +8,24 @@ function AdevarTileManager(forActuating) {
 	}
 	this.hostTiles = this.loadTileSet('H');
 	this.guestTiles = this.loadTileSet('G');
+
+	this.loadHTSFMap();
 }
+
+AdevarTileManager.htSfMap = {};
+
+AdevarTileManager.prototype.loadHTSFMap = function() {
+	var theMap = {};
+	theMap[AdevarTileCode.iris] = AdevarTileCode.irisSF;
+	theMap[AdevarTileCode.echeveria] = AdevarTileCode.echeveriaSF;
+	theMap[AdevarTileCode.orientalLily] = AdevarTileCode.orientalLilySF;
+	theMap[AdevarTileCode.whiteRose] = AdevarTileCode.whiteRoseSF;
+	theMap[AdevarTileCode.whiteLotus] = AdevarTileCode.whiteLotusSF;
+	theMap[AdevarTileCode.birdOfParadise] = AdevarTileCode.birdOfParadiseSF;
+	theMap[AdevarTileCode.blackOrchid] = AdevarTileCode.blackOrchidSF;
+
+	AdevarTileManager.htSfMap = new TwoWayMap(theMap);
+};
 
 AdevarTileManager.prototype.loadTileSet = function(ownerCode) {
 	return this.loadAdevarSet(ownerCode);
@@ -17,39 +34,53 @@ AdevarTileManager.prototype.loadTileSet = function(ownerCode) {
 AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 	var tiles = [];
 
+	/* Hidden Tiles - show first, and apply "selected" effect since one will be chosen */
+	tiles.push(new AdevarTile(AdevarTileCode.iris, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.orientalLily, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.echeveria, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.whiteRose, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.whiteLotus, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.birdOfParadise, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.blackOrchid, ownerCode));
+
+	// Apply "selected" effect to Hidden Tiles
+	tiles.forEach(function(tile) {
+		tile.selectedFromPile = true;
+	});
+
+	/* The rest of the tiles */
+
 	for (var i = 0; i < 10; i++) {
-		tiles.push(new AdevarTile("Lilac", ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.lilac, ownerCode));
 	}
 	
 	for (var i = 0; i < 8; i++) {
-		tiles.push(new AdevarTile("Zinnia", ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.zinnia, ownerCode));
 	}
 	
 	for (var i = 0; i < 5; i++) {
-		tiles.push(new AdevarTile("Foxglove", ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.foxglove, ownerCode));
 	}
 	
 	for (var i = 0; i < 2; i++) {
-		tiles.push(new AdevarTile("Gate", ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.gate, ownerCode));
 	}
 	
-	tiles.push(new AdevarTile("Iris", ownerCode));
-	
-	tiles.push(new AdevarTile("OrientalLily", ownerCode));
-	
-	tiles.push(new AdevarTile("Echeveria", ownerCode));
-	
-	tiles.push(new AdevarTile("IrisSecondFace", ownerCode));
-	
-	tiles.push(new AdevarTile("OrientalLilySecondFace", ownerCode));
-	
-	tiles.push(new AdevarTile("EcheveriaSecondFace", ownerCode));
+	if (!gameOptionEnabled(ADEVAR_LITE)) {
+		tiles.push(new AdevarTile(AdevarTileCode.irisSF, ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.orientalLilySF, ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.echeveriaSF, ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.whiteLotusSF, ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.birdOfParadiseSF, ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.whiteRoseSF, ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.blackOrchidSF, ownerCode));
+
+		tiles.push(new AdevarTile(AdevarTileCode.reflection, ownerCode));
+	}
 	
 	for (var i = 0; i < 2; i++) {
-		tiles.push(new AdevarTile("Vanguard", ownerCode));
+		tiles.push(new AdevarTile(AdevarTileCode.vanguard, ownerCode));
 	}
-	
-	tiles.push(new AdevarTile("WatersReflection", ownerCode));
 
 	return tiles;
 };
@@ -58,6 +89,10 @@ AdevarTileManager.prototype.grabTile = function(player, tileCode) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {
 		tilePile = this.guestTiles;
+	}
+
+	if (tileCode === AdevarTileCode.blankHiddenTile) {
+		return new AdevarTile(tileCode, getPlayerCodeFromName(player));
 	}
 
 	var tile;
@@ -70,7 +105,7 @@ AdevarTileManager.prototype.grabTile = function(player, tileCode) {
 	}
 
 	if (!tile) {
-		debug("NONE OF THAT TILE FOUND");
+		debug("NONE OF THAT TILE FOUND: " + player + " " + tileCode);
 	}
 
 	return tile;
@@ -133,6 +168,32 @@ AdevarTileManager.prototype.putTileBack = function(tile) {
 	}
 
 	tilePile.push(tile);
+};
+
+AdevarTileManager.prototype.removeRemainingHiddenTiles = function(player) {
+	this.removeRemainingTilesOfType(player, AdevarTileType.hiddenTile);
+};
+
+AdevarTileManager.prototype.removeRemainingTilesOfType = function(player, tileType, exceptTheseTiles) {
+	var tilePile = this.getTilePile(player);
+	if (tilePile) {
+		for (var i = tilePile.length - 1; i >= 0; i--) {
+			var tile = tilePile[i];
+			if (tile.type === tileType) {
+				if (!(exceptTheseTiles && exceptTheseTiles.includes(tile))) {
+					tilePile.splice(i, 1);
+				}
+			}
+		}
+	}
+};
+
+AdevarTileManager.prototype.getTilePile = function(player) {
+	var tilePile = this.hostTiles;
+	if (player === GUEST) {
+		tilePile = this.guestTiles;
+	}
+	return tilePile;
 };
 
 AdevarTileManager.prototype.getCopy = function() {

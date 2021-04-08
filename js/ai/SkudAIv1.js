@@ -238,8 +238,10 @@ SkudAIv1.prototype.getPossibleMoves = function(thisGame, player) {
 	var moves = [];
 
 	if (this.moveNum === 0) {
+		/* First turn is Accent Tile selection */
 		this.addAccentSelectionMoves(moves, thisGame, player);
 	} else {
+		/* Get list of all Planting moves and all Arranging moves */
 		this.addPlantMoves(moves, thisGame, player);
 		this.addArrangeMoves(moves, thisGame, player);
 	}
@@ -286,7 +288,7 @@ SkudAIv1.prototype.addPlantMoves = function(moves, game, player) {
 
 	var tilePile = this.getTilePile(game, player);
 
-	// For each tile...
+	// For each tile in player's tile reserve ("tile pile"), build Planting moves
 	for (var i = 0; i < tilePile.length; i++) {
 		var tile = tilePile[i];
 		if (tile.type === BASIC_FLOWER) {

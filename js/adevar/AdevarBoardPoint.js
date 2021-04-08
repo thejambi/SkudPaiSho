@@ -1,14 +1,33 @@
 // Board Point
 
+var AdevarBoardPointType = {
+	NORTH_NEUTRAL_PLOT: "Northern Open Plot",
+	EAST_NEUTRAL_PLOT: "Eastern Open Plot",
+	SOUTH_NEUTRAL_PLOT: "Southern Open Plot",
+	WEST_NEUTRAL_PLOT: "Western Open Plot",
+	NORTH_RED_PLOT: "Northern Red Plot",
+	SOUTH_RED_PLOT: "Southern Red Plot",
+	WEST_WHITE_PLOT: "Western White Plot",
+	EAST_WHITE_PLOT: "Eastern White Plot"
+};
+
 function AdevarBoardPoint() {
 	this.types = [];
+	this.plotTypes = [];
 	this.row = -1;
 	this.col = -1;
+	this.gardenHighlightNumbers = [];
 }
 
 AdevarBoardPoint.prototype.addType = function(type) {
 	if (!this.types.includes(type)) {
 		this.types.push(type);
+	}
+};
+
+AdevarBoardPoint.prototype.addPlotType = function(type) {
+	if (!this.plotTypes.includes(type)) {
+		this.plotTypes.push(type);
 	}
 };
 
@@ -73,6 +92,14 @@ AdevarBoardPoint.prototype.clearPossibleMovementTypes = function() {
 	this.moveDistanceRemaining = null;
 };
 
+AdevarBoardPoint.prototype.highlight = function(gardenNumber) {
+	this.gardenHighlightNumbers.push(gardenNumber);
+};
+
+AdevarBoardPoint.prototype.removeHighlight = function() {
+	this.gardenHighlightNumbers = [];
+};
+
 AdevarBoardPoint.prototype.getCopy = function() {
 	var copy = new AdevarBoardPoint();
 
@@ -97,6 +124,15 @@ AdevarBoardPoint.prototype.getCopy = function() {
 
 
 // Point makers
+
+AdevarBoardPoint.newPoint = function(pointTypes) {
+	var point = new AdevarBoardPoint();
+	pointTypes.forEach(function(pointType) {
+		point.addType(pointType);
+		point.addPlotType(pointType);
+	});
+	return point;
+};
 
 AdevarBoardPoint.neutral = function() {
 	var point = new AdevarBoardPoint();

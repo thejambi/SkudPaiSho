@@ -35,6 +35,17 @@ SolitaireController.prototype.resetGameManager = function() {
 	this.theGame = new SolitaireGameManager(this.actuator);
 };
 
+SolitaireController.prototype.getMoveNumber = function() {
+	return this.gameNotation.moves.length;
+};
+
+SolitaireController.prototype.undoMoveAllowed = function() {
+	return false;
+};
+SolitaireController.prototype.automaticallySubmitMoveRequired = function() {
+	return true;
+};
+
 SolitaireController.prototype.resetNotationBuilder = function() {
 	this.notationBuilder = new SolitaireNotationBuilder();
 };
@@ -89,7 +100,7 @@ SolitaireController.prototype.resetMove = function() {
 };
 
 SolitaireController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Solitaire Pai Sho</h4> <p>Pai Sho is a game of harmony. The goal of Solitaire Pai Sho is to place Flower Tiles to create a balance of Harmony and Disharmony on the board.</p> <p>Each turn, you are given a tile that's been drawn for you to place on the board. When all the tiles have been played, the game ends and your score will be calculated.</p> <p><a href='https://skudpaisho.com/site/games/solitaire-pai-sho/'>View the resources page</a> for the rules.</p>";
+	return "<h4>Solitaire Pai Sho</h4> <p>Solitaire Pai Sho is a game of harmony, based on Skud Pai Sho. The goal of Solitaire Pai Sho is to place Flower Tiles to create a balance of Harmony and Disharmony on the board.</p> <p>Each turn, you are given a tile that's been drawn for you to place on the board. When all the tiles have been played, the game ends and your score will be calculated.</p> <p><a href='https://skudpaisho.com/site/games/solitaire-pai-sho/'>View the resources page</a> for the rules.</p>";
 };
 
 SolitaireController.prototype.getAdditionalMessage = function() {
@@ -125,18 +136,25 @@ SolitaireController.prototype.unplayedTileClicked = function(tileDiv) {
 
 	var tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
 
-	if (this.notationBuilder.status === BRAND_NEW) {
-		tile.selectedFromPile = true;
-		this.drawnTile.selectedFromPile = true;
+	if (tile) {
+		if (this.notationBuilder.status === BRAND_NEW) {
+			tile.selectedFromPile = true;
+			this.drawnTile.selectedFromPile = true;
 
-		this.notationBuilder.moveType = PLANTING;
-		this.notationBuilder.plantedFlowerType = tileCode;
-		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
+			this.notationBuilder.moveType = PLANTING;
+			this.notationBuilder.plantedFlowerType = tileCode;
+			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
-		this.theGame.setAllLegalPointsOpen(getCurrentPlayer(), tile);
+			this.theGame.setAllLegalPointsOpen(getCurrentPlayer(), tile);
+		} else {
+			this.theGame.hidePossibleMovePoints();
+			this.notationBuilder = new SolitaireNotationBuilder();
+		}
 	} else {
-		this.theGame.hidePossibleMovePoints();
-		this.notationBuilder = new SolitaireNotationBuilder();
+		/* No Tile! Had an incorrect draw... redraw. 
+			Something is wrong that this has to be here... but it handles it.
+		*/
+		this.callActuate();
 	}
 }
 

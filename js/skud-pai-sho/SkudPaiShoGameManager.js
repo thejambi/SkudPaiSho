@@ -140,6 +140,9 @@ SkudPaiShoGameManager.prototype.buildPlantingGameLogText = function(move, tile) 
 		+ move.player + ' Planted ' + tile.getName() + ' at ' + move.endPoint.pointText;
 };
 SkudPaiShoGameManager.prototype.buildArrangingGameLogText = function(move, moveResults) {
+	if (!moveResults) {
+		return "Invalid Move :(";
+	}
 	this.gameLogText = move.moveNum + move.playerCode + '. '
 		+ move.player + ' moved ' + moveResults.movedTile.getName() + ' ' + move.moveTextOnly;
 	if (moveResults.capturedTile) {
@@ -254,11 +257,7 @@ SkudPaiShoGameManager.prototype.getWinResultTypeCode = function() {
 	if (this.board.winners.length === 1) {
 		return 1;	// Harmony Ring is 1
 	} else if (this.endGameWinners.length === 1) {
-		if (this.tileManager.getPlayerWithMoreAccentTiles()) {
-			return 2;	// More Accent Tiles remaining
-		} else {
-			return 3;	// Most Harmonies
-		}
+		return 3;	// Most Harmonies crossing midline
 	} else if (this.endGameWinners.length > 1 || this.board.winners.length > 1) {
 		return 4;	// Tie
 	}

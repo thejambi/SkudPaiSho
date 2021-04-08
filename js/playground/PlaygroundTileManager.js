@@ -15,9 +15,9 @@ function PlaygroundTileManager(forActuating) {
 	this.capturedTiles = [];
 
 	this.pilesByName = {};
-	this.pilesByName[PlaygroundNotationContstants.hostReservePile] = this.hostTileReserve;
-	this.pilesByName[PlaygroundNotationContstants.guestReservePile] = this.guestTileReserve;
-	this.pilesByName[PlaygroundNotationContstants.capturedPile] = this.capturedTiles;
+	this.pilesByName[PlaygroundNotationConstants.hostReservePile] = this.hostTileReserve;
+	this.pilesByName[PlaygroundNotationConstants.guestReservePile] = this.guestTileReserve;
+	this.pilesByName[PlaygroundNotationConstants.capturedPile] = this.capturedTiles;
 }
 
 PlaygroundTileManager.prototype.loadTileSet = function(ownerCode) {
@@ -82,11 +82,47 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Advr", "Advr_Iris", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_OrientalLily", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_Echeveria", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_WhiteRose", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_WhiteLotus", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_BirdOfParadise", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_BlackOrchid", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_IrisSecondFace", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_OrientalLilySecondFace", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_EcheveriaSecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_WhiteRoseSecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_WhiteLotusSecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_BirdOfParadiseSecondFace", ownerCode));
+	tiles.push(new PlaygroundTile("Advr", "Advr_BlackOrchidSecondFace", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_Vanguard", ownerCode));
 	tiles.push(new PlaygroundTile("Advr", "Advr_WatersReflection", ownerCode));
+
+	// Warfront
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Cavalry", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Guardian", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Lotus", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_SiegeEngine", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Soldier", ownerCode));
+
+	// Chess
+	tiles.push(new PlaygroundTile("Chess", "Chess_K", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_Q", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_R", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_N", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_B", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_P", ownerCode));
+
+	// Other from Sirstotes
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Water", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Earth", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Fire", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Air", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_RedLotus", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Oasis", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Library", ownerCode));
+	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Temple", ownerCode));
+
+	// Other
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_Ginseng", ownerCode));
 
 	return tiles;
 };

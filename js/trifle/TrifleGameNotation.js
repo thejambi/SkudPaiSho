@@ -2,12 +2,12 @@
 
 // --------------------------------------------- // 
 
-function TrifleNotationMove(text) {
+Trifle.NotationMove = function(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
 }
 
-TrifleNotationMove.prototype.analyzeMove = function() {
+Trifle.NotationMove.prototype.analyzeMove = function() {
 	this.valid = true;
 
 	// Get move number
@@ -75,11 +75,11 @@ TrifleNotationMove.prototype.analyzeMove = function() {
 	this.offerDraw = moveText.endsWith(DRAW_OFFER);
 };
 
-TrifleNotationMove.prototype.isValidNotation = function() {
+Trifle.NotationMove.prototype.isValidNotation = function() {
 	return this.valid;
 };
 
-TrifleNotationMove.prototype.equals = function(otherMove) {
+Trifle.NotationMove.prototype.equals = function(otherMove) {
 	return this.fullMoveText === otherMove.fullMoveText;
 };
 
@@ -87,7 +87,7 @@ TrifleNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function TrifleNotationBuilder() {
+Trifle.NotationBuilder = function() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -103,7 +103,7 @@ function TrifleNotationBuilder() {
 	this.status = BRAND_NEW;
 }
 
-TrifleNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
+Trifle.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 	var notationLine = moveNum + player.charAt(0) + ".";
 	if (this.moveType === TEAM_SELECTION) {
 		notationLine += this.teamSelection;
@@ -119,29 +119,29 @@ TrifleNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 		notationLine += DRAW_OFFER;
 	}
 	
-	return new TrifleNotationMove(notationLine);
+	return new Trifle.NotationMove(notationLine);
 };
 
 // --------------------------------------- //
 
 
 
-function TrifleGameNotation() {
+Trifle.GameNotation = function() {
 	this.notationText = "";
 	this.moves = [];
 }
 
-TrifleGameNotation.prototype.setNotationText = function(text) {
+Trifle.GameNotation.prototype.setNotationText = function(text) {
 	this.notationText = text;
 	this.loadMoves();
 };
 
-TrifleGameNotation.prototype.addNotationLine = function(text) {
+Trifle.GameNotation.prototype.addNotationLine = function(text) {
 	this.notationText += ";" + text.trim();
 	this.loadMoves();
 };
 
-TrifleGameNotation.prototype.addMove = function(move) {
+Trifle.GameNotation.prototype.addMove = function(move) {
 	if (this.notationText) {
 		this.notationText += ";" + move.fullMoveText;
 	} else {
@@ -150,12 +150,12 @@ TrifleGameNotation.prototype.addMove = function(move) {
 	this.loadMoves();
 };
 
-TrifleGameNotation.prototype.removeLastMove = function() {
+Trifle.GameNotation.prototype.removeLastMove = function() {
 	this.notationText = this.notationText.substring(0, this.notationText.lastIndexOf(";"));
 	this.loadMoves();
 };
 
-TrifleGameNotation.prototype.getPlayerMoveNum = function() {
+Trifle.GameNotation.prototype.getPlayerMoveNum = function() {
 	var moveNum = 0;
 	var lastMove = this.moves[this.moves.length-1];
 
@@ -168,7 +168,7 @@ TrifleGameNotation.prototype.getPlayerMoveNum = function() {
 	return moveNum;
 };
 
-TrifleGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
+Trifle.GameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	var moveNum = 0;
 	var player = HOST;
 
@@ -186,7 +186,7 @@ TrifleGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	return builder.getNotationMove(moveNum, player);
 };
 
-TrifleGameNotation.prototype.loadMoves = function() {
+Trifle.GameNotation.prototype.loadMoves = function() {
 	this.moves = [];
 	var lines = [];
 	if (this.notationText) {
@@ -200,7 +200,7 @@ TrifleGameNotation.prototype.loadMoves = function() {
 	var self = this;
 	var lastPlayer = GUEST;
 	lines.forEach(function(line) {
-		var move = new TrifleNotationMove(line);
+		var move = new Trifle.NotationMove(line);
 		if (move.isValidNotation() && move.player !== lastPlayer) {
 			self.moves.push(move);
 			lastPlayer = move.player;
@@ -210,7 +210,7 @@ TrifleGameNotation.prototype.loadMoves = function() {
 	});
 };
 
-TrifleGameNotation.prototype.getNotationHtml = function() {
+Trifle.GameNotation.prototype.getNotationHtml = function() {
 	var lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
@@ -229,12 +229,12 @@ TrifleGameNotation.prototype.getNotationHtml = function() {
 	return notationHtml;
 };
 
-TrifleGameNotation.prototype.notationTextForUrl = function() {
+Trifle.GameNotation.prototype.notationTextForUrl = function() {
 	var str = this.notationText;
 	return str;
 };
 
-TrifleGameNotation.prototype.getNotationForEmail = function() {
+Trifle.GameNotation.prototype.getNotationForEmail = function() {
 	var lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
@@ -253,15 +253,15 @@ TrifleGameNotation.prototype.getNotationForEmail = function() {
 	return notationHtml;
 };
 
-TrifleGameNotation.prototype.getLastMoveText = function() {
+Trifle.GameNotation.prototype.getLastMoveText = function() {
 	return this.moves[this.moves.length - 1].fullMoveText;
 };
 
-TrifleGameNotation.prototype.getLastMoveNumber = function() {
+Trifle.GameNotation.prototype.getLastMoveNumber = function() {
 	return this.moves[this.moves.length - 1].moveNum;
 };
 
-TrifleGameNotation.prototype.lastMoveHasDrawOffer = function() {
+Trifle.GameNotation.prototype.lastMoveHasDrawOffer = function() {
 	return this.moves[this.moves.length - 1] 
 		&& this.moves[this.moves.length - 1].offerDraw;
 };

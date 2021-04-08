@@ -82,6 +82,9 @@
       <div class='sidenavEntry sidenavLink skipBonus' onclick='viewTournamentsClicked();'>
         <i class="fa fa-trophy" aria-hidden="true"></i> Tournaments
       </div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameRankingsClicked();'>
+        <i class="fa fa-tachometer" aria-hidden="true"></i> Game Rankings
+      </div>
       <div class='gone'>
         <hr />
         <div class='sidenavSectionHeader'>New Game</div>
@@ -93,7 +96,7 @@
       <div class='sidenavEntry sidenavLink skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameReplayLink();'>Get game link</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameNotationModal();'>Show game notation</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='quitOnlineGameClicked();'>Quit online game</div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='quitOnlineGameClicked();'>Mark game inactive</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='closeGame();'>Close this game</div>
       <hr />
       <div class='sidenavSectionHeader'>About</div>
@@ -103,13 +106,18 @@
       <div class='sidenavEntry sidenavLink skipBonus' onclick='showWelcomeTutorial();'>Show welcome screens</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='openShop();'>Buy Pai Sho sets</div>
       <div class='sidenavEntry'>
-        <a href='https://www.patreon.com/SkudPaiSho' target='_blank' class='sidenavLink'>Support on Patreon</a>
-      </div>
-      <div class='sidenavEntry'>
         <a href='https://discord.gg/dStDZx7' target='_blank' class='sidenavLink'>Join Discord Server</a>
       </div>
       <div class='sidenavEntry'>
         <a href='https://forum.skudpaisho.com/' target='_blank' class='sidenavLink'>The Garden Gate Forum</a>
+      </div>
+      <hr />
+      <div class='sidenavSectionHeader'>Support The Garden Gate</div>
+      <div class='sidenavEntry'>
+        <a href='https://www.patreon.com/SkudPaiSho' target='_blank' class='sidenavLink'>Support on Patreon</a>
+      </div>
+      <div class='sidenavEntry'>
+        <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank' class='sidenavLink'>Leave a tip</a>
       </div>
 
       <hr />
@@ -117,6 +125,7 @@
         <div onClick='promptAddOption()'>Other</div>
       </div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleSoundOn();'>Toggle Sound On/Off</div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleAnimationsOn();'>Toggle Animations On/Off</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleDarkMode();'>Toggle Dark Mode</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='location.reload(true);'>Reload website</div>
 
@@ -162,6 +171,15 @@
   <div id='mainWrapper'>
 
     <div class="game-container-wrapper">
+
+      <div id="game-title-container">
+        <h2 id="game-title-heading" class="game-title-text">Game Title</h2>
+        <div id="defaultGameMessage" class="gone">
+          Try <span id="defaultGameMessageGameTitle" class="game-title-text">Game Title</span> by clicking on tiles below. 
+          Click <span style="white-space: nowrap;"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Game</span> from the <span style="white-space: nowrap;"><span class='stretchText'>&nbsp;&#8801&nbsp;</span>side menu</span> 
+          to try one of the many other games here.
+        </div>
+      </div>
 
       <div id="game-container" class="game-container"></div>
 
@@ -209,7 +227,7 @@
             <hr />
             <a href='https://skudpaisho.com/site/buying-pai-sho/' target='_blank'>Buying Pai Sho page</a>: For information about buying a Pai Sho set, the free print-and-play set, and information about making your own Pai Sho set, visit the <a href='https://skudpaisho.com/site/buying-pai-sho/' target='_blank'>Buying Pai Sho page</a>.
             <hr />
-            <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a>: Support The Garden Gate on <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a>.
+            <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a>: Support The Garden Gate monthly on <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a> or <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank'>leave a one-time tip</a>.
             <hr />
             <a href='https://forum.skudpaisho.com/' target='_blank'>Forum</a>: The forum has some important posts that is a supplement to the Discord community.
           </div>
@@ -219,7 +237,7 @@
           </div>
         </div>
         <div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
-          <div id="chatMessagesHeader" class="chatMessagesHeader"><em>Game Chat messages may be viewed by other players. Abide by the Discord server #rules to be allowed to use Game Chat. Thank you!</em><hr /></div>
+          <div id="chatMessagesHeader" class="chatMessagesHeader"><em>Game Chat messages may be viewed by other players. Abide by the Discord server #rules to be allowed to use Game Chat. Thank you!</em><div class='clickableText' onclick='toggleTimestamps()'>Toggle timestamp display</div><hr /></div>
           <div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
           <div id="chatMessageInputContainer" class="chatMessageInputContainer">
             <textarea id="chatMessageInput" class="chatMessageInput"></textarea>
@@ -233,7 +251,15 @@
   <div class="footer"></div>
 
   <div id="replayControls" class="gone">
-    <div id='gameLogText' class='gameLogText'></div>
+    <div id='confirmMoveButton' class='gone'>
+      <div class="center">
+        <span class='replayButton' onclick="confirmMoveClicked()">
+          Submit Move
+        </span>
+      </div>
+    </div>
+    <div id='gameLogText' class='gameLogText replayControlsAdditionalContent'></div>
+    <div id='gameClockContainer' class='gameClockContainer replayControlsAdditionalContent'></div>
     <div class="center">
       <span class='replayButton' onclick="rewindAllMoves()">
         <i class="fa fa-fast-backward" aria-hidden="true"></i>
@@ -337,7 +363,7 @@
   <!-- <script src="js/lz-string.min.js"></script> -->
 
   <!-- Compressed -->
-  <script src="psmin_20201011-074507.js"></script>
+  <script src="psmin_20210316-151139.js"></script>
 </body>
 
 </html>

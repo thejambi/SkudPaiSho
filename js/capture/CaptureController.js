@@ -1,5 +1,14 @@
 /* Capture Pai Sho specific UI interaction logic */
 
+var CapturePreferences = {
+	tileDesignKey: "TileDesigns",
+	tileDesignTypeValues: {
+		original: "Original",
+		chuji: "Chu Ji by Sirstotes",
+		minimalist: "Minimalist by Sirstotes"
+	}
+};
+
 function CaptureController(gameContainer, isMobile) {
 	this.actuator = new CaptureActuator(gameContainer, isMobile);
 	
@@ -13,9 +22,18 @@ function CaptureController(gameContainer, isMobile) {
 	this.isPaiShoGame = true;
 }
 
+CaptureController.prototype.getGameTypeId = function() {
+	return GameType.CapturePaiSho.id;
+};
+
 CaptureController.prototype.completeSetup = function() {
-	// Randomly place tiles on board
-	
+	/* Set default preferences */
+	if (!getUserGamePreference(CapturePreferences.tileDesignKey)
+			|| !CapturePreferences.tileDesignTypeValues[getUserGamePreference(CapturePreferences.tileDesignKey)]) {
+		setUserGamePreference(CapturePreferences.tileDesignKey, "original");
+	}
+
+	// Randomly place tiles on board for game setup
 	this.addSetupForPlayerCode('H');
 	this.addSetupForPlayerCode('G');
 
@@ -260,6 +278,19 @@ CaptureController.prototype.isSolitaire = function() {
 
 CaptureController.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
+};
+
+CaptureController.prototype.getAdditionalHelpTabDiv = function() {
+	var settingsDiv = document.createElement("div");
+
+	var heading = document.createElement("h4");
+	heading.innerText = "Capture Pai Sho Preferences:";
+
+	settingsDiv.appendChild(heading);
+	settingsDiv.appendChild(buildPreferenceDropdownDiv("Tile Designs", "capturePaiShoDesignsDropdown", CapturePreferences.tileDesignTypeValues, CapturePreferences.tileDesignKey));
+
+	settingsDiv.appendChild(document.createElement("br"));
+	return settingsDiv;
 };
 
 /* Capture Pai Sho specific methods */

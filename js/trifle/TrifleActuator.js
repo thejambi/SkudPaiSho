@@ -6,8 +6,8 @@ function TrifleActuator(gameContainer, isMobile) {
 
 	var containers = setupPaiShoBoard(
 		this.gameContainer, 
-		TrifleController.getHostTilesContainerDivs(),
-		TrifleController.getGuestTilesContainerDivs(), 
+		Trifle.Controller.getHostTilesContainerDivs(),
+		Trifle.Controller.getGuestTilesContainerDivs(), 
 		true
 	);
 
@@ -16,7 +16,8 @@ function TrifleActuator(gameContainer, isMobile) {
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-TrifleActuator.imagePath = "images/Trifle/standard/";
+// TrifleActuator.imagePath = "images/Trifle/standard/";
+TrifleActuator.imagePath = "images/Trifle/chuji/";
 TrifleActuator.hostTeamTilesDivId = "hostTilesContainer";
 TrifleActuator.guestTeamTilesDivId = "guestTilesContainer";
 
@@ -59,15 +60,15 @@ TrifleActuator.prototype.htmlify = function(board, tileManager) {
 	if (!tileManager.hostTeamIsFull()) {
 		this.addLineBreakInTilePile(HOST);
 		this.addLineBreakInTilePile(HOST);
-		Object.keys(TrifleTileCodes).forEach(function(key,index) {
-			self.addTeamTile(new TrifleTile(TrifleTileCodes[key], hostPlayerCode), HOST, true);
+		Object.keys(Trifle.TileCodes).forEach(function(key,index) {
+			self.addTeamTile(new Trifle.Tile(Trifle.TileCodes[key], hostPlayerCode), HOST, true);
 		});
 	}
 	if (!tileManager.guestTeamIsFull()) {
 		this.addLineBreakInTilePile(GUEST);
 		this.addLineBreakInTilePile(GUEST);
-		Object.keys(TrifleTileCodes).forEach(function(key,index) {
-			self.addTeamTile(new TrifleTile(TrifleTileCodes[key], guestPlayerCode), GUEST, true);
+		Object.keys(Trifle.TileCodes).forEach(function(key,index) {
+			self.addTeamTile(new Trifle.Tile(Trifle.TileCodes[key], guestPlayerCode), GUEST, true);
 		});
 	}
 };

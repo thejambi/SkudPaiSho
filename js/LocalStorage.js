@@ -23,8 +23,6 @@ function LocalStorage() {
 
 	var supported = this.localStorageSupported();
 	this.storage = supported ? window.localStorage : window.fakeStorage;
-
-	debug(this.getUserEmail());
 }
 
 LocalStorage.prototype.localStorageSupported = function () {
