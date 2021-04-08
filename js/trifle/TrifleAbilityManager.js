@@ -112,6 +112,17 @@ Trifle.AbilityManager.prototype.abilityTargetingTileExists = function(abilityNam
 	return targetsTile;
 };
 
+Trifle.AbilityManager.prototype.getAbilitiesTargetingTile = function(abilityName, tile) {
+	var abilitiesTargetingTile = [];
+	this.abilities.forEach(function(ability) {
+		if (ability.abilityType === abilityName
+				&& ability.abilityTargetsTile(tile)) {
+			abilitiesTargetingTile.push(ability);
+		}
+	});
+	return abilitiesTargetingTile;
+};
+
 Trifle.AbilityManager.prototype.tickDurationAbilities = function() {
 	// TODO: Something like this old tick code did:
 	/* for (var i = this.activeDurationAbilities.length - 1; i >= 0; i--) {

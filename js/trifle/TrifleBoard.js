@@ -1263,9 +1263,38 @@ Trifle.Board.prototype.setPossibleMovePoints = function(boardPointStart) {
 					self.setPossibleMovesForMovement(movementInfo, boardPointStart);
 				});
 			}
-			var bonusMovementInfo = this.getBonusMovementInfo(boardPointStart);
-			this.setBonusMovementPossibleMoves(bonusMovementInfo, boardPointStart);
+			var bonusMovementInfoList = this.getBonusMovementInfoList(boardPointStart);
+			if (bonusMovementInfoList && bonusMovementInfoList.length > 0) {
+				bonusMovementInfoList.forEach(function(bonusMovementInfo) {
+					self.setBonusMovementPossibleMoves(bonusMovementInfo, boardPointStart);
+				});
+			}
 		}
+	}
+};
+
+Trifle.Board.prototype.getBonusMovementInfoList = function(originPoint) {
+	var tile = originPoint.tile;
+	var tileInfo = TrifleTiles[originPoint.tile.code];
+
+	var bonusMovementInfoList = [];
+
+	var grantBonusMovementAbilities = this.abilityManager.getAbilitiesTargetingTile(Trifle.AbilityName.grantBonusMovement, tile);
+
+	var self = this;
+	grantBonusMovementAbilities.forEach(function(ability) {
+		if (ability.abilityInfo.bonusMovement) {
+			ability.abilityInfo.bonusMovement.movementFunction = self.determineMovementFunction(ability.abilityInfo.bonusMovement.type);
+			bonusMovementInfoList.push(ability.abilityInfo.bonusMovement);
+		}
+	});
+
+	return bonusMovementInfoList;
+};
+
+Trifle.Board.prototype.determineMovementFunction = function(movementType) {
+	if (movementType === Trifle.MovementType.standard) {
+		return Trifle.Board.standardMovementFunction;
 	}
 };
 
@@ -1296,6 +1325,32 @@ Trifle.Board.prototype.getBonusMovementInfo = function(originPoint) {
 	if (bonusMovementInfo.type) {
 		return bonusMovementInfo;
 	}
+};
+
+Trifle.Board.prototype.setPossibleMovesForBonusMovement = function(movementInfo, originPoint, movementStartPoint, tile) {
+	this.movementPointChecks = 0;
+	var isImmobilized = this.tileMovementIsImmobilized(tile, movementInfo, originPoint);
+	if (!isImmobilized) {
+		if (movementInfo.type === Trifle.MovementType.standard) {
+			/* Standard movement, moving and turning as you go */
+			this.setPossibleMovementPointsFromMovePoints([movementStartPoint], Trifle.Board.standardMovementFunction, tile, movementInfo, movementStartPoint, movementInfo.distance, 0);
+		} else if (movementInfo.type === Trifle.MovementType.diagonal) {
+			/* Diagonal movement, jumping across the lines up/down/left/right as looking at the board */
+			this.setPossibleMovementPointsFromMovePoints([movementStartPoint], Trifle.Board.diagonalMovementFunction, tile, movementInfo, movementStartPoint, movementInfo.distance, 0);
+		} else if (movementInfo.type === Trifle.MovementType.jumpAlongLineOfSight) {
+			/* Jump to tiles along line of sight */
+			this.setPossibleMovementPointsFromMovePoints([movementStartPoint], Trifle.Board.jumpAlongLineOfSightMovementFunction, tile, movementInfo, movementStartPoint, 1, 0);
+		} else if (movementInfo.type === Trifle.MovementType.withinFriendlyTileZone) {
+			this.setMovePointsWithinTileZone(movementStartPoint, tile.ownerName, tile, movementInfo);
+		} else if (movementInfo.type === Trifle.MovementType.anywhere) {
+			this.setMovePointsAnywhere(movementStartPoint, movementInfo);
+		} else if (movementInfo.type === Trifle.MovementType.jumpShape) {
+			this.setPossibleMovementPointsFromMovePoints([movementStartPoint], Trifle.Board.jumpShapeMovementFunction, tile, movementInfo, movementStartPoint, movementInfo.distance, 0);
+		} else if (movementInfo.type === Trifle.MovementType.travelShape) {
+			this.setPossibleMovementPointsFromMovePointsOnePathAtATime(Trifle.Board.travelShapeMovementFunction, tile, movementInfo, movementStartPoint, movementStartPoint, movementInfo.shape.length, 0, [movementStartPoint]);
+		}
+	}
+	debug("Movement Point Checks: " + this.movementPointChecks);
 };
 
 Trifle.Board.prototype.setPossibleMovesForMovement = function(movementInfo, boardPointStart) {
@@ -1455,12 +1510,21 @@ Trifle.Board.prototype.setPossibleMovementPointsFromMovePointsOnePathAtATime = f
 };
 
 Trifle.Board.prototype.setBonusMovementPossibleMoves = function(bonusMovementInfo, originPoint) {
-	if (bonusMovementInfo && bonusMovementInfo.type && bonusMovementInfo.distance && bonusMovementInfo.movementFunction) {
+	/* if (bonusMovementInfo && bonusMovementInfo.type && bonusMovementInfo.distance && bonusMovementInfo.movementFunction) {
 		var possibleMovePoints = this.getPointsMarkedAsPossibleMove();
 		possibleMovePoints.push(originPoint);
 		var self = this;
 		possibleMovePoints.forEach(function(boardPoint) {
 			self.setPossibleMovementPointsFromMovePoints([boardPoint], bonusMovementInfo.movementFunction, originPoint.tile, bonusMovementInfo, boardPoint, bonusMovementInfo.distance, 0);
+		});
+	} */
+
+	if (bonusMovementInfo && bonusMovementInfo.type) {
+		var possibleMovePoints = this.getPointsMarkedAsPossibleMove();
+		possibleMovePoints.push(originPoint);
+		var self = this;
+		possibleMovePoints.forEach(function(boardPoint) {
+			self.setPossibleMovesForBonusMovement(bonusMovementInfo, originPoint, boardPoint, originPoint.tile);
 		});
 	}
 };
@@ -1976,30 +2040,29 @@ Trifle.Board.prototype.movementPassesLineOfSightTest = function(targetPoint, til
 	var movementPassesLineOfSightTest = true;
 	var lineOfSightPoints = this.getPointsForTilesInLineOfSight(originPoint);
 	var self = this;
-	lineOfSightPoints.forEach(function(lineOfSightPoint) {
-		if (lineOfSightPoint.hasTile()) {
-			var lineOfSightTileInfo = TrifleTiles[lineOfSightPoint.tile.code];
-			// todo... ability active? etc...
-			/* While Tiles in Line of Sight trigger */
-		}
 
-		// if (lineOfSightPoint.hasTile() && lineOfSightPoint.tile.ownerName !== tileBeingMoved.ownerName) {
-		// 	var lineOfSightTileInfo = TrifleTiles[lineOfSightPoint.tile.code];
-		// 	if (Trifle.TileInfo.tileHasDrawTilesInLineOfSightAbility(lineOfSightTileInfo)) {
-		// 		pointsToMoveTowards.push(lineOfSightPoint);
-		// 		/* Movement OK if:
-		// 			- Target Point is in line of sight of affecting tile
-		// 			- Tile will be closer to affecting tile than it was where it started
-		// 			- Tile be closer to where it started than the affecting tile was (did not move past the affecting tile) */
-		// 		movementPassesLineOfSightTest = self.targetPointIsInLineOfSightOfThesePoints(targetPoint, [lineOfSightPoint])
-		// 			&& self.targetPointIsCloserToThesePointsThanOriginPointIs(targetPoint, [lineOfSightPoint], originPoint)
-		// 			&& self.getDistanceBetweenPoints(originPoint, targetPoint) < self.getDistanceBetweenPoints(originPoint, lineOfSightPoint);
-		// 		if (!movementPassesLineOfSightTest) {
-		// 			return false;
-		// 		}
-		// 	}
-		// }
-	});
+	var drawAlongLineOfSightAbilities = this.abilityManager.getAbilitiesTargetingTile(Trifle.AbilityName.drawTilesAlongLineOfSight, tileBeingMoved);
+	if (drawAlongLineOfSightAbilities && drawAlongLineOfSightAbilities.length === 1) {
+		lineOfSightPoints.forEach(function(lineOfSightPoint) {
+			var drawAbility = drawAlongLineOfSightAbilities[0];
+			if (lineOfSightPoint.hasTile() && lineOfSightPoint.tile === drawAbility.sourceTile) {
+				pointsToMoveTowards.push(lineOfSightPoint);
+				/* Movement OK if:
+					- Target Point is in line of sight of affecting tile
+					- Tile will be closer to affecting tile than it was where it started
+					- Tile be closer to where it started than the affecting tile was (did not move past the affecting tile) */
+				movementPassesLineOfSightTest = self.targetPointIsInLineOfSightOfThesePoints(targetPoint, [lineOfSightPoint])
+					&& self.targetPointIsCloserToThesePointsThanOriginPointIs(targetPoint, [lineOfSightPoint], originPoint)
+					&& self.getDistanceBetweenPoints(originPoint, targetPoint) < self.getDistanceBetweenPoints(originPoint, lineOfSightPoint)
+					|| targetPoint === drawAbility.sourceTilePoint;
+				if (!movementPassesLineOfSightTest) {
+					return false;
+				}
+			}
+		});
+	} else if (drawAlongLineOfSightAbilities && drawAlongLineOfSightAbilities.length > 1) {
+		movementPassesLineOfSightTest = false;	// Being pulled in multiple directions, cannot satisfy both
+	}
 
 	return movementPassesLineOfSightTest;
 };

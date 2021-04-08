@@ -7,6 +7,7 @@ Trifle.Ability = function(abilityContext) {
 	this.abilityInfo = abilityContext.tileAbilityInfo;
 	this.sourceTile = abilityContext.tile;
 	this.sourceTileInfo = abilityContext.tileInfo;
+	this.sourceTilePoint = abilityContext.pointWithTile;
 	this.triggerBrainMap = abilityContext.triggerBrainMap;
 
 	this.triggerTargetTiles = [];
@@ -93,6 +94,25 @@ Trifle.Ability.prototype.setTriggerTargetTiles = function() {
 
 	debug("Target Tiles:");
 	debug(this.triggerTargetTiles);
+};
+
+Trifle.Ability.prototype.getTriggerTypeTargets = function(triggerType) {
+	var targetTiles = [];
+	var targetTilePoints = [];
+
+	var self = this;
+
+	var triggerBrain = this.triggerBrainMap[triggerType];
+
+	if (triggerBrain && triggerBrain.targetTiles && triggerBrain.targetTiles.length) {
+		targetTiles = triggerBrain.targetTiles;
+		targetTilePoints = triggerBrain.targetTilePoints;
+	}
+
+	return {
+		targetTiles: targetTiles,
+		targetTilePoints: targetTilePoints
+	};
 };
 
 Trifle.Ability.prototype.appearsToBeTheSameAs = function(otherAbility) {
