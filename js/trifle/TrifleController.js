@@ -12,6 +12,7 @@ Trifle.Controller = function(gameContainer, isMobile) {
 	this.hostAccentTiles = [];
 	this.guestAccentTiles = [];
 
+	this.isInviteOnly = true;
 	this.isPaiShoGame = true;
 }
 
