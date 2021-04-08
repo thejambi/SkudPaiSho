@@ -102,6 +102,11 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Warfront", "Warfront_Lotus", ownerCode));
 	tiles.push(new PlaygroundTile("Warfront", "Warfront_SiegeEngine", ownerCode));
 	tiles.push(new PlaygroundTile("Warfront", "Warfront_Soldier", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Cavalry2", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Guardian2", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Lotus2", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_SiegeEngine2", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Soldier2", ownerCode));
 
 	// Chess
 	tiles.push(new PlaygroundTile("Chess", "Chess_K", ownerCode));
