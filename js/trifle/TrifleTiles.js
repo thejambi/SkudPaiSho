@@ -341,6 +341,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	/* Vagabond Tiles */
 
 	TrifleTiles[Trifle.TileCodes.SkyBison] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.animal],
 		identifiers: [Trifle.TileIdentifier.air],
 		deployTypes: [ Trifle.DeployType.temple ],
@@ -364,7 +365,6 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		abilities: [
 			{
 				type: Trifle.AbilityName.cancelZone,
-				triggeringBoardStates: [Trifle.AbilityTriggerType.whileInsideTemple],
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whileInsideTemple,
@@ -377,6 +377,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	};
 
 	TrifleTiles[Trifle.TileCodes.Chrysanthemum] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.flower],
 		deployTypes: [Trifle.DeployType.anywhere],
 		abilities: [
@@ -408,6 +409,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	};
 
 	TrifleTiles[Trifle.TileCodes.Badgermole] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.animal],
 		deployTypes: [Trifle.DeployType.anywhere],
 		movements: [
@@ -436,6 +438,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	};
 
 	TrifleTiles[Trifle.TileCodes.FireLily] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.flower],
 		deployTypes: [Trifle.DeployType.anywhere],
 		territorialZone: {
@@ -444,6 +447,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	};
 
 	TrifleTiles[Trifle.TileCodes.Dragon] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.animal],
 		specialDeployTypes: [
 			{
@@ -462,6 +466,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 
 	/* Air Tiles */
 	TrifleTiles[Trifle.TileCodes.AirBanner] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.banner],
 		deployTypes: [ Trifle.DeployType.anywhere ],
 		movements: [
@@ -491,6 +496,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	};
 
 	TrifleTiles[Trifle.TileCodes.FlyingLemur] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.animal],
 		identifiers: [Trifle.TileIdentifier.air],
 		deployTypes: [ Trifle.DeployType.temple ],
@@ -509,6 +515,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	};
 
 	TrifleTiles[Trifle.TileCodes.HermitCrab] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.animal],
 		identifiers: [Trifle.TileIdentifier.air],
 		deployTypes: [Trifle.DeployType.anywhere],
@@ -533,6 +540,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	};
 
 	TrifleTiles[Trifle.TileCodes.Firefly] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.animal],
 		identifiers: [Trifle.TileIdentifier.air],
 		deployTypes: [Trifle.DeployType.temple],
@@ -577,6 +585,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	};
 
 	TrifleTiles[Trifle.TileCodes.NobleRhubarb] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.flower],
 		deployTypes: [Trifle.DeployType.anywhere],
 		abilities: [
@@ -599,6 +608,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	};
 
 	TrifleTiles[Trifle.TileCodes.Lavender] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.flower],
 		deployTypes: [Trifle.DeployType.anywhere],
 		abilities: [
@@ -614,7 +624,8 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	TrifleTiles[Trifle.TileCodes.WaterBanner] = {
+	TrifleTiles[Trifle.TileCodes.WaterBanner] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.banner],
 		deployTypes: [ Trifle.DeployType.anywhere ],
 		movements: [
@@ -625,7 +636,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	TrifleTiles[Trifle.TileCodes.SnowLeopard] = {
+	TrifleTiles[Trifle.TileCodes.SnowLeopard] = {	// todo
 		types: [Trifle.TileType.animal],
 		deployTypes: [Trifle.DeployType.anywhere],
 		movements: [
@@ -645,7 +656,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	TrifleTiles[Trifle.TileCodes.PolarBearDog] = {
+	TrifleTiles[Trifle.TileCodes.PolarBearDog] = {	// todo
 		types: [Trifle.TileType.animal],
 		deployTypes: [Trifle.DeployType.anywhere],
 		movements: [
@@ -669,7 +680,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	TrifleTiles[Trifle.TileCodes.BuffaloYak] = {
+	TrifleTiles[Trifle.TileCodes.BuffaloYak] = {	// todo
 		types: [Trifle.TileType.animal],
 		deployTypes: [Trifle.DeployType.anywhere],
 		movements: [
@@ -691,7 +702,8 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		}
 	};
 
-	TrifleTiles[Trifle.TileCodes.TitanArum] = {
+	TrifleTiles[Trifle.TileCodes.TitanArum] = {	/* Done */	// TODO: Allow restrictMovementWithinZone affected tiles to move away as much as possible if they cannot escape zone?
+		available: true,
 		types: [Trifle.TileType.flower],
 		deployTypes: [ Trifle.DeployType.anywhere ],
 		territorialZone: {
@@ -700,13 +712,14 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				{
 					type: Trifle.ZoneAbility.restrictMovementWithinZone,
 					targetTeams: [ Trifle.TileTeam.friendly, Trifle.TileTeam.enemy ],
-					targetTileTypes: [ Trifle.TileType.animal, Trifle.TileType.traveler, Trifle.TileType.banner ]
+					targetTileTypes: [ Trifle.TileType.animal, Trifle.TileType.banner ]
 				}
 			]
 		}
 	};
 
-	TrifleTiles[Trifle.TileCodes.LilyPad] = {
+	TrifleTiles[Trifle.TileCodes.LilyPad] = {	// TODO convert to ability instead of zone
+		// available: true,
 		types: [Trifle.TileType.flower],
 		deployTypes: [ Trifle.DeployType.anywhere ],
 		territorialZone: {
@@ -721,37 +734,29 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		}
 	};
 
-	/* TrifleTiles[Trifle.TileCodes.Lupine] = {
-		types: [Trifle.TileType.flower],
-		deployTypes: [ Trifle.DeployType.anywhere ],
-		territorialZone: {
-			size: 3,
-			abilities: [
-				{
-					type: Trifle.BoardPresenceAbility.increaseFriendlyTileMovementDistance
-					// targetTeams
-				}
-			]
-		}
-	}; */
-
 	/* Earth */
 
-	TrifleTiles[Trifle.TileCodes.EarthBanner] = {
+	TrifleTiles[Trifle.TileCodes.EarthBanner] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.banner],
 		deployTypes: [Trifle.DeployType.anywhere],
-		territorialZone: {
-			size: 1,
-			abilities: [
-				{
-					type: Trifle.ZoneAbility.protectFriendlyTilesFromCapture,
-					targetTileTypes: [Trifle.TileType.flower]
-				}
-			]
-		}
+		abilities: [
+			{
+				type: Trifle.AbilityName.protectFromCapture,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent,
+						targetTeams: [Trifle.TileTeam.friendly],
+						targetTileTypes: [Trifle.TileType.flower]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			}
+		]
 	};
 
-	TrifleTiles[Trifle.TileCodes.SaberToothMooseLion] = {
+	TrifleTiles[Trifle.TileCodes.SaberToothMooseLion] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.animal],
 		deployTypes: [Trifle.DeployType.anywhere],
 		movements: [
@@ -823,58 +828,13 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	};
 
 
-	TrifleTiles[Trifle.TileCodes.MessengerHawk] = {
+	TrifleTiles[Trifle.TileCodes.MessengerHawk] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.animal],
 		deployTypes: [Trifle.DeployType.anywhere, Trifle.DeployType.temple],
 		movements: [
 			{
 				type: Trifle.MovementType.anywhere,
-			}
-		], // Ability testing
-		territorialZone: {
-			size: 5
-		},
-		abilities: [
-			/* {
-				type: Trifle.AbilityName.immobilizeTiles,
-				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsAdjacent],
-				targetTeams: [Trifle.TileTeam.enemy],
-				targetTileTypes: [Trifle.TileType.traveler]
-			}, */
-			/* {
-				type: Trifle.AbilityName.cancelZone,
-				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsAdjacent],
-				targetTeams: [Trifle.TileTeam.enemy],
-				targetTileTypes: [Trifle.TileType.animal],
-				targetTileIdentifiers: [Trifle.TileIdentifier.air]
-			}, */
-			/* {
-				type: Trifle.AbilityName.captureTargetTiles,
-				triggeringActions: [Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile],
-				targetTeams: [Trifle.TileTeam.enemy, Trifle.TileTeam.friendly],
-				targetTileTypes: [Trifle.TileType.flower, Trifle.TileType.animal]
-			}, */
-			/* {
-				type: Trifle.AbilityName.captureTargetTiles,
-				triggeringActions: [Trifle.AbilityTriggerType.whenTargetTileMovesFromWithinZone],
-				targetTeams: [Trifle.TileTeam.enemy, Trifle.TileTeam.friendly],
-				targetTileTypes: [Trifle.TileType.flower, Trifle.TileType.animal]
-			} */
-			/* {
-				type: Trifle.AbilityName.immobilizeTiles,
-				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight],
-				targetTeams: [Trifle.TileTeam.enemy]
-			} */
-			{
-				type: Trifle.AbilityName.immobilizeTiles,
-				triggers: [
-					{
-						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsOnBoard,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
-					}
-				],
-				targetTypes: [Trifle.TargetType.allTiles],
-				targetTeams: [Trifle.TileTeam.enemy]
 			}
 		]
 	};
@@ -1002,6 +962,102 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	}; */
 
+	/* TrifleTiles[Trifle.TileCodes.Lupine] = {
+		types: [Trifle.TileType.flower],
+		deployTypes: [ Trifle.DeployType.anywhere ],
+		territorialZone: {
+			size: 3,
+			abilities: [
+				{
+					type: Trifle.BoardPresenceAbility.increaseFriendlyTileMovementDistance
+					// targetTeams
+				}
+			]
+		}
+	}; */
+
 };
 
+
+Trifle.TileInfo.getReadableDescription = function(tileCode) {
+	var tileHtml = "";
+
+	var tileInfo = TrifleTiles[tileCode];
+
+	if (tileInfo) {
+		tileHtml = "Type: " + tileInfo.types;
+
+		if (tileInfo.identifiers) tileHtml += "<br />Identifiers: " + tileInfo.identifiers;
+
+		if (tileInfo.deployTypes) {
+			tileHtml += "<br />";
+			tileHtml += "Deploy: " + tileInfo.deployTypes
+		}
+
+		if (tileInfo.specialDeployTypes) {
+			tileHtml += "<br />";
+			tileInfo.specialDeployTypes.forEach(function(specialDeployInfo) {
+				tileHtml += "Deploy: " + specialDeployInfo.type + " of " + specialDeployInfo.targetTileCodes;
+			});
+		}
+
+		if (tileInfo.movements) {
+			tileInfo.movements.forEach(function(movementInfo) {
+				tileHtml += "<br /><br />";
+				tileHtml += "Movement type: " + movementInfo.type;
+				if (movementInfo.shape) tileHtml += "</br />- Shape: " + movementInfo.shape;
+				if (movementInfo.distance) tileHtml += "<br />- Distance: " + (movementInfo.distance === 99 ? "unlimited" : movementInfo.distance);
+				if (movementInfo.targetTileTypes) tileHtml += "<br />- Of Tiles of Type: " + movementInfo.targetTileTypes;
+				if (movementInfo.targetTileCodes) tileHtml += "<br />- Of Tiles: " + movementInfo.targetTileCodes;
+				if (movementInfo.abilities) {
+					movementInfo.abilities.forEach(function(movementAbilityInfo) {
+						tileHtml += "<br />- Movement Ability: " + movementAbilityInfo.type;
+					});
+				}
+				if (movementInfo.restrictions) {
+					movementInfo.restrictions.forEach(function(movementRestrictionInfo) {
+						tileHtml += "<br />- Movement Restriction: " + movementRestrictionInfo.type;
+					});
+				}
+
+				if (movementInfo.captureTypes) tileHtml += "<br />- Can Capture: " + movementInfo.captureTypes;
+			});
+		}
+
+		if (tileInfo.territorialZone) {
+			tileHtml += "<br /><br />Zone Size: " + tileInfo.territorialZone.size;
+			if (tileInfo.territorialZone.abilities) {
+				tileInfo.territorialZone.abilities.forEach(function(ZoneAbilityInfo) {
+					tileHtml += "<br />Zone Ability: " + ZoneAbilityInfo.type;
+					if (ZoneAbilityInfo.targetTeams) tileHtml += "<br />- Target Tiles: " + ZoneAbilityInfo.targetTeams;
+					if (ZoneAbilityInfo.targetTileCodes) tileHtml += "<br />- Target Tiles: " + ZoneAbilityInfo.targetTileCodes;
+					if (ZoneAbilityInfo.targetTileTypes) tileHtml += "<br />- Target Tiles: " + ZoneAbilityInfo.targetTileTypes;
+				});
+			}
+		}
+		
+		if (tileInfo.abilities) {
+			tileInfo.abilities.forEach(function(abilityInfo) {
+				tileHtml += "<br /><br />";
+				tileHtml += "Ability: " + abilityInfo.type;
+				abilityInfo.triggers.forEach(function(triggerInfo) {
+					tileHtml += "<br />- Trigger: " + triggerInfo.triggerType;
+					if (triggerInfo.targetTeams) tileHtml += "<br />-- Target Tiles: " + triggerInfo.targetTeams;
+					if (triggerInfo.targetTileTypes) tileHtml += "<br />-- Target Tiles: " + triggerInfo.targetTileTypes;
+					if (triggerInfo.targetTileIdentifiers) tileHtml += "<br />-- Target Tile Identifiers: " + triggerInfo.targetTileIdentifiers;
+				});
+				tileHtml += "<br />- Ability Target Types: " + abilityInfo.targetTypes;
+				if (abilityInfo.targetTeams) tileHtml += "<br />-- Target Tiles: " + abilityInfo.targetTeams;
+				if (abilityInfo.targetTileTypes) tileHtml += "<br />-- Target Tiles: " + abilityInfo.targetTileTypes;
+			});
+		}
+
+
+		tileHtml += "<br />";
+	} else {
+		tileHtml = tileCode;
+	}
+
+	return tileHtml;
+};
 

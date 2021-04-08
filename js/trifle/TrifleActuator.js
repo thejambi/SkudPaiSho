@@ -61,14 +61,18 @@ TrifleActuator.prototype.htmlify = function(board, tileManager) {
 		this.addLineBreakInTilePile(HOST);
 		this.addLineBreakInTilePile(HOST);
 		Object.keys(Trifle.TileCodes).forEach(function(key,index) {
-			self.addTeamTile(new Trifle.Tile(Trifle.TileCodes[key], hostPlayerCode), HOST, true);
+			if (TrifleTiles[key] && TrifleTiles[key].available) {
+				self.addTeamTile(new Trifle.Tile(Trifle.TileCodes[key], hostPlayerCode), HOST, true);
+			}
 		});
 	}
 	if (!tileManager.guestTeamIsFull()) {
 		this.addLineBreakInTilePile(GUEST);
 		this.addLineBreakInTilePile(GUEST);
 		Object.keys(Trifle.TileCodes).forEach(function(key,index) {
-			self.addTeamTile(new Trifle.Tile(Trifle.TileCodes[key], guestPlayerCode), GUEST, true);
+			if (TrifleTiles[key] && TrifleTiles[key].available) {
+				self.addTeamTile(new Trifle.Tile(Trifle.TileCodes[key], guestPlayerCode), GUEST, true);
+			}
 		});
 	}
 };
