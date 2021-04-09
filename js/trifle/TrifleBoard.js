@@ -1888,7 +1888,7 @@ Trifle.Board.prototype.setDeployPointsPossibleMoves = function(tile) {
 
 	if (tileInfo && tileInfo.specialDeployTypes) {
 		tileInfo.specialDeployTypes.forEach(function(specialDeployInfo) {
-			self.setDeployPointsPossibleForSpecialDeploy(player, tile, tileInfo, specialDeployInfo);
+			self.setDeployPointsPossibleForSpecialDeploy(tile, tileInfo, specialDeployInfo);
 		});
 	}
 
@@ -1929,18 +1929,18 @@ Trifle.Board.prototype.setDeployPointsPossibleMoves = function(tile) {
 	}
 };
 
-Trifle.Board.prototype.setDeployPointsPossibleForSpecialDeploy = function(player, tile, tileInfo, specialDeployInfo) {
+Trifle.Board.prototype.setDeployPointsPossibleForSpecialDeploy = function(tile, tileInfo, specialDeployInfo) {
 	if (specialDeployInfo.type === Trifle.SpecialDeployType.withinFriendlyTileZone) {
-		this.setDeployPointsWithinTileZone(player, tile, tileInfo, specialDeployInfo);
+		this.setDeployPointsWithinTileZone(tile, tileInfo, specialDeployInfo);
 	}
 };
 
-Trifle.Board.prototype.setDeployPointsWithinTileZone = function(zoneOwner, tile, tileInfo, specialDeployInfo) {
+Trifle.Board.prototype.setDeployPointsWithinTileZone = function(tile, tileInfo, specialDeployInfo) {
 	if (specialDeployInfo.targetTileCodes && specialDeployInfo.targetTileCodes.length > 0) {
 		var self = this;
 		this.forEachBoardPoint(function(targetPoint) {
 			if (!targetPoint.hasTile() && !targetPoint.isType(TEMPLE)
-					&& self.pointIsWithinZoneOfOneOfTheseTiles(targetPoint, specialDeployInfo.targetTileCodes, zoneOwner)
+					&& self.pointIsWithinZoneOfOneOfTheseTiles(targetPoint, specialDeployInfo.targetTileCodes, tile.ownerName)
 					&& !self.tileZonedOutOfSpaceByAbility(tile, targetPoint)) {
 				targetPoint.addType(POSSIBLE_MOVE);
 			}
