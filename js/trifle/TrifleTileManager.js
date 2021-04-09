@@ -182,6 +182,10 @@ Trifle.TileManager.prototype.getPlayerTilePile = function(player) {
 	return tilePile;
 };
 
+Trifle.TileManager.prototype.getAllTiles = function() {
+	return this.hostTeam.concat(this.guestTeam);
+};
+
 Trifle.TileManager.prototype.getCopy = function() {
 	var copy = new Trifle.TileManager();
 

@@ -14,7 +14,7 @@ Trifle.GameManager = function(actuator, ignoreActuate, isCopy) {
 // Set up the game
 Trifle.GameManager.prototype.setup = function (ignoreActuate) {
 
-	this.board = new Trifle.Board();
+	this.board = new Trifle.Board(this.tileManager);
 
 	// Update the actuator
 	if (!ignoreActuate) {
@@ -130,8 +130,8 @@ Trifle.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	}
 };
 
-Trifle.GameManager.prototype.revealDeployPoints = function(player, tileCode, ignoreActuate) {
-	this.board.setDeployPointsPossibleMoves(player, tileCode);
+Trifle.GameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
+	this.board.setDeployPointsPossibleMoves(tile);
 	
 	if (!ignoreActuate) {
 		this.actuate();

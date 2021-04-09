@@ -21,6 +21,15 @@ Trifle.AllTilesTargetBrain.prototype.setTargets = function() {
 			debug(boardPointWithTile);
 		}
 	});
+
+	this.board.tileManager.getAllTiles().forEach(function(tile) {
+		var targetHelper = new Trifle.TargetHelper(self.abilityObject, null, self, tile);
+		if (targetHelper.tileIsTargeted()) {
+			self.targetTiles.push(tile);
+			debug("All Tiles Target Brain found target: ");
+			debug(tile);
+		}
+	});
 };
 
 

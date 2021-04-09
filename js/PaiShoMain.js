@@ -2119,7 +2119,9 @@ var GameType = {
 			'Korron',
 			'vescucci',
 			'geebung02',
-			'sirstotes'
+			'sirstotes',
+			'Cannoli',
+			'SpinxKreuz'
 		],
 		noRankedGames: true
 	},

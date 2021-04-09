@@ -45,7 +45,9 @@ Trifle.TargetHelper.prototype.targetTileTypesCheck = function() {
 		return this.abilityInfo.targetTileTypes.includes(Trifle.TileCategory.allTileTypes)
 			|| arrayIncludesOneOf(this.possibleTargetTileInfo.types, this.abilityInfo.targetTileTypes)
 			|| (this.abilityInfo.targetTileTypes.includes(Trifle.TileCategory.thisTile)
-				&& this.possibleTargetTile === this.abilityObject.sourceTile);
+				&& this.possibleTargetTile === this.abilityObject.sourceTile)
+			|| (this.abilityInfo.targetTileTypes.includes(Trifle.TileCategory.allButThisTile)
+				&& this.possibleTargetTile !== this.abilityObject.sourceTile);
 	} else {
 		return true;
 	}

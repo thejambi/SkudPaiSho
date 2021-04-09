@@ -1,6 +1,7 @@
 
 Trifle.AbilityManager = function(board) {
 	this.board = board;
+	this.tileManager = board.tileManager;
 	this.abilities = [];
 	this.readyAbilities = {};
 }
@@ -13,13 +14,13 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	var boardHasChanged = false;
 	var self = this;
 
-	/* Mark all as do not preserve */
+	/* Mark all existing abilities as do not preserve */
 	debug("Clearing ability preserve values");
 	this.abilities.forEach(function(existingAbility) {
 		existingAbility.preserve = false;
 	});
 
-	/* Mark abilities to preserve based on ready abilities */
+	/* Mark abilities to preserve based on matching ready abilities */
 	debug("Marking preserve abilities");
 	Object.values(this.readyAbilities).forEach(function(abilityList) {
 		abilityList.forEach(function(ability) {
@@ -31,7 +32,7 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	debug("Deactivating abilities");
 	var newAbilities = [];
 	this.abilities.forEach(function(existingAbility) {
-		if (existingAbility.preserve) {
+		if (existingAbility.preserve && !self.abilityIsCanceled(existingAbility.sourceTile, existingAbility.abilityInfo)) {
 			debug("Preserving ability: ");
 			debug(existingAbility);
 			newAbilities.push(existingAbility);
@@ -41,16 +42,35 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	});
 	this.abilities = newAbilities;
 
-	/* Activate abitlies! */
+	/* Activate abilities! */
+	if (this.readyAbilities[Trifle.AbilityName.cancelAbilities] && this.readyAbilities[Trifle.AbilityName.cancelAbilities].length) {
+		this.readyAbilities[Trifle.AbilityName.cancelAbilities].forEach(function(ability) {
+			boardHasChanged = self.doTheActivateThing(ability);
+			if (boardHasChanged) {
+				return;	// If board changes, quit!
+			}
+		});
+	}
+
+	if (boardHasChanged) {
+		return;	// If board changes, quit!
+	}
+
 	Object.values(this.readyAbilities).forEach(function(abilityList) {
 		abilityList.forEach(function(ability) {
-			var abilityIsReadyToActivate = self.addNewAbility(ability);
-			if (abilityIsReadyToActivate) {
-				ability.activateAbility();
-			}
-			if (ability.boardChangedAfterActivation()) {
-				boardHasChanged = true;
-				debug("Board changed! Will need to process abilities again");
+			/* if (!ability.activated) {
+				var abilityIsReadyToActivate = self.addNewAbility(ability);
+				if (abilityIsReadyToActivate) {
+					ability.activateAbility();
+				}
+				if (ability.boardChangedAfterActivation()) {
+					boardHasChanged = true;
+					debug("Board changed! Will need to process abilities again");
+					return;	// If board changes, quit!
+				}
+			} */
+			boardHasChanged = self.doTheActivateThing(ability);
+			if (boardHasChanged) {
 				return;	// If board changes, quit!
 			}
 		});
@@ -61,15 +81,30 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	};
 };
 
+Trifle.AbilityManager.prototype.doTheActivateThing = function(ability) {
+	var boardHasChanged = false;
+	if (!ability.activated) {
+		var abilityIsReadyToActivate = this.addNewAbility(ability);
+		if (abilityIsReadyToActivate) {
+			ability.activateAbility();
+		}
+		if (ability.boardChangedAfterActivation()) {
+			boardHasChanged = true;
+			debug("Board changed! Will need to process abilities again");
+			return;	// If board changes, quit!
+		}
+	}
+	return boardHasChanged;
+};
+
 /**
  * Return `true` if ability is new and not already active, aka ability is ready to activate.
  * @param {*} ability 
  */
 Trifle.AbilityManager.prototype.addNewAbility = function(ability) {
-	// Go through abilities and see if this one is already active
 	var added = false;
 
-	if (!this.abilitiesAlreadyIncludes(ability)) {
+	if (!this.abilitiesAlreadyIncludes(ability) && !this.abilityIsCanceled(ability.sourceTile, ability.abilityInfo)) {
 		this.abilities.push(ability);
 		added = true;
 		debug("Just added ability");
@@ -121,6 +156,39 @@ Trifle.AbilityManager.prototype.getAbilitiesTargetingTile = function(abilityName
 		}
 	});
 	return abilitiesTargetingTile;
+};
+
+Trifle.AbilityManager.prototype.getAbilitiesTargetingTileFromSourceTile = function(abilityName, tile, sourceTile) {
+	var abilitiesTargetingTile = [];
+	this.abilities.forEach(function(ability) {
+		if (ability.abilityType === abilityName
+				&& ability.sourceTile === sourceTile
+				&& ability.abilityTargetsTile(tile)) {
+			abilitiesTargetingTile.push(ability);
+		}
+	});
+	return abilitiesTargetingTile;
+};
+
+Trifle.AbilityManager.prototype.abilityIsCanceled = function(tile, abilityInfo) {
+	var isCanceled = false;
+	var affectingCancelAbilities = this.getAbilitiesTargetingTile(Trifle.AbilityName.cancelAbilities, tile);
+
+	affectingCancelAbilities.forEach(function(cancelingAbility) {
+		// Does canceling ability affecting tile cancel this kind of ability?
+		if (cancelingAbility.abilityInfo.targetAbilityTypes.includes(Trifle.AbilityType.all)) {
+			isCanceled = true;	// Dat is for sure
+		}
+
+		cancelingAbility.abilityInfo.targetAbilityTypes.forEach(function(canceledAbilityType) {
+			var abilitiesForType = Trifle.AbilitiesForType[canceledAbilityType];
+			if (abilitiesForType && abilitiesForType.length && abilitiesForType.includes(abilityInfo.type)) {
+				isCanceled = true;
+			}
+		});
+	});
+
+	return isCanceled;
 };
 
 Trifle.AbilityManager.prototype.tickDurationAbilities = function() {

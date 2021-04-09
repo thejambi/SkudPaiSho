@@ -31,12 +31,15 @@ Trifle.TriggerHelper.prototype.targetTeamsCheck = function() {
 	}
 };
 
+// TODO split into "Tile Category Check"?
 Trifle.TriggerHelper.prototype.targetTileTypesCheck = function() {
 	if (this.triggerInfo.targetTileTypes) {
 		return this.triggerInfo.targetTileTypes.includes(Trifle.TileCategory.allTileTypes)
 			|| arrayIncludesOneOf(this.possibleTargetTileInfo.types, this.triggerInfo.targetTileTypes)
 			|| (this.triggerInfo.targetTileTypes.includes(Trifle.TileCategory.thisTile)
-				&& this.possibleTargetTilePoint.tile === this.triggerContext.tile);
+				&& this.possibleTargetTilePoint.tile === this.triggerContext.tile)
+			|| (this.triggerInfo.targetTileTypes.includes(Trifle.TileCategory.allButThisTile)
+				&& this.possibleTargetTilePoint.tile !== this.triggerContext.tile);
 	} else {
 		return true;
 	}
