@@ -200,7 +200,7 @@ Trifle.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.tileType = tileCode;
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
-		this.theGame.revealDeployPoints(tile.ownerName, tileCode);
+		this.theGame.revealDeployPoints(tile);
 	} else {
 		this.theGame.hidePossibleMovePoints();
 		this.resetNotationBuilder();

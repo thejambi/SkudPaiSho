@@ -24,6 +24,7 @@ Trifle.Ability = function(abilityContext) {
 
 	debug("New Ability created! " + this.abilityType + " from tile " + this.sourceTile.code);
 	this.boardChanged = false;
+	this.activated = false;
 }
 
 Trifle.Ability.prototype.setAbilityTargetTiles = function() {
@@ -58,12 +59,14 @@ Trifle.Ability.prototype.activateAbility = function() {
 	debug(this);
 
 	this.abilityActivatedResults = this.abilityBrain.activateAbility();
+	this.activated = true;
 };
 
 Trifle.Ability.prototype.deactivate = function() {
 	// What needed to do?
 	debug("Deactivating ability: ");
 	debug(this);
+	this.activated = false;
 };
 
 Trifle.Ability.prototype.boardChangedAfterActivation = function() {
