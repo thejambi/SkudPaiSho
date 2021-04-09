@@ -521,19 +521,12 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	TrifleTiles[Trifle.TileCodes.Edelweiss] = {	/* TODO */
+	TrifleTiles[Trifle.TileCodes.Edelweiss] = {	/* Done */
 		available: true,
 		types: [Trifle.TileType.flower],
 		deployTypes: [Trifle.DeployType.anywhere],
 		territorialZone: {
 			size: 2
-			/* abilities: [
-				{
-					type: Trifle.ZoneAbility.removesTileAbilities,
-					targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy],
-					targetTileTypes: [Trifle.TileCategory.allTileTypes]
-				}
-			] */
 		},
 		abilities: [
 			{
@@ -892,7 +885,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	/* Random tile ideas or unused tiles */
 
 	TrifleTiles[Trifle.TileCodes.AirGlider] = {
-		available: true,
+		available: false,
 		types: [Trifle.TileType.traveler],
 		deployTypes: [Trifle.DeployType.temple],
 		movements: [
