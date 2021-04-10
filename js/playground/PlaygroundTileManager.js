@@ -126,8 +126,16 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Library", ownerCode));
 	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Temple", ownerCode));
 
-	// Other
-	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_Ginseng", ownerCode));
+	// Ginseng
+	tiles.push(new PlaygroundTile("Ginseng", "B", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "D", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "FB", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "G", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "K", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "L", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "LT", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "O", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "W", ownerCode));
 
 	return tiles;
 };
