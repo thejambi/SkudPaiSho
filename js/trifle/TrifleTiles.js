@@ -684,15 +684,22 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		types: [Trifle.TileType.flower],
 		deployTypes: [ Trifle.DeployType.anywhere ],
 		territorialZone: {
-			size: 2,
-			abilities: [
-				{
-					type: Trifle.ZoneAbility.restrictMovementWithinZone,
-					targetTeams: [ Trifle.TileTeam.friendly, Trifle.TileTeam.enemy ],
-					targetTileTypes: [ Trifle.TileType.animal, Trifle.TileType.banner ]
-				}
-			]
-		}
+			size: 2
+		},
+		abilities: [
+			{
+				type: Trifle.AbilityName.restrictMovementWithinZone,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsOnBoard,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					}
+				],
+				targetTypes: [Trifle.TargetType.allTiles],
+				targetTeams: [Trifle.TileTeam.enemy, Trifle.TileTeam.friendly],
+				targetTileTypes: [Trifle.TileType.animal, Trifle.TileType.banner]
+			}
+		]
 	};
 
 	TrifleTiles[Trifle.TileCodes.LilyPad] = {	// TODO convert to ability instead of zone
