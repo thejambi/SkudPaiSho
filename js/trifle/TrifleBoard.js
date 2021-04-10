@@ -845,8 +845,6 @@ Trifle.Board.prototype.moveTile = function(player, notationPointStart, notationP
 			&& Trifle.TileInfo.tileHasMovementAbility(tileInfo, Trifle.MovementAbility.chargeCapture)) {
 		this.setPossibleMovePoints(boardPointStart);
 		movementPath = boardPointEnd.getOnlyPossibleMovementPath();
-		debug("Movement Path: ");
-		debug(movementPath);
 		this.removePossibleMovePoints();
 
 		movementPath.forEach(function(movePathPoint) {
@@ -917,8 +915,6 @@ Trifle.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedO
 	*/
 
 	var self = this;
-
-	debug("Here we go... Looking for abilities to activate...");
 
 	this.forEachBoardPointWithTile(function(pointWithTile) {
 		var tile = pointWithTile.tile;
@@ -1297,7 +1293,7 @@ Trifle.Board.prototype.setPossibleMovesForBonusMovement = function(movementInfo,
 			this.setPossibleMovementPointsFromMovePointsOnePathAtATime(Trifle.Board.travelShapeMovementFunction, tile, movementInfo, movementStartPoint, movementStartPoint, movementInfo.shape.length, 0, [movementStartPoint]);
 		}
 	}
-	debug("Movement Point Checks: " + this.movementPointChecks);
+	// debug("Movement Point Checks: " + this.movementPointChecks);
 };
 
 Trifle.Board.prototype.setPossibleMovesForMovement = function(movementInfo, boardPointStart) {
@@ -1323,7 +1319,7 @@ Trifle.Board.prototype.setPossibleMovesForMovement = function(movementInfo, boar
 			this.setPossibleMovementPointsFromMovePointsOnePathAtATime(Trifle.Board.travelShapeMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, boardPointStart, movementInfo.shape.length, 0, [boardPointStart]);
 		}
 	}
-	debug("Movement Point Checks: " + this.movementPointChecks);
+	// debug("Movement Point Checks: " + this.movementPointChecks);
 };
 Trifle.Board.standardMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
 	var mustPreserveDirection = Trifle.TileInfo.movementMustPreserveDirection(movementInfo);
@@ -1351,9 +1347,6 @@ Trifle.Board.prototype.setPossibleMovementPointsFromMovePoints = function(movePo
 			|| movePoints.length <= 0) {
 		return;	// Complete
 	}
-
-	debug("MovePoints: ");
-	debug(movePoints);
 
 	var self = this;
 	var nextPointsConfirmed = [];
@@ -2153,8 +2146,6 @@ Trifle.Board.prototype.activateAbility = function(tileOwningAbility, targetTile,
 			targetTileType: targetTileType,
 			ability: abilityInfo
 		});
-		debug("Activated ability!");
-		debug(abilityInfo);
 	}
 };
 
@@ -2162,17 +2153,15 @@ Trifle.Board.prototype.tickDurationAbilities = function() {
 	this.abilityManager.tickDurationAbilities();
 
 	/* old: */
-	for (var i = this.activeDurationAbilities.length - 1; i >= 0; i--) {
+	/* for (var i = this.activeDurationAbilities.length - 1; i >= 0; i--) {
 		var durationAbilityDetails = this.activeDurationAbilities[i];
 		var durationAbilityInfo = durationAbilityDetails.ability;
 		durationAbilityInfo.remainingDuration -= 0.5;
 		if (durationAbilityInfo.remainingDuration <= 0) {
 			durationAbilityInfo.active = false;
 			this.activeDurationAbilities.splice(i, 1);
-			debug("Ability deactivated!");
-			debug(durationAbilityInfo);
 		}
-	}
+	} */
 };
 
 

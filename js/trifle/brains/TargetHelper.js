@@ -17,10 +17,17 @@ Trifle.TargetHelper = function(abilityObject, possibleTargetTilePoint, targetBra
 };
 
 Trifle.TargetHelper.prototype.tileIsTargeted = function() {
-	return this.targetTeamsCheck()
+	return this.targetingIsNotCanceledCheck()
+			&& this.targetTeamsCheck()
 			&& this.targetTileTypesCheck()
 			&& this.targetTileIdentifiersCheck()
 			&& this.targetTileNamesCheck();
+};
+
+Trifle.TargetHelper.prototype.targetingIsNotCanceledCheck = function() {
+	var abilityManager = this.abilityObject.board.abilityManager;
+	var targetingIsCanceled = abilityManager.targetingIsCanceled(this.abilityObject, this.possibleTargetTile);
+	return !targetingIsCanceled;
 };
 
 Trifle.TargetHelper.prototype.targetTeamsCheck = function() {
@@ -32,8 +39,6 @@ Trifle.TargetHelper.prototype.targetTeamsCheck = function() {
 		var isEnemyTargetedTile = this.abilityInfo.targetTeams.includes(Trifle.TileTeam.enemy)
 				&& possibleTargetTileOwner !== this.abilityObject.sourceTile.ownerName;
 
-		debug("Target teams check: ");
-		debug(isFriendlyTargetedTile || isEnemyTargetedTile);
 		return isFriendlyTargetedTile || isEnemyTargetedTile;
 	} else {
 		return true;

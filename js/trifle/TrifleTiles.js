@@ -161,7 +161,8 @@ Trifle.AbilityName = {
 	cancelZone: "cancelZone",
 	immobilizeTiles: "immobilizeTiles",
 	restrictMovementWithinZone: "restrictMovementWithinZone",
-	cancelAbilities: "cancelAbilities"
+	cancelAbilities: "cancelAbilities",
+	cancelAbilitiesTargetingTiles: "cancelAbilitiesTargetingTiles"
 };
 
 Trifle.AbilityType = {
@@ -596,6 +597,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	};
 
 	TrifleTiles[Trifle.TileCodes.SnowLeopard] = {	// todo
+		available: true,
 		types: [Trifle.TileType.animal],
 		deployTypes: [Trifle.DeployType.anywhere],
 		movements: [
@@ -607,10 +609,26 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		],
 		abilities: [
 			{
-				type: Trifle.AbilityName.removeEffects,
-				triggeringBoardStates: [Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight],
-				targetEffectTypes: [Trifle.AbilityType.protection],
-				targetTileTypes: [Trifle.TileCategory.allTileTypes]
+				type: Trifle.AbilityName.cancelAbilities,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight,
+						targetTeams: [Trifle.TileTeam.enemy]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				targetAbilityTypes: [Trifle.AbilityType.protection]
+			},
+			{
+				type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight,
+						targetTeams: [Trifle.TileTeam.enemy]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				targetAbilityTypes: [Trifle.AbilityType.protection]
 			}
 		]
 	};

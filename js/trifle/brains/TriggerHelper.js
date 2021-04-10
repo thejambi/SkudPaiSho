@@ -23,8 +23,6 @@ Trifle.TriggerHelper.prototype.targetTeamsCheck = function() {
 		var isEnemyTargetedTile = this.triggerInfo.targetTeams.includes(Trifle.TileTeam.enemy)
 				&& possibleTargetTileOwner !== this.triggerContext.tile.ownerName;
 
-		debug("Target teams check: ");
-		debug(isFriendlyTargetedTile || isEnemyTargetedTile);
 		return isFriendlyTargetedTile || isEnemyTargetedTile;
 	} else {
 		return true;
