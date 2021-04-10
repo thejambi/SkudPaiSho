@@ -126,7 +126,8 @@ Trifle.MoveDirection = {
 
 Trifle.CaptureType = {
 	none: "none",
-	all: "all"
+	all: "all",
+	tilesTargetedByAbility: "tilesTargetedByAbility"
 };
 
 Trifle.ZoneAbility = {
@@ -161,6 +162,7 @@ Trifle.AbilityName = {
 	cancelZone: "cancelZone",
 	immobilizeTiles: "immobilizeTiles",
 	restrictMovementWithinZone: "restrictMovementWithinZone",
+	restrictMovementWithinZoneUnlessCapturing: "restrictMovementWithinZoneUnlessCapturing",
 	cancelAbilities: "cancelAbilities",
 	cancelAbilitiesTargetingTiles: "cancelAbilitiesTargetingTiles"
 };
@@ -182,6 +184,7 @@ Trifle.AbilityTriggerType = {
 	whileOnBoard: "whileOnBoard",	// Remove?
 	whileTargetTileIsAdjacent: "whileTargetTileIsAdjacent",
 	whenLandsAdjacentToTargetTile: "whenLandsAdjacentToTargetTile",
+	whenTargetTileLandsAdjacent: "whenTargetTileLandsAdjacent",
 	whileTargetTileIsInZone: "whileTargetTileIsInZone"
 };
 
@@ -688,7 +691,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		},
 		abilities: [
 			{
-				type: Trifle.AbilityName.restrictMovementWithinZone,
+				type: Trifle.AbilityName.restrictMovementWithinZoneUnlessCapturing,
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsOnBoard,
@@ -702,20 +705,26 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	TrifleTiles[Trifle.TileCodes.LilyPad] = {	// TODO convert to ability instead of zone
-		// available: true,
+	TrifleTiles[Trifle.TileCodes.LilyPad] = {
+		available: true,
 		types: [Trifle.TileType.flower],
 		deployTypes: [ Trifle.DeployType.anywhere ],
 		territorialZone: {
-			size: 1,
-			abilities: [
-				{
-					type: Trifle.ZoneAbility.restrictMovementWithinZone,
-					targetTeams: [ Trifle.TileTeam.enemy ],
-					targetTileTypes: [ Trifle.TileCategory.allTileTypes ]
-				}
-			]
-		}
+			size: 1
+		},
+		abilities: [
+			{
+				type: Trifle.AbilityName.restrictMovementWithinZoneUnlessCapturing,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsOnBoard,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					}
+				],
+				targetTypes: [Trifle.TargetType.allTiles],
+				targetTeams: [Trifle.TileTeam.enemy, Trifle.TileTeam.friendly]
+			}
+		]
 	};
 
 	TrifleTiles[Trifle.TileCodes.Cattail] = {	// TODO
@@ -801,31 +810,43 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	TrifleTiles[Trifle.TileCodes.Shirshu] = {
+	TrifleTiles[Trifle.TileCodes.Shirshu] = {	/* Done */
+		available: true,
 		types: [Trifle.TileType.animal],
 		deployTypes: [Trifle.DeployType.anywhere],
 		movements: [
 			{
 				type: Trifle.MovementType.standard,
-				distance: 2
+				distance: 2,
+				captureTypes: [
+					{
+						type: Trifle.CaptureType.tilesTargetedByAbility,
+						targetAbilities: [Trifle.AbilityName.immobilizeTiles]
+					}
+				]
 			},
 			{
 				type: Trifle.MovementType.jumpAlongLineOfSight,
-				targetTileTypes: [Trifle.TileType.animal, Trifle.TileType.traveler]
+				targetTileTypes: [Trifle.TileType.animal]
 			}
 		],
-		territorialZone: {
-			size: 1,
-			abilities: [
-				{
-					type: Trifle.ZoneAbility.immobilizesTiles,
-					targetTeams: [Trifle.TileTeam.enemy]
-				}
-			]
-		}
+		abilities: [
+			{
+				type: Trifle.AbilityName.immobilizeTiles,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent,
+						targetTeams: [Trifle.TileTeam.enemy],
+						targetTileTypes: [Trifle.TileType.animal]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			}
+		]
 	};
 
 	TrifleTiles[Trifle.TileCodes.BoarQPine] = {
+		available: true,
 		types: [Trifle.TileType.animal],
 		deployTypes: [Trifle.DeployType.anywhere],
 		movements: [
@@ -834,16 +855,18 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				distance: 1
 			}
 		],
-		territorialZone: {
-			size: 1,
-			abilities: [
-				{
-					type: Trifle.AbilityName.captureTargetTiles,
-					triggeringActions: [Trifle.AbilityTriggerType.whenTargetTileLandsInZone],
-					targetTileTypes: [Trifle.TileCategory.landingTile]
-				}
-			]
-		}
+		abilities: [
+			{
+				type: Trifle.AbilityName.captureTargetTiles,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsAdjacent,
+						targetTeams: [Trifle.TileTeam.enemy]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			}
+		]
 	};
 
 	/* Fire */

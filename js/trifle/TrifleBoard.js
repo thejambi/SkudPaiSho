@@ -1604,7 +1604,7 @@ Trifle.Board.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targe
 	var canCaptureTarget = this.targetPointHasTileTileThatCanBeCaptured(tile, movementInfo, fromPoint, targetPoint);
 	return (!targetPoint.hasTile() || canCaptureTarget)
 		&& (!targetPoint.isType(TEMPLE) || canCaptureTarget)
-		&& !this.tileZonedOutOfSpace(tile, movementInfo, targetPoint)
+		&& !this.tileZonedOutOfSpace(tile, movementInfo, targetPoint, canCaptureTarget)
 		&& !this.tileMovementIsImmobilized(tile, movementInfo, fromPoint);
 };
 
@@ -1648,6 +1648,21 @@ Trifle.Board.prototype.tileHasActiveCaptureProtectionFromCapturingTile = functio
 	return tileHasActiveCaptureProtection; */
 };
 
+Trifle.Board.prototype.capturePossibleBasedOnBannersPlayed = function(capturingPlayer, targetPoint) {
+	var targetTile = targetPoint.tile;
+	var targetTileInfo = TrifleTiles[targetTile.code];
+
+	var playerBannerPlayed = this.hostBannerPlayed;
+	var otherBannerPlayed = this.guestBannerPlayed;
+	if (capturingPlayer === GUEST) {
+		playerBannerPlayed = this.guestBannerPlayed;
+		otherBannerPlayed = this.hostBannerPlayed;
+	}
+
+	return (playerBannerPlayed && Trifle.TileInfo.tileIsOneOfTheseTypes(targetTileInfo, [Trifle.TileType.flower, Trifle.TileType.banner]))
+			|| (playerBannerPlayed && otherBannerPlayed);
+};
+
 Trifle.Board.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, targetPoint) {
 	var playerBannerPlayed = this.hostBannerPlayed;
 	var otherBannerPlayed = this.guestBannerPlayed;
@@ -1659,10 +1674,23 @@ Trifle.Board.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, 
 	var targetTile = targetPoint.tile;
 	var targetTileInfo = TrifleTiles[targetTile.code];
 
-	return targetTileInfo 
-		&& movementInfo 
+	var capturePossibleWithMovement = movementInfo
 		&& movementInfo.captureTypes
-		&& movementInfo.captureTypes.includes(Trifle.CaptureType.all)
+		&& movementInfo.captureTypes.includes(Trifle.CaptureType.all);
+	
+	var self = this;
+	if (movementInfo && movementInfo.captureTypes && movementInfo.captureTypes.length) {
+		movementInfo.captureTypes.forEach(function(captureTypeInfo) {
+			if (captureTypeInfo.type && captureTypeInfo.type === Trifle.CaptureType.tilesTargetedByAbility) {
+				captureTypeInfo.targetAbilities.forEach(function(targetAbilityName) {
+					capturePossibleWithMovement = self.abilityManager.abilityTargetingTileExists(targetAbilityName, targetPoint.tile);
+				});
+			} 
+		});
+	}
+
+	return targetTileInfo 
+		&& capturePossibleWithMovement
 		&& (
 			(playerBannerPlayed 
 				&& Trifle.TileInfo.tileIsOneOfTheseTypes(targetTileInfo, [Trifle.TileType.flower, Trifle.TileType.banner])
@@ -1723,10 +1751,10 @@ Trifle.Board.prototype.movementInfoHasAbility = function(movementInfo, movementA
 	return matchFound;
 };
 
-Trifle.Board.prototype.tileZonedOutOfSpace = function(tile, movementInfo, targetPoint) {
+Trifle.Board.prototype.tileZonedOutOfSpace = function(tile, movementInfo, targetPoint, canCaptureTarget) {
 	var isZonedOut = this.tileZonedOutOfSpaceByMovementRestriction(tile, movementInfo, targetPoint);
 	
-	isZonedOut = isZonedOut || this.tileZonedOutOfSpaceByAbility(tile, targetPoint);
+	isZonedOut = isZonedOut || this.tileZonedOutOfSpaceByAbility(tile, targetPoint, canCaptureTarget);
 
 	return isZonedOut;
 };
@@ -1735,7 +1763,7 @@ Trifle.Board.prototype.tileZoneIsActive = function(tile) {
 	return !this.abilityManager.abilityTargetingTileExists(Trifle.AbilityName.cancelZone, tile);
 };
 
-Trifle.Board.prototype.tileZonedOutOfSpaceByAbility = function(tile, targetPoint) {
+Trifle.Board.prototype.tileZonedOutOfSpaceByAbility = function(tile, targetPoint, canCaptureTarget) {
 	var isZonedOut = false;
 
 	var self = this;
@@ -1743,6 +1771,14 @@ Trifle.Board.prototype.tileZonedOutOfSpaceByAbility = function(tile, targetPoint
 		var restrictMovementWithinZoneAbilities = self.abilityManager.getAbilitiesTargetingTileFromSourceTile(Trifle.AbilityName.restrictMovementWithinZone, tile, checkBoardPoint.tile);
 
 		if (restrictMovementWithinZoneAbilities.length
+				&& self.pointTileZoneContainsPoint(checkBoardPoint, targetPoint)) {
+			isZonedOut = true;
+			return;
+		}
+
+		var restrictMovementWithinZoneUnlessCapturingAbilities = self.abilityManager.getAbilitiesTargetingTileFromSourceTile(Trifle.AbilityName.restrictMovementWithinZoneUnlessCapturing, tile, checkBoardPoint.tile);
+
+		if (!canCaptureTarget && restrictMovementWithinZoneUnlessCapturingAbilities.length
 				&& self.pointTileZoneContainsPoint(checkBoardPoint, targetPoint)) {
 			isZonedOut = true;
 			return;
@@ -1841,6 +1877,17 @@ Trifle.Board.prototype.removePossibleMovePoints = function() {
 		boardPoint.clearPossibleMovementTypes();
 		boardPoint.clearPossibleMovementPaths();
 	});
+};
+
+Trifle.Board.prototype.captureTileOnPoint = function(boardPoint) {
+	var capturedTile = boardPoint.removeTile();
+
+	// If tile is capturing a Banner tile, there's a winner
+	if (capturedTile && Trifle.TileInfo.tileIsBanner(TrifleTiles[capturedTile.code])) {
+		this.winners.push(getOpponentName(capturedTile.ownerName));
+	}
+
+	return capturedTile;
 };
 
 Trifle.Board.prototype.getFireLilyPoint = function(player) {

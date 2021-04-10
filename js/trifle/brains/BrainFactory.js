@@ -27,6 +27,8 @@ Trifle.BrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, 
 			return new Trifle.WhenCapturingTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile:
 			return new Trifle.WhenLandsAdjacentToTargetTileTriggerBrain(triggerContext);
+		case Trifle.AbilityTriggerType.whenTargetTileLandsAdjacent:
+			return new Trifle.WhenTargetTileLandsAdjacentTriggerBrain(triggerContext);
 	}
 };
 
