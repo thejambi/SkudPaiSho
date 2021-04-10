@@ -129,6 +129,9 @@ gameOptionDescriptions[DIAGONAL_MOVEMENT] = "Diagonal Movement";
 var EVERYTHING_CAPTURE = "EverythingCapture";	// April Fools 2021
 gameOptionDescriptions[EVERYTHING_CAPTURE] = "Everything Captures Everything";
 
+var GINSENG_ROTATE = "GinsengBoardRotation";
+gameOptionDescriptions[GINSENG_ROTATE] = "Ginseng Board Rotation";
+
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {

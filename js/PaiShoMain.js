@@ -2152,6 +2152,7 @@ var GameType = {
 			PLAY_IN_SPACES,
 			VAGABOND_ROTATE,
 			ADEVAR_ROTATE,
+			GINSENG_ROTATE,
 			SPECTATORS_CAN_PLAY
 		],
 		noRankedGames: true

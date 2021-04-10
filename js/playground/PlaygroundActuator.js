@@ -6,12 +6,17 @@ function PlaygroundActuator(gameContainer, isMobile, enableAnimations) {
 
 	this.animationOn = enableAnimations;
 
+	var rotateType = false;
+	if (gameOptionEnabled(ADEVAR_ROTATE)) rotateType = ADEVAR_ROTATE;
+	if (gameOptionEnabled(VAGABOND_ROTATE)) rotateType = VAGABOND_ROTATE;
+	if (gameOptionEnabled(GINSENG_ROTATE)) rotateType = GINSENG_ROTATE;
+
 	var containers = setupPaiShoBoard(
 		this.gameContainer, 
 		PlaygroundController.getHostTilesContainerDivs(),
 		PlaygroundController.getGuestTilesContainerDivs(), 
-		(gameOptionEnabled(VAGABOND_ROTATE) || gameOptionEnabled(ADEVAR_ROTATE)),
-		(gameOptionEnabled(ADEVAR_ROTATE) ? ADEVAR_ROTATE : false),
+		(gameOptionEnabled(VAGABOND_ROTATE) || gameOptionEnabled(ADEVAR_ROTATE) || gameOptionEnabled(GINSENG_ROTATE)),
+		rotateType,
 		gameOptionEnabled(PLAY_IN_SPACES)
 	);
 
@@ -252,6 +257,8 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 			theDiv.classList.add("vagabondPointRotate");
 		} else if (gameOptionEnabled(ADEVAR_ROTATE)) {
 			theDiv.classList.add("adevarPointRotate");
+		} else if (gameOptionEnabled(GINSENG_ROTATE)) {
+			theDiv.classList.add("ginsengPointRotate");
 		}
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
@@ -359,6 +366,11 @@ PlaygroundActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		var top = (y - oy);
 		theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
 		theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
+	} else if (gameOptionEnabled(GINSENG_ROTATE)) {
+		var left = (x - ox);
+		var top = (y - oy);
+		theImg.style.left = ((left * cos90 - top * sin90) * pointSizeMultiplierX) + unitString;
+		theImg.style.top = ((top * cos90 + left * sin90) * pointSizeMultiplierY) + unitString;
 	} else {
 		theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
 		theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;

@@ -5,6 +5,10 @@ var sin45 = cos45 = Math.sin(Math.PI / 4);
 var sin135 = Math.sin(3 * Math.PI / 4);
 var cos135 = Math.cos(3 * Math.PI / 4);
 
+/* Used in Ginseng Board Rotate */
+var sin90 = 1;
+var cos90 = 0;
+
 function createDivWithClass(className) {
 	var div = document.createElement("div");
 	div.classList.add(className);
@@ -62,6 +66,7 @@ function setupPaiShoBoard(gameContainer,
 	var addVagabondBoardRotate = false;
 	var addAdevarBoardRotate = false;
 	var addAdevarGuestBoardRotate = false;
+	var addGinsengBoardRotate = false;
 	// Check for existing vagabond class on board...
 	if (document.querySelector(".vagabondBoardRotate")) {
 		addVagabondBoardRotate = true;
@@ -69,6 +74,8 @@ function setupPaiShoBoard(gameContainer,
 		addAdevarBoardRotate = true;
 	} else if (document.querySelector(".adevarGuestBoardRotate")) {
 		addAdevarGuestBoardRotate = true;
+	} else if (document.querySelector(".ginsengBoardRotate")) {
+		addGinsengBoardRotate = true;
 	}
 
 	removeChildren(gameContainer);
@@ -92,6 +99,8 @@ function setupPaiShoBoard(gameContainer,
 		svgContainer.classList.add("adevarBoardRotate");
 	} else if (addAdevarGuestBoardRotate) {
 		svgContainer.classList.add("adevarGuestBoardRotate");
+	} else if (addGinsengBoardRotate) {
+		svgContainer.classList.add("ginsengBoardRotate");
 	}
 
 	bgSvg.appendChild(boardContainer);
@@ -128,12 +137,15 @@ function setupPaiShoBoard(gameContainer,
 			rotateClass = "adevarBoardRotate";
 		} else if (rotateType === ADEVAR_GUEST_ROTATE) {
 			rotateClass = "adevarGuestBoardRotate";
+		} else if (rotateType === GINSENG_ROTATE) {
+			rotateClass = "ginsengBoardRotate";
 		}
 		// Set Timeout to get animated board rotation
 		setTimeout(function () {
 			svgContainer.classList.remove("vagabondBoardRotate");
 			svgContainer.classList.remove("adevarBoardRotate");
 			svgContainer.classList.remove("adevarGuestBoardRotate");
+			svgContainer.classList.remove("ginsengBoardRotate");
 			svgContainer.classList.add(rotateClass);
 		}, addClassAfterThisManyMs);
 	} else {
@@ -142,6 +154,7 @@ function setupPaiShoBoard(gameContainer,
 			svgContainer.classList.remove("vagabondBoardRotate");
 			svgContainer.classList.remove("adevarBoardRotate");
 			svgContainer.classList.remove("adevarGuestBoardRotate");
+			svgContainer.classList.remove("ginsengBoardRotate");
 		}, addClassAfterThisManyMs);
 	}
 
