@@ -2121,7 +2121,8 @@ var GameType = {
 			'geebung02',
 			'sirstotes',
 			'Cannoli',
-			'SpinxKreuz'
+			'SpinxKreuz',
+			'TheRealMomo'
 		],
 		noRankedGames: true
 	},
