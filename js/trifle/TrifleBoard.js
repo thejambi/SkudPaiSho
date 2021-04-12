@@ -1671,6 +1671,8 @@ Trifle.Board.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, 
 		otherBannerPlayed = this.hostBannerPlayed;
 	}
 
+	var captureProhibited = this.abilityManager.abilityTargetingTileExists(Trifle.AbilityName.prohibitTileFromCapturing, tile);
+
 	var targetTile = targetPoint.tile;
 	var targetTileInfo = TrifleTiles[targetTile.code];
 
@@ -1689,7 +1691,8 @@ Trifle.Board.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, 
 		});
 	}
 
-	return targetTileInfo 
+	return !captureProhibited
+		&& targetTileInfo 
 		&& capturePossibleWithMovement
 		&& (
 			(playerBannerPlayed 

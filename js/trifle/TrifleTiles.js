@@ -164,7 +164,8 @@ Trifle.AbilityName = {
 	restrictMovementWithinZone: "restrictMovementWithinZone",
 	restrictMovementWithinZoneUnlessCapturing: "restrictMovementWithinZoneUnlessCapturing",
 	cancelAbilities: "cancelAbilities",
-	cancelAbilitiesTargetingTiles: "cancelAbilitiesTargetingTiles"
+	cancelAbilitiesTargetingTiles: "cancelAbilitiesTargetingTiles",
+	prohibitTileFromCapturing: "prohibitTileFromCapturing"
 };
 
 Trifle.AbilityType = {
@@ -730,7 +731,19 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	TrifleTiles[Trifle.TileCodes.Cattail] = {	// TODO
 		available: true,
 		types: [Trifle.TileType.flower],
-		deployTypes: [ Trifle.DeployType.anywhere ]
+		deployTypes: [ Trifle.DeployType.anywhere ],
+		abilities: [
+			{
+				type: Trifle.AbilityName.prohibitTileFromCapturing,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent,
+						targetTeams: [Trifle.TileTeam.enemy]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			}
+		]
 	};
 
 	/* Earth */
