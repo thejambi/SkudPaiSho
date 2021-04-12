@@ -16,11 +16,6 @@ Trifle.Controller = function(gameContainer, isMobile) {
 	this.isPaiShoGame = true;
 }
 
-Trifle.Controller.userIsTrifleDeveloper = function() {
-	return usernameIsOneOf(
-		);
-};
-
 Trifle.Controller.prototype.getGameTypeId = function() {
 	return GameType.Trifle.id;
 };
@@ -184,7 +179,7 @@ Trifle.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 				this.notationBuilder.teamSelection = this.theGame.getPlayerTeamSelectionTileCodeList(player);
 				this.completeMove();
 			}
-		} else {
+		} else if (!this.theGame.tileManager.playerTeamIsFull(selectedTile.ownerName)) {
 			// Need to remove from team instead
 			this.theGame.removeTileFromTeam(selectedTile);
 		}

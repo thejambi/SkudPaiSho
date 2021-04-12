@@ -599,7 +599,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	};
 
-	TrifleTiles[Trifle.TileCodes.SnowLeopard] = {	// todo
+	TrifleTiles[Trifle.TileCodes.SnowLeopard] = {	/* Done */
 		available: true,
 		types: [Trifle.TileType.animal],
 		deployTypes: [Trifle.DeployType.anywhere],

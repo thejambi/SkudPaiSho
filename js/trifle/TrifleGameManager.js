@@ -60,7 +60,7 @@ Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
 };
 
 Trifle.GameManager.prototype.buildTeamSelectionGameLogText = function(move) {
-	this.gameLogText = move.player + "'s team: " + move.teamTileCodes;
+	this.gameLogText = move.player + " selected their team";
 };
 Trifle.GameManager.prototype.buildDeployGameLogText = function(move, tile) {
 	this.gameLogText = move.player + ' placed ' + Trifle.Tile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
@@ -82,7 +82,7 @@ Trifle.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails) 
 };
 
 Trifle.GameManager.prototype.playersAreSelectingTeams = function() {
-	return !this.tileManager.hostTeamIsFull() || !this.tileManager.guestTeamIsFull();
+	return this.tileManager.playersAreSelectingTeams();
 };
 
 Trifle.GameManager.prototype.getPlayerTeamSelectionTileCodeList = function(player) {
