@@ -40,7 +40,8 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	/* Activate abilities! */
 
 	var abilityActivationOrder = [
-		Trifle.AbilityName.cancelAbilities
+		Trifle.AbilityName.cancelAbilities,
+		Trifle.AbilityName.cancelAbilitiesTargetingTiles
 	];
 
 	abilityActivationOrder.forEach(function(abilityName) {

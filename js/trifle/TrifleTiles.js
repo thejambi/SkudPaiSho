@@ -433,7 +433,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			"Deploys in Temples",
 			"Moves 6 spaces, can capture",
 			"Territorial Zone: 6",
-			"Enemy Sky Bison may not move in this tile's Zone",
+			"Enemy Sky Bison may not move into this tile's Zone",
 			"While inside a Temple, Sky Bison has no Zone"
 		]
 	};
@@ -488,7 +488,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		textLines: [
 			"Animal | Air",
 			"Deploys anywhere",
-			"Jumps in a 1-2 shape any number of times in same direction, jumping over pieces in path"
+			"Jumps in a 1-2 shape any number of times in same direction, jumping over pieces in path, can capture"
 		]
 	};
 
@@ -701,6 +701,12 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				targetAbilityTypes: [Trifle.AbilityType.protection]
 			}
+		],
+		textLines: [
+			"Animal | Water",
+			"Deploys anywhere",
+			"Moves 3 spaces, can capture",
+			"Protection abilities coming from or applying to enemy tiles in Snow Leopard's line of sight are canceled"
 		]
 	};
 
@@ -773,6 +779,12 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				targetTeams: [Trifle.TileTeam.enemy, Trifle.TileTeam.friendly],
 				targetTileTypes: [Trifle.TileType.animal, Trifle.TileType.banner]
 			}
+		],
+		textLines: [
+			"Flower | Water",
+			"Deploys anywhere",
+			"Territorial Zone: 2",
+			"Animal and Banner tiles may not move into Titan Arum's zone unless they are capturing"
 		]
 	};
 
@@ -796,6 +808,12 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				targetTypes: [Trifle.TargetType.allTiles],
 				targetTeams: [Trifle.TileTeam.enemy, Trifle.TileTeam.friendly]
 			}
+		],
+		textLines: [
+			"Flower | Water",
+			"Deploys anywhere",
+			"Territorial Zone: 1",
+			"Tiles may not move into Lily Pad's zone unless they are capturing"
 		]
 	};
 
@@ -815,6 +833,11 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			}
+		],
+		textLines: [
+			"Flower | Water",
+			"Deploys anywhere",
+			"Enemy tiles adjacent to Cattail may not capture when moved"
 		]
 	};
 
@@ -837,6 +860,11 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			}
+		],
+		textLines: [
+			"Banner | Earth",
+			"Deploys anywhere",
+			"Friendly Flowers adjacent to Earth Banner are protected from capture"
 		]
 	};
 
@@ -867,6 +895,12 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			}
+		],
+		textLines: [
+			"Animal | Earth",
+			"Deploys anywhere",
+			"Moves 1 space, or moves adjacent to a Flower or Banner in line of sight",
+			"Friendly Flowers or Banner adjacent to Badgermole are protected from capture"
 		]
 	};
 
@@ -884,17 +918,17 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 					Trifle.MoveDirection.straight
 				],
 				captureTypes: [Trifle.CaptureType.all],
-				restrictions: [
-					{
-						type: Trifle.MovementRestriction.mustPreserveDirection
-					}
-				],
 				abilities: [
 					{
 						type: Trifle.MovementAbility.chargeCapture
 					}
 				]
 			}
+		],
+		textLines: [
+			"Animal | Earth",
+			"Deploys anywhere",
+			"Moves 3 spaces in a straight line, with Charge Capture"
 		]
 	};
 
@@ -925,12 +959,17 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent,
-						targetTeams: [Trifle.TileTeam.enemy],
 						targetTileTypes: [Trifle.TileType.animal]
 					}
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			}
+		],
+		textLines: [
+			"Animal | Earth",
+			"Deploys anywhere",
+			"Moves 2 spaces, can capture immobilized tiles; or moves adjacent to an Animal in line of sight",
+			"Animal tiles adjacent to Shirshu are immobilized"
 		]
 	};
 
@@ -956,6 +995,12 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			}
+		],
+		textLines: [
+			"Animal | Earth",
+			"Deploys anywhere",
+			"Moves 1 space",
+			"Enemy tiles that land adjacent to BoarQPine are captured"
 		]
 	};
 
@@ -977,6 +1022,11 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				targetTileCodes: [Trifle.TileCodes.FireLily],
 				captureTypes: [Trifle.CaptureType.all]
 			}
+		],
+		textLines: [
+			"Animal | Fire",
+			"Deploys within Zone of friendly Fire Lily",
+			"When in friendly Fire Lily Zone, may move anywhere else within that Zone, can capture"
 		]
 	};
 
@@ -989,6 +1039,11 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			{
 				type: Trifle.MovementType.anywhere,
 			}
+		],
+		textLines: [
+			"Animal | Fire",
+			"Deploys anywhere, including in Temples",
+			"Flies anywhere, excluding Temples"
 		]
 	};
 
@@ -999,7 +1054,12 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		deployTypes: [Trifle.DeployType.anywhere],
 		territorialZone: {
 			size: 5
-		}
+		},
+		textLines: [
+			"Flower | Fire",
+			"Deploys anywhere",
+			"Territorial Zone: 5"
+		]
 	};
 
 
@@ -1156,7 +1216,7 @@ Trifle.TileInfo.getReadableDescription = function(tileCode) {
 		tileInfo.textLines.forEach(function(textLine) {
 			tileHtml += "- " + textLine + "<br />";
 		});
-		return tileHtml;
+		return tileHtml + "<br />";
 	}
 
 	if (tileInfo) {

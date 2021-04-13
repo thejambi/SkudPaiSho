@@ -2122,7 +2122,8 @@ var GameType = {
 			'sirstotes',
 			'Cannoli',
 			'SpinxKreuz',
-			'TheRealMomo'
+			'TheRealMomo',
+			'MrsSkud'
 		],
 		noRankedGames: true
 	},
