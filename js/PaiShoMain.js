@@ -2155,7 +2155,8 @@ var GameType = {
 			VAGABOND_ROTATE,
 			ADEVAR_ROTATE,
 			GINSENG_ROTATE,
-			SPECTATORS_CAN_PLAY
+			SPECTATORS_CAN_PLAY,
+			FULL_GRID
 		],
 		noRankedGames: true
 	},
