@@ -168,7 +168,8 @@ Trifle.AbilityName = {
 	restrictMovementWithinZoneUnlessCapturing: "restrictMovementWithinZoneUnlessCapturing",
 	cancelAbilities: "cancelAbilities",
 	cancelAbilitiesTargetingTiles: "cancelAbilitiesTargetingTiles",
-	prohibitTileFromCapturing: "prohibitTileFromCapturing"
+	prohibitTileFromCapturing: "prohibitTileFromCapturing",
+	changeMovementDistanceByFactor: "changeMovementDistanceByFactor"
 };
 
 Trifle.AbilityType = {
@@ -648,6 +649,8 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	};
 
+	/* Water */
+
 	TrifleTiles[Trifle.TileCodes.WaterBanner] = {	/* Done */
 		available: true,
 		types: [Trifle.TileType.banner],
@@ -732,6 +735,10 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				// tileTypesProtectedFrom: [Trifle.TileType.traveler]
 				// tilesProtectedFrom: [Trifle.TileCodes.Wheel, Trifle.TileCodes.Dragon]
 			}
+		],
+		textLines: [
+			"Animal | Water",
+			"If this tile captures an opponent's tile it can't be captured on your opponent next turn. Moves 4 spaces. Can capture other tiles."
 		]
 	};
 
@@ -755,7 +762,11 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 					targetTileTypes: [Trifle.TileType.flower]
 				}
 			]
-		}
+		},
+		textLines: [
+			"Animal | Water",
+			"Flower tiles within 2 spaces have their effects nullified. Can move two spaces, and can capture."
+		]
 	};
 
 	TrifleTiles[Trifle.TileCodes.TitanArum] = {	/* Done */	// TODO: Allow restrictMovementWithinZone affected tiles to move away as much as possible if they cannot escape zone?
@@ -1006,6 +1017,31 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 
 	/* Fire */
 
+	TrifleTiles[Trifle.TileCodes.FireBanner] = {	/* todo */
+		available: false,
+		types: [Trifle.TileType.banner],
+		identifiers: [Trifle.TileIdentifier.earth],
+		deployTypes: [Trifle.DeployType.anywhere],
+		abilities: [
+			{
+				type: Trifle.AbilityName.protectFromCapture,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsAdjacent,
+						targetTeams: [Trifle.TileTeam.friendly],
+						targetTileTypes: [Trifle.TileType.flower]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			}
+		],
+		textLines: [
+			"Banner | Earth",
+			"Deploys anywhere",
+			"Friendly Flowers adjacent to Earth Banner are protected from capture"
+		]
+	};
+
 	TrifleTiles[Trifle.TileCodes.Dragon] = {	/* Done */
 		available: true,
 		types: [Trifle.TileType.animal],
@@ -1027,6 +1063,51 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			"Animal | Fire",
 			"Deploys within Zone of friendly Fire Lily",
 			"When in friendly Fire Lily Zone, may move anywhere else within that Zone, can capture"
+		]
+	};
+
+	TrifleTiles[Trifle.TileCodes.KomodoRhino] = {	/* TODO */
+		available: false,
+		types: [Trifle.TileType.animal],
+		identifiers: [Trifle.TileIdentifier.fire],
+		deployTypes: [Trifle.DeployType.anywhere, Trifle.DeployType.temple],
+		movements: [
+			{
+				type: Trifle.MovementType.anywhere,
+			}
+		],
+		abilities: [
+			{
+				type: Trifle.AbilityName.changeMovementDistanceByFactor,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight,
+						targetTeams: [Trifle.TileTeam.enemy]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				distanceAdjustmentFactor: 1/2
+			}
+		],
+		textLines: [
+			"Animal | Fire",
+			"Enemy tiles in this tiles line of sight have their movement speed halved (Tiles with an odd number of space movement is decreased by half rounded down). This tile can move 2 spaces and can capture tiles."
+		]
+	};
+
+	TrifleTiles[Trifle.TileCodes.ArmadilloBear] = {	/* TODO */
+		available: false,
+		types: [Trifle.TileType.animal],
+		identifiers: [Trifle.TileIdentifier.fire],
+		deployTypes: [Trifle.DeployType.anywhere, Trifle.DeployType.temple],
+		movements: [
+			{
+				type: Trifle.MovementType.anywhere,
+			}
+		],
+		textLines: [
+			"Animal | Fire",
+			"This tile can't be captured if it is within 2 spaces of any friendly Fire Lily tile. This tile can move 2 spaces. Can capture other tiles"
 		]
 	};
 
@@ -1059,6 +1140,39 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			"Flower | Fire",
 			"Deploys anywhere",
 			"Territorial Zone: 5"
+		]
+	};
+
+	TrifleTiles[Trifle.TileCodes.GrassWeed] = {	/* TODO */
+		available: false,
+		types: [Trifle.TileType.flower],
+		identifiers: [Trifle.TileIdentifier.fire],
+		deployTypes: [Trifle.DeployType.anywhere, Trifle.DeployType.temple],
+		textLines: [
+			"Flower | Fire",
+			"When this Plant tile is deployed it captures all flower tiles adjacent to it. Flower tiles can't be deployed or moved to a space adjacent to this tile"
+		]
+	};
+
+	TrifleTiles[Trifle.TileCodes.GrippingGrass] = {	/* TODO */
+		available: false,
+		types: [Trifle.TileType.flower],
+		identifiers: [Trifle.TileIdentifier.fire],
+		deployTypes: [Trifle.DeployType.anywhere, Trifle.DeployType.temple],
+		textLines: [
+			"Flower | Fire",
+			"Animals adjacent may not move (But keep range and effects) (Can be captured through (Like the original chrysanthemum could be captured by bison))"
+		]
+	};
+
+	TrifleTiles[Trifle.TileCodes.Saffron] = {	/* TODO */
+		available: false,
+		types: [Trifle.TileType.flower],
+		identifiers: [Trifle.TileIdentifier.fire],
+		deployTypes: [Trifle.DeployType.anywhere, Trifle.DeployType.temple],
+		textLines: [
+			"Flower | Fire",
+			"When a tile is captured within 4 spaces, capture this tile instead and move that piece to saffron's position"
 		]
 	};
 
