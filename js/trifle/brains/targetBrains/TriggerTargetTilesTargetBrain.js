@@ -10,6 +10,9 @@ Trifle.TriggerTargetTilesTargetBrain = function(abilityObject) {
 }
 
 Trifle.TriggerTargetTilesTargetBrain.prototype.setTargets = function() {
+	this.targetTiles = [];
+	this.targetTilePoints = [];
+
 	var self = this;
 
 	if (this.abilityObject.abilityInfo.triggerTypeToTarget) {
@@ -22,8 +25,6 @@ Trifle.TriggerTargetTilesTargetBrain.prototype.setTargets = function() {
 			if (targetHelper.tileIsTargeted()) {
 				self.targetTiles.push(boardPointWithTile.tile);
 				self.targetTilePoints.push(boardPointWithTile);
-				debug("Trigger Target Tiles Target Brain found target: ");
-				debug(boardPointWithTile);
 			}
 		});
 
@@ -31,8 +32,6 @@ Trifle.TriggerTargetTilesTargetBrain.prototype.setTargets = function() {
 			var targetHelper = new Trifle.TargetHelper(self.abilityObject, null, self, possibleTargetTile);
 			if (targetHelper.tileIsTargeted() && !self.targetTiles.includes(possibleTargetTile)) {
 				self.targetTiles.push(possibleTargetTile);
-				debug("Trigger Target Tiles Target Brain found target: ");
-				debug(possibleTargetTile);
 			}
 		});
 	}

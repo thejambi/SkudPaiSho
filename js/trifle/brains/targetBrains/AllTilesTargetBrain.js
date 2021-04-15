@@ -10,6 +10,8 @@ Trifle.AllTilesTargetBrain = function(abilityObject) {
 }
 
 Trifle.AllTilesTargetBrain.prototype.setTargets = function() {
+	this.targetTiles = [];
+	this.targetTilePoints = [];
 	
 	var self = this;
 	this.board.forEachBoardPointWithTile(function(boardPointWithTile) {
@@ -17,8 +19,6 @@ Trifle.AllTilesTargetBrain.prototype.setTargets = function() {
 		if (targetHelper.tileIsTargeted()) {
 			self.targetTiles.push(boardPointWithTile.tile);
 			self.targetTilePoints.push(boardPointWithTile);
-			debug("All Tiles Target Brain found target: ");
-			debug(boardPointWithTile);
 		}
 	});
 
@@ -26,8 +26,6 @@ Trifle.AllTilesTargetBrain.prototype.setTargets = function() {
 		var targetHelper = new Trifle.TargetHelper(self.abilityObject, null, self, tile);
 		if (targetHelper.tileIsTargeted()) {
 			self.targetTiles.push(tile);
-			debug("All Tiles Target Brain found target: ");
-			debug(tile);
 		}
 	});
 };

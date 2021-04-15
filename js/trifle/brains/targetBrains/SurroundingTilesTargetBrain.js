@@ -10,6 +10,9 @@ Trifle.SurroundingTilesTargetBrain = function(abilityObject) {
 }
 
 Trifle.SurroundingTilesTargetBrain.prototype.setTargets = function() {
+	this.targetTiles = [];
+	this.targetTilePoints = [];
+
 	var self = this;
 	
 	this.abilityObject.triggerTargetTilePoints.forEach(function(boardPointWithTile) {
@@ -17,8 +20,6 @@ Trifle.SurroundingTilesTargetBrain.prototype.setTargets = function() {
 		if (targetHelper.tileIsTargeted()) {
 			self.targetTiles.push(boardPointWithTile.tile);
 			self.targetTilePoints.push(boardPointWithTile);
-			debug("Surrounding Tiles Target Brain found target: ");
-			debug(boardPointWithTile);
 		}
 	});
 };

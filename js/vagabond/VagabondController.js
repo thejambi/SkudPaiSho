@@ -33,7 +33,7 @@ VagabondController.prototype.completeSetup = function() {
 	debug("!this.peek...: " + !this.peekAtOpponentMoves);
 
 	if (gameOptionEnabled(SWAP_BISON_WITH_LEMUR)) {
-		VagabondController.setTileDesignsPreference("tggvagabond");
+		VagabondController.setTileDesignsPreference("tggoriginal");
 	}
 };
 

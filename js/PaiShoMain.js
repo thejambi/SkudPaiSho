@@ -2121,7 +2121,10 @@ var GameType = {
 			'geebung02',
 			'sirstotes',
 			'Cannoli',
-			'SpinxKreuz'
+			'SpinxKreuz',
+			'TheRealMomo',
+			'MrsSkud',
+			'markdwagner'
 		],
 		noRankedGames: true
 	},
@@ -2152,7 +2155,9 @@ var GameType = {
 			PLAY_IN_SPACES,
 			VAGABOND_ROTATE,
 			ADEVAR_ROTATE,
-			SPECTATORS_CAN_PLAY
+			GINSENG_ROTATE,
+			SPECTATORS_CAN_PLAY,
+			FULL_GRID
 		],
 		noRankedGames: true
 	},

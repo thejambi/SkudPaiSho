@@ -100,7 +100,7 @@ SolitaireController.prototype.resetMove = function() {
 };
 
 SolitaireController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Solitaire Pai Sho</h4> <p>Solitaire Pai Sho is a game of harmony, based on Skud Pai Sho. The goal of Solitaire Pai Sho is to place Flower Tiles to create a balance of Harmony and Disharmony on the board.</p> <p>Each turn, you are given a tile that's been drawn for you to place on the board. When all the tiles have been played, the game ends and your score will be calculated.</p> <p><a href='https://skudpaisho.com/site/games/solitaire-pai-sho/'>View the resources page</a> for the rules.</p>";
+	return "<h4>Nature's Grove: Respite</h4> <p>Nature's Grove: Respite is a solitaire Pai Sho is a game of harmony, based on Skud Pai Sho. The goal of Respite is to place Flower Tiles to create a balance of Harmony and Disharmony on the board.</p> <p>Each turn, you are given a tile that's been drawn for you to place on the board. When all the tiles have been played, the game ends and your score will be calculated.</p> <p><a href='https://skudpaisho.com/site/games/solitaire-pai-sho/'>Read the full rules here</a>.</p>";
 };
 
 SolitaireController.prototype.getAdditionalMessage = function() {

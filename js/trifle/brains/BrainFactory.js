@@ -27,18 +27,15 @@ Trifle.BrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, 
 			return new Trifle.WhenCapturingTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile:
 			return new Trifle.WhenLandsAdjacentToTargetTileTriggerBrain(triggerContext);
+		case Trifle.AbilityTriggerType.whenTargetTileLandsAdjacent:
+			return new Trifle.WhenTargetTileLandsAdjacentTriggerBrain(triggerContext);
 	}
 };
 
 Trifle.BrainFactory.createAbilityBrain = function(abilityName, abilityObject) {
 	switch(abilityName) {
-		/* case Trifle.AbilityName.cancelZone:
-		case Trifle.AbilityName.immobilizeTiles:
-		case Trifle.AbilityName.drawTilesAlongLineOfSight:
-		case Trifle.AbilityName.protectFromCapture:
-		case Trifle.AbilityName.grantBonusMovement:
-		case Trifle.AbilityName.restrictMovementWithinZone:
-			return new Trifle.SimpleOngoingAbilityBrain(abilityObject); */
+		/* Action abilities will need specific ability brains
+			but ongoing abilities that are checked for in game logic can have generic brain */
 		case Trifle.AbilityName.captureTargetTiles:
 			return new Trifle.CaptureTargetTilesAbilityBrain(abilityObject);
 		default:

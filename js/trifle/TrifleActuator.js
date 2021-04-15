@@ -49,12 +49,18 @@ TrifleActuator.prototype.htmlify = function(board, tileManager) {
 	// Go through tile piles and clear containers
 	self.clearContainerWithId(TrifleActuator.hostTeamTilesDivId);
 	self.clearContainerWithId(TrifleActuator.guestTeamTilesDivId);
-	tileManager.hostTiles.forEach(function(tile) {
-		self.addTeamTile(tile, HOST);
-	});
-	tileManager.guestTiles.forEach(function(tile) {
-		self.addTeamTile(tile, GUEST);
-	});
+	if (tileManager.playersAreSelectingTeams() && !tileManager.hostTeamIsFull()
+			|| !tileManager.playersAreSelectingTeams()) {
+		tileManager.hostTiles.forEach(function(tile) {
+			self.addTeamTile(tile, HOST);
+		});
+	}
+	if (tileManager.playersAreSelectingTeams() && !tileManager.guestTeamIsFull()
+			|| !tileManager.playersAreSelectingTeams()) {
+		tileManager.guestTiles.forEach(function(tile) {
+			self.addTeamTile(tile, GUEST);
+		});
+	}
 
 	/* Team Selection Area */
 	if (!tileManager.hostTeamIsFull()) {
@@ -65,8 +71,7 @@ TrifleActuator.prototype.htmlify = function(board, tileManager) {
 				self.addTeamTile(new Trifle.Tile(Trifle.TileCodes[key], hostPlayerCode), HOST, true);
 			}
 		});
-	}
-	if (!tileManager.guestTeamIsFull()) {
+	} else if (!tileManager.guestTeamIsFull()) {
 		this.addLineBreakInTilePile(GUEST);
 		this.addLineBreakInTilePile(GUEST);
 		Object.keys(Trifle.TileCodes).forEach(function(key,index) {

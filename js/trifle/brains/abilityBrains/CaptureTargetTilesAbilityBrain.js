@@ -4,23 +4,17 @@ Trifle.CaptureTargetTilesAbilityBrain = function(abilityObject) {
 }
 
 Trifle.CaptureTargetTilesAbilityBrain.prototype.activateAbility = function() {
-	debug("Capture Tiles ability activating...");
-	// Attach ability to target tile
-	// Get target tiles
-	var targetTilePoints = this.abilityObject.targetTilePoints;
-
-	debug("Target Tile Points:");
-	debug(targetTilePoints);
+	var targetTilePoints = this.abilityObject.abilityTargetTilePoints;
 
 	this.capturedTiles = [];
 
 	var self = this;
 	if (targetTilePoints && targetTilePoints.length > 0) {
 		targetTilePoints.forEach(function(targetTilePoint) {
-			var capturedTile = targetTilePoint.removeTile();
-			debug("Ability is capturing tile: ");
-			debug(capturedTile);
-			self.capturedTiles.push(capturedTile);
+			if (self.abilityObject.board.capturePossibleBasedOnBannersPlayed(self.abilityObject.sourceTile.ownerName, targetTilePoint)) {
+				var capturedTile = self.abilityObject.board.captureTileOnPoint(targetTilePoint);
+				self.capturedTiles.push(capturedTile);
+			}
 		});
 	}
 

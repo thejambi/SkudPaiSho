@@ -845,8 +845,6 @@ Trifle.Board.prototype.moveTile = function(player, notationPointStart, notationP
 			&& Trifle.TileInfo.tileHasMovementAbility(tileInfo, Trifle.MovementAbility.chargeCapture)) {
 		this.setPossibleMovePoints(boardPointStart);
 		movementPath = boardPointEnd.getOnlyPossibleMovementPath();
-		debug("Movement Path: ");
-		debug(movementPath);
 		this.removePossibleMovePoints();
 
 		movementPath.forEach(function(movePathPoint) {
@@ -917,8 +915,6 @@ Trifle.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedO
 	*/
 
 	var self = this;
-
-	debug("Here we go... Looking for abilities to activate...");
 
 	this.forEachBoardPointWithTile(function(pointWithTile) {
 		var tile = pointWithTile.tile;
@@ -1297,7 +1293,7 @@ Trifle.Board.prototype.setPossibleMovesForBonusMovement = function(movementInfo,
 			this.setPossibleMovementPointsFromMovePointsOnePathAtATime(Trifle.Board.travelShapeMovementFunction, tile, movementInfo, movementStartPoint, movementStartPoint, movementInfo.shape.length, 0, [movementStartPoint]);
 		}
 	}
-	debug("Movement Point Checks: " + this.movementPointChecks);
+	// debug("Movement Point Checks: " + this.movementPointChecks);
 };
 
 Trifle.Board.prototype.setPossibleMovesForMovement = function(movementInfo, boardPointStart) {
@@ -1323,7 +1319,7 @@ Trifle.Board.prototype.setPossibleMovesForMovement = function(movementInfo, boar
 			this.setPossibleMovementPointsFromMovePointsOnePathAtATime(Trifle.Board.travelShapeMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, boardPointStart, movementInfo.shape.length, 0, [boardPointStart]);
 		}
 	}
-	debug("Movement Point Checks: " + this.movementPointChecks);
+	// debug("Movement Point Checks: " + this.movementPointChecks);
 };
 Trifle.Board.standardMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
 	var mustPreserveDirection = Trifle.TileInfo.movementMustPreserveDirection(movementInfo);
@@ -1351,9 +1347,6 @@ Trifle.Board.prototype.setPossibleMovementPointsFromMovePoints = function(movePo
 			|| movePoints.length <= 0) {
 		return;	// Complete
 	}
-
-	debug("MovePoints: ");
-	debug(movePoints);
 
 	var self = this;
 	var nextPointsConfirmed = [];
@@ -1611,7 +1604,7 @@ Trifle.Board.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targe
 	var canCaptureTarget = this.targetPointHasTileTileThatCanBeCaptured(tile, movementInfo, fromPoint, targetPoint);
 	return (!targetPoint.hasTile() || canCaptureTarget)
 		&& (!targetPoint.isType(TEMPLE) || canCaptureTarget)
-		&& !this.tileZonedOutOfSpace(tile, movementInfo, targetPoint)
+		&& !this.tileZonedOutOfSpace(tile, movementInfo, targetPoint, canCaptureTarget)
 		&& !this.tileMovementIsImmobilized(tile, movementInfo, fromPoint);
 };
 
@@ -1655,6 +1648,21 @@ Trifle.Board.prototype.tileHasActiveCaptureProtectionFromCapturingTile = functio
 	return tileHasActiveCaptureProtection; */
 };
 
+Trifle.Board.prototype.capturePossibleBasedOnBannersPlayed = function(capturingPlayer, targetPoint) {
+	var targetTile = targetPoint.tile;
+	var targetTileInfo = TrifleTiles[targetTile.code];
+
+	var playerBannerPlayed = this.hostBannerPlayed;
+	var otherBannerPlayed = this.guestBannerPlayed;
+	if (capturingPlayer === GUEST) {
+		playerBannerPlayed = this.guestBannerPlayed;
+		otherBannerPlayed = this.hostBannerPlayed;
+	}
+
+	return (playerBannerPlayed && Trifle.TileInfo.tileIsOneOfTheseTypes(targetTileInfo, [Trifle.TileType.flower, Trifle.TileType.banner]))
+			|| (playerBannerPlayed && otherBannerPlayed);
+};
+
 Trifle.Board.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, targetPoint) {
 	var playerBannerPlayed = this.hostBannerPlayed;
 	var otherBannerPlayed = this.guestBannerPlayed;
@@ -1663,13 +1671,29 @@ Trifle.Board.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, 
 		otherBannerPlayed = this.hostBannerPlayed;
 	}
 
+	var captureProhibited = this.abilityManager.abilityTargetingTileExists(Trifle.AbilityName.prohibitTileFromCapturing, tile);
+
 	var targetTile = targetPoint.tile;
 	var targetTileInfo = TrifleTiles[targetTile.code];
 
-	return targetTileInfo 
-		&& movementInfo 
+	var capturePossibleWithMovement = movementInfo
 		&& movementInfo.captureTypes
-		&& movementInfo.captureTypes.includes(Trifle.CaptureType.all)
+		&& movementInfo.captureTypes.includes(Trifle.CaptureType.all);
+	
+	var self = this;
+	if (movementInfo && movementInfo.captureTypes && movementInfo.captureTypes.length) {
+		movementInfo.captureTypes.forEach(function(captureTypeInfo) {
+			if (captureTypeInfo.type && captureTypeInfo.type === Trifle.CaptureType.tilesTargetedByAbility) {
+				captureTypeInfo.targetAbilities.forEach(function(targetAbilityName) {
+					capturePossibleWithMovement = self.abilityManager.abilityTargetingTileExists(targetAbilityName, targetPoint.tile);
+				});
+			} 
+		});
+	}
+
+	return !captureProhibited
+		&& targetTileInfo 
+		&& capturePossibleWithMovement
 		&& (
 			(playerBannerPlayed 
 				&& Trifle.TileInfo.tileIsOneOfTheseTypes(targetTileInfo, [Trifle.TileType.flower, Trifle.TileType.banner])
@@ -1730,10 +1754,10 @@ Trifle.Board.prototype.movementInfoHasAbility = function(movementInfo, movementA
 	return matchFound;
 };
 
-Trifle.Board.prototype.tileZonedOutOfSpace = function(tile, movementInfo, targetPoint) {
+Trifle.Board.prototype.tileZonedOutOfSpace = function(tile, movementInfo, targetPoint, canCaptureTarget) {
 	var isZonedOut = this.tileZonedOutOfSpaceByMovementRestriction(tile, movementInfo, targetPoint);
 	
-	isZonedOut = isZonedOut || this.tileZonedOutOfSpaceByAbility(tile, targetPoint);
+	isZonedOut = isZonedOut || this.tileZonedOutOfSpaceByAbility(tile, targetPoint, canCaptureTarget);
 
 	return isZonedOut;
 };
@@ -1742,7 +1766,7 @@ Trifle.Board.prototype.tileZoneIsActive = function(tile) {
 	return !this.abilityManager.abilityTargetingTileExists(Trifle.AbilityName.cancelZone, tile);
 };
 
-Trifle.Board.prototype.tileZonedOutOfSpaceByAbility = function(tile, targetPoint) {
+Trifle.Board.prototype.tileZonedOutOfSpaceByAbility = function(tile, targetPoint, canCaptureTarget) {
 	var isZonedOut = false;
 
 	var self = this;
@@ -1750,6 +1774,14 @@ Trifle.Board.prototype.tileZonedOutOfSpaceByAbility = function(tile, targetPoint
 		var restrictMovementWithinZoneAbilities = self.abilityManager.getAbilitiesTargetingTileFromSourceTile(Trifle.AbilityName.restrictMovementWithinZone, tile, checkBoardPoint.tile);
 
 		if (restrictMovementWithinZoneAbilities.length
+				&& self.pointTileZoneContainsPoint(checkBoardPoint, targetPoint)) {
+			isZonedOut = true;
+			return;
+		}
+
+		var restrictMovementWithinZoneUnlessCapturingAbilities = self.abilityManager.getAbilitiesTargetingTileFromSourceTile(Trifle.AbilityName.restrictMovementWithinZoneUnlessCapturing, tile, checkBoardPoint.tile);
+
+		if (!canCaptureTarget && restrictMovementWithinZoneUnlessCapturingAbilities.length
 				&& self.pointTileZoneContainsPoint(checkBoardPoint, targetPoint)) {
 			isZonedOut = true;
 			return;
@@ -1850,6 +1882,17 @@ Trifle.Board.prototype.removePossibleMovePoints = function() {
 	});
 };
 
+Trifle.Board.prototype.captureTileOnPoint = function(boardPoint) {
+	var capturedTile = boardPoint.removeTile();
+
+	// If tile is capturing a Banner tile, there's a winner
+	if (capturedTile && Trifle.TileInfo.tileIsBanner(TrifleTiles[capturedTile.code])) {
+		this.winners.push(getOpponentName(capturedTile.ownerName));
+	}
+
+	return capturedTile;
+};
+
 Trifle.Board.prototype.getFireLilyPoint = function(player) {
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
@@ -1888,7 +1931,7 @@ Trifle.Board.prototype.setDeployPointsPossibleMoves = function(tile) {
 
 	if (tileInfo && tileInfo.specialDeployTypes) {
 		tileInfo.specialDeployTypes.forEach(function(specialDeployInfo) {
-			self.setDeployPointsPossibleForSpecialDeploy(player, tile, tileInfo, specialDeployInfo);
+			self.setDeployPointsPossibleForSpecialDeploy(tile, tileInfo, specialDeployInfo);
 		});
 	}
 
@@ -1929,18 +1972,18 @@ Trifle.Board.prototype.setDeployPointsPossibleMoves = function(tile) {
 	}
 };
 
-Trifle.Board.prototype.setDeployPointsPossibleForSpecialDeploy = function(player, tile, tileInfo, specialDeployInfo) {
+Trifle.Board.prototype.setDeployPointsPossibleForSpecialDeploy = function(tile, tileInfo, specialDeployInfo) {
 	if (specialDeployInfo.type === Trifle.SpecialDeployType.withinFriendlyTileZone) {
-		this.setDeployPointsWithinTileZone(player, tile, tileInfo, specialDeployInfo);
+		this.setDeployPointsWithinTileZone(tile, tileInfo, specialDeployInfo);
 	}
 };
 
-Trifle.Board.prototype.setDeployPointsWithinTileZone = function(zoneOwner, tile, tileInfo, specialDeployInfo) {
+Trifle.Board.prototype.setDeployPointsWithinTileZone = function(tile, tileInfo, specialDeployInfo) {
 	if (specialDeployInfo.targetTileCodes && specialDeployInfo.targetTileCodes.length > 0) {
 		var self = this;
 		this.forEachBoardPoint(function(targetPoint) {
 			if (!targetPoint.hasTile() && !targetPoint.isType(TEMPLE)
-					&& self.pointIsWithinZoneOfOneOfTheseTiles(targetPoint, specialDeployInfo.targetTileCodes, zoneOwner)
+					&& self.pointIsWithinZoneOfOneOfTheseTiles(targetPoint, specialDeployInfo.targetTileCodes, tile.ownerName)
 					&& !self.tileZonedOutOfSpaceByAbility(tile, targetPoint)) {
 				targetPoint.addType(POSSIBLE_MOVE);
 			}
@@ -2153,8 +2196,6 @@ Trifle.Board.prototype.activateAbility = function(tileOwningAbility, targetTile,
 			targetTileType: targetTileType,
 			ability: abilityInfo
 		});
-		debug("Activated ability!");
-		debug(abilityInfo);
 	}
 };
 
@@ -2162,17 +2203,15 @@ Trifle.Board.prototype.tickDurationAbilities = function() {
 	this.abilityManager.tickDurationAbilities();
 
 	/* old: */
-	for (var i = this.activeDurationAbilities.length - 1; i >= 0; i--) {
+	/* for (var i = this.activeDurationAbilities.length - 1; i >= 0; i--) {
 		var durationAbilityDetails = this.activeDurationAbilities[i];
 		var durationAbilityInfo = durationAbilityDetails.ability;
 		durationAbilityInfo.remainingDuration -= 0.5;
 		if (durationAbilityInfo.remainingDuration <= 0) {
 			durationAbilityInfo.active = false;
 			this.activeDurationAbilities.splice(i, 1);
-			debug("Ability deactivated!");
-			debug(durationAbilityInfo);
 		}
-	}
+	} */
 };
 
 

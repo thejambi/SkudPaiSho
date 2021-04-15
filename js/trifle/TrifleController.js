@@ -16,11 +16,6 @@ Trifle.Controller = function(gameContainer, isMobile) {
 	this.isPaiShoGame = true;
 }
 
-Trifle.Controller.userIsTrifleDeveloper = function() {
-	return usernameIsOneOf(
-		);
-};
-
 Trifle.Controller.prototype.getGameTypeId = function() {
 	return GameType.Trifle.id;
 };
@@ -178,21 +173,17 @@ Trifle.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 	if (this.theGame.playersAreSelectingTeams()) {
 		var selectedTile = new Trifle.Tile(tileCode, playerCode);
 		if (tileDiv.classList.contains("selectedFromPile")) {
-			debug("You picked one for the team!");
 			var teamIsNowFull = this.theGame.addTileToTeam(selectedTile);
 			if (teamIsNowFull) {
-				debug("Gotta build notation");
 				this.notationBuilder.moveType = TEAM_SELECTION;
 				this.notationBuilder.teamSelection = this.theGame.getPlayerTeamSelectionTileCodeList(player);
 				this.completeMove();
 			}
-		} else {
+		} else if (!this.theGame.tileManager.playerTeamIsFull(selectedTile.ownerName)) {
 			// Need to remove from team instead
-			debug("You are removing one from your team :(");
 			this.theGame.removeTileFromTeam(selectedTile);
 		}
 	} else if (this.notationBuilder.status === BRAND_NEW) {
-		debug("Yes, begin deploying!");
 		// new Deploy turn
 		tile.selectedFromPile = true;
 
