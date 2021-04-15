@@ -2123,7 +2123,8 @@ var GameType = {
 			'Cannoli',
 			'SpinxKreuz',
 			'TheRealMomo',
-			'MrsSkud'
+			'MrsSkud',
+			'markdwagner'
 		],
 		noRankedGames: true
 	},
