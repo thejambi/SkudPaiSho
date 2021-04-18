@@ -2257,11 +2257,11 @@ function getGameControllerForGameType(gameTypeId) {
 			controller = new MeadowController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Trifle.id:
-			if (gameDevOn || GameType.Trifle.usersWithAccess.includes(getUsername())) {
+			// if (gameDevOn || GameType.Trifle.usersWithAccess.includes(getUsername())) {
 				controller = new Trifle.Controller(gameContainerDiv, isMobile);
-			} else {
-				closeGame();
-			}
+			// } else {
+			// 	closeGame();
+			// }
 			break;
 		case GameType.Hexentafl.id:
 			controller = new HexentaflController(gameContainerDiv, isMobile);

@@ -155,6 +155,10 @@ Trifle.SpawnLocation = {
 	adjacent: "adjacent"
 };
 
+Trifle.AttributeType = {
+	gigantic: "gigantic"
+}
+
 Trifle.AbilityName = {
 	captureTargetTiles: "captureTargetTiles",
 	removeEffects: "removeEffects",
@@ -169,7 +173,8 @@ Trifle.AbilityName = {
 	cancelAbilities: "cancelAbilities",
 	cancelAbilitiesTargetingTiles: "cancelAbilitiesTargetingTiles",
 	prohibitTileFromCapturing: "prohibitTileFromCapturing",
-	changeMovementDistanceByFactor: "changeMovementDistanceByFactor"
+	changeMovementDistanceByFactor: "changeMovementDistanceByFactor",
+	growGigantic: "growGigantic"
 };
 
 Trifle.AbilityType = {
@@ -1012,6 +1017,36 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			"Deploys anywhere",
 			"Moves 1 space",
 			"Enemy tiles that land adjacent to BoarQPine are captured"
+		]
+	};
+
+	//
+
+	TrifleTiles[Trifle.TileCodes.Sunflower] = {	/* Todo */
+		available: false,
+		types: [Trifle.TileType.flower],
+		identifiers: [Trifle.TileIdentifier.earth],
+		deployTypes: [Trifle.DeployType.anywhere],
+		attributes: [	// Attribute - for looking at when placing a piece, etc
+			Trifle.AttributeType.gigantic
+		],
+		abilities: [	// Ability - for when on the board
+			{
+				type: Trifle.AbilityName.growGigantic,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsOnBoard,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				inevitable: true
+			}
+		],
+		textLines: [
+			"Flower | Earth",
+			"Deploys anywhere",
+			"Sunflower is a 2x2 giant tile that occupies four spaces instead of 1"
 		]
 	};
 
