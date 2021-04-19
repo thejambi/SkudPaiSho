@@ -670,7 +670,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		textLines: [
 			"Banner | Water",
 			"Deploys anywhere",
-			"Tiles adjacent to Lavender are immobilized"
+			"Moves 2 spaces"
 		]
 	};
 
