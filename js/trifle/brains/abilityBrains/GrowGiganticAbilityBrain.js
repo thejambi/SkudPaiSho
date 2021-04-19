@@ -7,9 +7,11 @@ Trifle.GrowGiganticAbilityBrain = function(abilityObject) {
 Trifle.GrowGiganticAbilityBrain.prototype.activateAbility = function() {
 	var targetTilePoints = this.abilityObject.abilityTargetTilePoints;
 
-	if (this.abilityObject.sourceTilePoint.isGigantic) {
+	if (this.abilityObject.sourceTile.isGigantic) {
 		return;	// End
 	}
+
+	this.abilityObject.sourceTile.isGigantic = true;
 
 	var self = this;
 	if (targetTilePoints && targetTilePoints.length > 0) {
@@ -19,11 +21,11 @@ Trifle.GrowGiganticAbilityBrain.prototype.activateAbility = function() {
 				occupyPoint.putTile(self.abilityObject.sourceTile);
 				occupyPoint.occupiedByAbility = true;
 				occupyPoint.pointOccupiedBy = self.abilityObject.sourceTilePoint;
-				occupyPoint.isGigantic = true;
+				// occupyPoint.isGigantic = true;
 			});
 
 			self.abilityObject.sourceTilePoint.otherPointsOccupied = occupiedPoints;
-			self.abilityObject.sourceTilePoint.isGigantic = true;
+			// self.abilityObject.sourceTilePoint.isGigantic = true;
 		});
 	}
 };

@@ -885,9 +885,11 @@ Trifle.Board.prototype.moveTile = function(player, notationPointStart, notationP
 		movementPath = boardPointEnd.getOnlyPossibleMovementPath();
 		this.removePossibleMovePoints();
 
+		var self = this;
 		movementPath.forEach(function(movePathPoint) {
 			if (movePathPoint.hasTile() && movePathPoint !== boardPointStart) {
-				capturedTiles.push(movePathPoint.removeTile());
+				capturedTiles.push(self.captureTileOnPoint(movePathPoint));
+				// capturedTiles.push(movePathPoint.removeTile());
 			}
 		});
 	}
@@ -906,7 +908,8 @@ Trifle.Board.prototype.moveTile = function(player, notationPointStart, notationP
 	}
 
 	if (boardPointEnd.hasTile() && !capturedTiles.includes(boardPointEnd.tile)) {
-		capturedTiles.push(boardPointEnd.tile);
+		// capturedTiles.push(boardPointEnd.tile);
+		capturedTiles.push(this.captureTileOnPoint(boardPointEnd));
 	}
 
 	boardPointEnd.putTile(tile);
@@ -1921,7 +1924,26 @@ Trifle.Board.prototype.removePossibleMovePoints = function() {
 };
 
 Trifle.Board.prototype.captureTileOnPoint = function(boardPoint) {
-	var capturedTile = boardPoint.removeTile();
+	var capturedTile = null;
+
+	if (boardPoint.occupiedByAbility) {
+		var occupyingPoint = boardPoint.pointOccupiedBy;
+		occupyingPoint.otherPointsOccupied.forEach(function(occupiedPoint) {
+			occupiedPoint.removeTile();
+			occupiedPoint.occupiedByAbility = false;
+			occupiedPoint.pointOccupiedBy = null;
+		});
+		capturedTile = occupyingPoint.removeTile();
+	} else if (boardPoint.otherPointsOccupied) {
+		boardPoint.otherPointsOccupied.forEach(function(occupiedPoint) {
+			occupiedPoint.removeTile();
+			occupiedPoint.occupiedByAbility = false;
+			occupiedPoint.pointOccupiedBy = null;
+		});
+		capturedTile = boardPoint.removeTile();
+	} else {
+		capturedTile = boardPoint.removeTile();
+	}
 
 	// If tile is capturing a Banner tile, there's a winner
 	if (capturedTile && Trifle.TileInfo.tileIsBanner(TrifleTiles[capturedTile.code])) {

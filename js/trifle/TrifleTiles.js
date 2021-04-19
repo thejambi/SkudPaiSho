@@ -1022,8 +1022,8 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 
 	//
 
-	TrifleTiles[Trifle.TileCodes.Sunflower] = {	/* Todo */
-		available: false,
+	TrifleTiles[Trifle.TileCodes.Sunflower] = {	/* Done? Need testing */
+		available: true,
 		types: [Trifle.TileType.flower],
 		identifiers: [Trifle.TileIdentifier.earth],
 		deployTypes: [Trifle.DeployType.anywhere],
@@ -1237,7 +1237,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	TrifleTiles[Trifle.TileCodes.AirGlider] = {
 		available: false,
 		types: [Trifle.TileType.traveler],
-		deployTypes: [Trifle.DeployType.temple],
+		deployTypes: [Trifle.DeployType.temple, Trifle.DeployType.anywhere],
 		movements: [
 			{
 				type: Trifle.MovementType.travelShape,
@@ -1254,8 +1254,23 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				type: Trifle.MovementType.anywhere,
 				captureTypes: [Trifle.CaptureType.all]
 			}
+		], // Ability testing...
+		attributes: [	// Attribute - for looking at when placing a piece, etc
+			Trifle.AttributeType.gigantic
+		],
+		abilities: [	// Ability - for when on the board
+			{
+				type: Trifle.AbilityName.growGigantic,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsOnBoard,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				inevitable: true
+			}
 		]
-		// Ability testing...
 	};
 
 	/* TrifleTiles[Trifle.TileCodes.Lotus] = {

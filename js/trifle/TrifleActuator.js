@@ -169,6 +169,8 @@ Trifle.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 				// Gigantic!
 				this.adjustBoardPointForGiganticDeploy(theDiv, boardPoint);
 			}
+
+			theDiv.style.zIndex = 95;
 		}
 		
 		if (this.mobile) {
@@ -186,7 +188,7 @@ Trifle.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 		var theImg = document.createElement("img");
 
 		var moveToAnimate = null;
-		if (moveToAnimate || boardPoint.isGigantic) {
+		if (moveToAnimate || boardPoint.tile.isGigantic) {
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
 		}
 
@@ -275,7 +277,7 @@ Trifle.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnima
 
 	var scaleValue = 1;
 
-	if (boardPoint.isGigantic) {
+	if (boardPoint.tile.isGigantic) {
 		scaleValue = 2;
 	}
 
@@ -284,7 +286,7 @@ Trifle.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnima
 
 	var left = (x - ox);
 	var top = (y - oy);
-	if (boardPoint.isGigantic) {
+	if (boardPoint.tile.isGigantic) {
 		// left += 0.5;
 		// top += 0.5;
 		// finalLeft += 0.5;
