@@ -7,7 +7,8 @@ Trifle.GrowGiganticAbilityBrain = function(abilityObject) {
 Trifle.GrowGiganticAbilityBrain.prototype.activateAbility = function() {
 	var targetTilePoints = this.abilityObject.abilityTargetTilePoints;
 
-	if (this.abilityObject.sourceTile.isGigantic) {
+	if (this.abilityObject.sourceTile.isGigantic
+			|| this.abilityObject.sourceTilePoint.occupiedByAbility) {	// What's best checks here?
 		return;	// End
 	}
 

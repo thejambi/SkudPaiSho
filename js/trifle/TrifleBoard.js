@@ -872,6 +872,15 @@ Trifle.Board.prototype.moveTile = function(player, notationPointStart, notationP
 	var boardPointStart = this.cells[startRowCol.row][startRowCol.col];
 	var boardPointEnd = this.cells[endRowCol.row][endRowCol.col];
 
+	/* Does tile occupy other spaces? If so, remove the tile from those points */
+	if (boardPointStart.otherPointsOccupied && boardPointStart.otherPointsOccupied.length) {
+		boardPointStart.otherPointsOccupied.forEach(function(occupiedPoint) {
+			occupiedPoint.occupiedByAbility = false;
+			occupiedPoint.pointOccupiedBy = null;
+			occupiedPoint.removeTile();
+		});
+	}
+
 	var capturedTiles = [];
 
 	/* If movement path is needed, get that */
@@ -900,12 +909,13 @@ Trifle.Board.prototype.moveTile = function(player, notationPointStart, notationP
 		debug("Error: No tile to move!");
 	}
 
-	// If tile is capturing a Banner tile, there's a winner
+	/* // If tile is capturing a Banner tile, there's a winner
+	// This now happens in `captureTileOnPoint` function
 	if (boardPointEnd.hasTile() 
 			&& Trifle.TileInfo.tileIsBanner(TrifleTiles[boardPointEnd.tile.code])
 			&& tile.ownerName !== boardPointEnd.tile.ownerName) {
 		this.winners.push(tile.ownerName);
-	}
+	} */
 
 	if (boardPointEnd.hasTile() && !capturedTiles.includes(boardPointEnd.tile)) {
 		// capturedTiles.push(boardPointEnd.tile);
@@ -1240,6 +1250,10 @@ Trifle.Board.prototype.setPossibleMovePoints = function(boardPointStart) {
 		var playerName = boardPointStart.tile.ownerName;
 
 		var tileInfo = TrifleTiles[boardPointStart.tile.code];
+
+		this.currentlyDeployingTile = boardPointStart.tile;
+		this.currentlyDeployingTileInfo = tileInfo;
+
 		if (tileInfo) {
 			var self = this;
 			if (tileInfo.movements) {
@@ -1643,7 +1657,7 @@ Trifle.Board.prototype.canMoveHereMoreEfficientlyAlready = function(boardPoint, 
 Trifle.Board.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targetPoint, fromPoint) {
 	var tileInfo = TrifleTiles[tile.code];
 	var canCaptureTarget = this.targetPointHasTileTileThatCanBeCaptured(tile, movementInfo, fromPoint, targetPoint);
-	return (!targetPoint.hasTile() || canCaptureTarget)
+	return (!targetPoint.hasTile() || canCaptureTarget || targetPoint.tile === tile)
 		&& (!targetPoint.isType(TEMPLE) || canCaptureTarget)
 		&& !this.tileZonedOutOfSpace(tile, movementInfo, targetPoint, canCaptureTarget)
 		&& !this.tileMovementIsImmobilized(tile, movementInfo, fromPoint);
@@ -1775,7 +1789,8 @@ Trifle.Board.prototype.tilesBelongToDifferentOwnersOrTargetTileHasFriendlyCaptur
 Trifle.Board.prototype.tileCanMoveThroughPoint = function(tile, movementInfo, targetPoint, fromPoint) {
 	var tileInfo = TrifleTiles[tile.code];
 	return tileInfo
-		&& (!targetPoint.hasTile()
+		&& (
+			(!targetPoint.hasTile() || targetPoint.tile === tile)
 				|| this.movementInfoHasAbility(movementInfo, Trifle.MovementAbility.jumpOver)
 				|| (this.movementInfoHasAbility(movementInfo, Trifle.MovementAbility.chargeCapture) && this.tileCanMoveOntoPoint(tile, movementInfo, targetPoint, fromPoint))
 			)
