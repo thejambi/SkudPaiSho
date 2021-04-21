@@ -14,7 +14,7 @@ Trifle.GameManager = function(actuator, ignoreActuate, isCopy) {
 // Set up the game
 Trifle.GameManager.prototype.setup = function (ignoreActuate) {
 
-	this.board = new Trifle.Board(this.tileManager);
+	this.board = new PaiShoGames.Board(this.tileManager);
 
 	// Update the actuator
 	if (!ignoreActuate) {

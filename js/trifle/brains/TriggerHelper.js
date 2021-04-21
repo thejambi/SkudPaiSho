@@ -2,7 +2,7 @@
 Trifle.TriggerHelper = function(triggerContext, possibleTargetTilePoint) {
 	this.triggerContext = triggerContext;
 	this.possibleTargetTilePoint = possibleTargetTilePoint;
-	this.possibleTargetTileInfo = TrifleTiles[this.possibleTargetTilePoint.tile.code];
+	this.possibleTargetTileInfo = PaiShoGames.currentTileMetadata[this.possibleTargetTilePoint.tile.code];
 	this.abilityInfo = this.triggerContext.tileAbilityInfo;
 	this.triggerInfo = this.triggerContext.currentTrigger;
 };

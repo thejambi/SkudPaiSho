@@ -80,7 +80,7 @@ Trifle.Tile.getTileName = function(tileCode) {
 };
 
 Trifle.Tile.getTeamLimitForTile = function(tileCode) {
-	var tileData = TrifleTiles[tileCode];
+	var tileData = PaiShoGames.currentTileMetadata[tileCode];
 	if (tileData) {
 		if (tileData.teamLimit) {
 			return tileData.teamLimit;

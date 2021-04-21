@@ -354,7 +354,7 @@ Trifle.TileInfo.defineAbilityTypes = function () {
 };
 
 Trifle.TileInfo.defineTrifleTiles = function() {
-	TrifleTiles = {};
+	var TrifleTiles = {};
 
 	/* Air */
 
@@ -1368,13 +1368,14 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		}
 	}; */
 
+	Trifle.TrifleTiles = TrifleTiles;
 };
 
 
 Trifle.TileInfo.getReadableDescription = function(tileCode) {
 	var tileHtml = "";
 
-	var tileInfo = TrifleTiles[tileCode];
+	var tileInfo = PaiShoGames.currentTileMetadata[tileCode];
 
 	if (tileInfo.textLines) {
 		tileInfo.textLines.forEach(function(textLine) {
