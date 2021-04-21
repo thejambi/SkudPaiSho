@@ -7,8 +7,11 @@ Trifle.GrowGiganticAbilityBrain = function(abilityObject) {
 Trifle.GrowGiganticAbilityBrain.prototype.activateAbility = function() {
 	var targetTilePoints = this.abilityObject.abilityTargetTilePoints;
 
-	if (this.abilityObject.sourceTile.isGigantic
-			|| this.abilityObject.sourceTilePoint.occupiedByAbility) {	// What's best checks here?
+	// if (this.abilityObject.sourceTilePoint.occupiedByAbility) {	// What's best checks here?
+	// 	return;	// End
+	// }
+
+	if (this.abilityObject.sourceTilePoint !== this.abilityObject.sourceTile.seatedPoint) {
 		return;	// End
 	}
 
@@ -17,16 +20,18 @@ Trifle.GrowGiganticAbilityBrain.prototype.activateAbility = function() {
 	var self = this;
 	if (targetTilePoints && targetTilePoints.length > 0) {
 		targetTilePoints.forEach(function(targetTilePoint) {
-			var occupiedPoints = self.board.getGrowGiantOccupiedPoints(targetTilePoint);
-			occupiedPoints.forEach(function(occupyPoint) {
-				occupyPoint.putTile(self.abilityObject.sourceTile);
-				occupyPoint.occupiedByAbility = true;
-				occupyPoint.pointOccupiedBy = self.abilityObject.sourceTilePoint;
-				// occupyPoint.isGigantic = true;
-			});
+			if (targetTilePoint === self.abilityObject.sourceTile.seatedPoint) {
+				var occupiedPoints = self.board.getGrowGiantOccupiedPoints(targetTilePoint);
+				occupiedPoints.forEach(function(occupyPoint) {
+					occupyPoint.putTile(self.abilityObject.sourceTile);
+					occupyPoint.occupiedByAbility = true;
+					occupyPoint.pointOccupiedBy = self.abilityObject.sourceTilePoint;
+					// occupyPoint.isGigantic = true;
+				});
 
-			self.abilityObject.sourceTilePoint.otherPointsOccupied = occupiedPoints;
-			// self.abilityObject.sourceTilePoint.isGigantic = true;
+				self.abilityObject.sourceTilePoint.otherPointsOccupied = occupiedPoints;
+				// self.abilityObject.sourceTilePoint.isGigantic = true;
+			}
 		});
 	}
 };

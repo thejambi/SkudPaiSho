@@ -386,6 +386,7 @@ Trifle.Board.prototype.putTileOnPoint = function(tile, notationPoint) {
 	var point = this.getPointFromNotationPoint(notationPoint);
 	
 	point.putTile(tile);
+	tile.seatedPoint = point;
 
 	/* // Check if gigantic...
 	var tileInfo = TrifleTiles[tile.code];
@@ -860,6 +861,18 @@ Trifle.Board.prototype.pointIsOpenGate = function(notationPoint) {
 	return point.isOpenGate();
 };
 
+Trifle.Board.prototype.debugPointsOccupiedByAbility = function() {
+	this.forEachBoardPoint(function(bp) {
+		if (bp.occupiedByAbility) {
+			debug(bp);
+		}
+		if (bp.otherPointsOccupied) {
+			debug("Occupies other points:");
+			debug(bp);
+		}
+	});
+};
+
 Trifle.Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
 	this.tilesCapturedByTriggeredAbility = [];
 	var startRowCol = notationPointStart.rowAndColumn;
@@ -923,6 +936,7 @@ Trifle.Board.prototype.moveTile = function(player, notationPointStart, notationP
 	}
 
 	boardPointEnd.putTile(tile);
+	tile.seatedPoint = boardPointEnd;
 
 	this.setPointFlags();
 
