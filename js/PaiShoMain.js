@@ -80,7 +80,7 @@ var paiShoBoardDesignTypeValuesDefault = {
 	mayfair: "Mayfair Filter",
 	skudShop: "The Garden Gate Shop",
 	// vescucci: "Vescucci Style",
-	// xiangqi: "Xiangqi-Style Tile Colors",
+	xiangqi: "Xiangqi-Style Tile Colors",
 	// pixelsho: "Pixel-Sho",
 	remix: "Remix",
 	nomadsky: "Nomad's Sky by Morbius",
