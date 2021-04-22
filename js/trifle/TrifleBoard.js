@@ -1671,7 +1671,7 @@ Trifle.Board.prototype.canMoveHereMoreEfficientlyAlready = function(boardPoint, 
 Trifle.Board.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targetPoint, fromPoint) {
 	var tileInfo = TrifleTiles[tile.code];
 	var canCaptureTarget = this.targetPointHasTileTileThatCanBeCaptured(tile, movementInfo, fromPoint, targetPoint);
-	return (!targetPoint.hasTile() || canCaptureTarget || targetPoint.tile === tile)
+	return (!targetPoint.hasTile() || canCaptureTarget || (targetPoint.tile === tile && targetPoint.occupiedByAbility))
 		&& (!targetPoint.isType(TEMPLE) || canCaptureTarget)
 		&& !this.tileZonedOutOfSpace(tile, movementInfo, targetPoint, canCaptureTarget)
 		&& !this.tileMovementIsImmobilized(tile, movementInfo, fromPoint);
@@ -1804,7 +1804,7 @@ Trifle.Board.prototype.tileCanMoveThroughPoint = function(tile, movementInfo, ta
 	var tileInfo = TrifleTiles[tile.code];
 	return tileInfo
 		&& (
-			(!targetPoint.hasTile() || targetPoint.tile === tile)
+			(!targetPoint.hasTile() || (targetPoint.tile === tile && targetPoint.occupiedByAbility))
 				|| this.movementInfoHasAbility(movementInfo, Trifle.MovementAbility.jumpOver)
 				|| (this.movementInfoHasAbility(movementInfo, Trifle.MovementAbility.chargeCapture) && this.tileCanMoveOntoPoint(tile, movementInfo, targetPoint, fromPoint))
 			)
