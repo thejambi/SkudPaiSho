@@ -2157,7 +2157,8 @@ var GameType = {
 			ADEVAR_ROTATE,
 			GINSENG_ROTATE,
 			SPECTATORS_CAN_PLAY,
-			FULL_GRID
+			FULL_GRID,
+			SQUARE_SPACES
 		],
 		noRankedGames: true
 	},

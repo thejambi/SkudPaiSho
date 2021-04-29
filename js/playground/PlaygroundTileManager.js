@@ -108,13 +108,49 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Warfront", "Warfront_SiegeEngine2", ownerCode));
 	tiles.push(new PlaygroundTile("Warfront", "Warfront_Soldier2", ownerCode));
 
-	// Chess
+	// Chess (black and white colors)
 	tiles.push(new PlaygroundTile("Chess", "Chess_K", ownerCode));
 	tiles.push(new PlaygroundTile("Chess", "Chess_Q", ownerCode));
 	tiles.push(new PlaygroundTile("Chess", "Chess_R", ownerCode));
 	tiles.push(new PlaygroundTile("Chess", "Chess_N", ownerCode));
 	tiles.push(new PlaygroundTile("Chess", "Chess_B", ownerCode));
 	tiles.push(new PlaygroundTile("Chess", "Chess_P", ownerCode));
+
+	// Sovereign Chess Additional Pieces
+	tiles.push(new PlaygroundTile("Chess", "Chess_KAshSlate", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_QAshSlate", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_RAshSlate", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_NAshSlate", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_BAshSlate", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_PAshSlate", ownerCode));
+
+	tiles.push(new PlaygroundTile("Chess", "Chess_KPinkRed", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_QPinkRed", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_RPinkRed", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_NPinkRed", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_BPinkRed", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_PPinkRed", ownerCode));
+
+	tiles.push(new PlaygroundTile("Chess", "Chess_KOrangeYellow", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_QOrangeYellow", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_ROrangeYellow", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_NOrangeYellow", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_BOrangeYellow", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_POrangeYellow", ownerCode));
+
+	tiles.push(new PlaygroundTile("Chess", "Chess_KGreenCyan", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_QGreenCyan", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_RGreenCyan", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_NGreenCyan", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_BGreenCyan", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_PGreenCyan", ownerCode));
+
+	tiles.push(new PlaygroundTile("Chess", "Chess_KNavyViolet", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_QNavyViolet", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_RNavyViolet", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_NNavyViolet", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_BNavyViolet", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_PNavyViolet", ownerCode));
 
 	// Other from Sirstotes
 	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Water", ownerCode));

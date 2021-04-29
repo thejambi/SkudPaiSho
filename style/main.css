@@ -585,6 +585,9 @@ figure > div {
 .activePoint:hover {
   box-shadow: 0px 0px 24px 2px #054;
 }
+.point.pointSquare {
+  border-radius: 0px;
+}
 
 .hasTile {
   box-shadow: 0px 0px 4px #555;

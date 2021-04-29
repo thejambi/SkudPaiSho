@@ -135,6 +135,8 @@ gameOptionDescriptions[GINSENG_ROTATE] = "Ginseng Board Rotation";
 var FULL_GRID = "FullGrid";
 gameOptionDescriptions[FULL_GRID] = "Full Grid";
 
+var SQUARE_SPACES = "SquareSpaces";
+gameOptionDescriptions[SQUARE_SPACES] = "Square Spaces";
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {

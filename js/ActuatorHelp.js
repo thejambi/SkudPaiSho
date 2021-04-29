@@ -48,6 +48,10 @@ function createBoardPointDiv(boardPoint) {
 
 	theDiv.classList.add("point");
 
+	if (gameOptionEnabled(SQUARE_SPACES)) {
+		theDiv.classList.add("pointSquare");
+	}
+
 	var notationPointString = new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString;
 
 	theDiv.setAttribute("name", notationPointString);
