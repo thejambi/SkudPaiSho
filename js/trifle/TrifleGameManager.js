@@ -15,6 +15,9 @@ Trifle.GameManager = function(actuator, ignoreActuate, isCopy) {
 Trifle.GameManager.prototype.setup = function (ignoreActuate) {
 
 	this.board = new PaiShoGames.Board(this.tileManager);
+	this.winners = [];
+	this.hostBannerPlayed = false;
+	this.guestBannerPlayed = false;
 
 	// Update the actuator
 	if (!ignoreActuate) {
@@ -47,9 +50,28 @@ Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
 		this.board.placeTile(tile, move.endPoint);
 		this.buildDeployGameLogText(move, tile);
+
+		/* Banner played? */
+		if (Trifle.TileInfo.tileIsBanner(PaiShoGames.currentTileMetadata[tile.code])) {
+			if (tile.ownerName === HOST) {
+				this.hostBannerPlayed = true;
+			} else {
+				this.guestBannerPlayed = true;
+			}
+		}
 	} else if (move.moveType === MOVE) {
 		var moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint);
 		this.buildMoveGameLogText(move, moveDetails);
+
+		// If tile is capturing a Banner tile, there's a winner
+		if (moveDetails.capturedTiles && moveDetails.capturedTiles.length) {
+			var self = this;
+			capturedTiles.forEach(function(capturedTile) {
+				if (capturedTile && Trifle.TileInfo.tileIsBanner(PaiShoGames.currentTileMetadata[capturedTile.code])) {
+					self.winners.push(getOpponentName(capturedTile.ownerName));
+				}
+			});
+		}
 	} else if (move.moveType === DRAW_ACCEPT) {
 		this.gameHasEndedInDraw = true;
 	}
@@ -57,6 +79,10 @@ Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
 	if (withActuate) {
 		this.actuate();
 	}
+};
+
+Trifle.GameManager.tileCaptureRestrictionCheck = function() {
+	
 };
 
 Trifle.GameManager.prototype.buildTeamSelectionGameLogText = function(move) {
@@ -139,8 +165,8 @@ Trifle.GameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) 
 };
 
 Trifle.GameManager.prototype.getWinner = function() {
-	if (this.board.winners.length === 1) {
-		return this.board.winners[0];
+	if (this.winners.length === 1) {
+		return this.winners[0];
 	}
 };
 
@@ -149,7 +175,7 @@ Trifle.GameManager.prototype.getWinReason = function() {
 };
 
 Trifle.GameManager.prototype.getWinResultTypeCode = function() {
-	if (this.board.winners.length === 1) {
+	if (this.winners.length === 1) {
 		return 1;	// Standard win is 1
 	} else if (this.gameHasEndedInDraw) {
 		return 4;	// Tie/Draw is 4

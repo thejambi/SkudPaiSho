@@ -4,18 +4,17 @@ PaiShoGames.Board = function(tileManager) {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
-	this.tileMetadata = PaiShoGames.currentTileMetadata;
+	/* TODO move these to Trifle Game Controller */
+	this.hostBannerPlayed = false;
+	this.guestBannerPlayed = false;
 
-	this.winners = [];
+	this.tileMetadata = PaiShoGames.currentTileMetadata;
 
 	this.activeDurationAbilities = [];
 
 	this.tileManager = tileManager;
 
 	this.abilityManager = new Trifle.AbilityManager(this);
-
-	this.hostBannerPlayed = false;
-	this.guestBannerPlayed = false;
 
 	this.brainFactory = new Trifle.BrainFactory();
 }
