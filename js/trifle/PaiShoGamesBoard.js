@@ -4,9 +4,10 @@ PaiShoGames.Board = function(tileManager) {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
-	/* TODO move these to Trifle Game Controller */
+	// TODO Eventually remove Trifle-specific?:
 	this.hostBannerPlayed = false;
 	this.guestBannerPlayed = false;
+	this.useBannerCaptureSystem = false;
 
 	this.tileMetadata = PaiShoGames.currentTileMetadata;
 
@@ -361,7 +362,7 @@ PaiShoGames.Board.prototype.placeTile = function(tile, notationPoint) {
 	this.tilesCapturedByTriggeredAbility = [];
 	this.putTileOnPoint(tile, notationPoint);
 
-	// TODO Move to game manager:
+	// TODO Eventually remove Trifle-specific?:
 	if (Trifle.TileInfo.tileIsBanner(this.tileMetadata[tile.code])) {
 		if (tile.ownerName === HOST) {
 			this.hostBannerPlayed = true;
@@ -1720,6 +1721,10 @@ PaiShoGames.Board.prototype.tileHasActiveCaptureProtectionFromCapturingTile = fu
 };
 
 PaiShoGames.Board.prototype.capturePossibleBasedOnBannersPlayed = function(capturingPlayer, targetPoint) {
+	if (!this.useBannerCaptureSystem) {
+		return true;
+	}
+
 	var targetTile = targetPoint.tile;
 	var targetTileInfo = this.tileMetadata[targetTile.code];
 
@@ -1766,7 +1771,8 @@ PaiShoGames.Board.prototype.tileCanCapture = function(tile, movementInfo, fromPo
 		&& targetTileInfo 
 		&& capturePossibleWithMovement
 		&& (
-			(playerBannerPlayed 
+			!this.useBannerCaptureSystem
+			|| (playerBannerPlayed 
 				&& Trifle.TileInfo.tileIsOneOfTheseTypes(targetTileInfo, [Trifle.TileType.flower, Trifle.TileType.banner])
 			)
 			|| (playerBannerPlayed && otherBannerPlayed)
@@ -1789,7 +1795,8 @@ PaiShoGames.Board.prototype.tileCanBeCaptured = function(capturingPlayer, target
 
 	return targetTileInfo 
 		&& (
-			(playerBannerPlayed 
+			!this.useBannerCaptureSystem
+			|| (playerBannerPlayed 
 				&& Trifle.TileInfo.tileIsOneOfTheseTypes(targetTileInfo, [Trifle.TileType.flower, Trifle.TileType.banner])
 			)
 			|| (playerBannerPlayed && otherBannerPlayed)
@@ -1974,12 +1981,6 @@ PaiShoGames.Board.prototype.captureTileOnPoint = function(boardPoint) {
 		capturedTile = boardPoint.removeTile();
 	} else {
 		capturedTile = boardPoint.removeTile();
-	}
-
-	// If tile is capturing a Banner tile, there's a winner
-	// TODO Move to game manager:
-	if (capturedTile && Trifle.TileInfo.tileIsBanner(this.tileMetadata[capturedTile.code])) {
-		this.winners.push(getOpponentName(capturedTile.ownerName));
 	}
 
 	return capturedTile;

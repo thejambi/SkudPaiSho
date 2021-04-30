@@ -15,6 +15,7 @@ Trifle.GameManager = function(actuator, ignoreActuate, isCopy) {
 Trifle.GameManager.prototype.setup = function (ignoreActuate) {
 
 	this.board = new PaiShoGames.Board(this.tileManager);
+	this.board.useBannerCaptureSystem = true;
 	this.winners = [];
 	this.hostBannerPlayed = false;
 	this.guestBannerPlayed = false;
@@ -51,7 +52,7 @@ Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
 		this.board.placeTile(tile, move.endPoint);
 		this.buildDeployGameLogText(move, tile);
 
-		/* Banner played? */
+		/* Banner played? Could use this in future, currently in Board. */
 		if (Trifle.TileInfo.tileIsBanner(PaiShoGames.currentTileMetadata[tile.code])) {
 			if (tile.ownerName === HOST) {
 				this.hostBannerPlayed = true;
@@ -66,7 +67,7 @@ Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
 		// If tile is capturing a Banner tile, there's a winner
 		if (moveDetails.capturedTiles && moveDetails.capturedTiles.length) {
 			var self = this;
-			capturedTiles.forEach(function(capturedTile) {
+			moveDetails.capturedTiles.forEach(function(capturedTile) {
 				if (capturedTile && Trifle.TileInfo.tileIsBanner(PaiShoGames.currentTileMetadata[capturedTile.code])) {
 					self.winners.push(getOpponentName(capturedTile.ownerName));
 				}
@@ -79,10 +80,6 @@ Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
 	if (withActuate) {
 		this.actuate();
 	}
-};
-
-Trifle.GameManager.tileCaptureRestrictionCheck = function() {
-	
 };
 
 Trifle.GameManager.prototype.buildTeamSelectionGameLogText = function(move) {
