@@ -296,15 +296,23 @@ FirePaiShoGameManager.prototype.getWinner = function() {
 };
 
 FirePaiShoGameManager.prototype.getWinReason = function() {
+	var msg = "";
 	if (this.board.winners.length === 1) {
-		return " created a Harmony Ring and won the game!";
+		msg = " created a Harmony Ring and won the game!";
 	} else if (this.endGameWinners.length === 1) {
-		return " won the game with the most Harmonies crossing the midlines.";
+		var winnerPlayer = this.endGameWinners[0];
+		var loserPlayer = getOpponentName(winnerPlayer);
+		var winnerHarmonies = this.board.harmonyManager.getNumCrossingMidlinesForPlayer(winnerPlayer);
+		var loserHarmonies = this.board.harmonyManager.getNumCrossingMidlinesForPlayer(loserPlayer);;
+		msg = " won the game with " + winnerHarmonies + " Harmonies crossing the midlines. ";
+		msg += loserPlayer + " finished with " + loserHarmonies + " Harmonies crossing the midlines."
 	} else if (this.board.winners.length === 2) {
-		return " formed Harmony Rings for a tie!";
+		msg = " formed Harmony Rings for a tie!";
 	} else if (this.endGameWinners.length === 2) {
-		return " had the same number of Harmonies crossing the midlines for a tie!";	// Should there be any other tie breaker?
+		msg = " had the same number of Harmonies crossing the midlines for a tie!";	// Should there be any other tie breaker?
 	}
+
+	return msg;
 };
 
 FirePaiShoGameManager.prototype.getWinResultTypeCode = function() {
