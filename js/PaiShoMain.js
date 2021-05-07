@@ -2158,7 +2158,8 @@ var GameType = {
 			GINSENG_ROTATE,
 			SPECTATORS_CAN_PLAY,
 			FULL_GRID,
-			SQUARE_SPACES
+			SQUARE_SPACES,
+			BOTTOMLESS_RESERVES
 		],
 		noRankedGames: true
 	},

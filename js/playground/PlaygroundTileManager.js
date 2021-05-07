@@ -177,7 +177,7 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 };
 
 PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePileName) {
-	if (sourcePileName && this.pilesByName[sourcePileName]) {
+	if (sourcePileName && this.pilesByName[sourcePileName] && !gameOptionEnabled(BOTTOMLESS_RESERVES)) {
 		var tilePile = this.pilesByName[sourcePileName];
 
 		var tile;
