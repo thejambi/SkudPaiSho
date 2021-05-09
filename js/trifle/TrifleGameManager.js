@@ -14,7 +14,7 @@ Trifle.GameManager = function(actuator, ignoreActuate, isCopy) {
 // Set up the game
 Trifle.GameManager.prototype.setup = function (ignoreActuate) {
 
-	this.board = new Trifle.Board();
+	this.board = new Trifle.Board(this.tileManager);
 
 	// Update the actuator
 	if (!ignoreActuate) {
@@ -60,7 +60,7 @@ Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
 };
 
 Trifle.GameManager.prototype.buildTeamSelectionGameLogText = function(move) {
-	this.gameLogText = move.player + "'s team: " + move.teamTileCodes;
+	this.gameLogText = move.player + " selected their team";
 };
 Trifle.GameManager.prototype.buildDeployGameLogText = function(move, tile) {
 	this.gameLogText = move.player + ' placed ' + Trifle.Tile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
@@ -82,7 +82,7 @@ Trifle.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails) 
 };
 
 Trifle.GameManager.prototype.playersAreSelectingTeams = function() {
-	return !this.tileManager.hostTeamIsFull() || !this.tileManager.guestTeamIsFull();
+	return this.tileManager.playersAreSelectingTeams();
 };
 
 Trifle.GameManager.prototype.getPlayerTeamSelectionTileCodeList = function(player) {
@@ -130,8 +130,8 @@ Trifle.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	}
 };
 
-Trifle.GameManager.prototype.revealDeployPoints = function(player, tileCode, ignoreActuate) {
-	this.board.setDeployPointsPossibleMoves(player, tileCode);
+Trifle.GameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
+	this.board.setDeployPointsPossibleMoves(tile);
 	
 	if (!ignoreActuate) {
 		this.actuate();

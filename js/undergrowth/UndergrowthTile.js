@@ -78,8 +78,8 @@ Undergrowth.Tile.prototype.formsHarmonyWith = function(otherTile) {
 		return true;
 	}
 
-	if (!(this.type === BASIC_FLOWER || this.code === 'L')
-		|| !(otherTile.type === BASIC_FLOWER || otherTile.code === 'L')) {
+	if (!(this.type === BASIC_FLOWER || this.code === 'L' || this.code === 'O')
+		|| !(otherTile.type === BASIC_FLOWER || otherTile.code === 'L' || this.code === 'O')) {
 		// debug("One of the tiles must be Basic Flower to form Harmony");
 		return false;
 	}
@@ -98,6 +98,12 @@ Undergrowth.Tile.prototype.formsHarmonyWith = function(otherTile) {
 	// For normal Harmonies, tiles must belong to same player
 	if (otherTile.ownerName !== this.ownerName) {
 		return false;
+	}
+
+	/* Orchid harmonizes with all same-player's tiles */
+	if ((this.code === 'O' && otherTile.type !== ACCENT_TILE) 
+		|| (otherTile.code === 'O' && this.type !== ACCENT_TILE)) {
+		return true;
 	}
 
 	// Same color and number difference of 1

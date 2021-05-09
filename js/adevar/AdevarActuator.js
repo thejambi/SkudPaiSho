@@ -25,6 +25,8 @@ function AdevarActuator(gameContainer, isMobile, enableAnimations) {
 AdevarActuator.hostTeamTilesDivId = "hostTilesContainer";
 AdevarActuator.guestTeamTilesDivId = "guestTilesContainer";
 
+AdevarActuator.spaceTilesScaleMultiplier = 1.27;
+
 AdevarActuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
 };
@@ -178,6 +180,12 @@ AdevarActuator.prototype.addTile = function(tile, tileContainer, isCaptured) {
 	}
 
 	var theImg = document.createElement("img");
+
+	var scaleMultiplier = 1;
+	if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
+		scaleMultiplier = 1.2;
+	}
+	theImg.style.transform = AdevarActuator.buildScaleString(1, scaleMultiplier);
 	
 	var srcValue = this.getTileSrcPath(tile);
 	theImg.src = srcValue + tile.getImageName() + ".png";
@@ -243,6 +251,20 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		theDiv.classList.add("hasTile");
 		
 		var theImg = document.createElement("img");
+
+		var scaleMultiplier = 1;
+		if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
+			scaleMultiplier = AdevarActuator.spaceTilesScaleMultiplier;
+		}
+		theImg.style.transform = AdevarActuator.buildScaleString(1, scaleMultiplier);
+		theImg.transformRotate = "";
+
+		if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space'
+			&& ((AdevarOptions.viewAsGuest && boardPoint.tile.ownerName === HOST)
+				|| (!AdevarOptions.viewAsGuest && boardPoint.tile.ownerName === GUEST))) {
+			theImg.transformRotate = "rotate(180deg)";
+			theImg.style.transform += " " + theImg.transformRotate;
+		}
 
 		if (moveToAnimate) {
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
@@ -322,22 +344,27 @@ AdevarActuator.prototype.getCapturedTileFromMoveToAnimate = function(moveToAnima
 AdevarActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv) {
 	if (!this.animationOn) return;
 
+	var scaleMultiplier = 1;
+	if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
+		scaleMultiplier = AdevarActuator.spaceTilesScaleMultiplier;
+	}
+
 	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y;
 
 	if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
 		if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
 			x = moveToAnimate.startPoint.rowAndColumn.col;
 			y = moveToAnimate.startPoint.rowAndColumn.row;
-			theImg.style.transform = "scale(1.2)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
+			theImg.style.transform = AdevarActuator.buildScaleString(1.2, scaleMultiplier) + " " + theImg.transformRotate;	// Make the pieces look like they're picked up a little when moving, good idea or no?
 			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
 		}
 	} else if (moveToAnimate.moveType === DEPLOY) {
 		if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
 			if (piecePlaceAnimation === 1) {
-				theImg.style.transform = "scale(2)";
+				theImg.style.transform = AdevarActuator.buildScaleString(2, scaleMultiplier) + " " + theImg.transformRotate; // "scale(2)";
 				theDiv.style.zIndex = 99;
 				requestAnimationFrame(function() {
-					theImg.style.transform = "scale(1)";
+					theImg.style.transform = AdevarActuator.buildScaleString(1, scaleMultiplier) + " " + theImg.transformRotate; // "scale(1)";
 				});
 			}
 		}
@@ -370,9 +397,14 @@ AdevarActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimat
 	});
 	setTimeout(function() {
 		requestAnimationFrame(function() {
-			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
+			theImg.style.transform = AdevarActuator.buildScaleString(1, scaleMultiplier) + " " + theImg.transformRotate; //"scale(1)";	// This will size back to normal after moving
 		});
 	}, pieceAnimationLength);
+};
+
+AdevarActuator.buildScaleString = function(baseScale, scaleMultiplier) {
+	var scaleValue = baseScale * scaleMultiplier;
+	return "scale(" + scaleValue + ")";	
 };
 
 AdevarActuator.prototype.showOrientalLilyHighlights = function(player, gardenIndex) {

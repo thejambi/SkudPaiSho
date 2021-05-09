@@ -102,6 +102,10 @@ Trifle.TileManager.prototype.playerTeamIsFull = function(player) {
 	return this.getPlayerTeam(player).length >= this.getTeamSize();
 };
 
+Trifle.TileManager.prototype.playersAreSelectingTeams = function() {
+	return !this.hostTeamIsFull() || !this.guestTeamIsFull();
+};
+
 Trifle.TileManager.prototype.playerTeamHasBanner = function(player) {
 	var team = this.getPlayerTeam(player);
 	for (var i = 0; i < team.length; i++) {
@@ -149,7 +153,14 @@ Trifle.TileManager.prototype.addToTeamIfOk = function(tile) {
 Trifle.TileManager.prototype.removeTileFromTeam = function(tile) {
 	if (this.countOfThisTileInTeam(tile.code, tile.ownerName) > 0) {
 		var playerTeam = this.getPlayerTeam(tile.ownerName);
-		playerTeam.splice(playerTeam.indexOf(tile), 1);
+
+		for (var i = 0; i < playerTeam.length; i++) {
+			if (playerTeam[i].code === tile.code) {
+				playerTeam.splice(i, 1);
+				break;
+			}
+		}
+
 		this.grabTile(tile.ownerName, tile.code);
 	}
 };
@@ -180,6 +191,10 @@ Trifle.TileManager.prototype.getPlayerTilePile = function(player) {
 		tilePile = this.guestTiles;
 	}
 	return tilePile;
+};
+
+Trifle.TileManager.prototype.getAllTiles = function() {
+	return this.hostTeam.concat(this.guestTeam);
 };
 
 Trifle.TileManager.prototype.getCopy = function() {
