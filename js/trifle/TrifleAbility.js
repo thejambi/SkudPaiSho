@@ -115,7 +115,8 @@ Trifle.Ability.prototype.appearsToBeTheSameAs = function(otherAbility) {
 	return otherAbility 
 		&& this.abilityType === otherAbility.abilityType
 		&& this.sourceTile.id === otherAbility.sourceTile.id
-		&& this.triggerTargetTiles.equals(otherAbility.targetTiles);
+		&& this.triggerTargetTiles.equals(otherAbility.targetTiles)
+		&& this.sourceTilePoint === otherAbility.sourceTilePoint;
 };
 
 Trifle.Ability.prototype.abilityTargetsTile = function(tile) {

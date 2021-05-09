@@ -80,7 +80,7 @@ var paiShoBoardDesignTypeValuesDefault = {
 	mayfair: "Mayfair Filter",
 	skudShop: "The Garden Gate Shop",
 	// vescucci: "Vescucci Style",
-	// xiangqi: "Xiangqi-Style Tile Colors",
+	xiangqi: "Xiangqi-Style Tile Colors",
 	// pixelsho: "Pixel-Sho",
 	remix: "Remix",
 	nomadsky: "Nomad's Sky by Morbius",
@@ -1667,7 +1667,7 @@ function userHasGameAccess() {
 	return gameTypeId 
 		&& (gameDevOn 
 			|| !getGameTypeEntryFromId(gameTypeId).usersWithAccess
-			|| getGameTypeEntryFromId(gameTypeId).usersWithAccess.includes(getUsername()));
+			|| usernameIsOneOf(getGameTypeEntryFromId(gameTypeId).usersWithAccess));
 }
 
 function sandboxitize() {
@@ -2157,7 +2157,9 @@ var GameType = {
 			ADEVAR_ROTATE,
 			GINSENG_ROTATE,
 			SPECTATORS_CAN_PLAY,
-			FULL_GRID
+			FULL_GRID,
+			SQUARE_SPACES,
+			BOTTOMLESS_RESERVES
 		],
 		noRankedGames: true
 	},
@@ -2257,11 +2259,11 @@ function getGameControllerForGameType(gameTypeId) {
 			controller = new MeadowController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Trifle.id:
-			if (gameDevOn || GameType.Trifle.usersWithAccess.includes(getUsername())) {
+			// if (gameDevOn || usernamionof.... GameType.Trifle.usersWithAccess.includes(getUsername())) {
 				controller = new Trifle.Controller(gameContainerDiv, isMobile);
-			} else {
-				closeGame();
-			}
+			// } else {
+			// 	closeGame();
+			// }
 			break;
 		case GameType.Hexentafl.id:
 			controller = new HexentaflController(gameContainerDiv, isMobile);
@@ -2805,7 +2807,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 			if (
 				gameDevOn
 				|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
-				|| getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess.includes(getUsername())
+				|| usernameIsOneOf(getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess)
 			) {
 				var hostOnlineOrNotIconText = userOfflineIcon;
 				if (gameSeek.hostOnline) {
@@ -3150,7 +3152,7 @@ function getNewGameEntryForGameType(gameType) {
 	if (
 		gameDevOn
 		|| !gameType.usersWithAccess
-		|| gameType.usersWithAccess.includes(getUsername())
+		|| usernameIsOneOf(gameType.usersWithAccess)
 	) {
 		return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
 	}

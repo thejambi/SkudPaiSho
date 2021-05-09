@@ -1,10 +1,13 @@
 /* Trifle specific UI interaction logic */
 
+function PaiShoGames() {}
 function Trifle() {}
 
 Trifle.Controller = function(gameContainer, isMobile) {
-	this.actuator = new TrifleActuator(gameContainer, isMobile);
+	this.actuator = new Trifle.Actuator(gameContainer, isMobile);
 
+	Trifle.TileInfo.initializeTrifleData();
+	PaiShoGames.currentTileMetadata = Trifle.TrifleTiles;
 	this.resetGameManager();
 	this.resetNotationBuilder();
 	this.resetGameNotation();

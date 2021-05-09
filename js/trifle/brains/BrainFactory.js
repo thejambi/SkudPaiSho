@@ -38,6 +38,8 @@ Trifle.BrainFactory.createAbilityBrain = function(abilityName, abilityObject) {
 			but ongoing abilities that are checked for in game logic can have generic brain */
 		case Trifle.AbilityName.captureTargetTiles:
 			return new Trifle.CaptureTargetTilesAbilityBrain(abilityObject);
+		case Trifle.AbilityName.growGigantic:
+			return new Trifle.GrowGiganticAbilityBrain(abilityObject);
 		default:
 			return new Trifle.SimpleOngoingAbilityBrain(abilityObject);
 	}

@@ -155,6 +155,10 @@ Trifle.SpawnLocation = {
 	adjacent: "adjacent"
 };
 
+Trifle.AttributeType = {
+	gigantic: "gigantic"
+}
+
 Trifle.AbilityName = {
 	captureTargetTiles: "captureTargetTiles",
 	removeEffects: "removeEffects",
@@ -169,7 +173,8 @@ Trifle.AbilityName = {
 	cancelAbilities: "cancelAbilities",
 	cancelAbilitiesTargetingTiles: "cancelAbilitiesTargetingTiles",
 	prohibitTileFromCapturing: "prohibitTileFromCapturing",
-	changeMovementDistanceByFactor: "changeMovementDistanceByFactor"
+	changeMovementDistanceByFactor: "changeMovementDistanceByFactor",
+	growGigantic: "growGigantic"
 };
 
 Trifle.AbilityType = {
@@ -349,7 +354,7 @@ Trifle.TileInfo.defineAbilityTypes = function () {
 };
 
 Trifle.TileInfo.defineTrifleTiles = function() {
-	TrifleTiles = {};
+	var TrifleTiles = {};
 
 	/* Air */
 
@@ -665,7 +670,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		textLines: [
 			"Banner | Water",
 			"Deploys anywhere",
-			"Tiles adjacent to Lavender are immobilized"
+			"Moves 2 spaces"
 		]
 	};
 
@@ -1015,6 +1020,36 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		]
 	};
 
+	//
+
+	TrifleTiles[Trifle.TileCodes.Sunflower] = {	/* Done? Need testing */
+		available: true,
+		types: [Trifle.TileType.flower],
+		identifiers: [Trifle.TileIdentifier.earth],
+		deployTypes: [Trifle.DeployType.anywhere],
+		attributes: [	// Attribute - for looking at when placing a piece, etc
+			Trifle.AttributeType.gigantic
+		],
+		abilities: [	// Ability - for when on the board
+			{
+				type: Trifle.AbilityName.growGigantic,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsOnBoard,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				inevitable: true
+			}
+		],
+		textLines: [
+			"Flower | Earth",
+			"Deploys anywhere",
+			"Sunflower is a 2x2 giant tile that occupies four spaces instead of 1"
+		]
+	};
+
 	/* Fire */
 
 	TrifleTiles[Trifle.TileCodes.FireBanner] = {	/* todo */
@@ -1202,7 +1237,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	TrifleTiles[Trifle.TileCodes.AirGlider] = {
 		available: false,
 		types: [Trifle.TileType.traveler],
-		deployTypes: [Trifle.DeployType.temple],
+		deployTypes: [Trifle.DeployType.temple, Trifle.DeployType.anywhere],
 		movements: [
 			{
 				type: Trifle.MovementType.travelShape,
@@ -1219,8 +1254,23 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				type: Trifle.MovementType.anywhere,
 				captureTypes: [Trifle.CaptureType.all]
 			}
+		], // Ability testing...
+		attributes: [	// Attribute - for looking at when placing a piece, etc
+			Trifle.AttributeType.gigantic
+		],
+		abilities: [	// Ability - for when on the board
+			{
+				type: Trifle.AbilityName.growGigantic,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsOnBoard,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				inevitable: true
+			}
 		]
-		// Ability testing...
 	};
 
 	/* TrifleTiles[Trifle.TileCodes.Lotus] = {
@@ -1318,13 +1368,14 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 		}
 	}; */
 
+	Trifle.TrifleTiles = TrifleTiles;
 };
 
 
 Trifle.TileInfo.getReadableDescription = function(tileCode) {
 	var tileHtml = "";
 
-	var tileInfo = TrifleTiles[tileCode];
+	var tileInfo = PaiShoGames.currentTileMetadata[tileCode];
 
 	if (tileInfo.textLines) {
 		tileInfo.textLines.forEach(function(textLine) {
