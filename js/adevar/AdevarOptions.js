@@ -21,7 +21,8 @@ AdevarOptions.tileDesignTypeValues = {
 	// spoopy: "Adevar Spoopy",
 	icy: "Adevar Icy",
 	irl: "Adevar TGG Red Oak & Walnut",
-	chuji: "Chuji"
+	chuji: "Chuji",
+	asta: "Asta"
 };
 
 AdevarOptions.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
