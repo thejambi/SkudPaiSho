@@ -23,7 +23,8 @@ AdevarOptions.tileDesignTypeValues = {
 	icy: "Adevar Icy",
 	irl: "Adevar TGG Red Oak & Walnut",
 	chuji: "Chuji by Sirstotes",
-	space: "Adevar In Space! by Sirstotes"
+	space: "Adevar In Space! by Sirstotes",
+	asta: "Asta by Sirstotes"
 };
 
 AdevarOptions.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
