@@ -196,6 +196,9 @@ OvergrowthGameManager.prototype.getScoreSummary = function() {
 
 OvergrowthGameManager.prototype.getWinResultTypeCode = function() {
 	if (this.endGameWinners.length === 1) {
+		if (this.endGameWinners[0] === "BOTH players") {
+			return 4;	// Tie
+		}
 		return 1;
 	}
 };
