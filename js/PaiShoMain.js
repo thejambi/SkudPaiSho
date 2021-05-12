@@ -2124,7 +2124,8 @@ var GameType = {
 			'SpinxKreuz',
 			'TheRealMomo',
 			'MrsSkud',
-			'markdwagner'
+			'markdwagner',
+			'The_IceL0rd'
 		],
 		noRankedGames: true
 	},
