@@ -2837,7 +2837,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 	}
 
 	if (!gameSeeksDisplayed) {
-		message = "No games available to join. You can create a new game, or join <a href='https://discord.gg/dStDZx7' target='_blank'>Join the Discord</a> to find people to play with!";
+		message = "No games available to join. You can create a new game, or join <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a> to find people to play with!";
 	}
 
 	message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
@@ -3071,7 +3071,7 @@ var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(resul
 /* This is AKA Display Links tab content */
 function resetGlobalChats() {
 	// Clear all global chats..
-	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/dStDZx7' target='_blank'>Discord server</a>.<hr />";
+	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>.<hr />";
 }
 
 function fetchInitialGlobalChats() {
