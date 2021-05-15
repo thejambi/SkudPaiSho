@@ -2071,7 +2071,7 @@ var GameType = {
 	},
 	SolitairePaiSho: {
 		id: 4,
-		desc: "Solitaire Pai Sho",
+		desc: "Nature’s Grove: Respite",
 		rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/",
 		gameOptions: [
 			OPTION_DOUBLE_TILES,
@@ -2081,7 +2081,7 @@ var GameType = {
 	},
 	CoopSolitaire: {
 		id: 6,
-		desc: "Cooperative Solitaire",
+		desc: "Nature’s Grove: Synergy",
 		rulesUrl: "https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/",
 		gameOptions: [
 			LESS_TILES,
@@ -2092,7 +2092,7 @@ var GameType = {
 	},
 	OvergrowthPaiSho: {
 		id: 8,
-		desc: "Overgrowth Pai Sho",
+		desc: "Nature’s Grove: Overgrowth",
 		rulesUrl: "https://skudpaisho.com/site/games/overgrowth-pai-sho/",
 		gameOptions: [
 			LESS_TILES,
