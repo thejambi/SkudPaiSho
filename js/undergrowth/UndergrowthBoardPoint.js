@@ -108,6 +108,10 @@ Undergrowth.BoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 		return false;
 	}
 
+	if (gameOptionEnabled(UNDERGROWTH_SIMPLE)) {
+		return true;
+	}
+
 	// For Solitaire: GATEs are OK
 	if (this.isType(GATE)) {
 		return true;

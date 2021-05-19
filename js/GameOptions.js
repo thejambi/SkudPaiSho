@@ -141,6 +141,9 @@ gameOptionDescriptions[SQUARE_SPACES] = "Square Spaces";
 var BOTTOMLESS_RESERVES = "BottomlessReserves";
 gameOptionDescriptions[BOTTOMLESS_RESERVES] = "Bottomless Reserves";
 
+var UNDERGROWTH_SIMPLE = "UndergrowthSimple";
+gameOptionDescriptions[UNDERGROWTH_SIMPLE] = "Simplicity";
+
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
 		return gameOptionDescriptions[optionName];

@@ -72,7 +72,7 @@ Undergrowth.Controller.prototype.getDefaultHelpMessageText = function() {
 Undergrowth.Controller.prototype.getAdditionalMessage = function() {
 	var msg = "";
 	if (this.gameNotation.moves.length === 0) {
-		// msg += getGameOptionsMessageHtml(GameType.Undergrowth.gameOptions);
+		msg += getGameOptionsMessageHtml(GameType.Undergrowth.gameOptions);
 	}
 
 	if (!this.theGame.getWinner()) {

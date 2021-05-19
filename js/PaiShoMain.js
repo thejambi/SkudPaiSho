@@ -2106,7 +2106,10 @@ var GameType = {
 		desc: "Undergrowth Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/undergrowth-pai-sho/",
 		gameOptions: [],
-		noRankedGames: true
+		noRankedGames: true,
+		gameOptions: [
+			UNDERGROWTH_SIMPLE
+		]
 	},
 	Trifle: {
 		id: 10,
