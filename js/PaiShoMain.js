@@ -3240,6 +3240,7 @@ function promptForAgeToTreeYears() {
 	var message = "<br />Age: <input type='text' id='humanAgeInput' name='humanAgeInput' />";
 	message += "<br /><div class='clickableText' onclick='submitHumanAge()'>Convert to tree years</div>";
 	message += "<br /><div id='treeYearsResult'></div>";
+	message += "<br /><br /><div>Confused? <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a>! :))</div>";
 	showModal("How Old Are You in Tree Years?", message);
 }
 
