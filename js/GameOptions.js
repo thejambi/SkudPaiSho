@@ -142,7 +142,7 @@ var BOTTOMLESS_RESERVES = "BottomlessReserves";
 gameOptionDescriptions[BOTTOMLESS_RESERVES] = "Bottomless Reserves";
 
 var UNDERGROWTH_SIMPLE = "UndergrowthSimple";
-gameOptionDescriptions[UNDERGROWTH_SIMPLE] = "Simplicity";
+gameOptionDescriptions[UNDERGROWTH_SIMPLE] = "Simplicity (testing)";
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {

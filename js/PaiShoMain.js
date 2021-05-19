@@ -3230,7 +3230,25 @@ var processChatCommands = function(chatMessage) {
 		new AdevarOptions();
 		AdevarOptions.commenceSpoopy();
 	}
+
+	if (chatMessage.toLowerCase().includes('tree years')) {
+		promptForAgeToTreeYears();
+	}
 };
+
+function promptForAgeToTreeYears() {
+	var message = "<br />Age: <input type='text' id='humanAgeInput' name='humanAgeInput' />";
+	message += "<br /><div class='clickableText' onclick='submitHumanAge()'>Convert to tree years</div>";
+	message += "<br /><div id='treeYearsResult'></div>";
+	showModal("How Old Are You in Tree Years?", message);
+}
+
+function submitHumanAge() {
+	var age = document.getElementById("humanAgeInput").value;
+	if (!isNaN(age)) {
+		document.getElementById("treeYearsResult").innerText = humanYearsToTreeYears(parseInt(age, 10));
+	}
+}
   
 document.getElementById('chatMessageInput').onkeypress = function(e) {
 	var code = (e.keyCode ? e.keyCode : e.which);
