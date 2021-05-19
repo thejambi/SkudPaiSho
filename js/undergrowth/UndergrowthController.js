@@ -75,6 +75,10 @@ Undergrowth.Controller.prototype.getAdditionalMessage = function() {
 		msg += getGameOptionsMessageHtml(GameType.Undergrowth.gameOptions);
 	}
 
+	if (gameOptionEnabled(UNDERGROWTH_SIMPLE)) {
+		msg += "<br />Simplicity Rules: Your pieces form harmony with each other and disharmony with opponent's pieces.<br />";
+	}
+
 	if (!this.theGame.getWinner()) {
 		msg += "<strong>" + this.theGame.getScoreSummary() + "</strong>";
 	}
