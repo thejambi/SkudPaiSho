@@ -521,6 +521,7 @@ VagabondController.tileDesignTypeValues = {
 	tggkoiwheel: "TGG Koi-Wheel",
 	vescuccikoiwheel: "Vescucci Koi-Wheel",
 	vescuccikoiwheelrustic: "Rustic Vescucci Koi-Wheel",
+	keypaisho: "Key Pai Sho Vagabond",
 	tggoriginal: "The Garden Gate Designs Original",
 	chujired: "Chuji Red",
 	classic: "Classic Pai Sho Project",
