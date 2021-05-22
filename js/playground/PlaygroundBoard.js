@@ -879,7 +879,7 @@ PlaygroundBoard.prototype.putTileOnPoint = function(tile, notationPoint) {
 };
 
 PlaygroundBoard.prototype.isValidRowCol = function(rowCol) {
-	return rowCol.row >= 0 && rowCol.col >= 0 && rowCol.row <= 16 && rowCol.col <= 16;
+	return rowCol.row >= 0 && rowCol.col >= 0 && rowCol.row <= this.size.row - 1 && rowCol.col <= this.size.col - 1;
 };
 
 PlaygroundBoard.prototype.getClockwiseRowCol = function(center, rowCol) {
@@ -923,7 +923,7 @@ PlaygroundBoard.prototype.moveTile = function(notationPointStart, notationPointE
 	var startRowCol = notationPointStart.rowAndColumn;
 	var endRowCol = notationPointEnd.rowAndColumn;
 
-	if (startRowCol.row < 0 || startRowCol.row > 16 || endRowCol.row < 0 || endRowCol.row > 16) {
+	if (!this.isValidRowCol(startRowCol) || !this.isValidRowCol(endRowCol)) {
 		debug("That point does not exist. So it's not gonna happen.");
 		return false;
 	}

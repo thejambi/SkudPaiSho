@@ -55,6 +55,11 @@ function shouldRedirectIfNotHttps() {
   return !ios;
 }
 
+function humanYearsToTreeYears(humanAge) {
+  /* f(x)=x+90floor(x/10) */
+  return humanAge + 90 * (Math.floor(humanAge / 10));
+}
+
 
 function debug(str) {
     if (debugOn) {

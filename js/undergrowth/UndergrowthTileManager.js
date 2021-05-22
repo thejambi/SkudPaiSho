@@ -17,15 +17,17 @@ Undergrowth.TileManager.prototype.loadTileSet = function(ownerCode) {
 Undergrowth.TileManager.prototype.loadOneOfEach = function(ownerCode) {
 	var tiles = [];
 
-	tiles.push(new OvergrowthTile("R3", ownerCode));
-	tiles.push(new OvergrowthTile("R4", ownerCode));
-	tiles.push(new OvergrowthTile("R5", ownerCode));
-	tiles.push(new OvergrowthTile("W3", ownerCode));
-	tiles.push(new OvergrowthTile("W4", ownerCode));
-	tiles.push(new OvergrowthTile("W5", ownerCode));
+	var simplicity = gameOptionEnabled(UNDERGROWTH_SIMPLE);
 
-	tiles.push(new OvergrowthTile('L', ownerCode));
-	tiles.push(new OvergrowthTile('O', ownerCode));
+	tiles.push(new Undergrowth.Tile("R3", ownerCode, simplicity));
+	tiles.push(new Undergrowth.Tile("R4", ownerCode, simplicity));
+	tiles.push(new Undergrowth.Tile("R5", ownerCode, simplicity));
+	tiles.push(new Undergrowth.Tile("W3", ownerCode, simplicity));
+	tiles.push(new Undergrowth.Tile("W4", ownerCode, simplicity));
+	tiles.push(new Undergrowth.Tile("W5", ownerCode, simplicity));
+
+	tiles.push(new Undergrowth.Tile('L', ownerCode, simplicity));
+	tiles.push(new Undergrowth.Tile('O', ownerCode, simplicity));
 
 	return tiles;
 };
@@ -33,19 +35,20 @@ Undergrowth.TileManager.prototype.loadOneOfEach = function(ownerCode) {
 Undergrowth.TileManager.prototype.loadPlayerTileSet = function(ownerCode) {
 	var tiles = [];
 
+	var simplicity = gameOptionEnabled(UNDERGROWTH_SIMPLE);
 	// Basic flower tiles
 	for (var i = 0; i < 3; i++) {
-		tiles.push(new Undergrowth.Tile("R3", ownerCode));
-		tiles.push(new Undergrowth.Tile("R4", ownerCode));
-		tiles.push(new Undergrowth.Tile("R5", ownerCode));
-		tiles.push(new Undergrowth.Tile("W3", ownerCode));
-		tiles.push(new Undergrowth.Tile("W4", ownerCode));
-		tiles.push(new Undergrowth.Tile("W5", ownerCode));
+		tiles.push(new Undergrowth.Tile("R3", ownerCode, simplicity));
+		tiles.push(new Undergrowth.Tile("R4", ownerCode, simplicity));
+		tiles.push(new Undergrowth.Tile("R5", ownerCode, simplicity));
+		tiles.push(new Undergrowth.Tile("W3", ownerCode, simplicity));
+		tiles.push(new Undergrowth.Tile("W4", ownerCode, simplicity));
+		tiles.push(new Undergrowth.Tile("W5", ownerCode, simplicity));
 	}
 
 	// Special flower tiles
-	tiles.push(new Undergrowth.Tile('L', ownerCode));
-	tiles.push(new Undergrowth.Tile('O', ownerCode));
+	tiles.push(new Undergrowth.Tile('L', ownerCode, simplicity));
+	tiles.push(new Undergrowth.Tile('O', ownerCode, simplicity));
 
 	return tiles;
 };
