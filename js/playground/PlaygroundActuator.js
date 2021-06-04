@@ -184,6 +184,11 @@ PlaygroundActuator.prototype.addTile = function(tile, tileContainer, pileName) {
 	var theDiv = document.createElement("div");
 
 	theDiv.classList.add("point");
+
+	if (gameOptionEnabled(SQUARE_SPACES)) {
+		theDiv.classList.add("pointSquare");
+	}
+
 	theDiv.classList.add("hasTile");
 
 	if (tile.selectedFromPile || tile.gameType === "PossibleMove") {

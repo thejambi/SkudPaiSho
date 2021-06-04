@@ -44,12 +44,20 @@ var onlinePlayEnabled = false;
 
 
 // Redirect if needed
+if (window.location.href.includes("thegg.games")) {
+  window.location.replace("https://skudpaisho.com");
+}
 if (shouldRedirectIfNotHttps() && window.location.href.includes("http://")) {
   window.location.replace(window.location.href.replace("http://", "https://"));
 }
 
 function shouldRedirectIfNotHttps() {
   return !ios;
+}
+
+function humanYearsToTreeYears(humanAge) {
+  /* f(x)=x+90floor(x/10) */
+  return humanAge + 90 * (Math.floor(humanAge / 10));
 }
 
 

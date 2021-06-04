@@ -224,12 +224,16 @@ OvergrowthHarmonyManager.prototype.getWinningPlayer = function() {
 			return HOST;
 		} else if (clashPoints > harmonyPoints) {
 			return GUEST;
+		} else {
+			return "BOTH players";
 		}
 	} else {
 		if (this.numHarmonies() > this.numClashes()) {
 			return HOST;
 		} else if (this.numClashes() > this.numHarmonies()) {
 			return GUEST;
+		} else {
+			return "BOTH players";
 		}
 	}
 };

@@ -72,7 +72,11 @@ Undergrowth.Controller.prototype.getDefaultHelpMessageText = function() {
 Undergrowth.Controller.prototype.getAdditionalMessage = function() {
 	var msg = "";
 	if (this.gameNotation.moves.length === 0) {
-		// msg += getGameOptionsMessageHtml(GameType.Undergrowth.gameOptions);
+		msg += getGameOptionsMessageHtml(GameType.Undergrowth.gameOptions);
+	}
+
+	if (gameOptionEnabled(UNDERGROWTH_SIMPLE)) {
+		msg += "<br />Simplicity Rules: Your pieces form harmony with each other and disharmony with opponent's pieces.<br />";
 	}
 
 	if (!this.theGame.getWinner()) {

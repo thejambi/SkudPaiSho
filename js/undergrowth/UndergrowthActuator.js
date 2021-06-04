@@ -99,8 +99,12 @@ Undergrowth.Actuator.prototype.addTile = function(tile, mainContainer) {
 
 	var theImg = document.createElement("img");
 	
-	var srcValue = getSkudTilesSrcPath();
-	theImg.src = srcValue + tile.getImageName() + ".png";
+	if (gameOptionEnabled(UNDERGROWTH_SIMPLE)) {
+		theImg.src = "images/Adevar/monochrome/" + tile.ownerCode + "Back.png";
+	} else {
+		var srcValue = getSkudTilesSrcPath();
+		theImg.src = srcValue + tile.getImageName() + ".png";
+	}
 	theDiv.appendChild(theImg);
 
 	theDiv.setAttribute("name", tile.getImageName());
@@ -156,8 +160,12 @@ Undergrowth.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimat
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags);
 		}
 
-		var srcValue = getSkudTilesSrcPath();
-		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
+		if (gameOptionEnabled(UNDERGROWTH_SIMPLE)) {
+			theImg.src = "images/Adevar/monochrome/" + boardPoint.tile.ownerCode + "Back.png";
+		} else {
+			var srcValue = getSkudTilesSrcPath();
+			theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
+		}
 		
 		if (boardPoint.tile.inHarmony) {
 			theDiv.classList.add(HOST + "harmony");
@@ -174,8 +182,12 @@ Undergrowth.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimat
 					&& capturedStepInfo.capturedTileInfo 
 					&& capturedStepInfo.capturedTileInfo.capturedTile) {
 				var theImgCaptured = document.createElement("img");
-				var srcValue = getSkudTilesSrcPath();
-				theImgCaptured.src = srcValue + capturedStepInfo.capturedTileInfo.capturedTile.getImageName() + ".png";
+				if (gameOptionEnabled(UNDERGROWTH_SIMPLE)) {
+					theImgCaptured.src = "images/Adevar/monochrome/" + capturedStepInfo.capturedTileInfo.capturedTile.ownerCode + "Back.png";
+				} else {
+					var srcValue = getSkudTilesSrcPath();
+					theImgCaptured.src = srcValue + capturedStepInfo.capturedTileInfo.capturedTile.getImageName() + ".png";
+				}
 				theDiv.appendChild(theImgCaptured);
 				this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep, theImgCaptured, {
 					capturedStepInfo: capturedStepInfo,

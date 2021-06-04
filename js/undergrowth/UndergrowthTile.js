@@ -1,6 +1,8 @@
 // Tile
 
-Undergrowth.Tile = function(code, ownerCode) {
+Undergrowth.SIMPLE_TILE = "SimpleTile";
+
+Undergrowth.Tile = function(code, ownerCode, isSimple) {
 	this.code = code;
 	this.ownerCode = ownerCode;
 	if (this.ownerCode === 'G') {
@@ -16,7 +18,9 @@ Undergrowth.Tile = function(code, ownerCode) {
 	this.drained = false;
 	this.selectedFromPile = false;
 
-	if (this.code.length === 2 && (this.code.includes('R') || this.code.includes('W'))) {
+	if (isSimple && gameOptionEnabled(UNDERGROWTH_SIMPLE)) {
+		this.type = Undergrowth.SIMPLE_TILE;
+	} else if (this.code.length === 2 && (this.code.includes('R') || this.code.includes('W'))) {
 		this.type = BASIC_FLOWER;
 		this.basicColorCode = this.code.charAt(0);
 		this.basicValue = this.code.charAt(1);
@@ -73,6 +77,14 @@ Undergrowth.Tile.prototype.formsHarmonyWith = function(otherTile) {
 		return false;
 	}
 
+	if (gameOptionEnabled(UNDERGROWTH_SIMPLE)) {
+		if (this.ownerCode === otherTile.ownerCode) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	if ((this.code === 'L' && otherTile.code === 'O') 
 		|| (otherTile.code === 'L' && this.code === 'O')) {
 		return true;
@@ -123,6 +135,10 @@ Undergrowth.Tile.prototype.formsHarmonyWith = function(otherTile) {
 Undergrowth.Tile.prototype.clashesWith = function(otherTile) {
 	if (!otherTile) {
 		return false;
+	}
+
+	if (gameOptionEnabled(UNDERGROWTH_SIMPLE)) {
+		return this.ownerCode !== otherTile.ownerCode;
 	}
 	
 	if (this.type === ACCENT_TILE || otherTile.type === ACCENT_TILE) {

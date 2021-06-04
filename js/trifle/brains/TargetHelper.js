@@ -2,15 +2,16 @@
 Trifle.TargetHelper = function(abilityObject, possibleTargetTilePoint, targetBrain, possibleTargetTile) {
 	this.abilityObject = abilityObject;
 	this.abilityInfo = abilityObject.abilityInfo;
+	this.tileMetadata = PaiShoGames.currentTileMetadata;
 
 	this.possibleTargetTilePoint = possibleTargetTilePoint;
 
 	if (this.possibleTargetTilePoint) {
 		this.possibleTargetTile = this.possibleTargetTilePoint.tile;
-		this.possibleTargetTileInfo = TrifleTiles[this.possibleTargetTile.code];
+		this.possibleTargetTileInfo = this.tileMetadata[this.possibleTargetTile.code];
 	} else {
 		this.possibleTargetTile = possibleTargetTile;
-		this.possibleTargetTileInfo = TrifleTiles[this.possibleTargetTile.code];
+		this.possibleTargetTileInfo = this.tileMetadata[this.possibleTargetTile.code];
 	}
 
 	this.targetBrain = targetBrain;

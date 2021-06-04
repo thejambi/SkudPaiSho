@@ -17,6 +17,7 @@ AdevarOptions.tileDesignTypeKey = "adevarTileDesignTypeKey";
 /* Adevar tile designs */
 AdevarOptions.tileDesignTypeValues = {
 	classic: "Adevar Classic",
+	sleek: "Adevar Sleek",
 	monochrome: "Adevar Monochrome",
 	// spoopy: "Adevar Spoopy",
 	icy: "Adevar Icy",

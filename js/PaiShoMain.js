@@ -80,7 +80,7 @@ var paiShoBoardDesignTypeValuesDefault = {
 	mayfair: "Mayfair Filter",
 	skudShop: "The Garden Gate Shop",
 	// vescucci: "Vescucci Style",
-	// xiangqi: "Xiangqi-Style Tile Colors",
+	xiangqi: "Xiangqi-Style Tile Colors",
 	// pixelsho: "Pixel-Sho",
 	remix: "Remix",
 	nomadsky: "Nomad's Sky by Morbius",
@@ -1667,7 +1667,7 @@ function userHasGameAccess() {
 	return gameTypeId 
 		&& (gameDevOn 
 			|| !getGameTypeEntryFromId(gameTypeId).usersWithAccess
-			|| getGameTypeEntryFromId(gameTypeId).usersWithAccess.includes(getUsername()));
+			|| usernameIsOneOf(getGameTypeEntryFromId(gameTypeId).usersWithAccess));
 }
 
 function sandboxitize() {
@@ -2071,7 +2071,7 @@ var GameType = {
 	},
 	SolitairePaiSho: {
 		id: 4,
-		desc: "Solitaire Pai Sho",
+		desc: "Nature’s Grove: Respite",
 		rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/",
 		gameOptions: [
 			OPTION_DOUBLE_TILES,
@@ -2081,7 +2081,7 @@ var GameType = {
 	},
 	CoopSolitaire: {
 		id: 6,
-		desc: "Cooperative Solitaire",
+		desc: "Nature’s Grove: Synergy",
 		rulesUrl: "https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/",
 		gameOptions: [
 			LESS_TILES,
@@ -2092,7 +2092,7 @@ var GameType = {
 	},
 	OvergrowthPaiSho: {
 		id: 8,
-		desc: "Overgrowth Pai Sho",
+		desc: "Nature’s Grove: Overgrowth",
 		rulesUrl: "https://skudpaisho.com/site/games/overgrowth-pai-sho/",
 		gameOptions: [
 			LESS_TILES,
@@ -2106,7 +2106,10 @@ var GameType = {
 		desc: "Undergrowth Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/undergrowth-pai-sho/",
 		gameOptions: [],
-		noRankedGames: true
+		noRankedGames: true,
+		gameOptions: [
+			UNDERGROWTH_SIMPLE
+		]
 	},
 	Trifle: {
 		id: 10,
@@ -2124,7 +2127,8 @@ var GameType = {
 			'SpinxKreuz',
 			'TheRealMomo',
 			'MrsSkud',
-			'markdwagner'
+			'markdwagner',
+			'The_IceL0rd'
 		],
 		noRankedGames: true
 	},
@@ -2157,7 +2161,9 @@ var GameType = {
 			ADEVAR_ROTATE,
 			GINSENG_ROTATE,
 			SPECTATORS_CAN_PLAY,
-			FULL_GRID
+			FULL_GRID,
+			SQUARE_SPACES,
+			BOTTOMLESS_RESERVES
 		],
 		noRankedGames: true
 	},
@@ -2257,11 +2263,11 @@ function getGameControllerForGameType(gameTypeId) {
 			controller = new MeadowController(gameContainerDiv, isMobile);
 			break;
 		case GameType.Trifle.id:
-			if (gameDevOn || GameType.Trifle.usersWithAccess.includes(getUsername())) {
+			// if (gameDevOn || usernamionof.... GameType.Trifle.usersWithAccess.includes(getUsername())) {
 				controller = new Trifle.Controller(gameContainerDiv, isMobile);
-			} else {
-				closeGame();
-			}
+			// } else {
+			// 	closeGame();
+			// }
 			break;
 		case GameType.Hexentafl.id:
 			controller = new HexentaflController(gameContainerDiv, isMobile);
@@ -2805,7 +2811,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 			if (
 				gameDevOn
 				|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
-				|| getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess.includes(getUsername())
+				|| usernameIsOneOf(getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess)
 			) {
 				var hostOnlineOrNotIconText = userOfflineIcon;
 				if (gameSeek.hostOnline) {
@@ -2834,7 +2840,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 	}
 
 	if (!gameSeeksDisplayed) {
-		message = "No games available to join. You can create a new game, or join <a href='https://discord.gg/dStDZx7' target='_blank'>Join the Discord</a> to find people to play with!";
+		message = "No games available to join. You can create a new game, or join <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a> to find people to play with!";
 	}
 
 	message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
@@ -3068,7 +3074,7 @@ var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(resul
 /* This is AKA Display Links tab content */
 function resetGlobalChats() {
 	// Clear all global chats..
-	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/dStDZx7' target='_blank'>Discord server</a>.<hr />";
+	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>.<hr />";
 }
 
 function fetchInitialGlobalChats() {
@@ -3150,7 +3156,7 @@ function getNewGameEntryForGameType(gameType) {
 	if (
 		gameDevOn
 		|| !gameType.usersWithAccess
-		|| gameType.usersWithAccess.includes(getUsername())
+		|| usernameIsOneOf(gameType.usersWithAccess)
 	) {
 		return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
 	}
@@ -3224,7 +3230,26 @@ var processChatCommands = function(chatMessage) {
 		new AdevarOptions();
 		AdevarOptions.commenceSpoopy();
 	}
+
+	if (chatMessage.toLowerCase().includes('tree years')) {
+		promptForAgeToTreeYears();
+	}
 };
+
+function promptForAgeToTreeYears() {
+	var message = "<br />Age: <input type='text' id='humanAgeInput' name='humanAgeInput' />";
+	message += "<br /><div class='clickableText' onclick='submitHumanAge()'>Convert to tree years</div>";
+	message += "<br /><div id='treeYearsResult'></div>";
+	message += "<br /><br /><div>Confused? <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a>! :))</div>";
+	showModal("How Old Are You in Tree Years?", message);
+}
+
+function submitHumanAge() {
+	var age = document.getElementById("humanAgeInput").value;
+	if (!isNaN(age)) {
+		document.getElementById("treeYearsResult").innerText = humanYearsToTreeYears(parseInt(age, 10));
+	}
+}
   
 document.getElementById('chatMessageInput').onkeypress = function(e) {
 	var code = (e.keyCode ? e.keyCode : e.which);
