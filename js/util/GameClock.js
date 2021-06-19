@@ -215,7 +215,8 @@ GameClock.userHasGameClockAccess = function() {
             'Zach',
             'Dallin',
             'Pronetowander',
-            'vitheguy'
+            'vitheguy',
+            'Adevar'
         ]);
 };
 
