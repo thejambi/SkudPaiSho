@@ -51,6 +51,7 @@ var QueryString = function () {
 	  chujimono: "Chu Ji Canon Tiles",
 	  chujired: "Chu Ji Red",
 	  azulejos: "Azulejos by Cannoli",
+	  keygyatso: "Key Pai Sho Gyatso Style",
 	  pixelsho: "Pixel Sho v1 Tiles",
 	  pixelsho2: "Pixel Sho v2 Tiles",
 	  xiangqi: "Xiangqi Style",
