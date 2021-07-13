@@ -81,6 +81,10 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 
 		tiles.push(new AdevarTile(AdevarTileCode.reflection, ownerCode));
 	}
+
+	if (gameOptionEnabled(ADEVAR_LITE)){
+		tiles.push(new AdevarTile(AdevarTileCode.reflection, ownerCode));
+	}
 	
 	for (var i = 0; i < 2; i++) {
 		tiles.push(new AdevarTile(AdevarTileCode.vanguard, ownerCode));

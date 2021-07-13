@@ -275,7 +275,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		});
 
 		// Place Reflection tile
-		if (!gameOptionEnabled(ADEVAR_LITE)) {
+		if (!gameOptionEnabled(ADEVAR_LITE) || gameOptionEnabled(ADEVAR_LITE)) {
 			this.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.reflection), AdevarBoardSetupPoints.reflection[move.player]);
 		}
 
