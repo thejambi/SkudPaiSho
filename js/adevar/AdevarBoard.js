@@ -1006,6 +1006,17 @@ AdevarBoard.prototype.setPossibleDeployPoints = function(tile) {
 	}
 };
 
+/*AdevarBoard.prototype.canCaptureAwayGate = function(tile, tileType, onlyHomeGate){
+	var targetTilePoints = this.getTileTypePoints(tile.ownerName, tileType);
+
+	//var self = this;
+	targetTilePoints.forEach(function(targetTilePoint) {
+		if ((onlyHomeGate && targetTilePoint.tile.isHomeGate) || !onlyHomeGate) {
+			return true;
+		}
+	});
+};*/
+
 AdevarBoard.prototype.setPossibleDeployPointsAroundTilesOfType = function(tile, tileType, onlyHomeGate) {
 	var targetTilePoints = this.getTileTypePoints(tile.ownerName, tileType);
 

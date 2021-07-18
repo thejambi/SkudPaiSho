@@ -102,7 +102,8 @@ AdevarActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, c
 	var prevTile = null;
 	tileManager.hostTiles.forEach(function(tile) {
 		if (getUsername() === 'SkudPaiSho' && prevTile && (prevTile.type !== tile.type
-				|| (prevTile.type === AdevarTileType.basic && prevTile.code !== tile.code))) {
+				|| (prevTile.type === AdevarTileType.basic && prevTile.code !== tile.code) 
+				|| (prevTile.type === AdevarTileType.gate && prevTile.code !== tile.code))) {
 			var theP = document.createElement("br");
 			theP.style.clear = "both";
 			hostTileReserveContainer.appendChild(theP);
