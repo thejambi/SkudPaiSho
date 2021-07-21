@@ -2176,7 +2176,8 @@ var GameType = {
 			SHORTER_GAME,
 			FOUR_SIDED_BOARD,
 			SIX_SIDED_BOARD,
-			EIGHT_SIDED_BOARD
+			EIGHT_SIDED_BOARD,
+			HEXHEX_10
 		]
 	},
 	Meadow: {

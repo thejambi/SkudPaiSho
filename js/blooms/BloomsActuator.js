@@ -8,16 +8,26 @@ function BloomsActuator(gameContainer, isMobile, hostTilesContainerDivs, guestTi
 
 	var boardContainer = createDivWithClass("bloomsBoard");
 
+	var boardClass;
 	if (gameOptionEnabled(SIX_SIDED_BOARD)) {
-		boardContainer.classList.add("blooms6perSide");
+		boardClass = "blooms6perSide";
 	} else if (gameOptionEnabled(EIGHT_SIDED_BOARD)) {
-		boardContainer.classList.add("blooms8perSide");
+		boardClass = "blooms8perSide";
+	} else if (gameOptionEnabled(HEXHEX_10)) {
+		boardClass = "blooms10perSide";
+	}
+	if (boardClass) {
+		boardContainer.classList.add(boardClass);
 	}
 
 	var hostTilesContainer = createDivWithClass("hostTilesContainer");
 	var guestTilesContainer = createDivWithClass("guestTilesContainer");
 
 	var bcontainer = createDivWithClass("board-container");
+
+	if (boardClass) {
+		bcontainer.classList.add(boardClass+"bottomMargin");
+	}
 
 	bcontainer.appendChild(boardContainer);
 

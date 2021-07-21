@@ -144,6 +144,9 @@ gameOptionDescriptions[BOTTOMLESS_RESERVES] = "Bottomless Reserves";
 var UNDERGROWTH_SIMPLE = "UndergrowthSimple";
 gameOptionDescriptions[UNDERGROWTH_SIMPLE] = "Simplicity (testing)";
 
+var HEXHEX_10 = "Hexhex10Board";
+gameOptionDescriptions[HEXHEX_10] = "Board size: 10 per side";
+
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
 		return gameOptionDescriptions[optionName];
