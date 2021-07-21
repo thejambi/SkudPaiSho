@@ -1105,11 +1105,11 @@ input[type=submit] {
 
 .blooms10perSide {
   width: 1120px;
-  margin: -200px 0 0 -260px;
+  margin: -183px 0 0 -260px;
   transform: scale(0.55);
 }
 .blooms10perSidebottomMargin {
-  margin-bottom: -210px;
+  margin-bottom: -200px;
 }
 
 .blooms12sidedBoard {
@@ -1599,12 +1599,12 @@ textarea {
 
 .blooms10perSide {
   width: 196vw;
-  margin: -38vw 0 0 -50vw;
+  margin: -34vw 0 0 -50vw;
   transform: scale(0.51);
 }
 
 .blooms10perSidebottomMargin {
-  margin-bottom: -40vw;
+  margin-bottom: -38vw;
 }
 
 .boardHexhex6 {
