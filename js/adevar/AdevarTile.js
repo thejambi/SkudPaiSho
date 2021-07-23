@@ -153,6 +153,9 @@ AdevarTile.prototype.getConsoleDisplay = function() {
 
 AdevarTile.prototype.getImageName = function() {
 	var codeToUse = this.hidden ? "Back" : this.code;
+	if (codeToUse === AdevarTileCode.gateHome || codeToUse === AdevarTileCode.gateAway) {
+		codeToUse = AdevarTileCode.gate;
+	}
 	return this.ownerCode + "" + codeToUse;
 };
 
@@ -201,11 +204,9 @@ AdevarTile.prototype.canCapture = function(targetTile) {
 				&& AdevarTile.hiddenTileMatchesSecondFace(targetTile, this)) {
 			return true;
 		}
-	}
-	if (this.ownerName === targetTile.ownerName) {
-		if (this.type === AdevarTileType.reflection && targetTile.type === AdevarTileType.gate && targetTile.code !== AdevarTileCode.gateHome){
-			return true;
-		}
+	} else if (this.type === AdevarTileType.reflection 
+				&& targetTile.code === AdevarTileCode.gateAway) {
+		return true;
 	}
 
 	return false;
