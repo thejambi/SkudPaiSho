@@ -14,6 +14,8 @@ var AdevarTileCode = {
 	zinnia: "Zinnia",
 	foxglove: "Foxglove",
 	gate: "Gate",
+	gateHome: "GateHome",
+	gateAway: "GateAway",
 	vanguard: "Vanguard",
 	reflection: "WatersReflection",
 	iris: "Iris",
@@ -40,6 +42,8 @@ var AdevarTileNames = {
 	zinnia: "Zinnia",
 	foxglove: "Foxglove",
 	gate: "Gate",
+	gateHome: "Home Gate",
+	gateAway: "Away Gate",
 	vanguard: "Vanguard",
 	reflection: "Water's Reflection",
 	iris: "Iris",
@@ -66,6 +70,8 @@ var AdevarInSpaceAlternateNames = {
 	zinnia: "P-4 \"Zinnia\"",
 	foxglove: "S-5 \"Foxglove\"",
 	gate: "Space-Gate Station",
+	gateHome: "Home Space-Gate Station",
+	gateAway: "Away Space-Gate Station",
 	vanguard: "Vanguard Moon",
 	reflection: "Reflection Comet",
 	iris: "Saturn: Mission \"Iris\"",
@@ -123,6 +129,12 @@ function AdevarTile(code, ownerCode) {
 			this.type = AdevarTileType.basic;
 			break;
 		case AdevarTileCode.gate:
+			this.type = AdevarTileType.gate;
+			break;
+		case AdevarTileCode.gateHome:
+			this.type = AdevarTileType.gate;
+			break;
+		case AdevarTileCode.gateAway:
 			this.type = AdevarTileType.gate;
 			break;
 		case AdevarTileCode.vanguard:
@@ -187,6 +199,11 @@ AdevarTile.prototype.canCapture = function(targetTile) {
 		} else if (this.type === AdevarTileType.secondFace
 				&& targetTile.type === AdevarTileType.hiddenTile
 				&& AdevarTile.hiddenTileMatchesSecondFace(targetTile, this)) {
+			return true;
+		}
+	}
+	if (this.ownerName === targetTile.ownerName) {
+		if (this.type === AdevarTileType.reflection && targetTile.type === AdevarTileType.gate && targetTile.code !== AdevarTileCode.gateHome){
 			return true;
 		}
 	}

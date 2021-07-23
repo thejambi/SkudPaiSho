@@ -252,7 +252,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		});
 
 		// Place Gate tiles
-		var homeGateTile = self.tileManager.grabTile(move.player, AdevarTileCode.gate);
+		var homeGateTile = self.tileManager.grabTile(move.player, AdevarTileCode.gateHome);
 		homeGateTile.isHomeGate = true;
 		this.board.placeTile(homeGateTile, AdevarBoardSetupPoints.gate[move.player]);
 		
@@ -275,7 +275,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		});
 
 		// Place Reflection tile
-		if (!gameOptionEnabled(ADEVAR_LITE)) {
+		if (!gameOptionEnabled(ADEVAR_LITE) || gameOptionEnabled(ADEVAR_LITE)) {
 			this.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.reflection), AdevarBoardSetupPoints.reflection[move.player]);
 		}
 
@@ -598,7 +598,7 @@ AdevarGameManager.prototype.playerHasWhiteRoseWin = function(player) {
 	/* Objective: [Old] Capture opponent's Reflection tile */
 	// return this.playersWhoHaveCapturedReflection.includes(player);
 
-	/* Objective: [Beta] Call a Gate completely in opponent's starting Neutral Plot */
+	/* Objective: Call a Gate completely in opponent's starting Neutral Plot */
 	return this.board.playerHasGateInOpponentNeutralPlot(player);
 };
 
