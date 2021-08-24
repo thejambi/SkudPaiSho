@@ -3470,6 +3470,39 @@ function quitOnlineGameClicked() {
 	showModal("Quit Current Online Game", message);
 }
 
+function resignOnlineGame() {
+	if (playingOnlineGame()
+		&& iAmPlayerInCurrentOnlineGame()
+		&& !getGameWinner()
+		&& myTurn()
+	) {
+		var hostResultCode = usernameEquals(currentGameData.hostUsername) ? 0 : 1;
+		var newPlayerRatings = {};
+		if (currentGameData.isRankedGame && currentGameData.hostUsername !== currentGameData.guestUsername) {
+			newPlayerRatings = Elo.getNewPlayerRatings(currentGameData.hostRating, currentGameData.guestRating, hostResultCode);
+		}
+		onlinePlayEngine.updateGameWinInfo(gameId, getOnlineGameOpponentUsername(), 9, getLoginToken(), quitOnlineGameCallback, 
+			currentGameData.isRankedGame, newPlayerRatings.hostRating, newPlayerRatings.guestRating, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
+	}
+}
+
+function resignOnlineGameClicked() {
+	var message = "";
+	if (playingOnlineGame() 
+		&& iAmPlayerInCurrentOnlineGame()
+		&& !getGameWinner()
+		&& myTurn()
+	) {
+		message = "<div>Are you sure you want to resign this game, marking it as your loss?</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal(); resignOnlineGame();'>Yes - resign current game</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+	} else {
+		message = "When playing an online game, this is where you can resign the game on your turn.";
+	}
+
+	showModal("Resign Current Online Game", message);
+}
+
 function onlineGameIsOldEnoughToBeQuit() {
 	return true;
 	/* var currentGameTimestampDate = buildDateFromTimestamp(currentGameData.lastUpdatedTimestamp);
