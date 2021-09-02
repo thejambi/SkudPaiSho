@@ -241,6 +241,8 @@ PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
 		gameImgDir = "Adevar/" + getUserGamePreference(AdevarOptions.tileDesignTypeKey);
 	} else if (tile.gameType === "Warfront") {
 		gameImgDir = "Warfront";
+	} else if (tile.gameType === "Balance") {
+		gameImgDir = "Balance/Balance Pai Sho Tiles";
 	} else {
 		gameImgDir = tile.gameType;
 	}
