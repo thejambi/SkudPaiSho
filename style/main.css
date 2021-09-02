@@ -1103,6 +1103,15 @@ input[type=submit] {
   transform: scale(0.68);
 }
 
+.blooms10perSide {
+  width: 1120px;
+  margin: -183px 0 0 -260px;
+  transform: scale(0.55);
+}
+.blooms10perSidebottomMargin {
+  margin-bottom: -200px;
+}
+
 .blooms12sidedBoard {
   width: 1500px;
   margin: -190px 0 0 -416px;
@@ -1320,9 +1329,9 @@ input[type=submit] {
 }
 
 .boardHexhex8 {
-  width: 910px;
-  margin: -65px 0 0 -119px;
-  transform: scale(0.78);
+  width: 1500px;
+  margin: -198px 0 0 -331px;
+  transform: scale(0.55);
 }
 .boardHexhex8bottomMargin {
   margin-bottom: -60px;
@@ -1586,6 +1595,16 @@ textarea {
   width: 160vw;
   margin: -20vw 0 0 -31vw;
   transform: scale(0.65);
+}
+
+.blooms10perSide {
+  width: 196vw;
+  margin: -34vw 0 0 -50vw;
+  transform: scale(0.51);
+}
+
+.blooms10perSidebottomMargin {
+  margin-bottom: -38vw;
 }
 
 .boardHexhex6 {

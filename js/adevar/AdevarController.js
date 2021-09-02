@@ -106,7 +106,7 @@ AdevarController.prototype.getAdditionalMessage = function() {
 		}
 
 		if (gameOptionEnabled(ADEVAR_LITE)) {
-			msg += "<br /><strong>Adevăr Lite</strong> is a <em>training wheels</em> mode for beginners to learn the game - players play with their Hidden Tiles revealed and win by accomplishing their chosen Hidden Tile objective.<br />";
+			msg += "<br /><strong>Adevăr Lite</strong> is a <em>training wheels</em> mode for beginners to learn the game - players play with their Hidden Tiles revealed and win by accomplishing their chosen Hidden Tile objective.";
 		}
 
 	//	if (gameOptionEnabled(BLACK_ORCHID_BUFF)) {
@@ -378,15 +378,22 @@ AdevarController.prototype.buildOtherTileMessages = function(tile) {
 			messages.push("Foxglove tiles can also capture the opponent's Water's Reflection tile");
 		}
 	} else if (tile.type === AdevarTileType.gate) {
-		messages.push("Gate Tile");
+		if (tile.code === AdevarTileCode.gateHome) {
+			messages.push("Home Gate Tile");
+		}
+		if (tile.code === AdevarTileCode.gateAway) {
+			messages.push("Away Gate Tile");
+		}
 		messages.push("Basic tiles, Second Face tiles, and Water's Reflection tiles are called to the board through your Gate tiles");
 		messages.push("Gate tiles are called onto the board next to your Basic tiles");
+		messages.push("Your 'Away' Gate can be captured by your own Water's Reflection tile to be returned to your hand");
 	} else if (tile.type === AdevarTileType.reflection) {
 		messages.push("Water's Reflection Tile");
 		messages.push("Can move up to 5 spaces");
 		messages.push("Can capture Second Face tiles");
 		messages.push("Can be captured by Foxglove tiles");
 		messages.push("Returned to tile reserve when captured and can be called back to the board through a Gate tile");
+		messages.push("Can capture your 'Away' Gate; that is, your Gate which is placed onto the board from your hand");
 	} else if (tile.type === AdevarTileType.secondFace) {
 		messages.push("Can move up to 7 spaces");
 		messages.push("Can capture Vanguard tiles and its corresponding Hidden Tile");
