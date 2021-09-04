@@ -1443,8 +1443,12 @@ var createPrivateGameCallback = function createPrivateGameCallback(newGameId) {
 
 	var inviteLinkUrl = createInviteLinkUrl(newGameId);
 
-	showModal("Game Created!", "You just created a private game. Send <a href='" + inviteLinkUrl + "' target='_blank'>this invite link</a> to a friend so they can join. <br /><br />When a player joins this game, it will show up in your list of games when you click My Games.", true);
+	showModal("Game Created!", "You just created a private game. Send <a href='" + inviteLinkUrl + "' target='_blank'>this invite link</a> to a friend so they can join. <button onclick='copyLink("+inviteLinkURL+")'>Copy Link</button> <br /><br />When a player joins this game, it will show up in your list of games when you click My Games.", true);
 };
+
+function copyLink(link) {
+	navigator.clipboard.writeText(link);
+}
 
 function createInviteLinkUrl(newGameId) {
 	var urlParamStr = "ig=" + newGameId + "&h=" + getUsername();
@@ -1584,13 +1588,13 @@ function setMessage(msg) {
 	}
 }
 
-function getAltTilesOptionText() {
-	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.<br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "</p>";
-}
+// function getAltTilesOptionText() {
+// 	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.<br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "</p>";
+// }
 
-function getAltVagabondTilesOptionText() {
-	return "<p><span class='skipBonus' onclick='toggleVagabondTileDesigns();'>Click here</span> to switch between standard and modern tile designs for Vagabond Pai Sho.</p>";
-}
+// function getAltVagabondTilesOptionText() {
+// 	return "<p><span class='skipBonus' onclick='toggleVagabondTileDesigns();'>Click here</span> to switch between standard and modern tile designs for Vagabond Pai Sho.</p>";
+// }
 
 function getTournamentText() {
 	if (metadata.tournamentMatchNotes) {
@@ -2139,6 +2143,12 @@ var GameType = {
 		rulesUrl: "https://skudpaisho.com/site/games/capture-pai-sho/",
 		gameOptions: []
 	},
+	SpiritPaiSho: {
+		id: 17,
+		desc: "Spirit Pai Sho",
+		rulesUrl: "https://skudpaisho.com/",
+		gameOptions: []
+	},
 	StreetPaiSho: {
 		id: 5,
 		desc: "Street Pai Sho",
@@ -2241,6 +2251,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.CapturePaiSho.id:
 			controller = new CaptureController(gameContainerDiv, isMobile);
+			break;
+		case GameType.SpiritPaiSho.id:
+			controller = new SpiritController(gameContainerDiv, isMobile);
 			break;
 		case GameType.StreetPaiSho.id:
 			controller = new StreetController(gameContainerDiv, isMobile);
