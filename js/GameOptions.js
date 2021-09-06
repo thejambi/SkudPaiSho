@@ -128,6 +128,8 @@ var DIAGONAL_MOVEMENT = "DiagonalMovement";	// April Fools 2021
 gameOptionDescriptions[DIAGONAL_MOVEMENT] = "Diagonal Movement";
 var EVERYTHING_CAPTURE = "EverythingCapture";	// April Fools 2021
 gameOptionDescriptions[EVERYTHING_CAPTURE] = "Everything Captures Everything";
+var NO_WHEELS = "NoWheels";
+gameOptionDescriptions[NO_WHEELS] = "No Wheels";
 
 var GINSENG_ROTATE = "GinsengBoardRotation";
 gameOptionDescriptions[GINSENG_ROTATE] = "Ginseng Board Rotation";
@@ -143,6 +145,9 @@ gameOptionDescriptions[BOTTOMLESS_RESERVES] = "Bottomless Reserves";
 
 var UNDERGROWTH_SIMPLE = "UndergrowthSimple";
 gameOptionDescriptions[UNDERGROWTH_SIMPLE] = "Simplicity (testing)";
+
+var HEXHEX_10 = "Hexhex10Board";
+gameOptionDescriptions[HEXHEX_10] = "Board size: 10 per side";
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {

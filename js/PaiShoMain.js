@@ -2036,7 +2036,8 @@ var GameType = {
 			OPTION_INFORMAL_START,
 			OPTION_DOUBLE_ACCENT_TILES,
 			OPTION_ANCIENT_OASIS_EXPANSION,
-			NO_HARMONY_VISUAL_AIDS
+			NO_HARMONY_VISUAL_AIDS,
+			NO_WHEELS
 		],
 		secretGameOptions: [
 			DIAGONAL_MOVEMENT,
@@ -2076,7 +2077,7 @@ var GameType = {
 	},
 	SolitairePaiSho: {
 		id: 4,
-		desc: "Nature’s Grove: Respite",
+		desc: "Respite - Solitaire Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/",
 		gameOptions: [
 			OPTION_DOUBLE_TILES,
@@ -2086,7 +2087,7 @@ var GameType = {
 	},
 	CoopSolitaire: {
 		id: 6,
-		desc: "Nature’s Grove: Synergy",
+		desc: "Synergy - Co-op Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/",
 		gameOptions: [
 			LESS_TILES,
@@ -2097,7 +2098,7 @@ var GameType = {
 	},
 	OvergrowthPaiSho: {
 		id: 8,
-		desc: "Nature’s Grove: Overgrowth",
+		desc: "Overgrowth Pai Sho",
 		rulesUrl: "https://skudpaisho.com/site/games/overgrowth-pai-sho/",
 		gameOptions: [
 			LESS_TILES,
@@ -2186,7 +2187,8 @@ var GameType = {
 			SHORTER_GAME,
 			FOUR_SIDED_BOARD,
 			SIX_SIDED_BOARD,
-			EIGHT_SIDED_BOARD
+			EIGHT_SIDED_BOARD,
+			HEXHEX_10
 		]
 	},
 	Meadow: {
@@ -3479,6 +3481,39 @@ function quitOnlineGameClicked() {
 	}
 
 	showModal("Quit Current Online Game", message);
+}
+
+function resignOnlineGame() {
+	if (playingOnlineGame()
+		&& iAmPlayerInCurrentOnlineGame()
+		&& !getGameWinner()
+		&& myTurn()
+	) {
+		var hostResultCode = usernameEquals(currentGameData.hostUsername) ? 0 : 1;
+		var newPlayerRatings = {};
+		if (currentGameData.isRankedGame && currentGameData.hostUsername !== currentGameData.guestUsername) {
+			newPlayerRatings = Elo.getNewPlayerRatings(currentGameData.hostRating, currentGameData.guestRating, hostResultCode);
+		}
+		onlinePlayEngine.updateGameWinInfo(gameId, getOnlineGameOpponentUsername(), 9, getLoginToken(), quitOnlineGameCallback, 
+			currentGameData.isRankedGame, newPlayerRatings.hostRating, newPlayerRatings.guestRating, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
+	}
+}
+
+function resignOnlineGameClicked() {
+	var message = "";
+	if (playingOnlineGame() 
+		&& iAmPlayerInCurrentOnlineGame()
+		&& !getGameWinner()
+		&& myTurn()
+	) {
+		message = "<div>Are you sure you want to resign this game, marking it as your loss?</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal(); resignOnlineGame();'>Yes - resign current game</div>";
+		message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+	} else {
+		message = "When playing an online game, this is where you can resign the game on your turn.";
+	}
+
+	showModal("Resign Current Online Game", message);
 }
 
 function onlineGameIsOldEnoughToBeQuit() {
