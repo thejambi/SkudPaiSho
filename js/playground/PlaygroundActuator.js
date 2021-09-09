@@ -242,9 +242,10 @@ PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
 	} else if (tile.gameType === "Warfront") {
 		gameImgDir = "Warfront";
 	} else if (tile.gameType === "Balance") {
-		gameImgDir = "Balance/Balance Pai Sho Tiles";
+		gameImgDir = "Balance/balance";
 	} else if (tile.gameType === "Spirit") {
 		gameImgDir = "Spirit/original";
+	} else {
 		gameImgDir = tile.gameType;
 	}
 	if (gameImgDir) {

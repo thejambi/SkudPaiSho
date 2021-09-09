@@ -129,8 +129,6 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Spirit", "HeiBai", ownerCode));
 	tiles.push(new PlaygroundTile("Spirit", "Tui", ownerCode));
 	tiles.push(new PlaygroundTile("Spirit", "Koh", ownerCode));
-	tiles.push(new PlaygroundTile("Spirit", "Peace", ownerCode));
-	tiles.push(new PlaygroundTile("Spirit", "Water", ownerCode));
 	
 	// Chess (black and white colors)
 	tiles.push(new PlaygroundTile("Chess", "Chess_K", ownerCode));

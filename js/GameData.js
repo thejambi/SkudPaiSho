@@ -300,3 +300,21 @@ Array.prototype.equals = function (array) {
 }
 // Hide method from for-in loops
 Object.defineProperty(Array.prototype, "equals", {enumerable: false});
+
+
+/* Clipboard */
+async function copyTextToClipboard(theText, triggerButton) {
+	if (!navigator.clipboard) {
+		// Clipboard API not available
+		return;
+	}
+	try {
+		await navigator.clipboard.writeText(theText);
+    if (triggerButton) {
+      triggerButton.innerText = "Copied!";
+    }
+	} catch (err) {
+		console.error('Failed to copy!', err);
+	}
+}
+
