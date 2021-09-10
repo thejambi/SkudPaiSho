@@ -9,14 +9,14 @@ SpiritTileManager.prototype.loadTileSet = function(ownerCode) {
 	var tiles = [];
 
 	// 1 of each tile, in order
-	tiles.push(new SpiritTile('Raava', ownerCode));
-	tiles.push(new SpiritTile('WanShiTong', ownerCode));
-	tiles.push(new SpiritTile('La', ownerCode));
-	tiles.push(new SpiritTile('MotherOfFaces', ownerCode));
-	tiles.push(new SpiritTile('Vaatu', ownerCode));
-	tiles.push(new SpiritTile('HeiBai', ownerCode));
-	tiles.push(new SpiritTile('Tui', ownerCode));
-	tiles.push(new SpiritTile('Koh', ownerCode));
+	tiles.push(new SpiritTile('R', ownerCode));
+	tiles.push(new SpiritTile('W', ownerCode));
+	tiles.push(new SpiritTile('L', ownerCode));
+	tiles.push(new SpiritTile('M', ownerCode));
+	tiles.push(new SpiritTile('V', ownerCode));
+	tiles.push(new SpiritTile('H', ownerCode));
+	tiles.push(new SpiritTile('T', ownerCode));
+	tiles.push(new SpiritTile('K', ownerCode));
 
 	return tiles;
 };

@@ -31,7 +31,7 @@ SpiritTile.prototype.getName = function() {
 SpiritTile.prototype.canCapture = function(otherTile) {
 	if (otherTile.ownerCode !== this.ownerCode) {
 		// Can only capture other player's tiles...
-		var tileOrder = ['Raava','WanShiTong','La','MotherOfFaces','Vaatu','HeiBai','Tui','Koh'];
+		var tileOrder = ['R','W','L','M','V','H','T','K'];
 		var thisIndex = tileOrder.indexOf(this.code);
 		// If index of otherTile is one of the next three, then capture
 		var otherIndex = tileOrder.indexOf(otherTile.code);
@@ -62,21 +62,21 @@ SpiritTile.prototype.getCopy = function() {
 SpiritTile.getTileName = function(tileCode) {
 	var name = "";
 	
-	if (tileCode === 'Raava') {
+	if (tileCode === 'R') {
 		name = "Raava";
-	} else if (tileCode === 'WanShiTong') {
+	} else if (tileCode === 'W') {
 		name = "Wan Shi Tong";
-	} else if (tileCode === 'La') {
+	} else if (tileCode === 'L') {
 		name = "La";
-	} else if (tileCode === 'MotherOfFaces') {
+	} else if (tileCode === 'M') {
 		name = "Mother Of Faces";
-	} else if (tileCode === 'Vaatu') {
+	} else if (tileCode === 'V') {
 		name = "Vaatu";
-	} else if (tileCode === 'HeiBai') {
+	} else if (tileCode === 'H') {
 		name = "Hei Bai";
-	} else if (tileCode === 'Tui') {
+	} else if (tileCode === 'T') {
 		name = "Tui";
-	} else if (tileCode === 'Koh') {
+	} else if (tileCode === 'K') {
 		name = "Koh";
 	}
 
@@ -87,28 +87,28 @@ SpiritTile.prototype.getStartingPoint = function() {
 	var x = 0;
 	var y = 0;
 
-	if (tileCode === 'Raava') {
+	if (this.code === 'R') {
 		x = 1;
 		y = 1;
-	} else if (tileCode === 'WanShiTong') {
+	} else if (this.code === 'W') {
 		x = 4;
 		y = -1;
-	} else if (tileCode === 'La') {
+	} else if (this.code === 'L') {
 		x = 3;
 		y = 2;
-	} else if (tileCode === 'MotherOfFaces') {
+	} else if (this.code === 'M') {
 		x = 1;
 		y = -4;
-	} else if (tileCode === 'Vaatu') {
+	} else if (this.code === 'V') {
 		x = 5;
 		y = 0;
-	} else if (tileCode === 'HeiBai') {
+	} else if (this.code === 'H') {
 		x = 2;
 		y = 2;
-	} else if (tileCode === 'Tui') {
+	} else if (this.code === 'T') {
 		x = 3;
 		y = -2;
-	} else if (tileCode === 'Koh') {
+	} else if (this.code === 'K') {
 		x = 4;
 		y = 1;
 	}

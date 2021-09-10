@@ -28,7 +28,7 @@ SpiritController.prototype.completeSetup = function() {
 		setUserGamePreference(SpiritPreferences.tileDesignKey, "original");
 	}
 
-	// Randomly place tiles on board for game setup
+	//Place tiles on board for game setup
 	this.addSetupForPlayerCode('H');
 	this.addSetupForPlayerCode('G');
 
@@ -41,12 +41,6 @@ SpiritController.prototype.addSetupForPlayerCode = function(playerCode) {
 	var tiles = this.theGame.tileManager.loadTileSet(playerCode);
 	
 	var moveText = "0" + playerCode + ".";
-	tiles.forEach(
-		function(tile) {
-			moveText += tile.code;
-		}
-	);
-	debug(moveText);
 	var move = new SpiritNotationMove(moveText);
 	this.theGame.runNotationMove(move);
 	// Move all set. Add it to the notation!
@@ -66,15 +60,15 @@ SpiritController.prototype.resetGameNotation = function() {
 };
 
 SpiritController.prototype.getNewGameNotation = function() {
-	return new CaptureGameNotation();
+	return new SpiritGameNotation();
 };
 
 SpiritController.getHostTilesContainerDivs = function() {
-	return '<div class="HA"></div> <div class="HV"></div> <div class="HB"></div> <div class="HP"></div> <div class="HF"></div> <div class="HU"></div> <br class="clear" /> <div class="HK"></div> <div class="HL"></div> <div class="HD"></div> <div class="HM"></div> <div class="HT"></div> <div class="HO"></div>';
+	return '<div class="HR"></div> <div class="HW"></div> <div class="HL"></div> <div class="HM"></div> <div class="HV"></div> <div class="HH"></div> <br class="clear" /> <div class="HT"></div> <div class="HK"></div>';
 };
 
 SpiritController.getGuestTilesContainerDivs = function() {
-	return '<div class="GA"></div> <div class="GV"></div> <div class="GB"></div> <div class="GP"></div> <div class="GF"></div> <div class="GU"></div> <br class="clear" /> <div class="GK"></div> <div class="GL"></div> <div class="GD"></div> <div class="GM"></div> <div class="GT"></div> <div class="GO"></div>';
+	return '<div class="GR"></div> <div class="GW"></div> <div class="GL"></div> <div class="GM"></div> <div class="GV"></div> <div class="GH"></div> <br class="clear" /> <div class="GT"></div> <div class="GK"></div>';
 };
 
 SpiritController.prototype.callActuate = function() {
@@ -113,7 +107,7 @@ SpiritController.prototype.getAdditionalMessage = function() {
 };
 
 SpiritController.prototype.unplayedTileClicked = function(tileDiv) {
-	/* Tiles are all on the board for Capture Pai Sho */
+	/* Tiles are all on the board for Spirit Pai Sho */
 };
 
 SpiritController.prototype.clearCaptureHelpAndActuateIfNeeded = function() {
@@ -191,7 +185,7 @@ SpiritController.prototype.pointClicked = function(htmlPoint) {
 };
 
 SpiritController.prototype.getCommonHelpMessageChunk = function() {
-	return this.getCaptureCycleImageTag() + "<p>Each tile captures the next three tiles in the Capture Cycle (going clockwise). <a href='https://skudpaisho.com/site/games/capture-pai-sho/' target='_blank'>View the rules</a> to learn about how tiles move and jump on the board and more.</p><p><em>Capture Pai Sho is created and designed by <a href='https://redallure.deviantart.com/art/What-you-get-502701647' target='_blank'>Tom Ford</a>.</em></p>";
+	return this.getCaptureCycleImageTag() + "<p>Each tile captures the next two tiles in the Capture Cycle (going clockwise).</p>";
 };
 
 SpiritController.prototype.getCaptureCycleImageTag = function() {
@@ -203,7 +197,7 @@ SpiritController.prototype.getTheMessage = function(tile, ownerName) {
 
 	var tileCode = tile.code;
 
-	var heading = ownerName + "'s " + CaptureTile.getTileName(tileCode);
+	var heading = ownerName + "'s " + SpiritTile.getTileName(tileCode);
 
 	message.push(this.getCommonHelpMessageChunk());
 
