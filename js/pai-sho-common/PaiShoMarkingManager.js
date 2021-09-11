@@ -50,3 +50,4 @@ PaiShoMarkingManager.prototype.clearMarkings = function () {
     this.points = {};
     this.arrows = {};
 };
+ 
