@@ -183,7 +183,7 @@ GameClock.buildGameClockInstance = function(gameClockObject) {
 GameClock.timeControlsDropdownId = "timeControlsDropdown";
 
 GameClock.getTimeControlsDropdown = function() {
-    return buildDropdownDiv(GameClock.timeControlsDropdownId, "Time Controls:", GameClock.timeControlsLabelValues,
+    return buildDropdownDiv(GameClock.timeControlsDropdownId, "Time Controls (beta):", GameClock.timeControlsLabelValues,
 		"none",
 		function() {
             var timeControlsKey = this.value;
@@ -209,13 +209,17 @@ GameClock.loadGameClock = function(newClock) {
 };
 
 GameClock.userHasGameClockAccess = function() {
+    // return true;
     return usernameIsOneOf(
         [
             'SkudPaiSho',
             'Zach',
             'Dallin',
             'Pronetowander',
-            'vitheguy'
+            'vitheguy',
+            'markdwagner',
+            'tree',
+            'sirstotes'
         ]);
 };
 

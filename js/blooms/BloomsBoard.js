@@ -7,6 +7,8 @@ function BloomsBoard() {
 		this.edgeLength = 6;
 	} else if (gameOptionEnabled(EIGHT_SIDED_BOARD)) {
 		this.edgeLength = 8;
+	} else if (gameOptionEnabled(HEXHEX_10)) {
+		this.edgeLength = 10;
 	}
 
 	this.scoreTracks = [];

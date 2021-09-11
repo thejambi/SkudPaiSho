@@ -38,7 +38,7 @@ PlaygroundController.prototype.completeSetup = function() {
 	}
 
 	if (!getUserGamePreference(vagabondTileDesignTypeKey)) {
-		setUserGamePreference(vagabondTileDesignTypeKey, "delion");
+		setUserGamePreference(vagabondTileDesignTypeKey, "tggvagabond");
 	}
 
 	if (!getUserGamePreference(AdevarOptions.tileDesignTypeKey)) {
