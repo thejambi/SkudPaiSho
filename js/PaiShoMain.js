@@ -2140,12 +2140,12 @@ var GameType = {
 		rulesUrl: "https://skudpaisho.com/site/games/capture-pai-sho/",
 		gameOptions: []
 	},
-	// SpiritPaiSho: {
-	// 	id: 17,
-	// 	desc: "Spirit Pai Sho",
-	// 	rulesUrl: "https://skudpaisho.com/",
-	// 	gameOptions: []
-	// },
+	SpiritPaiSho: {
+		id: 17,
+		desc: "Spirit Pai Sho",
+		rulesUrl: "https://skudpaisho.com/",
+		gameOptions: []
+	},
 	StreetPaiSho: {
 		id: 5,
 		desc: "Street Pai Sho",
@@ -2250,9 +2250,9 @@ function getGameControllerForGameType(gameTypeId) {
 		case GameType.CapturePaiSho.id:
 			controller = new CaptureController(gameContainerDiv, isMobile);
 			break;
-		// case GameType.SpiritPaiSho.id:
-		// 	controller = new SpiritController(gameContainerDiv, isMobile);
-		// 	break;
+		case GameType.SpiritPaiSho.id:
+			controller = new SpiritController(gameContainerDiv, isMobile);
+			break;
 		case GameType.StreetPaiSho.id:
 			controller = new StreetController(gameContainerDiv, isMobile);
 			break;

@@ -45,14 +45,8 @@ SpiritGameManager.prototype.runNotationMove = function(move, withActuate) {
 		}
 	} else if (INITIAL_SETUP) {
 		var tileList = [];
-		// convert move.initialTileCodeList into tileList. Grab all tiles
-		var self = this;
-		move.initialTileCodeList.forEach(
-			function(tileCode) {
-				var tile = self.tileManager.grabTile(move.player, tileCode);
-				tileList.push(tile);
-			}
-		);
+		this.tileManager.guestTiles.forEach(function(tile) {tileList.push(tile);});
+		this.tileManager.hostTiles.forEach(function(tile) {tileList.push(tile);});
 		this.board.placeInitialTiles(move.player, tileList);
 	}
 

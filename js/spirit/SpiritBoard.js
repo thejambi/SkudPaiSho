@@ -14,303 +14,303 @@ SpiritBoard.prototype.brandNew = function() {
 	var cells = [];
 
 	cells[0] = this.newRow(9, 
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.gate(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.gate(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[1] = this.newRow(11, 
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.redWhiteNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(), 
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.redWhiteNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(), 
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[2] = this.newRow(13, 
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.whiteNeutral(), 
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.whiteNeutral(), 
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[3] = this.newRow(15,
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.whiteNeutral(), 
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.redNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.whiteNeutral(), 
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.redNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[4] = this.newRow(17,
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.whiteNeutral(), 
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.redNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.whiteNeutral(), 
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.redNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[5] = this.newRow(17,
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.whiteNeutral(), 
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.redNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.whiteNeutral(), 
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.redNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[6] = this.newRow(17,
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.whiteNeutral(), 
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.redNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.whiteNeutral(), 
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.redNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[7] = this.newRow(17,
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.whiteNeutral(), 
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.redNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.whiteNeutral(), 
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.redNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[8] = this.newRow(17,
-		[CaptureBoardPoint.gate(),
-		CaptureBoardPoint.redWhiteNeutral(), 
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.redWhiteNeutral(),
-		CaptureBoardPoint.gate()
+		[SpiritBoardPoint.gate(),
+		SpiritBoardPoint.redWhiteNeutral(), 
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.redWhiteNeutral(),
+		SpiritBoardPoint.gate()
 		]);
 
 	cells[9] = this.newRow(17,
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.redNeutral(), 
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.whiteNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.redNeutral(), 
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.whiteNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[10] = this.newRow(17,
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.redNeutral(), 
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.whiteNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.redNeutral(), 
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.whiteNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[11] = this.newRow(17,
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.redNeutral(), 
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.whiteNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.redNeutral(), 
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.whiteNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[12] = this.newRow(17,
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.redNeutral(), 
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.whiteNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.redNeutral(), 
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.whiteNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[13] = this.newRow(15,
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.redNeutral(), 
-		CaptureBoardPoint.red(),
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.white(),
-		CaptureBoardPoint.whiteNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.redNeutral(), 
+		SpiritBoardPoint.red(),
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.white(),
+		SpiritBoardPoint.whiteNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[14] = this.newRow(13,
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.redNeutral(), 
-		CaptureBoardPoint.redWhite(),
-		CaptureBoardPoint.whiteNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.redNeutral(), 
+		SpiritBoardPoint.redWhite(),
+		SpiritBoardPoint.whiteNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[15] = this.newRow(11,
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.redWhiteNeutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.redWhiteNeutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	cells[16] = this.newRow(9,
-		[CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.gate(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral(),
-		CaptureBoardPoint.neutral()
+		[SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.gate(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral(),
+		SpiritBoardPoint.neutral()
 		]);
 
 	for (var row = 0; row < cells.length; row++) {
@@ -328,7 +328,7 @@ SpiritBoard.prototype.newRow = function(numColumns, points) {
 
 	var numBlanksOnSides = (this.size.row - numColumns) / 2;
 
-	var nonPoint = new CaptureBoardPoint();
+	var nonPoint = new SpiritBoardPoint();
 	nonPoint.addType(NON_PLAYABLE);
 
 	for (var i = 0; i < this.size.row; i++) {
@@ -404,7 +404,7 @@ SpiritBoard.prototype.pointIsOpenGate = function(notationPoint) {
 };
 
 SpiritBoard.prototype.placeInitialTiles = function(player, tileList) {
-	for (var i = 0; i < 12; i++) {
+	for (var i = 0; i < tileList.length; i++) {
 		this.placeTile(tileList[i], tileList[i].getStartingPoint());
 	}
 };
@@ -487,8 +487,8 @@ SpiritBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boa
 	}
 
 	//Tile Movement
-	var potentialMovementPoints = this.getTileMovements(boardPointStart)
-	if (!potentialMovementPoints.contains(boardPointEnd)) {
+	var potentialMovementPoints = this.getTileMovements(boardPointStart);
+	if (!potentialMovementPoints.includes(boardPointEnd)) {
 		return false;
 	}
 	
@@ -498,45 +498,96 @@ SpiritBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boa
 
 SpiritBoard.prototype.getTileMovements = function(boardPoint) {
 	tileMovements = [];
-	this.recursiveAddMovement(tileMovements, boardPoint, 3);
+	this.recursiveAddMovement(tileMovements, boardPoint, 3, 0);
 	return tileMovements;
 };
 
-SpiritBoard.prototype.recursiveAddMovement = function(tileMovements, boardPoint, numberOfMoves) {
-	if (boardPoint == undefined) { return; } //End if it moves off the board
-	if (tileMovements.contains(boardPoint)) { return; } //End if this spot has been checked.
+/*function get_srrndng_spaces(tile,pos,dir,layer,maxlayer)
+	if tile:can_go_thru(pos) then
+		spaces = {{x=pos.x,y=pos.y}}
+		if layer < maxlayer then
+			if (dir != 0) then
+			 spaces = combine(spaces,get_srrndng_spaces(tile,{x=pos.x+1,y=pos.y},2,layer+1,maxlayer))
+			end
+			if (dir != 1) then
+			 spaces = combine(spaces,get_srrndng_spaces(tile,{x=pos.x,y=pos.y-1},3,layer+1,maxlayer))
+			end
+			if (dir != 2) then
+			 spaces = combine(spaces,get_srrndng_spaces(tile,{x=pos.x-1,y=pos.y},0,layer+1,maxlayer))
+			end
+			if (dir != 3) then
+			 spaces = combine(spaces,get_srrndng_spaces(tile,{x=pos.x,y=pos.y+1},1,layer+1,maxlayer))
+			end
+		end
+		return spaces
+	elseif tile:can_end_at(pos) then
+		return {{x=pos.x,y=pos.y}}
+	else
+		return {}
+	end
+end
+function flower:get_possible_pos()
+	positions={}
+	if self.onboard then
+		if not self.trapped then
+			positions=combine(positions,get_srrndng_spaces(self,{x=self.pos.x+1,y=self.pos.y},2,1,self.movement))
+			positions=combine(positions,get_srrndng_spaces(self,{x=self.pos.x,y=self.pos.y-1},3,1,self.movement))
+			positions=combine(positions,get_srrndng_spaces(self,{x=self.pos.x-1,y=self.pos.y},0,1,self.movement))
+			positions=combine(positions,get_srrndng_spaces(self,{x=self.pos.x,y=self.pos.y+1},1,1,self.movement))
+			foreach(positions, function(p)
+				if (not self:can_end_at(p)) del(positions,p)
+			end)
+		end
+	else
+		if get_tile_or_false({x=0,y=8},tilesonboard)==false then
+			add(positions, {x=0,y=8})
+		end
+		if get_tile_or_false({x=0,y=-8},tilesonboard)==false then
+			add(positions, {x=0,y=-8})
+		end
+		if get_tile_or_false({x=8,y=0},tilesonboard)==false then
+			add(positions, {x=8,y=0})
+		end
+		if get_tile_or_false({x=-8,y=0},tilesonboard)==false then
+			add(positions, {x=-8,y=0})
+		end
+	end
+	return positions
+end */
+
+SpiritBoard.prototype.recursiveAddMovement = function(tileMovements, boardPoint, numberOfMoves, direction) {
+	if (!boardPoint) { return; } //End if it moves off the board
+	//if (tileMovements.includes(boardPoint)) { return; } //End if this spot has been checked.
 
 	tileMovements.push(boardPoint); //Add point to the list
-
 	//PORTAL CHECK
-	if (boardPoint.isType(GATE)) {
-		this.recursiveAddMovement(tileMovements, this.cells[0][8], numberOfMoves); //North Gate
-		this.recursiveAddMovement(tileMovements, this.cells[8][0], numberOfMoves); //West Gate
-		this.recursiveAddMovement(tileMovements, this.cells[16][0], numberOfMoves); //South Gate
-		this.recursiveAddMovement(tileMovements, this.cells[0][16], numberOfMoves); //East Gate
+	if (boardPoint.isType(GATE) && direction != 9) {
+		if(boardPoint != this.cells[0][8]) {this.recursiveAddMovement(tileMovements, this.cells[0][8], numberOfMoves, 9);} //North Gate
+		if(boardPoint != this.cells[8][0]) {this.recursiveAddMovement(tileMovements, this.cells[8][0], numberOfMoves, 9);} //West Gate
+		if(boardPoint != this.cells[16][8]) {this.recursiveAddMovement(tileMovements, this.cells[16][8], numberOfMoves, 9);} //South Gate
+		if(boardPoint != this.cells[8][16]) {this.recursiveAddMovement(tileMovements, this.cells[8][16], numberOfMoves, 9);} //East Gate
 	}
-
 	if (numberOfMoves > 0) {
 		//UP
-		this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row - 1][boardPoint.col], numberOfMoves-1);
+		if (direction != 4) {if(this.cells[boardPoint.row - 1]){this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row - 1][boardPoint.col], numberOfMoves-1, 2);}}
 		//DOWN
-		this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row + 1][boardPoint.col], numberOfMoves-1);
+		if (direction != 2) {if(this.cells[boardPoint.row + 1]){this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row + 1][boardPoint.col], numberOfMoves-1, 4);}}
 		//RIGHT
-		this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row][boardPoint.col + 1], numberOfMoves-1);
+		if (direction != 1) {this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row][boardPoint.col + 1], numberOfMoves-1, 3);}
 		//LEFT
-		this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row][boardPoint.col - 1], numberOfMoves-1);
+		if (direction != 3) {this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row][boardPoint.col - 1], numberOfMoves-1, 1);}
 		//DIAGONALS
 		if (this.onUpRightDiagonal(boardPoint)) {
 			//UP+RIGHT
-			this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row - 1][boardPoint.col + 1], numberOfMoves-1);
+			if (direction != 5) {if(this.cells[boardPoint.row - 1]){this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row - 1][boardPoint.col + 1], numberOfMoves-1, 6);}}
 			//DOWN+LEFT
-			this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row + 1][boardPoint.col - 1], numberOfMoves-1);
+			if (direction != 6) {if(this.cells[boardPoint.row + 1]){this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row + 1][boardPoint.col - 1], numberOfMoves-1, 5);}}
 		}
 		if (this.onUpLeftDiagonal(boardPoint)) {
 			//UP+LEFT
-			this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row - 1][boardPoint.col - 1], numberOfMoves-1);
+			if (direction != 7) {if(this.cells[boardPoint.row - 1]){this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row - 1][boardPoint.col - 1], numberOfMoves-1, 8);}}
 			//DOWN+RIGHT
-			this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row + 1][boardPoint.col + 1], numberOfMoves-1);
+			if (direction != 8) {if(this.cells[boardPoint.row + 1]){this.recursiveAddMovement(tileMovements, this.cells[boardPoint.row + 1][boardPoint.col + 1], numberOfMoves-1, 7);}}
 		}
 	}
 }

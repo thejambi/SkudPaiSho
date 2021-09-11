@@ -43,12 +43,12 @@ SpiritNotationMove.prototype.analyzeMove = function() {
 	if (this.moveType === INITIAL_SETUP) {
 		// Example: VFBDOKUMLTAP
 
-		if (moveText.length !== 12) {
+		if (moveText.length !== 8) {
 			this.valid = false;
 		}
 
 		this.initialTileCodeList = [];
-		for (var i = 0; i < 12; i++) {
+		for (var i = 0; i < moveText.length; i++) {
 			this.initialTileCodeList.push(moveText.charAt(i));
 		}
 	} else if (this.moveType === MOVE) {
@@ -73,7 +73,7 @@ SpiritNotationMove.prototype.equals = function(otherMove) {
 
 // --------------------------------------- //
 
-function CaptureNotationBuilder() {
+function SpiritNotationBuilder() {
 	// this.moveNum;	// Let's try making this magic
 	// this.player;		// Magic
 	this.moveType;
@@ -89,7 +89,7 @@ function CaptureNotationBuilder() {
 	this.status = BRAND_NEW;
 }
 
-CaptureNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
+SpiritNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 	var notationLine = moveNum + player.charAt(0) + ".";
 	if (this.moveType === MOVE) {
 		notationLine += "(" + this.startPoint.pointText + ")-(" + this.endPoint.pointText + ")";
@@ -97,29 +97,29 @@ CaptureNotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 		notationLine += this.tileType + "(" + this.endPoint.pointText + ")";
 	}
 	
-	return new CaptureNotationMove(notationLine);
+	return new SpiritNotationMove(notationLine);
 };
 
 // --------------------------------------- //
 
 
 
-function CaptureGameNotation() {
+function SpiritGameNotation() {
 	this.notationText = "";
 	this.moves = [];
 }
 
-CaptureGameNotation.prototype.setNotationText = function(text) {
+SpiritGameNotation.prototype.setNotationText = function(text) {
 	this.notationText = text;
 	this.loadMoves();
 };
 
-CaptureGameNotation.prototype.addNotationLine = function(text) {
+SpiritGameNotation.prototype.addNotationLine = function(text) {
 	this.notationText += ";" + text.trim();
 	this.loadMoves();
 };
 
-CaptureGameNotation.prototype.addMove = function(move) {
+SpiritGameNotation.prototype.addMove = function(move) {
 	if (this.notationText) {
 		this.notationText += ";" + move.fullMoveText;
 	} else {
@@ -128,12 +128,12 @@ CaptureGameNotation.prototype.addMove = function(move) {
 	this.loadMoves();
 };
 
-CaptureGameNotation.prototype.removeLastMove = function() {
+SpiritGameNotation.prototype.removeLastMove = function() {
 	this.notationText = this.notationText.substring(0, this.notationText.lastIndexOf(";"));
 	this.loadMoves();
 };
 
-CaptureGameNotation.prototype.getPlayerMoveNum = function() {
+SpiritGameNotation.prototype.getPlayerMoveNum = function() {
 	var moveNum = 0;
 	var lastMove = this.moves[this.moves.length-1];
 
@@ -146,7 +146,7 @@ CaptureGameNotation.prototype.getPlayerMoveNum = function() {
 	return moveNum;
 };
 
-CaptureGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
+SpiritGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	// Example simple Arranging move: 7G.(8,0)-(7,1)
 
 	var moveNum = 0;
@@ -166,7 +166,7 @@ CaptureGameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	return builder.getNotationMove(moveNum, player);
 };
 
-CaptureGameNotation.prototype.loadMoves = function() {
+SpiritGameNotation.prototype.loadMoves = function() {
 	this.moves = [];
 	var lines = [];
 	if (this.notationText) {
@@ -180,7 +180,7 @@ CaptureGameNotation.prototype.loadMoves = function() {
 	var self = this;
 	var lastPlayer = GUEST;
 	lines.forEach(function(line) {
-		var move = new CaptureNotationMove(line);
+		var move = new SpiritNotationMove(line);
 		if (move.isValidNotation() && move.player !== lastPlayer) {
 			self.moves.push(move);
 			lastPlayer = move.player;
@@ -190,7 +190,7 @@ CaptureGameNotation.prototype.loadMoves = function() {
 	});
 };
 
-CaptureGameNotation.prototype.getNotationHtml = function() {
+SpiritGameNotation.prototype.getNotationHtml = function() {
 	var lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
@@ -209,12 +209,12 @@ CaptureGameNotation.prototype.getNotationHtml = function() {
 	return notationHtml;
 };
 
-CaptureGameNotation.prototype.notationTextForUrl = function() {
+SpiritGameNotation.prototype.notationTextForUrl = function() {
 	var str = this.notationText;
 	return str;
 };
 
-CaptureGameNotation.prototype.getNotationForEmail = function() {
+SpiritGameNotation.prototype.getNotationForEmail = function() {
 	var lines = [];
 	if (this.notationText) {
 		if (this.notationText.includes(';')) {
@@ -233,11 +233,11 @@ CaptureGameNotation.prototype.getNotationForEmail = function() {
 	return notationHtml;
 };
 
-CaptureGameNotation.prototype.getLastMoveText = function() {
+SpiritGameNotation.prototype.getLastMoveText = function() {
 	return this.moves[this.moves.length - 1].fullMoveText;
 };
 
-CaptureGameNotation.prototype.getLastMoveNumber = function() {
+SpiritGameNotation.prototype.getLastMoveNumber = function() {
 	return this.moves[this.moves.length - 1].moveNum;
 };
 
