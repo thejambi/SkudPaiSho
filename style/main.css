@@ -356,6 +356,20 @@ div.tab .alertTab, div.tab .alertTab.active {
   padding: 0; /* reset */
   padding-bottom: 100%;
   border: none;
+  overflow: hidden;
+  position: relative;
+}
+.arrowContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: scale(1,-1);
+  filter: drop-shadow(0px 0px 3px rgba(255, 170, 0, 0.8));
+}
+.arrow {
+  pointer-events: none;
+  stroke-width: 0.1;
+  stroke: rgba(255, 170, 0, 0.8);
 }
 /* .game-container.pixelsho .bg-svg {
   background-image: url(pixelshoboard.png);
@@ -587,6 +601,46 @@ figure > div {
 }
 .point.pointSquare {
   border-radius: 0px;
+}
+
+.markedPoint:before {
+  content: "";
+
+  /* Expand element */
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  border-radius: 17px;
+  /* Enough to sit on top of tiles */
+  z-index: 3;
+
+  /* Disable click events (will fall through to underlying point */
+  pointer-events: none;
+
+  box-shadow: inset 0px 0px 10px 2px rgba(255, 170, 0, 0.8);
+}
+.betweenHarmony.markedPoint:before {
+  content: "";
+
+  /* Expand element */
+  position: absolute;
+  /* BUG: This overwrites the tiny between harmony point sizes, but won't scale
+     down with a small screen */
+  width: 34px;
+  height: 34px;
+  left: -16px;
+  top: -16px;
+  right: 0px;
+  bottom: 0px;
+  border-radius: 17px;
+  z-index: 3;
+
+  /* Disable click events (will fall through to underlying point */
+  pointer-events: none;
+
+  box-shadow: inset 0px 0px 10px 2px rgba(255, 170, 0, 0.8);
 }
 
 .hasTile {

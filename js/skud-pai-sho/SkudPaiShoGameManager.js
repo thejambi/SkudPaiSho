@@ -7,6 +7,7 @@ function SkudPaiShoGameManager(actuator, ignoreActuate, isCopy) {
 	this.actuator = actuator;
 
 	this.tileManager = new SkudPaiShoTileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
@@ -27,7 +28,7 @@ SkudPaiShoGameManager.prototype.actuate = function (moveToAnimate, moveAnimation
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, moveToAnimate, moveAnimationBeginStep);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager, moveToAnimate, moveAnimationBeginStep);
 	setGameLogText(this.gameLogText);
 };
 
