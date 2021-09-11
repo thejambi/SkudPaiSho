@@ -281,7 +281,7 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 	  localStorage = new LocalStorage().storage;
   
 	  soundManager = new SoundManager();
-  
+
 	  /* Dark Mode Preferences (dark mode now default) */
 	  if (!localStorage.getItem("data-theme")) {
 		  /* to always have dark as default instead of system preferences */
@@ -1543,6 +1543,14 @@ function unplayedTileClicked(tileDiv) {
 
 function pointClicked(htmlPoint) {
 	gameController.pointClicked(htmlPoint);
+}
+
+function RmbDown(htmlPoint) {
+	gameController.RmbDown(htmlPoint);
+}
+
+function RmbUp(htmlPoint) {
+	gameController.RmbUp(htmlPoint);
 }
 
 function displayReturnedMessage(messageReturned) {
