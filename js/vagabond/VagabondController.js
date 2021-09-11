@@ -175,6 +175,9 @@ VagabondController.prototype.removeDrawOffer = function() {
 };
 
 VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	this.promptToAcceptDraw = false;
 
 	if (this.theGame.hasEnded() && this.notationBuilder.status !== READY_FOR_BONUS) {
@@ -224,7 +227,36 @@ VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 	}
 }
 
+VagabondController.prototype.RmbDown = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+}
+
+VagabondController.prototype.RmbUp = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	var mouseEndPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+	if (mouseEndPoint == this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedPoint(mouseEndPoint);
+	}
+	else if (this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedArrow(this.mouseStartPoint, mouseEndPoint);
+	}
+	this.mouseStartPoint = null;
+
+	this.callActuate();
+}
+
 VagabondController.prototype.pointClicked = function(htmlPoint) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	this.promptToAcceptDraw = false;
 
 	if (this.theGame.hasEnded()) {

@@ -19,6 +19,7 @@ var containers = setupPaiShoBoard(
 
 
 	this.boardContainer = containers.boardContainer;
+	this.arrowContainer = containers.arrowContainer;
 	this.hostTilesContainer = containers.hostTilesContainer;
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
@@ -27,7 +28,7 @@ FirePaiShoActuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
 };
 
-FirePaiShoActuator.prototype.actuate = function(board, tileManager, moveToAnimate, moveAnimationBeginStep) {
+FirePaiShoActuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep) {
 	var self = this;
 	// debugStackTrace();
 	// self.printBoard(board);
@@ -37,22 +38,34 @@ FirePaiShoActuator.prototype.actuate = function(board, tileManager, moveToAnimat
 	}
 
 	window.requestAnimationFrame(function() {
-		self.htmlify(board, tileManager, moveToAnimate, moveAnimationBeginStep);
+		self.htmlify(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep);
 	});
 };
 
-FirePaiShoActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, moveAnimationBeginStep) {
+FirePaiShoActuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep) {
 	this.clearContainer(this.boardContainer);
+	this.clearContainer(this.arrowContainer);
 
 	var self = this;
 
 	board.cells.forEach(function(column) {
 		column.forEach(function(cell) {
+			if (markingManager.pointIsMarked(cell) && !cell.isType(MARKED)){
+				cell.addType(MARKED);
+			}
+			else if (!markingManager.pointIsMarked(cell) && cell.isType(MARKED)){
+				cell.removeType(MARKED);
+			}
 			if (cell) {
 				self.addBoardPoint(cell, moveToAnimate, moveAnimationBeginStep);
 			}
 		});
 	});
+
+	// Draw all arrows
+	for (var [_, arrow] of Object.entries(markingManager.arrows)) {
+		this.arrowContainer.appendChild(createBoardArrow(arrow[0], arrow[1]));
+	}
 
 	var fullTileSet = new FirePaiShoTileManager(true);
 
@@ -222,6 +235,9 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		}
 //	theDiv.classList.add("vagabondPointRotate");
 
+		if (boardPoint.isType(MARKED)) {
+			theDiv.classList.add("markedPoint");
+		}	
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 		} else if (boardPoint.betweenHarmony 
@@ -269,6 +285,21 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
 			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mousedown', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbDown(theDiv);
+				}
+			});
+			theDiv.addEventListener('mouseup', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbUp(theDiv);
+				}
+			});
+			theDiv.addEventListener('contextmenu', e => {
+					e.preventDefault();
+				});
 		}
 	}
 

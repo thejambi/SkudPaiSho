@@ -6,6 +6,7 @@ function SolitaireGameManager(actuator, ignoreActuate, isCopy) {
 	this.actuator = actuator;
 
 	this.tileManager = new SolitaireTileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
@@ -27,7 +28,7 @@ SolitaireGameManager.prototype.actuate = function() {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this, gameController && gameController.drawnTile);
+	this.actuator.actuate(this.board, this, this.markingManager, gameController && gameController.drawnTile);
 };
 
 SolitaireGameManager.prototype.runNotationMove = function(move, withActuate) {

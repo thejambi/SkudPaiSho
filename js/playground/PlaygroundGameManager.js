@@ -6,6 +6,7 @@ function PlaygroundGameManager(actuator, ignoreActuate, isCopy) {
 	this.actuator = actuator;
 
 	this.tileManager = new PlaygroundTileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
@@ -33,7 +34,7 @@ PlaygroundGameManager.prototype.actuate = function (moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, this.actuateOptions, moveToAnimate);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager, this.actuateOptions, moveToAnimate);
 };
 
 PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {

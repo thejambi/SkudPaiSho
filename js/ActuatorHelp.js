@@ -82,10 +82,14 @@ function createBoardArrow(startBoardPoint, endBoardPoint) {
 	return arrow;
 }
 
-function createArrowSvg() {
+function createArrowSvg(playInSpaces) {
 	var arrowContainer = document.createElementNS(svgns, 'svg');
-	arrowContainer.setAttribute("viewBox", "-9 -9 18 18");
-	arrowContainer.setAttribute("oncontextmenu", "return false;");
+	if (playInSpaces) {
+		arrowContainer.setAttribute("viewBox", "-8.5 -9.5 18 18");
+	}
+	else {
+		arrowContainer.setAttribute("viewBox", "-9 -9 18 18");
+	}
 	arrowContainer.classList.add("arrowContainer");
 
 	// Arrowhead definition
@@ -138,12 +142,13 @@ function setupPaiShoBoard(gameContainer,
 		ptContainerClass = "pointContainerForPlayInSpaces"
 	}
 	var boardContainer = createDivWithClass(ptContainerClass);
+	boardContainer.setAttribute("oncontextmenu", "return false;");
 
 	var bcontainer = createDivWithClass("board-container");
 	var svgContainer = createDivWithClass("svgContainer");
 	var svgContainerContainer = createDivWithClass("svgContainerContainer");
 	var bgSvg = createDivWithClass("bg-svg");
-	var arrowSvg = createArrowSvg();
+	var arrowSvg = createArrowSvg(playInSpaces);
 	var arrowContainer = document.createElementNS(svgns, 'g');
 
 	applyBoardOptionToBgSvg(bgSvg);

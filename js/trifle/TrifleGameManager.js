@@ -7,6 +7,7 @@ Trifle.GameManager = function(actuator, ignoreActuate, isCopy) {
 	this.actuator = actuator;
 
 	this.tileManager = new Trifle.TileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
 }
@@ -31,7 +32,7 @@ Trifle.GameManager.prototype.actuate = function () {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager);
 	setGameLogText(this.gameLogText);
 };
 

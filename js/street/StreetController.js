@@ -109,6 +109,9 @@ StreetController.prototype.getAdditionalMessage = function() {
 };
 
 StreetController.prototype.unplayedTileClicked = function(tileDiv) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	if (this.theGame.getWinner() && this.notationBuilder.status !== READY_FOR_BONUS) {
 		return;
 	}
@@ -157,7 +160,36 @@ StreetController.prototype.unplayedTileClicked = function(tileDiv) {
 	}
 };
 
+StreetController.prototype.RmbDown = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+}
+
+StreetController.prototype.RmbUp = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	var mouseEndPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+	if (mouseEndPoint == this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedPoint(mouseEndPoint);
+	}
+	else if (this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedArrow(this.mouseStartPoint, mouseEndPoint);
+	}
+	this.mouseStartPoint = null;
+
+	this.callActuate();
+}
+
 StreetController.prototype.pointClicked = function(htmlPoint) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	if (this.theGame.getWinner() && this.notationBuilder.status !== WAITING_FOR_BONUS_ENDPOINT 
 			&& this.notationBuilder.status !== WAITING_FOR_BOAT_BONUS_POINT) {
 		return;

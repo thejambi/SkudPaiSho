@@ -172,6 +172,7 @@ function AdevarGameManager(actuator, ignoreActuate, isCopy) {
 	this.actuator = actuator;
 
 	this.tileManager = new AdevarTileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.endGameWinners = [];
 	this.capturedTiles = [];
@@ -219,7 +220,7 @@ AdevarGameManager.prototype.actuate = function (moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, this.capturedTiles, moveToAnimate);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager, this.capturedTiles, moveToAnimate);
 
 	setGameLogText(this.gameLogText);
 };
