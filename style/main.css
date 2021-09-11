@@ -621,27 +621,6 @@ figure > div {
 
   box-shadow: inset 0px 0px 10px 2px rgba(255, 170, 0, 0.8);
 }
-.betweenHarmony.markedPoint:before {
-  content: "";
-
-  /* Expand element */
-  position: absolute;
-  /* BUG: This overwrites the tiny between harmony point sizes, but won't scale
-     down with a small screen */
-  width: 34px;
-  height: 34px;
-  left: -16px;
-  top: -16px;
-  right: 0px;
-  bottom: 0px;
-  border-radius: 17px;
-  z-index: 3;
-
-  /* Disable click events (will fall through to underlying point */
-  pointer-events: none;
-
-  box-shadow: inset 0px 0px 10px 2px rgba(255, 170, 0, 0.8);
-}
 
 .hasTile {
   box-shadow: 0px 0px 4px #555;
@@ -718,22 +697,70 @@ figure > div {
 }
 
 
-.betweenHarmony {
+/* .betweenHarmony {
   margin: 16px;
   width: 2px;
   height: 2px;
-}
-.bhHost {
+} */
+.bhHost:before {
   box-shadow: 0px 0px 7px 3px #6cc;
   background-color: #6cc;
+  margin: 16px;
+  width: 2px;
+  height: 2px;
+  content: "";
+
+  /* Expand element */
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  border-radius: 17px;
 }
-.bhGuest {
+.bhGuest:before {
   box-shadow: 0px 0px 7px 3px #87f;
   background-color: #87f;
+  margin: 16px;
+  width: 2px;
+  height: 2px;
+  
+  /* Expand element */
+  content: "";
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  border-radius: 17px;
 }
-.bhHost.bhGuest {
+
+.bhHost.bhGuest:before {
+  content: "";
   box-shadow: 0px 0px 7px 3px #77A2E6;
   background-color: #77A2E6;
+  margin: 16px;
+  width: 2px;
+  height: 2px;
+
+  /* Expand element */
+  content: "";
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  border-radius: 17px;
+}
+
+.markedPoint.bhHost {
+  box-shadow: inset 0px 0px 10px 2px rgba(255, 170, 0, 0.8);
+}
+.markedPoint.bhGuest {
+  box-shadow: inset 0px 0px 10px 2px rgba(255, 170, 0, 0.8);
+}
+.markedPoint.bhHost.bhGuest {
+  box-shadow: inset 0px 0px 10px 2px rgba(255, 170, 0, 0.8);
 }
 
 
@@ -1594,25 +1621,61 @@ textarea {
     box-shadow: 0px 0px 4.2vw 0.3vw #054;
   }
 
-  .betweenHarmony {
-    /*margin: 0;*/
+  /* .betweenHarmony {
+    margin: 0;
     margin: 2.614vw;
     width: 0.3268vw;
     height: 0.3268vw;
-    /*width: 5.5555vw;
-      height: 5.611vw;*/
-  }
-  .bhHost {
+    width: 5.5555vw;
+      height: 5.611vw;
+  } */
+  
+  .bhHost:before {
     box-shadow: 0px 0px 7px 3px #6cc;
     background-color: #6cc;
+    margin: 2.614vw;
+    width: 0.3268vw;
+    height: 0.3268vw;
+    
+
+    /* Expand element */
+    content: "";
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
   }
-  .bhGuest {
+  .bhGuest:before {
     box-shadow: 0px 0px 7px 3px #87f;
     background-color: #87f;
+    margin: 2.614vw;
+    width: 0.3268vw;
+    height: 0.3268vw;
+    
+    /* Expand element */
+    content: "";
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
   }
-   .bhHost.bhGuest {
+  .bhHost.bhGuest:before {
     box-shadow: 0px 0px 7px 3px #77A2E6;
     background-color: #77A2E6;
+    margin: 2.614vw;
+    width: 0.3268vw;
+    height: 0.3268vw;
+
+
+    /* Expand element */
+    content: "";
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
   }
 
   .headerLeft {
@@ -1808,22 +1871,58 @@ textarea {
       height: 17px;
     }
 
-    .betweenHarmony {
+    /* .betweenHarmony {
       margin: 8px;
       width: 1px;
       height: 1px;
-    }
-    .bhHost {
+    } */
+    .bhHost:before {
       box-shadow: 0px 0px 7px 3px #6cc;
       background-color: #6cc;
+      margin: 8px;
+      width: 1px;
+      height: 1px;
+      
+  
+      /* Expand element */
+      content: "";
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
     }
-    .bhGuest {
+    .bhGuest:before {
       box-shadow: 0px 0px 7px 3px #87f;
       background-color: #87f;
+      margin: 8px;
+      width: 1px;
+      height: 1px;
+      
+      /* Expand element */
+      content: "";
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
     }
-    .bhHost.bhGuest {
+    .bhHost.bhGuest:before {
       box-shadow: 0px 0px 7px 3px #77A2E6;
       background-color: #77A2E6;
+      margin: 8px;
+      width: 1px;
+      height: 1px;
+
+
+      /* Expand element */
+      content: "";
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
+      border-radius: 8.5px;
     }
 
 }
