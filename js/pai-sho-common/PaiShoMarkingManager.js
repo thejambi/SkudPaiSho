@@ -1,7 +1,7 @@
 // Manages all highlighted points and drawn arrows on the board
 function PaiShoMarkingManager() {
     // Stored as maps to make lookup easier
-	this.arrows = {};
+    this.arrows = {};
     this.points = {};
 }
 
