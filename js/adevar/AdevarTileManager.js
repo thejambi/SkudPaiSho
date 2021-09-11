@@ -62,9 +62,8 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 		tiles.push(new AdevarTile(AdevarTileCode.foxglove, ownerCode));
 	}
 	
-	for (var i = 0; i < 2; i++) {
-		tiles.push(new AdevarTile(AdevarTileCode.gate, ownerCode));
-	}
+	tiles.push(new AdevarTile(AdevarTileCode.gateAway, ownerCode));
+	tiles.push(new AdevarTile(AdevarTileCode.gateHome, ownerCode));
 	
 	if (!gameOptionEnabled(ADEVAR_LITE)) {
 		tiles.push(new AdevarTile(AdevarTileCode.irisSF, ownerCode));
@@ -74,9 +73,9 @@ AdevarTileManager.prototype.loadAdevarSet = function(ownerCode) {
 		tiles.push(new AdevarTile(AdevarTileCode.birdOfParadiseSF, ownerCode));
 		tiles.push(new AdevarTile(AdevarTileCode.whiteRoseSF, ownerCode));
 		tiles.push(new AdevarTile(AdevarTileCode.blackOrchidSF, ownerCode));
-
-		tiles.push(new AdevarTile(AdevarTileCode.reflection, ownerCode));
 	}
+
+	tiles.push(new AdevarTile(AdevarTileCode.reflection, ownerCode));
 	
 	for (var i = 0; i < 2; i++) {
 		tiles.push(new AdevarTile(AdevarTileCode.vanguard, ownerCode));
