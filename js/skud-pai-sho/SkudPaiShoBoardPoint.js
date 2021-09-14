@@ -5,6 +5,7 @@ var NEUTRAL = "Neutral";
 
 var GATE = "Gate";
 
+var MARKED = "Marked";
 var POSSIBLE_MOVE = "Possible Move";
 var OPEN_GATE = "OPEN GATE";
 

@@ -108,17 +108,27 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Warfront", "Warfront_SiegeEngine2", ownerCode));
 	tiles.push(new PlaygroundTile("Warfront", "Warfront_Soldier2", ownerCode));
 
-	// Balance
-	tiles.push(new PlaygroundTile("Balance", "Air", ownerCode));
-	tiles.push(new PlaygroundTile("Balance", "Chaos", ownerCode));
-	tiles.push(new PlaygroundTile("Balance", "Dark", ownerCode));
-	tiles.push(new PlaygroundTile("Balance", "Earth", ownerCode));
-	tiles.push(new PlaygroundTile("Balance", "Fire", ownerCode));
-	tiles.push(new PlaygroundTile("Balance", "Light", ownerCode));
-	tiles.push(new PlaygroundTile("Balance", "LionTurtle", ownerCode));
-	tiles.push(new PlaygroundTile("Balance", "Lotus", ownerCode));
-	tiles.push(new PlaygroundTile("Balance", "Peace", ownerCode));
-	tiles.push(new PlaygroundTile("Balance", "Water", ownerCode));
+	// Balance --- // TODO - fix so old games missing "Balance_" work...
+	tiles.push(new PlaygroundTile("Balance", "Balance_Air", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Chaos", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Dark", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Earth", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Fire", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Light", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_LionTurtle", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Lotus", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Peace", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Water", ownerCode));
+
+	// Spirit
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_R", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_W", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_L", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_M", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_V", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_H", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_T", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_K", ownerCode));
 	
 	// Chess (black and white colors)
 	tiles.push(new PlaygroundTile("Chess", "Chess_K", ownerCode));
@@ -174,16 +184,16 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Library", ownerCode));
 	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Temple", ownerCode));
 
-	// Ginseng
-	tiles.push(new PlaygroundTile("Ginseng", "B", ownerCode));
-	tiles.push(new PlaygroundTile("Ginseng", "D", ownerCode));
-	tiles.push(new PlaygroundTile("Ginseng", "FB", ownerCode));
-	tiles.push(new PlaygroundTile("Ginseng", "G", ownerCode));
-	tiles.push(new PlaygroundTile("Ginseng", "K", ownerCode));
-	tiles.push(new PlaygroundTile("Ginseng", "L", ownerCode));
-	tiles.push(new PlaygroundTile("Ginseng", "LT", ownerCode));
-	tiles.push(new PlaygroundTile("Ginseng", "O", ownerCode));
-	tiles.push(new PlaygroundTile("Ginseng", "W", ownerCode));
+	// Ginseng --- // TODO - fix so old games missing "Ginseng_" work...
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_B", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_D", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_FB", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_G", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_K", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_L", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_LT", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_O", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_W", ownerCode));
 
 	return tiles;
 };
