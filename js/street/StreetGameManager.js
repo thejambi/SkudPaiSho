@@ -6,6 +6,7 @@ function StreetGameManager(actuator, ignoreActuate, isCopy) {
 	this.actuator = actuator;
 
 	this.tileManager = new StreetTileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
@@ -31,7 +32,7 @@ StreetGameManager.prototype.actuate = function () {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager);
 };
 
 StreetGameManager.prototype.runNotationMove = function(move, withActuate) {

@@ -6,6 +6,7 @@ function CaptureGameManager(actuator, ignoreActuate, isCopy) {
 	this.actuator = actuator;
 
 	this.tileManager = new CaptureTileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
 }
@@ -25,7 +26,7 @@ CaptureGameManager.prototype.actuate = function() {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager);
 };
 
 CaptureGameManager.prototype.drawRandomTile = function() {

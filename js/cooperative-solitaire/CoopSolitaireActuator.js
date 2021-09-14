@@ -12,30 +12,43 @@ function CoopSolitaireActuator(gameContainer, isMobile) {
 	);
 
 	this.boardContainer = containers.boardContainer;
+	this.arrowContainer = containers.arrowContainer;
 	this.hostTilesContainer = containers.hostTilesContainer;
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-CoopSolitaireActuator.prototype.actuate = function(board, theGame, drawnTile) {
+CoopSolitaireActuator.prototype.actuate = function(board, theGame, markingManager, drawnTile) {
 	var self = this;
 
 	window.requestAnimationFrame(function() {
-		self.htmlify(board, theGame, drawnTile);
+		self.htmlify(board, theGame, markingManager, drawnTile);
 	});
 };
 
-CoopSolitaireActuator.prototype.htmlify = function(board, theGame, drawnTile) {
+CoopSolitaireActuator.prototype.htmlify = function(board, theGame, markingManager, drawnTile) {
 	this.clearContainer(this.boardContainer);
+	this.clearContainer(this.arrowContainer);
 
 	var self = this;
 
 	board.cells.forEach(function(column) {
 		column.forEach(function(cell) {
+			if (markingManager.pointIsMarked(cell) && !cell.isType(MARKED)){
+				cell.addType(MARKED);
+			}
+			else if (!markingManager.pointIsMarked(cell) && cell.isType(MARKED)){
+				cell.removeType(MARKED);
+			}
 			if (cell) {
 				self.addBoardPoint(cell);
 			}
 		});
 	});
+
+	// Draw all arrows
+	for (var [_, arrow] of Object.entries(markingManager.arrows)) {
+		this.arrowContainer.appendChild(createBoardArrow(arrow[0], arrow[1]));
+	}
 
 	var fullTileSet = new SolitaireTileManager(true);
 
@@ -105,6 +118,9 @@ CoopSolitaireActuator.prototype.addBoardPoint = function(boardPoint) {
 	
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
+		if (boardPoint.isType(MARKED)) {
+			theDiv.classList.add("markedPoint");
+		}	
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 		} else if (boardPoint.betweenHarmony) {
@@ -123,6 +139,21 @@ CoopSolitaireActuator.prototype.addBoardPoint = function(boardPoint) {
 			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
 			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mousedown', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbDown(theDiv);
+				}
+			});
+			theDiv.addEventListener('mouseup', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbUp(theDiv);
+				}
+			});
+			theDiv.addEventListener('contextmenu', e => {
+				e.preventDefault();
+			});
 		}
 	}
 
