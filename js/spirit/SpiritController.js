@@ -3,7 +3,8 @@
 var SpiritPreferences = {
 	tileDesignKey: "TileDesigns",
 	tileDesignTypeValues: {
-		original: "Original Blue and Green"
+		original: "Original Blue and Green",
+		chuji: "Chu Ji",
 	}
 };
 
