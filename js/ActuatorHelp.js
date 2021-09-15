@@ -9,6 +9,9 @@ var cos135 = Math.cos(3 * Math.PI / 4);
 var sin90 = 1;
 var cos90 = 0;
 
+/* svg elements source */
+var svgns = "http://www.w3.org/2000/svg";
+
 function createDivWithClass(className) {
 	var div = document.createElement("div");
 	div.classList.add(className);
@@ -60,6 +63,52 @@ function createBoardPointDiv(boardPoint) {
 	return theDiv;
 }
 
+
+function createBoardArrow(startBoardPoint, endBoardPoint) {
+	var arrow = document.createElementNS(svgns, 'line');
+	arrow.classList.add("arrow");
+
+	var startCoord = new RowAndColumn(startBoardPoint.row, startBoardPoint.col);
+	var endCoord = new RowAndColumn(endBoardPoint.row, endBoardPoint.col);
+	var notationPointString = startCoord.notationPointString + "->" + endCoord.notationPointString;
+
+	arrow.setAttribute("name", notationPointString);
+	arrow.setAttribute("x1", startCoord.x);
+	arrow.setAttribute("y1", startCoord.y);
+	arrow.setAttribute("x2", endCoord.x);
+	arrow.setAttribute("y2", endCoord.y);
+	arrow.setAttribute("marker-end", "url(#arrowhead)");
+
+	return arrow;
+}
+
+function createArrowSvg() {
+	var arrowContainer = document.createElementNS(svgns, 'svg');
+	arrowContainer.setAttribute("viewBox", "-9 -9 18 18");
+	arrowContainer.setAttribute("oncontextmenu", "return false;");
+	arrowContainer.classList.add("arrowContainer");
+
+	// Arrowhead definition
+	var defs = document.createElementNS(svgns, 'defs');
+	var marker = document.createElementNS(svgns, 'marker');
+	marker.setAttribute("id", "arrowhead");
+	marker.setAttribute("markerWidth", "5");
+	marker.setAttribute("markerHeight", "3.5");
+	marker.setAttribute("refX", "5");
+	marker.setAttribute("refY", "1.75");
+	marker.setAttribute("orient", "auto");
+	
+	var polygon = document.createElementNS(svgns, 'polygon');
+	polygon.setAttribute("points", "0 0, 5 1.75, 0 3.5");
+	polygon.setAttribute("fill", "rgba(255, 170, 0, 0.8)");
+	
+	marker.appendChild(polygon);
+	defs.appendChild(marker);
+	arrowContainer.appendChild(defs);
+
+	return arrowContainer;
+}
+
 function setupPaiShoBoard(gameContainer,
 	hostTilesContainerDivs,
 	guestTilesContainerDivs,
@@ -94,6 +143,8 @@ function setupPaiShoBoard(gameContainer,
 	var svgContainer = createDivWithClass("svgContainer");
 	var svgContainerContainer = createDivWithClass("svgContainerContainer");
 	var bgSvg = createDivWithClass("bg-svg");
+	var arrowSvg = createArrowSvg();
+	var arrowContainer = document.createElementNS(svgns, 'g');
 
 	applyBoardOptionToBgSvg(bgSvg);
 
@@ -107,6 +158,8 @@ function setupPaiShoBoard(gameContainer,
 		svgContainer.classList.add("ginsengBoardRotate");
 	}
 
+	arrowSvg.appendChild(arrowContainer);
+	bgSvg.appendChild(arrowSvg);
 	bgSvg.appendChild(boardContainer);
 	svgContainer.appendChild(bgSvg);
 	svgContainerContainer.appendChild(svgContainer);
@@ -164,6 +217,7 @@ function setupPaiShoBoard(gameContainer,
 
 	return {
 		boardContainer: boardContainer,
+		arrowContainer: arrowContainer,
 		hostTilesContainer: hostTilesContainer,
 		guestTilesContainer: guestTilesContainer
 	}

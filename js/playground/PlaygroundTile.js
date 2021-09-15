@@ -1,7 +1,4 @@
 
-var RED = "Red";
-var WHITE = "White";
-
 function PlaygroundTile(gameType, code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;

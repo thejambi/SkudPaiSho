@@ -169,7 +169,7 @@ SpiritController.prototype.pointClicked = function(htmlPoint) {
 			// Move all set. Add it to the notation!
 			this.gameNotation.addMove(move);
 			if (onlinePlayEnabled && this.gameNotation.moves.length === 3) {
-				createGameIfThatIsOk(GameType.CapturePaiSho.id);
+				createGameIfThatIsOk(GameType.SpiritPaiSho.id);
 			} else {
 				if (playingOnlineGame()) {
 					callSubmitMove();

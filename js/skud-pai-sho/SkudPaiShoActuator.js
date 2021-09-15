@@ -14,6 +14,7 @@ function SkudPaiShoActuator(gameContainer, isMobile, enableAnimations) {
 	);
 
 	this.boardContainer = containers.boardContainer;
+	this.arrowContainer = containers.arrowContainer;
 	this.hostTilesContainer = containers.hostTilesContainer;
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
@@ -22,7 +23,7 @@ SkudPaiShoActuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
 };
 
-SkudPaiShoActuator.prototype.actuate = function(board, tileManager, moveToAnimate, moveAnimationBeginStep) {
+SkudPaiShoActuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep) {
 	var self = this;
 	// debugStackTrace();
 	// self.printBoard(board);
@@ -32,12 +33,13 @@ SkudPaiShoActuator.prototype.actuate = function(board, tileManager, moveToAnimat
 	}
 
 	window.requestAnimationFrame(function() {
-		self.htmlify(board, tileManager, moveToAnimate, moveAnimationBeginStep);
+		self.htmlify(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep);
 	});
 };
 
-SkudPaiShoActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, moveAnimationBeginStep) {
+SkudPaiShoActuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep) {
 	this.clearContainer(this.boardContainer);
+	this.clearContainer(this.arrowContainer);
 
 	if (moveToAnimate && moveToAnimate.moveType === ARRANGING) {
 		var cell = board.cells[moveToAnimate.endPoint.rowAndColumn.row][moveToAnimate.endPoint.rowAndColumn.col];
@@ -51,10 +53,21 @@ SkudPaiShoActuator.prototype.htmlify = function(board, tileManager, moveToAnimat
 	board.cells.forEach(function(column) {
 		column.forEach(function(cell) {
 			if (cell) {
+				if (markingManager.pointIsMarked(cell) && !cell.isType(MARKED)){
+					cell.addType(MARKED);
+				}
+				else if (!markingManager.pointIsMarked(cell) && cell.isType(MARKED)){
+					cell.removeType(MARKED);
+				}
 				self.addBoardPoint(cell, moveToAnimate, moveAnimationBeginStep);
 			}
 		});
 	});
+
+	// Draw all arrows
+	for (var [_, arrow] of Object.entries(markingManager.arrows)) {
+		this.arrowContainer.appendChild(createBoardArrow(arrow[0], arrow[1]));
+	}
 
 	var fullTileSet = new SkudPaiShoTileManager(true);
 
@@ -136,6 +149,9 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
+		if (boardPoint.isType(MARKED)) {
+			theDiv.classList.add("markedPoint");
+		}	
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 		} else if (boardPoint.betweenHarmony 
@@ -172,6 +188,21 @@ SkudPaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
 			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mousedown', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbDown(theDiv);
+				}
+			});
+			theDiv.addEventListener('mouseup', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbUp(theDiv);
+				}
+			});
+			theDiv.addEventListener('contextmenu', e => {
+					e.preventDefault();
+				});
 		}
 	}
 
