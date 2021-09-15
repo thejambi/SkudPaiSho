@@ -2150,7 +2150,7 @@ var GameType = {
 	},
 	SpiritPaiSho: {
 		id: 17,
-		desc: "Spirit Pai Sho",
+		desc: "Spirit Pai Sho (Beta)",
 		rulesUrl: "https://skudpaisho.com/",
 		gameOptions: []
 	},

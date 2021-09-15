@@ -154,8 +154,8 @@ SpiritActuator.prototype.addBoardPoint = function(boardPoint) {
 };
 
 SpiritActuator.prototype.getTileImageSourceDir = function() {
-	//return "images/Spirit/" + getUserGamePreference(CapturePreferences.tileDesignKey) + "/";
-	return "images/Spirit/original/";
+	return "images/Spirit/" + getUserGamePreference(SpiritPreferences.tileDesignKey) + "/";
+	//return "images/Spirit/original/";
 };
 
 SpiritActuator.prototype.printBoard = function(board) {
