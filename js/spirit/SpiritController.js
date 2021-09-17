@@ -3,8 +3,11 @@
 var SpiritPreferences = {
 	tileDesignKey: "TileDesigns",
 	tileDesignTypeValues: {
-		original: "Original Blue and Green",
+		original: "Blue and Green",
+		wooden: "Wooden",
+		bluepurple: "Blue and Purple",
 		chuji: "Chu Ji",
+		chujired: "Chu Ji Red",
 	}
 };
 
@@ -190,7 +193,7 @@ SpiritController.prototype.getCommonHelpMessageChunk = function() {
 };
 
 SpiritController.prototype.getCaptureCycleImageTag = function() {
-	return "<img src='https://cdn.discordapp.com/attachments/876944493625114694/882723688447897650/Skrmbillede_2021-09-01_kl._22.28.37.png' style='width:100%;' />";
+	return "<img src='images/Spirit/Spirit_Circle.png' style='width:100%;' />";
 };
 
 SpiritController.prototype.getTheMessage = function(tile, ownerName) {
