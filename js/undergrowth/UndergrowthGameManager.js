@@ -5,6 +5,7 @@ Undergrowth.GameManager = function(actuator, ignoreActuate, isCopy) {
 	this.actuator = actuator;
 
 	this.tileManager = new Undergrowth.TileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
@@ -28,7 +29,7 @@ Undergrowth.GameManager.prototype.actuate = function(move, moveAnimationBeginSte
 		return;
 	}
 
-	this.actuator.actuate(this.board, this, move, moveAnimationBeginStep);
+	this.actuator.actuate(this.board, this, this.markingManager, move, moveAnimationBeginStep);
 };
 
 Undergrowth.GameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep) {

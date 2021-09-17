@@ -6,6 +6,7 @@ function OvergrowthGameManager(actuator, ignoreActuate, isCopy, existingDrawnTil
 	this.actuator = actuator;
 
 	this.tileManager = new OvergrowthTileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.drawnTile = existingDrawnTile;
 	this.lastDrawnTile = existingLastDrawnTile; // Save for Undo
@@ -68,7 +69,7 @@ OvergrowthGameManager.prototype.actuate = function() {
 		}
 	}
 
-	this.actuator.actuate(this.board, this, this.drawnTile);
+	this.actuator.actuate(this.board, this, this.markingManager, this.drawnTile);
 };
 
 OvergrowthGameManager.prototype.runNotationMove = function(move, withActuate) {

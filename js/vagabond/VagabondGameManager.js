@@ -7,6 +7,7 @@ function VagabondGameManager(actuator, ignoreActuate, isCopy) {
 	this.actuator = actuator;
 
 	this.tileManager = new VagabondTileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
 }
@@ -27,7 +28,7 @@ VagabondGameManager.prototype.actuate = function (moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, moveToAnimate);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager, moveToAnimate);
 	setGameLogText(this.gameLogText);
 };
 
