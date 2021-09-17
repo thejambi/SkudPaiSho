@@ -21,6 +21,7 @@ function PlaygroundActuator(gameContainer, isMobile, enableAnimations) {
 	);
 
 	this.boardContainer = containers.boardContainer;
+	this.arrowContainer = containers.arrowContainer;
 	this.hostTilesContainer = containers.hostTilesContainer;
 	this.guestTilesContainer = containers.guestTilesContainer;
 
@@ -34,7 +35,7 @@ PlaygroundActuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
 };
 
-PlaygroundActuator.prototype.actuate = function(board, tileManager, actuateOptions, moveToAnimate) {
+PlaygroundActuator.prototype.actuate = function(board, tileManager, markingManager, actuateOptions, moveToAnimate) {
 	var self = this;
 	this.actuateOptions = actuateOptions;
 
@@ -43,22 +44,34 @@ PlaygroundActuator.prototype.actuate = function(board, tileManager, actuateOptio
 	debug(moveToAnimate);
 
 	window.requestAnimationFrame(function () {
-		self.htmlify(board, tileManager, moveToAnimate);
+		self.htmlify(board, tileManager, markingManager, moveToAnimate);
 	});
 };
 
-PlaygroundActuator.prototype.htmlify = function(board, tileManager, moveToAnimate) {
+PlaygroundActuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate) {
 	this.clearContainer(this.boardContainer);
+	this.clearContainer(this.arrowContainer);
 
 	var self = this;
 
 	board.cells.forEach(function(column) {
 		column.forEach(function(cell) {
+			if (markingManager.pointIsMarked(cell) && !cell.isType(MARKED)){
+				cell.addType(MARKED);
+			}
+			else if (!markingManager.pointIsMarked(cell) && cell.isType(MARKED)){
+				cell.removeType(MARKED);
+			}
 			if (cell) {
 				self.addBoardPoint(cell, moveToAnimate);
 			}
 		});
 	});
+
+	// Draw all arrows
+	for (var [_, arrow] of Object.entries(markingManager.arrows)) {
+		this.arrowContainer.appendChild(createBoardArrow(arrow[0], arrow[1]));
+	}
 
 	var fullTileSet = new PlaygroundTileManager(true);
 
@@ -262,6 +275,9 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 	
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
+		if (boardPoint.isType(MARKED)) {
+			theDiv.classList.add("markedPoint");
+		}
 		if (gameOptionEnabled(VAGABOND_ROTATE)) {
 			theDiv.classList.add("vagabondPointRotate");
 		} else if (gameOptionEnabled(ADEVAR_ROTATE)) {
@@ -287,6 +303,21 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
 			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mousedown', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbDown(theDiv);
+				}
+			});
+			theDiv.addEventListener('mouseup', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbUp(theDiv);
+				}
+			});
+			theDiv.addEventListener('contextmenu', e => {
+					e.preventDefault();
+			});
 		}
 	}
 
