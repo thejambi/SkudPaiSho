@@ -3848,7 +3848,7 @@ function promptAddOption() {
   
 		  var playerIsSignedUp = false;
 		  if (tournamentInfo.currentPlayers.length > 0) {
-			  message += "<br /><br /><div class='modalContentHeading collapsibleHeading' onclick='toggleCollapsedContent(this, this.nextElementSibling)'>Players currently signed up:<span style:'float:right'>+</span></div>";
+			  message += "<br /><br /><div class='modalContentHeading collapsibleHeading' onclick='toggleCollapsedContent(this, this.nextElementSibling)'>Players currently signed up:<span style='float:right'>+</span></div>";
 			  message += "<div class='collapsibleContent' style='display:none'>"
 			  for (var i = 0; i < tournamentInfo.currentPlayers.length; i++) {
 				  message += tournamentInfo.currentPlayers[i].username + "<br />";
@@ -3865,7 +3865,7 @@ function promptAddOption() {
 			  for (var i = 0; i < tournamentInfo.rounds.length; i++) {
 				  var round = tournamentInfo.rounds[i];
 				  var roundName = htmlEscape(round.name);
-				  message += "<br /><div class='collapsibleHeading'>" + roundName + "<span style:'float:right'>-</span></div>";
+				  message += "<br /><div class='collapsibleHeading' onclick='toggleCollapsedContent(this, this.nextElementSibling)'>" + roundName + "<span style='float:right'>-</span></div>";
 				  message += "<div class='collapsibleContent'>"
 				  /* Display all games for round */
 				  var gamesFoundForRound = false;
@@ -4532,7 +4532,7 @@ function redirectToTinyUrl(tinyUrlSlug) {
 }
 
 function toggleCollapsedContent(headingDiv, contentDiv) {
-    if (contentDiv.style.display === "block") {
+    if (contentDiv.style.display === "block" || !contentDiv.style.display) {
 		contentDiv.style.display = "none";
 		headingDiv.children[0].innerText = "+";
     } else {

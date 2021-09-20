@@ -15,6 +15,8 @@
   --input-background: #1b1b19;
   --input-color: #faf8ef;
   --replayControlsColor: #cac8bf;
+  --collapsible-content-bg: #282828;
+  --collapsible-heading-bg: #333;
 }
 
 [data-theme="dark"] {
@@ -33,6 +35,8 @@
   --hexentafld-bakcground: #000;
   --input-background: #1b1b19;
   --input-color: #faf8ef;
+  --collapsible-content-bg: #282828;
+  --collapsible-heading-bg: #333;
 }
 
 [data-theme="light"] {
@@ -51,6 +55,8 @@
   --hexentafld-bakcground: #3b3b39;
   --input-background: -internal-light-dark-color(white, black);
   --input-color: -internal-light-dark-color(black, white);
+  --collapsible-content-bg: #E1DFD7;
+  --collapsible-heading-bg: #faf8ef;
 }
 
 div {
@@ -978,11 +984,11 @@ input[type=submit] {
 
 .collapsibleHeading {
   padding: 10px;
-  background-color: #333;
+  background-color: var(--collapsible-heading-bg);
 }
 
 .collapsibleContent {
-  background-color: #282828;
+  background-color: var(--collapsible-content-bg);
   padding: 10px;
   display: block;
 }
