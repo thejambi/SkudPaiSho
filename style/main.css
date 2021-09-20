@@ -976,6 +976,17 @@ input[type=submit] {
   margin-top: 7px;
 }
 
+.collapsibleHeading {
+  padding: 10px;
+  background-color: #333;
+}
+
+.collapsibleContent {
+  background-color: #282828;
+  padding: 10px;
+  display: block;
+}
+
 /* Add Animation */
 @-webkit-keyframes animatetop {
     from {top: -300px; opacity: 0}
