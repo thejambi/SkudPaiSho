@@ -1,6 +1,10 @@
 
 function AdevarOptions() {
 	// Adevar options
+	if (dateIsBetween("10/01/2021", "11/04/2021")) {
+		AdevarOptions.enableSpoopyTiles();
+	}
+
 	if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
 		|| !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
 		AdevarOptions.setTileDesignsPreference("classic", true);
@@ -55,8 +59,12 @@ AdevarOptions.buildToggleViewAsGuestDiv = function() {
 	return div;
 };
 
-AdevarOptions.commenceSpoopy = function() {
+AdevarOptions.enableSpoopyTiles = function() {
 	AdevarOptions.tileDesignTypeValues['spoopy'] = "Adevar Spoopy";
+};
+
+AdevarOptions.commenceSpoopy = function() {
+	AdevarOptions.enableSpoopyTiles();
 	AdevarOptions.setTileDesignsPreference('spoopy');
 };
 
