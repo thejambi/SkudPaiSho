@@ -3254,6 +3254,12 @@ var processChatCommands = function(chatMessage) {
 	if (chatMessage.toLowerCase().includes('tree years')) {
 		promptForAgeToTreeYears();
 	}
+
+	if (chatMessage.toLowerCase().includes('halloween')) {
+		paiShoBoardDesignTypeValuesDefault['halloween2021'] = 'Halloween';
+		buildBoardDesignsValues();
+		clearMessage();
+	}
 };
 
 function promptForAgeToTreeYears() {
