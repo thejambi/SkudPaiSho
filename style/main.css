@@ -605,12 +605,14 @@ figure > div {
   display: inline;
   float: left;
   position: relative;
+  transform: inherit;
 }
 .activePoint:hover {
   box-shadow: 0px 0px 24px 2px #054;
 }
 .point.pointSquare {
   border-radius: 0px;
+  transform: inherit;
 }
 
 .markedPoint:before {

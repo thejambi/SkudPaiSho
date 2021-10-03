@@ -26,7 +26,7 @@ function AdevarActuator(gameContainer, isMobile, enableAnimations) {
 AdevarActuator.hostTeamTilesDivId = "hostTilesContainer";
 AdevarActuator.guestTeamTilesDivId = "guestTilesContainer";
 
-AdevarActuator.spaceTilesScaleMultiplier = 1.27;
+AdevarActuator.spaceTilesScaleMultiplier = 0.9;
 
 AdevarActuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
@@ -197,7 +197,8 @@ AdevarActuator.prototype.addTile = function(tile, tileContainer, isCaptured) {
 
 	var scaleMultiplier = 1;
 	if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
-		scaleMultiplier = 1.2;
+		// scaleMultiplier = 1.2;
+		theDiv.classList.add("pointSquare");
 	}
 	theImg.style.transform = AdevarActuator.buildScaleString(1, scaleMultiplier);
 	
@@ -231,7 +232,8 @@ AdevarActuator.prototype.getTileSrcPath = function(tile) {
 AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 	var self = this;
 
-	var theDiv = createBoardPointDiv(boardPoint);
+	var useSquareSpaces = localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space';
+	var theDiv = createBoardPointDiv(boardPoint, useSquareSpaces);
 	
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
@@ -283,19 +285,15 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		theDiv.classList.add("hasTile");
 		
 		var theImg = document.createElement("img");
+		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 
-		var scaleMultiplier = 1;
 		if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
-			scaleMultiplier = AdevarActuator.spaceTilesScaleMultiplier;
-		}
-		theImg.style.transform = AdevarActuator.buildScaleString(1, scaleMultiplier);
-		theImg.transformRotate = "";
-
-		if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space'
-			&& ((AdevarOptions.viewAsGuest && boardPoint.tile.ownerName === HOST)
-				|| (!AdevarOptions.viewAsGuest && boardPoint.tile.ownerName === GUEST))) {
-			theImg.transformRotate = "rotate(180deg)";
-			theImg.style.transform += " " + theImg.transformRotate;
+			theImg.elementStyleTransform.setValue("scale", AdevarActuator.spaceTilesScaleMultiplier);
+			if (boardPoint.tile.ownerName === HOST) {
+				theImg.elementStyleTransform.setValue("rotate", "180deg");
+			}
+		} else {
+			theImg.elementStyleTransform.setValue("rotate", "225deg");
 		}
 
 		if (moveToAnimate) {
@@ -321,8 +319,19 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 
 			/* Show HT at end point until animation is over (show it like a captured tile would be shown) */
 			var theImgCaptured = document.createElement("img");
+			theImgCaptured.elementStyleTransform = new ElementStyleTransform(theImgCaptured);
 			theImgCaptured.src = srcValue + moveToAnimate.moveTileResults.tileInEndPoint.getImageName() + ".png";
 			theImgCaptured.classList.add("underneath");
+
+			if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
+				theImgCaptured.elementStyleTransform.setValue("scale", AdevarActuator.spaceTilesScaleMultiplier);
+				if (moveToAnimate.moveTileResults.tileInEndPoint.ownerName === HOST) {
+					theImgCaptured.elementStyleTransform.setValue("rotate", "180deg");
+				}
+			} else {
+				theImgCaptured.elementStyleTransform.setValue("rotate", "225deg");
+			}
+
 			theDiv.appendChild(theImgCaptured);
 
 			/* After animation, hide moved tile */
@@ -349,8 +358,19 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 
 		if (this.animationOn && moveToAnimate && capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
 			var theImgCaptured = document.createElement("img");
+			theImgCaptured.elementStyleTransform = new ElementStyleTransform(theImgCaptured);
 			theImgCaptured.src = srcValue + capturedTile.getImageName() + ".png";
 			theImgCaptured.classList.add("underneath");
+
+			if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
+				theImgCaptured.elementStyleTransform.setValue("scale", AdevarActuator.spaceTilesScaleMultiplier);
+				if (capturedTile.ownerName === HOST) {
+					theImgCaptured.elementStyleTransform.setValue("rotate", "180deg");
+				}
+			} else {
+				theImgCaptured.elementStyleTransform.setValue("rotate", "225deg");
+			}
+
 			theDiv.appendChild(theImgCaptured);
 
 			/* After animation, hide captured tile */
@@ -387,16 +407,19 @@ AdevarActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimat
 		if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
 			x = moveToAnimate.startPoint.rowAndColumn.col;
 			y = moveToAnimate.startPoint.rowAndColumn.row;
-			theImg.style.transform = AdevarActuator.buildScaleString(1.2, scaleMultiplier) + " " + theImg.transformRotate;	// Make the pieces look like they're picked up a little when moving, good idea or no?
+			// theImg.style.transform = AdevarActuator.buildScaleString(1.2, scaleMultiplier) + " " + theImg.transformRotate;	// Make the pieces look like they're picked up a little when moving, good idea or no?
+			theImg.elementStyleTransform.setValue("scale", 1.2 * scaleMultiplier);
 			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
 		}
 	} else if (moveToAnimate.moveType === DEPLOY) {
 		if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
 			if (piecePlaceAnimation === 1) {
-				theImg.style.transform = AdevarActuator.buildScaleString(2, scaleMultiplier) + " " + theImg.transformRotate; // "scale(2)";
+				// theImg.style.transform = AdevarActuator.buildScaleString(2, scaleMultiplier) + " " + theImg.transformRotate; // "scale(2)";
+				theImg.elementStyleTransform.setValue("scale", 2 * scaleMultiplier);
 				theDiv.style.zIndex = 99;
 				requestAnimationFrame(function() {
-					theImg.style.transform = AdevarActuator.buildScaleString(1, scaleMultiplier) + " " + theImg.transformRotate; // "scale(1)";
+					// theImg.style.transform = AdevarActuator.buildScaleString(1, scaleMultiplier) + " " + theImg.transformRotate; // "scale(1)";
+					theImg.elementStyleTransform.setValue("scale", scaleMultiplier);
 				});
 			}
 		}
@@ -416,11 +439,15 @@ AdevarActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimat
 	var left = (x - ox);
 	var top = (y - oy);
 	if (AdevarOptions.viewAsGuest) {
-		theImg.style.left = ((left * -cos135 - top * -sin135) * pointSizeMultiplierX) + unitString;
-		theImg.style.top = ((top * -cos135 + left * -sin135) * pointSizeMultiplierY) + unitString;
+		// theImg.style.left = ((left * -cos135 - top * -sin135) * pointSizeMultiplierX) + unitString;
+		// theImg.style.top = ((top * -cos135 + left * -sin135) * pointSizeMultiplierY) + unitString;
+		theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+		theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
 	} else {
-		theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
-		theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
+		// theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
+		// theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
+		theImg.style.left = (left * pointSizeMultiplierX) + unitString;
+		theImg.style.top = (top * pointSizeMultiplierY) + unitString;
 	}
 
 	requestAnimationFrame(function() {
@@ -429,7 +456,8 @@ AdevarActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimat
 	});
 	setTimeout(function() {
 		requestAnimationFrame(function() {
-			theImg.style.transform = AdevarActuator.buildScaleString(1, scaleMultiplier) + " " + theImg.transformRotate; //"scale(1)";	// This will size back to normal after moving
+			// theImg.style.transform = AdevarActuator.buildScaleString(1, scaleMultiplier) + " " + theImg.transformRotate; //"scale(1)";	// This will size back to normal after moving
+			theImg.elementStyleTransform.setValue("scale", scaleMultiplier);
 		});
 	}, pieceAnimationLength);
 };
