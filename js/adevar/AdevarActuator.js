@@ -196,7 +196,7 @@ AdevarActuator.prototype.addTile = function(tile, tileContainer, isCaptured) {
 	var theImg = document.createElement("img");
 
 	var scaleMultiplier = 1;
-	if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
+	if (AdevarOptions.isSpaceTiles()) {
 		// scaleMultiplier = 1.2;
 		theDiv.classList.add("pointSquare");
 	}
@@ -232,7 +232,7 @@ AdevarActuator.prototype.getTileSrcPath = function(tile) {
 AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 	var self = this;
 
-	var useSquareSpaces = localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space';
+	var useSquareSpaces = AdevarOptions.isSpaceTiles();
 	var theDiv = createBoardPointDiv(boardPoint, useSquareSpaces);
 	
 	if (!boardPoint.isType(NON_PLAYABLE)) {
@@ -287,7 +287,7 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		var theImg = document.createElement("img");
 		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 
-		if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
+		if (AdevarOptions.isSpaceTiles()) {
 			theImg.elementStyleTransform.setValue("scale", AdevarActuator.spaceTilesScaleMultiplier);
 			if (boardPoint.tile.ownerName === HOST) {
 				theImg.elementStyleTransform.setValue("rotate", "180deg");
@@ -323,7 +323,7 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 			theImgCaptured.src = srcValue + moveToAnimate.moveTileResults.tileInEndPoint.getImageName() + ".png";
 			theImgCaptured.classList.add("underneath");
 
-			if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
+			if (AdevarOptions.isSpaceTiles()) {
 				theImgCaptured.elementStyleTransform.setValue("scale", AdevarActuator.spaceTilesScaleMultiplier);
 				if (moveToAnimate.moveTileResults.tileInEndPoint.ownerName === HOST) {
 					theImgCaptured.elementStyleTransform.setValue("rotate", "180deg");
@@ -362,7 +362,7 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 			theImgCaptured.src = srcValue + capturedTile.getImageName() + ".png";
 			theImgCaptured.classList.add("underneath");
 
-			if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
+			if (AdevarOptions.isSpaceTiles()) {
 				theImgCaptured.elementStyleTransform.setValue("scale", AdevarActuator.spaceTilesScaleMultiplier);
 				if (capturedTile.ownerName === HOST) {
 					theImgCaptured.elementStyleTransform.setValue("rotate", "180deg");
@@ -397,7 +397,7 @@ AdevarActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimat
 	if (!this.animationOn) return;
 
 	var scaleMultiplier = 1;
-	if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
+	if (AdevarOptions.isSpaceTiles()) {
 		scaleMultiplier = AdevarActuator.spaceTilesScaleMultiplier;
 	}
 
