@@ -325,6 +325,17 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 		theDiv.classList.add("hasTile");
 		
 		var theImg = document.createElement("img");
+		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
+
+		if (gameOptionEnabled(ADEVAR_ROTATE)) {
+			theImg.elementStyleTransform.setValue("rotate", "225deg");
+		} else if (gameOptionEnabled(VAGABOND_ROTATE)) {
+			theImg.elementStyleTransform.setValue("rotate", "315deg");
+		} else if (gameOptionEnabled(GINSENG_ROTATE)) {
+			theImg.elementStyleTransform.setValue("rotate", "270deg");
+		} else if (gameOptionEnabled(GINSENG_GUEST_ROTATE)) {
+			theImg.elementStyleTransform.setValue("rotate", "90deg");
+		}
 
 		if (moveToAnimate) {
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
@@ -370,16 +381,16 @@ PlaygroundActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
 			x = moveToAnimate.startPoint.rowAndColumn.col;
 			y = moveToAnimate.startPoint.rowAndColumn.row;
-			theImg.style.transform = "scale(1.2)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
+			theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving, good idea or no?
 			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
 		}
 	} else if (moveToAnimate.moveType === DEPLOY) {
 		if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
 			if (piecePlaceAnimation === 1) {
-				theImg.style.transform = "scale(2)";
+				theImg.elementStyleTransform.setValue("scale", 2);
 				theDiv.style.zIndex = 99;
 				requestAnimationFrame(function() {
-					theImg.style.transform = "scale(1)";
+					theImg.elementStyleTransform.setValue("scale", 1);
 				});
 			}
 		}
@@ -396,25 +407,27 @@ PlaygroundActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		unitString = "vw";
 	}
 
-	if (gameOptionEnabled(ADEVAR_ROTATE)) {
-		var left = (x - ox);
-		var top = (y - oy);
-		theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
-		theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
-	} else if (gameOptionEnabled(VAGABOND_ROTATE)) {
-		var left = (x - ox);
-		var top = (y - oy);
-		theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
-		theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
-	} else if (gameOptionEnabled(GINSENG_ROTATE)) {
-		var left = (x - ox);
-		var top = (y - oy);
-		theImg.style.left = ((left * cos90 - top * sin90) * pointSizeMultiplierX) + unitString;
-		theImg.style.top = ((top * cos90 + left * sin90) * pointSizeMultiplierY) + unitString;
-	} else {
-		theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
-		theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
-	}
+	// if (gameOptionEnabled(ADEVAR_ROTATE)) {
+	// 	var left = (x - ox);
+	// 	var top = (y - oy);
+	// 	theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
+	// 	theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
+	// } else if (gameOptionEnabled(VAGABOND_ROTATE)) {
+	// 	var left = (x - ox);
+	// 	var top = (y - oy);
+	// 	theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
+	// 	theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
+	// } else if (gameOptionEnabled(GINSENG_ROTATE)) {
+	// 	var left = (x - ox);
+	// 	var top = (y - oy);
+	// 	theImg.style.left = ((left * cos90 - top * sin90) * pointSizeMultiplierX) + unitString;
+	// 	theImg.style.top = ((top * cos90 + left * sin90) * pointSizeMultiplierY) + unitString;
+	// } else {
+	// 	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	// 	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+	// }
+	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
 
 	requestAnimationFrame(function() {
 		theImg.style.left = "0px";
@@ -422,7 +435,7 @@ PlaygroundActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	});
 	setTimeout(function() {
 		requestAnimationFrame(function() {
-			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
+			theImg.elementStyleTransform.setValue("scale", 1);	// This will size back to normal after moving
 		});
 	}, pieceAnimationLength);
 };

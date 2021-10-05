@@ -133,6 +133,8 @@ gameOptionDescriptions[NO_WHEELS] = "No Wheels";
 
 var GINSENG_ROTATE = "GinsengBoardRotation";
 gameOptionDescriptions[GINSENG_ROTATE] = "Ginseng Board Rotation";
+var GINSENG_GUEST_ROTATE = "GinsengGuestRotation";
+gameOptionDescriptions[GINSENG_GUEST_ROTATE] = "Ginseng Guest Rotation";
 
 var FULL_GRID = "FullGrid";
 gameOptionDescriptions[FULL_GRID] = "Full Grid";
