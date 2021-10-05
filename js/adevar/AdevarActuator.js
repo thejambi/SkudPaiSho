@@ -26,7 +26,7 @@ function AdevarActuator(gameContainer, isMobile, enableAnimations) {
 AdevarActuator.hostTeamTilesDivId = "hostTilesContainer";
 AdevarActuator.guestTeamTilesDivId = "guestTilesContainer";
 
-AdevarActuator.spaceTilesScaleMultiplier = 0.9;
+AdevarActuator.spaceTilesScaleMultiplier = 1;
 
 AdevarActuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
