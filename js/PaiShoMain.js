@@ -68,7 +68,8 @@ var QueryString = function () {
 	  earth: "Earth-Themed Vescucci Tiles",
 	  chujiblue: "Chu Ji Canon - Blue",
 	  azulejosmono: "Azulejos Monocromos",
-	  azulejosdemadera: "Azulejos de Madera"
+	  azulejosdemadera: "Azulejos de Madera",
+	  tggroyal: "TGG Royal"
   };
   
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
