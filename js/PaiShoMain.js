@@ -2970,9 +2970,9 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 			}
 
 			if (!gameController.isInviteOnly) {
-				message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create game</div>";
+				message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create public game</div>";
 			}
-			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create a private game with a friend</div>";
+			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create an invite-link game</div>";
 			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
 			showModal("Create game?", message);
 			if (GameClock.userHasGameClockAccess()) {
