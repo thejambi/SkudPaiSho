@@ -248,7 +248,7 @@ AdevarTile.getTileCodeKey = function(tileCode) {
 AdevarTile.getTileName = function(tileCode) {
 	var tileName = AdevarTileNames[AdevarTile.getTileCodeKey(tileCode)];
 
-	if (localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space') {
+	if (AdevarOptions.isSpaceTiles()) {
 		tileName = AdevarInSpaceAlternateNames[AdevarTile.getTileCodeKey(tileCode)];
 	}
 

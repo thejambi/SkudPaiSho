@@ -1,6 +1,10 @@
 
 function AdevarOptions() {
 	// Adevar options
+	if (dateIsBetween("10/01/2021", "11/04/2021")) {
+		AdevarOptions.enableSpoopyTiles();
+	}
+
 	if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
 		|| !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
 		AdevarOptions.setTileDesignsPreference("classic", true);
@@ -23,7 +27,7 @@ AdevarOptions.tileDesignTypeValues = {
 	icy: "Adevar Icy",
 	irl: "Adevar TGG Red Oak & Walnut",
 	chuji: "Chuji by Sirstotes",
-	space: "Adevar In Space! by Sirstotes",
+	space2: "Adevar In Space! by Sirstotes",
 	asta: "Asta by Sirstotes"
 };
 
@@ -55,8 +59,16 @@ AdevarOptions.buildToggleViewAsGuestDiv = function() {
 	return div;
 };
 
-AdevarOptions.commenceSpoopy = function() {
+AdevarOptions.enableSpoopyTiles = function() {
 	AdevarOptions.tileDesignTypeValues['spoopy'] = "Adevar Spoopy";
+};
+
+AdevarOptions.commenceSpoopy = function() {
+	AdevarOptions.enableSpoopyTiles();
 	AdevarOptions.setTileDesignsPreference('spoopy');
+};
+
+AdevarOptions.isSpaceTiles = function() {
+	return localStorage.getItem(AdevarOptions.tileDesignTypeKey) === 'space2';
 };
 

@@ -562,7 +562,9 @@ VagabondController.tileDesignTypeValues = {
 	water: "Water themed Garden Gate Designs",
 	fire: "Fire themed Garden Gate Designs",
 	canon: "Canon colors Garden Gate Designs",
-	owl: "Order of the White Lotus Garden Gate Designs"
+	owl: "Order of the White Lotus Garden Gate Designs",
+	royal: "TGG Royal",
+	royalkoiwheel: "TGG Royal Koi-Wheel"
 };
 
 VagabondController.setTileDesignsPreference = function(tileDesignKey) {

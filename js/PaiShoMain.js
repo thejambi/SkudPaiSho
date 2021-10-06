@@ -68,7 +68,8 @@ var QueryString = function () {
 	  earth: "Earth-Themed Vescucci Tiles",
 	  chujiblue: "Chu Ji Canon - Blue",
 	  azulejosmono: "Azulejos Monocromos",
-	  azulejosdemadera: "Azulejos de Madera"
+	  azulejosdemadera: "Azulejos de Madera",
+	  tggroyal: "TGG Royal"
   };
   
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
@@ -3254,6 +3255,12 @@ var processChatCommands = function(chatMessage) {
 	if (chatMessage.toLowerCase().includes('tree years')) {
 		promptForAgeToTreeYears();
 	}
+
+	if (chatMessage.toLowerCase().includes('halloween')) {
+		paiShoBoardDesignTypeValuesDefault['halloween2021'] = 'Halloween';
+		buildBoardDesignsValues();
+		clearMessage();
+	}
 };
 
 function promptForAgeToTreeYears() {
@@ -3848,13 +3855,15 @@ function promptAddOption() {
   
 		  var playerIsSignedUp = false;
 		  if (tournamentInfo.currentPlayers.length > 0) {
-			  message += "<br /><br /><div class='modalContentHeading'>Players currently signed up:</div>";
+			  message += "<br /><br /><div class='modalContentHeading collapsibleHeading' onclick='toggleCollapsedContent(this, this.nextElementSibling)'>Players currently signed up:<span style='float:right'>+</span></div>";
+			  message += "<div class='collapsibleContent' style='display:none'>"
 			  for (var i = 0; i < tournamentInfo.currentPlayers.length; i++) {
-				  message += "<br />" + tournamentInfo.currentPlayers[i].username;
+				  message += tournamentInfo.currentPlayers[i].username + "<br />";
 				  if (tournamentInfo.currentPlayers[i].username === getUsername()) {
 					  playerIsSignedUp = true;
 				  }
 			  }
+			  message += "</div>"
 		  }
   
 		  message += "<br />";
@@ -3863,7 +3872,8 @@ function promptAddOption() {
 			  for (var i = 0; i < tournamentInfo.rounds.length; i++) {
 				  var round = tournamentInfo.rounds[i];
 				  var roundName = htmlEscape(round.name);
-				  message += "<br /><div>" + roundName + "</div>";
+				  message += "<br /><div class='collapsibleHeading' onclick='toggleCollapsedContent(this, this.nextElementSibling)'>" + roundName + "<span style='float:right'>-</span></div>";
+				  message += "<div class='collapsibleContent'>"
 				  /* Display all games for round */
 				  var gamesFoundForRound = false;
 				  for (var j = 0; j < tournamentInfo.games.length; j++) {
@@ -3922,6 +3932,7 @@ function promptAddOption() {
 				  if (!gamesFoundForRound) {
 					  message += "<div><em>No games</em></div>"
 				  }
+				  message += "</div>"
 			  }
 		  } else {
 			  message += "<br /><em>No rounds</em>";
@@ -4527,3 +4538,12 @@ function redirectToTinyUrl(tinyUrlSlug) {
 	window.location.replace("https://tinyurl.com/" + tinyUrlSlug);
 }
 
+function toggleCollapsedContent(headingDiv, contentDiv) {
+    if (contentDiv.style.display === "block" || !contentDiv.style.display) {
+		contentDiv.style.display = "none";
+		headingDiv.children[0].innerText = "+";
+    } else {
+		contentDiv.style.display = "block";
+		headingDiv.children[0].innerText = "-";
+    }
+}

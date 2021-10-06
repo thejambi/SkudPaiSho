@@ -318,3 +318,13 @@ async function copyTextToClipboard(theText, triggerButton) {
 	}
 }
 
+/* Date */
+function dateIsBetween(date1MMSlashDDSlashYYYY, date2MMSlashDDSlashYYYY) {
+  var currentDate = new Date();
+
+  var dateRangeBegin = Date.parse(date1MMSlashDDSlashYYYY);
+  var dateRangeEnd = Date.parse(date2MMSlashDDSlashYYYY);
+
+  return currentDate >= dateRangeBegin && currentDate <= dateRangeEnd;
+}
+
