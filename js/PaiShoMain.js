@@ -75,8 +75,9 @@ var QueryString = function () {
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
 var customBoardUrlKey = "customBoardUrlKey";
 var customBoardUrlArrayKey = "customBoardUrlArrayKey";
+var defaultBoardDesignKey = "tgg20211007";
 var paiShoBoardDesignTypeValuesDefault = {
-	tgg: "The Garden Gate",
+	tgg20211007: "The Garden Gate",
 	nomadic: "Nomadic",
 	classy: "Classy Vescucci",
 	mayfair: "Mayfair Filter",
@@ -339,7 +340,7 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 	  if (localStorage.getItem(paiShoBoardDesignTypeKey)) {
 		  setPaiShoBoardOption(localStorage.getItem(paiShoBoardDesignTypeKey));
 	  } else {
-		  setPaiShoBoardOption("tgg");
+		  setPaiShoBoardOption(defaultBoardDesignKey);
 	  }
   
 	  /* --- */
@@ -807,7 +808,7 @@ function startWatchingGameRealTime() {
 /* Pai Sho Board Switches */
 function setPaiShoBoardOption(newPaiShoBoardKey, isTemporary) {
 	if (!paiShoBoardDesignTypeValues[newPaiShoBoardKey]) {
-		newPaiShoBoardKey = "tgg";
+		newPaiShoBoardKey = defaultBoardDesignKey;
 	}
 	var oldClassName = paiShoBoardKey + "Board";
 	gameContainerDiv.classList.remove(oldClassName);
