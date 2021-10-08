@@ -6,7 +6,8 @@ var PlaygroundMoveType = {
 	endGame: "END_GAME",
 	hideTileLibraries: "HideTileLibraries",
 	deployToTilePile: "DeployToTilePile",
-	moveToTilePile: "MoveToTilePile"
+	moveToTilePile: "MoveToTilePile",
+	rotateToFaceDirection: "RotateToFaceDirection"
 };
 
 var PlaygroundNotationConstants = {
@@ -17,7 +18,16 @@ var PlaygroundNotationConstants = {
 	guestLibraryPile: ":GL",
 	hostReservePile: ":HR",
 	guestReservePile: ":GR",
-	capturedPile: ":C"
+	capturedPile: ":C",
+	rotateToFace: "-rf"
+};
+
+/* Numbers important! Used in math for rotation in Actuator */
+var PlaygroundTileFacingDirection = {
+	RIGHT: 1,
+	DOWN: 2,
+	LEFT: 3,
+	UP: 0
 };
 
 function PlaygroundNotationMove(text) {
@@ -50,10 +60,13 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 		return;
 	}
 
-	// If starts with a ( then it's MOVE
 	var char0 = moveText.charAt(0);
 	if (char0 === '(') {
-		this.moveType = MOVE;
+		if (moveText.includes(PlaygroundNotationConstants.rotateToFace)) {
+			this.moveType = PlaygroundMoveType.rotateToFaceDirection;
+		} else {
+			this.moveType = MOVE;
+		}
 	} else {
 		this.moveType = DEPLOY;
 	}
@@ -107,6 +120,13 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 	} else if (this.moveType === PlaygroundMoveType.moveToTilePile) {
 		this.startPoint = new NotationPoint(moveText.substring(moveText.indexOf("(") + 1, moveText.indexOf(")")));
 		this.endPileName = moveText.substring(moveText.indexOf(PlaygroundNotationConstants.moveToPile) + PlaygroundNotationConstants.moveToPile.length);
+	} else if (this.moveType === PlaygroundMoveType.rotateToFaceDirection) {
+		// Get the starting point from string like: (-8,0)
+		var parts = moveText.substring(moveText.indexOf('(')+1).split(')'+PlaygroundNotationConstants.rotateToFace);
+
+		this.startPoint = new NotationPoint(parts[0]);
+
+		this.directionToFace = parts[1];
 	}
 };
 
@@ -153,6 +173,8 @@ PlaygroundNotationBuilder.prototype.getNotationMove = function(moveNum, player) 
 		notationLine += "(" + this.startPoint.pointText + ")" + PlaygroundNotationConstants.moveToPile + this.endPileName;
 	} else if (this.moveType === PlaygroundMoveType.deployToTilePile) {
 		notationLine += this.tileType + PlaygroundNotationConstants.deployToPile + this.endPileName + PlaygroundNotationConstants.fromPile + this.sourcePileName;
+	} else if (this.moveType === PlaygroundMoveType.rotateToFaceDirection) {
+		notationLine += "(" + this.startPoint.pointText + ")" + PlaygroundNotationConstants.rotateToFace + this.directionToFace;
 	}
 	
 	return new PlaygroundNotationMove(notationLine);

@@ -290,10 +290,10 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		if (AdevarOptions.isSpaceTiles()) {
 			theImg.elementStyleTransform.setValue("scale", AdevarActuator.spaceTilesScaleMultiplier);
 			if (boardPoint.tile.ownerName === HOST) {
-				theImg.elementStyleTransform.setValue("rotate", "180deg");
+				theImg.elementStyleTransform.setValue("rotate", 180, "deg");
 			}
 		} else {
-			theImg.elementStyleTransform.setValue("rotate", "225deg");
+			theImg.elementStyleTransform.setValue("rotate", 225, "deg");
 		}
 
 		if (moveToAnimate) {
@@ -326,10 +326,10 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 			if (AdevarOptions.isSpaceTiles()) {
 				theImgCaptured.elementStyleTransform.setValue("scale", AdevarActuator.spaceTilesScaleMultiplier);
 				if (moveToAnimate.moveTileResults.tileInEndPoint.ownerName === HOST) {
-					theImgCaptured.elementStyleTransform.setValue("rotate", "180deg");
+					theImgCaptured.elementStyleTransform.setValue("rotate", 180, "deg");
 				}
 			} else {
-				theImgCaptured.elementStyleTransform.setValue("rotate", "225deg");
+				theImgCaptured.elementStyleTransform.setValue("rotate", 225, "deg");
 			}
 
 			theDiv.appendChild(theImgCaptured);
@@ -365,10 +365,10 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 			if (AdevarOptions.isSpaceTiles()) {
 				theImgCaptured.elementStyleTransform.setValue("scale", AdevarActuator.spaceTilesScaleMultiplier);
 				if (capturedTile.ownerName === HOST) {
-					theImgCaptured.elementStyleTransform.setValue("rotate", "180deg");
+					theImgCaptured.elementStyleTransform.setValue("rotate", 180, "deg");
 				}
 			} else {
-				theImgCaptured.elementStyleTransform.setValue("rotate", "225deg");
+				theImgCaptured.elementStyleTransform.setValue("rotate", 225, "deg");
 			}
 
 			theDiv.appendChild(theImgCaptured);

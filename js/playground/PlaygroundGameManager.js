@@ -65,6 +65,8 @@ PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 	} else if (move.moveType === PlaygroundMoveType.moveToTilePile) {
 		var tile = this.board.removeTile(move.startPoint);
 		this.tileManager.pilesByName[move.endPileName].push(tile);
+	} else if (move.moveType === PlaygroundMoveType.rotateToFaceDirection) {
+		this.board.rotateTileToFaceDirection(move.startPoint, move.directionToFace);
 	}
 
 	if (withActuate) {

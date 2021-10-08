@@ -195,6 +195,16 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_O", ownerCode));
 	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_W", ownerCode));
 
+	// Paiko
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Sword", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Sai", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Bow", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Lotus", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Water", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Earth", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Fire", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Air", ownerCode));
+
 	return tiles;
 };
 
