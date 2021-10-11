@@ -294,6 +294,9 @@ AdevarActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 			}
 		} else {
 			theImg.elementStyleTransform.setValue("rotate", 225, "deg");
+			if (AdevarOptions.viewAsGuest) {
+				theImg.elementStyleTransform.adjustValue("rotate", 180, "deg");
+			}
 		}
 
 		if (moveToAnimate) {
