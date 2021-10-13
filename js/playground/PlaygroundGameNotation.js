@@ -128,6 +128,10 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 
 		this.directionToFace = parts[1];
 	}
+
+	if (this.tileType) {
+		this.tileType = PlaygroundTileManager.adjustTileCode(this.tileType);
+	}
 };
 
 PlaygroundNotationMove.prototype.isValidNotation = function() {

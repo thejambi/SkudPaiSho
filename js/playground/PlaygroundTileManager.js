@@ -208,6 +208,17 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	return tiles;
 };
 
+PlaygroundTileManager.adjustTileCode = function(tileCode) {
+	if (tileCode && !tileCode.includes("_")) {
+		if (tileCode.length < 3) {
+			return "Ginseng_" + tileCode;
+		} else {
+			return "Balance_" + tileCode;
+		}
+	}
+	return tileCode;
+};
+
 PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePileName) {
 	if (sourcePileName && this.pilesByName[sourcePileName] && !gameOptionEnabled(BOTTOMLESS_RESERVES)) {
 		var tilePile = this.pilesByName[sourcePileName];
