@@ -162,12 +162,21 @@ PlaygroundActuator.prototype.htmlify = function(board, tileManager, markingManag
 
 	if (this.actuateOptions.showTileLibrary) {
 		tileManager.hostTileLibrary.forEach(function(tile) {
-			self.addTile(tile, hostTileLibraryContainer, PlaygroundNotationConstants.hostLibraryPile);
+			if (self.shouldShowTile(tile)) {
+				self.addTile(tile, hostTileLibraryContainer, PlaygroundNotationConstants.hostLibraryPile);
+			}
 		});
 		tileManager.guestTileLibrary.forEach(function(tile) {
-			self.addTile(tile, guestTileLibraryContainer, PlaygroundNotationConstants.guestLibraryPile);
+			if (self.shouldShowTile(tile)) {
+				self.addTile(tile, guestTileLibraryContainer, PlaygroundNotationConstants.guestLibraryPile);
+			}
 		});
 	}
+};
+
+PlaygroundActuator.prototype.shouldShowTile = function(tile) {
+	// return tile.code.includes("Skud") || tile.code.includes("Vagabond");
+	return true;
 };
 
 PlaygroundActuator.prototype.clearContainer = function (container) {
