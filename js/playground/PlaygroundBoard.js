@@ -924,7 +924,7 @@ PlaygroundBoard.prototype.rotateTileToFaceDirection = function(notationPointStar
 	var boardPointStart = this.cells[startRowCol.row][startRowCol.col];
 
 	if (boardPointStart.hasTile()) {
-		boardPointStart.tile.directionToFace = directionToFace;
+		boardPointStart.tile.setDirectionToFace(directionToFace);
 	}
 };
 

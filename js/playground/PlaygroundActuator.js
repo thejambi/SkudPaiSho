@@ -346,8 +346,8 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 			theImg.elementStyleTransform.setValue("rotate", 90, "deg");
 		}
 
-		if (boardPoint.tile.directionToFace) {
-			theImg.elementStyleTransform.adjustValue("rotate", 90*boardPoint.tile.directionToFace, "deg");
+		if (boardPoint.tile.getDirectionToFace()) {
+			theImg.elementStyleTransform.adjustValue("rotate", 90*boardPoint.tile.getDirectionToFace(), "deg");
 		}
 
 		if (moveToAnimate) {
