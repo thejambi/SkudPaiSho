@@ -236,6 +236,11 @@ PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePile
 			debug("NONE OF THAT TILE FOUND");
 		}
 
+		if (sourcePileName === PlaygroundNotationConstants.hostReservePile
+				|| sourcePileName === PlaygroundNotationConstants.guestReservePile) {
+			tile = tile.getCopy();
+		}
+
 		return tile;
 	}
 

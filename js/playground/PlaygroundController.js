@@ -262,7 +262,7 @@ PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 	var sourcePileName = tileDiv.getAttribute("data-pileName");
 	var playerCode = divName.charAt(0);
-	var tileCode = divName;
+	var tileCode = divName.substring(1);
 
 	var player = GUEST;
 	if (playerCode === 'H') {
