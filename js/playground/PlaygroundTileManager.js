@@ -225,7 +225,7 @@ PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePile
 
 		var tile;
 		for (var i = 0; i < tilePile.length; i++) {
-			if (tilePile[i].code === tileCode) {
+			if (tilePile[i].code === tileCode && tilePile[i].ownerCode === player) {
 				newTileArr = tilePile.splice(i, 1);
 				tile = newTileArr[0];
 				break;
@@ -236,8 +236,8 @@ PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePile
 			debug("NONE OF THAT TILE FOUND");
 		}
 
-		if (sourcePileName === PlaygroundNotationConstants.hostReservePile
-				|| sourcePileName === PlaygroundNotationConstants.guestReservePile) {
+		if (sourcePileName === PlaygroundNotationConstants.hostLibraryPile
+				|| sourcePileName === PlaygroundNotationConstants.guestLibraryPile) {
 			tile = tile.getCopy();
 		}
 
@@ -254,10 +254,14 @@ PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePile
 	return this.peekTile(player, tileCode);
 };
 
-PlaygroundTileManager.prototype.peekTile = function(player, tileCode, tileId) {
+PlaygroundTileManager.prototype.peekTile = function(player, tileCode, tileId, sourcePileName) {
 	var tilePile = this.hostTileLibrary;
 	if (player === GUEST) {
 		tilePile = this.guestTileLibrary;
+	}
+
+	if (sourcePileName && this.pilesByName[sourcePileName] && !gameOptionEnabled(BOTTOMLESS_RESERVES)) {
+		tilePile = this.pilesByName[sourcePileName];
 	}
 
 	var tile;
@@ -270,7 +274,8 @@ PlaygroundTileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	}
 
 	for (var i = 0; i < tilePile.length; i++) {
-		if (tilePile[i].code === tileCode) {
+		// Eek. player is a name here but a code in grabTile above
+		if (tilePile[i].code === tileCode && tilePile[i].ownerName === player) {
 			tile = tilePile[i];
 			break;
 		}
