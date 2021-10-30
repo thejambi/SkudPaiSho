@@ -424,6 +424,8 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
   
 	  if (!debugOn && !QueryString.game && (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn())) {
 		  showWelcomeTutorial();
+	  } else {
+		  OnboardingFunctions.showOnLoadAnnouncements();
 	  }
   
 	  if (QueryString.wg) {	/* `wg` for watch game id */
