@@ -12,9 +12,9 @@ function OnboardingFunctions() {
 };
 
 OnboardingFunctions.showOnLoadAnnouncements = function() {
-	/* if (dateIsBetween("10/28/2021", "11/07/2021")) {
+	if (dateIsBetween("11/01/2021", "12/31/2021")) {
 		OnboardingFunctions.showJoinDiscord20211028Announcement();
-	} */
+	}
 };
 
 OnboardingFunctions.resetOnBoarding = function() {
@@ -86,9 +86,10 @@ OnboardingFunctions.showJoinDiscord20211028Announcement = function() {
 		};
 		yesNoOptions.noText = "Close";
 		showModal(
-			"The Garden Gate Discord Community Meetup!",
-			"Hi there! Whether you currently use Discord or not, you should join <a href='https://discord.gg/thegardengate' target='_blank'>The Garden Gate Discord community</a>. "
-			+ "Learn more about Pai Sho, get help learning the games, find others to play with, and get involved in The Garden Gate Community meetup happening soon!<br />",
+			"The Garden Gate Community Meetup!",
+			"Hi! If you didn't know, there is an active Discord community for The Garden Gate. "
+			+ "Members of the community are planning a real life Pai Sho Con and want to invite you! <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord server</a> today to find out more and get involved.<br />"
+			+ "<br /><br /><div align='center'><img src='https://cdn.discordapp.com/attachments/904911184803807273/904911232023265300/0001.jpg' width='90%' style='max-width:480px'></div>",
 			false,
 			yesNoOptions);
 	}
