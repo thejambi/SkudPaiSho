@@ -82,7 +82,7 @@ OnboardingFunctions.showJoinDiscord20211028Announcement = function() {
 		yesNoOptions.yesText = "OK - Don't show again";
 		yesNoOptions.yesFunction = function() {
 			closeModal();
-			localStorage.setItem(OnBoardingKeys.gameCrafterCrowdSaleDismissed, "true");
+			localStorage.setItem(OnBoardingKeys.joinDiscord20211028Dismissed, "true");
 		};
 		yesNoOptions.noText = "Close";
 		showModal(
