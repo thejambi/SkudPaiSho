@@ -3542,14 +3542,19 @@ function onlineGameIsOldEnoughToBeQuit() {
 function buildDateFromTimestamp(timestampStr) {
 	return new Date(timestampStr.replace(" ","T"));
 }
+
+function showWelcomeScreensClicked() {
+	OnboardingFunctions.resetOnBoarding();
+	showWelcomeTutorial();
+}
   
-  var tutorialInProgress = false;
-  
-  function showWelcomeTutorial() {
-	  tutorialInProgress = true;
-	  showModal("The Garden Gate", "<div id='tutorialContent'></div>");
-	  setTimeout(function(){runTutorial();}, 400);
-  }
+var tutorialInProgress = false;
+
+function showWelcomeTutorial() {
+	tutorialInProgress = true;
+	showModal("The Garden Gate", "<div id='tutorialContent'></div>");
+	setTimeout(function() { runTutorial(); }, 400);
+}
   
   function runTutorial() {
 	  // Who knocks
