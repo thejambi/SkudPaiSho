@@ -6,17 +6,16 @@ function FirePaiShoActuator(gameContainer, isMobile, enableAnimations) {
 
 	this.animationOn = enableAnimations;
 
-var rotateFacingRedGardens = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true";
-var rotateType = rotateFacingRedGardens ? ADEVAR_ROTATE : null;
-var containers = setupPaiShoBoard(
-        this.gameContainer,
-        FirePaiShoController.getHostTilesContainerDivs(),
-        FirePaiShoController.getGuestTilesContainerDivs(),
-        rotateFacingRedGardens,
-        rotateType,
-        false
-    );
-
+	this.rotateFacingRedGardens = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true";
+	var rotateType = this.rotateFacingRedGardens ? ADEVAR_ROTATE : null;
+	var containers = setupPaiShoBoard(
+		this.gameContainer,
+		FirePaiShoController.getHostTilesContainerDivs(),
+		FirePaiShoController.getGuestTilesContainerDivs(),
+		this.rotateFacingRedGardens,
+		rotateType,
+		false
+	);
 
 	this.boardContainer = containers.boardContainer;
 	this.arrowContainer = containers.arrowContainer;
@@ -233,7 +232,6 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true"){
 			theDiv.classList.add("adevarPointRotate");
 		}
-//	theDiv.classList.add("vagabondPointRotate");
 
 		if (boardPoint.isType(MARKED)) {
 			theDiv.classList.add("markedPoint");
@@ -306,6 +304,11 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 	if (isAnimationPointOfBoatRemovingAccentTile) {
 		// No tile here, but can animate the Boat removing the Accent Tile
 		var theImg = document.createElement("img");
+		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
+
+		if (this.rotateFacingRedGardens) {
+			theImg.elementStyleTransform.setValue("rotate", "225deg");
+		}
 
 		if (moveToAnimate) {
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep,
@@ -317,6 +320,12 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		theDiv.classList.add("hasTile");
 
 		var theImg = document.createElement("img");
+		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
+
+		if (this.rotateFacingRedGardens) {
+			theImg.elementStyleTransform.setValue("rotate", "225deg");
+		}
+
 		var flags = {
 			boostedOnThisTurn: false,
 			wasArranged: false,
@@ -433,7 +442,7 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 				flags.wasArranged = true;
 				x = moveToAnimate.startPoint.rowAndColumn.col;
 				y = moveToAnimate.startPoint.rowAndColumn.row;
-				theImg.style.transform = "scale(1.2)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
+				theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving, good idea or no?
 				theImg.style.zIndex = 98;	// Make sure "picked up" pieces show up above others
 			} else if (moveToAnimate.isOrchidMove) {
 				var dx = x - moveToAnimate.endPoint.rowAndColumn.col;
@@ -445,20 +454,20 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 					if (moveToAnimate.bonusEndPoint && moveToAnimate.endPoint.samesies(moveToAnimate.bonusEndPoint)) {
 						// debug("Boat played on tile that was planted, skip animating the usual placement");
 					} else {
-						theImg.style.transform = "scale(2)";
+						theImg.elementStyleTransform.setValue("scale", 2);
 						theImg.style.zIndex = 98; // Show new pieces above others
 						requestAnimationFrame(function() {
-							theImg.style.transform = "scale(1)";
+							theImg.elementStyleTransform.setValue("scale", 1);
 						});
 					}
 				}
 			} else if (isSamePoint(moveToAnimate.endPoint, x, y)) {
 				// The endPoint of the Plant was moved, either by Boat or Wheel?
 				if (piecePlaceAnimation === 1) {
-					theImg.style.transform = "scale(2)";
+					theImg.elementStyleTransform.setValue("scale", 2);
 					theImg.style.zIndex = 98; // Show new pieces above others
 					requestAnimationFrame(function() {
-						theImg.style.transform = "scale(1)";
+						theImg.elementStyleTransform.setValue("scale", 1);
 					});
 				}
 			}
@@ -481,55 +490,60 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	}
 	
 
-	if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true") {
-		//ADEVAR ROTATION
-		var left = (x - ox);
-		var top = (y - oy);
-		theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
-		theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
-	} else {
-		// SKUD ROTATION
-		theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
-		theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
-	}
+	// if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true") {
+	// 	//ADEVAR ROTATION
+	// 	var left = (x - ox);
+	// 	var top = (y - oy);
+	// 	theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
+	// 	theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
+	// } else {
+	// 	// SKUD ROTATION
+	// 	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	// 	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+	// }
+
+	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
 	
 	if (placedOnAccent && !boatRemovingAccent) {
 		theImg.style.visibility = "hidden";
 		if (piecePlaceAnimation === 1) {
-			theImg.style.transform = "scale(2)";
+			theImg.elementStyleTransform.setValue("scale", 2);
 		}
 	}
 
 	requestAnimationFrame(function() {
 		var left = ax - ox;
 		var top = ay - oy;
-		if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true") {
-			//ADEVAR ROTATION
-			theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
-			theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
-		} else {
-			// SKUD ROTATION
-			theImg.style.left = (left * pointSizeMultiplierX) + unitString;
-			theImg.style.top = (top * pointSizeMultiplierY) + unitString;
-		}
+		// if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true") {
+		// 	//ADEVAR ROTATION
+		// 	theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
+		// 	theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
+		// } else {
+		// 	// SKUD ROTATION
+		// 	theImg.style.left = (left * pointSizeMultiplierX) + unitString;
+		// 	theImg.style.top = (top * pointSizeMultiplierY) + unitString;
+		// }
+		theImg.style.left = (left * pointSizeMultiplierX) + unitString;
+		theImg.style.top = (top * pointSizeMultiplierY) + unitString;
 	});
 	setTimeout(function() {
 		requestAnimationFrame(function() {
 			theImg.style.left = "0px";
 			theImg.style.top = "0px";
 			theImg.style.visibility = "visible";
-			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
+			theImg.elementStyleTransform.setValue("scale", 1);	// This will size back to normal after moving
 
 			if (boatRemovingAccent) {
 				/* Change image to Boat being played */
 				theImg.classList.add("noTransition");
 				theImg.src = srcValue + moveToAnimate.accentTileUsed.getImageName() + ".png";
-				theImg.style.transform = "scale(2)";
+				theImg.elementStyleTransform.setValue("scale", 2);
 
 				requestAnimationFrame(function() {
 					/* Animate (scale 0 to shrink into disappearing) */
 					theImg.classList.remove("noTransition");
-					theImg.style.transform = "scale(1)";
+					theImg.elementStyleTransform.setValue("scale", 1);
 					setTimeout(function() {
 						theImg.style.visibility = "hidden";
 					}, pieceAnimationLength);	// If want to hide the img after transform, perhaps if going with some other animation

@@ -46,12 +46,12 @@ function removeChildren(myNode) {
 	}
 }
 
-function createBoardPointDiv(boardPoint) {
+function createBoardPointDiv(boardPoint, useSquareSpaces) {
 	var theDiv = document.createElement("div");
 
 	theDiv.classList.add("point");
 
-	if (gameOptionEnabled(SQUARE_SPACES)) {
+	if (gameOptionEnabled(SQUARE_SPACES) || useSquareSpaces) {
 		theDiv.classList.add("pointSquare");
 	}
 

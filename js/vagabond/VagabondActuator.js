@@ -134,7 +134,7 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
-		theDiv.classList.add("vagabondPointRotate");
+		// theDiv.classList.add("vagabondPointRotate");
 		if (boardPoint.isType(MARKED)) {
 			theDiv.classList.add("markedPoint");
 		}	
@@ -170,6 +170,9 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		theDiv.classList.add("hasTile");
 
 		var theImg = document.createElement("img");
+		theImg.rotateTransformStr = "rotate(315deg)";
+
+		theImg.style.transform = theImg.rotateTransformStr;
 
 		if (moveToAnimate) {
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
@@ -210,16 +213,16 @@ VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 		if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
 			x = moveToAnimate.startPoint.rowAndColumn.col;
 			y = moveToAnimate.startPoint.rowAndColumn.row;
-			theImg.style.transform = "scale(1.2)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
+			theImg.style.transform = "scale(1.2) " + theImg.rotateTransformStr;	// Make the pieces look like they're picked up a little when moving, good idea or no?
 			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
 		}
 	} else if (moveToAnimate.moveType === DEPLOY) {
 		if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
 			if (piecePlaceAnimation === 1) {
-				theImg.style.transform = "scale(2)";
+				theImg.style.transform = "scale(2) " + theImg.rotateTransformStr;
 				theDiv.style.zIndex = 99;
 				requestAnimationFrame(function() {
-					theImg.style.transform = "scale(1)";
+					theImg.style.transform = "scale(1) " + theImg.rotateTransformStr;
 				});
 			}
 		}
@@ -236,12 +239,12 @@ VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 		unitString = "vw";
 	}
 
-	/*theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
-	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;*/
-	var left = (x - ox);
-	var top = (y - oy);
-	theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
-	theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
+	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+	// var left = (x - ox);
+	// var top = (y - oy);
+	// theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
+	// theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
 
 	requestAnimationFrame(function() {
 		theImg.style.left = "0px";
@@ -249,7 +252,7 @@ VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 	});
 	setTimeout(function() {
 		requestAnimationFrame(function() {
-			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
+			theImg.style.transform = "scale(1) " + theImg.rotateTransformStr;	// This will size back to normal after moving
 		});
 	}, pieceAnimationLength);
 };
