@@ -116,6 +116,7 @@ var paiShoBoardDesignTypeValuesDefault = {
 	lightmode: "Old Default Light Mode",
 	darkmode: "Old Default Dark Mode",
 	adevar: "Adevăr",
+	chuji: "Chu Ji",
 	applycustomboard: "Add Custom Board from URL"
 };
 
