@@ -149,9 +149,49 @@ div.tab button.active {
 .headerRightContainer {
     background: none;
     color: var(--primary-text);
+    position:absolute;
+    top:5px;
+    right:5px;
+}
+@media only screen and (max-width: 703px) {
+    #headerRightText1 {
+        display:none;
+    }
+}
+@media only screen and (max-width: 655px) {
+    #headerRightText2 {
+        display:none;
+    }
+    .modal-content {
+        width:100%;
+    }
+}
+@media only screen and (max-width: 620px) {
+    #headerRightText3 {
+        display:none;
+    }
+}
+@media only screen and (max-width: 612px) {
+    .headerLeft {
+        display: inherit;
+    }
+}
+@media only screen and (max-width: 592px) {
+    #headerRightText4 {
+        display:none;
+    }
+}
+@media only screen and (max-width: 540px) {
+    #headerRightText4 {
+        display:inline;
+    }
+    #logo{
+        display:none;
+    }
 }
 .headerRight {
     margin-top: 6px;
+    right: 6px;
     margin-left: 0.8em;
     padding: 0.8em 0.8em;
     color: var(--primary-text);
@@ -169,8 +209,14 @@ div.tab button.active {
     padding: 12px 15px 12px 15px;
     border-radius: 15px;
     border:none;
+    position:relative;
 }
-.myMainModalClose {color: var(--primary-text);}
+.myMainModalClose {
+    color: var(--primary-text);
+    position:absolute;
+    top:4px;
+    right:15px;
+}
 .sidenav {
     background-color: var(--tertiary);
     color:var(--primary-text);
@@ -242,7 +288,6 @@ tr td:last-child { border-top-right-radius: 0.8em;  border-bottom-right-radius: 
     border-radius:0.8em;
     text-align: center;
     overflow:hidden;
-    margin:0.5%;
     cursor: pointer;
     color:var(--primary-text);
     vertical-align: top;
@@ -290,4 +335,29 @@ tr td:last-child { border-top-right-radius: 0.8em;  border-bottom-right-radius: 
 }
 hr{
     display:none;
+}
+@media only screen and (max-width: 520px) {
+    table { 
+        width:99%; 
+        font-size:small;
+    }
+    td {padding-left:2px;}
+    .gameDiv {
+        width:32%;
+        margin:2px;
+        font-size:smaller;
+    }
+    .gameDiv.small {
+        width:23.5%;
+    }
+    .gameDiv h3 {
+        margin-top: 0;
+        margin-bottom: 5px;
+    }
+    ::-webkit-scrollbar {
+        display:none;
+    }
+    .gameListExtra {
+        display:none;
+    }
 }

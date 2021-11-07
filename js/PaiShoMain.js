@@ -2612,7 +2612,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 		populateMyGamesList(results);
 
 		if (localStorage.getItem("data-theme") == "stotes") {
-			message += "<table><tr class='top-header'><td>Game Mode</td><td>Host</td><td></td><td>Guest</td><td>Date</td><td>Result</td></tr>";
+			message += "<table><tr class='top-header'><td>Game Mode</td><td>Host</td><td></td><td>Guest</td><td>Result</td><td class='gameListExtra'>Date</td></tr>";
 			var even = true;
 			for (var index in myGamesList) {
 				var myGame = myGamesList[index];
@@ -2628,7 +2628,6 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 				message += "<td>vs.</td>";
 				message += "<td>" + myGame.guestUserName + "</td>";
 
-				message += "<td>" + myGame.timestamp.slice(0, 10) + "</td>";
 
 				if (myGame.resultId === 10) {
 					message += "<td>[inactive]</td>";
@@ -2641,6 +2640,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 				} else {
 					message += "<td>[ended]</td>";
 				}
+				message += "<td class='gameListExtra'>" + myGame.timestamp.slice(0, 10) + "</td>";
 				message += "</tr>";
 
 				for (var i = 0; i < myGame.gameOptions.length; i++) {
@@ -2756,9 +2756,9 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 			  }
 			  message += "<td>" + icon + myGame.guestUserName + "</td>";
 			  if (myGame.isUserTurn) {
-				  message += "<td>Your Turn</td>";
+				  message += "<td class='gameListExtra'>Your Turn</td>";
 			  } else {
-				  message += "<td>Their Turn</td>";
+				  message += "<td class='gameListExtra'>Their Turn</td>";
 			  }
 			  message += "</tr>";
 
@@ -4501,6 +4501,7 @@ function setWebsiteTheme(theme) {
 		var logo = document.createElement("img");
 		logo.style = "margin-left:10px;";
 		logo.src = "style/logo.png";
+		logo.id = "logo";
 		headingHolder.replaceChild(logo, heading);
 		// Remove | Dividers
 		var x = document.getElementsByClassName("headerRight");
