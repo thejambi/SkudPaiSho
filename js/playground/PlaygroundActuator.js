@@ -162,12 +162,21 @@ PlaygroundActuator.prototype.htmlify = function(board, tileManager, markingManag
 
 	if (this.actuateOptions.showTileLibrary) {
 		tileManager.hostTileLibrary.forEach(function(tile) {
-			self.addTile(tile, hostTileLibraryContainer, PlaygroundNotationConstants.hostLibraryPile);
+			if (self.shouldShowTile(tile)) {
+				self.addTile(tile, hostTileLibraryContainer, PlaygroundNotationConstants.hostLibraryPile);
+			}
 		});
 		tileManager.guestTileLibrary.forEach(function(tile) {
-			self.addTile(tile, guestTileLibraryContainer, PlaygroundNotationConstants.guestLibraryPile);
+			if (self.shouldShowTile(tile)) {
+				self.addTile(tile, guestTileLibraryContainer, PlaygroundNotationConstants.guestLibraryPile);
+			}
 		});
 	}
+};
+
+PlaygroundActuator.prototype.shouldShowTile = function(tile) {
+	// return tile.code.includes("Skud") || tile.code.includes("Vagabond");
+	return true;
 };
 
 PlaygroundActuator.prototype.clearContainer = function (container) {
@@ -328,13 +337,17 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 
 		if (gameOptionEnabled(ADEVAR_ROTATE)) {
-			theImg.elementStyleTransform.setValue("rotate", "225deg");
+			theImg.elementStyleTransform.setValue("rotate", 225, "deg");
 		} else if (gameOptionEnabled(VAGABOND_ROTATE)) {
-			theImg.elementStyleTransform.setValue("rotate", "315deg");
+			theImg.elementStyleTransform.setValue("rotate", 315, "deg");
 		} else if (gameOptionEnabled(GINSENG_ROTATE)) {
-			theImg.elementStyleTransform.setValue("rotate", "270deg");
+			theImg.elementStyleTransform.setValue("rotate", 270, "deg");
 		} else if (gameOptionEnabled(GINSENG_GUEST_ROTATE)) {
-			theImg.elementStyleTransform.setValue("rotate", "90deg");
+			theImg.elementStyleTransform.setValue("rotate", 90, "deg");
+		}
+
+		if (boardPoint.tile.getDirectionToFace()) {
+			theImg.elementStyleTransform.adjustValue("rotate", 90*boardPoint.tile.getDirectionToFace(), "deg");
 		}
 
 		if (moveToAnimate) {

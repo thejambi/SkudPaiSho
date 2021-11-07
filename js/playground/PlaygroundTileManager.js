@@ -195,7 +195,28 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_O", ownerCode));
 	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_W", ownerCode));
 
+	// Paiko
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Sword", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Sai", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Bow", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Lotus", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Water", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Earth", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Fire", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Air", ownerCode));
+
 	return tiles;
+};
+
+PlaygroundTileManager.adjustTileCode = function(tileCode) {
+	if (tileCode && !tileCode.includes("_")) {
+		if (tileCode.length < 3) {
+			return "Ginseng_" + tileCode;
+		} else {
+			return "Balance_" + tileCode;
+		}
+	}
+	return tileCode;
 };
 
 PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePileName) {
@@ -204,7 +225,7 @@ PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePile
 
 		var tile;
 		for (var i = 0; i < tilePile.length; i++) {
-			if (tilePile[i].code === tileCode) {
+			if (tilePile[i].code === tileCode && tilePile[i].ownerCode === player) {
 				newTileArr = tilePile.splice(i, 1);
 				tile = newTileArr[0];
 				break;
@@ -213,6 +234,11 @@ PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePile
 
 		if (!tile) {
 			debug("NONE OF THAT TILE FOUND");
+		}
+
+		if (sourcePileName === PlaygroundNotationConstants.hostLibraryPile
+				|| sourcePileName === PlaygroundNotationConstants.guestLibraryPile) {
+			tile = tile.getCopy();
 		}
 
 		return tile;
@@ -228,10 +254,14 @@ PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePile
 	return this.peekTile(player, tileCode);
 };
 
-PlaygroundTileManager.prototype.peekTile = function(player, tileCode, tileId) {
+PlaygroundTileManager.prototype.peekTile = function(player, tileCode, tileId, sourcePileName) {
 	var tilePile = this.hostTileLibrary;
 	if (player === GUEST) {
 		tilePile = this.guestTileLibrary;
+	}
+
+	if (sourcePileName && this.pilesByName[sourcePileName] && !gameOptionEnabled(BOTTOMLESS_RESERVES)) {
+		tilePile = this.pilesByName[sourcePileName];
 	}
 
 	var tile;
@@ -244,7 +274,8 @@ PlaygroundTileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	}
 
 	for (var i = 0; i < tilePile.length; i++) {
-		if (tilePile[i].code === tileCode) {
+		// Eek. player is a name here but a code in grabTile above
+		if (tilePile[i].code === tileCode && tilePile[i].ownerName === player) {
 			tile = tilePile[i];
 			break;
 		}

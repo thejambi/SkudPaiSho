@@ -307,7 +307,7 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 
 		if (this.rotateFacingRedGardens) {
-			theImg.elementStyleTransform.setValue("rotate", "225deg");
+			theImg.elementStyleTransform.setValue("rotate", 225, "deg");
 		}
 
 		if (moveToAnimate) {
@@ -323,7 +323,7 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 
 		if (this.rotateFacingRedGardens) {
-			theImg.elementStyleTransform.setValue("rotate", "225deg");
+			theImg.elementStyleTransform.setValue("rotate", 225, "deg");
 		}
 
 		var flags = {

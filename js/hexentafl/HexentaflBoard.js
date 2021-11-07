@@ -6,7 +6,7 @@ var HexentaflDirections = {
 	UP: 4,
 	UP_LEFT: 5,
 	DOWN_LEFT: 6
-}
+};
 
 function HexentaflBoard() {
 	this.edgeLength = 4;
