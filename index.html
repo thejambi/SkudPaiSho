@@ -8,7 +8,8 @@
 
   <!-- Images of classic tile designs used in Skud Pai Sho are originally from the Lotus Gambit rules community at http://lotusgambit.pbworks.com/w/page/45592429/Home -->
 
-  <link href="style/main.css?v=20211101-234006" rel="stylesheet" type="text/css">
+  <link href="style/main.css?v=20210918-193912" rel="stylesheet" type="text/css">
+  <link id="overrideCSS" href="" rel="stylesheet" type="text/css">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -68,22 +69,24 @@
       <div class="closebtn" onclick="closeNav();">&nbsp;&times;</div>
       <h1>The Garden Gate</h1>
       <hr />
-      <div class='sidenavSectionHeader'>Play</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='accountHeaderClicked();'>
-        <i class="fa fa-user" aria-hidden="true"></i> View my games
-        <span id='myGamesNumberMyTurn'></span>
-      </div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameSeeksClicked();'>
-        <i class="fa fa-plug" aria-hidden="true"></i> Join a game
-      </div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='newGameClicked();'>
-        <i class="fa fa-plus-circle" aria-hidden="true"></i> New game
-      </div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='viewTournamentsClicked();'>
-        <i class="fa fa-trophy" aria-hidden="true"></i> Tournaments
-      </div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameRankingsClicked();'>
-        <i class="fa fa-tachometer" aria-hidden="true"></i> Game Rankings
+      <div class='sidenavSection odd'>
+        <div class='sidenavSectionHeader'>Play</div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='accountHeaderClicked();'>
+          <i class="fa fa-user" aria-hidden="true"></i> View my games
+          <span id='myGamesNumberMyTurn'></span>
+        </div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameSeeksClicked();'>
+          <i class="fa fa-plug" aria-hidden="true"></i> Join a game
+        </div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='newGameClicked();'>
+          <i class="fa fa-plus-circle" aria-hidden="true"></i> New game
+        </div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='viewTournamentsClicked();'>
+          <i class="fa fa-trophy" aria-hidden="true"></i> Tournaments
+        </div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameRankingsClicked();'>
+          <i class="fa fa-tachometer" aria-hidden="true"></i> Game Rankings
+        </div>
       </div>
       <div class='gone'>
         <hr />
@@ -91,44 +94,58 @@
         <div id="sidenavNewGameSection"></div>
       </div>
       <hr />
-      <div class='sidenavSectionHeader'>Current Game</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleReplayControls();'>Toggle replay controls</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameReplayLink();'>Get game link</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameNotationModal();'>Show game notation</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='quitOnlineGameClicked();'>Mark game inactive</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='resignOnlineGameClicked();'>Resign game</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='closeGame();'>Close this game</div>
-      <hr />
-      <div class='sidenavSectionHeader'>About</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='aboutClicked();'>About
-        <em>The Garden Gate</em>
-      </div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='showWelcomeScreensClicked();'>Show welcome screens</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='openShop();'>Buy Pai Sho sets</div>
-      <div class='sidenavEntry'>
-        <a href='https://discord.gg/thegardengate' target='_blank' class='sidenavLink'>Join Discord Server</a>
-      </div>
-      <div class='sidenavEntry'>
-        <a href='https://forum.skudpaisho.com/' target='_blank' class='sidenavLink'>The Garden Gate Forum</a>
+      <div class='sidenavSection even'>
+        <div class='sidenavSectionHeader'>Current Game</div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleReplayControls();'>Toggle replay controls</div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameReplayLink();'>Get game link</div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameNotationModal();'>Show game notation</div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='quitOnlineGameClicked();'>Mark game inactive</div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='resignOnlineGameClicked();'>Resign game</div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='closeGame();'>Close this game</div>
       </div>
       <hr />
-      <div class='sidenavSectionHeader'>Support The Garden Gate</div>
-      <div class='sidenavEntry'>
-        <a href='https://www.patreon.com/SkudPaiSho' target='_blank' class='sidenavLink'>Support on Patreon</a>
+      <div class='sidenavSection odd'>
+        <div class='sidenavSectionHeader'>About</div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='aboutClicked();'>About
+          <em>The Garden Gate</em>
+        </div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='showWelcomeTutorial();'>Show welcome screens</div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='openShop();'>Buy Pai Sho sets</div>
+        <div class='sidenavEntry'>
+          <a href='https://discord.gg/thegardengate' target='_blank' class='sidenavLink'>Join Discord Server</a>
+        </div>
+        <div class='sidenavEntry'>
+          <a href='https://forum.skudpaisho.com/' target='_blank' class='sidenavLink'>The Garden Gate Forum</a>
+        </div>
       </div>
-      <div class='sidenavEntry'>
-        <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank' class='sidenavLink'>Leave a tip</a>
-      </div>
-
       <hr />
+      <div class='sidenavSection even'>
+        <div class='sidenavSectionHeader'>Support The Garden Gate</div>
+        <div class='sidenavEntry'>
+          <a href='https://www.patreon.com/SkudPaiSho' target='_blank' class='sidenavLink'>Support on Patreon</a>
+        </div>
+        <div class='sidenavEntry'>
+          <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank' class='sidenavLink'>Leave a tip</a>
+        </div>
+      </div>
+      <hr />
+      <div class='sidenavSection odd'>
       <div class='sidenavSectionHeader'>
         <div onClick='promptAddOption()'>Other</div>
       </div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleSoundOn();'>Toggle Sound On/Off</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleAnimationsOn();'>Toggle Animations On/Off</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleDarkMode();'>Toggle Dark Mode</div>
+      <div class='sidenavEntry skipBonus'>
+        <label>Website Style:</label>
+        <select id='websiteStyleDropdown' onchange='setWebsiteTheme(this.value);'>
+          <option value='dark'>Classic Dark Mode</option>
+          <option value='light'>Classic Light Mode</option>
+          <option value='stotes'>Chu Ji Theme</option>
+        </select>
+      </div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='location.reload(true);'>Reload website</div>
+      </div>
 
       <div>&nbsp;</div><div>&nbsp;</div><div>&nbsp;</div>
       <!--  -->
@@ -153,18 +170,17 @@
     </div>
     <div class="headerRightContainer">
       <span class="headerRight clickableText" onclick='accountHeaderClicked();'>
-        <i class="fa fa-user" aria-hidden="true"></i>
-        <span id='accountHeaderLinkText'>Sign In</span>
+        <i class="fa fa-user" aria-hidden="true"></i><span id="headerRightText4"> <span id='accountHeaderLinkText'>Sign In</span></span>
       </span>
       <div class="headerRight">&nbsp;|&nbsp;</div>
       <span class="headerRight clickableText" onclick='newGameClicked();'>
-        <i class="fa fa-plus-circle" aria-hidden="true"></i> New</span>
+        <i class="fa fa-plus-circle" aria-hidden="true"></i> <span id="headerRightText3">New</span></span>
       <div class="headerRight">&nbsp;|&nbsp;</div>
       <span class="headerRight clickableText" onclick='viewGameSeeksClicked();'>
-        <i class="fa fa-plug" aria-hidden="true"></i> Join Game</span>
+        <i class="fa fa-plug" aria-hidden="true"></i> <span id="headerRightText2">Join</span></span>
       <div class="headerRight">&nbsp;|&nbsp;</div>
       <span class="headerRight clickableText" onclick='openShop();'>
-        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+        <i class="fa fa-shopping-cart" aria-hidden="true"></i> <span id="headerRightText1">Shop</span>
       </span>
     </div>
   </div>
@@ -320,7 +336,7 @@
         </tr>
       </table>
       <div>
-        <button type='button' onclick='sendVerificationCodeClicked();'>Send verification code</button>
+        <button type='button' class="signupbutton" onclick='sendVerificationCodeClicked();'>Send verification code</button>
         <br />
         <div id='verificationCodeSendResponse'>&nbsp;</div>
       </div>
@@ -334,7 +350,7 @@
         </tr>
       </table>
       <div>
-        <button id='verifyCodeBtn' type='button' onclick='verifyCodeClicked();'>Verify code</button>
+        <button id='verifyCodeBtn' class="signupbutton" type='button' onclick='verifyCodeClicked();'>Verify code</button>
       </div>
     </div>
   </div>
@@ -364,7 +380,7 @@
   <!-- <script src="js/lz-string.min.js"></script> -->
 
   <!-- Compressed -->
-  <script src="psmin_20211101-234006.js"></script>
+  <script src="psmin_211106.js"></script>
 </body>
 
 </html>

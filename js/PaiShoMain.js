@@ -117,6 +117,7 @@ var paiShoBoardDesignTypeValuesDefault = {
 	lightmode: "Old Default Light Mode",
 	darkmode: "Old Default Dark Mode",
 	adevar: "Adevăr",
+	chuji: "Chu Ji",
 	applycustomboard: "Add Custom Board from URL"
 };
 
@@ -302,7 +303,9 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 		  localStorage.setItem("data-theme", dataTheme);
 	  }
   
-	  applyDataTheme();
+	  //applyDataTheme();
+	  setWebsiteTheme(localStorage.getItem("data-theme"));
+	  document.getElementById("websiteStyleDropdown").value = localStorage.getItem("data-theme");
   
 	  defaultEmailMessageText = document.querySelector(".footer").innerHTML;
 
@@ -445,7 +448,52 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 		  jumpToGame(QueryString.joinPrivateGame);
 	  }
   });
-  
+  function getGameColor(gameMode) {
+    switch(gameMode) {
+        case "Skud Pai Sho":
+            return "var(--skudcolor)";
+            break;
+		case "Fire Pai Sho":
+			return "var(--firecolor)";
+			break;
+        case "Vagabond Pai Sho":
+            return "var(--vagabondcolor)";
+            break;
+        case "Capture Pai Sho":
+            return "var(--capturecolor)";
+            break;
+        case "Spirit Pai Sho":
+            return "var(--spiritcolor)";
+            break;
+        case "Nature's Grove: Respite":
+            return "var(--solitairecolor)";
+            break;
+        case "Nature's Grove: Synergy":
+            return "var(--coopsolitairecolor)";
+            break;
+        case "Nature's Grove: Overgrowth":
+            return "var(--overgrowthcolor)";
+            break;
+        case "Undergrowth Pai Sho":
+            return "var(--undergrowthcolor)";
+            break;
+        case "Street Pai Sho":
+            return "var(--streetcolor)";
+            break;
+        case "Adevăr Pai Sho":
+            return "var(--adevarcolor)";
+            break;
+        case "Blooms":
+            return "var(--bloomscolor)";
+        case "Meadow":
+            return "var(--meadowcolor)";
+        case "heXentafl":
+            return "var(--hexcolor)";
+        case "Tumbleweed":
+            return "var(--tumbleweedcolor)";
+    }
+    return "var(--othercolor)";
+}
 function usernameIsOneOf(theseNames) {
 	if (theseNames && theseNames.length) {
 		for (var i = 0; i < theseNames.length; i++) {
@@ -2038,7 +2086,11 @@ function forgetCurrentGameInfo() {
 var GameType = {
 	SkudPaiSho: {
 		id: 1,
+		name: "Skud Pai Sho",
 		desc: "Skud Pai Sho",
+		description: "Arrange flowers into position while changing the landscape of the board to outpace your opponent.",
+		coverImg: "skud.png",
+		color: "var(--skudcolor)",
 		rulesUrl: "https://skudpaisho.com/site/games/skud-pai-sho/",
 		gameOptions: [
 			OPTION_INFORMAL_START,
@@ -2055,7 +2107,11 @@ var GameType = {
 	},
 	VagabondPaiSho: {
 		id: 2,
+		name: "Vagabond Pai Sho",
 		desc: "Vagabond Pai Sho",
+		color: "var(--vagabondcolor)",
+		description: "Construct a battlefield by deploying tiles across the board, then attack your opponent’s Lotus tile.",
+		coverImg: "vagabond.png",
 		rulesUrl: "https://skudpaisho.com/site/games/vagabond-pai-sho/",
 		gameOptions: [
 			OPTION_DOUBLE_TILES,
@@ -2064,7 +2120,11 @@ var GameType = {
 	},
 	Adevar: {
 		id: 12,
+		name: "Adevăr Pai Sho",
 		desc: "Adevăr Pai Sho",
+		color: "var(--adevarcolor)",
+		description: "See through your opponent’s deception and skillfully craft your own disguise to further your hidden objective.",
+		coverImg: "adevar.png",
 		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
 		gameOptions: [
 			ADEVAR_LITE
@@ -2073,7 +2133,11 @@ var GameType = {
 	},
 	FirePaiSho: {
 		id: 15,
+		name: "Fire Pai Sho",
 		desc: "Fire Pai Sho",
+		color: "var(--firecolor)",
+		description: "Like Skud Pai Sho, but with a twist: tiles are chosen randomly.",
+		coverImg: "rose.png",
 		rulesUrl: "https://drive.google.com/file/d/1C3A5Mx0P8vrpKc-X5QbRHuLt27yoMqBj/view?usp=sharing",
 		gameOptions: [
 			NO_HARMONY_VISUAL_AIDS,
@@ -2086,7 +2150,11 @@ var GameType = {
 	},
 	SolitairePaiSho: {
 		id: 4,
+		name: "Nature's Grove: Respite",
 		desc: "Respite - Solitaire Pai Sho",
+		color: "var(--solitairecolor)",
+		description: "Arrange random flowers into position to achieve the highest score possible.",
+		coverImg: "rose.png",
 		rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/",
 		gameOptions: [
 			OPTION_DOUBLE_TILES,
@@ -2096,7 +2164,11 @@ var GameType = {
 	},
 	CoopSolitaire: {
 		id: 6,
+		desc: "Nature's Grove: Synergy",
 		desc: "Synergy - Co-op Pai Sho",
+		color: "var(--coopsolitairecolor)",
+		description: "Arrange random flowers into position with a partner to achieve the highest score possible.",
+		coverImg: "lotus.png",
 		rulesUrl: "https://skudpaisho.com/site/games/cooperative-solitaire-pai-sho/",
 		gameOptions: [
 			LESS_TILES,
@@ -2107,7 +2179,11 @@ var GameType = {
 	},
 	OvergrowthPaiSho: {
 		id: 8,
+		name: "Overgrowth Pai Sho",
 		desc: "Overgrowth Pai Sho",
+		color: "var(--overgrowthcolor)",
+		description: "Arrange random flowers into position to get a higher score than your opponent.",
+		coverImg: "rose.png",
 		rulesUrl: "https://skudpaisho.com/site/games/overgrowth-pai-sho/",
 		gameOptions: [
 			LESS_TILES,
@@ -2118,7 +2194,11 @@ var GameType = {
 	},
 	Undergrowth: {
 		id: 16,
+		name: "Undergrowth Pai Sho",
 		desc: "Undergrowth Pai Sho",
+		color: "var(--undergrowthcolor)",
+		description: "Arrange random flowers into position to get a higher score than your opponent.",
+		coverImg: "lotus.png",
 		rulesUrl: "https://skudpaisho.com/site/games/undergrowth-pai-sho/",
 		gameOptions: [],
 		noRankedGames: true,
@@ -2128,7 +2208,11 @@ var GameType = {
 	},
 	Trifle: {
 		id: 10,
+		name: "Pai and Sho's Trifle",
 		desc: "Pai and Sho's Trifle",
+		color: "var(--triflecolor)",
+		description: "Like Vagabond Pai Sho, but with new collectable tiles.",
+		coverImg: "lotus.png",
 		rulesUrl: "https://skudpaisho.com/site/games/pai-shos-trifle/",
 		gameOptions: [],
 		usersWithAccess: [
@@ -2149,19 +2233,31 @@ var GameType = {
 	},
 	CapturePaiSho: {
 		id: 3,
+		name: "Capture Pai Sho",
 		desc: "Capture Pai Sho",
+		color: "var(--capturecolor)",
+		description: "A capture battle between opponents.",
+		coverImg: "lotus.png",
 		rulesUrl: "https://skudpaisho.com/site/games/capture-pai-sho/",
 		gameOptions: []
 	},
 	SpiritPaiSho: {
 		id: 17,
+		name: "Spirit Pai Sho",
 		desc: "Spirit Pai Sho (Beta)",
+		color: "var(--spiritcolor)",
+		description: "A new ruleset based on Capture Pai Sho.",
+		coverImg: "lotus.png",
 		rulesUrl: "https://skudpaisho.com/",
 		gameOptions: []
 	},
 	StreetPaiSho: {
 		id: 5,
+		name: "Street Pai Sho",
 		desc: "Street Pai Sho",
+		color: "var(--streetcolor)",
+		description: "Based on the Pai Sho scene from The Legend of Korra.",
+		coverImg: "lotus.png",
 		rulesUrl: "https://skudpaisho.com/site/games/street-pai-sho/",
 		gameOptions: [
 			FORMAL_WIN_CONDITION,
@@ -2174,7 +2270,11 @@ var GameType = {
 	},
 	Playground: {
 		id: 7,
+		name: "Pai Sho Playground",
 		desc: "Pai Sho Playground",
+		color: "var(--playgroundcolor)",
+		description: "Move tiles freely and play around in this sandbox mode.",
+		coverImg: "lotus.png",
 		rulesUrl: "https://skudpaisho.com/site/games/pai-sho-playground/",
 		gameOptions: [
 			PLAY_IN_SPACES,
@@ -2190,7 +2290,11 @@ var GameType = {
 	},
 	Blooms: {
 		id: 9,
+		name: "Blooms",
 		desc: "Blooms",
+		color: "var(--bloomscolor)",
+		description: "A territory battle on a hexagonal board.",
+		coverImg: "hexagon.png",
 		rulesUrl: "https://www.nickbentley.games/blooms-rules/",
 		gameOptions: [
 			SHORTER_GAME,
@@ -2202,7 +2306,11 @@ var GameType = {
 	},
 	Meadow: {
 		id: 14,
+		name: "Meadow",
 		desc: "Meadow",
+		color: "var(--meadowcolor)",
+		description: "A territory battle on a hexagonal board.",
+		coverImg: "hexagon.png",
 		rulesUrl: "https://www.nickbentley.games/meadow-rules-and-tips/",
 		gameOptions: [
 			SHORTER_GAME,
@@ -2214,7 +2322,11 @@ var GameType = {
 	},
 	Hexentafl: {
 		id: 11,
+		name: "heXentafl",
 		desc: "heXentafl",
+		color: "var(--hexcolor)",
+		description: "An asymmetrical strategy game where one player must defend their king while the opponent attacks.",
+		coverImg: "hexagon.png",
 		rulesUrl: "https://nxsgame.wordpress.com/2019/09/26/hexentafl/",
 		gameOptions: [
 			OPTION_ATTACKERS_MOVE_FIRST,
@@ -2227,7 +2339,11 @@ var GameType = {
 	},
 	Tumbleweed: {
 		id: 13,
+		name: "Tumbleweed",
 		desc: "Tumbleweed",
+		color: "var(--tumbleweedcolor)",
+		description: "A hexagonal territory war where players stack tiles based on line-of-sight.",
+		coverImg: "hexagon.png",
 		rulesUrl: "https://www.youtube.com/watch?v=mjA_g3nwYW4",
 		gameOptions: [
 			HEXHEX_11,
@@ -2499,43 +2615,89 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 
 		populateMyGamesList(results);
 
-		var gameTypeHeading = "";
-		for (var index in myGamesList) {
-			var myGame = myGamesList[index];
+		if (localStorage.getItem("data-theme") == "stotes") {
+			message += "<table><tr class='top-header'><td>Game Mode</td><td>Host</td><td></td><td>Guest</td><td>Result</td><td class='gameListExtra'>Date</td></tr>";
+			var even = true;
+			for (var index in myGamesList) {
+				var myGame = myGamesList[index];
 
-			if (myGame.gameTypeDesc !== gameTypeHeading) {
-				if (gameTypeHeading !== "") {
-					message += "<br />";
+				var gId = parseInt(myGame.gameId);
+				var userIsHost = usernameEquals(myGame.hostUsername);
+				var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+				
+				message += "<tr onclick='jumpToGame(" + gId + ")' class='" + ((even)?("even"):("odd")) + "'>";
+				message += "<td style='color:" + getGameColor(myGame.gameTypeDesc) + ";'>" + myGame.gameTypeDesc + "</td>";
+				
+				message += "<td>" + myGame.hostUserName + "</td>";
+				message += "<td>vs.</td>";
+				message += "<td>" + myGame.guestUserName + "</td>";
+
+
+				if (myGame.resultId === 10) {
+					message += "<td>[inactive]</td>";
+				} else if (myGame.resultId === 8) {
+					message += "<td>[quit]</td>";
+				} else if (usernameEquals(myGame.winnerUsername)) {
+					message += "<td>[win]</td>";
+				} else if (myGame.winnerUsername === opponentUsername) {
+					message += "<td>[loss]</td>";
+				} else {
+					message += "<td>[ended]</td>";
 				}
-				gameTypeHeading = myGame.gameTypeDesc;
-				message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+				message += "<td class='gameListExtra'>" + myGame.timestamp.slice(0, 10) + "</td>";
+				message += "</tr>";
+
+				for (var i = 0; i < myGame.gameOptions.length; i++) {
+					message += "<tr onclick='jumpToGame(" + gId + ")' class='" + ((even)?("even"):("odd")) + "'><td><em>Game Option</td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
+				}
+
+				even = !even;
+				countOfGamesShown++;
+				if (!showAll && countOfGamesShown > 20) {
+					break;
+				}
 			}
+			message += "</table>";
+		} else {
+			var gameTypeHeading = "";
+			for (var index in myGamesList) {
+				var myGame = myGamesList[index];
 
-			var gId = parseInt(myGame.gameId);
-			var userIsHost = usernameEquals(myGame.hostUsername);
-			var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+				if (myGame.gameTypeDesc !== gameTypeHeading) {
+					if (gameTypeHeading !== "") {
+						message += "<br />";
+					}
+					gameTypeHeading = myGame.gameTypeDesc;
+					message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+				}
 
-			var gameDisplayTitle = myGame.hostUsername;
-			gameDisplayTitle += " vs. ";
-			gameDisplayTitle += myGame.guestUsername;
-			if (myGame.resultId === 10) {
-				gameDisplayTitle += " [inactive]";
-			} else if (myGame.resultId === 8) {
-				gameDisplayTitle += " [quit]";
-			} else if (usernameEquals(myGame.winnerUsername)) {
-				gameDisplayTitle += " [win]";
-			} else if (myGame.winnerUsername === opponentUsername) {
-				gameDisplayTitle += " [loss]";
+				var gId = parseInt(myGame.gameId);
+				var userIsHost = usernameEquals(myGame.hostUsername);
+				var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
+
+				var gameDisplayTitle = myGame.hostUsername;
+				gameDisplayTitle += " vs. ";
+				gameDisplayTitle += myGame.guestUsername;
+				if (myGame.resultId === 10) {
+					gameDisplayTitle += " [inactive]";
+				} else if (myGame.resultId === 8) {
+					gameDisplayTitle += " [quit]";
+				} else if (usernameEquals(myGame.winnerUsername)) {
+					gameDisplayTitle += " [win]";
+				} else if (myGame.winnerUsername === opponentUsername) {
+					gameDisplayTitle += " [loss]";
+				}
+
+				message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
+
+				countOfGamesShown++;
+				if (!showAll && countOfGamesShown > 20) {
+					break;
+				}
+
 			}
-
-			message += "<div class='clickableText' onclick='jumpToGame(" + gId + "); closeModal();'>" + gameDisplayTitle + "</div>";
-
-			countOfGamesShown++;
-			if (!showAll && countOfGamesShown > 20) {
-				break;
-			}
-
 		}
+
 	}
 
 	if (!showAll) {
@@ -2565,12 +2727,52 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
   }
   
   var showMyGamesCallback = function showMyGamesCallback(results) {
-	  var message = "No active games.";
-	  if (results) {
-		  message = "";
+	var message = "No active games.";
+	if (results) {
+		message = "";
+
+		populateMyGamesList(results);
+		if (localStorage.getItem("data-theme") == "stotes") {
+		  message += "<table><tr class='top-header'><td>Game Mode</td><td>Host</td><td></td><td>Guest</td><td></td></tr>";
+		  var even = true;
+		  for (var index in myGamesList) {
+			  var myGame = myGamesList[index];
   
-		  populateMyGamesList(results);
-  
+			  var gId = parseInt(myGame.gameId);
+			  
+			  message += "<tr onclick='jumpToGame(" + gId + ")' class='" + ((myGame.isUserTurn)?("top-header"):((even)?("even"):("odd"))) + "'>";
+			  message += "<td style='color:" + getGameColor(myGame.gameTypeDesc) + ";'>" + myGame.gameTypeDesc + "</td>";
+			  
+			  var icon = "";
+			  if (myGame.hostOnline) {
+				  icon = userOnlineIcon;
+			  } else {
+				  icon = userOfflineIcon;
+			  }
+			  message += "<td>" + icon + myGame.hostUserName + "</td>";
+			  message += "<td>vs.</td>";
+
+			  var icon = "";
+			  if (myGame.guestOnline) {
+				  icon = userOnlineIcon;
+			  } else {
+				  icon = userOfflineIcon;
+			  }
+			  message += "<td>" + icon + myGame.guestUserName + "</td>";
+			  if (myGame.isUserTurn) {
+				  message += "<td class='gameListExtra'>Your Turn</td>";
+			  } else {
+				  message += "<td class='gameListExtra'>Their Turn</td>";
+			  }
+			  message += "</tr>";
+
+			  for (var i = 0; i < myGame.gameOptions.length; i++) {
+				  message += "<tr onclick='jumpToGame(" + gId + ")' class='" + ((even)?("even"):("odd")) + "'><td><em>Game Option</td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
+			  }
+			  even = !even;
+		  }
+		  message += "</table>";
+		} else {
 		  var gameTypeHeading = "";
 		  for (var index in myGamesList) {
 			  var myGame = myGamesList[index];
@@ -2616,17 +2818,18 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 				  message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + getGameOptionDescription(myGame.gameOptions[i]) + "</em></div>"
 			  }
 		  }
-	  }
-	  message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
+		}
+	}
+	message += "<br /><br /><div class='clickableText' onclick='showPastGamesClicked();'>Show completed games</div>";
 
-	  message += "<br /><hr /><div><span class='skipBonus' onclick='showGameStats();'>Completed Game Stats</span></div>";
-	  message += "<br /><div><span class='skipBonus' onclick='viewGameRankingsClicked();'><i class='fa fa-tachometer' aria-hidden='true'></i> Game Rankings</span></div>";
-	  message += "<br /><div><span class='skipBonus' onclick='showPreferences();'>Device Preferences</span></div><br />";
+	message += "<br /><hr /><div><span class='skipBonus' onclick='showGameStats();'>Completed Game Stats</span></div>";
+	message += "<br /><div><span class='skipBonus' onclick='viewGameRankingsClicked();'><i class='fa fa-tachometer' aria-hidden='true'></i> Game Rankings</span></div>";
+	message += "<br /><div><span class='skipBonus' onclick='showPreferences();'>Device Preferences</span></div><br />";
 
-	  message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
-	  // message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
-	  showModal("Active Games", message);
-  };
+	message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
+	// message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
+	showModal("Active Games", message);
+};
   
   function showMyGames() {
 	  if (!onlinePlayPaused) {
@@ -2831,35 +3034,70 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 			gameSeekList.push(gameSeek);
 		}
 		var gameTypeHeading = "";
-		for (var index in gameSeekList) {
-			var gameSeek = gameSeekList[index];
-			if (
-				gameDevOn
-				|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
-				|| usernameIsOneOf(getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess)
-			) {
-				var hostOnlineOrNotIconText = userOfflineIcon;
-				if (gameSeek.hostOnline) {
-					hostOnlineOrNotIconText = userOnlineIcon;
-				}
-
-				if (gameSeek.gameTypeDesc !== gameTypeHeading) {
-					if (gameTypeHeading !== "") {
-						message += "<br />";
+		
+		if (localStorage.getItem("data-theme") == "stotes") {
+			message += "<table><tr class='top-header'><td>Game Mode</td><td>Host</td><td>Ranking</td></tr>";
+			var even = true;
+			for (var index in myGamesList) {
+				var gameSeek = gameSeekList[index];
+				if (
+					gameDevOn
+					|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
+					|| usernameIsOneOf(getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess)
+				) {
+					var gId = parseInt(myGame.gameId);
+					
+					message += "<tr onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");' class='gameSeekEntry " + ((even)?("even"):("odd")) + "'>";
+					message += "<td style='color:" + getGameColor(gameSeek.gameTypeDesc) + ";'>" + gameSeek.gameTypeDesc + "</td>";
+					
+					var icon = userOfflineIcon;
+					if (myGame.hostOnline) { icon = userOnlineIcon; }
+					message += "<td>" + icon + gameSeek.hostUsername + "</td>";
+					
+					if (gameSeek.rankedGame) {
+						message += "<td>" + gameSeek.hostRating + "</td>"
+					} else {
+						message += "<td>N/A</td>";
 					}
-					gameTypeHeading = gameSeek.gameTypeDesc;
-					message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+
+					for (var i = 0; i < gameSeek.gameOptions.length; i++) {
+						message += "<tr onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");' class='" + ((even)?("even"):("odd")) + "'><td><em>Game Option</td><td colspan='2'>" + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></td></tr>";
+					}
+					even = !even;
 				}
-				message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername;
-				if (gameSeek.rankedGame) {
-					message += " (" + gameSeek.hostRating + ")"
+			}
+			message += "</table>";
+		} else {
+			for (var index in gameSeekList) {
+				var gameSeek = gameSeekList[index];
+				if (
+					gameDevOn
+					|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
+					|| usernameIsOneOf(getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess)
+				) {
+					var hostOnlineOrNotIconText = userOfflineIcon;
+					if (gameSeek.hostOnline) {
+						hostOnlineOrNotIconText = userOnlineIcon;
+					}
+
+					if (gameSeek.gameTypeDesc !== gameTypeHeading) {
+						if (gameTypeHeading !== "") {
+							message += "<br />";
+						}
+						gameTypeHeading = gameSeek.gameTypeDesc;
+						message += "<div class='modalContentHeading'>" + gameTypeHeading + "</div>";
+					}
+					message += "<div><div class='clickableText gameSeekEntry' onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");'>Host: " + hostOnlineOrNotIconText + gameSeek.hostUsername;
+					if (gameSeek.rankedGame) {
+						message += " (" + gameSeek.hostRating + ")"
+					}
+					message += "</div>";
+					for (var i = 0; i < gameSeek.gameOptions.length; i++) {
+						message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></div>"
+					}
+					message += "</div>";
+					gameSeeksDisplayed = true;
 				}
-				message += "</div>";
-				for (var i = 0; i < gameSeek.gameOptions.length; i++) {
-					message += "<div>&nbsp;&bull;&nbsp;<em>Game Option: " + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></div>"
-				}
-				message += "</div>";
-				gameSeeksDisplayed = true;
 			}
 		}
 	}
@@ -3183,7 +3421,21 @@ function getNewGameEntryForGameType(gameType) {
 		|| !gameType.usersWithAccess
 		|| usernameIsOneOf(gameType.usersWithAccess)
 	) {
-		return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
+		if (localStorage.getItem("data-theme") == "stotes") {
+			var small = "small";
+			if (gameType.desc == "Skud Pai Sho") {
+				small = "";
+			}
+			if (gameType.desc == "Adevăr Pai Sho") {
+				small = "";
+			}
+			if (gameType.desc == "Vagabond Pai Sho") {
+				small = "";
+			}
+			return '<div class="gameDiv '+small+'" style="background-color:'+gameType.color+';"><img onclick="setGameController(' + gameType.id + '); closeModal();" src="style/game-icons/' + gameType.coverImg + '"><h3 onclick="setGameController(' + gameType.id + '); closeModal();">' + gameType.desc + '</h3><div class="gameDiv-hidden"><span class="rulesSpan"><i class="fa fa-book" aria-hidden="true"></i>&nbsp;<a href="' + gameType.rulesUrl + '" target="_blank">Rules</a></span><p>'+gameType.description+'</p></div></div>';
+		} else {
+			return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
+		}
 	}
 	return "";
 }
@@ -3417,7 +3669,8 @@ function openNav() {
 	window.onclick = function(event) {
 		if (event.target !== document.getElementById("mySidenav")
 			&& event.target !== document.getElementById("sidenavMenuButton")
-			&& event.target !== document.getElementById("siteHeading")) {
+			&& event.target !== document.getElementById("siteHeading")
+			&& event.target !== document.getElementById("websiteStyleDropdown")) {
 			closeNav();
 		}
 	};
@@ -4229,16 +4482,58 @@ function promptAddOption() {
 	  onlinePlayEngine.submitTournamentSignup(getLoginToken(), tournamentId, submitTournamentSignupCallback);
   }
   
-  function toggleDarkMode() {
-	  var currentTheme = localStorage.getItem("data-theme") || "dark";
-	  localStorage.setItem("data-theme", currentTheme === "dark" ? "light" : "dark");
-	  applyDataTheme();
-  }
+//   function toggleDarkMode() {
+// 	  var currentTheme = localStorage.getItem("data-theme") || "dark";
+// 	  localStorage.setItem("data-theme", currentTheme === "dark" ? "light" : "dark");
+// 	  applyDataTheme();
+//   }
   
-  function applyDataTheme() {
-	  var currentTheme = localStorage.getItem("data-theme") || "dark";
-	  document.body.setAttribute("data-theme", currentTheme);
-  }
+//   function applyDataTheme() {
+// 	  var currentTheme = localStorage.getItem("data-theme") || "dark";
+// 	  document.body.setAttribute("data-theme", currentTheme);
+//   }
+function setWebsiteTheme(theme) {
+	if (theme == "dark") {
+		localStorage.setItem("data-theme", "dark");
+		document.body.setAttribute("data-theme", "dark");
+		removeExtraCSS();
+	} else if (theme == "light") {
+		localStorage.setItem("data-theme", "light");
+		document.body.setAttribute("data-theme",  "light");
+		removeExtraCSS();
+	} else {
+		localStorage.setItem("data-theme", "stotes");
+		setExtraCSS("style/themes/chuji.css");
+		// Add Logo
+		var heading = document.getElementById("siteHeading");
+		var headingHolder = heading.parentElement;
+		var logo = document.createElement("img");
+		logo.style = "margin-left:10px;";
+		logo.src = "style/logo.png";
+		logo.id = "logo";
+		headingHolder.replaceChild(logo, heading);
+		// Remove | Dividers
+		var x = document.getElementsByClassName("headerRight");
+		for(var i = 0; i < x.length; i ++) {
+			if (x[i].innerHTML == "&nbsp;|&nbsp;") {
+				x[i].remove();
+			}
+			if (x[i].innerText == "") {
+				x[i].innerHTML = '<i class="fa fa-shopping-cart" aria-hidden="true"></i> Shop';
+		  	}
+		}
+	}
+}
+function removeExtraCSS() {
+	var styleLink = document.getElementById("overrideCSS");
+	styleLink.href = "";
+}
+function setExtraCSS(fileName) {
+	var styleLink = document.getElementById("overrideCSS");
+	if (styleLink.href != fileName) {
+		styleLink.href = fileName;
+	}
+}
   
 /* Game Controller classes should call these for user's preferences */
 function getUserGamePrefKeyName(preferenceKey) {
