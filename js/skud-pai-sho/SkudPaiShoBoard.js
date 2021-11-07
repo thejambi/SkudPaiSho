@@ -481,11 +481,13 @@ SkudPaiShoBoard.prototype.canPlaceWheel = function(boardPoint) {
 	}
 
 	// Does it create Disharmony?
-	var newBoard = this.getCopy();
-	var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
-	newBoard.placeWheel(new SkudPaiShoTile('W', 'G'), notationPoint, true);
-	if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
-		return false;
+	if (!gameOptionEnabled(IGNORE_CLASHING)) {
+		var newBoard = this.getCopy();
+		var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
+		newBoard.placeWheel(new SkudPaiShoTile('W', 'G'), notationPoint, true);
+		if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
+			return false;
+		}
 	}
 
 	return true;
@@ -594,7 +596,7 @@ SkudPaiShoBoard.prototype.canPlaceBoat = function(boardPoint, tile) {
 				// debug("Not played on Knotweed tile");
 				return false;
 			}
-		} else {
+		} else if (!gameOptionEnabled(IGNORE_CLASHING)) {
 			// Ensure no Disharmony
 			var newBoard = this.getCopy();
 			var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
@@ -680,11 +682,13 @@ SkudPaiShoBoard.prototype.canPlaceBamboo = function(boardPoint, tile) {
 	}
 
 	// Does it create Disharmony?
-	var newBoard = this.getCopy();
-	var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
-	newBoard.placeBamboo(new SkudPaiShoTile('M', 'G'), notationPoint, true);
-	if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
-		return false;
+	if (!gameOptionEnabled(IGNORE_CLASHING)) {
+		var newBoard = this.getCopy();
+		var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
+		newBoard.placeBamboo(new SkudPaiShoTile('M', 'G'), notationPoint, true);
+		if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
+			return false;
+		}
 	}
 
 	return true;
@@ -1157,7 +1161,8 @@ SkudPaiShoBoard.prototype.couldMoveTileToPoint = function(player, boardPointStar
 	}
 
 	// What if moving the tile there creates a Disharmony on the board? That can't happen!
-	if (this.moveCreatesDisharmony(boardPointStart, boardPointEnd)) {
+	if (!gameOptionEnabled(IGNORE_CLASHING) 
+			&& this.moveCreatesDisharmony(boardPointStart, boardPointEnd)) {
 		return false;
 	}
 
@@ -1218,7 +1223,8 @@ SkudPaiShoBoard.prototype.canMoveTileToPoint = function(player, boardPointStart,
 	}
 
 	// What if moving the tile there creates a Disharmony on the board? That can't happen!
-	if (this.moveCreatesDisharmony(boardPointStart, boardPointEnd)) {
+	if (!gameOptionEnabled(IGNORE_CLASHING) 
+			&& this.moveCreatesDisharmony(boardPointStart, boardPointEnd)) {
 		return false;
 	}
 
@@ -1253,13 +1259,15 @@ SkudPaiShoBoard.prototype.canTransportTileToPointWithBoat = function(boardPointS
 	// 	return false;
 	// }	// This disharmony check needs to first pretend that a Boat tile is on the spot the tile being moved was on. Fix is below:
 
-	var newBoard = this.getCopy();
-	var newBoardPointStart = newBoard.cells[boardPointStart.row][boardPointStart.col];
-	var notationPoint = new NotationPoint(new RowAndColumn(newBoardPointStart.row, newBoardPointStart.col).notationPointString);
-	var notationPointEnd = new NotationPoint(new RowAndColumn(boardPointEnd.row, boardPointEnd.col).notationPointString);
-	newBoard.placeBoat(new SkudPaiShoTile('B', 'G'), notationPoint, notationPointEnd, true);
-	if (newBoard.moveCreatesDisharmony(newBoardPointStart, newBoardPointStart)) {
-		return false;
+	if (!gameOptionEnabled(IGNORE_CLASHING)) {
+		var newBoard = this.getCopy();
+		var newBoardPointStart = newBoard.cells[boardPointStart.row][boardPointStart.col];
+		var notationPoint = new NotationPoint(new RowAndColumn(newBoardPointStart.row, newBoardPointStart.col).notationPointString);
+		var notationPointEnd = new NotationPoint(new RowAndColumn(boardPointEnd.row, boardPointEnd.col).notationPointString);
+		newBoard.placeBoat(new SkudPaiShoTile('B', 'G'), notationPoint, notationPointEnd, true);
+		if (newBoard.moveCreatesDisharmony(newBoardPointStart, newBoardPointStart)) {
+			return false;
+		}
 	}
 
 	// I guess we made it through
@@ -1979,7 +1987,7 @@ SkudPaiShoBoard.prototype.setOpenGatePossibleMoves = function(player, tile) {
 						var newBoard = this.getCopy();
 						var notationPoint = new NotationPoint(new RowAndColumn(surroundingPoint.row, surroundingPoint.col).notationPointString);
 						newBoard.placeTile(tile, notationPoint);
-						if (!newBoard.moveCreatesDisharmony(notationPoint, notationPoint)) {
+						if (gameOptionEnabled(IGNORE_CLASHING) || !newBoard.moveCreatesDisharmony(notationPoint, notationPoint)) {
 							surroundingPoint.addType(POSSIBLE_MOVE);
 						}
 					}
