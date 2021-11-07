@@ -75,8 +75,9 @@ var QueryString = function () {
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
 var customBoardUrlKey = "customBoardUrlKey";
 var customBoardUrlArrayKey = "customBoardUrlArrayKey";
+var defaultBoardDesignKey = "tgg20211007";
 var paiShoBoardDesignTypeValuesDefault = {
-	tgg: "The Garden Gate",
+	tgg20211007: "The Garden Gate",
 	nomadic: "Nomadic",
 	classy: "Classy Vescucci",
 	mayfair: "Mayfair Filter",
@@ -339,7 +340,7 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 	  if (localStorage.getItem(paiShoBoardDesignTypeKey)) {
 		  setPaiShoBoardOption(localStorage.getItem(paiShoBoardDesignTypeKey));
 	  } else {
-		  setPaiShoBoardOption("tgg");
+		  setPaiShoBoardOption(defaultBoardDesignKey);
 	  }
   
 	  /* --- */
@@ -423,6 +424,8 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
   
 	  if (!debugOn && !QueryString.game && (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn())) {
 		  showWelcomeTutorial();
+	  } else {
+		  OnboardingFunctions.showOnLoadAnnouncements();
 	  }
   
 	  if (QueryString.wg) {	/* `wg` for watch game id */
@@ -807,7 +810,7 @@ function startWatchingGameRealTime() {
 /* Pai Sho Board Switches */
 function setPaiShoBoardOption(newPaiShoBoardKey, isTemporary) {
 	if (!paiShoBoardDesignTypeValues[newPaiShoBoardKey]) {
-		newPaiShoBoardKey = "tgg";
+		newPaiShoBoardKey = defaultBoardDesignKey;
 	}
 	var oldClassName = paiShoBoardKey + "Board";
 	gameContainerDiv.classList.remove(oldClassName);
@@ -2042,7 +2045,8 @@ var GameType = {
 			OPTION_DOUBLE_ACCENT_TILES,
 			OPTION_ANCIENT_OASIS_EXPANSION,
 			NO_HARMONY_VISUAL_AIDS,
-			NO_WHEELS
+			NO_WHEELS,
+			IGNORE_CLASHING
 		],
 		secretGameOptions: [
 			DIAGONAL_MOVEMENT,
@@ -2970,9 +2974,9 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 			}
 
 			if (!gameController.isInviteOnly) {
-				message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create game</div>";
+				message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create public game</div>";
 			}
-			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create a private game with a friend</div>";
+			message += "<br /><div class='clickableText' onclick='replaceWithLoadingText(this); yesCreatePrivateGame(" + gameTypeId + ", !getBooleanPreference(createNonRankedGamePreferredKey)); closeModal();'>Yes - create an invite-link game</div>";
 			message += "<br /><div class='clickableText' onclick='closeModal(); finalizeMove();'>No - local game only</div>";
 			showModal("Create game?", message);
 			if (GameClock.userHasGameClockAccess()) {
@@ -3539,14 +3543,19 @@ function onlineGameIsOldEnoughToBeQuit() {
 function buildDateFromTimestamp(timestampStr) {
 	return new Date(timestampStr.replace(" ","T"));
 }
+
+function showWelcomeScreensClicked() {
+	OnboardingFunctions.resetOnBoarding();
+	showWelcomeTutorial();
+}
   
-  var tutorialInProgress = false;
-  
-  function showWelcomeTutorial() {
-	  tutorialInProgress = true;
-	  showModal("The Garden Gate", "<div id='tutorialContent'></div>");
-	  setTimeout(function(){runTutorial();}, 400);
-  }
+var tutorialInProgress = false;
+
+function showWelcomeTutorial() {
+	tutorialInProgress = true;
+	showModal("The Garden Gate", "<div id='tutorialContent'></div>");
+	setTimeout(function() { runTutorial(); }, 400);
+}
   
   function runTutorial() {
 	  // Who knocks

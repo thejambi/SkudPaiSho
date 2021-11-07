@@ -104,13 +104,18 @@ function createArrowSvg(playInSpaces) {
 	
 	var polygon = document.createElementNS(svgns, 'polygon');
 	polygon.setAttribute("points", "0 0, 5 1.75, 0 3.5");
-	polygon.setAttribute("fill", "rgba(255, 170, 0, 0.8)");
+	polygon.setAttribute("fill", getArrowColorRgbaString());
 	
 	marker.appendChild(polygon);
 	defs.appendChild(marker);
 	arrowContainer.appendChild(defs);
 
 	return arrowContainer;
+}
+
+function getArrowColorRgbaString() {
+	return "rgba(255, 170, 0, 0.8)";
+	// return "rgba(0, 0, 0, 0.8)";
 }
 
 function setupPaiShoBoard(gameContainer,

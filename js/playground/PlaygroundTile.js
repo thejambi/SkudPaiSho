@@ -12,7 +12,16 @@ function PlaygroundTile(gameType, code, ownerCode) {
 	this.selectedFromPile = false;
 
 	this.gameType = gameType;
+
+	this.directionToFace = PlaygroundTileFacingDirection.UP;
 }
+
+PlaygroundTile.prototype.setDirectionToFace = function(directionToFace) {
+	this.directionToFace = directionToFace;
+};
+PlaygroundTile.prototype.getDirectionToFace = function() {
+	return this.directionToFace;
+};
 
 PlaygroundTile.prototype.getConsoleDisplay = function() {
 	return this.ownerCode + "" + this.code;
@@ -42,7 +51,7 @@ PlaygroundTile.prototype.getName = function() {
 };
 
 PlaygroundTile.prototype.getCopy = function() {
-	return new PlaygroundTile(this.code, this.ownerCode);
+	return new PlaygroundTile(this.gameType, this.code, this.ownerCode);
 };
 
 

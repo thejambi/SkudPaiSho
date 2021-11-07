@@ -10,9 +10,12 @@ function AdevarOptions() {
 		AdevarOptions.setTileDesignsPreference("classic", true);
 	}
 
-	AdevarOptions.viewAsGuest = false;
+	AdevarOptions.viewAsGuest = false || AdevarOptions.viewAsGuest;
 	if (currentGameData && currentGameData.gameTypeId === GameType.Adevar.id && usernameEquals(currentGameData.guestUsername)) {
 		AdevarOptions.viewAsGuest = true;
+	}
+	if (currentGameData && currentGameData.gameTypeId === GameType.Adevar.id && usernameEquals(currentGameData.hostUsername)) {
+		AdevarOptions.viewAsGuest = false;
 	}
 }
 

@@ -122,7 +122,36 @@ PlaygroundController.prototype.getAdditionalMessage = function() {
 		}
 	}
 
+	if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
+		msg += "<span>Rotate tile to face:";
+		msg += " <span class='skipBonus' onClick='gameController.rotateTileToFaceDirection(PlaygroundTileFacingDirection.UP)'>Up</span>";
+		msg += " <span class='skipBonus' onClick='gameController.rotateTileToFaceDirection(PlaygroundTileFacingDirection.DOWN)'>Down</span>";
+		msg += " <span class='skipBonus' onClick='gameController.rotateTileToFaceDirection(PlaygroundTileFacingDirection.LEFT)'>Left</span>";
+		msg += " <span class='skipBonus' onClick='gameController.rotateTileToFaceDirection(PlaygroundTileFacingDirection.RIGHT)'>Right</span>";
+		msg += "</span><br />";
+	}
+
 	return msg;
+};
+
+PlaygroundController.prototype.rotateTileToFaceDirection = function(directionToFace) {
+	if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
+		this.theGame.hidePossibleMovePoints();
+
+		this.notationBuilder.moveType = PlaygroundMoveType.rotateToFaceDirection;
+		this.notationBuilder.directionToFace = directionToFace;
+
+		var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+
+		// Move all set. Add it to the notation!
+		this.gameNotation.addMove(move);
+
+		if (playingOnlineGame()) {
+			callSubmitMove();
+		} else {
+			finalizeMove();
+		}
+	}
 };
 
 PlaygroundController.prototype.hideTileLibraries = function() {
@@ -359,6 +388,7 @@ PlaygroundController.prototype.pointClicked = function(htmlPoint) {
 			this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
 			this.theGame.revealPossibleMovePoints(boardPoint);
+			refreshMessage();
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
