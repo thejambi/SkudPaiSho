@@ -95,7 +95,6 @@ div.tab button.active {
     border-radius: 7.5px;
 }
 .chatMessageInput {
-    width: 95%;
     padding-left: 0.8em;
     z-index: 0;
 }
@@ -107,10 +106,6 @@ div.tab button.active {
     cursor:pointer;
     padding: 6px 0.8em;
     border-radius: 20px;
-    float: right;
-    position: relative;
-    top: -32px;
-    z-index: 1;
 }
 #replayControls {
     background-color: var(--primary);
@@ -153,6 +148,16 @@ div.tab button.active {
     top:5px;
     right:5px;
 }
+.modal {
+    padding-top: 50px;
+}
+.modal-content {
+    background-color: var(--tertiary);
+    padding: 12px 15px 12px 15px;
+    border-radius: 15px;
+    border:none;
+    position:relative;
+}
 @media only screen and (max-width: 703px) {
     #headerRightText1 {
         display:none;
@@ -163,7 +168,9 @@ div.tab button.active {
         display:none;
     }
     .modal-content {
-        width:100%;
+        min-width:100%;
+        padding:12px 5px;
+        width:fit-content;
     }
 }
 @media only screen and (max-width: 620px) {
@@ -182,6 +189,12 @@ div.tab button.active {
     }
 }
 @media only screen and (max-width: 540px) {
+    #headerRightText2 {
+        display:inline;
+    }
+    #headerRightText3 {
+        display:inline;
+    }
     #headerRightText4 {
         display:inline;
     }
@@ -200,16 +213,6 @@ div.tab button.active {
 }
 #game-title-heading {
   padding-top: 0.8em;
-}
-.modal {
-    padding-top: 50px;
-}
-.modal-content {
-    background-color: var(--tertiary);
-    padding: 12px 15px 12px 15px;
-    border-radius: 15px;
-    border:none;
-    position:relative;
 }
 .myMainModalClose {
     color: var(--primary-text);
@@ -256,6 +259,10 @@ input, textarea, select {
     padding-right:5px;
 }
 /*New Stuff*/
+#logo{
+    max-height:45px;
+    margin:auto;
+}
 table { 
     border-collapse: separate; 
     width:95%; 
@@ -265,25 +272,26 @@ td {
     cursor: pointer;
     padding:3px 0.8em;
 }
-tr td:first-child { border-top-left-radius: 0.8em; border-bottom-left-radius: 0.8em;}
-tr td:last-child { border-top-right-radius: 0.8em;  border-bottom-right-radius: 0.8em;}
-.top-header {
-    background-color: var(--secondary-text);
-    color:var(--primary);
-}
+tr:first-child td:first-child { border-top-left-radius: 0.8em;}
+tr:first-child td:last-child { border-top-right-radius: 0.8em;}
+tr:last-child td:first-child {border-bottom-left-radius: 0.8em;}
+tr:last-child td:last-child {border-bottom-right-radius: 0.8em;}
 .odd {
     background-color:var(--primary);
 }
 .even {
     background-color:var(--secondary);
 }
+.gameDivContainer{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
 .gameDiv img {
     width:100%;
 }
 .gameDiv {
-    display:inline-block;
-    width:30%;
-    height:min-content;
+    width:30.5%;
     margin:0.5%;
     border-radius:0.8em;
     text-align: center;
@@ -325,6 +333,7 @@ tr td:last-child { border-top-right-radius: 0.8em;  border-bottom-right-radius: 
 .gameDiv:hover .gameDiv-hidden{
     max-height:10em;
     opacity: 1;
+    flex-grow:2;
 }
 .pie {
     position: relative;
@@ -336,28 +345,63 @@ tr td:last-child { border-top-right-radius: 0.8em;  border-bottom-right-radius: 
 hr{
     display:none;
 }
+.tr-header {
+    background-color: var(--primary);
+    color:var(--primary-text);
+}
+.tr-header td {border-bottom: 1px solid var(--primary-text);}
+.tr-footer {
+    background-color: var(--primary);
+    color:var(--primary-text);
+}
+.tr-footer td {border-top: 1px solid var(--primary-text);}
+.highlighted-game td{
+    border-top: 1px solid var(--primary-text);
+    border-bottom: 1px solid var(--primary-text);
+}
+.highlighted-game td:first-child{
+    border-left: 1px solid var(--primary-text);
+}
+.highlighted-game td:last-child{
+    border-right: 1px solid var(--primary-text);
+}
+div.tab .alertTab, div.tab .alertTab.active {
+  background-color: var(--highlight);
+}
 @media only screen and (max-width: 520px) {
     table { 
         width:99%; 
         font-size:small;
     }
-    td {padding-left:2px;}
-    .gameDiv {
+    td {
+        margin:0;
+        padding:3px 1px;
+    }
+    td.first {
+        padding-left:5px;
+    }
+    .gameDiv, .gameDiv.small {
         width:32%;
         margin:2px;
         font-size:smaller;
+
+        transition:  width 0.2s ease;
+        -moz-transition:  width 0.2s ease; /* Firefox 4 */
+        -webkit-transition:  width 0.2s ease; /* Safari and Chrome */
+        -o-transition:  width 0.2s ease; /* Opera */
+        -ms-transition:  width 0.2s ease; /* Explorer 10 */
     }
-    .gameDiv.small {
+    .gameDiv:hover, .gameDiv.small:hover {
+        width:64%;
+    }
+    /*.gameDiv.small {
         width:23.5%;
-    }
+    }*/
     .gameDiv h3 {
         margin-top: 0;
         margin-bottom: 5px;
     }
     ::-webkit-scrollbar {
-        display:none;
-    }
-    .gameListExtra {
         display:none;
     }
 }

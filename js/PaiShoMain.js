@@ -2616,7 +2616,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 		populateMyGamesList(results);
 
 		if (localStorage.getItem("data-theme") == "stotes") {
-			message += "<table><tr class='top-header'><td>Game Mode</td><td>Host</td><td></td><td>Guest</td><td>Result</td><td class='gameListExtra'>Date</td></tr>";
+			message += "<table><tr class='tr-header'><td class='first'>Game Mode</td><td>Host</td><td></td><td>Guest</td><td>Result</td><td>Date</td></tr>";
 			var even = true;
 			for (var index in myGamesList) {
 				var myGame = myGamesList[index];
@@ -2625,12 +2625,12 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 				var userIsHost = usernameEquals(myGame.hostUsername);
 				var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
 				
-				message += "<tr onclick='jumpToGame(" + gId + ")' class='" + ((even)?("even"):("odd")) + "'>";
-				message += "<td style='color:" + getGameColor(myGame.gameTypeDesc) + ";'>" + myGame.gameTypeDesc + "</td>";
+				message += "<tr onclick='jumpToGame(" + gId + ") closeModal();' class='" + ((even)?("even"):("odd")) + "'>";
+				message += "<td class='first' style='color:" + getGameColor(myGame.gameTypeDesc) + ";'>" + myGame.gameTypeDesc + "</td>";
 				
-				message += "<td>" + myGame.hostUserName + "</td>";
+				message += "<td>" + myGame.hostUsername + "</td>";
 				message += "<td>vs.</td>";
-				message += "<td>" + myGame.guestUserName + "</td>";
+				message += "<td>" + myGame.guestUsername + "</td>";
 
 
 				if (myGame.resultId === 10) {
@@ -2644,11 +2644,11 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 				} else {
 					message += "<td>[ended]</td>";
 				}
-				message += "<td class='gameListExtra'>" + myGame.timestamp.slice(0, 10) + "</td>";
+				message += "<td>" + myGame.timestamp.slice(0, 10) + "</td>";
 				message += "</tr>";
 
 				for (var i = 0; i < myGame.gameOptions.length; i++) {
-					message += "<tr onclick='jumpToGame(" + gId + ")' class='" + ((even)?("even"):("odd")) + "'><td><em>Game Option</td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
+					message += "<tr onclick='jumpToGame(" + gId + ") closeModal();' class='" + ((even)?("even"):("odd")) + "'><td class='first'><em>Game Option</em></td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
 				}
 
 				even = !even;
@@ -2657,7 +2657,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 					break;
 				}
 			}
-			message += "</table>";
+			message += "<tr class='tr-footer'><td class='first'>Game Mode</td><td>Host</td><td></td><td>Guest</td><td>Result</td><td>Date</td></tr></table>";
 		} else {
 			var gameTypeHeading = "";
 			for (var index in myGamesList) {
@@ -2733,15 +2733,15 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 
 		populateMyGamesList(results);
 		if (localStorage.getItem("data-theme") == "stotes") {
-		  message += "<table><tr class='top-header'><td>Game Mode</td><td>Host</td><td></td><td>Guest</td><td></td></tr>";
+		  message += "<table><tr class='tr-header'><td class='first'>Game Mode</td><td>Host</td><td></td><td>Guest</td><td></td></tr>";
 		  var even = true;
 		  for (var index in myGamesList) {
 			  var myGame = myGamesList[index];
   
 			  var gId = parseInt(myGame.gameId);
 			  
-			  message += "<tr onclick='jumpToGame(" + gId + ")' class='" + ((myGame.isUserTurn)?("top-header"):((even)?("even"):("odd"))) + "'>";
-			  message += "<td style='color:" + getGameColor(myGame.gameTypeDesc) + ";'>" + myGame.gameTypeDesc + "</td>";
+			  message += "<tr onclick='jumpToGame(" + gId + ") closeModal();' class='" + ((myGame.isUserTurn)?("highlighted-game"):((even)?("even"):("odd"))) + " '>";
+			  message += "<td class='first' style='color:" + getGameColor(myGame.gameTypeDesc) + ";'>" + myGame.gameTypeDesc + "</td>";
 			  
 			  var icon = "";
 			  if (myGame.hostOnline) {
@@ -2749,7 +2749,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 			  } else {
 				  icon = userOfflineIcon;
 			  }
-			  message += "<td>" + icon + myGame.hostUserName + "</td>";
+			  message += "<td>" + icon + myGame.hostUsername + "</td>";
 			  message += "<td>vs.</td>";
 
 			  var icon = "";
@@ -2758,20 +2758,20 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 			  } else {
 				  icon = userOfflineIcon;
 			  }
-			  message += "<td>" + icon + myGame.guestUserName + "</td>";
+			  message += "<td>" + icon + myGame.guestUsername + "</td>";
 			  if (myGame.isUserTurn) {
-				  message += "<td class='gameListExtra'>Your Turn</td>";
+				  message += "<td>Your Turn</td>";
 			  } else {
-				  message += "<td class='gameListExtra'>Their Turn</td>";
+				  message += "<td>Their Turn</td>";
 			  }
 			  message += "</tr>";
 
 			  for (var i = 0; i < myGame.gameOptions.length; i++) {
-				  message += "<tr onclick='jumpToGame(" + gId + ")' class='" + ((even)?("even"):("odd")) + "'><td><em>Game Option</td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
+				  message += "<tr onclick='jumpToGame(" + gId + ") closeModal();' class='" + ((even)?("even"):("odd")) + "'><td class='first'><em>Game Option</em></td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
 			  }
 			  even = !even;
 		  }
-		  message += "</table>";
+		  message += "<tr class='tr-footer'><td class='first'>Game Mode</td><td>Host</td><td></td><td>Guest</td><td></td></tr></table>";
 		} else {
 		  var gameTypeHeading = "";
 		  for (var index in myGamesList) {
@@ -3432,7 +3432,7 @@ function getNewGameEntryForGameType(gameType) {
 			if (gameType.desc == "Vagabond Pai Sho") {
 				small = "";
 			}
-			return '<div class="gameDiv '+small+'" style="background-color:'+gameType.color+';"><img onclick="setGameController(' + gameType.id + '); closeModal();" src="style/game-icons/' + gameType.coverImg + '"><h3 onclick="setGameController(' + gameType.id + '); closeModal();">' + gameType.desc + '</h3><div class="gameDiv-hidden"><span class="rulesSpan"><i class="fa fa-book" aria-hidden="true"></i>&nbsp;<a href="' + gameType.rulesUrl + '" target="_blank">Rules</a></span><p>'+gameType.description+'</p></div></div>';
+			return '<div class="gameDiv '+small+'" style="background-color:'+gameType.color+';"><img ondblclick="setGameController(' + gameType.id + '); closeModal();" src="style/game-icons/' + gameType.coverImg + '"><h3 onclick="setGameController(' + gameType.id + '); closeModal();">' + gameType.desc + '</h3><div class="gameDiv-hidden"><span class="rulesSpan"><i class="fa fa-book" aria-hidden="true"></i>&nbsp;<a href="' + gameType.rulesUrl + '" target="_blank">Rules</a></span><p>'+gameType.description+'</p></div></div>';
 		} else {
 			return "<div class='newGameEntry'><span class='clickableText' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink'>Rules</a></div>";
 		}
@@ -3441,11 +3441,13 @@ function getNewGameEntryForGameType(gameType) {
 }
 
 function newGameClicked() {
-	var message = "";
+	var message = "<div class='gameDivContainer'>";
 
 	Object.keys(GameType).forEach(function(key, index) {
 		message += getNewGameEntryForGameType(GameType[key]);
 	});
+
+	message += "</div>";
 
 	showModal("New Game", message);
 }
