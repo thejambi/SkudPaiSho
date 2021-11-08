@@ -130,6 +130,8 @@ var EVERYTHING_CAPTURE = "EverythingCapture";	// April Fools 2021
 gameOptionDescriptions[EVERYTHING_CAPTURE] = "Everything Captures Everything";
 var NO_WHEELS = "NoWheels";
 gameOptionDescriptions[NO_WHEELS] = "No Wheels";
+var IGNORE_CLASHING = "IgnoreClashing";
+gameOptionDescriptions[IGNORE_CLASHING] = "Ignore Clashing Rule";
 
 var GINSENG_ROTATE = "GinsengBoardRotation";
 gameOptionDescriptions[GINSENG_ROTATE] = "Ginseng Board Rotation";

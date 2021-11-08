@@ -919,6 +919,15 @@ PlaygroundBoard.prototype.pointIsOpenGate = function(notationPoint) {
 	return point.isOpenGate();
 };
 
+PlaygroundBoard.prototype.rotateTileToFaceDirection = function(notationPointStart, directionToFace) {
+	var startRowCol = notationPointStart.rowAndColumn;
+	var boardPointStart = this.cells[startRowCol.row][startRowCol.col];
+
+	if (boardPointStart.hasTile()) {
+		boardPointStart.tile.setDirectionToFace(directionToFace);
+	}
+};
+
 PlaygroundBoard.prototype.moveTile = function(notationPointStart, notationPointEnd) {
 	var startRowCol = notationPointStart.rowAndColumn;
 	var endRowCol = notationPointEnd.rowAndColumn;

@@ -217,6 +217,8 @@ Trifle.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 		theDiv.classList.add("hasTile");
 		
 		var theImg = document.createElement("img");
+		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
+		theImg.elementStyleTransform.setValue("rotate", 315, "deg");
 
 		var moveToAnimate = null;
 		if (moveToAnimate || boardPoint.tile.isGigantic) {
@@ -334,8 +336,6 @@ Trifle.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnima
 	theDiv.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
 
 	theDiv.style.transform = "scale(" + scaleValue + ")";
-
-	theImg.classList.add("vagabondPointRotate");
 
 	requestAnimationFrame(function() {
 		theDiv.style.left = ((finalLeft * cos45 - finalTop * sin45) * pointSizeMultiplierX) + unitString;
