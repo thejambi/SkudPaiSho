@@ -94,6 +94,11 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate, mo
 			errorFound = true;
 		}
 
+		if (gameOptionEnabled(SPECIAL_FLOWERS_BOUNCE) 
+				&& move.capturedTile && move.capturedTile.type === SPECIAL_FLOWER) {
+			this.tileManager.putTileBack(move.capturedTile);
+		}
+
 		this.buildArrangingGameLogText(move, moveResults);
 	}
 

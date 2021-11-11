@@ -132,6 +132,8 @@ var NO_WHEELS = "NoWheels";
 gameOptionDescriptions[NO_WHEELS] = "No Wheels";
 var IGNORE_CLASHING = "IgnoreClashing";
 gameOptionDescriptions[IGNORE_CLASHING] = "Ignore Clashing Rule";
+var SPECIAL_FLOWERS_BOUNCE = "SpecialFlowersBounce";
+gameOptionDescriptions[SPECIAL_FLOWERS_BOUNCE] = "Special Flower Reincarnation";
 
 var GINSENG_ROTATE = "GinsengBoardRotation";
 gameOptionDescriptions[GINSENG_ROTATE] = "Ginseng Board Rotation";
