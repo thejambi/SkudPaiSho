@@ -204,6 +204,9 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 			accentTilesNeededToStart = this.theGame.tileManager.numberOfAccentTilesPerPlayerSet();
 		} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
 			accentTilesNeededToStart = accentTilesNeededToStart * 2;
+			if (gameOptionEnabled(NO_WHEELS) && !gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
+				accentTilesNeededToStart = accentTilesNeededToStart - 2;
+			}
 		}
 
 		if (getCurrentPlayer() === HOST) {
