@@ -683,64 +683,68 @@ function updateCurrentGameTitle(isOpponentOnline) {
 	  updateCurrentGameTitle(isOpponentOnline);
   };
   
-  var getNewChatMessagesCallback = function getNewChatMessagesCallback(results) {
-	  if (results != "") {
-		  var resultRows = results.split('\n');
-  
-		  chatMessageList = [];
-		  var newChatMessagesHtml = "";
-  
-		  for (var index in resultRows) {
-			  var row = resultRows[index].split('|||');
-			  var chatMessage = {
-				  timestamp:row[0],
-				  username:row[1],
-				  message:row[2]
-			  };
-			  chatMessageList.push(chatMessage);
-			  lastChatTimestamp = chatMessage.timestamp;
-		  }
-  
-		  var alertNewMessages = false;
-  
-		  for (var index in chatMessageList) {
-			  var chatMessage = chatMessageList[index];
-			  var chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
+var getNewChatMessagesCallback = function getNewChatMessagesCallback(results) {
+	if (results != "") {
+		var resultRows = results.split('\n');
 
-			  newChatMessagesHtml += "<div class='chatMessage'>";
-  
-			  if (isTimestampsOn()) {
-				  newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
-			  }
+		chatMessageList = [];
+		var newChatMessagesHtml = "";
 
-			  newChatMessagesHtml += "<strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+		for (var index in resultRows) {
+			var row = resultRows[index].split('|||');
+			var chatMessage = {
+				timestamp: row[0],
+				username: row[1],
+				message: row[2]
+			};
+			chatMessageList.push(chatMessage);
+			lastChatTimestamp = chatMessage.timestamp;
+		}
 
-			  // The most recent message will determine whether to alert
-			  if (!usernameEquals(chatMessage.username)) {
-				  // Set chat tab color to alert new messages if newest message is not from user
-				  alertNewMessages = true;
-			  } else {
-				  alertNewMessages = false;
-			  }
-		  }
-  
-		  if (alertNewMessages) {
-			  document.getElementById('chatTab').classList.add('alertTab');
-		  }
-  
-		  /* Prepare to add chat content and keep scrolled to bottom */
-		  var chatMessagesDisplay = document.getElementById('chatMessagesDisplay');
-		  // allow 1px inaccuracy by adding 1
-		  var isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
-		  var newElement = document.createElement("div");
-		  newElement.innerHTML = newChatMessagesHtml;
-		  chatMessagesDisplay.appendChild(newElement);
-		  // scroll to bottom if isScrolledToBottom
-		  if(isScrolledToBottom) {
-			  chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
-		  }
-	  }
-  };
+		var alertNewMessages = false;
+
+		for (var index in chatMessageList) {
+			var chatMessage = chatMessageList[index];
+
+			if (!chatMessage.message.includes("➢ ") || isTimestampsOn()) {
+
+				var chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
+
+				newChatMessagesHtml += "<div class='chatMessage'>";
+
+				if (isTimestampsOn()) {
+					newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
+				}
+
+				newChatMessagesHtml += "<strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
+
+				// The most recent message will determine whether to alert
+				if (!usernameEquals(chatMessage.username)) {
+					// Set chat tab color to alert new messages if newest message is not from user
+					alertNewMessages = true;
+				} else {
+					alertNewMessages = false;
+				}
+			}
+		}
+
+		if (alertNewMessages) {
+			document.getElementById('chatTab').classList.add('alertTab');
+		}
+
+		/* Prepare to add chat content and keep scrolled to bottom */
+		var chatMessagesDisplay = document.getElementById('chatMessagesDisplay');
+		// allow 1px inaccuracy by adding 1
+		var isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
+		var newElement = document.createElement("div");
+		newElement.innerHTML = newChatMessagesHtml;
+		chatMessagesDisplay.appendChild(newElement);
+		// scroll to bottom if isScrolledToBottom
+		if (isScrolledToBottom) {
+			chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
+		}
+	}
+};
   
 function getTimestampString(timestampStr) {
 	var dte = new Date(timestampStr + " UTC");
@@ -1504,9 +1508,13 @@ function yesJoinPrivateGame(privateGameId) {
 }
 
 var submitMoveData = {};
-var submitMoveCallback = function submitMoveCallback() {
+var submitMoveCallback = function submitMoveCallback(resultData, move) {
 	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
 	finalizeMove(submitMoveData.moveAnimationBeginStep, false, true);
+
+	if (move && move.fullMoveText) {
+		sendChat("➢ " + move.fullMoveText);
+	}
 
 	startWatchingNumberOfGamesWhereUserTurn();
 
@@ -1853,7 +1861,9 @@ function closeModal() {
 	tutorialInProgress = false;
 }
   
-function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed) {
+var confirmMoveToSubmit = null;
+
+function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed, move) {
 	submitMoveData = {
 		moveAnimationBeginStep: moveAnimationBeginStep
 	};
@@ -1861,14 +1871,15 @@ function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed) {
 		GameClock.stopGameClock();
 		if (!GameClock.currentClockIsOutOfTime()) {
 			onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
-				GameClock.getCurrentGameClockJsonString(), currentGameData.resultId);
+				GameClock.getCurrentGameClockJsonString(), currentGameData.resultId, move);
 		}
 	} else {
 		/* Move needs to be confirmed. Finalize move and show confirm button. */
 		finalizeMove(submitMoveData.moveAnimationBeginStep);
 		if (gameController.automaticallySubmitMoveRequired && gameController.automaticallySubmitMoveRequired()) {
-			callSubmitMove(moveAnimationBeginStep, true);
+			callSubmitMove(moveAnimationBeginStep, true, move);
 		} else {
+			confirmMoveToSubmit = move;
 			showConfirmMoveButton();
 		}
 	}
@@ -4414,7 +4425,7 @@ function hideConfirmMoveButton() {
 }
 
 function confirmMoveClicked() {
-	callSubmitMove(submitMoveData.moveAnimationBeginStep, true);
+	callSubmitMove(submitMoveData.moveAnimationBeginStep, true, confirmMoveToSubmit);
 	hideConfirmMoveButton();
 }
 

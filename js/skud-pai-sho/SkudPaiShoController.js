@@ -378,7 +378,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 				// Move all set. Add it to the notation!
 				this.gameNotation.addMove(move);
 				if (playingOnlineGame()) {
-					callSubmitMove();
+					callSubmitMove(null, null, move);
 				} else {
 					finalizeMove();
 				}
@@ -406,7 +406,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 
 				this.gameNotation.addMove(move);
 				if (playingOnlineGame()) {
-					callSubmitMove(1);
+					callSubmitMove(1, null, move);
 				} else {
 					finalizeMove(1);
 				}
@@ -425,7 +425,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 			this.gameNotation.addMove(move);
 			if (playingOnlineGame()) {
-				callSubmitMove(1);
+				callSubmitMove(1, null, move);
 			} else {
 				finalizeMove(1);
 			}
@@ -443,7 +443,7 @@ SkudPaiShoController.prototype.skipHarmonyBonus = function() {
 		var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 		this.gameNotation.addMove(move);
 		if (playingOnlineGame()) {
-			callSubmitMove(1);
+			callSubmitMove(1, null, move);
 		} else {
 			finalizeMove(1);
 		}
