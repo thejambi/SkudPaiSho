@@ -2625,7 +2625,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 				var userIsHost = usernameEquals(myGame.hostUsername);
 				var opponentUsername = userIsHost ? myGame.guestUsername : myGame.hostUsername;
 				
-				message += "<tr onclick='jumpToGame(" + gId + ") closeModal();' class='" + ((even)?("even"):("odd")) + "'>";
+				message += "<tr onclick='jumpToGame(" + gId + "); closeModal();' class='" + ((even)?("even"):("odd")) + "'>";
 				message += "<td class='first' style='color:" + getGameColor(myGame.gameTypeDesc) + ";'>" + myGame.gameTypeDesc + "</td>";
 				
 				message += "<td>" + myGame.hostUsername + "</td>";
@@ -2648,7 +2648,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 				message += "</tr>";
 
 				for (var i = 0; i < myGame.gameOptions.length; i++) {
-					message += "<tr onclick='jumpToGame(" + gId + ") closeModal();' class='" + ((even)?("even"):("odd")) + "'><td class='first'><em>Game Option</em></td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
+					message += "<tr onclick='jumpToGame(" + gId + "); closeModal();' class='" + ((even)?("even"):("odd")) + "'><td class='first'><em>Game Option</em></td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
 				}
 
 				even = !even;
@@ -2740,7 +2740,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
   
 			  var gId = parseInt(myGame.gameId);
 			  
-			  message += "<tr onclick='jumpToGame(" + gId + ") closeModal();' class='" + ((myGame.isUserTurn)?("highlighted-game"):((even)?("even"):("odd"))) + " '>";
+			  message += "<tr onclick='jumpToGame(" + gId + "); closeModal();' class='" + ((myGame.isUserTurn)?("highlighted-game"):((even)?("even"):("odd"))) + " '>";
 			  message += "<td class='first' style='color:" + getGameColor(myGame.gameTypeDesc) + ";'>" + myGame.gameTypeDesc + "</td>";
 			  
 			  var icon = "";
@@ -2767,7 +2767,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 			  message += "</tr>";
 
 			  for (var i = 0; i < myGame.gameOptions.length; i++) {
-				  message += "<tr onclick='jumpToGame(" + gId + ") closeModal();' class='" + ((even)?("even"):("odd")) + "'><td class='first'><em>Game Option</em></td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
+				  message += "<tr onclick='jumpToGame(" + gId + "); closeModal();' class='" + ((even)?("even"):("odd")) + "'><td class='first'><em>Game Option</em></td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
 			  }
 			  even = !even;
 		  }
@@ -4533,7 +4533,7 @@ function removeExtraCSS() {
 function setExtraCSS(fileName) {
 	var styleLink = document.getElementById("overrideCSS");
 	if (styleLink.href != fileName) {
-		styleLink.href = fileName;
+		styleLink.href = fileName + "?v=2";
 	}
 }
   
