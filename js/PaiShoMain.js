@@ -755,14 +755,22 @@ function updateCurrentGameTitle(isOpponentOnline) {
 			  var chatMessage = chatMessageList[index];
 			  var chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
 
-			  newChatMessagesHtml += "<div class='chatMessage'>";
+			  newChatMessagesHtml += "<div class='chatMessage"+(usernameEquals(chatMessage.username))?(" self"):("")+"'>";
   
 			  if (isTimestampsOn()) {
 				  newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
 			  }
 
-			  newChatMessagesHtml += "<strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
-
+			  if (localStorage.getItem("data-theme") == "stotes") {
+				  if (usernameEquals(chatMessage.username)) {
+					newChatMessagesHtml += "<div class='message self'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div></div>";
+				  } else {
+					newChatMessagesHtml += "<strong>" + chatMessage.username + "</strong> <div class='message'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div></div>";
+				  }
+			  } else {
+				newChatMessagesHtml += "<strong>" + chatMessage.username + ":</strong>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+			  }
+			  
 			  // The most recent message will determine whether to alert
 			  if (!usernameEquals(chatMessage.username)) {
 				  // Set chat tab color to alert new messages if newest message is not from user
@@ -782,6 +790,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 		  var isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
 		  var newElement = document.createElement("div");
 		  newElement.innerHTML = newChatMessagesHtml;
+		  newElement.classList.add("chatMessageContainer");
 		  chatMessagesDisplay.appendChild(newElement);
 		  // scroll to bottom if isScrolledToBottom
 		  if(isScrolledToBottom) {
@@ -1495,7 +1504,7 @@ var createPrivateGameCallback = function createPrivateGameCallback(newGameId) {
 
 	var inviteLinkUrl = createInviteLinkUrl(newGameId);
 
-	showModal("Game Created!", "You just created a private game. Send <a href='" + inviteLinkUrl + "' target='_blank'>this invite link</a> to a friend so they can join. <button onclick='copyTextToClipboard(\""+inviteLinkUrl+"\", this);'>Copy Link</button> <br /><br />When a player joins this game, it will show up in your list of games when you click My Games.", true);
+	showModal("Game Created!", "You just created a private game. Send <a href='" + inviteLinkUrl + "' target='_blank'>this invite link</a> to a friend so they can join. <button onclick='copyTextToClipboard(\""+inviteLinkUrl+"\", this);' class='.button'>Copy Link</button> <br /><br />When a player joins this game, it will show up in your list of games when you click My Games.", true);
 };
 
 function createInviteLinkUrl(newGameId) {
@@ -2628,9 +2637,9 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 				message += "<tr onclick='jumpToGame(" + gId + "); closeModal();' class='" + ((even)?("even"):("odd")) + "'>";
 				message += "<td class='first' style='color:" + getGameColor(myGame.gameTypeDesc) + ";'>" + myGame.gameTypeDesc + "</td>";
 				
-				message += "<td>" + myGame.hostUsername + "</td>";
+				message += "<td class='name'>" + myGame.hostUsername + "</td>";
 				message += "<td>vs.</td>";
-				message += "<td>" + myGame.guestUsername + "</td>";
+				message += "<td class='name'>" + myGame.guestUsername + "</td>";
 
 
 				if (myGame.resultId === 10) {
@@ -2648,7 +2657,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 				message += "</tr>";
 
 				for (var i = 0; i < myGame.gameOptions.length; i++) {
-					message += "<tr onclick='jumpToGame(" + gId + "); closeModal();' class='" + ((even)?("even"):("odd")) + "'><td class='first'><em>Game Option</em></td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
+					message += "<tr onclick='jumpToGame(" + gId + "); closeModal();' class='" + ((even)?("even"):("odd")) + "'><td class='first'><em>-Game Option</em></td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
 				}
 
 				even = !even;
@@ -2733,7 +2742,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 
 		populateMyGamesList(results);
 		if (localStorage.getItem("data-theme") == "stotes") {
-		  message += "<table><tr class='tr-header'><td class='first'>Game Mode</td><td>Host</td><td></td><td>Guest</td><td></td></tr>";
+		  message += "<table><tr class='tr-header'><td class='first'>Game Mode</td><td>Host</td><td></td><td>Guest</td><td>Turn</td></tr>";
 		  var even = true;
 		  for (var index in myGamesList) {
 			  var myGame = myGamesList[index];
@@ -2749,7 +2758,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 			  } else {
 				  icon = userOfflineIcon;
 			  }
-			  message += "<td>" + icon + myGame.hostUsername + "</td>";
+			  message += "<td class='name'>" + icon + myGame.hostUsername + "</td>";
 			  message += "<td>vs.</td>";
 
 			  var icon = "";
@@ -2758,16 +2767,16 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 			  } else {
 				  icon = userOfflineIcon;
 			  }
-			  message += "<td>" + icon + myGame.guestUsername + "</td>";
+			  message += "<td class='name'>" + icon + myGame.guestUsername + "</td>";
 			  if (myGame.isUserTurn) {
-				  message += "<td>Your Turn</td>";
+				  message += "<td>Yous</td>";
 			  } else {
-				  message += "<td>Their Turn</td>";
+				  message += "<td>Theirs</td>";
 			  }
 			  message += "</tr>";
 
 			  for (var i = 0; i < myGame.gameOptions.length; i++) {
-				  message += "<tr onclick='jumpToGame(" + gId + "); closeModal();' class='" + ((even)?("even"):("odd")) + "'><td class='first'><em>Game Option</em></td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
+				  message += "<tr onclick='jumpToGame(" + gId + "); closeModal();' class='" + ((even)?("even"):("odd")) + "'><td class='first'><em>-Game Option</em></td><td colspan='5'>" + getGameOptionDescription(myGame.gameOptions[i]) + "</em></td></tr>";
 			  }
 			  even = !even;
 		  }
@@ -3036,7 +3045,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 		var gameTypeHeading = "";
 		
 		if (localStorage.getItem("data-theme") == "stotes") {
-			message += "<table><tr class='top-header'><td>Game Mode</td><td>Host</td><td>Ranking</td></tr>";
+			message += "<table><tr class='first'><td>Game Mode</td><td>Host</td><td>Ranking</td></tr>";
 			var even = true;
 			for (var index in myGamesList) {
 				var gameSeek = gameSeekList[index];
@@ -3051,7 +3060,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 					message += "<td style='color:" + getGameColor(gameSeek.gameTypeDesc) + ";'>" + gameSeek.gameTypeDesc + "</td>";
 					
 					var icon = userOfflineIcon;
-					if (myGame.hostOnline) { icon = userOnlineIcon; }
+					if (gameSeek.hostOnline) { icon = userOnlineIcon; }
 					message += "<td>" + icon + gameSeek.hostUsername + "</td>";
 					
 					if (gameSeek.rankedGame) {
@@ -3061,7 +3070,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 					}
 
 					for (var i = 0; i < gameSeek.gameOptions.length; i++) {
-						message += "<tr onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");' class='" + ((even)?("even"):("odd")) + "'><td><em>Game Option</td><td colspan='2'>" + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></td></tr>";
+						message += "<tr onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");' class='" + ((even)?("even"):("odd")) + "'><td><em>-Game Option</td><td colspan='2'>" + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></td></tr>";
 					}
 					even = !even;
 				}
@@ -4119,7 +4128,7 @@ function promptAddOption() {
   
 		  var playerIsSignedUp = false;
 		  if (tournamentInfo.currentPlayers.length > 0) {
-			  message += "<br /><br /><div class='modalContentHeading collapsibleHeading' onclick='toggleCollapsedContent(this, this.nextElementSibling)'>Players currently signed up:<span style='float:right'>+</span></div>";
+			  message += "<br /><br /><div class='modalContentHeading collapsibleHeading' onclick='toggleCollapsedContent(this, this.nextElementSibling)' class='collapsed'>Players currently signed up:<span style='float:right'>+</span></div>";
 			  message += "<div class='collapsibleContent' style='display:none'>"
 			  for (var i = 0; i < tournamentInfo.currentPlayers.length; i++) {
 				  message += tournamentInfo.currentPlayers[i].username + "<br />";
@@ -4136,8 +4145,8 @@ function promptAddOption() {
 			  for (var i = 0; i < tournamentInfo.rounds.length; i++) {
 				  var round = tournamentInfo.rounds[i];
 				  var roundName = htmlEscape(round.name);
-				  message += "<br /><div class='collapsibleHeading' onclick='toggleCollapsedContent(this, this.nextElementSibling)'>" + roundName + "<span style='float:right'>-</span></div>";
-				  message += "<div class='collapsibleContent'>"
+				  message += "<br /><div class='collapsibleHeading' onclick='toggleCollapsedContent(this, this.nextElementSibling)' class='collapsed'>" + roundName + "<span style='float:right'>+</span></div>";
+				  message += "<div class='collapsibleContent' style='display:none;'>"
 				  /* Display all games for round */
 				  var gamesFoundForRound = false;
 				  for (var j = 0; j < tournamentInfo.games.length; j++) {
@@ -4848,8 +4857,9 @@ function toggleCollapsedContent(headingDiv, contentDiv) {
     if (contentDiv.style.display === "block" || !contentDiv.style.display) {
 		contentDiv.style.display = "none";
 		headingDiv.children[0].innerText = "+";
+		headingDiv.classList.add("collapsed");
     } else {
 		contentDiv.style.display = "block";
-		headingDiv.children[0].innerText = "-";
+		headingDiv.classList.remove("collapsed");
     }
 }

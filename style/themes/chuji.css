@@ -95,7 +95,7 @@ div.tab button.active {
     border-radius: 7.5px;
 }
 .chatMessageInput {
-    padding-left: 0.8em;
+    padding: 0.8em;
     z-index: 0;
 }
 .button {
@@ -129,6 +129,7 @@ div.tab button.active {
   color: var(--secondary);
   background-color: var(--primary-text);
   box-shadow: 0px 0px 4px 1px var(--primary-text);
+  border-radius: 0.8em;
 }
 .skipBonus, .clickableText {
     color:var(--primary-text);
@@ -258,7 +259,29 @@ input, textarea, select {
     padding-left:5px;
     padding-right:5px;
 }
+
+.collapsibleHeading {
+    background-color: var(--primary);
+    border-top-left-radius:0.8em;
+    border-top-right-radius:0.8em;
+}
+.collapsibleHeading.collapsed {
+    background-color: var(--primary);
+    border-top-left-radius:0.8em;
+    border-top-right-radius:0.8em;
+    border-bottom-left-radius:0.8em;
+    border-bottom-right-radius:0.8em;
+}
+.collapsibleContent {
+    background-color: var(--secondary);
+    border-bottom-left-radius:0.8em;
+    border-bottom-right-radius:0.8em;
+}
+
 /*New Stuff*/
+/*body, input, textarea, button {
+    font: 12px 'Verdana';
+}*/
 #logo{
     max-height:45px;
     margin:auto;
@@ -271,7 +294,11 @@ table {
 td {
     cursor: pointer;
     padding:3px 0.8em;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
+td.name{color:var(--primary-text)}
 tr:first-child td:first-child { border-top-left-radius: 0.8em;}
 tr:first-child td:last-child { border-top-right-radius: 0.8em;}
 tr:last-child td:first-child {border-bottom-left-radius: 0.8em;}
@@ -355,15 +382,18 @@ hr{
     color:var(--primary-text);
 }
 .tr-footer td {border-top: 1px solid var(--primary-text);}
+.highlighted-game {
+    font-weight: bold;
+}
 .highlighted-game td{
-    border-top: 1px solid var(--primary-text);
-    border-bottom: 1px solid var(--primary-text);
+    border-top: 2px solid var(--primary-text);
+    border-bottom: 2px solid var(--primary-text);
 }
 .highlighted-game td:first-child{
-    border-left: 1px solid var(--primary-text);
+    border-left: 2px solid var(--primary-text);
 }
 .highlighted-game td:last-child{
-    border-right: 1px solid var(--primary-text);
+    border-right: 2px solid var(--primary-text);
 }
 div.tab .alertTab, div.tab .alertTab.active {
   background-color: var(--highlight);
@@ -375,7 +405,7 @@ div.tab .alertTab, div.tab .alertTab.active {
     }
     td {
         margin:0;
-        padding:3px 1px;
+        padding:5px 2px;
     }
     td.first {
         padding-left:5px;
@@ -404,4 +434,39 @@ div.tab .alertTab, div.tab .alertTab.active {
     ::-webkit-scrollbar {
         display:none;
     }
+}
+.chatMessagesDisplay{
+    margin-top:5px;
+    margin-bottom:10px;
+    border-radius:0.8em;
+}
+.chatMessageContainer {
+    display:flex;
+    flex-direction: column;
+    background-color: var(--secondary);
+    border-radius:0.8em;
+    padding:5px;
+}
+.chatMessage {
+    margin-top:3px;
+    margin-bottom:3px;
+    width:fit-content;
+}
+.chatMessage .message {
+    background-color: var(--secondary-text);
+    color:var(--primary);
+    border-radius:0.8em;
+    border-bottom-left-radius:0;
+    padding:3px 8px;
+    margin-top:1px;
+    display:inline-block;
+}
+.chatMessage.self .message {
+    background-color: var(--highlight);
+    color:var(--secondary-text);
+    border-bottom-right-radius:0;
+    border-bottom-left-radius:0.8em;
+}
+.chatMessage.self {
+    align-self: flex-end;
 }
