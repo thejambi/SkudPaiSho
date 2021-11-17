@@ -208,6 +208,7 @@ var deviceIdKey = "deviceIdKey";
 var deviceTokenKey = "deviceTokenKey";
 
 var showTimestampsKey = "showTimestamps";
+var showMoveLogsInChatKey = "showMoveLogsInChat";
 
 var welcomeTutorialDismissedKey = "welcomeTutorialDismissedKey";
 
@@ -706,20 +707,26 @@ var getNewChatMessagesCallback = function getNewChatMessagesCallback(results) {
 		for (var index in chatMessageList) {
 			var chatMessage = chatMessageList[index];
 
-			if (!chatMessage.message.includes("➢ ") || isTimestampsOn()) {
+			var isMoveLogMessage = chatMessage.message.includes("➢ ");
+
+			if (!isMoveLogMessage || isMoveLogDisplayOn()) {
 
 				var chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
 
 				newChatMessagesHtml += "<div class='chatMessage'>";
 
-				if (isTimestampsOn()) {
+				if (isTimestampsOn() || isMoveLogMessage) {
 					newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
 				}
 
-				newChatMessagesHtml += "<strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
+				if (isMoveLogMessage) {
+					newChatMessagesHtml += chatMessage.message.replace(/&amp;/g, '&') + "</div>";
+				} else {
+					newChatMessagesHtml += "<strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
+				}
 
 				// The most recent message will determine whether to alert
-				if (!usernameEquals(chatMessage.username)) {
+				if (!usernameEquals(chatMessage.username) && !isMoveLogMessage) {
 					// Set chat tab color to alert new messages if newest message is not from user
 					alertNewMessages = true;
 				} else {
@@ -4398,6 +4405,13 @@ function isTimestampsOn() {
 }
 function toggleTimestamps() {
 	localStorage.setItem(showTimestampsKey, !isTimestampsOn());
+	clearGameChats();
+}
+function isMoveLogDisplayOn() {
+	return localStorage.getItem(showMoveLogsInChatKey) === "true";
+}
+function toggleMoveLogDisplay() {
+	localStorage.setItem(showMoveLogsInChatKey, !isMoveLogDisplayOn());
 	clearGameChats();
 }
 
