@@ -715,7 +715,7 @@ var getNewChatMessagesCallback = function getNewChatMessagesCallback(results) {
 
 				newChatMessagesHtml += "<div class='chatMessage'>";
 
-				if (isTimestampsOn() || isMoveLogMessage) {
+				if (isTimestampsOn()) {
 					newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
 				}
 
