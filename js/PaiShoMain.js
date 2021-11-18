@@ -69,7 +69,8 @@ var QueryString = function () {
 	  chujiblue: "Chu Ji Canon - Blue",
 	  azulejosmono: "Azulejos Monocromos",
 	  azulejosdemadera: "Azulejos de Madera",
-	  tggroyal: "TGG Royal"
+	  tggroyal: "TGG Royal",
+	  custom: "Use Custom Designs"
   };
   
 var paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
@@ -335,7 +336,7 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 	  if (!localStorage.getItem(tileDesignTypeKey)) {
 		  setSkudTilesOption("tgggyatso");
 	  } else {
-		setSkudTilesOption(localStorage.getItem(tileDesignTypeKey));
+		setSkudTilesOption(localStorage.getItem(tileDesignTypeKey), true);
 	  }
   
 	  if (localStorage.getItem(paiShoBoardDesignTypeKey)) {
@@ -886,15 +887,19 @@ function setCustomBoardFromInput() {
 	clearMessage();
 }
   
-  /* Skud Pai Sho Tile Design Switches */
-  function setSkudTilesOption(newSkudTilesKey) {
-	  gameContainerDiv.classList.remove(skudTilesKey);
-	  localStorage.setItem(tileDesignTypeKey, newSkudTilesKey);
-	  skudTilesKey = newSkudTilesKey;
-	  gameContainerDiv.classList.add(skudTilesKey);
-	  gameController.callActuate();
-	  clearMessage(); // Refresh Help tab text
-  }
+/* Skud Pai Sho Tile Design Switches */
+function setSkudTilesOption(newSkudTilesKey, applyCustomBoolean) {
+	if (newSkudTilesKey === 'custom' && !applyCustomBoolean) {
+		promptForCustomTileDesigns(GameType.SkudPaiSho);
+	} else {
+		gameContainerDiv.classList.remove(skudTilesKey);
+		localStorage.setItem(tileDesignTypeKey, newSkudTilesKey);
+		skudTilesKey = newSkudTilesKey;
+		gameContainerDiv.classList.add(skudTilesKey);
+		gameController.callActuate();
+		clearMessage(); // Refresh Help tab text
+	}
+}
   
   function getSelectedTileDesignTypeDisplayName() {
 	  return tileDesignTypeValues[localStorage.getItem(tileDesignTypeKey)];
@@ -4581,4 +4586,22 @@ function toggleCollapsedContent(headingDiv, contentDiv) {
 		contentDiv.style.display = "block";
 		headingDiv.children[0].innerText = "-";
     }
+}
+
+function setCustomTileDesignsFromInput() {
+	var url = document.getElementById('customTileDesignsUrlInput').value;
+	url = url.substring(0, url.lastIndexOf("/") + 1);
+	if (gameController && gameController.setCustomTileDesignUrl) {
+		gameController.setCustomTileDesignUrl(url);
+	}
+}
+
+function promptForCustomTileDesigns(gameType) {
+	var message = "<p>You can use fan-created tile design sets. See the #custom-tile-designs channel in The Garden Gate Discord. Copy and paste the link to one of the images here:</p>";
+	// message += "<br />Name: <input type='text' id='customTileDesignsNameInput' name='customTileDesignsNameInput' /><br />";
+	message += "<br />URL: <input type='text' id='customTileDesignsUrlInput' name='customTileDesignsUrlInput' /><br />";
+	message += "<br /><div class='clickableText' onclick='closeModal();setCustomTileDesignsFromInput()'>Apply Custom Tile Designs for " + gameType.desc + "</div>";
+	// message += "<br /><br /><div class='clickableText' onclick='clearCustomBoardEntries()'>Clear Custom Boards</div>";
+
+	showModal("Use Custom Tile Designs", message);
 }

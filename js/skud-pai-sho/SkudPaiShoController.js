@@ -1,7 +1,16 @@
 /* Skud Pai Sho specific UI interaction logic */
 
+var SkudConstants = {
+	preferencesKey = "SkudPaiShoPreferencesKey"
+};
+var SkudPreferences = {
+	customTilesUrl: ""
+};
+
 function SkudPaiShoController(gameContainer, isMobile) {
 	this.actuator = new SkudPaiShoActuator(gameContainer, isMobile, isAnimationsOn());
+
+	SkudPaiShoController.loadPreferences();
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -12,6 +21,13 @@ function SkudPaiShoController(gameContainer, isMobile) {
 
 	this.isPaiShoGame = true;
 }
+
+SkudPaiShoController.loadPreferences = function() {
+	var savedPreferences = JSON.parse(localStorage.getItem(SkudConstants.preferencesKey));
+	if (savedPreferences) {
+		SkudPreferences = savedPreferences;
+	}
+};
 
 SkudPaiShoController.hideHarmonyAidsKey = "HideHarmonyAids";
 
@@ -794,4 +810,18 @@ SkudPaiShoController.prototype.toggleHarmonyAids = function() {
 
 SkudPaiShoController.prototype.setAnimationsOn = function(isAnimationsOn) {
 	this.actuator.setAnimationOn(isAnimationsOn);
+};
+
+SkudPaiShoController.isUsingCustomTileDesigns = function() {
+	return skudTilesKey === 'custom';
+};
+
+SkudPaiShoController.getCustomTileDesignsUrl = function() {
+	return SkudPreferences.customTilesUrl;
+};
+
+SkudPaiShoController.prototype.setCustomTileDesignUrl = function(url) {
+	SkudPreferences.customTilesUrl = url;
+	localStorage.setItem(SkudConstants.preferencesKey, JSON.stringify(SkudPreferences));
+	setSkudTilesOption('custom', true);
 };

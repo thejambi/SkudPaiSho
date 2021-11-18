@@ -1,11 +1,20 @@
 /* Vagabond Pai Sho specific UI interaction logic */
 
+var VagabondConstants = {
+	preferencesKey = "VagabondPreferencesKey"
+};
+var VagabondPreferences = {
+	customTilesUrl: ""
+};
+
 function VagabondController(gameContainer, isMobile) {
 	/* Set default preferences */
 	if (!localStorage.getItem(vagabondTileDesignTypeKey)
 			|| !VagabondController.tileDesignTypeValues[localStorage.getItem(vagabondTileDesignTypeKey)]) {
 		localStorage.setItem(vagabondTileDesignTypeKey, "tggvagabond");
 	}
+
+	VagabondController.loadPreferences();
 
 	this.actuator = new VagabondActuator(gameContainer, isMobile, this.isAnimationsEnabled());
 
@@ -18,6 +27,13 @@ function VagabondController(gameContainer, isMobile) {
 
 	this.isPaiShoGame = true;
 }
+
+VagabondController.loadPreferences = function() {
+	var savedPreferences = JSON.parse(localStorage.getItem(VagabondConstants.preferencesKey));
+	if (savedPreferences) {
+		VagabondPreferences = savedPreferences;
+	}
+};
 
 VagabondController.animationsEnabledKey = "AnimationsEnabled";
 
@@ -564,14 +580,36 @@ VagabondController.tileDesignTypeValues = {
 	canon: "Canon colors Garden Gate Designs",
 	owl: "Order of the White Lotus Garden Gate Designs",
 	royal: "TGG Royal",
-	royalkoiwheel: "TGG Royal Koi-Wheel"
+	royalkoiwheel: "TGG Royal Koi-Wheel",
+	custom: "Use Custom Designs"
 };
 
 VagabondController.setTileDesignsPreference = function(tileDesignKey) {
-	localStorage.setItem(vagabondTileDesignTypeKey, tileDesignKey);
+	if (tileDesignKey === 'custom') {
+		promptForCustomTileDesigns(GameType.VagabondPaiSho);
+	} else {
+		localStorage.setItem(vagabondTileDesignTypeKey, tileDesignKey);
+		if (gameController && gameController.callActuate) {
+			gameController.callActuate();
+		}
+	}
+};
+
+VagabondController.prototype.setCustomTileDesignUrl = function(url) {
+	VagabondPreferences.customTilesUrl = url;
+	localStorage.setItem(VagabondConstants.preferencesKey, JSON.stringify(VagabondPreferences));
+	localStorage.setItem(vagabondTileDesignTypeKey, 'custom');
 	if (gameController && gameController.callActuate) {
 		gameController.callActuate();
 	}
+};
+
+VagabondController.isUsingCustomTileDesigns = function() {
+	return localStorage.getItem(vagabondTileDesignTypeKey) === "custom";
+};
+
+VagabondController.getCustomTileDesignsUrl = function() {
+	return VagabondPreferences.customTilesUrl;
 };
 
 VagabondController.buildTileDesignDropdownDiv = function(alternateLabelText) {

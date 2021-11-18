@@ -271,8 +271,11 @@ function applyBoardOptionToBgSvg(bgSvgIfKnown) {
 }
 
 function getSkudTilesSrcPath() {
-	var srcValue = "images/SkudPaiSho/" + skudTilesKey + "/";
-	return srcValue;
+	if (SkudPaiShoController.isUsingCustomTileDesigns()) {
+		return SkudPaiShoController.getCustomTileDesignsUrl();
+	} else {
+		return "images/SkudPaiSho/" + skudTilesKey + "/";
+	}
 }
 
 function isSamePoint(movePoint, x, y) {
