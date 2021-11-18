@@ -50,7 +50,18 @@ Trifle.TileCodes = {
 	FireLily: 'FireLily',
 	GrassWeed: "GrassWeed",
 	GrippingGrass: "GrippingGrass",
-	Saffron: "Saffron"
+	Saffron: "Saffron",
+
+	/* Ginseng work */
+	GinsengWhiteLotus: "GinsengWhiteLotus",
+	GinsengKoi: "GinsengKoi",
+	GinsengBadgermole: "GinsengBadgermole",
+	GinsengDragon: "GinsengDragon",
+	GinsengBison: "GinsengBison",
+	GinsengLionTurtle: "GinsengLionTurtle",
+	GinsengGinseng: "GinsengGinseng",
+	GinsengOrchid: "GinsengOrchid",
+	GinsengWheel: "GinsengWheel"
 };
 
 Trifle.TileType = {
@@ -74,7 +85,8 @@ Trifle.TileCategory = {
 	allButThisTile: "allButThisTile",
 	allTileTypes: "allTileTypes",
 	landingTile: "landingTile",
-	surroundingTiles: "surroundingTiles"
+	surroundingTiles: "surroundingTiles",
+	tileWithAbility: "tileWithAbility"
 };
 
 Trifle.TargetType = {
@@ -103,7 +115,14 @@ Trifle.MovementType = {
 	withinFriendlyTileZone: "withinFriendlyTileZone",
 	anywhere: "anywhere",
 	jumpShape: "jumpShape",
-	travelShape: "travelShape"
+	travelShape: "travelShape",
+	awayFromTargetTileOrthogonal: "awayFromTargetTileOrthogonal",
+	jumpSurroundingTiles: "jumpSurroundingTiles"
+};
+
+Trifle.MovementDirection = {
+	orthogonal: "orthogonal",
+	diagonal: "diagonal"
 };
 
 Trifle.MovementRestriction = {
@@ -174,7 +193,8 @@ Trifle.AbilityName = {
 	cancelAbilitiesTargetingTiles: "cancelAbilitiesTargetingTiles",
 	prohibitTileFromCapturing: "prohibitTileFromCapturing",
 	changeMovementDistanceByFactor: "changeMovementDistanceByFactor",
-	growGigantic: "growGigantic"
+	growGigantic: "growGigantic",
+	moveTargetTile: "moveTargetTile"
 };
 
 Trifle.AbilityType = {
@@ -1093,6 +1113,12 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				targetTileCodes: [Trifle.TileCodes.FireLily],
 				captureTypes: [Trifle.CaptureType.all]
 			}
+			// ,
+			// {
+			// 	type: Trifle.MovementType.withinFriendlyTileZone,
+			// 	targetTileCodes: [Trifle.TileCodes.Dragon],
+			// 	captureTypes: [Trifle.CaptureType.all]
+			// }
 		],
 		textLines: [
 			"Animal | Fire",
@@ -1255,20 +1281,28 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				captureTypes: [Trifle.CaptureType.all]
 			}
 		], // Ability testing...
-		attributes: [	// Attribute - for looking at when placing a piece, etc
-			Trifle.AttributeType.gigantic
-		],
-		abilities: [	// Ability - for when on the board
+		abilities: [
 			{
-				type: Trifle.AbilityName.growGigantic,
+				type: Trifle.AbilityName.moveTargetTile,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsOnBoard,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
+						triggerType: Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile,
+						targetTeams: [Trifle.TileTeam.friendly]
 					}
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
-				inevitable: true
+				targetTileMovements: [
+					{
+						type: Trifle.MovementType.awayFromTargetTileOrthogonal,
+						distance: 2,
+						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
+					},
+					{
+						type: Trifle.MovementType.awayFromTargetTileDiagonal,
+						distance: 1,
+						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
+					}
+				]
 			}
 		]
 	};
@@ -1367,6 +1401,22 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			]
 		}
 	}; */
+
+	TrifleTiles[Trifle.TileCodes.GinsengWhiteLotus] = {
+		available: true,
+		//
+		types: [Trifle.TileType.traveler],
+		deployTypes: [Trifle.DeployType.temple],
+		//
+		movements: [
+			{
+				type: Trifle.MovementType.jumpSurroundingTiles,
+				jumpDirections: [Trifle.MovementDirection.diagonal],
+				targetTileTeams: [Trifle.TileTeam.friendly],
+				distance: 99
+			}
+		]
+	};
 
 	Trifle.TrifleTiles = TrifleTiles;
 };
