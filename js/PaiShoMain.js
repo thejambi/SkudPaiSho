@@ -890,7 +890,7 @@ function setCustomBoardFromInput() {
 /* Skud Pai Sho Tile Design Switches */
 function setSkudTilesOption(newSkudTilesKey, applyCustomBoolean) {
 	if (newSkudTilesKey === 'custom' && !applyCustomBoolean) {
-		promptForCustomTileDesigns(GameType.SkudPaiSho);
+		promptForCustomTileDesigns(GameType.SkudPaiSho, SkudPreferences.customTilesUrl);
 	} else {
 		gameContainerDiv.classList.remove(skudTilesKey);
 		localStorage.setItem(tileDesignTypeKey, newSkudTilesKey);
@@ -4596,10 +4596,16 @@ function setCustomTileDesignsFromInput() {
 	}
 }
 
-function promptForCustomTileDesigns(gameType) {
+function promptForCustomTileDesigns(gameType, existingCustomTilesUrl) {
 	var message = "<p>You can use fan-created tile design sets. See the #custom-tile-designs channel in The Garden Gate Discord. Copy and paste the link to one of the images here:</p>";
 	// message += "<br />Name: <input type='text' id='customTileDesignsNameInput' name='customTileDesignsNameInput' /><br />";
-	message += "<br />URL: <input type='text' id='customTileDesignsUrlInput' name='customTileDesignsUrlInput' /><br />";
+	
+	message += "<br />URL: <input type='text' id='customTileDesignsUrlInput' name='customTileDesignsUrlInput'";
+	if (existingCustomTilesUrl) {
+		message += " value='" + existingCustomTilesUrl + "'";
+	}
+	message += " /><br />";
+	
 	message += "<br /><div class='clickableText' onclick='closeModal();setCustomTileDesignsFromInput()'>Apply Custom Tile Designs for " + gameType.desc + "</div>";
 	// message += "<br /><br /><div class='clickableText' onclick='clearCustomBoardEntries()'>Clear Custom Boards</div>";
 

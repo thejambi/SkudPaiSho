@@ -586,7 +586,7 @@ VagabondController.tileDesignTypeValues = {
 
 VagabondController.setTileDesignsPreference = function(tileDesignKey) {
 	if (tileDesignKey === 'custom') {
-		promptForCustomTileDesigns(GameType.VagabondPaiSho);
+		promptForCustomTileDesigns(GameType.VagabondPaiSho, VagabondPreferences.customTilesUrl);
 	} else {
 		localStorage.setItem(vagabondTileDesignTypeKey, tileDesignKey);
 		if (gameController && gameController.callActuate) {
