@@ -2074,7 +2074,8 @@ var GameType = {
 		secretGameOptions: [
 			DIAGONAL_MOVEMENT,
 			EVERYTHING_CAPTURE,
-			IGNORE_CLASHING
+			IGNORE_CLASHING,
+			VARIABLE_ACCENT_TILES	// In development
 		]
 	},
 	VagabondPaiSho: {
@@ -2107,6 +2108,16 @@ var GameType = {
 			ETHEREAL_ACCENT_TILES
 		],
 		noRankedGames: true	// Can take out when testing done, game ready to enable ranked games
+	},
+	Ginseng: {
+		id: 18,
+		desc: "Ginseng Pai Sho",
+		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho'
+		],
+		noRankedGames: true
 	},
 	SolitairePaiSho: {
 		id: 4,
@@ -2329,6 +2340,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.FirePaiSho.id:
 			controller = new FirePaiShoController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Ginseng.id:
+			controller = new Ginseng.Controller(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
@@ -3185,7 +3199,7 @@ function randomIntFromInterval(min, max) {
 
 function closeGame() {
 	if (gameDevOn) {
-		setGameController(GameType.Trifle.id);
+		setGameController(GameType.Ginseng.id);
 		return;
 	}
 	var defaultGameTypeIds = [

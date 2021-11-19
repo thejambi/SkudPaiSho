@@ -16,6 +16,7 @@ Trifle.GameManager = function(actuator, ignoreActuate, isCopy) {
 Trifle.GameManager.prototype.setup = function (ignoreActuate) {
 
 	this.board = new PaiShoGames.Board(this.tileManager);
+	this.board.useTrifleTempleRules = true;
 	this.board.useBannerCaptureSystem = true;
 	this.winners = [];
 	this.hostBannerPlayed = false;

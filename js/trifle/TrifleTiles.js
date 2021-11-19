@@ -149,7 +149,12 @@ Trifle.MoveDirection = {
 Trifle.CaptureType = {
 	none: "none",
 	all: "all",
-	tilesTargetedByAbility: "tilesTargetedByAbility"
+	tilesTargetedByAbility: "tilesTargetedByAbility",
+	allExcludingCertainTiles: "allExcludingCertainTiles"
+};
+
+Trifle.ActivationRequirement = {
+	tilesNotInTemple: "tilesNotInTemple"
 };
 
 Trifle.ZoneAbility = {
@@ -232,7 +237,7 @@ Trifle.TrifleTiles = {};
 Trifle.TileInfo = {};
 
 Trifle.TileInfo.tileIsBanner = function(tileInfo) {
-	return tileInfo && tileInfo.types.includes(Trifle.TileType.banner);
+	return tileInfo && tileInfo.types && tileInfo.types.includes(Trifle.TileType.banner);
 };
 
 Trifle.TileInfo.tileIsOneOfTheseTypes = function(tileInfo, types) {
