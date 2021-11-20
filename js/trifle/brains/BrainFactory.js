@@ -13,6 +13,8 @@ Trifle.BrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, 
 			return new Trifle.WhileTargetTileIsOnBoardTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whileTargetTileIsAdjacent:
 			return new Trifle.WhileTargetTileIsAdjacentTriggerBrain(triggerContext);
+		case Trifle.AbilityTriggerType.whileTargetTileIsSurrounding:
+			return new Trifle.WhileTargetTileIsSurroundingTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whileTargetTileIsInZone:
 			return new Trifle.WhileTargetTileIsInZoneTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight:

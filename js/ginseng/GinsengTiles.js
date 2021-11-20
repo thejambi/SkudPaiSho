@@ -46,7 +46,31 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			{
 				type: Trifle.MovementType.standard,
 				distance: 5,
-				captureTypes: [ Trifle.CaptureType.all ]
+				captureTypes: [
+					{
+						type: Trifle.CaptureType.all
+					}
+				]
+			}
+		],
+		abilities: [
+			{
+				type: Trifle.AbilityName.immobilizeTiles,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+						targetTeams: [Trifle.TileTeam.enemy],
+						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						activationRequirements: [
+							{
+								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [Trifle.TileCategory.thisTile],
+								targetPointTypes: [WHITE]
+							}
+						]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			}
 		],
 		textLines: [
@@ -61,7 +85,11 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			{
 				type: Trifle.MovementType.standard,
 				distance: 5,
-				captureTypes: [ Trifle.CaptureType.all ]
+				captureTypes: [
+					{
+						type: Trifle.CaptureType.all
+					}
+				]
 			}
 		],
 		textLines: [
@@ -76,7 +104,11 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			{
 				type: Trifle.MovementType.standard,
 				distance: 5,
-				captureTypes: [ Trifle.CaptureType.all ]
+				captureTypes: [
+					{
+						type: Trifle.CaptureType.all
+					}
+				]
 			}
 		],
 		textLines: [
@@ -91,7 +123,11 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			{
 				type: Trifle.MovementType.standard,
 				distance: 5,
-				captureTypes: [ Trifle.CaptureType.all ]
+				captureTypes: [
+					{
+						type: Trifle.CaptureType.all
+					}
+				]
 			}
 		],
 		textLines: [
@@ -109,14 +145,14 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				captureTypes: [
 					{
 						type: Trifle.CaptureType.allExcludingCertainTiles,
-						excludedTileCodes: [Ginseng.TileCodes.LionTurtle],
-						activationRequirements: [
+						excludedTileCodes: [Ginseng.TileCodes.LionTurtle]
+						/* activationRequirements: [
 							{
 								type: Trifle.ActivationRequirement.tilesNotInTemple,
 								targetTileCodes: [Ginseng.TileCodes.WhiteLotus],
 								targetTileTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy]
 							}
-						]
+						] */
 					}
 				],
 			}
@@ -128,14 +164,14 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					{
 						triggerType: Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile,
 						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Ginseng.TileType.originalBender],
-						activationRequirements: [
+						targetTileTypes: [Ginseng.TileType.originalBender]
+						/* activationRequirements: [
 							{
 								type: Trifle.ActivationRequirement.tilesNotInTemple,
 								targetTileCodes: [Ginseng.TileCodes.WhiteLotus],
 								targetTileTeams: [Trifle.TileTeam.friendly]
 							}
-						]
+						] */
 					}
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
@@ -152,8 +188,17 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		movements: [
 			{
 				type: Trifle.MovementType.standard,
-				distance: 5,
-				captureTypes: [ Trifle.CaptureType.all ]
+				distance: 99,
+				captureTypes: [
+					{
+						type: Trifle.CaptureType.all
+					}
+				],
+				restrictions: [
+					{
+						type: Trifle.MovementRestriction.mustPreserveDirection
+					}
+				]
 			}
 		],
 		textLines: [
@@ -168,7 +213,11 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			{
 				type: Trifle.MovementType.standard,
 				distance: 5,
-				captureTypes: [ Trifle.CaptureType.all ]
+				captureTypes: [
+					{
+						type: Trifle.CaptureType.all
+					}
+				]
 			}
 		],
 		textLines: [
@@ -183,13 +232,59 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			{
 				type: Trifle.MovementType.standard,
 				distance: 5,
-				captureTypes: [ Trifle.CaptureType.all ]
+				captureTypes: [
+					{
+						type: Trifle.CaptureType.all
+					}
+				]
 			}
 		],
 		textLines: [
 			"Orchid"
 		]
 	};
+
+	/* Apply Capture and Ability Activation Requirements Rules */
+	Object.keys(GinsengTiles).forEach(function(key, index) {
+		var tileInfo = GinsengTiles[key];
+		if (tileInfo.movements && tileInfo.movements.length) {
+			tileInfo.movements.forEach(function(movementInfo) {
+				if (movementInfo.captureTypes && movementInfo.captureTypes.length) {
+					movementInfo.captureTypes.forEach(function(captureTypeInfo) {
+						var activationRequirement = {
+							type: Trifle.ActivationRequirement.tilesNotInTemple,
+							targetTileCodes: [Ginseng.TileCodes.WhiteLotus],
+							targetTileTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy]
+						};
+						if (captureTypeInfo.activationRequirements) {
+							captureTypeInfo.activationRequirements.push(activationRequirement);
+						} else {
+							captureTypeInfo["activationRequirements"] = [activationRequirement];
+						}
+					});
+				}
+			});
+		}
+
+		if (tileInfo.abilities && tileInfo.abilities.length) {
+			tileInfo.abilities.forEach(function(abilityInfo) {
+				if (abilityInfo.triggers && abilityInfo.triggers.length) {
+					abilityInfo.triggers.forEach(function(triggerInfo) {
+						var triggerActivationRequirement = {
+							type: Trifle.ActivationRequirement.tilesNotInTemple,
+							targetTileCodes: [Ginseng.TileCodes.WhiteLotus],
+							targetTileTeams: [Trifle.TileTeam.friendly]
+						};
+						if (triggerInfo.activationRequirements) {
+							triggerInfo.activationRequirements.push(triggerActivationRequirement);
+						} else {
+							triggerInfo["activationRequirements"] = [triggerActivationRequirement];
+						}
+					});
+				}
+			});
+		}
+	});
 
 	Ginseng.GinsengTiles = GinsengTiles;
 };

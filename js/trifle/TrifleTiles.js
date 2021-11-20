@@ -154,7 +154,8 @@ Trifle.CaptureType = {
 };
 
 Trifle.ActivationRequirement = {
-	tilesNotInTemple: "tilesNotInTemple"
+	tilesNotInTemple: "tilesNotInTemple",
+	tileIsOnPointOfType: "tileIsOnPointOfType"
 };
 
 Trifle.ZoneAbility = {
@@ -218,6 +219,7 @@ Trifle.AbilityTriggerType = {
 	whileTargetTileIsOnBoard: "whileTargetTileIsOnBoard",
 	whileOnBoard: "whileOnBoard",	// Remove?
 	whileTargetTileIsAdjacent: "whileTargetTileIsAdjacent",
+	whileTargetTileIsSurrounding: "whileTargetTileIsSurrounding",
 	whenLandsAdjacentToTargetTile: "whenLandsAdjacentToTargetTile",
 	whenTargetTileLandsAdjacent: "whenTargetTileLandsAdjacent",
 	whileTargetTileIsInZone: "whileTargetTileIsInZone"
