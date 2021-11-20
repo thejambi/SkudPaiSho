@@ -111,6 +111,46 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				]
 			}
 		],
+		abilities: [
+			{
+				type: Trifle.AbilityName.protectFromCapture,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+						targetTeams: [Trifle.TileTeam.friendly],
+						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						activationRequirements: [
+							{
+								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [Trifle.TileCategory.thisTile],
+								targetPointTypes: [WHITE]
+							}
+						]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			},
+			{
+				type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+						targetTeams: [Trifle.TileTeam.friendly],
+						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						activationRequirements: [
+							{
+								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [Trifle.TileCategory.thisTile],
+								targetPointTypes: [WHITE]
+							}
+						]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				targetAbilityTypes: [Trifle.AbilityType.all],
+				cancelAbilitiesFromTeam: Trifle.TileTeam.enemy
+			}
+		],
 		textLines: [
 			"Badgermole | Original Bender"
 		]
@@ -146,13 +186,6 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					{
 						type: Trifle.CaptureType.allExcludingCertainTiles,
 						excludedTileCodes: [Ginseng.TileCodes.LionTurtle]
-						/* activationRequirements: [
-							{
-								type: Trifle.ActivationRequirement.tilesNotInTemple,
-								targetTileCodes: [Ginseng.TileCodes.WhiteLotus],
-								targetTileTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy]
-							}
-						] */
 					}
 				],
 			}
@@ -165,13 +198,6 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						triggerType: Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile,
 						targetTeams: [Trifle.TileTeam.enemy],
 						targetTileTypes: [Ginseng.TileType.originalBender]
-						/* activationRequirements: [
-							{
-								type: Trifle.ActivationRequirement.tilesNotInTemple,
-								targetTileCodes: [Ginseng.TileCodes.WhiteLotus],
-								targetTileTeams: [Trifle.TileTeam.friendly]
-							}
-						] */
 					}
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]

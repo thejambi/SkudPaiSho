@@ -238,6 +238,7 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 
 			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
 				this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
+				// TODO - Does move require user to choose targets?... 
 				this.completeMove();
 			} else {
 				this.resetNotationBuilder();

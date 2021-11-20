@@ -1159,6 +1159,9 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 
 	var abilityActivationFlags = this.abilityManager.activateReadyAbilities();
 
+	/* Debugging */
+	debug(this.abilityManager.abilities);
+
 	if (abilityActivationFlags.boardHasChanged) {
 		// Need to re-process abilities... 
 		// Pass in some sort of context from the activation flags???
