@@ -92,6 +92,26 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				]
 			}
 		],
+		abilities: [
+			{
+				type: Trifle.AbilityName.captureTargetTiles,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
+						targetTeams: [Trifle.TileTeam.enemy],
+						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						activationRequirements: [
+							{
+								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [Trifle.TileCategory.thisTile],
+								targetPointTypes: [RED]
+							}
+						]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			}
+		],
 		textLines: [
 			"Dragon | Original Bender"
 		]

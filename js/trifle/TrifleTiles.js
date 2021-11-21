@@ -221,6 +221,7 @@ Trifle.AbilityTriggerType = {
 	whileTargetTileIsAdjacent: "whileTargetTileIsAdjacent",
 	whileTargetTileIsSurrounding: "whileTargetTileIsSurrounding",
 	whenLandsAdjacentToTargetTile: "whenLandsAdjacentToTargetTile",
+	whenLandsSurroundingTargetTile: "whenLandsSurroundingTargetTile",
 	whenTargetTileLandsAdjacent: "whenTargetTileLandsAdjacent",
 	whileTargetTileIsInZone: "whileTargetTileIsInZone"
 };
