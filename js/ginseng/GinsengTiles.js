@@ -36,6 +36,19 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				targetTileTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy],
 				distance: 99
 			}
+		],
+		abilities: [
+			{
+				type: Trifle.AbilityName.protectFromCapture,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight,
+						targetTeams: [Trifle.TileTeam.friendly],
+						targetTileCodes: [Ginseng.TileCodes.Ginseng]
+					}
+				],
+				targetTypes: [Trifle.TargetType.thisTile]
+			}
 		]
 	};
 

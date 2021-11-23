@@ -57,6 +57,8 @@ Trifle.BrainFactory.createTargetBrain = function(targetType, abilityObject) {
 			return new Trifle.AllTilesTargetBrain(abilityObject);
 		case Trifle.TargetType.surroundingTiles:
 			return new Trifle.SurroundingTilesTargetBrain(abilityObject);
+		case Trifle.TargetType.thisTile:
+			return new Trifle.ThisTileTargetBrain(abilityObject);
 	}
 };
 
