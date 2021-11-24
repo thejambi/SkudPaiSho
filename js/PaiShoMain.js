@@ -118,6 +118,7 @@ var paiShoBoardDesignTypeValuesDefault = {
 	lightmode: "Old Default Light Mode",
 	darkmode: "Old Default Dark Mode",
 	adevar: "Adevăr",
+	adevarrose: "Adevăr Rose",
 	applycustomboard: "Add Custom Board from URL"
 };
 
@@ -213,6 +214,8 @@ var showMoveLogsInChatKey = "showMoveLogsInChat";
 
 var welcomeTutorialDismissedKey = "welcomeTutorialDismissedKey";
 
+var customBgColorKey = "customBgColorKey";
+
 var url;
 
 var defaultHelpMessageText;
@@ -305,6 +308,11 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 	  }
   
 	  applyDataTheme();
+
+	  var customBgColorValue = localStorage.getItem(customBgColorKey);
+	  if (customBgColorValue) {
+		  setBackgroundColor(customBgColorValue);
+	  }
   
 	  defaultEmailMessageText = document.querySelector(".footer").innerHTML;
 
@@ -3710,7 +3718,7 @@ function addOptionFromInput() {
 	addGameOption(document.getElementById('optionAddInput').value);
 	closeModal();
 }
-  
+
 function promptAddOption() {
 	var message = "";
 	if (usernameIsOneOf(['SkudPaiSho'])) {
@@ -4462,11 +4470,52 @@ function confirmMoveClicked() {
 	hideConfirmMoveButton();
 }
 
+var customBackgroundColor = "";
+
+const isValidColor = (strColor) => {
+	const s = new Option().style;
+	s.color = strColor;
+	return s.color !== '';
+}
+
+function setBackgroundColor(colorValueStr) {
+	if (isValidColor(colorValueStr)) {
+		document.body.style.background = colorValueStr;
+	}
+}
+
+function setCustomBgColorFromInput() {
+	var customValueInput = document.getElementById("customBgColorInput");
+
+	if (customValueInput) {
+		var customValue = customValueInput.value;
+		if (isValidColor(customValue)) {
+			document.body.style.background = customValue;
+			localStorage.setItem(customBgColorKey, customValue);
+		} else {
+			document.body.style.background = "";
+			localStorage.removeItem(customBgColorKey);
+		}
+	}
+}
+
 function showPreferences() {
 	var message = "";
 
 	var checkedValue = isMoveConfirmationRequired() ? "checked='true'" : "";
 	message += "<div><input id='confirmMoveBeforeSubmittingCheckbox' type='checkbox' onclick='toggleConfirmMovePreference();' " + checkedValue + "'><label for='confirmMoveBeforeSubmittingCheckbox'> Confirm move before submitting?</label></div>";
+
+	var customBgColorValue = localStorage.getItem(customBgColorKey);
+	if (!customBgColorValue) {
+		customBgColorValue = "";
+	}
+	message += '<br /><div>Custom <code>html</code> background color code: <input type="text" id="customBgColorInput" value="'+ customBgColorValue +'" oninput="setCustomBgColorFromInput()" maxlength="15"></div>';
+
+	var soundOnCheckedValue = soundManager.isMoveSoundsEnabled() ? "checked='true'" : "";
+	message += "<br /><div><input id='soundsOnCheckBox' type='checkbox' onclick='toggleSoundOn();' " + soundOnCheckedValue + "'><label for='soundsOnCheckBox'> Move sounds enabled?</label></div>";
+	
+	var animationsOnCheckedValue = isAnimationsOn() ? "checked='true'" : "";
+	message += "<div><input id='animationsOnCheckBox' type='checkbox' onclick='toggleAnimationsOn();' " + animationsOnCheckedValue + "'><label for='animationsOnCheckBox'> Move animations enabled?</label></div>";
 
 	showModal("Device Preferences", message);
 }
