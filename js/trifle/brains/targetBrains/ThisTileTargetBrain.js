@@ -14,7 +14,7 @@ Trifle.ThisTileTargetBrain = class {
 		this.targetTiles = [];
 		this.targetTilePoints = [];
 
-		var targetHelper = new Trifle.TargetHelper(this.abilityObject, this.abilityObject.sourceTilePoint, this);
+		var targetHelper = new Trifle.TargetHelper(this.abilityObject, this.abilityObject.sourceTilePoint, this, this.abilityObject.sourceTile);
 		if (targetHelper.tileIsTargeted()) {
 			this.targetTiles.push(this.abilityObject.sourceTile);
 			this.targetTilePoints.push(this.abilityObject.sourceTilePoint);

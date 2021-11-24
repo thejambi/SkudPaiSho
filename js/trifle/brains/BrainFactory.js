@@ -33,6 +33,8 @@ Trifle.BrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, 
 			return new Trifle.WhenLandsSurroundingTargetTileTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whenTargetTileLandsAdjacent:
 			return new Trifle.WhenTargetTileLandsAdjacentTriggerBrain(triggerContext);
+		case Trifle.AbilityTriggerType.whenDeployed:
+			return new Trifle.WhenDeployedTriggerBrain(triggerContext);
 	}
 };
 
@@ -44,6 +46,10 @@ Trifle.BrainFactory.createAbilityBrain = function(abilityName, abilityObject) {
 			return new Trifle.CaptureTargetTilesAbilityBrain(abilityObject);
 		case Trifle.AbilityName.growGigantic:
 			return new Trifle.GrowGiganticAbilityBrain(abilityObject);
+		case Trifle.AbilityName.recordTilePoint:
+			return new Trifle.RecordTilePointAbilityBrain(abilityObject);
+		case Trifle.AbilityName.moveTileToRecordedPoint:
+			return new Trifle.MoveTileToRecordedPointAbilityBrain(abilityObject);
 		default:
 			return new Trifle.SimpleOngoingAbilityBrain(abilityObject);
 	}

@@ -29,6 +29,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 
 	GinsengTiles[Ginseng.TileCodes.WhiteLotus] = {
 		available: true,
+		types: [Ginseng.TileCodes.WhiteLotus],
 		movements: [
 			{
 				type: Trifle.MovementType.jumpSurroundingTiles,
@@ -48,6 +49,28 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					}
 				],
 				targetTypes: [Trifle.TargetType.thisTile]
+			},
+			{
+				type: Trifle.AbilityName.recordTilePoint,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whenDeployed,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				recordTilePointType: Trifle.RecordTilePointType.startPoint
+			},
+			{
+				type: Trifle.AbilityName.moveTileToRecordedPoint,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whenCapturedByTargetTile,
+						targetTileTypes: [Trifle.TileCategory.allTileTypes]
+					}
+				],
+				targetTypes: [Trifle.TargetType.thisTile],
+				recordedPointType: Trifle.RecordTilePointType.startPoint
 			}
 		]
 	};
@@ -327,7 +350,8 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 
 		if (tileInfo.abilities && tileInfo.abilities.length) {
 			tileInfo.abilities.forEach(function(abilityInfo) {
-				if (abilityInfo.triggers && abilityInfo.triggers.length) {
+				if (abilityInfo.type !== Trifle.AbilityName.recordTilePoint 
+						&& abilityInfo.triggers && abilityInfo.triggers.length) {
 					abilityInfo.triggers.forEach(function(triggerInfo) {
 						var triggerActivationRequirement = {
 							type: Trifle.ActivationRequirement.tilesNotInTemple,

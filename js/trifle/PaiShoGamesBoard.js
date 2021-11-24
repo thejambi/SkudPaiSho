@@ -12,6 +12,7 @@ PaiShoGames.Board = function(tileManager) {
 	this.tileMetadata = PaiShoGames.currentTileMetadata;
 
 	this.activeDurationAbilities = [];
+	this.recordedTilePoints = {};
 
 	this.tileManager = tileManager;
 
@@ -432,6 +433,9 @@ PaiShoGames.Board.prototype.getGrowGiantOccupiedPoints = function(boardPointToGr
 };
 
 PaiShoGames.Board.prototype.getPointFromNotationPoint = function(notationPoint) {
+	if (notationPoint.isType) {
+		return notationPoint;	// It's actually what we want already
+	}
 	var rowAndCol = notationPoint.rowAndColumn;
 	return this.cells[rowAndCol.row][rowAndCol.col];
 };
@@ -1110,9 +1114,7 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 		if (tileInfo.abilities) {
 			tileInfo.abilities.forEach(function(tileAbilityInfo) {
 				/* Check that ability trigger is "When Captured By Target Tile" - or in future, any other triggers that apply to captured tiles */
-				if (tileAbilityInfo.triggeringActions && tileAbilityInfo.triggeringActions.length === 1
-					&& tileAbilityInfo.triggeringActions.includes(Trifle.AbilityTriggerType.whenCapturedByTargetTile)) {
-
+				if (Trifle.TileInfo.tileAbilityIsTriggeredWhenCaptured(tileAbilityInfo)) {
 					var allTriggerConditionsMet = true;
 
 					var triggerBrainMap = {};
@@ -1149,6 +1151,26 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 								}
 							}
 						});
+					}
+
+					if (allTriggerConditionsMet) {
+						var abilityContext = {
+							board: self,
+							pointWithTile: null,
+							tile: tile,
+							tileInfo: tileInfo,
+							tileAbilityInfo: tileAbilityInfo,
+							triggerBrainMap: triggerBrainMap
+						}
+						var abilityObject = new Trifle.Ability(abilityContext);
+	
+						var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
+	
+						if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
+							abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
+						} else {
+							abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
+						}
 					}
 				}
 			});
@@ -2449,6 +2471,11 @@ PaiShoGames.Board.prototype.tickDurationAbilities = function() {
 	} */
 };
 
-
+PaiShoGames.Board.prototype.recordTilePoint = function(boardPoint, recordTilePointType) {
+	if (!this.recordedTilePoints[recordTilePointType]) {
+		this.recordedTilePoints[recordTilePointType] = {};
+	}
+	this.recordedTilePoints[recordTilePointType][boardPoint.tile.id] = boardPoint;
+};
 
 
