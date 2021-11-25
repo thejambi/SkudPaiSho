@@ -433,7 +433,7 @@ PaiShoGames.Board.prototype.getGrowGiantOccupiedPoints = function(boardPointToGr
 };
 
 PaiShoGames.Board.prototype.getPointFromNotationPoint = function(notationPoint) {
-	if (notationPoint.isType) {
+	if (notationPoint.isType) {	// Check if it's a BoardPoint object already
 		return notationPoint;	// It's actually what we want already
 	}
 	var rowAndCol = notationPoint.rowAndColumn;

@@ -200,7 +200,9 @@ Trifle.AbilityName = {
 	prohibitTileFromCapturing: "prohibitTileFromCapturing",
 	changeMovementDistanceByFactor: "changeMovementDistanceByFactor",
 	growGigantic: "growGigantic",
-	moveTargetTile: "moveTargetTile"
+	moveTargetTile: "moveTargetTile",
+	recordTilePoint: "recordTilePoint",
+	moveTileToRecordedPoint: "moveTileToRecordedPoint"
 };
 
 Trifle.AbilityType = {
@@ -223,12 +225,17 @@ Trifle.AbilityTriggerType = {
 	whenLandsAdjacentToTargetTile: "whenLandsAdjacentToTargetTile",
 	whenLandsSurroundingTargetTile: "whenLandsSurroundingTargetTile",
 	whenTargetTileLandsAdjacent: "whenTargetTileLandsAdjacent",
-	whileTargetTileIsInZone: "whileTargetTileIsInZone"
+	whileTargetTileIsInZone: "whileTargetTileIsInZone",
+	whenDeployed: "whenDeployed"
 };
 
 Trifle.TileTeam = {
 	friendly: "friendly",
 	enemy: "enemy"
+};
+
+Trifle.RecordTilePointType = {
+	startPoint: "startPoint"
 };
 
 Trifle.AbilitiesForType = {};
@@ -352,6 +359,18 @@ Trifle.TileInfo.getZoneAbilitiesWithAbilityTrigger = function(tileInfo, abilityT
 		});
 	}
 	return abilitiesWithTrigger;
+};
+
+Trifle.TileInfo.tileAbilityIsTriggeredWhenCaptured = function(tileAbilityInfo) {
+	var isTriggeredWhenCaptured = false;
+	if (tileAbilityInfo.triggers) {
+		tileAbilityInfo.triggers.forEach(function(triggerInfo) {
+			if (triggerInfo.triggerType === Trifle.AbilityTriggerType.whenCapturedByTargetTile) {
+				isTriggeredWhenCaptured = true;
+			}
+		});
+	}
+	return isTriggeredWhenCaptured;
 };
 
 Trifle.TileInfo.initializeTrifleData = function() {

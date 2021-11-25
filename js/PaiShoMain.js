@@ -918,184 +918,184 @@ function setSkudTilesOption(newSkudTilesKey, applyCustomBoolean) {
   
   /* --- */
   
-  function promptEmail() {
-	  // Just call loginClicked method to open modal dialog
-	  loginClicked();
-  }
-  
-  function updateFooter() {
-	  // var userEmail = localStorage.getItem(localEmailKey);
-	  // if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
-	  // 	document.querySelector(".footer").innerHTML = gamePlayersMessage() + "You are playing as " + userEmail
-	  // 	+ " | <span class='skipBonus' onclick='promptEmail();'>Edit email</span> | <span class='skipBonus' onclick='showSignOutModal();'>Sign out</span>";
-	  // } else {
-	  // 	document.querySelector(".footer").innerHTML = gamePlayersMessage() + defaultEmailMessageText;
-	  // }
-  }
-  
-  function gamePlayersMessage() {
-	  if (!hostEmail && !guestEmail) {
-		  return "";
-	  }
-	  var msg = "";
-	  if (hostEmail) {
-		  msg += "HOST: " + hostEmail + "<br />";
-	  }
-	  if (guestEmail) {
-		  msg += "GUEST: " + guestEmail + "<br />";
-	  }
-	  msg += "<br />";
-	  return msg;
-  }
-  
-  forgetOnlinePlayInfo = function() {
-	  // Forget online play info
-	  localStorage.removeItem(deviceIdKey);
-	  localStorage.removeItem(userIdKey);
-	  localStorage.removeItem(usernameKey);
-	  localStorage.removeItem(userEmailKey);
-  
-	  clearLogOnlineStatusInterval();
-  }
-  
-  function showSignOutModal() {
-	  var message = "<br /><div class='clickableText' onclick='signOut(true);'>Yes, sign out</div>";
-	  message += "<br /><div class='clickableText' onclick='signOut(false);'>Cancel</div>";
-  
-	  showModal("Really sign out?", message);
-  }
-  
-  function signOut(reallySignOut) {
-	  closeModal();
-  
-	  if (!reallySignOut) {
-		  updateFooter();
-		  return;
-	  }
-  
-	  if (hostEmail = getUserEmail()) {
-		  hostEmail = null;
-	  }
-  
-	  if (guestUsername = getUserEmail()) {
-		  guestEmail = null;
-	  }
-  
-	  document.title = "The Garden Gate";
-  
-	  localStorage.removeItem(localEmailKey);
-  
-	  forgetOnlinePlayInfo();
-  
-	  updateFooter();
-	  clearMessage();
-	  setAccountHeaderLinkText();
+function promptEmail() {
+	// Just call loginClicked method to open modal dialog
+	loginClicked();
+}
 
-	  OnboardingFunctions.resetOnBoarding();
-  }
-  
-  function rewindAllMoves() {
-	  pauseRun();
-	  gameController.resetGameManager();
-	  gameController.resetNotationBuilder();
-	  currentMoveIndex = 0;
-	  refreshMessage();
-  }
-  
-  /**
-   * moveAnimationBeginStep is the number of the step in the move to begin animation at. This could vary by game.
-   * For example, in Skud Pai Sho, there can be multi-step moves when a Harmony Bonus is included. 
-   * So when animating beginning at the Harmony Bonus step, the initial Arranging piece of the move will not be animated.
-   */
-  function playNextMove(withActuate, moveAnimationBeginStep) {
-	  if (currentMoveIndex >= gameController.gameNotation.moves.length) {
-		  // no more moves to run
-		  isInReplay = false;
-		  refreshMessage();
-		  return false;
-	  } else {
-		  isInReplay = true;
-		  if (withActuate && soundManager.nextMoveSoundsAreEnabled()) {
+function updateFooter() {
+	// var userEmail = localStorage.getItem(localEmailKey);
+	// if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
+	// 	document.querySelector(".footer").innerHTML = gamePlayersMessage() + "You are playing as " + userEmail
+	// 	+ " | <span class='skipBonus' onclick='promptEmail();'>Edit email</span> | <span class='skipBonus' onclick='showSignOutModal();'>Sign out</span>";
+	// } else {
+	// 	document.querySelector(".footer").innerHTML = gamePlayersMessage() + defaultEmailMessageText;
+	// }
+}
+
+function gamePlayersMessage() {
+	if (!hostEmail && !guestEmail) {
+		return "";
+	}
+	var msg = "";
+	if (hostEmail) {
+		msg += "HOST: " + hostEmail + "<br />";
+	}
+	if (guestEmail) {
+		msg += "GUEST: " + guestEmail + "<br />";
+	}
+	msg += "<br />";
+	return msg;
+}
+
+forgetOnlinePlayInfo = function() {
+	// Forget online play info
+	localStorage.removeItem(deviceIdKey);
+	localStorage.removeItem(userIdKey);
+	localStorage.removeItem(usernameKey);
+	localStorage.removeItem(userEmailKey);
+
+	clearLogOnlineStatusInterval();
+}
+
+function showSignOutModal() {
+	var message = "<br /><div class='clickableText' onclick='signOut(true);'>Yes, sign out</div>";
+	message += "<br /><div class='clickableText' onclick='signOut(false);'>Cancel</div>";
+
+	showModal("Really sign out?", message);
+}
+
+function signOut(reallySignOut) {
+	closeModal();
+
+	if (!reallySignOut) {
+		updateFooter();
+		return;
+	}
+
+	if (hostEmail = getUserEmail()) {
+		hostEmail = null;
+	}
+
+	if (guestUsername = getUserEmail()) {
+		guestEmail = null;
+	}
+
+	document.title = "The Garden Gate";
+
+	localStorage.removeItem(localEmailKey);
+
+	forgetOnlinePlayInfo();
+
+	updateFooter();
+	clearMessage();
+	setAccountHeaderLinkText();
+
+	OnboardingFunctions.resetOnBoarding();
+}
+
+function rewindAllMoves() {
+	pauseRun();
+	gameController.resetGameManager();
+	gameController.resetNotationBuilder();
+	currentMoveIndex = 0;
+	refreshMessage();
+}
+
+/**
+ * moveAnimationBeginStep is the number of the step in the move to begin animation at. This could vary by game.
+ * For example, in Skud Pai Sho, there can be multi-step moves when a Harmony Bonus is included. 
+ * So when animating beginning at the Harmony Bonus step, the initial Arranging piece of the move will not be animated.
+ */
+function playNextMove(withActuate, moveAnimationBeginStep) {
+	if (currentMoveIndex >= gameController.gameNotation.moves.length) {
+		// no more moves to run
+		isInReplay = false;
+		refreshMessage();
+		return false;
+	} else {
+		isInReplay = true;
+		if (withActuate && soundManager.nextMoveSoundsAreEnabled()) {
 			soundManager.playSound(SoundManager.sounds.tileLand);
-		  }
-		  if (gameController.getSkipToIndex) {
-			  var newMoveIndex = gameController.getSkipToIndex(currentMoveIndex);
-			  for (currentMoveIndex; currentMoveIndex < newMoveIndex; currentMoveIndex++) {
+		}
+		if (gameController.getSkipToIndex) {
+			var newMoveIndex = gameController.getSkipToIndex(currentMoveIndex);
+			for (currentMoveIndex; currentMoveIndex < newMoveIndex; currentMoveIndex++) {
 				gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], false);
-			  }
-		  }
-		  gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep);
-		  currentMoveIndex++;
-		  if (currentMoveIndex >= gameController.gameNotation.moves.length) {
-			  isInReplay = false;
-			  if (gameController.replayEnded) {
-				  gameController.replayEnded();
-			  }
-		  }
-		  if (withActuate) {
-			  refreshMessage();	// Adding this so it updates during replay... Is this the right spot?
-		  }
-		  return true;
-	  }
-  }
-  
-  function playPrevMove() {
-	  isInReplay = true;
-	  pauseRun();
-  
-	  var moveToPlayTo = currentMoveIndex - 1;
-  
-	  gameController.resetGameManager(true);
-	  gameController.resetNotationBuilder();
-  
-	  currentMoveIndex = 0;
-  
-	  while (currentMoveIndex < moveToPlayTo) {
-		  playNextMove();
-	  }
+			}
+		}
+		gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep);
+		currentMoveIndex++;
+		if (currentMoveIndex >= gameController.gameNotation.moves.length) {
+			isInReplay = false;
+			if (gameController.replayEnded) {
+				gameController.replayEnded();
+			}
+		}
+		if (withActuate) {
+			refreshMessage();	// Adding this so it updates during replay... Is this the right spot?
+		}
+		return true;
+	}
+}
 
-	  gameController.callActuate();
-  
-	  if (soundManager.prevMoveSoundsAreEnabled()) {
+function playPrevMove() {
+	isInReplay = true;
+	pauseRun();
+
+	var moveToPlayTo = currentMoveIndex - 1;
+
+	gameController.resetGameManager(true);
+	gameController.resetNotationBuilder();
+
+	currentMoveIndex = 0;
+
+	while (currentMoveIndex < moveToPlayTo) {
+		playNextMove();
+	}
+
+	gameController.callActuate();
+
+	if (soundManager.prevMoveSoundsAreEnabled()) {
 		soundManager.playSound(SoundManager.sounds.tileLand);
-	  }
-  
-	  refreshMessage();
-  }
-  
-  function playAllMoves(moveAnimationBeginStep) {
-	  pauseRun();
-	  if (currentMoveIndex >= gameController.gameNotation.moves.length - 1) {
+	}
+
+	refreshMessage();
+}
+
+function playAllMoves(moveAnimationBeginStep) {
+	pauseRun();
+	if (currentMoveIndex >= gameController.gameNotation.moves.length - 1) {
 		playPrevMove();	// If at end, jump to previous move so that final move can animate
-	  }
-	  while (currentMoveIndex < gameController.gameNotation.moves.length - 1) {
-		  playNextMove(false);
-	  }
+	}
+	while (currentMoveIndex < gameController.gameNotation.moves.length - 1) {
+		playNextMove(false);
+	}
 	playNextMove(true, moveAnimationBeginStep);
-  }
-  
-  function playPause() {
-	  if (gameController.gameNotation.moves.length === 0) {
-		  return;
-	  }
-	  if (interval === 0) {
-		  // Play
-		  document.querySelector(".playPauseButton").innerHTML = "<i class='fa fa-pause' aria-hidden='true'></i>";
-		  if (playNextMove(true)) {
-			  interval = setInterval(function() {
-				  if (!playNextMove(true)) {
-					  pauseRun();
-				  }
-			  }, replayIntervalLength);//800);
-  } else {
-			  // All done.. restart!
-			  rewindAllMoves();
-			  playPause();
-		  }
-	  } else {
-		  pauseRun();
-	  }
-  }
+}
+
+function playPause() {
+	if (gameController.gameNotation.moves.length === 0) {
+		return;
+	}
+	if (interval === 0) {
+		// Play
+		document.querySelector(".playPauseButton").innerHTML = "<i class='fa fa-pause' aria-hidden='true'></i>";
+		if (playNextMove(true)) {
+			interval = setInterval(function() {
+				if (!playNextMove(true)) {
+					pauseRun();
+				}
+			}, replayIntervalLength);//800);
+		} else {
+			// All done.. restart!
+			rewindAllMoves();
+			playPause();
+		}
+	} else {
+		pauseRun();
+	}
+}
   
 function pauseRun() {
 	clearInterval(interval);
@@ -1171,7 +1171,17 @@ function rerunAll(soundOkToPlay, moveAnimationBeginStep) {
 	}
 	refreshMessage();
 }
-  
+
+/* var quickFinalizeMove = function(soundOkToPlay) {
+	linkShortenCallback('');
+
+	if (soundOkToPlay && soundManager.rerunAllSoundsAreEnabled()) {
+		soundManager.playSound(SoundManager.sounds.tileLand);
+	}
+
+	refreshMessage();
+}; */
+
 var finalizeMove = function (moveAnimationBeginStep, ignoreNoEmail, okToUpdateWinInfo) {
   	rerunAll(true, moveAnimationBeginStep);
 

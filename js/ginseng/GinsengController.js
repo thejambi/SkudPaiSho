@@ -252,15 +252,21 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 
 Ginseng.Controller.prototype.completeMove = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-	this.theGame.runNotationMove(move);
-	this.gameNotation.addMove(move);
-	if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-		createGameIfThatIsOk(this.getGameTypeId());
+	var isPromptingUser = this.theGame.runNotationMove(move);
+
+	if (isPromptingUser) {
+		debug("Prompting user for the rest of the move!");
 	} else {
-		if (playingOnlineGame()) {
-			callSubmitMove();
+		this.gameNotation.addMove(move);
+		if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
+			createGameIfThatIsOk(this.getGameTypeId());
 		} else {
-			finalizeMove();
+			if (playingOnlineGame()) {
+				callSubmitMove();
+			} else {
+				finalizeMove();
+				// quickFinalizeMove();
+			}
 		}
 	}
 };

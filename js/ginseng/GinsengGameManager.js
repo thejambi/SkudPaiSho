@@ -68,39 +68,19 @@ Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
 
 	this.board.tickDurationAbilities();
 
-	if (move.moveType === TEAM_SELECTION) {
-		var self = this;
-		move.teamTileCodes.forEach(function(tileCode){
-			var tile = new Ginseng.Tile(tileCode, move.playerCode);
-			self.tileManager.addToTeamIfOk(tile);
-		});
-		this.buildTeamSelectionGameLogText(move);
-	} else if (move.moveType === DEPLOY) {
+	var needToPromptUser = false;
+
+	if (move.moveType === DEPLOY) {
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
 		this.board.placeTile(tile, move.endPoint);
 		this.buildDeployGameLogText(move, tile);
-
-		/* Banner played? Could use this in future, currently in Board. */
-		if (Trifle.TileInfo.tileIsBanner(PaiShoGames.currentTileMetadata[tile.code])) {
-			if (tile.ownerName === HOST) {
-				this.hostBannerPlayed = true;
-			} else {
-				this.guestBannerPlayed = true;
-			}
-		}
 	} else if (move.moveType === MOVE) {
 		var moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint);
+		needToPromptUser = moveDetails.promptingUserForRestOfMove;
+
 		this.buildMoveGameLogText(move, moveDetails);
 
-		// If tile is capturing a Banner tile, there's a winner
-		if (moveDetails.capturedTiles && moveDetails.capturedTiles.length) {
-			var self = this;
-			moveDetails.capturedTiles.forEach(function(capturedTile) {
-				if (capturedTile && Trifle.TileInfo.tileIsBanner(PaiShoGames.currentTileMetadata[capturedTile.code])) {
-					self.winners.push(getOpponentName(capturedTile.ownerName));
-				}
-			});
-		}
+		this.checkForWin();
 	} else if (move.moveType === DRAW_ACCEPT) {
 		this.gameHasEndedInDraw = true;
 	}
@@ -108,6 +88,8 @@ Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
 	if (withActuate) {
 		this.actuate();
 	}
+
+	return needToPromptUser;
 };
 
 Ginseng.GameManager.prototype.buildTeamSelectionGameLogText = function(move) {
@@ -129,6 +111,26 @@ Ginseng.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails)
 			}
 			this.gameLogText += Trifle.Tile.getTileName(capturedTile.code);
 		});
+	}
+};
+
+Ginseng.GameManager.prototype.checkForWin = function() {
+	var hostLotusPoints = this.board.getTilePoints(Ginseng.TileCodes.WhiteLotus, HOST);
+	var guestLotusPoints = this.board.getTilePoints(Ginseng.TileCodes.WhiteLotus, GUEST);
+	if (hostLotusPoints.length === 1) {
+		var hostLotusPoint = hostLotusPoints[0];
+		var hostLotusRowAndCol = new RowAndColumn(hostLotusPoint.row, hostLotusPoint.col);
+		if (hostLotusRowAndCol.x < 0) {
+			this.winners.push(HOST);
+		}
+	}
+
+	if (guestLotusPoints.length === 1) {
+		var guestLotusPoint = guestLotusPoints[0];
+		var guestLotusRowAndCol = new RowAndColumn(guestLotusPoint.row, guestLotusPoint.col);
+		if (guestLotusRowAndCol.x > 0) {
+			this.winners.push(GUEST);
+		}
 	}
 };
 
@@ -196,7 +198,7 @@ Ginseng.GameManager.prototype.getWinner = function() {
 };
 
 Ginseng.GameManager.prototype.getWinReason = function() {
-	return " has captured the opponent's Banner Tile and won the game!";
+	return " won the game!";
 };
 
 Ginseng.GameManager.prototype.getWinResultTypeCode = function() {
