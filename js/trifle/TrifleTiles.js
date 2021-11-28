@@ -117,6 +117,7 @@ Trifle.MovementType = {
 	jumpShape: "jumpShape",
 	travelShape: "travelShape",
 	awayFromTargetTileOrthogonal: "awayFromTargetTileOrthogonal",
+	awayFromTargetTileDiagonal: "awayFromTargetTileDiagonal",
 	jumpSurroundingTiles: "jumpSurroundingTiles"
 };
 
@@ -210,6 +211,10 @@ Trifle.AbilityType = {
 	protection: "protection"
 };
 
+Trifle.AbilityPriorityLevel = {
+	highest: "highest"
+};
+
 Trifle.AbilityTriggerType = {
 	whenCapturedByTargetTile: "whenCapturedByTargetTile",
 	whenCapturingTargetTile: "whenCapturingTargetTile",
@@ -227,6 +232,11 @@ Trifle.AbilityTriggerType = {
 	whenTargetTileLandsAdjacent: "whenTargetTileLandsAdjacent",
 	whileTargetTileIsInZone: "whileTargetTileIsInZone",
 	whenDeployed: "whenDeployed"
+};
+
+Trifle.PromptTargetType = {
+	boardPoint: "boardPoint",
+	tilePile: "tilePile"
 };
 
 Trifle.TileTeam = {
@@ -1320,12 +1330,12 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				targetTileMovements: [
 					{
-						type: Trifle.MovementType.awayFromTargetTileOrthogonal,
+						type: Trifle.MovementType.awayFromThisTileOrthogonal,
 						distance: 2,
 						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
 					},
 					{
-						type: Trifle.MovementType.awayFromTargetTileDiagonal,
+						type: Trifle.MovementType.awayFromThisTileDiagonal,
 						distance: 1,
 						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
 					}

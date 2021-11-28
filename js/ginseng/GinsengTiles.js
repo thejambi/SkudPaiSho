@@ -40,6 +40,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		],
 		abilities: [
 			{
+				title: "Harmony",
 				type: Trifle.AbilityName.protectFromCapture,
 				triggers: [
 					{
@@ -51,7 +52,9 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				targetTypes: [Trifle.TargetType.thisTile]
 			},
 			{
+				title: "Remember Start Point",
 				type: Trifle.AbilityName.recordTilePoint,
+				priority: Trifle.AbilityPriorityLevel.highest,
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whenDeployed,
@@ -63,6 +66,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			},
 			{
 				type: Trifle.AbilityName.moveTileToRecordedPoint,
+				priority: Trifle.AbilityPriorityLevel.highest,
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whenCapturedByTargetTile,
@@ -222,6 +226,58 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				captureTypes: [
 					{
 						type: Trifle.CaptureType.all
+					}
+				]
+			}
+		],
+		abilities: [
+			{
+				title: "Active Bison Push",
+				type: Trifle.AbilityName.moveTargetTile,
+				optional: true,
+				promptForTargets: true,
+				neededPromptTargetsInfo: [
+					{
+						title: "pushedTile",
+						targetType: Trifle.PromptTargetType.boardPoint
+					},
+					{
+						title: "pushLanding",
+						targetType: Trifle.PromptTargetType.boardPoint
+					}
+				],
+				priority: Trifle.AbilityPriorityLevel.highest,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
+						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						activationRequirements: [
+							{
+								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [Trifle.TileCategory.thisTile],
+								targetPointTypes: [RED]
+							}
+						]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				numberOfTargetTiles: 1,
+				promptTargetTitle: "pushedTile",
+				targetTileMovements: [
+					/* {
+						type: Trifle.MovementType.awayFromTargetTileOrthogonal,
+						distance: 2,
+						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
+					},
+					{
+						type: Trifle.MovementType.awayFromTargetTileDiagonal,
+						distance: 1,
+						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
+					} */
+					{
+						type: Trifle.MovementType.standard,
+						distance: 2,
+						promptTargetTitle: ""
 					}
 				]
 			}

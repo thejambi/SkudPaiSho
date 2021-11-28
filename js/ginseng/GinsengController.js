@@ -256,6 +256,7 @@ Ginseng.Controller.prototype.completeMove = function() {
 
 	if (isPromptingUser) {
 		debug("Prompting user for the rest of the move!");
+		this.notationBuilder.status = Trifle.NotationBuilderStatus.PROMPTING_FOR_TARGET;
 	} else {
 		this.gameNotation.addMove(move);
 		if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {

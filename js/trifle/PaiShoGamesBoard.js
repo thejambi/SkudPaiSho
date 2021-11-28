@@ -379,7 +379,7 @@ PaiShoGames.Board.prototype.placeTile = function(tile, notationPoint) {
 
 	var boardPoint = this.getPointFromNotationPoint(notationPoint);
 
-	this.processAbilities(tile, tileInfo, null, boardPoint, []);
+	this.processAbilities(tile, tileInfo, null, boardPoint, [], {});
 };
 
 PaiShoGames.Board.prototype.getDistanceBetweenPoints = function(bp1, bp2) {
@@ -933,7 +933,7 @@ PaiShoGames.Board.prototype.debugPointsOccupiedByAbility = function() {
 	});
 };
 
-PaiShoGames.Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
+PaiShoGames.Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd, currentMoveInfo) {
 	this.tilesCapturedByTriggeredAbility = [];
 	var startRowCol = notationPointStart.rowAndColumn;
 	var endRowCol = notationPointEnd.rowAndColumn;
@@ -1004,13 +1004,14 @@ PaiShoGames.Board.prototype.moveTile = function(player, notationPointStart, nota
 
 	/* Follow Order of Abilities and Triggers in Trifle documentation */
 	
-	this.processAbilities(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles);
+	var abilityActivationFlags = this.processAbilities(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo);
 
 	return {
 		movedTile: tile,
 		startPoint: boardPointStart,
 		endPoint: boardPointEnd,
-		capturedTiles: capturedTiles
+		capturedTiles: capturedTiles,
+		abilityActivationFlags: abilityActivationFlags
 	}
 };
 
@@ -1018,9 +1019,10 @@ PaiShoGames.Board.prototype.moveTile = function(player, notationPointStart, nota
  * Process abilities on the board after a tile is moved or placed/deployed.
  * `boardPointStart` will probably be null for when a tile is placed.
  */
-PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles) {
+PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo) {
 
 	var abilitiesToActivate = {};
+	var abilitiesWithPromptTargetsNeeded = [];
 
 	/* 
 	- Get abilities that should be active/activated
@@ -1091,9 +1093,14 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 						tile: tile,
 						tileInfo: tileInfo,
 						tileAbilityInfo: tileAbilityInfo,
-						triggerBrainMap: triggerBrainMap
+						triggerBrainMap: triggerBrainMap,
+						promptTargetInfo: currentMoveInfo.promptTargetInfo
 					}
 					var abilityObject = new Trifle.Ability(abilityContext);
+
+					if (!abilityObject.hasNeededPromptTargetInfo()) {
+						abilitiesWithPromptTargetsNeeded.push(abilityObject);
+					}
 
 					var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
 
@@ -1160,9 +1167,14 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 							tile: tile,
 							tileInfo: tileInfo,
 							tileAbilityInfo: tileAbilityInfo,
-							triggerBrainMap: triggerBrainMap
+							triggerBrainMap: triggerBrainMap,
+							promptTargetInfo: currentMoveInfo.promptTargetInfo
 						}
 						var abilityObject = new Trifle.Ability(abilityContext);
+
+						if (!abilityObject.hasNeededPromptTargetInfo()) {
+							abilitiesWithPromptTargetsNeeded.push(abilityObject);
+						}
 	
 						var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
 	
@@ -1178,8 +1190,9 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 	});
 	
 	this.abilityManager.setReadyAbilities(abilitiesToActivate);
+	this.abilityManager.setAbilitiesWithPromptTargetsNeeded(abilitiesWithPromptTargetsNeeded);
 
-	var abilityActivationFlags = this.abilityManager.activateReadyAbilities();
+	var abilityActivationFlags = this.abilityManager.activateReadyAbilitiesOrPromptForTargets();
 
 	/* Debugging */
 	debug(this.abilityManager.abilities);
@@ -1187,8 +1200,10 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 	if (abilityActivationFlags.boardHasChanged) {
 		// Need to re-process abilities... 
 		// Pass in some sort of context from the activation flags???
-		this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles);
+		this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo);
 	}
+
+	return abilityActivationFlags;
 };
 
 PaiShoGames.Board.prototype.getZonesPointIsWithin = function(boardPoint) {
@@ -2478,4 +2493,9 @@ PaiShoGames.Board.prototype.recordTilePoint = function(boardPoint, recordTilePoi
 	this.recordedTilePoints[recordTilePointType][boardPoint.tile.id] = boardPoint;
 };
 
+PaiShoGames.Board.prototype.promptForBoardPointInAVeryHackyWay = function() {
+	this.forEachBoardPoint(function(boardPoint) {
+		boardPoint.addType(POSSIBLE_MOVE);
+	})
+};
 

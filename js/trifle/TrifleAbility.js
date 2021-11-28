@@ -9,6 +9,7 @@ Trifle.Ability = function(abilityContext) {
 	this.sourceTileInfo = abilityContext.tileInfo;
 	this.sourceTilePoint = abilityContext.pointWithTile;
 	this.triggerBrainMap = abilityContext.triggerBrainMap;
+	this.promptTargetInfo = abilityContext.promptTargetInfo;
 
 	this.triggerTargetTiles = [];
 	this.triggerTargetTilePoints = [];
@@ -25,6 +26,35 @@ Trifle.Ability = function(abilityContext) {
 	this.boardChanged = false;
 	this.activated = false;
 }
+
+Trifle.Ability.prototype.hasNeededPromptTargetInfo = function() {
+	var hasPromptInfo = true;
+	var neededPromptTargetsInfo = this.abilityInfo.neededPromptTargetsInfo;
+	if (neededPromptTargetsInfo && neededPromptTargetsInfo.length >= 1) {
+		// Figure out what prompt targets are needed...
+		var self = this;
+		neededPromptTargetsInfo.forEach(function(neededPromptTargetInfo) {
+			debug(neededPromptTargetInfo);
+			if (!self.promptTargetInfoPresent(neededPromptTargetInfo)) {
+				debug("Need to prompt");
+				hasPromptInfo = false;
+			}
+		})
+	}
+	return hasPromptInfo;
+};
+
+Trifle.Ability.prototype.promptTargetInfoPresent = function(neededPromptTargetInfo) {
+	var hasTarget = false;
+	if (this.promptTargetInfo && this.promptTargetInfo.length) {
+		this.promptTargetInfo.forEach(function(promptTargetEntry) {
+			if (promptTargetEntry.title === neededPromptTargetInfo.title) {
+				hasTarget = true;
+			}
+		})
+	}
+	return hasTarget;
+};
 
 Trifle.Ability.prototype.setAbilityTargetTiles = function() {
 	this.targetBrains = [];
@@ -115,7 +145,7 @@ Trifle.Ability.prototype.appearsToBeTheSameAs = function(otherAbility) {
 	return otherAbility 
 		&& this.abilityType === otherAbility.abilityType
 		&& this.sourceTile.id === otherAbility.sourceTile.id
-		&& this.triggerTargetTiles.equals(otherAbility.targetTiles)
+		&& this.triggerTargetTiles.equals(otherAbility.triggerTargetTiles)
 		&& this.sourceTilePoint === otherAbility.sourceTilePoint;
 };
 
@@ -123,4 +153,27 @@ Trifle.Ability.prototype.abilityTargetsTile = function(tile) {
 	return this.abilityTargetTiles.includes(tile);
 };
 
+Trifle.Ability.prototype.isPriority = function(priorityLevel) {
+	return this.abilityInfo.priority === priorityLevel;
+};
+
+Trifle.Ability.prototype.getTitle = function() {
+	if (this.abilityInfo.title) {
+		return this.abilityInfo.title;
+	} else {
+		return this.abilityInfo.type;
+	}
+};
+
+Trifle.Ability.prototype.getNeededPromptTargetInfo = function(promptTargetTitle) {
+	var matchingPromptTargetInfo;
+	if (this.abilityInfo.neededPromptTargetsInfo && this.abilityInfo.neededPromptTargetsInfo.length) {
+		this.abilityInfo.neededPromptTargetsInfo.forEach(function(promptTargetInfo) {
+			if (promptTargetInfo.title === promptTargetTitle) {
+				matchingPromptTargetInfo = promptTargetInfo;
+			}
+		})
+	}
+	return matchingPromptTargetInfo;
+};
 

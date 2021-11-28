@@ -75,8 +75,11 @@ Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
 		this.board.placeTile(tile, move.endPoint);
 		this.buildDeployGameLogText(move, tile);
 	} else if (move.moveType === MOVE) {
-		var moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint);
-		needToPromptUser = moveDetails.promptingUserForRestOfMove;
+		var moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint, move);
+		var abilityActivationFlags = moveDetails.abilityActivationFlags;
+		debug(abilityActivationFlags);
+
+		needToPromptUser = abilityActivationFlags && abilityActivationFlags.neededPromptInfo && abilityActivationFlags.neededPromptInfo.currentPromptTargetTitle;
 
 		this.buildMoveGameLogText(move, moveDetails);
 

@@ -4,10 +4,23 @@ Trifle.AbilityManager = function(board) {
 	this.tileManager = board.tileManager;
 	this.abilities = [];
 	this.readyAbilities = {};
+	this.abilitiesWithPromptTargetsNeeded = {};
 }
 
 Trifle.AbilityManager.prototype.setReadyAbilities = function(readyAbilities) {
 	this.readyAbilities = readyAbilities;
+};
+
+Trifle.AbilityManager.prototype.setAbilitiesWithPromptTargetsNeeded = function(abilitiesWithPromptTargetsNeeded) {
+	this.abilitiesWithPromptTargetsNeeded = abilitiesWithPromptTargetsNeeded;
+};
+
+Trifle.AbilityManager.prototype.activateReadyAbilitiesOrPromptForTargets = function() {
+	if (this.abilitiesWithPromptTargetsNeeded && this.abilitiesWithPromptTargetsNeeded.length > 0) {
+		return this.promptForNextNeededTargets();
+	} else {
+		return this.activateReadyAbilities();
+	}
 };
 
 Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
@@ -39,6 +52,19 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 
 	/* Activate abilities! */
 
+	// Priority "highest" abilities first
+	Object.values(this.readyAbilities).forEach(function(abilityList) {
+		abilityList.forEach(function(ability) {
+			if (ability.isPriority(Trifle.AbilityPriorityLevel.highest)) {
+				debug("!!!!Priority Ability!!!! " + ability.getTitle());
+				boardHasChanged = self.doTheActivateThing(ability);
+				if (boardHasChanged) {
+					return;	// If board changes, quit!
+				}
+			}
+		});
+	});
+
 	var abilityActivationOrder = [
 		Trifle.AbilityName.cancelAbilities,
 		Trifle.AbilityName.cancelAbilitiesTargetingTiles
@@ -50,40 +76,29 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 			readyAbilitiesOfType.forEach(function(ability) {
 				boardHasChanged = self.doTheActivateThing(ability);
 				if (boardHasChanged) {
-					return;	// If board changes, quit!
+					return;	// If board changes, quit loop!
 				}
 			});
 		}
 		if (boardHasChanged) {
-			return;
+			return;	// Quit loop
 		}
 	});
-	if (this.readyAbilities[Trifle.AbilityName.cancelAbilities] && this.readyAbilities[Trifle.AbilityName.cancelAbilities].length) {
+	/* if (this.readyAbilities[Trifle.AbilityName.cancelAbilities] && this.readyAbilities[Trifle.AbilityName.cancelAbilities].length) {
 		this.readyAbilities[Trifle.AbilityName.cancelAbilities].forEach(function(ability) {
 			boardHasChanged = self.doTheActivateThing(ability);
 			if (boardHasChanged) {
 				return;	// If board changes, quit!
 			}
 		});
-	}
+	} */ // ^^^ This is old attempt at ability activation order???
 
 	if (boardHasChanged) {
 		return;	// If board changes, quit!
-	}
+	} // ^^^ Needed, the previous similar checks only escape loops to here
 
 	Object.values(this.readyAbilities).forEach(function(abilityList) {
 		abilityList.forEach(function(ability) {
-			/* if (!ability.activated) {
-				var abilityIsReadyToActivate = self.addNewAbility(ability);
-				if (abilityIsReadyToActivate) {
-					ability.activateAbility();
-				}
-				if (ability.boardChangedAfterActivation()) {
-					boardHasChanged = true;
-					debug("Board changed! Will need to process abilities again");
-					return;	// If board changes, quit!
-				}
-			} */
 			boardHasChanged = self.doTheActivateThing(ability);
 			if (boardHasChanged) {
 				return;	// If board changes, quit!
@@ -245,6 +260,36 @@ Trifle.AbilityManager.prototype.tickDurationAbilities = function() {
 			debug(durationAbilityInfo);
 		}
 	} */
+};
+
+Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
+	if (!(this.abilitiesWithPromptTargetsNeeded && this.abilitiesWithPromptTargetsNeeded.length > 0)) {
+		debug("Error: No abilities that need prompt targets found");
+		return {};
+	}
+
+	// ? 
+	var neededPromptInfo = {};
+
+	if (this.abilitiesWithPromptTargetsNeeded.length > 1) {
+		debug("Multiple abilities that need prompt targets. Will just choose first one to prompt...");
+	}
+
+	var abilityObject = this.abilitiesWithPromptTargetsNeeded[0];
+
+	debug(abilityObject);
+
+	// Do we have ability target?
+	if (abilityObject.abilityInfo.promptTargetTitle) {
+		// need to prompt for ability target
+		var targetInfo = abilityObject.getNeededPromptTargetInfo(abilityObject.abilityInfo.promptTargetTitle);
+		debug("Need to prompt for target type: " + targetInfo.targetType);
+		this.board.promptForBoardPointInAVeryHackyWay();
+
+		neededPromptInfo.currentPromptTargetTitle = abilityObject.abilityInfo.promptTargetTitle;
+	}
+
+	return { neededPromptInfo: neededPromptInfo };
 };
 
 

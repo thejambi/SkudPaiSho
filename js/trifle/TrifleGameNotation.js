@@ -2,6 +2,10 @@
 
 // --------------------------------------------- // 
 
+Trifle.NotationBuilderStatus = {
+	PROMPTING_FOR_TARGET = "PROMPTING_FOR_TARGET"
+};
+
 Trifle.NotationMove = function(text) {
 	this.fullMoveText = text;
 	this.analyzeMove();
