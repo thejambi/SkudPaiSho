@@ -239,6 +239,11 @@ Trifle.PromptTargetType = {
 	tilePile: "tilePile"
 };
 
+Trifle.TargetPromptId = {
+	movedTilePoint: "movedTilePoint",
+	movedTileDestinationPoint: "movedTileDestinationPoint"
+};
+
 Trifle.TileTeam = {
 	friendly: "friendly",
 	enemy: "enemy"

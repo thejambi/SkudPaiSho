@@ -239,10 +239,12 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				neededPromptTargetsInfo: [
 					{
 						title: "pushedTile",
+						promptId: Trifle.TargetPromptId.movedTilePoint,
 						targetType: Trifle.PromptTargetType.boardPoint
 					},
 					{
 						title: "pushLanding",
+						promptId: Trifle.TargetPromptId.movedTileDestinationPoint,
 						targetType: Trifle.PromptTargetType.boardPoint
 					}
 				],
@@ -277,7 +279,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					{
 						type: Trifle.MovementType.standard,
 						distance: 2,
-						promptTargetTitle: ""
+						promptTargetTitle: "pushLanding"
 					}
 				]
 			}

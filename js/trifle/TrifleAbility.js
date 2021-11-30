@@ -46,14 +46,8 @@ Trifle.Ability.prototype.hasNeededPromptTargetInfo = function() {
 
 Trifle.Ability.prototype.promptTargetInfoPresent = function(neededPromptTargetInfo) {
 	var hasTarget = false;
-	if (this.promptTargetInfo && this.promptTargetInfo.length) {
-		this.promptTargetInfo.forEach(function(promptTargetEntry) {
-			if (promptTargetEntry.title === neededPromptTargetInfo.title) {
-				hasTarget = true;
-			}
-		})
-	}
-	return hasTarget;
+
+	return this.promptTargetInfo && this.promptTargetInfo[neededPromptTargetInfo.promptId];
 };
 
 Trifle.Ability.prototype.setAbilityTargetTiles = function() {
@@ -165,11 +159,11 @@ Trifle.Ability.prototype.getTitle = function() {
 	}
 };
 
-Trifle.Ability.prototype.getNeededPromptTargetInfo = function(promptTargetTitle) {
+Trifle.Ability.prototype.getNeededPromptTargetInfo = function(promptTargetId) {
 	var matchingPromptTargetInfo;
 	if (this.abilityInfo.neededPromptTargetsInfo && this.abilityInfo.neededPromptTargetsInfo.length) {
 		this.abilityInfo.neededPromptTargetsInfo.forEach(function(promptTargetInfo) {
-			if (promptTargetInfo.title === promptTargetTitle) {
+			if (promptTargetInfo.promptId === promptTargetId) {
 				matchingPromptTargetInfo = promptTargetInfo;
 			}
 		})

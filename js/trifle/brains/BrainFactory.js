@@ -50,6 +50,8 @@ Trifle.BrainFactory.createAbilityBrain = function(abilityName, abilityObject) {
 			return new Trifle.RecordTilePointAbilityBrain(abilityObject);
 		case Trifle.AbilityName.moveTileToRecordedPoint:
 			return new Trifle.MoveTileToRecordedPointAbilityBrain(abilityObject);
+		case Trifle.AbilityName.moveTargetTile:
+			return new Trifle.MoveTargetTileAbilityBrain(abilityObject);
 		default:
 			return new Trifle.SimpleOngoingAbilityBrain(abilityObject);
 	}

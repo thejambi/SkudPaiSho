@@ -279,14 +279,22 @@ Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
 
 	debug(abilityObject);
 
+	neededPromptInfo.abilitySourceTile = abilityObject.sourceTile;
+
 	// Do we have ability target?
-	if (abilityObject.abilityInfo.promptTargetTitle) {
-		// need to prompt for ability target
-		var targetInfo = abilityObject.getNeededPromptTargetInfo(abilityObject.abilityInfo.promptTargetTitle);
-		debug("Need to prompt for target type: " + targetInfo.targetType);
+
+	var nextNeededPromptTargetInfo;
+	abilityObject.abilityInfo.neededPromptTargetsInfo.forEach(function(neededPromptTargetInfo) {
+		if (!nextNeededPromptTargetInfo && !abilityObject.promptTargetInfo[neededPromptTargetInfo.promptId]) {
+			nextNeededPromptTargetInfo = neededPromptTargetInfo;
+		}
+	});
+
+	if (nextNeededPromptTargetInfo) {
+		debug("Need to prompt for target type: " + nextNeededPromptTargetInfo.targetType);
 		this.board.promptForBoardPointInAVeryHackyWay();
 
-		neededPromptInfo.currentPromptTargetTitle = abilityObject.abilityInfo.promptTargetTitle;
+		neededPromptInfo.currentPromptTargetId = nextNeededPromptTargetInfo.promptId;
 	}
 
 	return { neededPromptInfo: neededPromptInfo };

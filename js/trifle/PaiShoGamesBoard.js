@@ -935,6 +935,14 @@ PaiShoGames.Board.prototype.debugPointsOccupiedByAbility = function() {
 
 PaiShoGames.Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd, currentMoveInfo) {
 	this.tilesCapturedByTriggeredAbility = [];
+
+	if (!notationPointStart.rowAndColumn) {	// Assume String representation of points if no rowAndColumn property
+		notationPointStart = new NotationPoint(notationPointStart);
+	}
+	if (!notationPointEnd.rowAndColumn) {
+		notationPointEnd = new NotationPoint(notationPointEnd);
+	}
+
 	var startRowCol = notationPointStart.rowAndColumn;
 	var endRowCol = notationPointEnd.rowAndColumn;
 
@@ -1020,6 +1028,9 @@ PaiShoGames.Board.prototype.moveTile = function(player, notationPointStart, nota
  * `boardPointStart` will probably be null for when a tile is placed.
  */
 PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo) {
+	if (!currentMoveInfo) {
+		currentMoveInfo = {};
+	}
 
 	var abilitiesToActivate = {};
 	var abilitiesWithPromptTargetsNeeded = [];
@@ -1094,7 +1105,7 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 						tileInfo: tileInfo,
 						tileAbilityInfo: tileAbilityInfo,
 						triggerBrainMap: triggerBrainMap,
-						promptTargetInfo: currentMoveInfo.promptTargetInfo
+						promptTargetInfo: currentMoveInfo.promptTargetData
 					}
 					var abilityObject = new Trifle.Ability(abilityContext);
 
@@ -1168,7 +1179,7 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 							tileInfo: tileInfo,
 							tileAbilityInfo: tileAbilityInfo,
 							triggerBrainMap: triggerBrainMap,
-							promptTargetInfo: currentMoveInfo.promptTargetInfo
+							promptTargetInfo: currentMoveInfo.promptTargetData
 						}
 						var abilityObject = new Trifle.Ability(abilityContext);
 
@@ -2497,5 +2508,9 @@ PaiShoGames.Board.prototype.promptForBoardPointInAVeryHackyWay = function() {
 	this.forEachBoardPoint(function(boardPoint) {
 		boardPoint.addType(POSSIBLE_MOVE);
 	})
+};
+
+PaiShoGames.Board.prototype.getBoardPointFromRowAndCol = function(rowAndCol) {
+	return this.cells[rowAndCol.row][rowAndCol.col];
 };
 

@@ -2133,7 +2133,12 @@ var GameType = {
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [],
 		usersWithAccess: [
-			'SkudPaiSho'
+			'SkudPaiSho',
+			'Monk_Gyatso',
+			'markdwagner',
+			'sirstotes',
+			'Sambews',
+			'Cannoli'
 		],
 		noRankedGames: true
 	},

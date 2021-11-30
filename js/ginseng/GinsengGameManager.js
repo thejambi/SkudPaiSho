@@ -64,11 +64,12 @@ Ginseng.GameManager.prototype.actuate = function () {
 };
 
 Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
-	debug("Running Move: " + move.fullMoveText);
+	debug("Runining Move:");
+	debug(move);
 
 	this.board.tickDurationAbilities();
 
-	var needToPromptUser = false;
+	var neededPromptInfo;
 
 	if (move.moveType === DEPLOY) {
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
@@ -79,7 +80,10 @@ Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
 		var abilityActivationFlags = moveDetails.abilityActivationFlags;
 		debug(abilityActivationFlags);
 
-		needToPromptUser = abilityActivationFlags && abilityActivationFlags.neededPromptInfo && abilityActivationFlags.neededPromptInfo.currentPromptTargetTitle;
+		var needToPromptUser = abilityActivationFlags && abilityActivationFlags.neededPromptInfo && abilityActivationFlags.neededPromptInfo.currentPromptTargetId;
+		if (needToPromptUser) {
+			neededPromptInfo = abilityActivationFlags.neededPromptInfo;
+		}
 
 		this.buildMoveGameLogText(move, moveDetails);
 
@@ -92,7 +96,7 @@ Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
 		this.actuate();
 	}
 
-	return needToPromptUser;
+	return neededPromptInfo;
 };
 
 Ginseng.GameManager.prototype.buildTeamSelectionGameLogText = function(move) {

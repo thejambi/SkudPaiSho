@@ -31,7 +31,8 @@ Ginseng.Controller.prototype.resetNotationBuilder = function() {
 	if (this.notationBuilder) {
 		offerDraw = this.notationBuilder.offerDraw;
 	}
-	this.notationBuilder = new Ginseng.NotationBuilder();
+	this.notationBuilder = new Trifle.NotationBuilder();
+	this.notationBuilder.promptTargetData = {};
 	if (offerDraw) {
 		this.notationBuilder.offerDraw = true;
 	}
@@ -43,7 +44,7 @@ Ginseng.Controller.prototype.resetGameNotation = function() {
 };
 
 Ginseng.Controller.prototype.getNewGameNotation = function() {
-	return new Ginseng.GameNotation();
+	return new Trifle.GameNotation();
 };
 
 Ginseng.Controller.getHostTilesContainerDivs = function() {
@@ -71,7 +72,7 @@ Ginseng.Controller.prototype.resetMove = function() {
 };
 
 Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>GINSENG!!!!</h4> <p> <p>Trifle is inspired by Vagabond Pai Sho, the Pai Sho variant seen in the fanfiction story <a href='https://skudpaisho.com/site/more/fanfiction-recommendations/' target='_blank'>Gambler and Trifle (download here)</a>.</p> <p><strong>You win</strong> if you capture your opponent's Banner tile.</p> <p><strong>On a turn</strong>, you may either deploy a tile or move a tile.</p> <p><strong>You can't capture Flower/Banner tiles</strong> until your Banner has been deployed.<br /> <strong>You can't capture Non-Flower/Banner tiles</strong> until both players' Banner tiles have been deployed.</p> <p><strong>Hover</strong> over any tile to see how it works.</p> </p> <p>Select tiles to learn more or <a href='https://skudpaisho.com/site/games/trifle-pai-sho/' target='_blank'>view the rules</a>.</p>";
+	return "<h4>Ginseng Pai Sho</h4><p><a href='https://skudpaisho.com/site/games/ginseng-pai-sho/' target='_blank'>view the rules</a>.</p>";
 };
 
 Ginseng.Controller.prototype.getAdditionalMessage = function() {
@@ -247,16 +248,35 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 			this.theGame.hidePossibleMovePoints();
 			this.resetNotationBuilder();
 		}
+	} else if (this.notationBuilder.status === Trifle.NotationBuilderStatus.PROMPTING_FOR_TARGET) {
+		if (boardPoint.isType(POSSIBLE_MOVE)) {
+			this.theGame.hidePossibleMovePoints();
+
+			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
+				this.notationBuilder.promptTargetData[this.notationBuilder.neededPromptTargetInfo.currentPromptTargetId] = new NotationPoint(htmlPoint.getAttribute("name"));
+				// TODO - Does move require user to choose targets?... 
+				var notationBuilderSave = this.notationBuilder;
+				this.resetMove();
+				this.notationBuilder = notationBuilderSave;
+				this.completeMove();
+			} else {
+				this.resetNotationBuilder();
+			}
+		} else {
+			// this.theGame.hidePossibleMovePoints();
+			// this.notationBuilder.status = ?
+		}
 	}
 };
 
 Ginseng.Controller.prototype.completeMove = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-	var isPromptingUser = this.theGame.runNotationMove(move);
+	var neededPromptTargetInfo = this.theGame.runNotationMove(move);
 
-	if (isPromptingUser) {
+	if (neededPromptTargetInfo) {
 		debug("Prompting user for the rest of the move!");
 		this.notationBuilder.status = Trifle.NotationBuilderStatus.PROMPTING_FOR_TARGET;
+		this.notationBuilder.neededPromptTargetInfo = neededPromptTargetInfo;
 	} else {
 		this.gameNotation.addMove(move);
 		if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
