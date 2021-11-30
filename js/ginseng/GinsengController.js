@@ -72,7 +72,7 @@ Ginseng.Controller.prototype.resetMove = function() {
 };
 
 Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Ginseng Pai Sho</h4><p><a href='https://skudpaisho.com/site/games/ginseng-pai-sho/' target='_blank'>view the rules</a>.</p>";
+	return "<h4>Ginseng Pai Sho (beta testing)</h4><p><a href='https://skudpaisho.com/site/games/ginseng-pai-sho/' target='_blank'>view the rules</a>.</p>";
 };
 
 Ginseng.Controller.prototype.getAdditionalMessage = function() {
@@ -253,7 +253,11 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 			this.theGame.hidePossibleMovePoints();
 
 			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
-				this.notationBuilder.promptTargetData[this.notationBuilder.neededPromptTargetInfo.currentPromptTargetId] = new NotationPoint(htmlPoint.getAttribute("name"));
+				var sourceTileKey = JSON.stringify(this.notationBuilder.neededPromptTargetInfo.sourceTileKey);
+				if (!this.notationBuilder.promptTargetData[sourceTileKey]) {
+					this.notationBuilder.promptTargetData[sourceTileKey] = {};
+				}
+				this.notationBuilder.promptTargetData[sourceTileKey][this.notationBuilder.neededPromptTargetInfo.currentPromptTargetId] = new NotationPoint(htmlPoint.getAttribute("name"));
 				// TODO - Does move require user to choose targets?... 
 				var notationBuilderSave = this.notationBuilder;
 				this.resetMove();

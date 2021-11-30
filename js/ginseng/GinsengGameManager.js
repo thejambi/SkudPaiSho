@@ -6,6 +6,7 @@ Ginseng.GameManager = function(actuator, ignoreActuate, isCopy) {
 
 	this.actuator = actuator;
 
+	Trifle.tileId = 1;
 	this.tileManager = new Ginseng.TileManager();
 	this.markingManager = new PaiShoMarkingManager();
 
@@ -100,13 +101,13 @@ Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
 };
 
 Ginseng.GameManager.prototype.buildTeamSelectionGameLogText = function(move) {
-	this.gameLogText = move.player + " selected their team";
+	// this.gameLogText = move.player + " selected their team";
 };
 Ginseng.GameManager.prototype.buildDeployGameLogText = function(move, tile) {
-	this.gameLogText = move.player + ' placed ' + Trifle.Tile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
+	// this.gameLogText = move.player + ' placed ' + Trifle.Tile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
 };
 Ginseng.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails) {
-	this.gameLogText = move.player + ' moved ' + Trifle.Tile.getTileName(moveDetails.movedTile.code) + ' from ' + move.startPoint.pointText + ' to ' + move.endPoint.pointText;
+	/* this.gameLogText = move.player + ' moved ' + Trifle.Tile.getTileName(moveDetails.movedTile.code) + ' from ' + move.startPoint.pointText + ' to ' + move.endPoint.pointText;
 	if (moveDetails.capturedTiles && moveDetails.capturedTiles.length > 0) {
 		this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ';// + Trifle.Tile.getTileName(moveDetails.capturedTile.code);
 		var first = true;
@@ -118,7 +119,7 @@ Ginseng.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails)
 			}
 			this.gameLogText += Trifle.Tile.getTileName(capturedTile.code);
 		});
-	}
+	} */
 };
 
 Ginseng.GameManager.prototype.checkForWin = function() {

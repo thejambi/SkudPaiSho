@@ -1,5 +1,7 @@
 // Tile
 
+Trifle.tileId = 1;
+
 Trifle.Tile = function(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
@@ -10,7 +12,7 @@ Trifle.Tile = function(code, ownerCode) {
 	} else {
 		debug("INCORRECT OWNER CODE");
 	}
-	this.id = tileId++;
+	this.id = Trifle.tileId++;
 	this.selectedFromPile = false;
 }
 

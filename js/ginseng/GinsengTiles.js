@@ -291,7 +291,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 
 	GinsengTiles[Ginseng.TileCodes.LionTurtle] = {
 		available: true,
-		types: [Ginseng.TileType.originalBender],
+		types: [Ginseng.TileCodes.LionTurtle],
 		movements: [
 			{
 				type: Trifle.MovementType.standard,

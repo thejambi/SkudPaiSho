@@ -47,7 +47,11 @@ Trifle.Ability.prototype.hasNeededPromptTargetInfo = function() {
 Trifle.Ability.prototype.promptTargetInfoPresent = function(neededPromptTargetInfo) {
 	var hasTarget = false;
 
-	return this.promptTargetInfo && this.promptTargetInfo[neededPromptTargetInfo.promptId];
+	var sourceTileKey = JSON.stringify(Trifle.AbilityManager.buildSourceTileKeyObject(this.sourceTile));
+
+	return this.promptTargetInfo 
+		&& this.promptTargetInfo[sourceTileKey]
+		&& this.promptTargetInfo[sourceTileKey][neededPromptTargetInfo.promptId];
 };
 
 Trifle.Ability.prototype.setAbilityTargetTiles = function() {

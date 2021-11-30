@@ -4,25 +4,18 @@ Trifle.MoveTargetTileAbilityBrain = function(abilityObject) {
 }
 
 Trifle.MoveTargetTileAbilityBrain.prototype.activateAbility = function() {
-	/* var targetTilePoint = this.abilityObject.abilityTargetTilePoints[0];
-	var targetTile = this.abilityObject.abilityTargetTiles[0];
-
-	var recordedPointType = this.abilityObject.abilityInfo.recordedPointType;
-
-	if (recordedPointType) {
-		var destinationPoint = this.abilityObject.board.recordedTilePoints[recordedPointType][targetTile.id];
-		this.abilityObject.board.placeTile(targetTile, destinationPoint);
-		this.abilityObject.boardChanged = true;
-	} else {
-		debug("No recorded point type defined");
-	} */
-
 	var promptTargetInfo = this.abilityObject.promptTargetInfo;
+
+	debug("PUSHING");
+
+	var sourceTileKey = JSON.stringify(Trifle.AbilityManager.buildSourceTileKeyObject(this.abilityObject.sourceTile));
+
 	if (promptTargetInfo 
-			&& promptTargetInfo[Trifle.TargetPromptId.movedTilePoint]
-			&& promptTargetInfo[Trifle.TargetPromptId.movedTileDestinationPoint]) {
-		var movedTilePoint = promptTargetInfo[Trifle.TargetPromptId.movedTilePoint];
-		var movedTileDestinationPoint = promptTargetInfo[Trifle.TargetPromptId.movedTileDestinationPoint];
+			&& promptTargetInfo[sourceTileKey]
+			&& promptTargetInfo[sourceTileKey][Trifle.TargetPromptId.movedTilePoint]
+			&& promptTargetInfo[sourceTileKey][Trifle.TargetPromptId.movedTileDestinationPoint]) {
+		var movedTilePoint = promptTargetInfo[sourceTileKey][Trifle.TargetPromptId.movedTilePoint];
+		var movedTileDestinationPoint = promptTargetInfo[sourceTileKey][Trifle.TargetPromptId.movedTileDestinationPoint];
 		
 		var movedTileBoardPoint = this.abilityObject.board.getBoardPointFromRowAndCol(movedTilePoint.rowAndColumn);
 		var movedTileDestBoardPoint = this.abilityObject.board.getBoardPointFromRowAndCol(movedTileDestinationPoint.rowAndColumn);

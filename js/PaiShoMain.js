@@ -2129,7 +2129,7 @@ var GameType = {
 	},
 	Ginseng: {
 		id: 18,
-		desc: "Ginseng Pai Sho",
+		desc: "Ginseng Pai Sho (beta)",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [],
 		usersWithAccess: [
@@ -2138,7 +2138,8 @@ var GameType = {
 			'markdwagner',
 			'sirstotes',
 			'Sambews',
-			'Cannoli'
+			'Cannoli',
+			'Dallin'
 		],
 		noRankedGames: true
 	},

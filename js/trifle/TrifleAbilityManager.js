@@ -268,7 +268,6 @@ Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
 		return {};
 	}
 
-	// ? 
 	var neededPromptInfo = {};
 
 	if (this.abilitiesWithPromptTargetsNeeded.length > 1) {
@@ -277,27 +276,58 @@ Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
 
 	var abilityObject = this.abilitiesWithPromptTargetsNeeded[0];
 
+	debug("Prompt needed for ability? :");
 	debug(abilityObject);
 
 	neededPromptInfo.abilitySourceTile = abilityObject.sourceTile;
+	neededPromptInfo.sourceAbility = abilityObject;
+	neededPromptInfo.sourceTileKey = Trifle.AbilityManager.buildSourceTileKeyObject(abilityObject.sourceTile);
+	var sourceTileKeyStr = JSON.stringify(neededPromptInfo.sourceTileKey);
 
 	// Do we have ability target?
 
 	var nextNeededPromptTargetInfo;
 	abilityObject.abilityInfo.neededPromptTargetsInfo.forEach(function(neededPromptTargetInfo) {
-		if (!nextNeededPromptTargetInfo && !abilityObject.promptTargetInfo[neededPromptTargetInfo.promptId]) {
+		if (!nextNeededPromptTargetInfo 
+				&& (!abilityObject.promptTargetInfo[sourceTileKeyStr] 
+				|| !abilityObject.promptTargetInfo[sourceTileKeyStr][neededPromptTargetInfo.promptId])) {
 			nextNeededPromptTargetInfo = neededPromptTargetInfo;
 		}
 	});
 
 	if (nextNeededPromptTargetInfo) {
 		debug("Need to prompt for target type: " + nextNeededPromptTargetInfo.targetType);
-		this.board.promptForBoardPointInAVeryHackyWay();
+
+		// I need BRAINS
+
+		// TODO create braiiiiins
+		if (nextNeededPromptTargetInfo.promptId === Trifle.TargetPromptId.movedTilePoint
+				&& abilityObject.abilityInfo.targetTypes.length === 1
+				&& abilityObject.abilityInfo.targetTypes.includes(Trifle.TargetType.triggerTargetTiles)) {
+			// not hacky! \o/ (except it's not in a brain yet so it is, shhhh)
+			abilityObject.triggerTargetTilePoints.forEach(function(targetTilePoint) {
+				targetTilePoint.addType(POSSIBLE_MOVE);
+			})
+		} else {
+			// Hacky \o/
+			this.board.promptForBoardPointInAVeryHackyWay();
+		}
 
 		neededPromptInfo.currentPromptTargetId = nextNeededPromptTargetInfo.promptId;
+	} else {
+		debug("No prompt needed");
 	}
 
 	return { neededPromptInfo: neededPromptInfo };
+};
+
+Trifle.AbilityManager.buildSourceTileKeyObject = function(abilitySourceTile) {
+	return {
+		tileOwner: abilitySourceTile.ownerCode,
+		tileCode: abilitySourceTile.code,
+		boardPoint: abilitySourceTile.seatedPoint.getNotationPointString(),
+		tileId: abilitySourceTile.id
+	};
 };
 
 
