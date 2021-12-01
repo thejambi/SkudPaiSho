@@ -266,7 +266,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				numberOfTargetTiles: 1,
 				promptTargetTitle: "pushedTile",
 				targetTileMovements: [
-					/* {
+					{
 						type: Trifle.MovementType.awayFromTargetTileOrthogonal,
 						distance: 2,
 						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
@@ -275,12 +275,12 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						type: Trifle.MovementType.awayFromTargetTileDiagonal,
 						distance: 1,
 						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
-					} */
-					{
+					}
+					/* {
 						type: Trifle.MovementType.standard,
 						distance: 2,
 						promptTargetTitle: "pushLanding"
-					}
+					} */
 				]
 			}
 		],

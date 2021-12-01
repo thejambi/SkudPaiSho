@@ -137,12 +137,19 @@ Trifle.GameNotation.prototype.loadMoves = function() {
 	}
 };
 
+Trifle.GameNotation.prototype.buildSimplifiedNotationString = function(move) {
+	var playerCode = getPlayerCodeFromName(move.player);
+	var moveNum = move.moveNum;
+
+	return moveNum + playerCode + ".¯\\_(ツ)_/¯";	// TODO, obviously
+};
+
 Trifle.GameNotation.prototype.getNotationHtml = function() {
 	var notationHtml = "";
 
 	this.moves.forEach(function(move) {
-		notationHtml += JSON.stringify(move) + "<br />";
-	})
+		notationHtml += this.buildSimplifiedNotationString(move) + "<br />";
+	});
 
 	return notationHtml;
 };
@@ -155,9 +162,9 @@ Trifle.GameNotation.prototype.notationTextForUrl = function() {
 Trifle.GameNotation.prototype.getNotationForEmail = function() {
 	var notationHtml = "";
 
-	this.moves.forEach(function(move) {
-		notationHtml += JSON.stringify(move) + "[BR]";
-	})
+	this.moves.forEach((move) => {
+		notationHtml += this.buildSimplifiedNotationString(move) + "[BR]";
+	});
 
 	return notationHtml;
 };

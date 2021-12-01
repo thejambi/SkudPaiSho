@@ -268,26 +268,21 @@ Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
 		return {};
 	}
 
-	var neededPromptInfo = {};
-
 	if (this.abilitiesWithPromptTargetsNeeded.length > 1) {
 		debug("Multiple abilities that need prompt targets. Will just choose first one to prompt...");
 	}
 
 	var abilityObject = this.abilitiesWithPromptTargetsNeeded[0];
 
-	debug("Prompt needed for ability? :");
-	debug(abilityObject);
+	var neededPromptInfo = {};
 
 	neededPromptInfo.abilitySourceTile = abilityObject.sourceTile;
 	neededPromptInfo.sourceAbility = abilityObject;
 	neededPromptInfo.sourceTileKey = Trifle.AbilityManager.buildSourceTileKeyObject(abilityObject.sourceTile);
 	var sourceTileKeyStr = JSON.stringify(neededPromptInfo.sourceTileKey);
 
-	// Do we have ability target?
-
 	var nextNeededPromptTargetInfo;
-	abilityObject.abilityInfo.neededPromptTargetsInfo.forEach(function(neededPromptTargetInfo) {
+	abilityObject.abilityInfo.neededPromptTargetsInfo.forEach((neededPromptTargetInfo) => {
 		if (!nextNeededPromptTargetInfo 
 				&& (!abilityObject.promptTargetInfo[sourceTileKeyStr] 
 				|| !abilityObject.promptTargetInfo[sourceTileKeyStr][neededPromptTargetInfo.promptId])) {
@@ -296,24 +291,10 @@ Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
 	});
 
 	if (nextNeededPromptTargetInfo) {
-		debug("Need to prompt for target type: " + nextNeededPromptTargetInfo.targetType);
-
-		// I need BRAINS
-
-		// TODO create braiiiiins
-		if (nextNeededPromptTargetInfo.promptId === Trifle.TargetPromptId.movedTilePoint
-				&& abilityObject.abilityInfo.targetTypes.length === 1
-				&& abilityObject.abilityInfo.targetTypes.includes(Trifle.TargetType.triggerTargetTiles)) {
-			// not hacky! \o/ (except it's not in a brain yet so it is, shhhh)
-			abilityObject.triggerTargetTilePoints.forEach(function(targetTilePoint) {
-				targetTilePoint.addType(POSSIBLE_MOVE);
-			})
-		} else {
-			// Hacky \o/
-			this.board.promptForBoardPointInAVeryHackyWay();
-		}
-
 		neededPromptInfo.currentPromptTargetId = nextNeededPromptTargetInfo.promptId;
+
+		var abilityBrain = Trifle.BrainFactory.createAbilityBrain(abilityObject.abilityType, abilityObject);
+		abilityBrain.promptForTarget(nextNeededPromptTargetInfo, sourceTileKeyStr);
 	} else {
 		debug("No prompt needed");
 	}

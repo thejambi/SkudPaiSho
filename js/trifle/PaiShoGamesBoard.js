@@ -472,6 +472,24 @@ PaiShoGames.Board.prototype.getSurroundingBoardPoints = function(initialBoardPoi
 	return surroundingPoints;
 };
 
+PaiShoGames.Board.prototype.getDiagonalBoardPoints = function(initialBoardPoint) {
+	var diagonalPoints = [];
+	for (var row = initialBoardPoint.row - 1; row <= initialBoardPoint.row + 1; row++) {
+		for (var col = initialBoardPoint.col - 1; col <= initialBoardPoint.col + 1; col++) {
+			if ((row !== initialBoardPoint.row || col !== initialBoardPoint.col)	// Not the center given point
+				&& (row >= 0 && col >= 0) && (row < 17 && col < 17)) {	// Not outside range of the grid
+				var boardPoint = this.cells[row][col];
+				if (!boardPoint.isType(NON_PLAYABLE)
+						&& boardPoint.row !== initialBoardPoint.row 
+						&& boardPoint.col !== initialBoardPoint.col) {
+					diagonalPoints.push(boardPoint);
+				}
+			}
+		}
+	}
+	return diagonalPoints;
+};
+
 PaiShoGames.Board.prototype.getAdjacentRowAndCols = function(rowAndCol) {
 	var rowAndCols = [];
 
@@ -814,6 +832,75 @@ PaiShoGames.Board.prototype.getJumpSurroundingTilesPointsPossibleMoves = functio
 	});
 
 	return finalPoints;
+};
+
+PaiShoGames.Board.prototype.getAwayFromTilePossibleMoves = function(targetTilePoint, originPoint, boardPointAlongTheWay) {
+	var movePoints = [];
+
+	// Get points surrounding this one. The one that is farther away from targetTilePoint with same slope is the one
+	var surroundingPoints = this.getSurroundingBoardPoints(boardPointAlongTheWay);
+
+	var originalDistance = this.getDistanceBetweenPoints(targetTilePoint, originPoint);
+	var originalSlope = this.calculateSlopeBetweenPoints(targetTilePoint, originPoint);
+
+	surroundingPoints.forEach((surroundingPoint) => {
+		if (!surroundingPoint.hasTile()) {
+			var distance = this.getDistanceBetweenPoints(targetTilePoint, surroundingPoint);
+			var slope = this.calculateSlopeBetweenPoints(targetTilePoint, surroundingPoint);
+
+			if (slope === originalSlope && distance > originalDistance) {
+				movePoints.push(surroundingPoint);
+			}
+		}
+	});
+
+	return movePoints;
+};
+
+PaiShoGames.Board.prototype.getAwayFromTileOrthogonalPossibleMoves = function(targetTilePoint, originPoint, boardPointAlongTheWay) {
+	var movePoints = [];
+
+	// Get points adjacent to this one. The one that is farther away from targetTilePoint with same slope is the one
+	var adjacentPoints = this.getAdjacentPoints(boardPointAlongTheWay);
+
+	var originalDistance = this.getDistanceBetweenPoints(targetTilePoint, originPoint);
+	var originalSlope = this.calculateSlopeBetweenPoints(targetTilePoint, originPoint);
+
+	adjacentPoints.forEach((surroundingPoint) => {
+		if (!surroundingPoint.hasTile()) {
+			var distance = this.getDistanceBetweenPoints(targetTilePoint, surroundingPoint);
+			var slope = this.calculateSlopeBetweenPoints(targetTilePoint, surroundingPoint);
+
+			if (slope === originalSlope && distance > originalDistance) {
+				movePoints.push(surroundingPoint);
+			}
+		}
+	});
+
+	return movePoints;
+};
+
+PaiShoGames.Board.prototype.getAwayFromTileDiagonalPossibleMoves = function(targetTilePoint, originPoint, boardPointAlongTheWay) {
+	var movePoints = [];
+
+	// Get points diagonal to this one. The one that is farther away from targetTilePoint with same slope is the one
+	var diagonalPoints = this.getDiagonalBoardPoints(boardPointAlongTheWay);
+
+	var originalDistance = this.getDistanceBetweenPoints(targetTilePoint, originPoint);
+	var originalSlope = this.calculateSlopeBetweenPoints(targetTilePoint, originPoint);
+
+	diagonalPoints.forEach((surroundingPoint) => {
+		if (!surroundingPoint.hasTile()) {
+			var distance = this.getDistanceBetweenPoints(targetTilePoint, surroundingPoint);
+			var slope = this.calculateSlopeBetweenPoints(targetTilePoint, surroundingPoint);
+
+			if (slope === originalSlope && distance > originalDistance) {
+				movePoints.push(surroundingPoint);
+			}
+		}
+	});
+
+	return movePoints;
 };
 
 PaiShoGames.Board.prototype.getPointsNextToTilesInLineOfSight = function(movementInfo, originPoint) {
@@ -1497,6 +1584,12 @@ PaiShoGames.Board.prototype.setPossibleMovesForMovement = function(movementInfo,
 			this.setPossibleMovementPointsFromMovePointsOnePathAtATime(PaiShoGames.Board.travelShapeMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, boardPointStart, movementInfo.shape.length, 0, [boardPointStart]);
 		} else if (movementInfo.type === Trifle.MovementType.jumpSurroundingTiles) {
 			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.jumpSurroundingTilesMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+		} else if (movementInfo.type === Trifle.MovementType.awayFromTargetTile) {
+			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.awayFromTargetTileOrthogonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+		} else if (movementInfo.type === Trifle.MovementType.awayFromTargetTileOrthogonal) {
+			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.awayFromTargetTileOrthogonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+		} else if (movementInfo.type === Trifle.MovementType.awayFromTargetTileDiagonal) {
+			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.awayFromTargetTileDiagonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
 		}
 	}
 	// debug("Movement Point Checks: " + this.movementPointChecks);
@@ -1523,6 +1616,27 @@ PaiShoGames.Board.travelShapeMovementFunction = function(board, originPoint, boa
 PaiShoGames.Board.jumpSurroundingTilesMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, movementStepNumber) {
 	var mustPreserveDirection = Trifle.TileInfo.movementMustPreserveDirection(movementInfo);
 	return board.getJumpSurroundingTilesPointsPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
+};
+PaiShoGames.Board.awayFromTargetTileMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
+	if (movementInfo.targetTilePoint) {
+		return board.getAwayFromTilePossibleMoves(movementInfo.targetTilePoint, originPoint, boardPointAlongTheWay);
+	} else {
+		debug("Missing targetTilePoint");
+	}
+};
+PaiShoGames.Board.awayFromTargetTileOrthogonalMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
+	if (movementInfo.targetTilePoint) {
+		return board.getAwayFromTileOrthogonalPossibleMoves(movementInfo.targetTilePoint, originPoint, boardPointAlongTheWay);
+	} else {
+		debug("Missing targetTilePoint");
+	}
+};
+PaiShoGames.Board.awayFromTargetTileDiagonalMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
+	if (movementInfo.targetTilePoint) {
+		return board.getAwayFromTileDiagonalPossibleMoves(movementInfo.targetTilePoint, originPoint, boardPointAlongTheWay);
+	} else {
+		debug("Missing targetTilePoint");
+	}
 };
 
 PaiShoGames.Board.prototype.setPossibleMovementPointsFromMovePoints = function(movePoints, nextPossibleMovementPointsFunction, tile, movementInfo, originPoint, distanceRemaining, moveStepNumber) {

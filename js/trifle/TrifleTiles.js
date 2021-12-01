@@ -116,6 +116,7 @@ Trifle.MovementType = {
 	anywhere: "anywhere",
 	jumpShape: "jumpShape",
 	travelShape: "travelShape",
+	awayFromTargetTile: "awayFromTargetTile",
 	awayFromTargetTileOrthogonal: "awayFromTargetTileOrthogonal",
 	awayFromTargetTileDiagonal: "awayFromTargetTileDiagonal",
 	jumpSurroundingTiles: "jumpSurroundingTiles"
