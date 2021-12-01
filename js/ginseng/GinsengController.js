@@ -3,7 +3,10 @@
 function Ginseng() {}
 
 Ginseng.Controller = function(gameContainer, isMobile) {
-	this.actuator = new Ginseng.Actuator(gameContainer, isMobile);
+	new Ginseng.Options();	// Initialize
+	this.gameContainer = gameContainer;
+	this.isMobile = isMobile;
+	this.createActuator();
 
 	Ginseng.TileInfo.initializeTrifleData();
 	PaiShoGames.currentTileMetadata = Ginseng.GinsengTiles;
@@ -17,6 +20,13 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 	this.isInviteOnly = true;
 	this.isPaiShoGame = true;
 }
+
+Ginseng.Controller.prototype.createActuator = function() {
+	this.actuator = new Ginseng.Actuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	if (this.theGame) {
+		this.theGame.updateActuator(this.actuator);
+	}
+};
 
 Ginseng.Controller.prototype.getGameTypeId = function() {
 	return GameType.Ginseng.id;
@@ -105,6 +115,31 @@ Ginseng.Controller.prototype.getAdditionalMessage = function() {
 	}
 
 	return msg;
+};
+
+Ginseng.Controller.prototype.getAdditionalHelpTabDiv = function() {
+	var settingsDiv = document.createElement("div");
+
+	var heading = document.createElement("h4");
+	heading.innerText = "Ginseng Preferences:";
+
+	settingsDiv.appendChild(heading);
+	settingsDiv.appendChild(Ginseng.Options.buildTileDesignDropdownDiv("Tile Designs"));
+
+	if (!playingOnlineGame() || !iAmPlayerInCurrentOnlineGame() || getOnlineGameOpponentUsername() === getUsername()) {
+		settingsDiv.appendChild(document.createElement("br"));
+		settingsDiv.appendChild(Ginseng.Options.buildToggleViewAsGuestDiv());
+	}
+
+	settingsDiv.appendChild(document.createElement("br"));
+	return settingsDiv;
+};
+
+Ginseng.Controller.prototype.toggleViewAsGuest = function() {
+	Ginseng.Options.viewAsGuest = !Ginseng.Options.viewAsGuest;
+	this.createActuator();
+	this.callActuate();
+	clearMessage();
 };
 
 Ginseng.Controller.prototype.gameHasEndedInDraw = function() {

@@ -11,7 +11,11 @@ Ginseng.GameManager = function(actuator, ignoreActuate, isCopy) {
 	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
-}
+};
+
+Ginseng.GameManager.prototype.updateActuator = function(newActuator) {
+	this.actuator = newActuator;
+};
 
 // Set up the game
 Ginseng.GameManager.prototype.setup = function (ignoreActuate) {

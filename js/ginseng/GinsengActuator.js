@@ -9,7 +9,7 @@ Ginseng.Actuator = function(gameContainer, isMobile) {
 		Ginseng.Controller.getHostTilesContainerDivs(),
 		Ginseng.Controller.getGuestTilesContainerDivs(), 
 		true,
-		GINSENG_ROTATE
+		Ginseng.Options.viewAsGuest ? GINSENG_GUEST_ROTATE : GINSENG_ROTATE
 	);
 
 	this.boardContainer = containers.boardContainer;
@@ -175,10 +175,16 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
-		theDiv.classList.add("ginsengPointRotate");
 		if (boardPoint.isType(MARKED)) {
 			theDiv.classList.add("markedPoint");
-		}	
+		}
+		
+		if (Ginseng.Options.viewAsGuest) {
+			theDiv.classList.add("ginsengGuestPointRotate");
+		} else {
+			theDiv.classList.add("ginsengPointRotate");
+		}
+
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 			if (board.currentlyDeployingTileInfo && board.currentlyDeployingTileInfo.attributes
@@ -219,7 +225,11 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 		
 		var theImg = document.createElement("img");
 		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
+
 		theImg.elementStyleTransform.setValue("rotate", 270, "deg");
+		if (Ginseng.Options.viewAsGuest) {
+			theImg.elementStyleTransform.adjustValue("rotate", 180, "deg");
+		}
 
 		var moveToAnimate = null;
 		if (moveToAnimate || boardPoint.tile.isGigantic) {
