@@ -1162,7 +1162,8 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 						boardPointStart: boardPointStart,
 						boardPointEnd: boardPointEnd,
 						capturedTiles: capturedTiles
-					}
+					},
+					isPassiveMovement: currentMoveInfo.isPassiveMovement
 				};
 
 				var triggers = tileAbilityInfo.triggers;
@@ -1172,7 +1173,7 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 							triggerContext.currentTrigger = triggerInfo;
 							var brain = self.brainFactory.createTriggerBrain(triggerInfo, triggerContext);
 							if (brain && brain.isTriggerMet && self.activationRequirementsAreMet(triggerInfo, tile, triggerContext)) {
-								if (brain.isTriggerMet()) {
+								if (allTriggerConditionsMet && brain.isTriggerMet()) {
 									triggerBrainMap[triggerInfo.triggerType] = brain;
 								} else {
 									allTriggerConditionsMet = false;
@@ -1192,7 +1193,8 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 						tileInfo: tileInfo,
 						tileAbilityInfo: tileAbilityInfo,
 						triggerBrainMap: triggerBrainMap,
-						promptTargetInfo: currentMoveInfo.promptTargetData
+						promptTargetInfo: currentMoveInfo.promptTargetData,
+						isPassiveMovement: currentMoveInfo.isPassiveMovement
 					}
 					var abilityObject = new Trifle.Ability(abilityContext);
 
@@ -1236,7 +1238,8 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 							boardPointStart: boardPointStart,
 							boardPointEnd: boardPointEnd,
 							capturedTiles: capturedTiles
-						}
+						},
+						isPassiveMovement: currentMoveInfo.isPassiveMovement
 					};
 
 					var triggers = tileAbilityInfo.triggers;
@@ -1246,7 +1249,7 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 								triggerContext.currentTrigger = triggerInfo;
 								var brain = self.brainFactory.createTriggerBrain(triggerInfo, triggerContext);
 								if (brain && brain.isTriggerMet && self.activationRequirementsAreMet(triggerInfo, tile, triggerContext)) {
-									if (brain.isTriggerMet()) {
+									if (allTriggerConditionsMet && brain.isTriggerMet()) {
 										triggerBrainMap[triggerInfo.triggerType] = brain;
 									} else {
 										allTriggerConditionsMet = false;

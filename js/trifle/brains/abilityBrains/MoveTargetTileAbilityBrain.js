@@ -24,7 +24,10 @@ Trifle.MoveTargetTileAbilityBrain.prototype.activateAbility = function() {
 				&& !movedTileDestBoardPoint.hasTile()) {
 			// Ok, tile is targeted and destination point is clear!
 			// TODO verify dest point is able to be reached by movement
-			this.abilityObject.board.moveTile(this.abilityObject.sourceTile.ownerName, movedTilePoint, movedTileDestinationPoint);
+			var currentMoveInfo = {
+				isPassiveMovement: this.abilityObject.abilityInfo.isPassiveMovement
+			};
+			this.abilityObject.board.moveTile(this.abilityObject.sourceTile.ownerName, movedTilePoint, movedTileDestinationPoint, currentMoveInfo);
 			this.abilityObject.boardChanged = true;
 		} else {
 			debug("Wrong tile, bub");
@@ -44,7 +47,21 @@ Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeede
 	if (nextNeededPromptTargetInfo.promptId === Trifle.TargetPromptId.movedTilePoint) {
 		if (this.abilityObject.abilityInfo.targetTypes.length === 1
 				&& this.abilityObject.abilityInfo.targetTypes.includes(Trifle.TargetType.triggerTargetTiles)) {
-			this.abilityObject.triggerTargetTilePoints.forEach((targetTilePoint) => {
+			/* this.abilityObject.triggerTargetTilePoints.forEach((targetTilePoint) => {
+				targetTilePoint.addType(POSSIBLE_MOVE);
+			}); */	// This breaks when targeting only certain trigger targets, which we need to do
+			var abilityTargetTiles = [];
+			var abilityTargetTilePoints = [];
+			if (this.abilityObject.abilityInfo.targetTypes && this.abilityObject.abilityInfo.targetTypes.length) {
+				this.abilityObject.abilityInfo.targetTypes.forEach((targetType) => {
+					var targetBrain = Trifle.BrainFactory.createTargetBrain(targetType, this.abilityObject);
+		
+					abilityTargetTiles = abilityTargetTiles.concat(targetBrain.targetTiles);
+					abilityTargetTilePoints = abilityTargetTilePoints.concat(targetBrain.targetTilePoints);
+				});
+			}
+
+			abilityTargetTilePoints.forEach((targetTilePoint) => {
 				targetTilePoint.addType(POSSIBLE_MOVE);
 			});
 		} else {

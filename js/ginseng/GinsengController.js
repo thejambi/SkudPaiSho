@@ -295,7 +295,6 @@ Ginseng.Controller.prototype.completeMove = function() {
 				// quickFinalizeMove();
 			}
 		}
-		refreshMessage();
 	}
 };
 

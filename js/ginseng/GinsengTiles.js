@@ -147,9 +147,14 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 								targetPointTypes: [RED]
 							}
 						]
+					},
+					{
+						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
 					}
 				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile
 			}
 		],
 		textLines: [
@@ -234,6 +239,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			{
 				title: "Active Bison Push",
 				type: Trifle.AbilityName.moveTargetTile,
+				isPassiveMovement: true,
 				optional: true,
 				promptForTargets: true,
 				neededPromptTargetsInfo: [
@@ -260,9 +266,14 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 								targetPointTypes: [RED]
 							}
 						]
+					},
+					{
+						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
 					}
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
 				numberOfTargetTiles: 1,
 				promptTargetTitle: "pushedTile",
 				targetTileMovements: [
@@ -312,9 +323,14 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						triggerType: Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile,
 						targetTeams: [Trifle.TileTeam.enemy],
 						targetTileTypes: [Ginseng.TileType.originalBender]
+					},
+					{
+						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
 					}
 				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile
 			}
 		],
 		textLines: [
@@ -352,12 +368,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		movements: [
 			{
 				type: Trifle.MovementType.standard,
-				distance: 5,
-				captureTypes: [
-					{
-						type: Trifle.CaptureType.all
-					}
-				]
+				distance: 6
 			}
 		],
 		textLines: [

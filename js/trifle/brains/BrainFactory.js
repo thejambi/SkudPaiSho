@@ -35,6 +35,10 @@ Trifle.BrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, 
 			return new Trifle.WhenTargetTileLandsAdjacentTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whenDeployed:
 			return new Trifle.WhenDeployedTriggerBrain(triggerContext);
+		case Trifle.AbilityTriggerType.whenActiveMovement:
+			return new Trifle.WhenActiveMovementTriggerBrain(triggerContext);
+		default:
+			debug("No Trigger Brain created for trigger: " + abilityTriggerInfo.triggerType);
 	}
 };
 

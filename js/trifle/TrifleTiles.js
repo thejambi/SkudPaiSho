@@ -232,7 +232,8 @@ Trifle.AbilityTriggerType = {
 	whenLandsSurroundingTargetTile: "whenLandsSurroundingTargetTile",
 	whenTargetTileLandsAdjacent: "whenTargetTileLandsAdjacent",
 	whileTargetTileIsInZone: "whileTargetTileIsInZone",
-	whenDeployed: "whenDeployed"
+	whenDeployed: "whenDeployed",
+	whenActiveMovement: "whenActiveMovement"
 };
 
 Trifle.PromptTargetType = {
