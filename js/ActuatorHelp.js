@@ -290,3 +290,16 @@ function getSkudTilesSrcPath() {
 function isSamePoint(movePoint, x, y) {
 	return movePoint.rowAndColumn.col === x && movePoint.rowAndColumn.row === y;
 }
+
+function getTilesForPlayer(tiles, player) {
+	var playerTiles = [];
+	if (tiles && tiles.length > 0) {
+		tiles.forEach(function(tile) {
+			if (tile.ownerName === player) {
+				playerTiles.push(tile);
+			}
+		});
+	}
+	return playerTiles;
+};
+

@@ -21,4 +21,8 @@ Trifle.CaptureTargetTilesAbilityBrain.prototype.activateAbility = function() {
 	if (this.capturedTiles.length > 0) {
 		this.abilityObject.boardChanged = true;
 	}
+
+	return {
+		capturedTiles: this.capturedTiles
+	};
 };

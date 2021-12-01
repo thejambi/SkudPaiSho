@@ -16,7 +16,7 @@ Ginseng.Actuator = function(gameContainer, isMobile) {
 	this.arrowContainer = containers.arrowContainer;
 	this.hostTilesContainer = containers.hostTilesContainer;
 	this.guestTilesContainer = containers.guestTilesContainer;
-}
+};
 
 // Ginseng.Actuator.imagePath = "images/Trifle/standard/";
 Ginseng.Actuator.imagePath = "images/Ginseng/standard/";
@@ -59,41 +59,81 @@ Ginseng.Actuator.prototype.htmlify = function(board, tileManager, markingManager
 	}
 
 	/* Player Tiles */
-	/* Team Tiles */
-	// Go through tile piles and clear containers
+
 	self.clearContainerWithId(Ginseng.Actuator.hostTeamTilesDivId);
 	self.clearContainerWithId(Ginseng.Actuator.guestTeamTilesDivId);
-	/* if (tileManager.playersAreSelectingTeams() && !tileManager.hostTeamIsFull()
-			|| !tileManager.playersAreSelectingTeams()) {
-		tileManager.hostTiles.forEach(function(tile) {
-			self.addTeamTile(tile, HOST);
+	
+	var hostCapturedTiles = getTilesForPlayer(tileManager.capturedTiles, HOST);
+	var guestCapturedTiles = getTilesForPlayer(tileManager.capturedTiles, GUEST);
+
+	var showHostCapturedTiles = hostCapturedTiles.length > 0;
+	if (showHostCapturedTiles) {
+		var hostCapturedTilesContainer = document.createElement("span");
+		hostCapturedTilesContainer.classList.add("tileLibrary");
+		var capturedTileLabel = document.createElement("span");
+		capturedTileLabel.innerText = "--Captured Tiles--";
+		hostCapturedTilesContainer.appendChild(capturedTileLabel);
+		hostCapturedTilesContainer.appendChild(document.createElement("br"));
+		this.hostTilesContainer.appendChild(hostCapturedTilesContainer);
+	}
+
+	var showGuestCapturedTiles = guestCapturedTiles.length > 0;
+	if (showGuestCapturedTiles) {
+		var guestCapturedTilesContainer = document.createElement("span");
+		guestCapturedTilesContainer.classList.add("tileLibrary");
+		var capturedTileLabel = document.createElement("span");
+		capturedTileLabel.innerText = "--Captured Tiles--";
+		guestCapturedTilesContainer.appendChild(capturedTileLabel);
+		guestCapturedTilesContainer.appendChild(document.createElement("br"));
+		this.guestTilesContainer.appendChild(guestCapturedTilesContainer);
+	}
+
+	if (showHostCapturedTiles) {
+		hostCapturedTiles.forEach((tile) => {
+			this.addTile(tile, hostCapturedTilesContainer, true);
 		});
 	}
-	if (tileManager.playersAreSelectingTeams() && !tileManager.guestTeamIsFull()
-			|| !tileManager.playersAreSelectingTeams()) {
-		tileManager.guestTiles.forEach(function(tile) {
-			self.addTeamTile(tile, GUEST);
+	if (showGuestCapturedTiles) {
+		guestCapturedTiles.forEach((tile) => {
+			this.addTile(tile, guestCapturedTilesContainer, true);
 		});
-	} */
+	}
+};
 
-	/* Team Selection Area */
-	/* if (!tileManager.hostTeamIsFull()) {
-		this.addLineBreakInTilePile(HOST);
-		this.addLineBreakInTilePile(HOST);
-		Object.keys(Ginseng.TileCodes).forEach(function(key,index) {
-			if (PaiShoGames.currentTileMetadata[key] && PaiShoGames.currentTileMetadata[key].available) {
-				self.addTeamTile(new Ginseng.Tile(Ginseng.TileCodes[key], hostPlayerCode), HOST, true);
-			}
-		});
-	} else if (!tileManager.guestTeamIsFull()) {
-		this.addLineBreakInTilePile(GUEST);
-		this.addLineBreakInTilePile(GUEST);
-		Object.keys(Ginseng.TileCodes).forEach(function(key,index) {
-			if (PaiShoGames.currentTileMetadata[key] && PaiShoGames.currentTileMetadata[key].available) {
-				self.addTeamTile(new Ginseng.Tile(Ginseng.TileCodes[key], guestPlayerCode), GUEST, true);
-			}
-		});
-	} */
+Ginseng.Actuator.prototype.addTile = function(tile, tileContainer, isCaptured) {
+	if (!tile) {
+		return;
+	}
+	var theDiv = document.createElement("div");
+
+	theDiv.classList.add("point");
+	theDiv.classList.add("hasTile");
+
+	if (tile.selectedFromPile) {
+		theDiv.classList.add("selectedFromPile");
+		theDiv.classList.add("drained");
+	}
+
+	var theImg = document.createElement("img");
+	
+	var srcValue = this.getTileSrcPath(tile);
+	theImg.src = srcValue + tile.getImageName() + ".png";
+	theDiv.appendChild(theImg);
+
+	theDiv.setAttribute("name", tile.code);
+	theDiv.setAttribute("id", tile.id);
+
+	if (!isCaptured) {
+		if (this.mobile) {
+			theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
+		} else {
+			theDiv.setAttribute("onclick", "unplayedTileClicked(this);");
+			theDiv.setAttribute("onmouseover", "showTileMessage(this);");
+			theDiv.setAttribute("onmouseout", "clearMessage();");
+		}
+	}
+
+	tileContainer.appendChild(theDiv);
 };
 
 Ginseng.Actuator.prototype.clearContainer = function (container) {
@@ -357,6 +397,13 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 			theDiv.style.transform = "scale(" + scaleValue + ")";	// This will size back to normal after moving
 		});
 	}, pieceAnimationLength);
+};
+
+Ginseng.Actuator.prototype.getTileSrcPath = function(tile) {
+	var srcValue = "images/";
+	var gameImgDir = "Ginseng/" + localStorage.getItem(Ginseng.Options.tileDesignTypeKey);
+	srcValue = srcValue + gameImgDir + "/";
+	return srcValue;
 };
 
 Ginseng.Actuator.prototype.printBoard = function(board) {

@@ -6,7 +6,8 @@ var RESTRICTED_BY_OPPONENT_TILE_ZONE = "Restricted by opponent tile zone";
 Ginseng.TileManager = function() {
 	this.hostTiles = this.loadTileSet('H');
 	this.guestTiles = this.loadTileSet('G');
-}
+	this.capturedTiles = [];
+};
 
 Ginseng.TileManager.prototype.loadTileSet = function(ownerCode) {
 	var tiles = [];
@@ -99,6 +100,12 @@ Ginseng.TileManager.prototype.putTileBack = function(tile) {
 	var tilePile = this.getPlayerTilePile(player);
 
 	tilePile.push(tile);
+};
+
+Ginseng.TileManager.prototype.addToCapturedTiles = function(tiles) {
+	tiles.forEach((tile) => {
+		this.capturedTiles.push(tile);
+	});
 };
 
 Ginseng.TileManager.prototype.getTeamSize = function() {

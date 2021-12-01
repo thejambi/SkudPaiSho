@@ -78,12 +78,19 @@ Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
 
 	if (move.moveType === DEPLOY) {
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
-		this.board.placeTile(tile, move.endPoint);
+		var placeTileResults = this.board.placeTile(tile, move.endPoint);
+		this.tileManager.addToCapturedTiles(placeTileResults.capturedTiles);
 		this.buildDeployGameLogText(move, tile);
 	} else if (move.moveType === MOVE) {
 		var moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint, move);
+		this.tileManager.addToCapturedTiles(moveDetails.capturedTiles);
+
 		var abilityActivationFlags = moveDetails.abilityActivationFlags;
 		debug(abilityActivationFlags);
+
+		if (abilityActivationFlags.capturedTiles && abilityActivationFlags.capturedTiles.length) {
+			this.tileManager.addToCapturedTiles(abilityActivationFlags.capturedTiles);
+		}
 
 		var needToPromptUser = abilityActivationFlags && abilityActivationFlags.neededPromptInfo && abilityActivationFlags.neededPromptInfo.currentPromptTargetId;
 		if (needToPromptUser) {

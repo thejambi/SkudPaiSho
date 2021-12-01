@@ -379,7 +379,13 @@ PaiShoGames.Board.prototype.placeTile = function(tile, notationPoint) {
 
 	var boardPoint = this.getPointFromNotationPoint(notationPoint);
 
-	this.processAbilities(tile, tileInfo, null, boardPoint, [], {});
+	var capturedTiles = [];
+
+	this.processAbilities(tile, tileInfo, null, boardPoint, capturedTiles, {});
+
+	return {
+		capturedTiles: capturedTiles
+	}
 };
 
 PaiShoGames.Board.prototype.getDistanceBetweenPoints = function(bp1, bp2) {
@@ -1114,7 +1120,7 @@ PaiShoGames.Board.prototype.moveTile = function(player, notationPointStart, nota
  * Process abilities on the board after a tile is moved or placed/deployed.
  * `boardPointStart` will probably be null for when a tile is placed.
  */
-PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo) {
+PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo, existingAbilityActivationFlags) {
 	if (!currentMoveInfo) {
 		currentMoveInfo = {};
 	}
@@ -1301,7 +1307,13 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 	if (abilityActivationFlags.boardHasChanged) {
 		// Need to re-process abilities... 
 		// Pass in some sort of context from the activation flags???
-		this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo);
+		var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo, abilityActivationFlags);
+		if (nextAbilityActivationFlags.capturedTiles && nextAbilityActivationFlags.capturedTiles.length) {
+			if (!abilityActivationFlags.capturedTiles) {
+				abilityActivationFlags.capturedTiles = [];
+			}
+			abilityActivationFlags.capturedTiles = abilityActivationFlags.capturedTiles.concat(nextAbilityActivationFlags.capturedTiles);
+		}
 	}
 
 	return abilityActivationFlags;

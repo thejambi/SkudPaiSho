@@ -2141,7 +2141,8 @@ var GameType = {
 			'Cannoli',
 			'Dallin',
 			'HeBear',
-			'emanuelovici'
+			'emanuelovici',
+			'fish'
 		],
 		noRankedGames: true
 	},
