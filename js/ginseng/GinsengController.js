@@ -281,6 +281,8 @@ Ginseng.Controller.prototype.completeMove = function() {
 		debug("Prompting user for the rest of the move!");
 		this.notationBuilder.status = Trifle.NotationBuilderStatus.PROMPTING_FOR_TARGET;
 		this.notationBuilder.neededPromptTargetInfo = neededPromptTargetInfo;
+		// TODO show skip ability option if optional ability
+		showResetMoveMessage();
 	} else {
 		this.gameNotation.addMove(move);
 		if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
@@ -293,6 +295,7 @@ Ginseng.Controller.prototype.completeMove = function() {
 				// quickFinalizeMove();
 			}
 		}
+		refreshMessage();
 	}
 };
 
