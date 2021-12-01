@@ -32,7 +32,7 @@ Trifle.Controller.prototype.resetNotationBuilder = function() {
 	if (this.notationBuilder) {
 		offerDraw = this.notationBuilder.offerDraw;
 	}
-	this.notationBuilder = new Trifle.NotationBuilder();
+	this.notationBuilder = new OldTrifle.NotationBuilder();
 	if (offerDraw) {
 		this.notationBuilder.offerDraw = true;
 	}
@@ -44,7 +44,7 @@ Trifle.Controller.prototype.resetGameNotation = function() {
 };
 
 Trifle.Controller.prototype.getNewGameNotation = function() {
-	return new Trifle.GameNotation();
+	return new OldTrifle.GameNotation();
 };
 
 Trifle.Controller.getHostTilesContainerDivs = function() {
