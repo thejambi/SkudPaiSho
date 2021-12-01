@@ -2139,7 +2139,9 @@ var GameType = {
 			'sirstotes',
 			'Sambews',
 			'Cannoli',
-			'Dallin'
+			'Dallin',
+			'HeBear',
+			'emanuelovici'
 		],
 		noRankedGames: true
 	},
