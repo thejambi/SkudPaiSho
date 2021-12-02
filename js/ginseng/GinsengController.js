@@ -420,6 +420,11 @@ Ginseng.Controller.prototype.isSolitaire = function() {
 
 Ginseng.Controller.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
+	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && getOnlineGameOpponentUsername() != getUsername()) {
+		new Ginseng.Options();	// To set perspective...
+		this.createActuator();
+		clearMessage();
+	}
 };
 
 Ginseng.Controller.prototype.skipClicked = function() {
