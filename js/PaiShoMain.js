@@ -1409,7 +1409,25 @@ function getResetMoveText() {
 		return "";
 	}
 }
-  
+
+function skipClicked() {
+	if (gameController && gameController.skipClicked) {
+		gameController.skipClicked();
+	}
+}
+
+function getSkipButtonHtmlText(overrideText) {
+	var text = "Skip";
+	if (overrideText) {
+		text = overrideText;
+	}
+	return "<br /><span class='skipBonus' onclick='skipClicked();'>" + text + "</span>";
+}
+ 
+function showSkipButtonMessage(overrideText) {
+	getGameMessageElement().innerHTML += getSkipButtonHtmlText(overrideText);
+}
+
 function showResetMoveMessage() {
 	getGameMessageElement().innerHTML += getResetMoveText();
 }

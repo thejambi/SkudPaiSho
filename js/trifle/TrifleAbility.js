@@ -51,7 +51,8 @@ Trifle.Ability.prototype.promptTargetInfoPresent = function(neededPromptTargetIn
 
 	return this.promptTargetInfo 
 		&& this.promptTargetInfo[sourceTileKey]
-		&& this.promptTargetInfo[sourceTileKey][neededPromptTargetInfo.promptId];
+		&& (this.promptTargetInfo[sourceTileKey].skipped
+			|| this.promptTargetInfo[sourceTileKey][neededPromptTargetInfo.promptId]);
 };
 
 Trifle.Ability.prototype.setAbilityTargetTiles = function() {

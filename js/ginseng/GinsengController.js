@@ -316,7 +316,11 @@ Ginseng.Controller.prototype.completeMove = function() {
 		debug("Prompting user for the rest of the move!");
 		this.notationBuilder.status = Trifle.NotationBuilderStatus.PROMPTING_FOR_TARGET;
 		this.notationBuilder.neededPromptTargetInfo = neededPromptTargetInfo;
-		// TODO show skip ability option if optional ability
+		
+		if (neededPromptTargetInfo.sourceAbility.abilityInfo.optional) {
+			showSkipButtonMessage("Skip optional ability");
+		}
+
 		showResetMoveMessage();
 	} else {
 		this.gameNotation.addMove(move);
@@ -407,7 +411,7 @@ Ginseng.Controller.prototype.getCurrentPlayer = function() {
 };
 
 Ginseng.Controller.prototype.cleanup = function() {
-	// document.querySelector(".svgContainer").classList.remove("TrifleBoardRotate");
+	// Nothing to do
 };
 
 Ginseng.Controller.prototype.isSolitaire = function() {
@@ -417,6 +421,20 @@ Ginseng.Controller.prototype.isSolitaire = function() {
 Ginseng.Controller.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 };
+
+Ginseng.Controller.prototype.skipClicked = function() {
+	var sourceTileKey = JSON.stringify(this.notationBuilder.neededPromptTargetInfo.sourceTileKey);
+	if (!this.notationBuilder.promptTargetData[sourceTileKey]) {
+		this.notationBuilder.promptTargetData[sourceTileKey] = {};
+	}
+	this.notationBuilder.promptTargetData[sourceTileKey].skipped = true;
+	var notationBuilderSave = this.notationBuilder;
+	this.resetMove();
+	this.notationBuilder = notationBuilderSave;
+	this.completeMove();
+};
+
+/* TODO Find more global way of doing RmbDown,etc methods? */
 
 Ginseng.Controller.prototype.RmbDown = function(htmlPoint) {
 	var npText = htmlPoint.getAttribute("name");

@@ -33,6 +33,8 @@ Trifle.BrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, 
 			return new Trifle.WhenLandsSurroundingTargetTileTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whenTargetTileLandsAdjacent:
 			return new Trifle.WhenTargetTileLandsAdjacentTriggerBrain(triggerContext);
+		case Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding:
+			return new Trifle.WhenTargetTileLandsSurroundingTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whenDeployed:
 			return new Trifle.WhenDeployedTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whenActiveMovement:

@@ -231,6 +231,7 @@ Trifle.AbilityTriggerType = {
 	whenLandsAdjacentToTargetTile: "whenLandsAdjacentToTargetTile",
 	whenLandsSurroundingTargetTile: "whenLandsSurroundingTargetTile",
 	whenTargetTileLandsAdjacent: "whenTargetTileLandsAdjacent",
+	whenTargetTileLandsSurrounding: "whenTargetTileLandsSurrounding",
 	whileTargetTileIsInZone: "whileTargetTileIsInZone",
 	whenDeployed: "whenDeployed",
 	whenActiveMovement: "whenActiveMovement"
@@ -1456,7 +1457,7 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			{
 				type: Trifle.MovementType.jumpSurroundingTiles,
 				jumpDirections: [Trifle.MovementDirection.diagonal],
-				targetTileTeams: [Trifle.TileTeam.friendly],
+				targetTeams: [Trifle.TileTeam.friendly],
 				distance: 99
 			}
 		]

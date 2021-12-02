@@ -814,7 +814,7 @@ PaiShoGames.Board.prototype.getJumpSurroundingTilesPointsPossibleMoves = functio
 
 	var self = this;
 	surroundingPoints.forEach(function(surroundingPoint) {
-		if (surroundingPoint.hasTile() && self.targetTileMatchesTargetTeam(surroundingPoint.tile, originPoint.tile, movementInfo.targetTileTeams)) {
+		if (surroundingPoint.hasTile() && self.targetTileMatchesTargetTeam(surroundingPoint.tile, originPoint.tile, movementInfo.targetTeams)) {
 			potentialMovePoints = [];
 
 			if (movementInfo.jumpDirections && movementInfo.jumpDirections.includes(Trifle.MovementDirection.diagonal)
@@ -2039,10 +2039,10 @@ PaiShoGames.Board.prototype.activationRequirementsAreMet = function(abilityInfo,
 		abilityInfo.activationRequirements.forEach(function(activationRequirement) {
 			if (activationRequirement.type === Trifle.ActivationRequirement.tilesNotInTemple) {
 				var ownerNames = [];
-				if (activationRequirement.targetTileTeams.includes(Trifle.TileTeam.friendly)) {
+				if (activationRequirement.targetTeams.includes(Trifle.TileTeam.friendly)) {
 					ownerNames.push(tile.ownerName);
 				}
-				if (activationRequirement.targetTileTeams.includes(Trifle.TileTeam.enemy)) {
+				if (activationRequirement.targetTeams.includes(Trifle.TileTeam.enemy)) {
 					ownerNames.push(getOpponentName(tile.ownerName));
 				}
 				requirementCheckPoints = self.getPointsForTileCodes(activationRequirement.targetTileCodes, ownerNames);

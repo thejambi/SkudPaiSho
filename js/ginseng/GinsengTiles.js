@@ -34,7 +34,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			{
 				type: Trifle.MovementType.jumpSurroundingTiles,
 				jumpDirections: [Trifle.MovementDirection.diagonal],
-				targetTileTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy],
+				targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy],
 				distance: 99
 			}
 		],
@@ -287,11 +287,59 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						distance: 1,
 						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
 					}
-					/* {
-						type: Trifle.MovementType.standard,
+				]
+			},
+			{
+				title: "Passive Bison Push",
+				type: Trifle.AbilityName.moveTargetTile,
+				isPassiveMovement: true,
+				optional: true,
+				promptForTargets: true,
+				neededPromptTargetsInfo: [
+					{
+						title: "pushedTile",
+						promptId: Trifle.TargetPromptId.movedTilePoint,
+						targetType: Trifle.PromptTargetType.boardPoint
+					},
+					{
+						title: "pushLanding",
+						promptId: Trifle.TargetPromptId.movedTileDestinationPoint,
+						targetType: Trifle.PromptTargetType.boardPoint
+					}
+				],
+				priority: Trifle.AbilityPriorityLevel.highest,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding,
+						targetTeams: [Trifle.TileTeam.friendly],
+						activationRequirements: [
+							{
+								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [Trifle.TileCategory.thisTile],
+								targetPointTypes: [RED]
+							}
+						]
+					},
+					{
+						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [Trifle.TileCategory.allTileTypes]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				triggerTypeToTarget: Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding,
+				numberOfTargetTiles: 1,
+				promptTargetTitle: "pushedTile",
+				targetTileMovements: [
+					{
+						type: Trifle.MovementType.awayFromTargetTileOrthogonal,
 						distance: 2,
-						promptTargetTitle: "pushLanding"
-					} */
+						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
+					},
+					{
+						type: Trifle.MovementType.awayFromTargetTileDiagonal,
+						distance: 1,
+						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
+					}
 				]
 			}
 		],
@@ -405,7 +453,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						var activationRequirement = {
 							type: Trifle.ActivationRequirement.tilesNotInTemple,
 							targetTileCodes: [Ginseng.TileCodes.WhiteLotus],
-							targetTileTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy]
+							targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy]
 						};
 						if (captureTypeInfo.activationRequirements) {
 							captureTypeInfo.activationRequirements.push(activationRequirement);
@@ -425,7 +473,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						var triggerActivationRequirement = {
 							type: Trifle.ActivationRequirement.tilesNotInTemple,
 							targetTileCodes: [Ginseng.TileCodes.WhiteLotus],
-							targetTileTeams: [Trifle.TileTeam.friendly]
+							targetTeams: [Trifle.TileTeam.friendly]
 						};
 						if (triggerInfo.activationRequirements) {
 							triggerInfo.activationRequirements.push(triggerActivationRequirement);
