@@ -396,7 +396,11 @@ Ginseng.Controller.prototype.getPointMessage = function(htmlPoint) {
 	if (boardPoint.hasTile()) {
 		return this.getTheMessage(boardPoint.tile, boardPoint.tile.ownerName);
 	} else {
-		return null;
+		var messageLines = this.theGame.buildAbilitySummaryLines();
+		return {
+			heading: "Active Abilities",
+			message: messageLines
+		};
 	}
 }
 

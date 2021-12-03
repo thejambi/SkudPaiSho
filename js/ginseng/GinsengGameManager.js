@@ -231,11 +231,20 @@ Ginseng.GameManager.prototype.buildAbilityActivationOrder = function() {
 	return [
 		Trifle.AbilityName.recordTilePoint,
 		Trifle.AbilityName.moveTileToRecordedPoint,
-		// Trifle.AbilityName.cancelAbilities,
-		// Trifle.AbilityName.cancelAbilitiesTargetingTiles,
+		Trifle.AbilityName.cancelAbilities,
+		Trifle.AbilityName.cancelAbilitiesTargetingTiles,
 		Trifle.AbilityName.protectFromCapture,
 		Trifle.AbilityName.moveTargetTile
 	];
+};
+
+Ginseng.GameManager.prototype.buildAbilitySummaryLines = function() {
+	var abilitySummaryLines = [];
+	this.board.abilityManager.abilities.forEach((abilityObject) => {
+		abilitySummaryLines = abilitySummaryLines.concat(abilityObject.getSummaryLines());
+	});
+
+	return abilitySummaryLines;
 };
 
 Ginseng.GameManager.prototype.getCopy = function() {

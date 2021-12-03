@@ -196,6 +196,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			},
 			{
+				title: "Protect From Enemy Abilities",
 				type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
 				triggers: [
 					{

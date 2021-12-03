@@ -176,3 +176,20 @@ Trifle.Ability.prototype.getNeededPromptTargetInfo = function(promptTargetId) {
 	return matchingPromptTargetInfo;
 };
 
+Trifle.Ability.prototype.getSummaryLines = function() {
+	var lines = [];
+	var abilityTitle = this.abilityType;
+	if (this.abilityInfo.title) {
+		abilityTitle = this.abilityInfo.title;
+	}
+	lines.push("=== " + abilityTitle + " ===");
+	lines.push("- Source Tile: " + this.sourceTile.ownerName + " " + Trifle.Tile.getTileName(this.sourceTile.code));
+	var targetTileNames = [];
+	this.abilityTargetTiles.forEach((abilityTargetTile) => {
+		targetTileNames.push(" " + abilityTargetTile.ownerName + " " + Trifle.Tile.getTileName(abilityTargetTile.code));
+	});
+	lines.push("- Target Tiles:" + targetTileNames);
+
+	return lines;
+};
+
