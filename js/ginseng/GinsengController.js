@@ -10,6 +10,7 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 
 	Ginseng.TileInfo.initializeTrifleData();
 	PaiShoGames.currentTileMetadata = Ginseng.GinsengTiles;
+	PaiShoGames.currentTileCodes = Ginseng.TileCodes;
 	this.resetGameManager();
 	this.resetGameNotation();
 	this.resetNotationBuilder();

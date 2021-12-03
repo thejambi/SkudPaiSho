@@ -1515,7 +1515,17 @@ Trifle.TileInfo.getReadableDescription = function(tileCode) {
 					});
 				}
 
-				if (movementInfo.captureTypes) tileHtml += "<br />- Can Capture: " + movementInfo.captureTypes;
+				if (movementInfo.captureTypes) {
+					// tileHtml += "<br />- Can Capture: " + movementInfo.captureTypes;
+					// tileHtml += "<br />Capturing Properties:";
+					/* movementInfo.captureTypes.forEach((captureTypeInfoList) => {
+						Object.keys(captureTypeInfoList).forEach((key, index) => {
+							var captureTypeInfoEntry = captureTypeInfoList[key];
+							tileHtml += "<br />- " + key + ": " + captureTypeInfoEntry;
+						});
+					}); */
+					tileHtml += Trifle.TileInfo.getObjectSummary("Capturing Properties", movementInfo.captureTypes, 0);
+				}
 			});
 		}
 
@@ -1554,5 +1564,29 @@ Trifle.TileInfo.getReadableDescription = function(tileCode) {
 	}
 
 	return tileHtml;
+};
+
+Trifle.TileInfo.getObjectSummary = function(origKey, theObject, indentDepth) {
+	var indentDashStr = "";
+	for (var i = 0; i < indentDepth; i++) {
+		indentDashStr += "-";
+	}
+	var htmlSummary = "";
+	if (theObject instanceof Array && !(theObject[0] instanceof Object)) {
+		htmlSummary += "<br />" + indentDashStr + " " + origKey + ": " + theObject;
+	} else if (theObject instanceof Object) {
+		if (!isNaN(origKey)) {
+			indentDepth--;
+		} else {
+			htmlSummary += "<br />" + indentDashStr + " " + origKey + ": ";
+		}
+		Object.keys(theObject).forEach((key, index) => {
+			var captureTypeInfoEntry = theObject[key];
+			htmlSummary += Trifle.TileInfo.getObjectSummary(key, captureTypeInfoEntry, indentDepth+1);
+		});
+	} else {
+		htmlSummary += "<br />" + indentDashStr + " " + origKey + ": " + theObject;
+	}
+	return htmlSummary;
 };
 

@@ -60,27 +60,11 @@ Trifle.Tile.prototype.getCopy = function() {
 Trifle.Tile.getTileName = function(tileCode) {
 	var name = "";
 	
-	if (tileCode === 'L') {
-		name = "White Lotus";
-	} else if (tileCode === 'S') {
-		name = "Sky Bison";
-	} else if (tileCode === 'B') {
-		name = "Badgermole";
-	} else if (tileCode === 'W') {
-		name = "Wheel";
-	} else if (tileCode === 'C') {
-		name = "Chrysanthemum";
-	} else if (tileCode === 'F') {
-		name = "Fire Lily";
-	} else if (tileCode === 'D') {
-		name = "White Dragon";
-	} else {
-		Object.keys(Trifle.TileCodes).forEach(function(key,index) {
-			if (Trifle.TileCodes[key] === tileCode) {
-				name = key;
-			}
-		});
-	}
+	Object.keys(PaiShoGames.currentTileCodes).forEach(function(key, index) {
+		if (PaiShoGames.currentTileCodes[key] === tileCode) {
+			name = key;
+		}
+	});
 
 	return name;
 };

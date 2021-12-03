@@ -112,10 +112,10 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			}
-		],
+		]/* ,
 		textLines: [
 			"Koi | Original Bender"
-		]
+		] */
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Dragon] = {
@@ -156,10 +156,10 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile
 			}
-		],
+		]/* ,
 		textLines: [
 			"Dragon | Original Bender"
-		]
+		] */
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Badgermole] = {
@@ -215,10 +215,10 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				targetAbilityTypes: [Trifle.AbilityType.all],
 				cancelAbilitiesFromTeam: Trifle.TileTeam.enemy
 			}
-		],
+		]/* ,
 		textLines: [
 			"Badgermole | Original Bender"
-		]
+		] */
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Bison] = {
@@ -342,10 +342,10 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					}
 				]
 			}
-		],
+		]/* ,
 		textLines: [
 			"Bison | Original Bender"
-		]
+		] */
 	};
 
 	GinsengTiles[Ginseng.TileCodes.LionTurtle] = {
@@ -380,10 +380,10 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile
 			}
-		],
+		]/* ,
 		textLines: [
 			"Lion Turtle"
-		]
+		] */
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Wheel] = {
@@ -404,10 +404,10 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					}
 				]
 			}
-		],
+		]/* ,
 		textLines: [
 			"Wheel"
-		]
+		] */
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Ginseng] = {
@@ -418,10 +418,10 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				type: Trifle.MovementType.standard,
 				distance: 6
 			}
-		],
+		]/* ,
 		textLines: [
 			"Ginseng"
-		]
+		] */
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Orchid] = {
@@ -437,10 +437,10 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					}
 				]
 			}
-		],
+		]/* ,
 		textLines: [
 			"Orchid"
-		]
+		] */
 	};
 
 	/* Apply Capture and Ability Activation Requirements Rules */
