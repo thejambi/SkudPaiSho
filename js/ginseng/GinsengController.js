@@ -11,8 +11,8 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 	Ginseng.TileInfo.initializeTrifleData();
 	PaiShoGames.currentTileMetadata = Ginseng.GinsengTiles;
 	this.resetGameManager();
-	this.resetNotationBuilder();
 	this.resetGameNotation();
+	this.resetNotationBuilder();
 
 	this.hostAccentTiles = [];
 	this.guestAccentTiles = [];
@@ -47,6 +47,8 @@ Ginseng.Controller.prototype.resetNotationBuilder = function() {
 		this.notationBuilder.offerDraw = true;
 	}
 	this.checkingOutOpponentTileOrNotMyTurn = false;
+
+	this.notationBuilder.currentPlayer = this.getCurrentPlayer();
 };
 
 Ginseng.Controller.prototype.resetGameNotation = function() {
@@ -90,9 +92,9 @@ Ginseng.Controller.prototype.getAdditionalMessage = function() {
 	
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by choosing your team. <br />";
+			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by clicking <strong>Start Online Game<strong> below.";
 		} else {
-			msg += "Sign in to enable online gameplay. Or, start playing a local game by choosing your team.";
+			msg += "Sign in to enable online gameplay. Or, start playing a local game.";
 		}
 
 		msg += getGameOptionsMessageHtml(GameType.Ginseng.gameOptions);
@@ -114,7 +116,18 @@ Ginseng.Controller.prototype.getAdditionalMessage = function() {
 		}
 	}
 
+	if (!playingOnlineGame()) {
+		// msg += getGameOptionsMessageHtml(GameType.Ginseng.gameOptions);	// For when there are game options
+		if (onlinePlayEnabled && this.gameNotation.moves.length === 0) {
+			msg += "<br /><span class='skipBonus' onClick='gameController.startOnlineGame()'>Start Online Game</span><br />";
+		}
+	}
+
 	return msg;
+};
+
+Ginseng.Controller.prototype.startOnlineGame = function() {
+	createGameIfThatIsOk(GameType.Ginseng.id);
 };
 
 Ginseng.Controller.prototype.getAdditionalHelpTabDiv = function() {
@@ -324,15 +337,10 @@ Ginseng.Controller.prototype.completeMove = function() {
 		showResetMoveMessage();
 	} else {
 		this.gameNotation.addMove(move);
-		if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-			createGameIfThatIsOk(this.getGameTypeId());
+		if (playingOnlineGame()) {
+			callSubmitMove();
 		} else {
-			if (playingOnlineGame()) {
-				callSubmitMove();
-			} else {
-				finalizeMove();
-				// quickFinalizeMove();
-			}
+			finalizeMove();
 		}
 	}
 };
@@ -404,10 +412,15 @@ Ginseng.Controller.prototype.getAiList = function() {
 }
 
 Ginseng.Controller.prototype.getCurrentPlayer = function() {
-	if (currentMoveIndex % 2 === 0) {	// To get right player during replay...
-		return HOST;
-	} else {
+	if (this.gameNotation.moves.length == 0) {
 		return GUEST;
+	}
+	var lastPlayer = this.gameNotation.moves[this.gameNotation.moves.length - 1].player;
+
+	if (lastPlayer === HOST) {
+		return GUEST;
+	} else if (lastPlayer === GUEST) {
+		return HOST;
 	}
 };
 

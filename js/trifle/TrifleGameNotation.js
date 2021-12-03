@@ -99,7 +99,7 @@ Trifle.GameNotation.prototype.removeLastMove = function() {
 	debug(removedMove);
 };
 
-Trifle.GameNotation.prototype.getPlayerMoveNum = function() {
+/* Trifle.GameNotation.prototype.getPlayerMoveNum = function() {
 	var moveNum = 0;
 	var lastMove = this.moves[this.moves.length-1];
 
@@ -110,24 +110,26 @@ Trifle.GameNotation.prototype.getPlayerMoveNum = function() {
 		}
 	}
 	return moveNum;
-};
+}; */	// Can get rid of this?
 
 Trifle.GameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	var moveNum = 0;
-	var player = HOST;
+
+	if (this.moves.length === 0) {
+		this.firstPlayer = builder.currentPlayer;
+		this.secondPlayer = getOpponentName(this.firstPlayer);
+	}
 
 	var lastMove = this.moves[this.moves.length-1];
 
 	if (lastMove) {
 		moveNum = lastMove.moveNum;
-		if (lastMove.player === GUEST) {
+		if (lastMove.player === this.secondPlayer) {
 			moveNum++;
-		} else {
-			player = GUEST;
 		}
 	}
 
-	return builder.getNotationMove(moveNum, player);
+	return builder.getNotationMove(moveNum, builder.currentPlayer);
 };
 
 Trifle.GameNotation.prototype.loadMoves = function() {
