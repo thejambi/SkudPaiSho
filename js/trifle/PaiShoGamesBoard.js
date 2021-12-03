@@ -1096,6 +1096,10 @@ PaiShoGames.Board.prototype.moveTile = function(player, notationPointStart, nota
 		capturedTiles.push(this.captureTileOnPoint(boardPointEnd));
 	}
 
+	capturedTiles.forEach((capturedTile) => {
+		capturedTile.beingCaptured = true;
+	});
+
 	boardPointEnd.putTile(tile);
 	tile.seatedPoint = boardPointEnd;
 

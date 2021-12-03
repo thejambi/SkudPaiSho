@@ -110,7 +110,11 @@ Ginseng.TileManager.prototype.putTileBack = function(tile) {
 
 Ginseng.TileManager.prototype.addToCapturedTiles = function(tiles) {
 	tiles.forEach((tile) => {
-		this.capturedTiles.push(tile);
+		if (tile.beingCaptured || tile.beingCapturedByAbility) {
+			this.capturedTiles.push(tile);
+		}
+		tile.beingCaptured = null;
+		tile.beingCapturedByAbility = null;
 	});
 };
 

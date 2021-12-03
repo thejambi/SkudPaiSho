@@ -14,6 +14,11 @@ Trifle.MoveTileToRecordedPointAbilityBrain.prototype.activateAbility = function(
 		this.abilityObject.board.placeTile(targetTile, destinationPoint);
 		this.abilityObject.boardChanged = true;
 
+		if (targetTile.beingCaptured || targetTile.beingCapturedByAbility) {
+			targetTile.beingCaptured = null;
+			targetTile.beingCapturedByAbility = null;
+		}
+
 		return {
 			tileMoved: targetTile
 		};

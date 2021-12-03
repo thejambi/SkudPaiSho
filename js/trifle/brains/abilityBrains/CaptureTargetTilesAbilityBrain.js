@@ -14,6 +14,7 @@ Trifle.CaptureTargetTilesAbilityBrain.prototype.activateAbility = function() {
 			var tileIsCapturable = self.abilityObject.board.targetPointTileIsCapturableByTileAbility(targetTilePoint, self.abilityObject.sourceTile);
 			if (tileIsCapturable && self.abilityObject.board.capturePossibleBasedOnBannersPlayed(self.abilityObject.sourceTile.ownerName, targetTilePoint)) {
 				var capturedTile = self.abilityObject.board.captureTileOnPoint(targetTilePoint);
+				capturedTile.beingCapturedByAbility = true;
 				self.capturedTiles.push(capturedTile);
 			}
 		});
