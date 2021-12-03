@@ -241,7 +241,9 @@ Ginseng.GameManager.prototype.buildAbilityActivationOrder = function() {
 Ginseng.GameManager.prototype.buildAbilitySummaryLines = function() {
 	var abilitySummaryLines = [];
 	this.board.abilityManager.abilities.forEach((abilityObject) => {
-		abilitySummaryLines = abilitySummaryLines.concat(abilityObject.getSummaryLines());
+		if (abilityObject.activated) {
+			abilitySummaryLines = abilitySummaryLines.concat(abilityObject.getSummaryLines());
+		}
 	});
 
 	return abilitySummaryLines;

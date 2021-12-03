@@ -85,8 +85,10 @@ Trifle.Ability.prototype.activateAbility = function() {
 	// Get AbilityBrain
 	this.setAbilityTargetTiles();
 
-	this.abilityActivatedResults = this.abilityBrain.activateAbility();
-	this.activated = true;
+	if (this.abilityTargetTiles.length > 0) {	// Ability must have target tile?
+		this.abilityActivatedResults = this.abilityBrain.activateAbility();
+		this.activated = true;
+	}
 };
 
 Trifle.Ability.prototype.deactivate = function() {
