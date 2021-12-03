@@ -73,6 +73,12 @@ Ginseng.TileManager.prototype.peekTile = function(player, tileCode, tileId) {
 
 	if (!tile) {
 		debug("NONE OF THAT TILE FOUND");
+		this.capturedTiles.forEach((capturedTile) => {
+			if (capturedTile.id === tileId) {
+				tile = capturedTile;
+				debug("Found in captured tiles.. that ok?")
+			}
+		});
 	}
 
 	return tile;

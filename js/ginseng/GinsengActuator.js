@@ -120,7 +120,7 @@ Ginseng.Actuator.prototype.addTile = function(tile, tileContainer, isCaptured) {
 	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
 
-	theDiv.setAttribute("name", tile.code);
+	theDiv.setAttribute("name", tile.getNotationName());
 	theDiv.setAttribute("id", tile.id);
 
 	if (!isCaptured) {

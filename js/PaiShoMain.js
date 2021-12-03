@@ -3013,7 +3013,7 @@ var yesCreateGame = function yesCreateGame(gameTypeId, rankedGame) {
 	if (GameClock.currentClock && GameClock.currentClock.getJsonObjectString) {
 		gameClockJson = GameClock.currentClock.getJsonObjectString();
 	}
-	onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), '', getLoginToken(), createGameCallback,
+	onlinePlayEngine.createGame(gameTypeId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), JSON.stringify(ggOptions), '', getLoginToken(), createGameCallback,
 		rankedInd, gameClockJson);
 };
   
@@ -3026,7 +3026,7 @@ var yesCreatePrivateGame = function yesCreatePrivateGame(gameTypeId, rankedGame)
 	if (GameClock.currentClock && GameClock.currentClock.getJsonObjectString) {
 		gameClockJson = GameClock.currentClock.getJsonObjectString();
 	}
-	onlinePlayEngine.createGame(gameTypeId, gameController.gameNotation.notationTextForUrl(), JSON.stringify(ggOptions), 'Y', getLoginToken(), createPrivateGameCallback,
+	onlinePlayEngine.createGame(gameTypeId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), JSON.stringify(ggOptions), 'Y', getLoginToken(), createPrivateGameCallback,
 		rankedInd, gameClockJson);
 };
 

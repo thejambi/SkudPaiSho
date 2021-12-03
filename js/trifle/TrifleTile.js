@@ -48,6 +48,10 @@ Trifle.Tile.prototype.getName = function() {
 	return Trifle.Tile.getTileName(this.code);
 };
 
+Trifle.Tile.prototype.getNotationName = function() {
+	return this.ownerCode + "" + this.code;
+}
+
 Trifle.Tile.prototype.getCopy = function() {
 	return new Trifle.Tile(this.code, this.ownerCode);
 };

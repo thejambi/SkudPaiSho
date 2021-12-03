@@ -19,8 +19,7 @@ Ginseng.GameManager.prototype.updateActuator = function(newActuator) {
 
 // Set up the game
 Ginseng.GameManager.prototype.setup = function (ignoreActuate) {
-
-	this.board = new PaiShoGames.Board(this.tileManager);
+	this.board = new PaiShoGames.Board(this.tileManager, this.buildAbilityActivationOrder());
 	this.board.useBannerCaptureSystem = false;
 	this.winners = [];
 	this.hostBannerPlayed = false;
@@ -226,6 +225,17 @@ Ginseng.GameManager.prototype.getWinResultTypeCode = function() {
 	} else if (this.gameHasEndedInDraw) {
 		return 4;	// Tie/Draw is 4
 	}
+};
+
+Ginseng.GameManager.prototype.buildAbilityActivationOrder = function() {
+	return [
+		Trifle.AbilityName.recordTilePoint,
+		Trifle.AbilityName.moveTileToRecordedPoint,
+		// Trifle.AbilityName.cancelAbilities,
+		// Trifle.AbilityName.cancelAbilitiesTargetingTiles,
+		Trifle.AbilityName.protectFromCapture,
+		Trifle.AbilityName.moveTargetTile
+	];
 };
 
 Ginseng.GameManager.prototype.getCopy = function() {

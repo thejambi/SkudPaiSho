@@ -13,6 +13,10 @@ Trifle.MoveTileToRecordedPointAbilityBrain.prototype.activateAbility = function(
 		var destinationPoint = this.abilityObject.board.recordedTilePoints[recordedPointType][targetTile.id];
 		this.abilityObject.board.placeTile(targetTile, destinationPoint);
 		this.abilityObject.boardChanged = true;
+
+		return {
+			tileMoved: targetTile
+		};
 	} else {
 		debug("No recorded point type defined");
 	}

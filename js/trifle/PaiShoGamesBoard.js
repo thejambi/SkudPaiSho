@@ -1,6 +1,6 @@
 // A more reusable and global Pai Sho Board
 
-PaiShoGames.Board = function(tileManager) {
+PaiShoGames.Board = function(tileManager, customAbilityActivationOrder) {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
@@ -16,7 +16,7 @@ PaiShoGames.Board = function(tileManager) {
 
 	this.tileManager = tileManager;
 
-	this.abilityManager = new Trifle.AbilityManager(this);
+	this.abilityManager = new Trifle.AbilityManager(this, customAbilityActivationOrder);
 
 	this.brainFactory = new Trifle.BrainFactory();
 }
@@ -1307,7 +1307,7 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 	if (abilityActivationFlags.boardHasChanged) {
 		// Need to re-process abilities... 
 		// Pass in some sort of context from the activation flags???
-		var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo, abilityActivationFlags);
+		var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.capturedTiles, currentMoveInfo, abilityActivationFlags);
 		if (nextAbilityActivationFlags.capturedTiles && nextAbilityActivationFlags.capturedTiles.length) {
 			if (!abilityActivationFlags.capturedTiles) {
 				abilityActivationFlags.capturedTiles = [];
@@ -2030,6 +2030,10 @@ PaiShoGames.Board.prototype.tileCanCapture = function(tile, movementInfo, fromPo
 		)
 		&& this.tilesBelongToDifferentOwnersOrTargetTileHasFriendlyCapture(tile, targetTile, targetTileInfo) // TODO
 		&& !targetPoint.tile.protected;
+};
+
+PaiShoGames.Board.prototype.targetPointTileIsCapturableByTileAbility = function(targetPoint, capturingTile) {
+	return !this.tileHasActiveCaptureProtectionFromCapturingTile(targetPoint.tile, capturingTile);
 };
 
 PaiShoGames.Board.prototype.activationRequirementsAreMet = function(abilityInfo, tile, triggerContext) {

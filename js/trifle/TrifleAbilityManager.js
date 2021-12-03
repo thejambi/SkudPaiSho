@@ -1,10 +1,11 @@
 
-Trifle.AbilityManager = function(board) {
+Trifle.AbilityManager = function(board, customAbilityActivationOrder) {
 	this.board = board;
 	this.tileManager = board.tileManager;
 	this.abilities = [];
 	this.readyAbilities = {};
 	this.abilitiesWithPromptTargetsNeeded = {};
+	this.abilityActivationOrder = customAbilityActivationOrder;
 }
 
 Trifle.AbilityManager.prototype.setReadyAbilities = function(readyAbilities) {
@@ -66,10 +67,15 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 		});
 	});
 
+	// Default ability activation order
 	var abilityActivationOrder = [
 		Trifle.AbilityName.cancelAbilities,
 		Trifle.AbilityName.cancelAbilitiesTargetingTiles
 	];
+
+	if (this.abilityActivationOrder) {
+		abilityActivationOrder = this.abilityActivationOrder;
+	}
 
 	abilityActivationOrder.forEach(function(abilityName) {
 		var readyAbilitiesOfType = self.readyAbilities[abilityName];
@@ -122,7 +128,6 @@ Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, capturedT
 		}
 		if (ability.boardChangedAfterActivation()) {
 			boardHasChanged = true;
-			return;	// If board changes, quit!
 		}
 	}
 	return boardHasChanged;

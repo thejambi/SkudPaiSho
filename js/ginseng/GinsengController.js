@@ -365,8 +365,9 @@ Ginseng.Controller.prototype.getTheMessage = function(tile, ownerName) {
 Ginseng.Controller.prototype.getTileMessage = function(tileDiv) {
 	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
-
-	var tile = new Ginseng.Tile(divName.substring(1), divName.charAt(0));
+	var playerCode = divName.charAt(0);
+	var tileCode = divName.substring(1);
+	var tile = new Trifle.Tile(tileCode, playerCode);
 
 	var ownerName = HOST;
 	if (divName.startsWith('G')) {
