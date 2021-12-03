@@ -453,12 +453,18 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
         case "Skud Pai Sho":
             return "var(--skudcolor)";
             break;
-		case "Fire Pai Sho":
-			return "var(--firecolor)";
-			break;
         case "Vagabond Pai Sho":
             return "var(--vagabondcolor)";
             break;
+		case "Adevăr Pai Sho":
+			return "var(--adevarcolor)";
+			break;
+		case "Fire Pai Sho":
+			return "var(--firecolor)";
+			break;
+		case "Ginseng Pai Sho":
+			return "var(--ginsengcolor)";
+			break;
         case "Capture Pai Sho":
             return "var(--capturecolor)";
             break;
@@ -479,9 +485,6 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
             break;
         case "Street Pai Sho":
             return "var(--streetcolor)";
-            break;
-        case "Adevăr Pai Sho":
-            return "var(--adevarcolor)";
             break;
         case "Blooms":
             return "var(--bloomscolor)";
@@ -750,33 +753,57 @@ function updateCurrentGameTitle(isOpponentOnline) {
 		  }
   
 		  var alertNewMessages = false;
-  
+		  
+		  var pastMessageUsername = "";
+		  var lastMoveStamp = "";
 		  for (var index in chatMessageList) {
 			  var chatMessage = chatMessageList[index];
 			  var chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
 
-			  newChatMessagesHtml += "<div class='chatMessage"+(usernameEquals(chatMessage.username))?(" self"):("")+"'>";
+			  if (chatMessage.message[0] == "➢") {
+				lastMoveStamp = "<p>" + chatMessage.message.replace(/&amp;/g,'&') + "</p>";
+			  } else {
+				if (lastMoveStamp != "") {//Only add the most recent move stamp. The entire game doesn't need to be displayed in chat.
+					newChatMessagesHtml += lastMoveStamp;
+					lastMoveStamp = "";
+					pastMessageUsername = "moveStamp";
+				}
+				newChatMessagesHtml += "<div class='chatMessage "+((usernameEquals(chatMessage.username))?(' self'):(''))+"'>";
+	
+				if (isTimestampsOn()) {
+					newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
+				}
   
-			  if (isTimestampsOn()) {
-				  newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
-			  }
+				if (localStorage.getItem("data-theme") == "stotes") {
+					if (usernameEquals(chatMessage.username)) {
+					  newChatMessagesHtml += "<div class='message'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+					} else if (chatMessage.username == currentGameOpponentUsername) {
+						newChatMessagesHtml += "<div class='message opponent'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+					} else{
+						//Don't display the username multiple times if someone does many messages in a row.
+						if (chatMessage.username == pastMessageUsername) {
+							if (chatMessage.username == "SkudPaiSho") {
+								newChatMessagesHtml += "<div class='message golden'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+							} else {
+								newChatMessagesHtml += "<div class='message'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+							}
+						}  else {
+							newChatMessagesHtml += "<strong>" + chatMessage.username + "</strong> <div class='message'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+						}
+					}
+				} else {
+				  newChatMessagesHtml += "<strong>" + chatMessage.username + ":</strong>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+				}
+				newChatMessagesHtml += "</div>";
 
-			  if (localStorage.getItem("data-theme") == "stotes") {
-				  if (usernameEquals(chatMessage.username)) {
-					newChatMessagesHtml += "<div class='message self'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div></div>";
-				  } else {
-					newChatMessagesHtml += "<strong>" + chatMessage.username + "</strong> <div class='message'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div></div>";
-				  }
-			  } else {
-				newChatMessagesHtml += "<strong>" + chatMessage.username + ":</strong>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
-			  }
-			  
-			  // The most recent message will determine whether to alert
-			  if (!usernameEquals(chatMessage.username)) {
-				  // Set chat tab color to alert new messages if newest message is not from user
-				  alertNewMessages = true;
-			  } else {
-				  alertNewMessages = false;
+				// The most recent message will determine whether to alert
+				if (!usernameEquals(chatMessage.username)) {
+					// Set chat tab color to alert new messages if newest message is not from user
+					alertNewMessages = true;
+				} else {
+					alertNewMessages = false;
+				}
+				pastMessageUsername = chatMessage.username;
 			  }
 		  }
   
@@ -2156,6 +2183,29 @@ var GameType = {
 			ETHEREAL_ACCENT_TILES
 		],
 		noRankedGames: true	// Can take out when testing done, game ready to enable ranked games
+	},
+	Ginseng: {
+		id: 18,
+		desc: "Ginseng Pai Sho",
+		desc: "Ginseng Pai Sho (beta)",
+		color: "var(--ginsengcolor)",
+		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
+		coverImg: "rose.png",
+		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho',
+			'Monk_Gyatso',
+			'markdwagner',
+			'sirstotes',
+			'Sambews',
+			'Cannoli',
+			'Dallin',
+			'HeBear',
+			'emanuelovici',
+			'fish'
+		],
+		noRankedGames: true
 	},
 	SolitairePaiSho: {
 		id: 4,

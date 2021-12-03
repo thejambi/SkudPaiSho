@@ -10,6 +10,7 @@
     --skudcolor: #c83737;
     --vagabondcolor: #88bd38;
     --adevarcolor: #ab6bff;
+    --ginsengcolor: #e69e1a;
     --capturecolor: #3860ce;
     --spiritcolor: #1d94da;
     --streetcolor: #464444;
@@ -24,7 +25,7 @@
     --hexcolor: #969595;
     --tumbleweedcolor: #b99700;
     --triflecolor: #3eb870;
-    --othercolor: #f1f1f1;
+    --othercolor: #726d6d;
   
     --bloomsh1: #e75776;
     --bloomsh2: #c83737;
@@ -450,6 +451,7 @@ div.tab .alertTab, div.tab .alertTab.active {
 .chatMessage {
     margin-top:3px;
     margin-bottom:3px;
+    padding:0;
     width:fit-content;
 }
 .chatMessage .message {
@@ -463,10 +465,18 @@ div.tab .alertTab, div.tab .alertTab.active {
 }
 .chatMessage.self .message {
     background-color: var(--highlight);
-    color:var(--secondary-text);
+    color:var(--primary-text);
     border-bottom-right-radius:0;
     border-bottom-left-radius:0.8em;
 }
 .chatMessage.self {
     align-self: flex-end;
+}
+.message.opponent {
+    background-color: var(--capturecolor);
+    color:var(--primary-text);
+}
+.message.golden {
+    background-color: var(--bloomsg1);
+    color:var(--primary);
 }
