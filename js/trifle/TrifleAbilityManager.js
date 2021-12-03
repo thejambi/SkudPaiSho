@@ -67,43 +67,43 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 		});
 	});
 
-	// Default ability activation order
-	var abilityActivationOrder = [
-		Trifle.AbilityName.cancelAbilities,
-		Trifle.AbilityName.cancelAbilitiesTargetingTiles
-	];
+	if (!boardHasChanged) {
+		// Default ability activation order
+		var abilityActivationOrder = [
+			Trifle.AbilityName.cancelAbilities,
+			Trifle.AbilityName.cancelAbilitiesTargetingTiles
+		];
 
-	if (this.abilityActivationOrder) {
-		abilityActivationOrder = this.abilityActivationOrder;
-	}
-
-	abilityActivationOrder.forEach(function(abilityName) {
-		var readyAbilitiesOfType = self.readyAbilities[abilityName];
-		if (readyAbilitiesOfType && readyAbilitiesOfType.length) {
-			readyAbilitiesOfType.forEach(function(ability) {
-				boardHasChanged = self.doTheActivateThing(ability, capturedTiles);
-				if (boardHasChanged) {
-					return;	// If board changes, quit loop!
-				}
-			});
+		if (this.abilityActivationOrder) {
+			abilityActivationOrder = this.abilityActivationOrder;
 		}
-		if (boardHasChanged) {
-			return;	// Quit loop
-		}
-	});
 
-	if (boardHasChanged) {
-		return;	// If board changes, quit!
-	} // ^^^ Needed, the previous similar checks only escape loops to here
-
-	Object.values(this.readyAbilities).forEach(function(abilityList) {
-		abilityList.forEach(function(ability) {
-			boardHasChanged = self.doTheActivateThing(ability, capturedTiles);
+		abilityActivationOrder.forEach(function(abilityName) {
+			var readyAbilitiesOfType = self.readyAbilities[abilityName];
+			if (readyAbilitiesOfType && readyAbilitiesOfType.length) {
+				readyAbilitiesOfType.forEach(function(ability) {
+					boardHasChanged = self.doTheActivateThing(ability, capturedTiles);
+					if (boardHasChanged) {
+						return;	// If board changes, quit loop!
+					}
+				});
+			}
 			if (boardHasChanged) {
-				return;	// If board changes, quit!
+				return;	// Quit loop
 			}
 		});
-	});
+
+		if (!boardHasChanged) {
+			Object.values(this.readyAbilities).forEach(function(abilityList) {
+				abilityList.forEach(function(ability) {
+					boardHasChanged = self.doTheActivateThing(ability, capturedTiles);
+					if (boardHasChanged) {
+						return;	// If board changes, quit!
+					}
+				});
+			});
+		}
+	}
 
 	return {
 		boardHasChanged: boardHasChanged,
