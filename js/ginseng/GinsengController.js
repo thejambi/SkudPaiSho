@@ -20,6 +20,8 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 
 	this.isInviteOnly = true;
 	this.isPaiShoGame = true;
+
+	this.showDebugInfo = false;
 }
 
 Ginseng.Controller.prototype.createActuator = function() {
@@ -127,6 +129,11 @@ Ginseng.Controller.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
+Ginseng.Controller.prototype.toggleDebug = function() {
+	this.showDebugInfo = !this.showDebugInfo;
+	clearMessage();
+};
+
 Ginseng.Controller.prototype.startOnlineGame = function() {
 	createGameIfThatIsOk(GameType.Ginseng.id);
 };
@@ -146,6 +153,21 @@ Ginseng.Controller.prototype.getAdditionalHelpTabDiv = function() {
 	}
 
 	settingsDiv.appendChild(document.createElement("br"));
+
+	var toggleDebugText = "Enable debug Help display";
+	if (this.showDebugInfo) {
+		toggleDebugText = "Disable debug Help display";
+	}
+	var toggleDebugSpan = document.createElement("span");
+	toggleDebugSpan.classList.add("skipBonus");
+	toggleDebugSpan.setAttribute("onclick", "gameController.toggleDebug();");
+	toggleDebugSpan.innerText = toggleDebugText;
+
+	settingsDiv.appendChild(toggleDebugSpan);
+
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(document.createElement("br"));
+
 	return settingsDiv;
 };
 
@@ -395,7 +417,7 @@ Ginseng.Controller.prototype.getPointMessage = function(htmlPoint) {
 
 	if (boardPoint.hasTile()) {
 		return this.getTheMessage(boardPoint.tile, boardPoint.tile.ownerName);
-	} else {
+	} else if (this.showDebugInfo) {
 		var messageLines = this.theGame.buildAbilitySummaryLines();
 		return {
 			heading: "Active Abilities",
