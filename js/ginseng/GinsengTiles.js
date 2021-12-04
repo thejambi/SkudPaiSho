@@ -467,7 +467,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		movements: [
 			{
 				type: Trifle.MovementType.standard,
-				distance: 5,
+				distance: 6,
 				captureTypes: [
 					{
 						type: Trifle.CaptureType.all
