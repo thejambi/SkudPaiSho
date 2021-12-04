@@ -7,6 +7,7 @@ Ginseng.TileManager = function() {
 	this.hostTiles = this.loadTileSet('H');
 	this.guestTiles = this.loadTileSet('G');
 	this.capturedTiles = [];
+	this.customPiles = {};
 };
 
 Ginseng.TileManager.prototype.loadTileSet = function(ownerCode) {
@@ -110,12 +111,22 @@ Ginseng.TileManager.prototype.putTileBack = function(tile) {
 
 Ginseng.TileManager.prototype.addToCapturedTiles = function(tiles) {
 	tiles.forEach((tile) => {
-		if (tile.beingCaptured || tile.beingCapturedByAbility) {
+		if (tile.moveToPile) {
+			this.addToPile(tile, tile.moveToPile);
+		} else if ((tile.beingCaptured || tile.beingCapturedByAbility) && !tile.moveToPile) {
 			this.capturedTiles.push(tile);
 		}
 		tile.beingCaptured = null;
 		tile.beingCapturedByAbility = null;
+		tile.moveToPile = null;
 	});
+};
+
+Ginseng.TileManager.prototype.addToPile = function(tile, pileName) {
+	if (!this.customPiles[pileName]) {
+		this.customPiles[pileName] = [];
+	}
+	this.customPiles[pileName].push(tile);
 };
 
 Ginseng.TileManager.prototype.getTeamSize = function() {

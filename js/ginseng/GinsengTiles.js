@@ -15,6 +15,10 @@ Ginseng.TileType = {
 	originalBender: "originalBender"
 };
 
+Ginseng.TilePileNames = {
+	banish: "banish"
+};
+
 Ginseng.GinsengTiles = {};
 Ginseng.TileInfo = {};
 
@@ -438,7 +442,28 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					}
 				]
 			}
-		]/* ,
+		],
+		abilities: [
+			{
+				type: Trifle.AbilityName.moveTargetTileToPile,
+				destinationPile: Ginseng.TilePileNames.banish,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whenCapturingTargetTile,
+						targetTeams: [Trifle.TileTeam.enemy]
+					},
+					{
+						triggerType: Trifle.AbilityTriggerType.whenActiveMovement
+					}
+				],
+				targetTypes: [
+					Trifle.TargetType.triggerTargetTiles,
+					Trifle.TargetType.thisTile
+				],
+				triggerTypeToTarget: Trifle.AbilityTriggerType.whenCapturingTargetTile
+			}
+		]
+		/* ,
 		textLines: [
 			"Orchid"
 		] */

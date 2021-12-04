@@ -25,8 +25,8 @@ Trifle.BrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, 
 			return new Trifle.WhenTargetTileMovesFromWithinZoneTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whenCapturedByTargetTile:
 			return new Trifle.WhenCapturedByTargetTileTriggerBrain(triggerContext);
-		case Trifle.AbilityTriggerType.whenCapturing:
-			return new Trifle.WhenCapturingTriggerBrain(triggerContext);
+		case Trifle.AbilityTriggerType.whenCapturingTargetTile:
+			return new Trifle.WhenCapturingTargetTileTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile:
 			return new Trifle.WhenLandsAdjacentToTargetTileTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile:
@@ -58,6 +58,8 @@ Trifle.BrainFactory.createAbilityBrain = function(abilityName, abilityObject) {
 			return new Trifle.MoveTileToRecordedPointAbilityBrain(abilityObject);
 		case Trifle.AbilityName.moveTargetTile:
 			return new Trifle.MoveTargetTileAbilityBrain(abilityObject);
+		case Trifle.AbilityName.moveTargetTileToPile:
+			return new Trifle.MoveTargetTileToPileAbilityBrain(abilityObject);
 		default:
 			return new Trifle.SimpleOngoingAbilityBrain(abilityObject);
 	}

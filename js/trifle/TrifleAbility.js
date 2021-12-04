@@ -82,7 +82,6 @@ Trifle.Ability.prototype.setAbilityTargetTiles = function() {
 };
 
 Trifle.Ability.prototype.activateAbility = function() {
-	// Get AbilityBrain
 	this.setAbilityTargetTiles();
 
 	if (this.abilityTargetTiles.length > 0) {	// Ability must have target tile?

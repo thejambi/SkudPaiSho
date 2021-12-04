@@ -204,7 +204,8 @@ Trifle.AbilityName = {
 	growGigantic: "growGigantic",
 	moveTargetTile: "moveTargetTile",
 	recordTilePoint: "recordTilePoint",
-	moveTileToRecordedPoint: "moveTileToRecordedPoint"
+	moveTileToRecordedPoint: "moveTileToRecordedPoint",
+	moveTargetTileToPile: "moveTargetTileToPile"
 };
 
 Trifle.AbilityType = {

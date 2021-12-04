@@ -1,8 +1,12 @@
 
-Trifle.TriggerHelper = function(triggerContext, possibleTargetTilePoint) {
+Trifle.TriggerHelper = function(triggerContext, possibleTargetTilePoint, possibleTargetTile) {
 	this.triggerContext = triggerContext;
-	this.possibleTargetTilePoint = possibleTargetTilePoint;
-	this.possibleTargetTileInfo = PaiShoGames.currentTileMetadata[this.possibleTargetTilePoint.tile.code];
+	if (possibleTargetTile) {
+		this.possibleTargetTile = possibleTargetTile;
+	} else if (possibleTargetTilePoint) {
+		this.possibleTargetTile = possibleTargetTilePoint.tile;
+	}
+	this.possibleTargetTileInfo = PaiShoGames.currentTileMetadata[this.possibleTargetTile.code];
 	this.abilityInfo = this.triggerContext.tileAbilityInfo;
 	this.triggerInfo = this.triggerContext.currentTrigger;
 };
@@ -16,7 +20,7 @@ Trifle.TriggerHelper.prototype.tileIsTargeted = function() {
 
 Trifle.TriggerHelper.prototype.targetTeamsCheck = function() {
 	if (this.triggerInfo.targetTeams) {
-		var possibleTargetTileOwner = this.possibleTargetTilePoint.tile.ownerName;
+		var possibleTargetTileOwner = this.possibleTargetTile.ownerName;
 
 		var isFriendlyTargetedTile = this.triggerInfo.targetTeams.includes(Trifle.TileTeam.friendly)
 				&& possibleTargetTileOwner === this.triggerContext.tile.ownerName;
@@ -35,9 +39,9 @@ Trifle.TriggerHelper.prototype.targetTileTypesCheck = function() {
 		return this.triggerInfo.targetTileTypes.includes(Trifle.TileCategory.allTileTypes)
 			|| arrayIncludesOneOf(this.possibleTargetTileInfo.types, this.triggerInfo.targetTileTypes)
 			|| (this.triggerInfo.targetTileTypes.includes(Trifle.TileCategory.thisTile)
-				&& this.possibleTargetTilePoint.tile === this.triggerContext.tile)
+				&& this.possibleTargetTile === this.triggerContext.tile)
 			|| (this.triggerInfo.targetTileTypes.includes(Trifle.TileCategory.allButThisTile)
-				&& this.possibleTargetTilePoint.tile !== this.triggerContext.tile);
+				&& this.possibleTargetTile !== this.triggerContext.tile);
 	} else {
 		return true;
 	}
@@ -53,7 +57,7 @@ Trifle.TriggerHelper.prototype.targetTileIdentifiersCheck = function() {
 
 Trifle.TriggerHelper.prototype.targetTileNamesCheck = function() {
 	if (this.triggerInfo.targetTileCodes) {
-		return arrayIncludesOneOf(this.triggerInfo.targetTileCodes, [this.possibleTargetTilePoint.tile.code]);
+		return arrayIncludesOneOf(this.triggerInfo.targetTileCodes, [this.possibleTargetTile.code]);
 	} else {
 		return true;
 	}

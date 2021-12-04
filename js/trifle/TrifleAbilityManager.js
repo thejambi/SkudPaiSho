@@ -26,7 +26,10 @@ Trifle.AbilityManager.prototype.activateReadyAbilitiesOrPromptForTargets = funct
 
 Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	var boardHasChanged = false;
-	var capturedTiles = [];
+	var tileRecords = {
+		capturedTiles: [],
+		tilesMovedToPiles: []
+	};
 	var self = this;
 
 	/* Mark all existing abilities as do not preserve */
@@ -59,7 +62,7 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 		abilityList.forEach(function(ability) {
 			if (ability.isPriority(Trifle.AbilityPriorityLevel.highest)) {
 				debug("!!!!Priority Ability!!!! " + ability.getTitle());
-				boardHasChanged = self.doTheActivateThing(ability, capturedTiles);
+				boardHasChanged = self.doTheActivateThing(ability, tileRecords);
 				if (boardHasChanged) {
 					return;	// If board changes, quit!
 				}
@@ -82,7 +85,7 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 			var readyAbilitiesOfType = self.readyAbilities[abilityName];
 			if (readyAbilitiesOfType && readyAbilitiesOfType.length) {
 				readyAbilitiesOfType.forEach(function(ability) {
-					boardHasChanged = self.doTheActivateThing(ability, capturedTiles);
+					boardHasChanged = self.doTheActivateThing(ability, tileRecords);
 					if (boardHasChanged) {
 						return;	// If board changes, quit loop!
 					}
@@ -96,7 +99,7 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 		if (!boardHasChanged) {
 			Object.values(this.readyAbilities).forEach(function(abilityList) {
 				abilityList.forEach(function(ability) {
-					boardHasChanged = self.doTheActivateThing(ability, capturedTiles);
+					boardHasChanged = self.doTheActivateThing(ability, tileRecords);
 					if (boardHasChanged) {
 						return;	// If board changes, quit!
 					}
@@ -107,11 +110,14 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 
 	return {
 		boardHasChanged: boardHasChanged,
-		capturedTiles: capturedTiles
+		tileRecords: tileRecords
 	};
 };
 
-Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, capturedTiles) {
+Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecords) {
+	var capturedTiles = tileRecords.capturedTiles;
+	var tilesMovedToPiles = tileRecords.tilesMovedToPiles;
+
 	var boardHasChanged = false;
 	if (!ability.activated) {
 		var abilityIsReadyToActivate = this.addNewAbility(ability);
@@ -123,6 +129,14 @@ Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, capturedT
 					&& ability.abilityActivatedResults.capturedTiles.length) {
 				ability.abilityActivatedResults.capturedTiles.forEach((capturedTile) => {
 					capturedTiles.push(capturedTile);
+				});
+			}
+
+			if (ability.abilityActivatedResults
+					&& ability.abilityActivatedResults.tilesMovedToPiles
+					&& ability.abilityActivatedResults.tilesMovedToPiles.length) {
+				ability.abilityActivatedResults.tilesMovedToPiles.forEach((movedTile) => {
+					tilesMovedToPiles.push(movedTile);
 				});
 			}
 		}

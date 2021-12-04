@@ -87,8 +87,11 @@ Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
 		var abilityActivationFlags = moveDetails.abilityActivationFlags;
 		debug(abilityActivationFlags);
 
-		if (abilityActivationFlags.capturedTiles && abilityActivationFlags.capturedTiles.length) {
-			this.tileManager.addToCapturedTiles(abilityActivationFlags.capturedTiles);
+		if (abilityActivationFlags.tileRecords.capturedTiles && abilityActivationFlags.tileRecords.capturedTiles.length) {
+			this.tileManager.addToCapturedTiles(abilityActivationFlags.tileRecords.capturedTiles);
+		}
+		if (abilityActivationFlags.tileRecords.tilesMovedToPiles && abilityActivationFlags.tileRecords.tilesMovedToPiles.length) {
+			this.tileManager.addToCapturedTiles(abilityActivationFlags.tileRecords.tilesMovedToPiles);
 		}
 
 		var needToPromptUser = abilityActivationFlags && abilityActivationFlags.neededPromptInfo && abilityActivationFlags.neededPromptInfo.currentPromptTargetId;

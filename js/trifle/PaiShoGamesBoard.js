@@ -1311,12 +1311,12 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 	if (abilityActivationFlags.boardHasChanged) {
 		// Need to re-process abilities... 
 		// Pass in some sort of context from the activation flags???
-		var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.capturedTiles, currentMoveInfo, abilityActivationFlags);
-		if (nextAbilityActivationFlags.capturedTiles && nextAbilityActivationFlags.capturedTiles.length) {
-			if (!abilityActivationFlags.capturedTiles) {
-				abilityActivationFlags.capturedTiles = [];
+		var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.tileRecords.capturedTiles, currentMoveInfo, abilityActivationFlags);
+		if (nextAbilityActivationFlags.tileRecords.capturedTiles && nextAbilityActivationFlags.tileRecords.capturedTiles.length) {
+			if (!abilityActivationFlags.tileRecords.capturedTiles) {
+				abilityActivationFlags.tileRecords.capturedTiles = [];
 			}
-			abilityActivationFlags.capturedTiles = abilityActivationFlags.capturedTiles.concat(nextAbilityActivationFlags.capturedTiles);
+			abilityActivationFlags.tileRecords.capturedTiles = abilityActivationFlags.tileRecords.capturedTiles.concat(nextAbilityActivationFlags.capturedTiles);
 		}
 	}
 
