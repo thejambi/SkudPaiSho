@@ -18,8 +18,6 @@ Ginseng.Actuator = function(gameContainer, isMobile) {
 	this.guestTilesContainer = containers.guestTilesContainer;
 };
 
-// Ginseng.Actuator.imagePath = "images/Trifle/standard/";
-Ginseng.Actuator.imagePath = "images/Ginseng/standard/";
 Ginseng.Actuator.hostTeamTilesDivId = "hostTilesContainer";
 Ginseng.Actuator.guestTeamTilesDivId = "guestTilesContainer";
 
@@ -189,7 +187,7 @@ Ginseng.Actuator.prototype.addTeamTile = function(tile, player, isForTeamSelecti
 
 	var theImg = document.createElement("img");
 
-	var srcValue = Ginseng.Actuator.imagePath;
+	var srcValue = this.getTileSrcPath();
 
 	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
@@ -276,7 +274,7 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
 		}
 
-		var srcValue = Ginseng.Actuator.imagePath;
+		var srcValue = this.getTileSrcPath();
 		
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 		

@@ -2,7 +2,7 @@
 Ginseng.Options = function() {
 	if (!localStorage.getItem(Ginseng.Options.tileDesignTypeKey)
 		|| !Ginseng.Options.tileDesignTypeValues[localStorage.getItem(Ginseng.Options.tileDesignTypeKey)]) {
-		Ginseng.Options.setTileDesignsPreference("standard", true);
+		Ginseng.Options.setTileDesignsPreference("gaoling", true);
 	}
 
 	Ginseng.Options.viewAsGuest = false || Ginseng.Options.viewAsGuest;
@@ -17,7 +17,8 @@ Ginseng.Options = function() {
 Ginseng.Options.tileDesignTypeKey = "ginsengTileDesignTypeKey";
 
 Ginseng.Options.tileDesignTypeValues = {
-	standard: "Ginseng"
+	gaoling: "Gaoling",
+	gaipan: "Gaipan"
 };
 
 Ginseng.Options.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
