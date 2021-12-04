@@ -95,7 +95,8 @@ Trifle.TargetType = {
 	landingTile: "landingTile",		//
 	allTiles: "allTiles",
 	triggerTargetTiles: "triggerTargetTiles",
-	surroundingTiles: "surroundingTiles"
+	surroundingTiles: "surroundingTiles",
+	chosenCapturedTile: "chosenCapturedTile"
 }
 
 Trifle.DeployType = {
@@ -205,7 +206,8 @@ Trifle.AbilityName = {
 	moveTargetTile: "moveTargetTile",
 	recordTilePoint: "recordTilePoint",
 	moveTileToRecordedPoint: "moveTileToRecordedPoint",
-	moveTargetTileToPile: "moveTargetTileToPile"
+	moveTargetTileToPile: "moveTargetTileToPile",
+	exchangeWithCapturedTile: "exchangeWithCapturedTile"
 };
 
 Trifle.AbilityType = {
@@ -235,17 +237,20 @@ Trifle.AbilityTriggerType = {
 	whenTargetTileLandsSurrounding: "whenTargetTileLandsSurrounding",
 	whileTargetTileIsInZone: "whileTargetTileIsInZone",
 	whenDeployed: "whenDeployed",
-	whenActiveMovement: "whenActiveMovement"
+	whenActiveMovement: "whenActiveMovement",
+	whenTargetTileLandsInTemple: "whenTargetTileLandsInTemple"
 };
 
 Trifle.PromptTargetType = {
 	boardPoint: "boardPoint",
-	tilePile: "tilePile"
+	tilePile: "tilePile",
+	capturedTile: "capturedTile"
 };
 
 Trifle.TargetPromptId = {
 	movedTilePoint: "movedTilePoint",
-	movedTileDestinationPoint: "movedTileDestinationPoint"
+	movedTileDestinationPoint: "movedTileDestinationPoint",
+	chosenCapturedTile: "chosenCapturedTile"
 };
 
 Trifle.TileTeam = {

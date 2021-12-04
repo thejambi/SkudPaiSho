@@ -39,6 +39,8 @@ Trifle.BrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, 
 			return new Trifle.WhenDeployedTriggerBrain(triggerContext);
 		case Trifle.AbilityTriggerType.whenActiveMovement:
 			return new Trifle.WhenActiveMovementTriggerBrain(triggerContext);
+		case Trifle.AbilityTriggerType.whenTargetTileLandsInTemple:
+			return new Trifle.WhenTargetTileLandsInTempleTriggerBrain(triggerContext);
 		default:
 			debug("No Trigger Brain created for trigger: " + abilityTriggerInfo.triggerType);
 	}
@@ -60,6 +62,8 @@ Trifle.BrainFactory.createAbilityBrain = function(abilityName, abilityObject) {
 			return new Trifle.MoveTargetTileAbilityBrain(abilityObject);
 		case Trifle.AbilityName.moveTargetTileToPile:
 			return new Trifle.MoveTargetTileToPileAbilityBrain(abilityObject);
+		case Trifle.AbilityName.exchangeWithCapturedTile:
+			return new Trifle.ExchangeWithCapturedTileAbilityBrain(abilityObject);
 		default:
 			return new Trifle.SimpleOngoingAbilityBrain(abilityObject);
 	}
@@ -75,6 +79,8 @@ Trifle.BrainFactory.createTargetBrain = function(targetType, abilityObject) {
 			return new Trifle.SurroundingTilesTargetBrain(abilityObject);
 		case Trifle.TargetType.thisTile:
 			return new Trifle.ThisTileTargetBrain(abilityObject);
+		case Trifle.TargetType.chosenCapturedTile:
+			return new Trifle.ChosenCapturedTileTargetBrain(abilityObject);
 	}
 };
 

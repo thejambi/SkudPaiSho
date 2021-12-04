@@ -267,6 +267,23 @@ Ginseng.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
 		this.theGame.revealDeployPoints(tile);
+	} else if (this.notationBuilder.status === Trifle.NotationBuilderStatus.PROMPTING_FOR_TARGET) {
+		if (tile.tileIsSelectable) {
+			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
+				var sourceTileKey = JSON.stringify(this.notationBuilder.neededPromptTargetInfo.sourceTileKey);
+				if (!this.notationBuilder.promptTargetData[sourceTileKey]) {
+					this.notationBuilder.promptTargetData[sourceTileKey] = {};
+				}
+				this.notationBuilder.promptTargetData[sourceTileKey][this.notationBuilder.neededPromptTargetInfo.currentPromptTargetId] = tile.getOwnerCodeIdObject();
+				// TODO - Does move require user to choose targets?... 
+				var notationBuilderSave = this.notationBuilder;
+				this.resetMove();
+				this.notationBuilder = notationBuilderSave;
+				this.completeMove();
+			} else {
+				this.resetNotationBuilder();
+			}
+		}
 	} else {
 		this.theGame.hidePossibleMovePoints();
 		this.resetNotationBuilder();

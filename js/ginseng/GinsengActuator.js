@@ -107,7 +107,7 @@ Ginseng.Actuator.prototype.addTile = function(tile, tileContainer, isCaptured) {
 	theDiv.classList.add("point");
 	theDiv.classList.add("hasTile");
 
-	if (tile.selectedFromPile) {
+	if (tile.selectedFromPile || tile.tileIsSelectable) {
 		theDiv.classList.add("selectedFromPile");
 		theDiv.classList.add("drained");
 	}
@@ -121,7 +121,11 @@ Ginseng.Actuator.prototype.addTile = function(tile, tileContainer, isCaptured) {
 	theDiv.setAttribute("name", tile.getNotationName());
 	theDiv.setAttribute("id", tile.id);
 
-	if (!isCaptured) {
+	var clickable = !isCaptured;
+	if (tile.tileIsSelectable) {
+		clickable = true;
+	}
+	if (clickable) {
 		if (this.mobile) {
 			theDiv.setAttribute("onclick", "unplayedTileClicked(this); showTileMessage(this);");
 		} else {

@@ -50,6 +50,24 @@ Ginseng.TileManager.prototype.grabTile = function(player, tileCode) {
 	return tile;
 };
 
+Ginseng.TileManager.prototype.grabCapturedTile = function(player, tileCode) {
+	var tile;
+	for (var i = 0; i < this.capturedTiles.length; i++) {
+		if (this.capturedTiles[i].ownerName === player 
+				&& this.capturedTiles[i].code === tileCode) {
+			newTileArr = this.capturedTiles.splice(i, 1);
+			tile = newTileArr[0];
+			break;
+		}
+	}
+
+	if (!tile) {
+		debug("NONE OF THAT TILE FOUND");
+	}
+
+	return tile;
+};
+
 Ginseng.TileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	var tilePile = this.hostTiles;
 	if (player === GUEST) {

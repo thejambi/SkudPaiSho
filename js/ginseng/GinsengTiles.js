@@ -246,7 +246,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				type: Trifle.AbilityName.moveTargetTile,
 				isPassiveMovement: true,
 				optional: true,
-				promptForTargets: true,
+				promptForTargets: true,	// This line not needed?
 				neededPromptTargetsInfo: [
 					{
 						title: "pushedTile",
@@ -421,9 +421,41 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		movements: [
 			{
 				type: Trifle.MovementType.standard,
-				distance: 6
+				distance: 60,
+				captureTypes: [
+					{
+						type: Trifle.CaptureType.all
+					}
+				]
 			}
-		]/* ,
+		],
+		abilities: [
+			{
+				type: Trifle.AbilityName.exchangeWithCapturedTile,
+				optional: true,
+				neededPromptTargetsInfo: [
+					{
+						title: "exchangedTile",
+						promptId: Trifle.TargetPromptId.chosenCapturedTile,
+						targetType: Trifle.PromptTargetType.capturedTile
+					}
+				],
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsInTemple,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					},
+					{
+						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					}
+				],
+				targetTypes: [Trifle.TargetType.chosenCapturedTile],
+				targetTeams: [Trifle.TileTeam.friendly],
+				promptTargetTitle: "exchangedTile"
+			}
+		]
+		/* ,
 		textLines: [
 			"Ginseng"
 		] */
@@ -470,6 +502,12 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 	};
 
 	/* Apply Capture and Ability Activation Requirements Rules */
+	Ginseng.applyCaptureAndAbilityActivationRequirementRules(GinsengTiles);
+
+	Ginseng.GinsengTiles = GinsengTiles;
+};
+
+Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles) {
 	Object.keys(GinsengTiles).forEach(function(key, index) {
 		var tileInfo = GinsengTiles[key];
 		if (tileInfo.movements && tileInfo.movements.length) {
@@ -511,6 +549,4 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			});
 		}
 	});
-
-	Ginseng.GinsengTiles = GinsengTiles;
 };

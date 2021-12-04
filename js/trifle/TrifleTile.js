@@ -69,6 +69,14 @@ Trifle.Tile.getTileName = function(tileCode) {
 	return name;
 };
 
+Trifle.Tile.prototype.getOwnerCodeIdObject = function() {
+	return {
+		ownerName: this.ownerName,
+		code: this.code,
+		id: this.id
+	};
+};
+
 Trifle.Tile.getTeamLimitForTile = function(tileCode) {
 	var tileData = PaiShoGames.currentTileMetadata[tileCode];
 	if (tileData) {
