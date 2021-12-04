@@ -93,7 +93,7 @@ Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
 Ginseng.Controller.prototype.getAdditionalMessage = function() {
 	var msg = "";
 	
-	if (this.gameNotation.moves.length === 0) {
+	if (this.gameNotation.moves.length === 0 && !playingOnlineGame()) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
 			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by clicking <strong>Start Online Game<strong> below.";
 		} else {

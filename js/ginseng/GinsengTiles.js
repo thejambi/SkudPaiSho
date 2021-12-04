@@ -493,6 +493,30 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					Trifle.TargetType.thisTile
 				],
 				triggerTypeToTarget: Trifle.AbilityTriggerType.whenCapturingTargetTile
+			},
+			{
+				type: Trifle.AbilityName.exchangeWithCapturedTile,
+				optional: true,
+				neededPromptTargetsInfo: [
+					{
+						title: "exchangedTile",
+						promptId: Trifle.TargetPromptId.chosenCapturedTile,
+						targetType: Trifle.PromptTargetType.capturedTile
+					}
+				],
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsInTemple,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					},
+					{
+						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					}
+				],
+				targetTypes: [Trifle.TargetType.chosenCapturedTile],
+				targetTeams: [Trifle.TileTeam.friendly],
+				promptTargetTitle: "exchangedTile"
 			}
 		]
 		/* ,
