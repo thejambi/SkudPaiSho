@@ -371,6 +371,7 @@ Ginseng.Controller.prototype.completeMove = function() {
 		this.notationBuilder.neededPromptTargetInfo = neededPromptTargetInfo;
 		
 		if (neededPromptTargetInfo.sourceAbility.abilityInfo.optional) {
+			refreshMessage();
 			showSkipButtonMessage("Skip optional ability");
 		}
 
