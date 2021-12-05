@@ -18,7 +18,9 @@ Ginseng.Options.tileDesignTypeKey = "ginsengTileDesignTypeKey";
 
 Ginseng.Options.tileDesignTypeValues = {
 	gaoling: "Gaoling",
-	gaipan: "Gaipan"
+	gaipan: "Gaipan",
+	zaofu: "Zaofu",
+	northern: "Agna Qel'a"
 };
 
 Ginseng.Options.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
