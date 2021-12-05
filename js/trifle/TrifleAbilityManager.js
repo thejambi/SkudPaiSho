@@ -58,16 +58,15 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	/* Activate abilities! */
 
 	// Priority "highest" abilities first
-	Object.values(this.readyAbilities).forEach(function(abilityList) {
-		abilityList.forEach(function(ability) {
+	Object.values(this.readyAbilities).every(abilityList => {
+		abilityList.every(ability => {
 			if (ability.isPriority(Trifle.AbilityPriorityLevel.highest)) {
 				debug("!!!!Priority Ability!!!! " + ability.getTitle());
 				boardHasChanged = self.doTheActivateThing(ability, tileRecords);
-				if (boardHasChanged) {
-					return;	// If board changes, quit!
-				}
+				return !boardHasChanged;	// Continue if board has not changed
 			}
 		});
+		return !boardHasChanged;	// Continue if board has not changed
 	});
 
 	if (!boardHasChanged) {
@@ -81,29 +80,24 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 			abilityActivationOrder = this.abilityActivationOrder;
 		}
 
-		abilityActivationOrder.forEach(function(abilityName) {
+		abilityActivationOrder.every(abilityName => {
 			var readyAbilitiesOfType = self.readyAbilities[abilityName];
 			if (readyAbilitiesOfType && readyAbilitiesOfType.length) {
-				readyAbilitiesOfType.forEach(function(ability) {
+				readyAbilitiesOfType.every(ability => {
 					boardHasChanged = self.doTheActivateThing(ability, tileRecords);
-					if (boardHasChanged) {
-						return;	// If board changes, quit loop!
-					}
+					return !boardHasChanged;	// Continue if board has not changed
 				});
 			}
-			if (boardHasChanged) {
-				return;	// Quit loop
-			}
+			return !boardHasChanged;	// Continue if board has not changed
 		});
 
 		if (!boardHasChanged) {
-			Object.values(this.readyAbilities).forEach(function(abilityList) {
-				abilityList.forEach(function(ability) {
+			Object.values(this.readyAbilities).every(abilityList => {
+				abilityList.every(ability => {
 					boardHasChanged = self.doTheActivateThing(ability, tileRecords);
-					if (boardHasChanged) {
-						return;	// If board changes, quit!
-					}
+					return !boardHasChanged;	// Continue if board has not changed
 				});
+				return !boardHasChanged;	// Continue if board has not changed
 			});
 		}
 	}
