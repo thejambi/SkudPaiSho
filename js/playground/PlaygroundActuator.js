@@ -252,8 +252,14 @@ PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
 
 	var gameImgDir;
 	if (tile.gameType === GameType.SkudPaiSho) {
+		if (getUserGamePreference(tileDesignTypeKey) === 'custom') {
+			return SkudPaiShoController.getCustomTileDesignsUrl();
+		}
 		gameImgDir = "SkudPaiSho/" + getUserGamePreference(tileDesignTypeKey);
 	} else if (tile.gameType === GameType.VagabondPaiSho) {
+		if (getUserGamePreference(vagabondTileDesignTypeKey) === 'custom') {
+			return VagabondController.getCustomTileDesignsUrl();
+		}
 		gameImgDir = "Vagabond/" + getUserGamePreference(vagabondTileDesignTypeKey);
 	} else if (tile.gameType === GameType.CapturePaiSho) {
 		gameImgDir = "Capture/" + getUserGamePreference(CapturePreferences.tileDesignKey);

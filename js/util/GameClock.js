@@ -219,7 +219,8 @@ GameClock.userHasGameClockAccess = function() {
             'vitheguy',
             'markdwagner',
             'tree',
-            'sirstotes'
+            'sirstotes',
+            'yugandda'
         ]);
 };
 

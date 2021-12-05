@@ -117,6 +117,10 @@ SoundManager.prototype.makeNoNoise = function () {
 	}, 0);
 };
 
+SoundManager.prototype.isMoveSoundsEnabled = function() {
+	return !this.storageManager.getSoundOff();
+};
+
 SoundManager.prototype.nextMoveSoundsAreEnabled = function() {
 	return !this.storageManager.getSoundOff();
 };

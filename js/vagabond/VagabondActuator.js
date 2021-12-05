@@ -259,7 +259,11 @@ VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 };
 
 VagabondActuator.prototype.getTileImageSourceDir = function() {
-	return "images/Vagabond/" + localStorage.getItem(vagabondTileDesignTypeKey) + "/";
+	if (VagabondController.isUsingCustomTileDesigns()) {
+		return VagabondController.getCustomTileDesignsUrl();
+	} else {
+		return "images/Vagabond/" + localStorage.getItem(vagabondTileDesignTypeKey) + "/";
+	}
 };
 
 VagabondActuator.prototype.printBoard = function(board) {

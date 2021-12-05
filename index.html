@@ -49,7 +49,7 @@
   <script src="https://use.fontawesome.com/8d1446c26f.js"></script>
 
   <!-- Global site tag (gtag.js) - Google AdWords: 972849224 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-972849224"></script>
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=AW-972849224"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -58,7 +58,7 @@
     }
     gtag('js', new Date());
     gtag('config', 'AW-972849224');
-  </script>
+  </script> -->
 
 </head>
 
@@ -134,8 +134,10 @@
       <div class='sidenavSectionHeader'>
         <div onClick='promptAddOption()'>Other</div>
       </div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleSoundOn();'>Toggle Sound On/Off</div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='showPreferences();'>Device Preferences</div>
+      <!-- <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleSoundOn();'>Toggle Sound On/Off</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleAnimationsOn();'>Toggle Animations On/Off</div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleDarkMode();'>Toggle Dark Mode</div> -->
       <div class='sidenavEntry skipBonus'>
         <label>Website Style:</label>
         <select id='websiteStyleDropdown' onchange='setWebsiteTheme(this.value);'>
@@ -254,7 +256,7 @@
           </div>
         </div>
         <div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
-          <div id="chatMessagesHeader" class="chatMessagesHeader"><em>Game Chat messages may be viewed by other players. Abide by the Discord server #rules to be allowed to use Game Chat. Thank you!</em><div class='clickableText' onclick='toggleTimestamps()'>Toggle timestamp display</div><hr /></div>
+          <div id="chatMessagesHeader" class="chatMessagesHeader"><em>Game Chat messages may be viewed by other players. Abide by the Discord server #rules to be allowed to use Game Chat. Thank you!</em><div class='clickableText' onclick='toggleTimestamps()'>Toggle timestamp display</div><div class='clickableText' onclick='toggleMoveLogDisplay()'>Toggle move log messages</div><hr /></div>
           <div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
           <div id="chatMessageInputContainer" class="chatMessageInputContainer">
             <textarea id="chatMessageInput" class="chatMessageInput"></textarea>
@@ -356,22 +358,7 @@
   </div>
   <!--  -->
 
-  <script>
-    (function (i, s, o, g, r, a, m) {
-      i['GoogleAnalyticsObject'] = r;
-      i[r] = i[r] || function () {
-        (i[r].q = i[r].q || []).push(arguments)
-      }, i[r].l = 1 * new Date();
-      a = s.createElement(o),
-        m = s.getElementsByTagName(o)[0];
-      a.async = 1;
-      a.src = g;
-      m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-
-    ga('create', 'UA-85118304-1', 'auto');
-    ga('send', 'pageview');
-  </script>
+  
 
   <!-- jquery cloud reference -->
   <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> -->

@@ -1,4 +1,4 @@
-// Trifle Board
+// Trifle Board ---- THIS IS OLD and unused
 
 Trifle.Board = function(tileManager) {
 	this.size = new RowAndColumn(17, 17);

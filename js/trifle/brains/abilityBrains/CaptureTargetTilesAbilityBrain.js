@@ -11,8 +11,10 @@ Trifle.CaptureTargetTilesAbilityBrain.prototype.activateAbility = function() {
 	var self = this;
 	if (targetTilePoints && targetTilePoints.length > 0) {
 		targetTilePoints.forEach(function(targetTilePoint) {
-			if (self.abilityObject.board.capturePossibleBasedOnBannersPlayed(self.abilityObject.sourceTile.ownerName, targetTilePoint)) {
+			var tileIsCapturable = self.abilityObject.board.targetPointTileIsCapturableByTileAbility(targetTilePoint, self.abilityObject.sourceTile);
+			if (tileIsCapturable && self.abilityObject.board.capturePossibleBasedOnBannersPlayed(self.abilityObject.sourceTile.ownerName, targetTilePoint)) {
 				var capturedTile = self.abilityObject.board.captureTileOnPoint(targetTilePoint);
+				capturedTile.beingCapturedByAbility = true;
 				self.capturedTiles.push(capturedTile);
 			}
 		});
@@ -21,4 +23,8 @@ Trifle.CaptureTargetTilesAbilityBrain.prototype.activateAbility = function() {
 	if (this.capturedTiles.length > 0) {
 		this.abilityObject.boardChanged = true;
 	}
+
+	return {
+		capturedTiles: this.capturedTiles
+	};
 };

@@ -1,6 +1,6 @@
 // A more reusable and global Pai Sho Board
 
-PaiShoGames.Board = function(tileManager) {
+PaiShoGames.Board = function(tileManager, customAbilityActivationOrder) {
 	this.size = new RowAndColumn(17, 17);
 	this.cells = this.brandNew();
 
@@ -12,10 +12,11 @@ PaiShoGames.Board = function(tileManager) {
 	this.tileMetadata = PaiShoGames.currentTileMetadata;
 
 	this.activeDurationAbilities = [];
+	this.recordedTilePoints = {};
 
 	this.tileManager = tileManager;
 
-	this.abilityManager = new Trifle.AbilityManager(this);
+	this.abilityManager = new Trifle.AbilityManager(this, customAbilityActivationOrder);
 
 	this.brainFactory = new Trifle.BrainFactory();
 }
@@ -378,7 +379,13 @@ PaiShoGames.Board.prototype.placeTile = function(tile, notationPoint) {
 
 	var boardPoint = this.getPointFromNotationPoint(notationPoint);
 
-	this.processAbilities(tile, tileInfo, null, boardPoint, []);
+	var capturedTiles = [];
+
+	this.processAbilities(tile, tileInfo, null, boardPoint, capturedTiles, {});
+
+	return {
+		capturedTiles: capturedTiles
+	}
 };
 
 PaiShoGames.Board.prototype.getDistanceBetweenPoints = function(bp1, bp2) {
@@ -432,6 +439,9 @@ PaiShoGames.Board.prototype.getGrowGiantOccupiedPoints = function(boardPointToGr
 };
 
 PaiShoGames.Board.prototype.getPointFromNotationPoint = function(notationPoint) {
+	if (notationPoint.isType) {	// Check if it's a BoardPoint object already
+		return notationPoint;	// It's actually what we want already
+	}
 	var rowAndCol = notationPoint.rowAndColumn;
 	return this.cells[rowAndCol.row][rowAndCol.col];
 };
@@ -466,6 +476,24 @@ PaiShoGames.Board.prototype.getSurroundingBoardPoints = function(initialBoardPoi
 		}
 	}
 	return surroundingPoints;
+};
+
+PaiShoGames.Board.prototype.getDiagonalBoardPoints = function(initialBoardPoint) {
+	var diagonalPoints = [];
+	for (var row = initialBoardPoint.row - 1; row <= initialBoardPoint.row + 1; row++) {
+		for (var col = initialBoardPoint.col - 1; col <= initialBoardPoint.col + 1; col++) {
+			if ((row !== initialBoardPoint.row || col !== initialBoardPoint.col)	// Not the center given point
+				&& (row >= 0 && col >= 0) && (row < 17 && col < 17)) {	// Not outside range of the grid
+				var boardPoint = this.cells[row][col];
+				if (!boardPoint.isType(NON_PLAYABLE)
+						&& boardPoint.row !== initialBoardPoint.row 
+						&& boardPoint.col !== initialBoardPoint.col) {
+					diagonalPoints.push(boardPoint);
+				}
+			}
+		}
+	}
+	return diagonalPoints;
 };
 
 PaiShoGames.Board.prototype.getAdjacentRowAndCols = function(rowAndCol) {
@@ -759,6 +787,128 @@ PaiShoGames.Board.prototype.getPointsWithMoveStepAppliedToCol = function(startPo
 	return nextPoints;
 };
 
+PaiShoGames.Board.prototype.targetTileMatchesTargetTeam = function(targetTile, originTile, targetTeams) {
+	var matchesTargetTeam = false;
+
+	targetTeams.forEach(function(targetTeam) {
+		if (targetTeam === Trifle.TileTeam.friendly && targetTile.ownerName === originTile.ownerName) {
+			matchesTargetTeam = true;
+		} else if (targetTeam === Trifle.TileTeam.enemy && targetTile.ownerName !== originTile.ownerName) {
+			matchesTargetTeam = true;
+		}
+	});
+
+	return matchesTargetTeam;
+};
+
+PaiShoGames.Board.prototype.getJumpSurroundingTilesPointsPossibleMoves = function(pointAlongTheWay, originPoint, mustPreserveDirection, movementInfo) {
+	var potentialMovePoints = [];
+
+	var finalPoints = [];
+
+	if (!pointAlongTheWay) {
+		pointAlongTheWay = originPoint;
+	}
+
+	var surroundingPoints = this.getSurroundingBoardPoints(pointAlongTheWay);
+
+	var self = this;
+	surroundingPoints.forEach(function(surroundingPoint) {
+		if (surroundingPoint.hasTile() && self.targetTileMatchesTargetTeam(surroundingPoint.tile, originPoint.tile, movementInfo.targetTeams)) {
+			potentialMovePoints = [];
+
+			if (movementInfo.jumpDirections && movementInfo.jumpDirections.includes(Trifle.MovementDirection.diagonal)
+					&& surroundingPoint.row !== pointAlongTheWay.row && surroundingPoint.col !== pointAlongTheWay.col) {
+				potentialMovePoints = potentialMovePoints.concat(self.getSurroundingBoardPoints(surroundingPoint));
+			}
+			if (movementInfo.jumpDirections && movementInfo.jumpDirections.includes(Trifle.MovementDirection.orthogonal)
+					&& (surroundingPoint.row === pointAlongTheWay.row || surroundingPoint.col === pointAlongTheWay.col)) {
+				potentialMovePoints = potentialMovePoints.concat(self.getSurroundingBoardPoints(surroundingPoint));
+			}
+
+			var slopeToSurrounding = self.calculateSlopeBetweenPoints(pointAlongTheWay, surroundingPoint);
+
+			potentialMovePoints.forEach(function(potentialMovePoint) {
+				var slopeToPotential = self.calculateSlopeBetweenPoints(pointAlongTheWay, potentialMovePoint);
+				if (!potentialMovePoint.hasTile() && slopeToPotential === slopeToSurrounding) {	// TODO: Or can capture?
+					finalPoints.push(potentialMovePoint);
+				}
+			});
+		}
+	});
+
+	return finalPoints;
+};
+
+PaiShoGames.Board.prototype.getAwayFromTilePossibleMoves = function(targetTilePoint, originPoint, boardPointAlongTheWay) {
+	var movePoints = [];
+
+	// Get points surrounding this one. The one that is farther away from targetTilePoint with same slope is the one
+	var surroundingPoints = this.getSurroundingBoardPoints(boardPointAlongTheWay);
+
+	var originalDistance = this.getDistanceBetweenPoints(targetTilePoint, originPoint);
+	var originalSlope = this.calculateSlopeBetweenPoints(targetTilePoint, originPoint);
+
+	surroundingPoints.forEach((surroundingPoint) => {
+		if (!surroundingPoint.hasTile()) {
+			var distance = this.getDistanceBetweenPoints(targetTilePoint, surroundingPoint);
+			var slope = this.calculateSlopeBetweenPoints(targetTilePoint, surroundingPoint);
+
+			if (slope === originalSlope && distance > originalDistance) {
+				movePoints.push(surroundingPoint);
+			}
+		}
+	});
+
+	return movePoints;
+};
+
+PaiShoGames.Board.prototype.getAwayFromTileOrthogonalPossibleMoves = function(targetTilePoint, originPoint, boardPointAlongTheWay) {
+	var movePoints = [];
+
+	// Get points adjacent to this one. The one that is farther away from targetTilePoint with same slope is the one
+	var adjacentPoints = this.getAdjacentPoints(boardPointAlongTheWay);
+
+	var originalDistance = this.getDistanceBetweenPoints(targetTilePoint, originPoint);
+	var originalSlope = this.calculateSlopeBetweenPoints(targetTilePoint, originPoint);
+
+	adjacentPoints.forEach((surroundingPoint) => {
+		if (!surroundingPoint.hasTile()) {
+			var distance = this.getDistanceBetweenPoints(targetTilePoint, surroundingPoint);
+			var slope = this.calculateSlopeBetweenPoints(targetTilePoint, surroundingPoint);
+
+			if (slope === originalSlope && distance > originalDistance) {
+				movePoints.push(surroundingPoint);
+			}
+		}
+	});
+
+	return movePoints;
+};
+
+PaiShoGames.Board.prototype.getAwayFromTileDiagonalPossibleMoves = function(targetTilePoint, originPoint, boardPointAlongTheWay) {
+	var movePoints = [];
+
+	// Get points diagonal to this one. The one that is farther away from targetTilePoint with same slope is the one
+	var diagonalPoints = this.getDiagonalBoardPoints(boardPointAlongTheWay);
+
+	var originalDistance = this.getDistanceBetweenPoints(targetTilePoint, originPoint);
+	var originalSlope = this.calculateSlopeBetweenPoints(targetTilePoint, originPoint);
+
+	diagonalPoints.forEach((surroundingPoint) => {
+		if (!surroundingPoint.hasTile()) {
+			var distance = this.getDistanceBetweenPoints(targetTilePoint, surroundingPoint);
+			var slope = this.calculateSlopeBetweenPoints(targetTilePoint, surroundingPoint);
+
+			if (slope === originalSlope && distance > originalDistance) {
+				movePoints.push(surroundingPoint);
+			}
+		}
+	});
+
+	return movePoints;
+};
+
 PaiShoGames.Board.prototype.getPointsNextToTilesInLineOfSight = function(movementInfo, originPoint) {
 	var jumpPoints = [];
 	if (movementInfo.type === Trifle.MovementType.jumpAlongLineOfSight && movementInfo.targetTileTypes) {
@@ -876,8 +1026,16 @@ PaiShoGames.Board.prototype.debugPointsOccupiedByAbility = function() {
 	});
 };
 
-PaiShoGames.Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
+PaiShoGames.Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd, currentMoveInfo) {
 	this.tilesCapturedByTriggeredAbility = [];
+
+	if (!notationPointStart.rowAndColumn) {	// Assume String representation of points if no rowAndColumn property
+		notationPointStart = new NotationPoint(notationPointStart);
+	}
+	if (!notationPointEnd.rowAndColumn) {
+		notationPointEnd = new NotationPoint(notationPointEnd);
+	}
+
 	var startRowCol = notationPointStart.rowAndColumn;
 	var endRowCol = notationPointEnd.rowAndColumn;
 
@@ -938,6 +1096,10 @@ PaiShoGames.Board.prototype.moveTile = function(player, notationPointStart, nota
 		capturedTiles.push(this.captureTileOnPoint(boardPointEnd));
 	}
 
+	capturedTiles.forEach((capturedTile) => {
+		capturedTile.beingCaptured = true;
+	});
+
 	boardPointEnd.putTile(tile);
 	tile.seatedPoint = boardPointEnd;
 
@@ -947,13 +1109,14 @@ PaiShoGames.Board.prototype.moveTile = function(player, notationPointStart, nota
 
 	/* Follow Order of Abilities and Triggers in Trifle documentation */
 	
-	this.processAbilities(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles);
+	var abilityActivationFlags = this.processAbilities(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo);
 
 	return {
 		movedTile: tile,
 		startPoint: boardPointStart,
 		endPoint: boardPointEnd,
-		capturedTiles: capturedTiles
+		capturedTiles: capturedTiles,
+		abilityActivationFlags: abilityActivationFlags
 	}
 };
 
@@ -961,9 +1124,13 @@ PaiShoGames.Board.prototype.moveTile = function(player, notationPointStart, nota
  * Process abilities on the board after a tile is moved or placed/deployed.
  * `boardPointStart` will probably be null for when a tile is placed.
  */
-PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles) {
+PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo, existingAbilityActivationFlags) {
+	if (!currentMoveInfo) {
+		currentMoveInfo = {};
+	}
 
 	var abilitiesToActivate = {};
+	var abilitiesWithPromptTargetsNeeded = [];
 
 	/* 
 	- Get abilities that should be active/activated
@@ -1005,7 +1172,8 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 						boardPointStart: boardPointStart,
 						boardPointEnd: boardPointEnd,
 						capturedTiles: capturedTiles
-					}
+					},
+					isPassiveMovement: currentMoveInfo.isPassiveMovement
 				};
 
 				var triggers = tileAbilityInfo.triggers;
@@ -1014,8 +1182,8 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 						if (Trifle.TriggerHelper.hasInfo(triggerInfo)) {
 							triggerContext.currentTrigger = triggerInfo;
 							var brain = self.brainFactory.createTriggerBrain(triggerInfo, triggerContext);
-							if (brain && brain.isTriggerMet) {
-								if (brain.isTriggerMet()) {
+							if (brain && brain.isTriggerMet && self.activationRequirementsAreMet(triggerInfo, tile, triggerContext)) {
+								if (allTriggerConditionsMet && brain.isTriggerMet()) {
 									triggerBrainMap[triggerInfo.triggerType] = brain;
 								} else {
 									allTriggerConditionsMet = false;
@@ -1034,9 +1202,15 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 						tile: tile,
 						tileInfo: tileInfo,
 						tileAbilityInfo: tileAbilityInfo,
-						triggerBrainMap: triggerBrainMap
+						triggerBrainMap: triggerBrainMap,
+						promptTargetInfo: currentMoveInfo.promptTargetData,
+						isPassiveMovement: currentMoveInfo.isPassiveMovement
 					}
 					var abilityObject = new Trifle.Ability(abilityContext);
+
+					if (!abilityObject.hasNeededPromptTargetInfo()) {
+						abilitiesWithPromptTargetsNeeded.push(abilityObject);
+					}
 
 					var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
 
@@ -1057,9 +1231,7 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 		if (tileInfo.abilities) {
 			tileInfo.abilities.forEach(function(tileAbilityInfo) {
 				/* Check that ability trigger is "When Captured By Target Tile" - or in future, any other triggers that apply to captured tiles */
-				if (tileAbilityInfo.triggeringActions && tileAbilityInfo.triggeringActions.length === 1
-					&& tileAbilityInfo.triggeringActions.includes(Trifle.AbilityTriggerType.whenCapturedByTargetTile)) {
-
+				if (Trifle.TileInfo.tileAbilityIsTriggeredWhenCaptured(tileAbilityInfo)) {
 					var allTriggerConditionsMet = true;
 
 					var triggerBrainMap = {};
@@ -1076,7 +1248,8 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 							boardPointStart: boardPointStart,
 							boardPointEnd: boardPointEnd,
 							capturedTiles: capturedTiles
-						}
+						},
+						isPassiveMovement: currentMoveInfo.isPassiveMovement
 					};
 
 					var triggers = tileAbilityInfo.triggers;
@@ -1085,8 +1258,8 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 							if (Trifle.TriggerHelper.hasInfo(triggerInfo)) {
 								triggerContext.currentTrigger = triggerInfo;
 								var brain = self.brainFactory.createTriggerBrain(triggerInfo, triggerContext);
-								if (brain && brain.isTriggerMet) {
-									if (brain.isTriggerMet()) {
+								if (brain && brain.isTriggerMet && self.activationRequirementsAreMet(triggerInfo, tile, triggerContext)) {
+									if (allTriggerConditionsMet && brain.isTriggerMet()) {
 										triggerBrainMap[triggerInfo.triggerType] = brain;
 									} else {
 										allTriggerConditionsMet = false;
@@ -1097,20 +1270,57 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 							}
 						});
 					}
+
+					if (allTriggerConditionsMet) {
+						var abilityContext = {
+							board: self,
+							pointWithTile: null,
+							tile: tile,
+							tileInfo: tileInfo,
+							tileAbilityInfo: tileAbilityInfo,
+							triggerBrainMap: triggerBrainMap,
+							promptTargetInfo: currentMoveInfo.promptTargetData
+						}
+						var abilityObject = new Trifle.Ability(abilityContext);
+
+						if (!abilityObject.hasNeededPromptTargetInfo()) {
+							abilitiesWithPromptTargetsNeeded.push(abilityObject);
+						}
+	
+						var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
+	
+						if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
+							abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
+						} else {
+							abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
+						}
+					}
 				}
 			});
 		}
 	});
 	
 	this.abilityManager.setReadyAbilities(abilitiesToActivate);
+	this.abilityManager.setAbilitiesWithPromptTargetsNeeded(abilitiesWithPromptTargetsNeeded);
 
-	var abilityActivationFlags = this.abilityManager.activateReadyAbilities();
+	var abilityActivationFlags = this.abilityManager.activateReadyAbilitiesOrPromptForTargets();
+
+	/* Debugging */
+	debug(this.abilityManager.abilities);
 
 	if (abilityActivationFlags.boardHasChanged) {
 		// Need to re-process abilities... 
 		// Pass in some sort of context from the activation flags???
-		this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles);
+		var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.tileRecords.capturedTiles, currentMoveInfo, abilityActivationFlags);
+		if (nextAbilityActivationFlags.tileRecords.capturedTiles && nextAbilityActivationFlags.tileRecords.capturedTiles.length) {
+			if (!abilityActivationFlags.tileRecords.capturedTiles) {
+				abilityActivationFlags.tileRecords.capturedTiles = [];
+			}
+			abilityActivationFlags.tileRecords.capturedTiles = abilityActivationFlags.tileRecords.capturedTiles.concat(nextAbilityActivationFlags.capturedTiles);
+		}
 	}
+
+	return abilityActivationFlags;
 };
 
 PaiShoGames.Board.prototype.getZonesPointIsWithin = function(boardPoint) {
@@ -1363,6 +1573,8 @@ PaiShoGames.Board.prototype.setPossibleMovesForBonusMovement = function(movement
 			this.setPossibleMovementPointsFromMovePoints([movementStartPoint], PaiShoGames.Board.jumpShapeMovementFunction, tile, movementInfo, movementStartPoint, movementInfo.distance, 0);
 		} else if (movementInfo.type === Trifle.MovementType.travelShape) {
 			this.setPossibleMovementPointsFromMovePointsOnePathAtATime(PaiShoGames.Board.travelShapeMovementFunction, tile, movementInfo, movementStartPoint, movementStartPoint, movementInfo.shape.length, 0, [movementStartPoint]);
+		} else if (movementInfo.type === Trifle.MovementType.jumpSurroundingTiles) {
+			this.setPossibleMovementPointsFromMovePoints([movementStartPoint], PaiShoGames.Board.jumpSurroundingTilesMovementFunction, tile, movementInfo, movementStartPoint, movementInfo.distance, 0);
 		}
 	}
 	// debug("Movement Point Checks: " + this.movementPointChecks);
@@ -1389,6 +1601,14 @@ PaiShoGames.Board.prototype.setPossibleMovesForMovement = function(movementInfo,
 			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.jumpShapeMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
 		} else if (movementInfo.type === Trifle.MovementType.travelShape) {
 			this.setPossibleMovementPointsFromMovePointsOnePathAtATime(PaiShoGames.Board.travelShapeMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, boardPointStart, movementInfo.shape.length, 0, [boardPointStart]);
+		} else if (movementInfo.type === Trifle.MovementType.jumpSurroundingTiles) {
+			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.jumpSurroundingTilesMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+		} else if (movementInfo.type === Trifle.MovementType.awayFromTargetTile) {
+			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.awayFromTargetTileOrthogonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+		} else if (movementInfo.type === Trifle.MovementType.awayFromTargetTileOrthogonal) {
+			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.awayFromTargetTileOrthogonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+		} else if (movementInfo.type === Trifle.MovementType.awayFromTargetTileDiagonal) {
+			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.awayFromTargetTileDiagonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
 		}
 	}
 	// debug("Movement Point Checks: " + this.movementPointChecks);
@@ -1411,6 +1631,31 @@ PaiShoGames.Board.jumpShapeMovementFunction = function(board, originPoint, board
 PaiShoGames.Board.travelShapeMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber, currentMovementPath) {
 	var mustPreserveDirection = Trifle.TileInfo.movementMustPreserveDirection(movementInfo);
 	return board.getNextPointsForTravelShapeMovement(movementInfo, moveStepNumber, originPoint, boardPointAlongTheWay, currentMovementPath, mustPreserveDirection);
+};
+PaiShoGames.Board.jumpSurroundingTilesMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, movementStepNumber) {
+	var mustPreserveDirection = Trifle.TileInfo.movementMustPreserveDirection(movementInfo);
+	return board.getJumpSurroundingTilesPointsPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
+};
+PaiShoGames.Board.awayFromTargetTileMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
+	if (movementInfo.targetTilePoint) {
+		return board.getAwayFromTilePossibleMoves(movementInfo.targetTilePoint, originPoint, boardPointAlongTheWay);
+	} else {
+		debug("Missing targetTilePoint");
+	}
+};
+PaiShoGames.Board.awayFromTargetTileOrthogonalMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
+	if (movementInfo.targetTilePoint) {
+		return board.getAwayFromTileOrthogonalPossibleMoves(movementInfo.targetTilePoint, originPoint, boardPointAlongTheWay);
+	} else {
+		debug("Missing targetTilePoint");
+	}
+};
+PaiShoGames.Board.awayFromTargetTileDiagonalMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
+	if (movementInfo.targetTilePoint) {
+		return board.getAwayFromTileDiagonalPossibleMoves(movementInfo.targetTilePoint, originPoint, boardPointAlongTheWay);
+	} else {
+		debug("Missing targetTilePoint");
+	}
 };
 
 PaiShoGames.Board.prototype.setPossibleMovementPointsFromMovePoints = function(movePoints, nextPossibleMovementPointsFunction, tile, movementInfo, originPoint, distanceRemaining, moveStepNumber) {
@@ -1655,12 +1900,12 @@ PaiShoGames.Board.prototype.getTilePoints = function(tileCode, ownerName) {
 	return points;
 };
 
-PaiShoGames.Board.prototype.getPointsForTileCodes = function(tileCodes, ownerName) {
+PaiShoGames.Board.prototype.getPointsForTileCodes = function(tileCodes, ownerNames) {
 	var points = [];
 	this.forEachBoardPoint(function(boardPoint) {
 		if (boardPoint.hasTile()
 				&& tileCodes.includes(boardPoint.tile.code)
-				&& boardPoint.tile.ownerName === ownerName) {
+				&& ownerNames.includes(boardPoint.tile.ownerName)) {
 			points.push(boardPoint);
 		}
 	});
@@ -1675,7 +1920,7 @@ PaiShoGames.Board.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, 
 	var tileInfo = this.tileMetadata[tile.code];
 	var canCaptureTarget = this.targetPointHasTileTileThatCanBeCaptured(tile, movementInfo, fromPoint, targetPoint);
 	return (!targetPoint.hasTile() || canCaptureTarget || (targetPoint.tile === tile && targetPoint.occupiedByAbility))
-		&& (!targetPoint.isType(TEMPLE) || canCaptureTarget)
+		&& (!this.useTrifleTempleRules || !targetPoint.isType(TEMPLE) || canCaptureTarget)
 		&& !this.tileZonedOutOfSpace(tile, movementInfo, targetPoint, canCaptureTarget)
 		&& !this.tileMovementIsImmobilized(tile, movementInfo, fromPoint);
 };
@@ -1759,11 +2004,21 @@ PaiShoGames.Board.prototype.tileCanCapture = function(tile, movementInfo, fromPo
 	var self = this;
 	if (movementInfo && movementInfo.captureTypes && movementInfo.captureTypes.length) {
 		movementInfo.captureTypes.forEach(function(captureTypeInfo) {
-			if (captureTypeInfo.type && captureTypeInfo.type === Trifle.CaptureType.tilesTargetedByAbility) {
+			if (captureTypeInfo.type && captureTypeInfo.type === Trifle.CaptureType.all) {
+				capturePossibleWithMovement = true;
+			} else if (captureTypeInfo.type && captureTypeInfo.type === Trifle.CaptureType.tilesTargetedByAbility) {
 				captureTypeInfo.targetAbilities.forEach(function(targetAbilityName) {
 					capturePossibleWithMovement = self.abilityManager.abilityTargetingTileExists(targetAbilityName, targetPoint.tile);
 				});
-			} 
+			} else if (captureTypeInfo.type && captureTypeInfo.type === Trifle.CaptureType.allExcludingCertainTiles) {
+				if (!captureTypeInfo.excludedTileCodes.includes(targetPoint.tile.code)) {
+					capturePossibleWithMovement = true;
+				}
+			}
+
+			if (!self.activationRequirementsAreMet(captureTypeInfo, tile)) {
+				captureProhibited = true;
+			}
 		});
 	}
 
@@ -1779,6 +2034,52 @@ PaiShoGames.Board.prototype.tileCanCapture = function(tile, movementInfo, fromPo
 		)
 		&& this.tilesBelongToDifferentOwnersOrTargetTileHasFriendlyCapture(tile, targetTile, targetTileInfo) // TODO
 		&& !targetPoint.tile.protected;
+};
+
+PaiShoGames.Board.prototype.targetPointTileIsCapturableByTileAbility = function(targetPoint, capturingTile) {
+	return !this.tileHasActiveCaptureProtectionFromCapturingTile(targetPoint.tile, capturingTile);
+};
+
+PaiShoGames.Board.prototype.activationRequirementsAreMet = function(abilityInfo, tile, triggerContext) {
+	var activationRequirementsAreMet = true;	// Assume true, change if ever false
+	if (abilityInfo.activationRequirements && abilityInfo.activationRequirements.length) {
+		var self = this;
+		abilityInfo.activationRequirements.forEach(function(activationRequirement) {
+			if (activationRequirement.type === Trifle.ActivationRequirement.tilesNotInTemple) {
+				var ownerNames = [];
+				if (activationRequirement.targetTeams.includes(Trifle.TileTeam.friendly)) {
+					ownerNames.push(tile.ownerName);
+				}
+				if (activationRequirement.targetTeams.includes(Trifle.TileTeam.enemy)) {
+					ownerNames.push(getOpponentName(tile.ownerName));
+				}
+				requirementCheckPoints = self.getPointsForTileCodes(activationRequirement.targetTileCodes, ownerNames);
+				
+				requirementCheckPoints.forEach(function(checkPoint) {
+					if (checkPoint.isType(TEMPLE)) {
+						activationRequirementsAreMet = false;
+					}
+				});
+			} else if (activationRequirement.type === Trifle.ActivationRequirement.tileIsOnPointOfType) {
+				var tileIsPointOfTypeRequirementMet = false;
+				if (activationRequirement.targetTileTypes) {
+					if (activationRequirement.targetTileTypes && activationRequirement.targetTileTypes.length) {
+						if (activationRequirement.targetTileTypes.includes(Trifle.TileCategory.thisTile)) {
+							if (arrayIncludesOneOf(activationRequirement.targetPointTypes, triggerContext.pointWithTile.types)) {
+								tileIsPointOfTypeRequirementMet = true;
+							}
+						}
+					}
+				}
+				if (!tileIsPointOfTypeRequirementMet) {
+					activationRequirementsAreMet = false;
+				}
+			}
+		});
+	} else {
+		activationRequirementsAreMet = true;
+	}
+	return activationRequirementsAreMet;
 };
 
 /** Can a tile be captured by a Capture ability? */
@@ -2113,7 +2414,7 @@ PaiShoGames.Board.prototype.setDeployPointsWithinTileZone = function(tile, tileI
 PaiShoGames.Board.prototype.setMovePointsWithinTileZone = function(boardPointStart, zoneOwner, tileBeingMoved, movementInfo) {
 	if (movementInfo.targetTileCodes && movementInfo.targetTileCodes.length > 0) {
 		var self = this;
-		var pointsOfZoneTiles = this.getPointsForTileCodes(movementInfo.targetTileCodes, zoneOwner);
+		var pointsOfZoneTiles = this.getPointsForTileCodes(movementInfo.targetTileCodes, [zoneOwner]);
 		this.forEachBoardPoint(function(targetPoint) {
 			var startAndEndPointAreInSameZone = self.oneOfTheseZonesContainsPoints(pointsOfZoneTiles, [boardPointStart, targetPoint]);
 			if (startAndEndPointAreInSameZone
@@ -2333,6 +2634,20 @@ PaiShoGames.Board.prototype.tickDurationAbilities = function() {
 	} */
 };
 
+PaiShoGames.Board.prototype.recordTilePoint = function(boardPoint, recordTilePointType) {
+	if (!this.recordedTilePoints[recordTilePointType]) {
+		this.recordedTilePoints[recordTilePointType] = {};
+	}
+	this.recordedTilePoints[recordTilePointType][boardPoint.tile.id] = boardPoint;
+};
 
+PaiShoGames.Board.prototype.promptForBoardPointInAVeryHackyWay = function() {
+	this.forEachBoardPoint(function(boardPoint) {
+		boardPoint.addType(POSSIBLE_MOVE);
+	})
+};
 
+PaiShoGames.Board.prototype.getBoardPointFromRowAndCol = function(rowAndCol) {
+	return this.cells[rowAndCol.row][rowAndCol.col];
+};
 
