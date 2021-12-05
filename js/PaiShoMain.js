@@ -2241,7 +2241,7 @@ var GameType = {
 		desc: "Ginseng Pai Sho (beta)",
 		color: "var(--ginsengcolor)",
 		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
-		coverImg: "rose.png",
+		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [],
 		usersWithAccess: [
@@ -3149,17 +3149,15 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 		var gameTypeHeading = "";
 		
 		if (localStorage.getItem("data-theme") == "stotes") {
-			message += "<table><tr class='first'><td>Game Mode</td><td>Host</td><td>Ranking</td></tr>";
+			message += "<table><tr class='tr-header'><td>Game Mode</td><td>Host</td><td>Ranking</td></tr>";
 			var even = true;
-			for (var index in myGamesList) {
+			for (var index in gameSeekList) {
 				var gameSeek = gameSeekList[index];
 				if (
 					gameDevOn
 					|| !getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess
 					|| usernameIsOneOf(getGameTypeEntryFromId(gameSeek.gameTypeId).usersWithAccess)
 				) {
-					var gId = parseInt(myGame.gameId);
-					
 					message += "<tr onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");' class='gameSeekEntry " + ((even)?("even"):("odd")) + "'>";
 					message += "<td style='color:" + getGameColor(gameSeek.gameTypeDesc) + ";'>" + gameSeek.gameTypeDesc + "</td>";
 					
@@ -3172,14 +3170,16 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 					} else {
 						message += "<td>N/A</td>";
 					}
+					message += "</tr>";
 
 					for (var i = 0; i < gameSeek.gameOptions.length; i++) {
-						message += "<tr onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");' class='" + ((even)?("even"):("odd")) + "'><td><em>-Game Option</td><td colspan='2'>" + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></td></tr>";
+						message += "<tr onclick='acceptGameSeekClicked(" + parseInt(gameSeek.gameId) + ");' class='" + ((even)?("even"):("odd")) + "'><td colspan='3'><em>-Game Option: " + getGameOptionDescription(gameSeek.gameOptions[i]) + "</em></td></tr>";
 					}
 					even = !even;
+					gameSeeksDisplayed = true;
 				}
 			}
-			message += "</table>";
+			message += "<tr class='tr-footer'><td>Game Mode</td><td>Host</td><td>Ranking</td></tr></table>";
 		} else {
 			for (var index in gameSeekList) {
 				var gameSeek = gameSeekList[index];
@@ -3216,12 +3216,12 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 	}
 
 	if (!gameSeeksDisplayed) {
-		message = "No games available to join. You can create a new game, or join <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a> to find people to play with!";
+		//message = "No games available to join. You can create a new game, or join <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a> to find people to play with!";
 	}
 
 	message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
 
-	onlinePlayEngine.getActiveGamesCount(getActiveGamesCountCallback);
+	//onlinePlayEngine.getActiveGamesCount(getActiveGamesCountCallback);
 
 	showModal("Join a game", message);
 };
