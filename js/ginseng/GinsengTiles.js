@@ -23,9 +23,22 @@ Ginseng.GinsengTiles = {};
 Ginseng.TileInfo = {};
 
 Ginseng.TileInfo.initializeTrifleData = function() {
+	Ginseng.TileInfo.setTileNames();
+
 	Trifle.TileInfo.initializeTrifleData();
 
 	Ginseng.TileInfo.defineGinsengTiles();
+};
+
+Ginseng.TileInfo.setTileNames = function() {
+	/* Set tile names that do not match thier keys in TileCodes */
+	var tileNames = {};
+
+	tileNames[Ginseng.TileCodes.WhiteLotus] = "White Lotus";
+	tileNames[Ginseng.TileCodes.Bison] = "Flying Bison";
+	tileNames[Ginseng.TileCodes.LionTurtle] = "Lion Turtle";
+
+	PaiShoGames.currentTileNames = tileNames;
 };
 
 Ginseng.TileInfo.defineGinsengTiles = function() {
@@ -80,6 +93,17 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				targetTypes: [Trifle.TargetType.thisTile],
 				recordedPointType: Trifle.RecordTilePointType.startPoint
 			}
+		],
+		textLines: [
+			"<strong>Movement</strong>",
+			"- Moves by jumping over any tiles that are diagonal to it. Can be continued as a chain.",
+			"",
+			"<strong>Ability</strong>",
+			"- White Lotus cannot be captured when Ginseng is in harmony with it.",
+			"",
+			"<strong>Other</strong>",
+			"- Cannot capture.",
+			"- When your White Lotus is captured, it is returned to its starting point."
 		]
 	};
 
@@ -116,10 +140,17 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			}
-		]/* ,
+		],
 		textLines: [
-			"Koi | Original Bender"
-		] */
+			"<em>Original Bender</em>",
+			"",
+			"<strong>Movement</strong>",
+			"- Can move 5 spaces",
+			"- Can capture any tile by movement.",
+			"",
+			"<strong>Ability</strong>",
+			"- Traps all surrounding enemy tiles when it is touching either White Garden."
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Dragon] = {
@@ -160,10 +191,17 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile
 			}
-		]/* ,
+		],
 		textLines: [
-			"Dragon | Original Bender"
-		] */
+			"<em>Original Bender</em>",
+			"",
+			"<strong>Movement</strong>",
+			"- Can move 5 spaces",
+			"- Can capture any tile by movement.",
+			"",
+			"<strong>Ability</strong>",
+			"- Captures all surrounding tiles when it is touching either Red Garden."
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Badgermole] = {
@@ -220,10 +258,17 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				targetAbilityTypes: [Trifle.AbilityType.all],
 				cancelAbilitiesFromTeam: Trifle.TileTeam.enemy
 			}
-		]/* ,
+		],
 		textLines: [
-			"Badgermole | Original Bender"
-		] */
+			"<em>Original Bender</em>",
+			"",
+			"<strong>Movement</strong>",
+			"- Can move 5 spaces",
+			"- Can capture any tile by movement.",
+			"",
+			"<strong>Ability</strong>",
+			"- Protects all surrounding friendly tiles when it is touching either White Garden"
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Bison] = {
@@ -347,10 +392,18 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					}
 				]
 			}
-		]/* ,
+		],
 		textLines: [
-			"Bison | Original Bender"
-		] */
+			"<em>Original Bender</em>",
+			"",
+			"<strong>Movement</strong>",
+			"- Can move 5 spaces",
+			"- Can capture any tile by movement.",
+			"",
+			"<strong>Ability</strong>",
+			"- Pushes a single surrounding tile in a straight line away from itself when it is touching either Red Garden.",
+			"- If you move a tile to a point surrounding your Flying Bison, you may push that tile."
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.LionTurtle] = {
@@ -385,10 +438,15 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile
 			}
-		]/* ,
+		],
 		textLines: [
-			"Lion Turtle"
-		] */
+			"<strong>Movement</strong>",
+			"- Can move 6 spaces",
+			"- Can capture any tile by movement except the opponent's Lion Turtle",
+			"",
+			"<strong>Ability</strong>",
+			"- Captures all adjacent Original Benders."
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Wheel] = {
@@ -409,10 +467,12 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					}
 				]
 			}
-		]/* ,
+		],
 		textLines: [
-			"Wheel"
-		] */
+			"<strong>Movement</strong>",
+			"- Can move unlimited spaces in one direction on the horizontal or vertical lines.",
+			"- Can capture any tile by movement."
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Ginseng] = {
@@ -454,11 +514,16 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				targetTeams: [Trifle.TileTeam.friendly],
 				promptTargetTitle: "exchangedTile"
 			}
-		]
-		/* ,
+		],
 		textLines: [
-			"Ginseng"
-		] */
+			"<strong>Movement</strong>",
+			"- Can move 6 spaces",
+			"- Cannot capture.",
+			"",
+			"<strong>Ability</strong>",
+			"- White Lotus cannot be captured when Ginseng is in harmony with it.",
+			"- May retrieve a captured tile by being exchanged at either the Eastern or Western Temples."
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Orchid] = {
@@ -518,11 +583,16 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				targetTeams: [Trifle.TileTeam.friendly],
 				promptTargetTitle: "exchangedTile"
 			}
-		]
-		/* ,
+		],
 		textLines: [
-			"Orchid"
-		] */
+			"<strong>Movement</strong>",
+			"- Can move 6 spaces",
+			"- Unique Capture: Orchid banishes the tile it captures and itself. Banished tiles cannot be retrieved.",
+			"- Cannot capture/banish the White Lotus.",
+			"",
+			"<strong>Ability</strong>",
+			"- May retrieve a captured tile by being exchanged at either the Eastern or Western Temples."
+		]
 	};
 
 	/* Apply Capture and Ability Activation Requirements Rules */

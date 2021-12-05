@@ -1480,7 +1480,7 @@ Trifle.TileInfo.getReadableDescription = function(tileCode) {
 
 	if (tileInfo.textLines) {
 		tileInfo.textLines.forEach(function(textLine) {
-			tileHtml += "- " + textLine + "<br />";
+			tileHtml += textLine + "<br />";
 		});
 		return tileHtml + "<br />";
 	}

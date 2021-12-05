@@ -59,12 +59,16 @@ Trifle.Tile.prototype.getCopy = function() {
 
 Trifle.Tile.getTileName = function(tileCode) {
 	var name = "";
-	
-	Object.keys(PaiShoGames.currentTileCodes).forEach(function(key, index) {
-		if (PaiShoGames.currentTileCodes[key] === tileCode) {
-			name = key;
-		}
-	});
+
+	if (PaiShoGames.currentTileNames && PaiShoGames.currentTileNames[tileCode]) {
+		name = PaiShoGames.currentTileNames[tileCode];
+	} else {
+		Object.keys(PaiShoGames.currentTileCodes).forEach(function(key, index) {
+			if (PaiShoGames.currentTileCodes[key] === tileCode) {
+				name = key;
+			}
+		});
+	}
 
 	return name;
 };
