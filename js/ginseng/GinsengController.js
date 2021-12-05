@@ -87,7 +87,7 @@ Ginseng.Controller.prototype.resetMove = function() {
 };
 
 Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Ginseng Pai Sho (beta testing)</h4><p><a href='https://skudpaisho.com/site/games/ginseng-pai-sho/' target='_blank'>view the rules</a>.</p>";
+	return "<h4>Ginseng Pai Sho (beta testing)</h4><p><h4>Objective</h4><p>The objective of Ginseng Pai Sho is to cross the Border with your White Lotus tile. The first player to achieve this, wins the game. The Border is the midline between Host and Guest tiles.</p><h4>Temple Rules</h4><p>Tiles are protected when inside of the Eastern or Western Temple. Protected tiles cannot be captured, trapped, or pushed. A tile inside of a Temple can still use its abilities.</p><p><em>Reminder: A Temple is not a Garden.</em></p><h4>White Lotus Rules</h4><p><strong>When your White Lotus is inside of a Temple:</strong></p><ul><li>You cannot capture tiles by movement</li><li>Your tiles’ abilities are not in effect</li></ul><p><strong>When only your White Lotus is outside of a Temple:</strong></p><ul><li>You cannot capture tiles by movement</li><li>Your tiles’ abilities are in effect</li></ul><p><strong>When both White Lotuses are outside of a Temple:</strong></p><ul><li>You can capture tiles by movement</li><li>Your tiles’ abilities are in effect</li></ul></p><p><a href='https://skudpaisho.com/site/games/ginseng-pai-sho/' target='_blank'>view the full rules</a>.</p>";
 };
 
 Ginseng.Controller.prototype.getAdditionalMessage = function() {
