@@ -5,6 +5,10 @@ function AdevarOptions() {
 		AdevarOptions.enableSpoopyTiles();
 	}
 
+	if (dateIsBetween("12/01/2021", "01/04/2022")) {
+		AdevarOptions.enableChristmasTiles();
+	}
+
 	if (!localStorage.getItem(AdevarOptions.tileDesignTypeKey)
 		|| !AdevarOptions.tileDesignTypeValues[localStorage.getItem(AdevarOptions.tileDesignTypeKey)]) {
 		AdevarOptions.setTileDesignsPreference("classic", true);
@@ -64,6 +68,10 @@ AdevarOptions.buildToggleViewAsGuestDiv = function() {
 
 AdevarOptions.enableSpoopyTiles = function() {
 	AdevarOptions.tileDesignTypeValues['spoopy'] = "Adevar Spoopy";
+};
+
+AdevarOptions.enableChristmasTiles = function() {
+	AdevarOptions.tileDesignTypeValues['christmas'] = "Adevar Christmas";
 };
 
 AdevarOptions.commenceSpoopy = function() {

@@ -8,6 +8,7 @@ Trifle.Controller = function(gameContainer, isMobile) {
 
 	Trifle.TileInfo.initializeTrifleData();
 	PaiShoGames.currentTileMetadata = Trifle.TrifleTiles;
+	PaiShoGames.currentTileCodes = Trifle.TileCodes;
 	this.resetGameManager();
 	this.resetNotationBuilder();
 	this.resetGameNotation();
@@ -32,7 +33,7 @@ Trifle.Controller.prototype.resetNotationBuilder = function() {
 	if (this.notationBuilder) {
 		offerDraw = this.notationBuilder.offerDraw;
 	}
-	this.notationBuilder = new Trifle.NotationBuilder();
+	this.notationBuilder = new OldTrifle.NotationBuilder();
 	if (offerDraw) {
 		this.notationBuilder.offerDraw = true;
 	}
@@ -44,7 +45,7 @@ Trifle.Controller.prototype.resetGameNotation = function() {
 };
 
 Trifle.Controller.prototype.getNewGameNotation = function() {
-	return new Trifle.GameNotation();
+	return new OldTrifle.GameNotation();
 };
 
 Trifle.Controller.getHostTilesContainerDivs = function() {

@@ -6,10 +6,18 @@
     --highlight:#c83737;
     --primary-text:#f1f1f1;
     --secondary-text:#cac8bf;
+
+    --user-chat-bubble:var(--highlight);
+    --opponent-chat-bubble:#dfdbdb;
+    --spectator-chat-bubble:#a19e99;
+    --user-chat-text:var(--primary-text);
+    --opponent-chat-text:var(--primary);
+    --spectator-chat-text:var(--primary);
   
     --skudcolor: #c83737;
     --vagabondcolor: #88bd38;
     --adevarcolor: #ab6bff;
+    --ginsengcolor: #e69e1a;
     --capturecolor: #3860ce;
     --spiritcolor: #1d94da;
     --streetcolor: #464444;
@@ -24,7 +32,7 @@
     --hexcolor: #969595;
     --tumbleweedcolor: #b99700;
     --triflecolor: #3eb870;
-    --othercolor: #f1f1f1;
+    --othercolor: #726d6d;
   
     --bloomsh1: #e75776;
     --bloomsh2: #c83737;
@@ -450,11 +458,12 @@ div.tab .alertTab, div.tab .alertTab.active {
 .chatMessage {
     margin-top:3px;
     margin-bottom:3px;
+    padding:0;
     width:fit-content;
 }
 .chatMessage .message {
-    background-color: var(--secondary-text);
-    color:var(--primary);
+    background-color: var(--spectator-chat-bubble);
+    color:var(--spectator-chat-text);
     border-radius:0.8em;
     border-bottom-left-radius:0;
     padding:3px 8px;
@@ -462,11 +471,19 @@ div.tab .alertTab, div.tab .alertTab.active {
     display:inline-block;
 }
 .chatMessage.self .message {
-    background-color: var(--highlight);
-    color:var(--secondary-text);
+    background-color: var(--user-chat-bubble);
+    color:var(--user-chat-text);
     border-bottom-right-radius:0;
     border-bottom-left-radius:0.8em;
 }
 .chatMessage.self {
     align-self: flex-end;
+}
+.message.opponent {
+    background-color: var(--opponent-chat-bubble);
+    color:var(--opponent-chat-text);
+}
+.message.golden {
+    background-color: var(--bloomsg1);
+    color:var(--primary);
 }

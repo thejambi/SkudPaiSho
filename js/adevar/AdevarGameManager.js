@@ -179,7 +179,7 @@ function AdevarGameManager(actuator, ignoreActuate, isCopy) {
 	this.playersWhoHaveCapturedReflection = [];
 
 	this.setup(ignoreActuate);
-}
+};
 
 AdevarGameManager.prototype.updateActuator = function(newActuator) {
 	this.actuator = newActuator;

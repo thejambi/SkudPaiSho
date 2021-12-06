@@ -78,8 +78,8 @@ AdevarActuator.prototype.htmlify = function(board, tileManager, markingManager, 
 	hostTileReserveContainer.appendChild(document.createElement("br"));
 	this.hostTilesContainer.appendChild(hostTileReserveContainer);
 
-	var hostCapturedTiles = this.getTilesForPlayer(capturedTiles, HOST);
-	var guestCapturedTiles = this.getTilesForPlayer(capturedTiles, GUEST);
+	var hostCapturedTiles = getTilesForPlayer(capturedTiles, HOST);
+	var guestCapturedTiles = getTilesForPlayer(capturedTiles, GUEST);
 
 	var showHostCapturedTiles = hostCapturedTiles.length > 0;
 	if (showHostCapturedTiles) {
@@ -145,18 +145,6 @@ AdevarActuator.prototype.htmlify = function(board, tileManager, markingManager, 
 			self.addTile(tile, guestCapturedTilesContainer, true);
 		});
 	}
-};
-
-AdevarActuator.prototype.getTilesForPlayer = function(tiles, player) {
-	var playerTiles = [];
-	if (tiles && tiles.length > 0) {
-		tiles.forEach(function(tile) {
-			if (tile.ownerName === player) {
-				playerTiles.push(tile);
-			}
-		});
-	}
-	return playerTiles;
 };
 
 AdevarActuator.prototype.clearContainer = function (container) {

@@ -286,7 +286,7 @@ OnlinePlayEngine.prototype.checkIfUserOnline = function(username, callback) {
 };
 
 OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, loginToken, gameTypeName, callback,
-        gameClockJson, gameResultId) {
+        gameClockJson, gameResultId, move) {
     $.post("backend/updateGameNotationV3.php",
         {
             id: gameId,
@@ -301,7 +301,7 @@ OnlinePlayEngine.prototype.submitMove = function(gameId, gameNotationText, login
         },
         function(data, status){
             if (status === 'success') {
-                callback(data.trim());
+                callback(data.trim(), move);
             }
         }
     );
