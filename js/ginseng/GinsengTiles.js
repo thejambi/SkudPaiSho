@@ -435,7 +435,6 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		abilities: [
 			{
 				type: Trifle.AbilityName.captureTargetTiles,
-				priority: 1,
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile,
@@ -457,7 +456,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			"- Can capture any tile by movement except the opponent's Lion Turtle",
 			"",
 			"<strong>Ability</strong>",
-			"- Captures all adjacent Original Benders, regardless of protection from capture."
+			"- Captures all adjacent Original Benders."
 		]
 	};
 
