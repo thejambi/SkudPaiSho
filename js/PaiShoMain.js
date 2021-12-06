@@ -4608,15 +4608,17 @@ function promptAddOption() {
 // 	  document.body.setAttribute("data-theme", currentTheme);
 //   }
 function setWebsiteTheme(theme) {
-	if (theme == "dark") {
+	var previousTheme = localStorage.getItem("data-theme");
+
+	if (theme === "dark") {
 		localStorage.setItem("data-theme", "dark");
 		document.body.setAttribute("data-theme", "dark");
 		removeExtraCSS();
-	} else if (theme == "light") {
+	} else if (theme === "light") {
 		localStorage.setItem("data-theme", "light");
 		document.body.setAttribute("data-theme",  "light");
 		removeExtraCSS();
-	} else {
+	} else if (theme === "stotes") {
 		localStorage.setItem("data-theme", "stotes");
 		setExtraCSS("style/themes/chuji.css");
 		// Add Logo
@@ -4637,6 +4639,30 @@ function setWebsiteTheme(theme) {
 				x[i].innerHTML = '<i class="fa fa-shopping-cart" aria-hidden="true"></i> Shop';
 		  	}
 		}
+	} else {
+		debug("Unsupported theme chosen, default to dark.");
+		localStorage.setItem("data-theme", "dark");
+		document.body.setAttribute("data-theme", "dark");
+		removeExtraCSS();
+	}
+
+	/* Prompt for page refresh to fully apply theme if needed (i.e. changing from stotes to dark/light for now) */
+	if (previousTheme === "stotes" && theme !== previousTheme) {
+		var yesNoOptions = {};
+		yesNoOptions.yesText = "OK - Refresh site now";
+		yesNoOptions.yesFunction = function() {
+			location.reload();
+		};
+		yesNoOptions.noText = "Cancel - Revert theme";
+		yesNoOptions.noFunction = function() {
+			closeModal();
+			setWebsiteTheme("stotes");
+		};
+		showModal(
+			"Changing Theme",
+			"To apply this theme, you will need to refresh the website.",
+			false,
+			yesNoOptions);
 	}
 }
 function removeExtraCSS() {
@@ -4649,7 +4675,7 @@ function setExtraCSS(fileName) {
 		styleLink.href = fileName + "?v=2";
 	}
 }
-  
+
 /* Game Controller classes should call these for user's preferences */
 function getUserGamePrefKeyName(preferenceKey) {
 	return "GameType" + gameController.getGameTypeId() + preferenceKey;
