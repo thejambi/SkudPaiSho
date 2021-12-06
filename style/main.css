@@ -239,7 +239,6 @@ div.tab .alertTab, div.tab .alertTab.active {
   max-width: 100px;
   padding: 5px;
   text-align: center;
-
 }
 .button:active {
     box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);

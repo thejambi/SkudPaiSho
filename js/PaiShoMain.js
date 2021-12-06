@@ -1494,7 +1494,7 @@ function getSkipButtonHtmlText(overrideText) {
 	if (overrideText) {
 		text = overrideText;
 	}
-	return "<br /><span class='skipBonus' onclick='skipClicked();'>" + text + "</span>";
+	return "<br /><button onclick='skipClicked()' style='font-size:medium'>" + text + "</button>";
 }
  
 function showSkipButtonMessage(overrideText) {

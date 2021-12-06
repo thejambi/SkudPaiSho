@@ -52,7 +52,15 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				type: Trifle.MovementType.jumpSurroundingTiles,
 				jumpDirections: [Trifle.MovementDirection.diagonal],
 				targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy],
-				distance: 99
+				distance: 99,
+				restrictions: [
+					{
+						type: Trifle.MovementRestriction.restrictMovementOntoRecordedTilePoint,
+						recordTilePointType: Trifle.RecordTilePointType.startPoint,
+						targetTileCode: Ginseng.TileCodes.WhiteLotus,
+						targetTeams: [Trifle.TileTeam.enemy]
+					}
+				]
 			}
 		],
 		abilities: [
@@ -481,16 +489,12 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		movements: [
 			{
 				type: Trifle.MovementType.standard,
-				distance: 6,
-				captureTypes: [
-					{
-						type: Trifle.CaptureType.all
-					}
-				]
+				distance: 6
 			}
 		],
 		abilities: [
 			{
+				title: "Exchange With Captured Tile",
 				type: Trifle.AbilityName.exchangeWithCapturedTile,
 				optional: true,
 				neededPromptTargetsInfo: [
@@ -560,6 +564,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				triggerTypeToTarget: Trifle.AbilityTriggerType.whenCapturingTargetTile
 			},
 			{
+				title: "Exchange With Captured Tile",
 				type: Trifle.AbilityName.exchangeWithCapturedTile,
 				optional: true,
 				neededPromptTargetsInfo: [
@@ -606,6 +611,7 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles
 		var tileInfo = GinsengTiles[key];
 		if (tileInfo.movements && tileInfo.movements.length) {
 			tileInfo.movements.forEach(function(movementInfo) {
+				/* Add Capture-By-Movement Activation Requirement: Both Lotus Tiles Are Not In Temple */
 				if (movementInfo.captureTypes && movementInfo.captureTypes.length) {
 					movementInfo.captureTypes.forEach(function(captureTypeInfo) {
 						var activationRequirement = {
@@ -620,11 +626,29 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles
 						}
 					});
 				}
+
+				/* Add Movement Restriction For All Tiles Except Lotus: 
+				 * Cannot Move Onto Any Lotus Starting Point
+				 */
+				if (tileInfo.code !== Ginseng.TileCodes.WhiteLotus) {
+					var movementRestriction = {
+						type: Trifle.MovementRestriction.restrictMovementOntoRecordedTilePoint,
+						recordTilePointType: Trifle.RecordTilePointType.startPoint,
+						targetTileCode: Ginseng.TileCodes.WhiteLotus,
+						targetTeams: [Trifle.TileTeam.friendly, Trifle.TileTeam.enemy]
+					};
+					if (movementInfo.restrictions) {
+						movementInfo.restrictions.push(movementRestriction);
+					} else {
+						movementInfo["restrictions"] = [movementRestriction];
+					}
+				}
 			});
 		}
 
 		if (tileInfo.abilities && tileInfo.abilities.length) {
 			tileInfo.abilities.forEach(function(abilityInfo) {
+				/* Add Ability Activation Requirement: Friendly Lotus Not In A Temple */
 				if (abilityInfo.type !== Trifle.AbilityName.recordTilePoint 
 						&& abilityInfo.triggers && abilityInfo.triggers.length) {
 					abilityInfo.triggers.forEach(function(triggerInfo) {

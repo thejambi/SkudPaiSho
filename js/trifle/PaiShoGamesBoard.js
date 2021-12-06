@@ -1922,7 +1922,51 @@ PaiShoGames.Board.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, 
 	return (!targetPoint.hasTile() || canCaptureTarget || (targetPoint.tile === tile && targetPoint.occupiedByAbility))
 		&& (!this.useTrifleTempleRules || !targetPoint.isType(TEMPLE) || canCaptureTarget)
 		&& !this.tileZonedOutOfSpace(tile, movementInfo, targetPoint, canCaptureTarget)
-		&& !this.tileMovementIsImmobilized(tile, movementInfo, fromPoint);
+		&& !this.tileMovementIsImmobilized(tile, movementInfo, fromPoint)
+		&& !this.tilePreventedFromPointByMovementRestriction(tile, movementInfo, targetPoint, fromPoint);
+};
+
+PaiShoGames.Board.prototype.tilePreventedFromPointByMovementRestriction = function(tile, movementInfo, targetPoint, fromPoint) {
+	var isRestricted = false;
+	if (movementInfo.restrictions) {
+		movementInfo.restrictions.every(restrictionInfo => {
+			if (restrictionInfo.type === Trifle.MovementRestriction.restrictMovementOntoRecordedTilePoint) {
+				/* Currently supporting when has these required properties:
+				 * - targetTileCode
+				 * - targetTeams
+				 */
+				/* Is targetPoint recorded? */
+				var recordedPointsOfType = this.recordedTilePoints[restrictionInfo.recordTilePointType];
+				if (recordedPointsOfType) {
+					var targetTileOwnerName = null;
+					if (restrictionInfo.targetTeams.length === 1 && restrictionInfo.targetTeams.includes(Trifle.TileTeam.enemy)) {
+						targetTileOwnerName = getOpponentName(tile.ownerName);
+					} else if (restrictionInfo.targetTeams.length === 1 && restrictionInfo.targetTeams.includes(Trifle.TileTeam.friendly)) {
+						targetTileOwnerName = tile.ownerName;
+					}
+					var tileKey = {
+						ownerName: targetTileOwnerName,
+						code: restrictionInfo.targetTileCode
+					};
+					
+					Object.keys(recordedPointsOfType).forEach(function(key, index) {
+						var keyObject = JSON.parse(key);
+						if (keyObject.code === tileKey.code
+								&& (targetTileOwnerName === null || keyObject.ownerName === targetTileOwnerName)) {
+							if (recordedPointsOfType[key] === targetPoint) {
+								isRestricted = true;
+							}
+						}
+					});
+				}
+				return !isRestricted;	// Check next restriction if not restricted
+			} else {
+				debug("Movement restriction not handled here: " + restrictionInfo.type);
+				return true;	// Continue to next restriction
+			}
+		});
+	}
+	return isRestricted;
 };
 
 PaiShoGames.Board.prototype.targetPointIsEmptyOrCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint) {
@@ -2638,7 +2682,7 @@ PaiShoGames.Board.prototype.recordTilePoint = function(boardPoint, recordTilePoi
 	if (!this.recordedTilePoints[recordTilePointType]) {
 		this.recordedTilePoints[recordTilePointType] = {};
 	}
-	this.recordedTilePoints[recordTilePointType][boardPoint.tile.id] = boardPoint;
+	this.recordedTilePoints[recordTilePointType][boardPoint.tile.getOwnerCodeIdObjectString()] = boardPoint;
 };
 
 PaiShoGames.Board.prototype.promptForBoardPointInAVeryHackyWay = function() {
