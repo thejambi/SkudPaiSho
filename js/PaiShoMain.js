@@ -4636,6 +4636,9 @@ function setWebsiteTheme(theme) {
 			}
 			if (x[i].innerText == "") {
 				x[i].innerHTML = '<i class="fa fa-shopping-cart" aria-hidden="true"></i> Shop';
+				if (isMobile) {
+					x[i].remove();
+				}
 		  	}
 		}
 	} else {
