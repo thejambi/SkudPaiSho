@@ -2237,7 +2237,7 @@ var GameType = {
 	Ginseng: {
 		id: 18,
 		name: "Ginseng Pai Sho",
-		desc: "Ginseng Pai Sho (beta)",
+		desc: "Ginseng Pai Sho",
 		color: "var(--ginsengcolor)",
 		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
 		coverImg: "ginseng.png",
