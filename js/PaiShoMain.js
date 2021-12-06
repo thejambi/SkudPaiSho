@@ -2872,7 +2872,7 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 			  }
 			  message += "<td class='name'>" + icon + myGame.guestUsername + "</td>";
 			  if (myGame.isUserTurn) {
-				  message += "<td>Yous</td>";
+				  message += "<td>Yours</td>";
 			  } else {
 				  message += "<td>Theirs</td>";
 			  }
