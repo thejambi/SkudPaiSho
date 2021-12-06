@@ -12,10 +12,19 @@ Trifle.TriggerHelper = function(triggerContext, possibleTargetTilePoint, possibl
 };
 
 Trifle.TriggerHelper.prototype.tileIsTargeted = function() {
-	return this.targetTeamsCheck()
+	return this.targetingIsNotCanceledCheck()
+			&& this.targetTeamsCheck()
 			&& this.targetTileTypesCheck()
 			&& this.targetTileIdentifiersCheck()
 			&& this.targetTileNamesCheck();
+};
+
+Trifle.TriggerHelper.prototype.targetingIsNotCanceledCheck = function() {
+	var abilityManager = this.triggerContext.board.abilityManager;
+	var abilitySourceTile = this.triggerContext.tile;
+	var abilityType = this.triggerContext.tileAbilityInfo.type;
+	var targetingIsCanceled = abilityManager.targetingIsCanceled(abilitySourceTile, abilityType, this.possibleTargetTile);
+	return !targetingIsCanceled;
 };
 
 Trifle.TriggerHelper.prototype.targetTeamsCheck = function() {
