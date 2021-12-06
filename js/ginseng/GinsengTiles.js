@@ -710,7 +710,7 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles
 			targetTypes: [Trifle.TargetType.triggerTargetTiles]
 		};
 		var protectFromAbilitiesWhileInTempleAbility = {
-			title: "Protect From Enemy Abilities While Temple",
+			title: "Protect From All Abilities While In Temple",
 			type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
 			triggers: [
 				{
@@ -719,8 +719,7 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles
 				}
 			],
 			targetTypes: [Trifle.TargetType.triggerTargetTiles],
-			targetAbilityTypes: [Trifle.AbilityType.all],
-			cancelAbilitiesFromTeam: Trifle.TileTeam.enemy
+			targetAbilityTypes: [Trifle.AbilityType.all]
 		};
 		tileInfo.abilities.push(protectFromCaptureWhileInTempleAbility);
 		tileInfo.abilities.push(protectFromAbilitiesWhileInTempleAbility);
