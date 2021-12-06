@@ -666,5 +666,38 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles
 				}
 			});
 		}
+
+		/* Add Ability: Protect Tiles While In A Temple */
+		if (!tileInfo.abilities) {
+			tileInfo.abilities = [];
+		}
+		var protectFromCaptureWhileInTempleAbility = {
+			title: "Protect From Capture While In Temple",
+			type: Trifle.AbilityName.protectFromCapture,
+			triggers: [
+				{
+					triggerType: Trifle.AbilityTriggerType.whileInsideTemple,
+					targetTileTypes: [Trifle.TileCategory.thisTile]
+				}
+			],
+			targetTypes: [Trifle.TargetType.triggerTargetTiles]
+		};
+		var protectFromAbilitiesWhileInTempleAbility = {
+			title: "Protect From Enemy Abilities While Temple",
+			type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
+			triggers: [
+				{
+					triggerType: Trifle.AbilityTriggerType.whileInsideTemple,
+					targetTileTypes: [Trifle.TileCategory.thisTile]
+				}
+			],
+			targetTypes: [Trifle.TargetType.triggerTargetTiles],
+			targetAbilityTypes: [Trifle.AbilityType.all],
+			cancelAbilitiesFromTeam: Trifle.TileTeam.enemy
+		};
+		tileInfo.abilities.push(protectFromCaptureWhileInTempleAbility);
+		tileInfo.abilities.push(protectFromAbilitiesWhileInTempleAbility);
+		// ------
+
 	});
 };
