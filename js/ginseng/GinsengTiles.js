@@ -79,7 +79,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			{
 				title: "Remember Start Point",
 				type: Trifle.AbilityName.recordTilePoint,
-				priority: Trifle.AbilityPriorityLevel.highest,
+				priority: 1,
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whenDeployed,
@@ -91,7 +91,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			},
 			{
 				type: Trifle.AbilityName.moveTileToRecordedPoint,
-				priority: Trifle.AbilityPriorityLevel.highest,
+				priority: 1,
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whenCapturedByTargetTile,
@@ -132,6 +132,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		abilities: [
 			{
 				type: Trifle.AbilityName.immobilizeTiles,
+				priority: 3,
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
@@ -229,6 +230,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		abilities: [
 			{
 				type: Trifle.AbilityName.protectFromCapture,
+				priority: 2,
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
@@ -248,6 +250,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			{
 				title: "Protect From Enemy Abilities",
 				type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
+				priority: 2,
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
@@ -297,6 +300,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			{
 				title: "Active Bison Push",
 				type: Trifle.AbilityName.moveTargetTile,
+				// priority: ?,
 				isPassiveMovement: true,
 				optional: true,
 				promptForTargets: true,	// This line not needed?
@@ -312,7 +316,6 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						targetType: Trifle.PromptTargetType.boardPoint
 					}
 				],
-				priority: Trifle.AbilityPriorityLevel.highest,
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
@@ -350,6 +353,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			{
 				title: "Passive Bison Push",
 				type: Trifle.AbilityName.moveTargetTile,
+				// priority: ?,
 				isPassiveMovement: true,
 				optional: true,
 				promptForTargets: true,
@@ -365,7 +369,6 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						targetType: Trifle.PromptTargetType.boardPoint
 					}
 				],
-				priority: Trifle.AbilityPriorityLevel.highest,
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsSurrounding,
@@ -432,6 +435,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		abilities: [
 			{
 				type: Trifle.AbilityName.captureTargetTiles,
+				priority: 1,
 				triggers: [
 					{
 						triggerType: Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile,
@@ -453,7 +457,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			"- Can capture any tile by movement except the opponent's Lion Turtle",
 			"",
 			"<strong>Ability</strong>",
-			"- Captures all adjacent Original Benders."
+			"- Captures all adjacent Original Benders, regardless of protection from capture."
 		]
 	};
 

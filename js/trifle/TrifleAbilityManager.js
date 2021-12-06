@@ -57,17 +57,26 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 
 	/* Activate abilities! */
 
-	// Priority "highest" abilities first
-	Object.values(this.readyAbilities).every(abilityList => {
-		abilityList.every(ability => {
-			if (ability.isPriority(Trifle.AbilityPriorityLevel.highest)) {
-				debug("!!!!Priority Ability!!!! " + ability.getTitle());
-				boardHasChanged = self.doTheActivateThing(ability, tileRecords);
-				return !boardHasChanged;	// Continue if board has not changed
-			}
+	// Priority abilities first
+	var currentPriority = 1;
+	var priorityAbilityFound = true;
+	while (priorityAbilityFound) {
+		priorityAbilityFound = false;
+		
+		Object.values(this.readyAbilities).every(abilityList => {
+			abilityList.every(ability => {
+				if (ability.isPriority(currentPriority)) {
+					priorityAbilityFound = true;
+					debug("!!!!Priority " + currentPriority + " Ability!!!! " + ability.getTitle());
+					boardHasChanged = self.doTheActivateThing(ability, tileRecords);
+					return !boardHasChanged;	// Continue if board has not changed
+				}
+			});
+			return !boardHasChanged;	// Continue if board has not changed
 		});
-		return !boardHasChanged;	// Continue if board has not changed
-	});
+		
+		currentPriority++;
+	}
 
 	if (!boardHasChanged) {
 		// Default ability activation order
