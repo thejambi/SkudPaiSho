@@ -633,7 +633,7 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles
 				/* Add Movement Restriction For All Tiles Except Lotus: 
 				 * Cannot Move Onto Any Lotus Starting Point
 				 */
-				if (tileInfo.code !== Ginseng.TileCodes.WhiteLotus) {
+				if (!tileInfo.types.includes(Ginseng.TileCodes.WhiteLotus)) {
 					var movementRestriction = {
 						type: Trifle.MovementRestriction.restrictMovementOntoRecordedTilePoint,
 						recordTilePointType: Trifle.RecordTilePointType.startPoint,
