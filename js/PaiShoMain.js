@@ -777,7 +777,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 					lastMoveStamp = "";
 					pastMessageUsername = "moveStamp";
 				}
-				newChatMessagesHtml += "<div class='chatMessage "+((usernameEquals(chatMessage.username))?(' self'):(''))+"'> ";
+				newChatMessagesHtml += "<div class='chatMessage "+((usernameEquals(chatMessage.username))?(' self'):(''))+"'>";
 	
 				if (isTimestampsOn()) {
 					newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
@@ -801,7 +801,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 						}
 					}
 				} else {
-				  newChatMessagesHtml += "<strong>" + chatMessage.username + ":</strong>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+				  newChatMessagesHtml += "<strong>" + chatMessage.username + ": </strong>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
 				}
 				newChatMessagesHtml += "</div>";
 
