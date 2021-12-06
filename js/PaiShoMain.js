@@ -777,7 +777,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
 					lastMoveStamp = "";
 					pastMessageUsername = "moveStamp";
 				}
-				newChatMessagesHtml += "<div class='chatMessage "+((usernameEquals(chatMessage.username))?(' self'):(''))+"'>";
+				newChatMessagesHtml += "<div class='chatMessage "+((usernameEquals(chatMessage.username))?(' self'):(''))+"'> ";
 	
 				if (isTimestampsOn()) {
 					newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
@@ -785,7 +785,7 @@ function updateCurrentGameTitle(isOpponentOnline) {
   
 				if (localStorage.getItem("data-theme") == "stotes") {
 					if (usernameEquals(chatMessage.username)) {
-					  newChatMessagesHtml += "<div class='message'> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+					  newChatMessagesHtml += "<div class='message'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
 					} else if (chatMessage.username == currentGameOpponentUsername) {
 						newChatMessagesHtml += "<div class='message opponent'> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
 					} else{
@@ -794,10 +794,10 @@ function updateCurrentGameTitle(isOpponentOnline) {
 							if (chatMessage.username == "SkudPaiSho") {
 								newChatMessagesHtml += "<div class='message golden'> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
 							} else {
-								newChatMessagesHtml += "<div class='message'> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+								newChatMessagesHtml += "<div class='message'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
 							}
 						}  else {
-							newChatMessagesHtml += "<strong>" + chatMessage.username + "</strong> <div class='message'> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+							newChatMessagesHtml += "<strong>" + chatMessage.username + "</strong> <div class='message'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
 						}
 					}
 				} else {
