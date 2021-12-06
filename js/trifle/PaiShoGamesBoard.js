@@ -1796,8 +1796,9 @@ PaiShoGames.Board.prototype.setMovePointsAnywhere = function(boardPointStart, mo
 };
 
 PaiShoGames.Board.prototype.tileMovementIsImmobilized = function(tile, movementInfo, boardPointStart) {
-	return this.tileMovementIsImmobilizedByMovementRestriction(tile, movementInfo, boardPointStart)
-		|| this.abilityManager.abilityTargetingTileExists(Trifle.AbilityName.immobilizeTiles, tile);
+	return !movementInfo.regardlessOfImmobilization
+		&& (this.tileMovementIsImmobilizedByMovementRestriction(tile, movementInfo, boardPointStart)
+		|| this.abilityManager.abilityTargetingTileExists(Trifle.AbilityName.immobilizeTiles, tile));
 };
 
 PaiShoGames.Board.prototype.tileMovementIsImmobilizedByTileZoneAbility = function(zoneAbility, tilePoint, tileBeingMoved, tileBeingMovedInfo, movementStartPoint) {

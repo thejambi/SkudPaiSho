@@ -131,6 +131,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 		],
 		abilities: [
 			{
+				title: "Trap Enemy Tiles",
 				type: Trifle.AbilityName.immobilizeTiles,
 				priority: 3,
 				triggers: [
@@ -148,6 +149,28 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					}
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			},
+			{
+				title: "Prevent Enemy Pushing Trapped Tiles",
+				type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
+				priority: 3,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+						targetTeams: [Trifle.TileTeam.enemy],
+						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						activationRequirements: [
+							{
+								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [Trifle.TileCategory.thisTile],
+								targetPointTypes: [WHITE]
+							}
+						]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				cancelAbilitiesFromTeam: Trifle.TileTeam.enemy,
+				cancelAbilitiesFromTileCodes: [Ginseng.TileCodes.Bison]
 			}
 		],
 		textLines: [
@@ -303,7 +326,6 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				// priority: ?,
 				isPassiveMovement: true,
 				optional: true,
-				promptForTargets: true,	// This line not needed?
 				neededPromptTargetsInfo: [
 					{
 						title: "pushedTile",
@@ -341,12 +363,14 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					{
 						type: Trifle.MovementType.awayFromTargetTileOrthogonal,
 						distance: 2,
-						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
+						targetTileTypes: [Trifle.TileCategory.tileWithAbility],
+						regardlessOfImmobilization: true
 					},
 					{
 						type: Trifle.MovementType.awayFromTargetTileDiagonal,
 						distance: 1,
-						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
+						targetTileTypes: [Trifle.TileCategory.tileWithAbility],
+						regardlessOfImmobilization: true
 					}
 				]
 			},

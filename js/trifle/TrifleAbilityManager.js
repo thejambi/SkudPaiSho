@@ -250,21 +250,28 @@ Trifle.AbilityManager.prototype.targetingIsCanceled = function(abilitySourceTile
 	affectingCancelAbilities.forEach(function(cancelingAbility) {
 		if (!cancelingAbility.abilityInfo.cancelAbilitiesFromTeam
 			|| (
-				(cancelingAbility.abilityInfo.cancelAbilitiesFromTeam === Trifle.TileTeam.enemy && abilitySourceTile.ownerName !== possibleTargetTile.ownerName)
-				|| (cancelingAbility.abilityInfo.cancelAbilitiesFromTeam === Trifle.TileTeam.friendly && abilitySourceTile.ownerName === possibleTargetTile.ownerName)
+				(cancelingAbility.abilityInfo.cancelAbilitiesFromTeam === Trifle.TileTeam.enemy && cancelingAbility.sourceTile.ownerName !== abilitySourceTile.ownerName)
+				|| (cancelingAbility.abilityInfo.cancelAbilitiesFromTeam === Trifle.TileTeam.friendly && cancelingAbility.sourceTile.ownerName === abilitySourceTile.ownerName)
 				)
 		) {
-			// Does canceling ability affecting tile cancel this kind of ability?
-			if (cancelingAbility.abilityInfo.targetAbilityTypes.includes(Trifle.AbilityType.all)) {
-				isCanceled = true;	// Dat is for sure
+			if (cancelingAbility.abilityInfo.targetAbilityTypes) {
+				// Does canceling ability affecting tile cancel this kind of ability?
+				if (cancelingAbility.abilityInfo.targetAbilityTypes.includes(Trifle.AbilityType.all)) {
+					isCanceled = true;	// Dat is for sure
+				}
+
+				cancelingAbility.abilityInfo.targetAbilityTypes.forEach(function(canceledAbilityType) {
+					var abilitiesForType = Trifle.AbilitiesForType[canceledAbilityType];
+					if (abilitiesForType && abilitiesForType.length && abilitiesForType.includes(abilityType)) {
+						isCanceled = true;
+					}
+				});
 			}
 
-			cancelingAbility.abilityInfo.targetAbilityTypes.forEach(function(canceledAbilityType) {
-				var abilitiesForType = Trifle.AbilitiesForType[canceledAbilityType];
-				if (abilitiesForType && abilitiesForType.length && abilitiesForType.includes(abilityType)) {
-					isCanceled = true;
-				}
-			});
+			if (cancelingAbility.abilityInfo.cancelAbilitiesFromTileCodes
+					&& cancelingAbility.abilityInfo.cancelAbilitiesFromTileCodes.includes(abilitySourceTile.code)) {
+				isCanceled = true;
+			}
 		}
 	});
 
