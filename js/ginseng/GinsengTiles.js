@@ -373,7 +373,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						regardlessOfImmobilization: true
 					}
 				]
-			},
+			}/* ,
 			{
 				title: "Passive Bison Push",
 				type: Trifle.AbilityName.moveTargetTile,
@@ -426,7 +426,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						targetTileTypes: [Trifle.TileCategory.tileWithAbility]
 					}
 				]
-			}
+			} */
 		],
 		textLines: [
 			"<em>Original Bender</em>",
@@ -437,7 +437,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			"",
 			"<strong>Ability</strong>",
 			"- Pushes a single surrounding tile in a straight line away from itself when it is touching either Red Garden.",
-			"- If you move a tile to a point surrounding your Flying Bison, you may push that tile."
+			// "- If you move a tile to a point surrounding your Flying Bison, you may push that tile."
 		]
 	};
 
