@@ -8,9 +8,6 @@ Trifle.CancelZoneAbilityBrain = function(abilityObject) {
 }
 
 Trifle.CancelZoneAbilityBrain.prototype.setTargetTiles = function() {
-
-	
-
 	this.targetTiles = this.abilityObject.targetTiles;
 
 	debug("Target Tiles:");

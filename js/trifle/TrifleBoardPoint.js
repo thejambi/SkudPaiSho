@@ -192,6 +192,11 @@ Trifle.BoardPoint.prototype.betweenPlayerHarmony = function(player) {
 	return false;
 };
 
+Trifle.BoardPoint.prototype.getNotationPointString = function() {
+	var rowAndCol = new RowAndColumn(this.row, this.col);
+	return rowAndCol.notationPointString;
+};
+
 Trifle.BoardPoint.prototype.getCopy = function() {
 	var copy = new Trifle.BoardPoint();
 

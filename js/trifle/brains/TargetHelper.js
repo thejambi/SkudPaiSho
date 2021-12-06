@@ -6,19 +6,22 @@ Trifle.TargetHelper = function(abilityObject, possibleTargetTilePoint, targetBra
 
 	this.possibleTargetTilePoint = possibleTargetTilePoint;
 
-	if (this.possibleTargetTilePoint) {
+	if (this.possibleTargetTilePoint && this.possibleTargetTilePoint.hasTile()) {
 		this.possibleTargetTile = this.possibleTargetTilePoint.tile;
 		this.possibleTargetTileInfo = this.tileMetadata[this.possibleTargetTile.code];
-	} else {
+	} else if (possibleTargetTile) {
 		this.possibleTargetTile = possibleTargetTile;
 		this.possibleTargetTileInfo = this.tileMetadata[this.possibleTargetTile.code];
+	} else {
+		debug("No posible target tile found!");
 	}
 
 	this.targetBrain = targetBrain;
 };
 
 Trifle.TargetHelper.prototype.tileIsTargeted = function() {
-	return this.targetingIsNotCanceledCheck()
+	return this.possibleTargetTile
+			&& this.targetingIsNotCanceledCheck()
 			&& this.targetTeamsCheck()
 			&& this.targetTileTypesCheck()
 			&& this.targetTileIdentifiersCheck()

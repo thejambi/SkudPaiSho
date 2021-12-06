@@ -161,7 +161,7 @@ AdevarTile.prototype.getImageName = function() {
 
 AdevarTile.prototype.getNotationName = function() {
 	return this.ownerCode + "" + this.code;
-}
+};
 
 AdevarTile.prototype.getMovementInfo = function() {
 	return {
