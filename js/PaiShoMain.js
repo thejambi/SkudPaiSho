@@ -2242,20 +2242,7 @@ var GameType = {
 		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
-		gameOptions: [],
-		usersWithAccess: [
-			'SkudPaiSho',
-			'Monk_Gyatso',
-			'markdwagner',
-			'sirstotes',
-			'Sambews',
-			'Cannoli',
-			'Dallin',
-			'HeBear',
-			'emanuelovici',
-			'fish'
-		],
-		noRankedGames: true
+		gameOptions: []
 	},
 	SolitairePaiSho: {
 		id: 4,
@@ -3517,7 +3504,8 @@ function closeGame() {
 	var defaultGameTypeIds = [
 		GameType.SkudPaiSho.id,
 		GameType.VagabondPaiSho.id,
-		GameType.Adevar.id
+		GameType.Adevar.id,
+		GameType.Ginseng.id
 	]
 	setGameController(defaultGameTypeIds[randomIntFromInterval(0, defaultGameTypeIds.length - 1)]);
 	showDefaultGameOpenedMessage(true);
