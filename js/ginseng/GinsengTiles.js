@@ -566,7 +566,8 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				distance: 6,
 				captureTypes: [
 					{
-						type: Trifle.CaptureType.all
+						type: Trifle.CaptureType.allExcludingCertainTiles,
+						excludedTileCodes: [Ginseng.TileCodes.WhiteLotus]
 					}
 				]
 			}
