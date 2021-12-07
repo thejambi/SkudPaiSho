@@ -18,7 +18,6 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 	this.hostAccentTiles = [];
 	this.guestAccentTiles = [];
 
-	this.isInviteOnly = true;
 	this.isPaiShoGame = true;
 
 	this.showDebugInfo = false;

@@ -743,97 +743,127 @@ function updateCurrentGameTitle(isOpponentOnline) {
 	  updateCurrentGameTitle(isOpponentOnline);
   };
   
-  var getNewChatMessagesCallback = function getNewChatMessagesCallback(results) {
-	  if (results != "") {
-		  var resultRows = results.split('\n');
-  
-		  chatMessageList = [];
-		  var newChatMessagesHtml = "";
-  
-		  for (var index in resultRows) {
-			  var row = resultRows[index].split('|||');
-			  var chatMessage = {
-				  timestamp:row[0],
-				  username:row[1],
-				  message:row[2]
-			  };
-			  chatMessageList.push(chatMessage);
-			  lastChatTimestamp = chatMessage.timestamp;
-		  }
-  
-		  var alertNewMessages = false;
-		  
-		  var pastMessageUsername = "";
-		  var lastMoveStamp = "";
-		  for (var index in chatMessageList) {
-			  var chatMessage = chatMessageList[index];
-			  var chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
+var getNewChatMessagesCallback = function getNewChatMessagesCallback(results) {
+	if (results != "") {
+		var resultRows = results.split('\n');
 
-			  if (chatMessage.message[0] == "➢") {
-				lastMoveStamp = "<p>" + chatMessage.message.replace(/&amp;/g,'&') + "</p>";
-			  } else {
-				if (lastMoveStamp != "") {//Only add the most recent move stamp. The entire game doesn't need to be displayed in chat.
-					newChatMessagesHtml += lastMoveStamp;
-					lastMoveStamp = "";
-					pastMessageUsername = "moveStamp";
-				}
-				newChatMessagesHtml += "<div class='chatMessage "+((usernameEquals(chatMessage.username))?(' self'):(''))+"'>";
-	
-				if (isTimestampsOn()) {
-					newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
-				}
-  
-				if (localStorage.getItem("data-theme") == "stotes") {
+		chatMessageList = [];
+		var newChatMessagesHtml = "";
+
+		for (var index in resultRows) {
+			var row = resultRows[index].split('|||');
+			var chatMessage = {
+				timestamp: row[0],
+				username: row[1],
+				message: row[2]
+			};
+			chatMessageList.push(chatMessage);
+			lastChatTimestamp = chatMessage.timestamp;
+		}
+
+		var alertNewMessages = false;
+
+		var pastMessageUsername = "";
+		var lastMoveStamp = "";
+
+		if (localStorage.getItem("data-theme") == "stotes") {
+			for (var index in chatMessageList) {
+				var chatMessage = chatMessageList[index];
+				var chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
+
+				if (chatMessage.message[0] == "➢") {
+					lastMoveStamp = "<p>" + chatMessage.message.replace(/&amp;/g, '&') + "</p>";
+				} else {
+					if (lastMoveStamp != "") {//Only add the most recent move stamp. The entire game doesn't need to be displayed in chat.
+						newChatMessagesHtml += lastMoveStamp;
+						lastMoveStamp = "";
+						pastMessageUsername = "moveStamp";
+					}
+					newChatMessagesHtml += "<div class='chatMessage " + ((usernameEquals(chatMessage.username)) ? (' self') : ('')) + "'>";
+
+					if (isTimestampsOn()) {
+						newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
+					}
 					if (usernameEquals(chatMessage.username)) {
-					  newChatMessagesHtml += "<div class='message'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+						newChatMessagesHtml += "<div class='message'>" + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
 					} else if (chatMessage.username == currentGameOpponentUsername) {
-						newChatMessagesHtml += "<div class='message opponent'> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
-					} else{
+						newChatMessagesHtml += "<div class='message opponent'> " + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
+					} else {
 						//Don't display the username multiple times if someone does many messages in a row.
 						if (chatMessage.username == pastMessageUsername) {
 							if (chatMessage.username == "SkudPaiSho") {
-								newChatMessagesHtml += "<div class='message golden'> " + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+								newChatMessagesHtml += "<div class='message golden'> " + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
 							} else {
-								newChatMessagesHtml += "<div class='message'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+								newChatMessagesHtml += "<div class='message'>" + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
 							}
-						}  else {
-							newChatMessagesHtml += "<strong>" + chatMessage.username + "</strong> <div class='message'>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
+						} else {
+							newChatMessagesHtml += "<strong>" + chatMessage.username + "</strong> <div class='message'>" + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
 						}
 					}
-				} else {
-				  newChatMessagesHtml += "<strong>" + chatMessage.username + ": </strong>" + chatMessage.message.replace(/&amp;/g,'&') + "</div>";
-				}
-				newChatMessagesHtml += "</div>";
+					newChatMessagesHtml += "</div>";
 
-				// The most recent message will determine whether to alert
-				if (!usernameEquals(chatMessage.username)) {
-					// Set chat tab color to alert new messages if newest message is not from user
-					alertNewMessages = true;
-				} else {
-					alertNewMessages = false;
+					// The most recent message will determine whether to alert
+					if (!usernameEquals(chatMessage.username)) {
+						// Set chat tab color to alert new messages if newest message is not from user
+						alertNewMessages = true;
+					} else {
+						alertNewMessages = false;
+					}
+					pastMessageUsername = chatMessage.username;
 				}
-				pastMessageUsername = chatMessage.username;
-			  }
-		  }
-  
-		  if (alertNewMessages) {
-			  document.getElementById('chatTab').classList.add('alertTab');
-		  }
-  
-		  /* Prepare to add chat content and keep scrolled to bottom */
-		  var chatMessagesDisplay = document.getElementById('chatMessagesDisplay');
-		  // allow 1px inaccuracy by adding 1
-		  var isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
-		  var newElement = document.createElement("div");
-		  newElement.innerHTML = newChatMessagesHtml;
-		  newElement.classList.add("chatMessageContainer");
-		  chatMessagesDisplay.appendChild(newElement);
-		  // scroll to bottom if isScrolledToBottom
-		  if(isScrolledToBottom) {
-			  chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
-		  }
-	  }
-  };
+			}
+		} else {
+			/* TGG Theme */
+			for (var index in chatMessageList) {
+				var chatMessage = chatMessageList[index];
+
+				var isMoveLogMessage = chatMessage.message.includes("➢ ");
+
+				if (!isMoveLogMessage || isMoveLogDisplayOn()) {
+
+					var chatMsgTimestamp = getTimestampString(chatMessage.timestamp);
+
+					newChatMessagesHtml += "<div class='chatMessage'>";
+
+					if (isTimestampsOn()) {
+						newChatMessagesHtml += "<em>" + chatMsgTimestamp + "</em> ";
+					}
+
+					if (isMoveLogMessage) {
+						newChatMessagesHtml += chatMessage.message.replace(/&amp;/g, '&') + "</div>";
+					} else {
+						newChatMessagesHtml += "<strong>" + chatMessage.username + ":</strong> " + chatMessage.message.replace(/&amp;/g, '&') + "</div>";
+					}
+
+					// The most recent message will determine whether to alert
+					if (!usernameEquals(chatMessage.username) && !isMoveLogMessage) {
+						// Set chat tab color to alert new messages if newest message is not from user
+						alertNewMessages = true;
+					} else {
+						alertNewMessages = false;
+					}
+				}
+			}
+		}
+
+		if (alertNewMessages) {
+			document.getElementById('chatTab').classList.add('alertTab');
+		}
+
+		/* Prepare to add chat content and keep scrolled to bottom */
+		var chatMessagesDisplay = document.getElementById('chatMessagesDisplay');
+		// allow 1px inaccuracy by adding 1
+		var isScrolledToBottom = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight <= chatMessagesDisplay.scrollTop + 1;
+		var newElement = document.createElement("div");
+		newElement.innerHTML = newChatMessagesHtml;
+		newElement.classList.add("chatMessageContainer");
+		chatMessagesDisplay.appendChild(newElement);
+		// scroll to bottom if isScrolledToBottom
+		if (isScrolledToBottom) {
+			chatMessagesDisplay.scrollTop = chatMessagesDisplay.scrollHeight - chatMessagesDisplay.clientHeight;
+		}
+	}
+};
   
 function getTimestampString(timestampStr) {
 	var dte = new Date(timestampStr + " UTC");
@@ -2565,6 +2595,11 @@ function setGameController(gameTypeId, keepGameOptions) {
 	}
 	if (gameController.completeSetup) {
 		gameController.completeSetup();
+	}
+	if (gameController.supportsMoveLogMessages) {
+		document.getElementById("toggleMoveLogDisplayDiv").classList.remove("gone");
+	} else {
+		document.getElementById("toggleMoveLogDisplayDiv").classList.add("gone");
 	}
 
 	var gameTitleElements = document.getElementsByClassName('game-title-text');
