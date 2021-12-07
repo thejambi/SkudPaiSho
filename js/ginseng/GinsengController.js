@@ -18,7 +18,6 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 	this.hostAccentTiles = [];
 	this.guestAccentTiles = [];
 
-	this.isInviteOnly = true;
 	this.isPaiShoGame = true;
 
 	this.showDebugInfo = false;
@@ -87,7 +86,7 @@ Ginseng.Controller.prototype.resetMove = function() {
 };
 
 Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Ginseng Pai Sho (beta testing)</h4>"
+	return "<h4>Ginseng Pai Sho</h4>"
 		+ "<p>The first player to cross the Border with their White Lotus tile wins. The Border is the midline between Host and Guest tiles.</p><h4>Temple Rules</h4><p>Tiles are protected when inside of the Eastern or Western Temple. Protected tiles cannot be captured, trapped, or pushed. A tile inside of a Temple can still use its abilities.</p><h4>White Lotus Rules</h4><p>When your White Lotus is inside of a Temple:</p><ul><li>You cannot capture tiles by movement</li><li>Your tiles’ abilities are not in effect</li></ul><p>When only your White Lotus is outside of a Temple:</p><ul><li>You cannot capture tiles by movement</li><li>Your tiles’ abilities are in effect</li></ul><p>When both White Lotuses are outside of a Temple:</p><ul><li>You can capture tiles by movement</li><li>Your tiles’ abilities are in effect</li></ul>"
 		+ "<p><a href='https://skudpaisho.com/site/games/ginseng-pai-sho/' target='_blank'>view the full rules</a>.</p>";
 };
@@ -156,18 +155,21 @@ Ginseng.Controller.prototype.getAdditionalHelpTabDiv = function() {
 
 	settingsDiv.appendChild(document.createElement("br"));
 
-	var toggleDebugText = "Enable debug Help display";
-	if (this.showDebugInfo) {
-		toggleDebugText = "Disable debug Help display";
+	if (usernameIsOneOf(["SkudPaiSho"])) {
+		var toggleDebugText = "Enable debug Help display";
+		if (this.showDebugInfo) {
+			toggleDebugText = "Disable debug Help display";
+		}
+		var toggleDebugSpan = document.createElement("span");
+		toggleDebugSpan.classList.add("skipBonus");
+		toggleDebugSpan.setAttribute("onclick", "gameController.toggleDebug();");
+		toggleDebugSpan.innerText = toggleDebugText;
+
+		settingsDiv.appendChild(toggleDebugSpan);
+
+		settingsDiv.appendChild(document.createElement("br"));
 	}
-	var toggleDebugSpan = document.createElement("span");
-	toggleDebugSpan.classList.add("skipBonus");
-	toggleDebugSpan.setAttribute("onclick", "gameController.toggleDebug();");
-	toggleDebugSpan.innerText = toggleDebugText;
 
-	settingsDiv.appendChild(toggleDebugSpan);
-
-	settingsDiv.appendChild(document.createElement("br"));
 	settingsDiv.appendChild(document.createElement("br"));
 
 	return settingsDiv;
@@ -374,7 +376,11 @@ Ginseng.Controller.prototype.completeMove = function() {
 		
 		if (neededPromptTargetInfo.sourceAbility.abilityInfo.optional) {
 			refreshMessage();
-			showSkipButtonMessage("Skip optional ability");
+			var abilityTitle = neededPromptTargetInfo.sourceAbility.abilityInfo.title;
+			if (!abilityTitle) {
+				abilityTitle = neededPromptTargetInfo.sourceAbility.abilityInfo.type;
+			}
+			showSkipButtonMessage("Skip ability: " + abilityTitle);
 		}
 
 		showResetMoveMessage();

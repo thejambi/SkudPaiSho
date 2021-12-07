@@ -57,17 +57,26 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 
 	/* Activate abilities! */
 
-	// Priority "highest" abilities first
-	Object.values(this.readyAbilities).every(abilityList => {
-		abilityList.every(ability => {
-			if (ability.isPriority(Trifle.AbilityPriorityLevel.highest)) {
-				debug("!!!!Priority Ability!!!! " + ability.getTitle());
-				boardHasChanged = self.doTheActivateThing(ability, tileRecords);
-				return !boardHasChanged;	// Continue if board has not changed
-			}
+	// Priority abilities first
+	var currentPriority = 1;
+	var priorityAbilityFound = true;
+	while (priorityAbilityFound) {
+		priorityAbilityFound = false;
+		
+		Object.values(this.readyAbilities).every(abilityList => {
+			abilityList.every(ability => {
+				if (ability.isPriority(currentPriority)) {
+					priorityAbilityFound = true;
+					debug("!!!!Priority " + currentPriority + " Ability!!!! " + ability.getTitle());
+					boardHasChanged = self.doTheActivateThing(ability, tileRecords);
+					return !boardHasChanged;	// Continue if board has not changed
+				}
+			});
+			return !boardHasChanged;	// Continue if board has not changed
 		});
-		return !boardHasChanged;	// Continue if board has not changed
-	});
+		
+		currentPriority++;
+	}
 
 	if (!boardHasChanged) {
 		// Default ability activation order
@@ -234,28 +243,35 @@ Trifle.AbilityManager.prototype.abilityIsCanceled = function(abilityObject) {
 	return isCanceled;
 };
 
-Trifle.AbilityManager.prototype.targetingIsCanceled = function(abilityObject, possibleTargetTile) {
+Trifle.AbilityManager.prototype.targetingIsCanceled = function(abilitySourceTile, abilityType, possibleTargetTile) {
 	var isCanceled = false;
 	var affectingCancelAbilities = this.getAbilitiesTargetingTile(Trifle.AbilityName.cancelAbilitiesTargetingTiles, possibleTargetTile);
 
 	affectingCancelAbilities.forEach(function(cancelingAbility) {
 		if (!cancelingAbility.abilityInfo.cancelAbilitiesFromTeam
 			|| (
-				(cancelingAbility.abilityInfo.cancelAbilitiesFromTeam === Trifle.TileTeam.enemy && abilityObject.sourceTile.ownerName !== possibleTargetTile.ownerName)
-				|| (cancelingAbility.abilityInfo.cancelAbilitiesFromTeam === Trifle.TileTeam.friendly && abilityObject.sourceTile.ownerName === possibleTargetTile.ownerName)
+				(cancelingAbility.abilityInfo.cancelAbilitiesFromTeam === Trifle.TileTeam.enemy && cancelingAbility.sourceTile.ownerName !== abilitySourceTile.ownerName)
+				|| (cancelingAbility.abilityInfo.cancelAbilitiesFromTeam === Trifle.TileTeam.friendly && cancelingAbility.sourceTile.ownerName === abilitySourceTile.ownerName)
 				)
 		) {
-			// Does canceling ability affecting tile cancel this kind of ability?
-			if (cancelingAbility.abilityInfo.targetAbilityTypes.includes(Trifle.AbilityType.all)) {
-				isCanceled = true;	// Dat is for sure
+			if (cancelingAbility.abilityInfo.targetAbilityTypes) {
+				// Does canceling ability affecting tile cancel this kind of ability?
+				if (cancelingAbility.abilityInfo.targetAbilityTypes.includes(Trifle.AbilityType.all)) {
+					isCanceled = true;	// Dat is for sure
+				}
+
+				cancelingAbility.abilityInfo.targetAbilityTypes.forEach(function(canceledAbilityType) {
+					var abilitiesForType = Trifle.AbilitiesForType[canceledAbilityType];
+					if (abilitiesForType && abilitiesForType.length && abilitiesForType.includes(abilityType)) {
+						isCanceled = true;
+					}
+				});
 			}
 
-			cancelingAbility.abilityInfo.targetAbilityTypes.forEach(function(canceledAbilityType) {
-				var abilitiesForType = Trifle.AbilitiesForType[canceledAbilityType];
-				if (abilitiesForType && abilitiesForType.length && abilitiesForType.includes(abilityObject.abilityInfo.type)) {
-					isCanceled = true;
-				}
-			});
+			if (cancelingAbility.abilityInfo.cancelAbilitiesFromTileCodes
+					&& cancelingAbility.abilityInfo.cancelAbilitiesFromTileCodes.includes(abilitySourceTile.code)) {
+				isCanceled = true;
+			}
 		}
 	});
 

@@ -31,7 +31,7 @@ OnboardingFunctions.showConfirmMoveButtonHelp = function() {
 			closeModal();
 			localStorage.setItem(OnBoardingKeys.confirmMoveButtonHelpDismissed, "true");
 		};
-	yesNoOptions.noText = "Close";
+		yesNoOptions.noText = "Close";
 		showModal(
 			"Submitting Your Move",
 			"To submit your move in an online game, click the Submit Move button at the bottom of screen. <br /><br />To automatically submit your moves, visit the Device Preferences from your My Games list.",

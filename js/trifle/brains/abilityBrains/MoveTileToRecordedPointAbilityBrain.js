@@ -10,7 +10,7 @@ Trifle.MoveTileToRecordedPointAbilityBrain.prototype.activateAbility = function(
 	var recordedPointType = this.abilityObject.abilityInfo.recordedPointType;
 
 	if (recordedPointType) {
-		var destinationPoint = this.abilityObject.board.recordedTilePoints[recordedPointType][targetTile.id];
+		var destinationPoint = this.abilityObject.board.recordedTilePoints[recordedPointType][targetTile.getOwnerCodeIdObjectString()];
 		this.abilityObject.board.placeTile(targetTile, destinationPoint);
 		this.abilityObject.boardChanged = true;
 

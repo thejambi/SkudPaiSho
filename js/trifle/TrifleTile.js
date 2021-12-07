@@ -80,6 +80,9 @@ Trifle.Tile.prototype.getOwnerCodeIdObject = function() {
 		id: this.id
 	};
 };
+Trifle.Tile.prototype.getOwnerCodeIdObjectString = function() {
+	return JSON.stringify(this.getOwnerCodeIdObject());
+};
 
 Trifle.Tile.getTeamLimitForTile = function(tileCode) {
 	var tileData = PaiShoGames.currentTileMetadata[tileCode];
