@@ -1245,7 +1245,7 @@ function getGameMessageElement() {
 		return gameMessage;
 	}
 }
-  
+
 function refreshMessage() {
 	var message = "";
 	if (!playingOnlineGame()) {
@@ -1260,7 +1260,7 @@ function refreshMessage() {
 		showResetMoveMessage();
 	}
 }
-  
+
 function rerunAll(soundOkToPlay, moveAnimationBeginStep) {
 	gameController.resetGameManager();
 	gameController.resetNotationBuilder();
@@ -1343,6 +1343,12 @@ function getGameWinner() {
 		return GUEST;
 	} else if (GameClock.playerIsOutOfTime(GUEST)) {
 		return HOST;
+	} else if (currentGameData && currentGameData.resultId === 9 && currentGameData.winnerUsername) {
+		if (currentGameData.hostUsername === currentGameData.winnerUsername) {
+			return HOST;
+		} else {
+			return GUEST;
+		}
 	} else {
 		return gameController.theGame.getWinner();
 	}
@@ -1351,6 +1357,8 @@ function getGameWinner() {
 function getGameWinReason() {
 	if (GameClock.aPlayerIsOutOfTime()) {
 		return " won the game due to opponent running out of time";
+	} else if (currentGameData && currentGameData.resultId === 9) {
+		return " wins ᕕ( ᐛ )ᕗ! Opponent has resigned.";
 	} else {
 		return gameController.theGame.getWinReason();
 	}
@@ -2658,6 +2666,7 @@ var jumpToGameCallback = function jumpToGameCallback(results) {
 		currentGameData.isRankedGame = myGame.rankedGame;
 		currentGameData.hostRating = myGame.hostRating;
 		currentGameData.guestRating = myGame.guestRating;
+		currentGameData.winnerUsername = myGame.winnerUsername;
 		currentGameData.resultId = myGame.resultId;
 		currentGameData.gameClock = myGame.gameClock;
 		GameClock.loadGameClock(currentGameData.gameClock);
