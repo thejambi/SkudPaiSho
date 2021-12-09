@@ -24,6 +24,12 @@ Trifle.BoardPoint = function() {
 	this.possibleMovementPaths = [];
 }
 
+Trifle.BoardPoint.prototype.setRowAndCol = function(row, col) {
+	this.row = row;
+	this.col = col;
+	this.rowAndCol = new RowAndColumn(this.row, this.col);
+};
+
 Trifle.BoardPoint.prototype.addType = function(type) {
 	if (!this.types.includes(type)) {
 		this.types.push(type);
@@ -193,8 +199,7 @@ Trifle.BoardPoint.prototype.betweenPlayerHarmony = function(player) {
 };
 
 Trifle.BoardPoint.prototype.getNotationPointString = function() {
-	var rowAndCol = new RowAndColumn(this.row, this.col);
-	return rowAndCol.notationPointString;
+	return this.rowAndCol.notationPointString;
 };
 
 Trifle.BoardPoint.prototype.getCopy = function() {

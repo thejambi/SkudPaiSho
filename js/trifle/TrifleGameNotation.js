@@ -78,9 +78,11 @@ Trifle.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 
 
 
-Trifle.GameNotation = function() {
+Trifle.GameNotation = function(firstPlayer) {
 	this.notationText = "";
 	this.moves = [];
+	this.firstPlayer = firstPlayer;
+	this.secondPlayer = getOpponentName(firstPlayer);
 }
 
 Trifle.GameNotation.prototype.setNotationText = function(text) {
@@ -114,11 +116,6 @@ Trifle.GameNotation.prototype.removeLastMove = function() {
 
 Trifle.GameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	var moveNum = 0;
-
-	if (this.moves.length === 0) {
-		this.firstPlayer = builder.currentPlayer;
-		this.secondPlayer = getOpponentName(this.firstPlayer);
-	}
 
 	var lastMove = this.moves[this.moves.length-1];
 

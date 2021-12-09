@@ -58,7 +58,7 @@ Ginseng.Controller.prototype.resetGameNotation = function() {
 };
 
 Ginseng.Controller.prototype.getNewGameNotation = function() {
-	return new Trifle.GameNotation();
+	return new Trifle.GameNotation(GUEST);
 };
 
 Ginseng.Controller.getHostTilesContainerDivs = function() {

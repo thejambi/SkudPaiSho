@@ -322,10 +322,13 @@ Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
 	});
 
 	if (nextNeededPromptTargetInfo) {
-		neededPromptInfo.currentPromptTargetId = nextNeededPromptTargetInfo.promptId;
-
 		var abilityBrain = Trifle.BrainFactory.createAbilityBrain(abilityObject.abilityType, abilityObject);
-		abilityBrain.promptForTarget(nextNeededPromptTargetInfo, sourceTileKeyStr);
+		var promptTargetsExist = abilityBrain.promptForTarget(nextNeededPromptTargetInfo, sourceTileKeyStr);
+		if (promptTargetsExist) {
+			neededPromptInfo.currentPromptTargetId = nextNeededPromptTargetInfo.promptId;
+		} else {
+			debug("No targets available to prompt.. so no prompt needed!");
+		}
 	} else {
 		debug("No prompt needed");
 	}

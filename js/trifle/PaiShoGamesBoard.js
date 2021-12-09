@@ -326,8 +326,7 @@ PaiShoGames.Board.prototype.brandNew = function () {
 
 	for (var row = 0; row < cells.length; row++) {
 		for (var col = 0; col < cells[row].length; col++) {
-			cells[row][col].row = row;
-			cells[row][col].col = col;
+			cells[row][col].setRowAndCol(row, col);
 		}
 	}
 
