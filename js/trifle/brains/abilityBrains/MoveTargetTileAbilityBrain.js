@@ -36,6 +36,8 @@ Trifle.MoveTargetTileAbilityBrain.prototype.activateAbility = function() {
 };
 
 Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeededPromptTargetInfo, sourceTileKeyStr) {
+	var promptTargetsExist = false;
+
 	debug("Need to prompt for target: " + nextNeededPromptTargetInfo.promptId);
 
 	/*
@@ -62,6 +64,7 @@ Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeede
 			}
 
 			abilityTargetTilePoints.forEach((targetTilePoint) => {
+				promptTargetsExist = true;
 				targetTilePoint.addType(POSSIBLE_MOVE);
 			});
 		} else {
@@ -76,9 +79,15 @@ Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeede
 			this.abilityObject.abilityInfo.targetTileMovements.forEach((movementInfo) => {
 				movementInfo.targetTilePoint = this.abilityObject.sourceTilePoint;	// TODO targetTileTypes not being checked yet...
 				this.abilityObject.board.setPossibleMovesForMovement(movementInfo, this.abilityObject.board.getBoardPointFromRowAndCol(movedTilePoint.rowAndColumn));
+
+				// Can check for any possible movements that were marked.. but for now, assume there are some
+				promptTargetsExist = true;
 			});
 		} else {
 			debug("Missing targetTileMovements");
 		}
 	}
+
+	debug("promptTargetsExist for move target tile ability prompt? : " + promptTargetsExist);
+	return promptTargetsExist;
 };

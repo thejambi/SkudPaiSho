@@ -20,11 +20,12 @@ Trifle.TriggerHelper.prototype.tileIsTargeted = function() {
 };
 
 Trifle.TriggerHelper.prototype.targetingIsNotCanceledCheck = function() {
-	var abilityManager = this.triggerContext.board.abilityManager;
+	/* var abilityManager = this.triggerContext.board.abilityManager;
 	var abilitySourceTile = this.triggerContext.tile;
 	var abilityType = this.triggerContext.tileAbilityInfo.type;
 	var targetingIsCanceled = abilityManager.targetingIsCanceled(abilitySourceTile, abilityType, this.possibleTargetTile);
-	return !targetingIsCanceled;
+	return !targetingIsCanceled; */
+	return true;	// TODO... this checks if *ability* targeting is canceled.. what if the trigger targets a tile but the ability doesn't? Did you even THINK OF THAT
 };
 
 Trifle.TriggerHelper.prototype.targetTeamsCheck = function() {
