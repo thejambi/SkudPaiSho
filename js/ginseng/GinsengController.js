@@ -543,8 +543,26 @@ Ginseng.Controller.prototype.buildNotationString = function(move) {
 	if (move.moveType === MOVE) {
 		var startRowAndCol = new NotationPoint(move.startPoint).rowAndColumn;
 		var endRowAndCol = new NotationPoint(move.endPoint).rowAndColumn;
-		moveNotation = moveNotation + "(" + Ginseng.NotationAdjustmentFunction(startRowAndCol.row, startRowAndCol.col) + ")-";
-		moveNotation = moveNotation + "(" + Ginseng.NotationAdjustmentFunction(endRowAndCol.row, endRowAndCol.col) + ")";
+		moveNotation += "(" + Ginseng.NotationAdjustmentFunction(startRowAndCol.row, startRowAndCol.col) + ")-";
+		moveNotation += "(" + Ginseng.NotationAdjustmentFunction(endRowAndCol.row, endRowAndCol.col) + ")";
+
+		if (move.promptTargetData) {
+			Object.keys(move.promptTargetData).forEach((key, index) => {
+				var promptDataEntry = move.promptTargetData[key];
+				var keyObject = JSON.parse(key);
+				if (promptDataEntry.movedTilePoint && promptDataEntry.movedTileDestinationPoint) {
+					var movedTilePointRowAndCol = promptDataEntry.movedTilePoint.rowAndColumn;
+					var movedTileDestinationRowAndCol = promptDataEntry.movedTileDestinationPoint.rowAndColumn;
+					moveNotation += "+";
+					moveNotation += "(" + Ginseng.NotationAdjustmentFunction(movedTilePointRowAndCol.row, movedTilePointRowAndCol.col) + ")-";
+					moveNotation += "(" + Ginseng.NotationAdjustmentFunction(movedTileDestinationRowAndCol.row, movedTileDestinationRowAndCol.col) + ")";
+				} else if (promptDataEntry.chosenCapturedTile) {
+					moveNotation += "+" + promptDataEntry.chosenCapturedTile.code;
+				} else {
+					moveNotation += " Ability?";
+				}
+			});
+		}
 	}
 
 	moveNotation = moveNotation;
