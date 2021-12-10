@@ -213,7 +213,7 @@ Ginseng.Actuator.prototype.addTeamTile = function(tile, player, isForTeamSelecti
 Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 	var self = this;
 
-	var theDiv = createBoardPointDiv(boardPoint);
+	var theDiv = createBoardPointDiv(boardPoint, null, Ginseng.NotationAdjustmentFunction);
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");

@@ -46,7 +46,7 @@ function removeChildren(myNode) {
 	}
 }
 
-function createBoardPointDiv(boardPoint, useSquareSpaces) {
+function createBoardPointDiv(boardPoint, useSquareSpaces, coordinatesAdjustmentFunction) {
 	var theDiv = document.createElement("div");
 
 	theDiv.classList.add("point");
@@ -56,6 +56,10 @@ function createBoardPointDiv(boardPoint, useSquareSpaces) {
 	}
 
 	var notationPointString = new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString;
+
+	if (coordinatesAdjustmentFunction) {
+		notationPointString = coordinatesAdjustmentFunction(boardPoint.row, boardPoint.col);
+	}
 
 	theDiv.setAttribute("name", notationPointString);
 	theDiv.setAttribute("title", "(" + notationPointString + ")");

@@ -533,3 +533,21 @@ Ginseng.Controller.prototype.RmbUp = function(htmlPoint) {
 
 	this.callActuate();
 }
+
+Ginseng.Controller.prototype.buildNotationString = function(move) {
+	var playerCode = getPlayerCodeFromName(move.player);
+	var moveNum = move.moveNum;
+
+	var moveNotation = moveNum + playerCode + ".";
+
+	if (move.moveType === MOVE) {
+		var startRowAndCol = new NotationPoint(move.startPoint).rowAndColumn;
+		var endRowAndCol = new NotationPoint(move.endPoint).rowAndColumn;
+		moveNotation = moveNotation + "(" + Ginseng.NotationAdjustmentFunction(startRowAndCol.row, startRowAndCol.col) + ")-";
+		moveNotation = moveNotation + "(" + Ginseng.NotationAdjustmentFunction(endRowAndCol.row, endRowAndCol.col) + ")";
+	}
+
+	moveNotation = moveNotation;
+
+	return moveNotation;
+};

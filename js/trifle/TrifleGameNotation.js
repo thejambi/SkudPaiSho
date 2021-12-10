@@ -137,10 +137,14 @@ Trifle.GameNotation.prototype.loadMoves = function() {
 };
 
 Trifle.GameNotation.prototype.buildSimplifiedNotationString = function(move) {
+	if (gameController.buildNotationString) {
+		return gameController.buildNotationString(move);
+	}
+
 	var playerCode = getPlayerCodeFromName(move.player);
 	var moveNum = move.moveNum;
 
-	return moveNum + playerCode + ".¯\\_(ツ)_/¯";	// TODO, obviously
+	return moveNum + playerCode + ".¯\\_(ツ)_/¯";
 };
 
 Trifle.GameNotation.prototype.getNotationHtml = function() {

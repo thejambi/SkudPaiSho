@@ -260,3 +260,9 @@ Ginseng.GameManager.prototype.getCopy = function() {
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;
 };
+
+Ginseng.NotationAdjustmentFunction = function(row, col) {
+	/* Return string displaying point notation for this game */
+	// return "row:" + row + " col:" + col;
+	return new RowAndColumn(col, 16 - row).notationPointString;
+};
