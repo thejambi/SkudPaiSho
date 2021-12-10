@@ -57,12 +57,14 @@ function createBoardPointDiv(boardPoint, useSquareSpaces, coordinatesAdjustmentF
 
 	var notationPointString = new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString;
 
+	var title = notationPointString;
+
 	if (coordinatesAdjustmentFunction) {
-		notationPointString = coordinatesAdjustmentFunction(boardPoint.row, boardPoint.col);
+		title = coordinatesAdjustmentFunction(boardPoint.row, boardPoint.col);
 	}
 
 	theDiv.setAttribute("name", notationPointString);
-	theDiv.setAttribute("title", "(" + notationPointString + ")");
+	theDiv.setAttribute("title", "(" + title + ")");
 
 	return theDiv;
 }
