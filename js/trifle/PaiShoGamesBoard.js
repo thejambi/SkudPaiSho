@@ -1315,7 +1315,7 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 			if (!abilityActivationFlags.tileRecords.capturedTiles) {
 				abilityActivationFlags.tileRecords.capturedTiles = [];
 			}
-			abilityActivationFlags.tileRecords.capturedTiles = abilityActivationFlags.tileRecords.capturedTiles.concat(nextAbilityActivationFlags.capturedTiles);
+			abilityActivationFlags.tileRecords.capturedTiles = abilityActivationFlags.tileRecords.capturedTiles.concat(nextAbilityActivationFlags.tileRecords.capturedTiles);
 		}
 	}
 
