@@ -71,6 +71,14 @@ Trifle.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 		move.offerDraw = true;
 	}
 
+	if (this.selectedPointMovementPath) {
+		var movementPathNotationPoints = [];
+		this.selectedPointMovementPath.forEach(boardPoint => {
+			movementPathNotationPoints.push(boardPoint.getNotationPointString());
+		});
+		move.movementPath = movementPathNotationPoints;
+	}
+
 	return move;
 };
 

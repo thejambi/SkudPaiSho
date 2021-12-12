@@ -335,30 +335,21 @@ Ginseng.Actuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, 
 Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv) {
 	// if (!this.animationOn) return;
 
-	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y;
+	var startX = boardPoint.col, startY = boardPoint.row, endX = startX, endY = startY;
 
-	var initialScaleValue = 1;
+	var movementPath;
 
 	if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
-		if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
+		if (isSamePoint(moveToAnimate.endPoint, endX, endY)) {// Piece moved
 			var moveStartPoint = new NotationPoint(moveToAnimate.startPoint);
-			x = moveStartPoint.rowAndColumn.col;
-			y = moveStartPoint.rowAndColumn.row;
+			startX = moveStartPoint.rowAndColumn.col;
+			startY = moveStartPoint.rowAndColumn.row;
 			theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving, good idea or no?
-			initialScaleValue = 1.2;
 			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
+
+			movementPath = moveToAnimate.movementPath;
 		}
-	}/*  else if (moveToAnimate.moveType === DEPLOY) {
-		if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
-			if (piecePlaceAnimation === 1) {
-				theImg.style.transform = "scale(2)";
-				theDiv.style.zIndex = 99;
-				requestAnimationFrame(function() {
-					theImg.style.transform = "scale(1)";
-				});
-			}
-		}
-	} */
+	}
 
 	var pointSizeMultiplierX = 34;
 	var pointSizeMultiplierY = pointSizeMultiplierX;
@@ -371,47 +362,46 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 		unitString = "vw";
 	}
 
-	var scaleValue = 1;
+	var left = (startX - endX);
+	var top = (startY - endY);
+	
+	/* Begin tile at origin point */
+	theImg.style.left = (left * pointSizeMultiplierX) + unitString;
+	theImg.style.top = (top * pointSizeMultiplierY) + unitString;
 
-	if (boardPoint.tile.isGigantic) {
-		scaleValue = 2;
-	}
-
-	var finalLeft = 0;
-	var finalTop = 0;
-
-	var left = (x - ox);
-	var top = (y - oy);
-	if (boardPoint.tile.isGigantic) {
-		// left += 0.5;
-		// top += 0.5;
-		// finalLeft += 0.5;
-		// finalTop += 0.5;
-
-		left += 0.7;
-		// top += 0.5;
-		finalLeft += 0.7;
-		// finalTop += 0.5;
-
-		theImg.style.zIndex = 90;
-	}
-	// theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
-	// theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
-	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
-	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
-
-	// theDiv.style.transform = "scale(" + scaleValue + ")";
-	theImg.elementStyleTransform.setValue("scale", scaleValue * initialScaleValue);
-
-	requestAnimationFrame(function() {
-		// theImg.style.left = ((finalLeft * cos45 - finalTop * sin45) * pointSizeMultiplierX) + unitString;
-		// theImg.style.top = ((finalTop * cos45 + finalLeft * sin45) * pointSizeMultiplierY) + unitString;
+	if (movementPath) {
+		var movementAnimationLength = pieceAnimationLength / (movementPath.length);
+		var cssLength = movementAnimationLength * (1 + 0.05*movementPath.length);	// Higher multiplication factor gives smoother transition
+		theImg.style.transition = "left " + cssLength + "ms ease-out, right " + cssLength + "ms ease-out, top " + cssLength + "ms ease-out, bottom " + movementAnimationLength + "ms ease-out, transform 0.5s ease-in, opacity 0.5s";
+		var movementNum = 0;
+		movementPath.forEach(pathPointStr => {
+			var currentMovementAnimationTime = movementAnimationLength * movementNum;
+			setTimeout(function() {
+				requestAnimationFrame(function() {
+					var pathPoint = new NotationPoint(pathPointStr);
+					var pointX = pathPoint.rowAndColumn.col;
+					var pointY = pathPoint.rowAndColumn.row;
+					left = (pointX - endX);
+					top = (pointY - endY);
+					theImg.style.left = (left * pointSizeMultiplierX) + unitString;
+					theImg.style.top = (top * pointSizeMultiplierY) + unitString;
+					debug("time: " + currentMovementAnimationTime + " left: " + left + " top: " + top);
+				});
+			}, currentMovementAnimationTime);
+			movementNum++;
+		});
+	} else {
+		/* Make tile be at it's current point so it animates to that point from start point */
+		requestAnimationFrame(function() {
 			theImg.style.left = "0px";
 			theImg.style.top = "0px";
-	});
+		});
+	}
+
+	/* Scale back to normal size after animation complete */
 	setTimeout(function() {
 		requestAnimationFrame(function() {
-			theImg.elementStyleTransform.setValue("scale", scaleValue); // This will size back to normal after moving
+			theImg.elementStyleTransform.setValue("scale", 1); // This will size back to normal after moving
 		});
 	}, pieceAnimationLength);
 };

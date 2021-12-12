@@ -22,6 +22,8 @@ Trifle.BoardPoint = function() {
 	this.possibleMoveTypes = [];
 	this.moveDistanceRemaining = {};
 	this.possibleMovementPaths = [];
+	this.previousMovePointsForMovement = {};
+	this.previousMovePoint = null;
 }
 
 Trifle.BoardPoint.prototype.setRowAndCol = function(row, col) {
@@ -109,9 +111,13 @@ Trifle.BoardPoint.prototype.isPossibleForMovementType = function(movementInfo) {
 Trifle.BoardPoint.prototype.clearPossibleMovementTypes = function() {
 	this.possibleMoveTypes = [];
 	this.moveDistanceRemaining = {};
+	this.previousMovePointsForMovement = {};
+	this.previousMovePoint = null;
 };
 Trifle.BoardPoint.prototype.clearPossibleMovementPaths = function() {
 	this.possibleMovementPaths = [];
+	this.previousMovePointsForMovement = {};
+	this.previousMovePoint = null;
 };
 Trifle.BoardPoint.prototype.addPossibleMovementPath = function(movementPath) {
 	this.possibleMovementPaths.push(movementPath);
@@ -131,6 +137,62 @@ Trifle.BoardPoint.prototype.getMoveDistanceRemaining = function(movementInfo) {
 };
 Trifle.BoardPoint.getMovementType = function(movementInfo) {
 	return movementInfo.title ? movementInfo.title : movementInfo.type;
+};
+Trifle.BoardPoint.prototype.setPreviousPointForMovement = function(movementInfo, previousPoint) {
+	var movementType = Trifle.BoardPoint.getMovementType(movementInfo);
+	if (previousPoint !== this && previousPoint.previousMovePointsForMovement[movementType] !== this) {
+		this.previousMovePointsForMovement[movementType] = previousPoint;
+	}
+};
+Trifle.BoardPoint.prototype.setPreviousPoint = function(previousPoint) {
+	this.previousMovePoint = previousPoint;
+};
+
+Trifle.BoardPoint.prototype.buildMovementPath = function() {
+	this.movementPath = [];
+
+	if (this.previousMovePoint) {
+		this.movementPath = this.previousMovePoint.buildMovementPath().concat(this);
+	} else {
+		this.movementPath = [this];
+	}
+
+	return this.movementPath;
+};
+
+Trifle.BoardPoint.prototype.buildMovementPathsInfo = function() {
+	this.movementPathForMoveTypes = {};
+
+	Object.keys(this.previousMovePointsForMovement).forEach((key,index) => {
+		var prevPoint = this.previousMovePointsForMovement[key];
+		if (prevPoint) {
+			var prevPointMovePathInfo = prevPoint.buildMovementPathsInfo();
+			var prevPointMovePath = prevPointMovePathInfo[key];
+			if (prevPointMovePath) {
+				this.movementPathForMoveTypes[key] = prevPointMovePath.concat(this);
+			}
+		} else {
+			debug("bad?");
+		}
+	});
+
+	return this.movementPathForMoveTypes;
+
+	// var movementPaths = {};
+
+	// Object.keys(this.previousMovePointsForMovement).forEach((key,index) => {
+	// 	var prevPoint = this.previousMovePointsForMovement[key];
+	// 	if (prevPoint && prevPoint !== this) {
+	// 		var prevMovementPathsInfo = prevPoint.buildMovementPathsInfo();
+	// 		if (prevMovementPathsInfo[key]) {
+	// 			movementPaths[key] = prevMovementPathsInfo[key].concat(this);
+	// 		}
+	// 	} else {
+	// 		movementPaths[key] = [this];
+	// 	}
+	// });
+
+	// return movementPaths;
 };
 
 Trifle.BoardPoint.prototype.isOpenGate = function() {

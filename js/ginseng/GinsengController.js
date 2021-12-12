@@ -309,6 +309,12 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 	var notationPoint = new NotationPoint(npText);
 	var rowCol = notationPoint.rowAndColumn;
 	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+	// var movementPaths = boardPoint.buildMovementPathsInfo();
+	// debug(movementPaths);
+	var movementPath = boardPoint.buildMovementPath();
+	debug("movement path:");
+	debug(movementPath);
+	this.notationBuilder.selectedPointMovementPath = movementPath;
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
