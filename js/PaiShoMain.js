@@ -2023,18 +2023,23 @@ function closeModal() {
 	document.getElementById('myMainModal').style.display = "none";
 	tutorialInProgress = false;
 }
-  
+
 var confirmMoveToSubmit = null;
+var lockedInNotationTextForUrl = null;
 
 function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed, move) {
+	if (!lockedInNotationTextForUrl) {
+		lockedInNotationTextForUrl = gameController.gameNotation.notationTextForUrl();
+	}
 	submitMoveData = {
 		moveAnimationBeginStep: moveAnimationBeginStep
 	};
 	if (moveIsConfirmed || !isMoveConfirmationRequired()) {	/* Move should be processed */
 		GameClock.stopGameClock();
 		if (!GameClock.currentClockIsOutOfTime()) {
-			onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
+			onlinePlayEngine.submitMove(gameId, encodeURIComponent(lockedInNotationTextForUrl), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
 				GameClock.getCurrentGameClockJsonString(), currentGameData.resultId, move);
+			lockedInNotationTextForUrl = null;
 		}
 	} else {
 		/* Move needs to be confirmed. Finalize move and show confirm button. */
