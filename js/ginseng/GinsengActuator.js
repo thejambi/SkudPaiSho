@@ -337,12 +337,15 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 
 	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y;
 
+	var initialScaleValue = 1;
+
 	if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
 		if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
 			var moveStartPoint = new NotationPoint(moveToAnimate.startPoint);
 			x = moveStartPoint.rowAndColumn.col;
 			y = moveStartPoint.rowAndColumn.row;
 			theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving, good idea or no?
+			initialScaleValue = 1.2;
 			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
 		}
 	}/*  else if (moveToAnimate.moveType === DEPLOY) {
@@ -398,7 +401,7 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
 
 	// theDiv.style.transform = "scale(" + scaleValue + ")";
-	theImg.elementStyleTransform.setValue("scale", scaleValue);
+	theImg.elementStyleTransform.setValue("scale", scaleValue * initialScaleValue);
 
 	requestAnimationFrame(function() {
 		// theImg.style.left = ((finalLeft * cos45 - finalTop * sin45) * pointSizeMultiplierX) + unitString;
