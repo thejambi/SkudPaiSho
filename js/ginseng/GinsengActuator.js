@@ -348,6 +348,9 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
 
 			movementPath = moveToAnimate.endPointMovementPath;
+			if (!movementPath && moveToAnimate.movementPath) {
+				movementPath = moveToAnimate.movementPath;
+			}
 		}
 	}
 
