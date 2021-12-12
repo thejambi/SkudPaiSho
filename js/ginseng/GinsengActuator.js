@@ -347,7 +347,7 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 			theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving, good idea or no?
 			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
 
-			movementPath = moveToAnimate.movementPath;
+			movementPath = moveToAnimate.endPointMovementPath;
 		}
 	}
 
@@ -372,7 +372,7 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 	if (movementPath && isSamePoint(movementPath[0], startX, startY)) {
 		var numMovements = movementPath.length - 1;
 		var movementAnimationLength = pieceAnimationLength / numMovements;
-		var cssLength = movementAnimationLength * (1 + (0.05 * numMovements));	// Higher multiplication factor gives smoother transition
+		var cssLength = movementAnimationLength * (1 + (0.25 * numMovements));	// Higher multiplication factor gives smoother transition
 		theImg.style.transition = "left " + cssLength + "ms ease-out, right " + cssLength + "ms ease-out, top " + cssLength + "ms ease-out, bottom " + movementAnimationLength + "ms ease-out, transform 0.5s ease-in, opacity 0.5s";
 		var movementNum = -1;
 		movementPath.forEach(pathPointStr => {
