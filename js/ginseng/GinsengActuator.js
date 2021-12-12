@@ -370,10 +370,11 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 	theImg.style.top = (top * pointSizeMultiplierY) + unitString;
 
 	if (movementPath) {
-		var movementAnimationLength = pieceAnimationLength / (movementPath.length);
-		var cssLength = movementAnimationLength * (1 + 0.05*movementPath.length);	// Higher multiplication factor gives smoother transition
+		var numMovements = movementPath.length - 1;
+		var movementAnimationLength = pieceAnimationLength / numMovements;
+		var cssLength = movementAnimationLength * (1 + (0.05 * numMovements));	// Higher multiplication factor gives smoother transition
 		theImg.style.transition = "left " + cssLength + "ms ease-out, right " + cssLength + "ms ease-out, top " + cssLength + "ms ease-out, bottom " + movementAnimationLength + "ms ease-out, transform 0.5s ease-in, opacity 0.5s";
-		var movementNum = 0;
+		var movementNum = -1;
 		movementPath.forEach(pathPointStr => {
 			var currentMovementAnimationTime = movementAnimationLength * movementNum;
 			setTimeout(function() {
