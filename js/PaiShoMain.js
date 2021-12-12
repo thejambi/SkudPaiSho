@@ -1110,7 +1110,7 @@ function rewindAllMoves() {
  * For example, in Skud Pai Sho, there can be multi-step moves when a Harmony Bonus is included. 
  * So when animating beginning at the Harmony Bonus step, the initial Arranging piece of the move will not be animated.
  */
-function playNextMove(withActuate, moveAnimationBeginStep) {
+function playNextMove(withActuate, moveAnimationBeginStep, skipAnimation) {
 	if (currentMoveIndex >= gameController.gameNotation.moves.length) {
 		// no more moves to run
 		isInReplay = false;
@@ -1127,7 +1127,7 @@ function playNextMove(withActuate, moveAnimationBeginStep) {
 				gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], false);
 			}
 		}
-		gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep);
+		gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep, skipAnimation);
 		currentMoveIndex++;
 		if (currentMoveIndex >= gameController.gameNotation.moves.length) {
 			isInReplay = false;
@@ -1166,7 +1166,7 @@ function playPrevMove() {
 	refreshMessage();
 }
 
-function playAllMoves(moveAnimationBeginStep) {
+function playAllMoves(moveAnimationBeginStep, skipAnimation) {
 	pauseRun();
 	if (currentMoveIndex >= gameController.gameNotation.moves.length - 1) {
 		playPrevMove();	// If at end, jump to previous move so that final move can animate
@@ -1174,7 +1174,7 @@ function playAllMoves(moveAnimationBeginStep) {
 	while (currentMoveIndex < gameController.gameNotation.moves.length - 1) {
 		playNextMove(false);
 	}
-	playNextMove(true, moveAnimationBeginStep);
+	playNextMove(true, moveAnimationBeginStep, skipAnimation);
 }
 
 function playPause() {
@@ -1261,13 +1261,13 @@ function refreshMessage() {
 	}
 }
 
-function rerunAll(soundOkToPlay, moveAnimationBeginStep) {
+function rerunAll(soundOkToPlay, moveAnimationBeginStep, skipAnimation) {
 	gameController.resetGameManager();
 	gameController.resetNotationBuilder();
 
 	currentMoveIndex = 0;
 
-	playAllMoves(moveAnimationBeginStep);
+	playAllMoves(moveAnimationBeginStep, skipAnimation);
 
 	if (soundOkToPlay && soundManager.rerunAllSoundsAreEnabled()) {
 		soundManager.playSound(SoundManager.sounds.tileLand);
@@ -1275,7 +1275,10 @@ function rerunAll(soundOkToPlay, moveAnimationBeginStep) {
 	refreshMessage();
 }
 
-/* var quickFinalizeMove = function(soundOkToPlay) {
+var quickFinalizeMove = function(soundOkToPlay) {
+	// gameController.resetGameManager();
+	gameController.resetNotationBuilder();
+	currentMoveIndex++;
 	linkShortenCallback('');
 
 	if (soundOkToPlay && soundManager.rerunAllSoundsAreEnabled()) {
@@ -1283,7 +1286,8 @@ function rerunAll(soundOkToPlay, moveAnimationBeginStep) {
 	}
 
 	refreshMessage();
-}; */
+	showResetMoveMessage();
+};
 
 var finalizeMove = function (moveAnimationBeginStep, ignoreNoEmail, okToUpdateWinInfo) {
   	rerunAll(true, moveAnimationBeginStep);

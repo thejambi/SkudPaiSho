@@ -73,7 +73,7 @@ Ginseng.Controller.prototype.callActuate = function() {
 	this.theGame.actuate();
 };
 
-Ginseng.Controller.prototype.resetMove = function() {
+Ginseng.Controller.prototype.resetMove = function(skipAnimation) {
 	this.notationBuilder.offerDraw = false;
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// Remove last move
@@ -82,7 +82,7 @@ Ginseng.Controller.prototype.resetMove = function() {
 		// Just rerun
 	}
 
-	rerunAll();
+	rerunAll(null, null, skipAnimation);
 };
 
 Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
@@ -281,7 +281,7 @@ Ginseng.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 				this.notationBuilder.promptTargetData[sourceTileKey][this.notationBuilder.neededPromptTargetInfo.currentPromptTargetId] = tile.getOwnerCodeIdObject();
 				// TODO - Does move require user to choose targets?... 
 				var notationBuilderSave = this.notationBuilder;
-				this.resetMove();
+				this.resetMove(true);
 				this.notationBuilder = notationBuilderSave;
 				this.completeMove();
 			} else {
@@ -331,7 +331,6 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 
 			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
 				this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
-				// TODO - Does move require user to choose targets?... 
 				this.completeMove();
 			} else {
 				this.resetNotationBuilder();
@@ -352,7 +351,7 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 				this.notationBuilder.promptTargetData[sourceTileKey][this.notationBuilder.neededPromptTargetInfo.currentPromptTargetId] = new NotationPoint(htmlPoint.getAttribute("name"));
 				// TODO - Does move require user to choose targets?... 
 				var notationBuilderSave = this.notationBuilder;
-				this.resetMove();
+				this.resetMove(true);
 				this.notationBuilder = notationBuilderSave;
 				this.completeMove();
 			} else {
@@ -367,7 +366,8 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 
 Ginseng.Controller.prototype.completeMove = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-	var neededPromptTargetInfo = this.theGame.runNotationMove(move);
+	var skipAnimation = this.notationBuilder.status === Trifle.NotationBuilderStatus.PROMPTING_FOR_TARGET;
+	var neededPromptTargetInfo = this.theGame.runNotationMove(move, true, null, skipAnimation);
 
 	if (neededPromptTargetInfo) {
 		debug("Prompting user for the rest of the move!");
@@ -389,7 +389,8 @@ Ginseng.Controller.prototype.completeMove = function() {
 		if (playingOnlineGame()) {
 			callSubmitMove();
 		} else {
-			finalizeMove();
+			// finalizeMove();
+			quickFinalizeMove();
 		}
 	}
 };

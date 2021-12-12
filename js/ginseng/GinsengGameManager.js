@@ -59,15 +59,15 @@ Ginseng.GameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-Ginseng.GameManager.prototype.actuate = function () {
+Ginseng.GameManager.prototype.actuate = function(moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, this.markingManager);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager, moveToAnimate);
 	setGameLogText(this.gameLogText);
 };
 
-Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
+Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep_unused, skipAnimation) {
 	debug("Runining Move:");
 	debug(move);
 
@@ -108,8 +108,11 @@ Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
 		this.gameHasEndedInDraw = true;
 	}
 
-	if (withActuate) {
+	/* if (withActuate && neededPromptInfo) {
 		this.actuate();
+	} else  */
+	if (withActuate && !skipAnimation) {
+		this.actuate(move);
 	}
 
 	return neededPromptInfo;

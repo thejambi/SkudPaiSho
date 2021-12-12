@@ -294,6 +294,9 @@ function getSkudTilesSrcPath() {
 }
 
 function isSamePoint(movePoint, x, y) {
+	if (typeof movePoint === 'string') {
+		movePoint = new NotationPoint(movePoint);
+	}
 	return movePoint.rowAndColumn.col === x && movePoint.rowAndColumn.row === y;
 }
 
