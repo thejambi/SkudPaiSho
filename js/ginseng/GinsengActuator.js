@@ -333,7 +333,7 @@ Ginseng.Actuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, 
 };
 
 Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv) {
-	// if (!this.animationOn) return;
+	if (!this.animationOn) return;
 
 	var startX = boardPoint.col, startY = boardPoint.row, endX = startX, endY = startY;
 
