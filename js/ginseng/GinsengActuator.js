@@ -27,18 +27,18 @@ Ginseng.Actuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
 };
 
-Ginseng.Actuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate) {
+Ginseng.Actuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate, moveDetails) {
 	var self = this;
 
 	debug("Move to animate: ");
 	debug(moveToAnimate);
 
 	window.requestAnimationFrame(function () {
-		self.htmlify(board, tileManager, markingManager, moveToAnimate);
+		self.htmlify(board, tileManager, markingManager, moveToAnimate, moveDetails);
 	});
 };
 
-Ginseng.Actuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate) {
+Ginseng.Actuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate, moveDetails) {
 	this.clearContainer(this.boardContainer);
 	this.clearContainer(this.arrowContainer);
 
@@ -53,7 +53,7 @@ Ginseng.Actuator.prototype.htmlify = function(board, tileManager, markingManager
 				cell.removeType(MARKED);
 			}
 			if (cell) {
-				self.addBoardPoint(cell, board, moveToAnimate);
+				self.addBoardPoint(cell, board, moveToAnimate, moveDetails);
 			}
 		});
 	});
@@ -217,7 +217,7 @@ Ginseng.Actuator.prototype.addTeamTile = function(tile, player, isForTeamSelecti
 	container.appendChild(theDiv);
 };
 
-Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAnimate) {
+Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAnimate, moveDetails) {
 	var self = this;
 
 	var theDiv = createBoardPointDiv(boardPoint, null, Ginseng.NotationAdjustmentFunction);
@@ -281,7 +281,7 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAni
 		}
 
 		if (moveToAnimate || boardPoint.tile.isGigantic) {
-			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
+			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv, moveDetails);
 		}
 
 		var srcValue = this.getTileSrcPath();
@@ -332,7 +332,7 @@ Ginseng.Actuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, 
 	theDiv.style.transform = "scale(" + scaleValue + ")";
 };
 
-Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv) {
+Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv, moveDetails) {
 	if (!this.animationOn) return;
 
 	var startX = boardPoint.col, startY = boardPoint.row, endX = startX, endY = startY;
@@ -372,7 +372,7 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 	theImg.style.left = (left * pointSizeMultiplierX) + unitString;
 	theImg.style.top = (top * pointSizeMultiplierY) + unitString;
 
-	if (movementPath && isSamePoint(movementPath[0], startX, startY)) {
+	if (movementPath) {
 		var numMovements = movementPath.length - 1;
 		var movementAnimationLength = pieceAnimationLength / numMovements;
 		var cssLength = movementAnimationLength * (1 + (0.05 * numMovements));	// Higher multiplication factor gives smoother transition
