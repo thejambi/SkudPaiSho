@@ -269,7 +269,8 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAni
 		}
 	}
 
-	if (boardPoint.hasTile() && !boardPoint.occupiedByAbility) {
+	if ((boardPoint.hasTile() && !boardPoint.occupiedByAbility)
+			|| (moveToAnimate && !boardPoint.hasTile() && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row))) {
 		theDiv.classList.add("hasTile");
 		
 		var theImg = document.createElement("img");
@@ -285,10 +286,54 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAni
 		}
 
 		var srcValue = this.getTileSrcPath();
+
+		var tileMoved = boardPoint.tile;
+
+		var showMovedTileDuringAnimation = this.animationOn && moveDetails && moveDetails.movedTile
+											&& isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row);
+		if (showMovedTileDuringAnimation) {
+			tileMoved = moveDetails.movedTile;
+		}
 		
-		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
+		theImg.src = srcValue + tileMoved.getImageName() + ".png";
 		
 		theDiv.appendChild(theImg);
+
+		var capturedTile = this.getCapturedTileFromMove(moveDetails);
+
+		if (showMovedTileDuringAnimation) {
+			setTimeout(function() {
+				requestAnimationFrame(function(){
+					if (boardPoint.hasTile()) {
+						theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
+					} else {
+						theImg.classList.add("gone");
+					}
+				});
+			}, pieceAnimationLength);
+		}
+		if (this.animationOn && moveToAnimate && capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
+			var theImgCaptured = document.createElement("img");
+			theImgCaptured.elementStyleTransform = new ElementStyleTransform(theImgCaptured);
+			theImgCaptured.src = srcValue + capturedTile.getImageName() + ".png";
+			theImgCaptured.classList.add("underneath");
+
+			theImgCaptured.elementStyleTransform.setValue("rotate", 270, "deg");
+			if (Ginseng.Options.viewAsGuest) {
+				theImgCaptured.elementStyleTransform.adjustValue("rotate", 180, "deg");
+			}
+
+			theDiv.appendChild(theImgCaptured);
+
+			/* After animation, hide captured tile */
+			setTimeout(function() {
+				requestAnimationFrame(function() {
+					theImgCaptured.style.visibility = "hidden";
+				});
+			}, pieceAnimationLength);
+		}
+	} else if (moveToAnimate && !boardPoint.hasTile() && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
+		debug("banish?");
 	}
 
 	if (boardPoint.occupiedByAbility) {
@@ -302,6 +347,13 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAni
 		theBr.classList.add("clear");
 		this.boardContainer.appendChild(theBr);
 	}
+};
+
+Ginseng.Actuator.prototype.getCapturedTileFromMove = function(moveDetails) {
+	if (moveDetails && moveDetails.capturedTiles && moveDetails.capturedTiles.length === 1) {
+		return moveDetails.capturedTiles[0];
+	}
+	return null;
 };
 
 Ginseng.Actuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, boardPoint) {
@@ -339,7 +391,7 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 
 	var movementPath;
 
-	if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
+	if (moveToAnimate.moveType === MOVE && (boardPoint.tile || moveDetails.movedTile)) {
 		if (isSamePoint(moveToAnimate.endPoint, endX, endY)) {// Piece moved
 			var moveStartPoint = new NotationPoint(moveToAnimate.startPoint);
 			startX = moveStartPoint.rowAndColumn.col;
