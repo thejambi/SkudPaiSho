@@ -164,6 +164,24 @@ Ginseng.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails)
 		});
 		this.gameLogText += " banished";
 	}
+
+	if (move.promptTargetData) {
+		Object.keys(move.promptTargetData).forEach((key, index) => {
+			var promptDataEntry = move.promptTargetData[key];
+			var keyObject = JSON.parse(key);
+			if (promptDataEntry.movedTilePoint && promptDataEntry.movedTileDestinationPoint) {
+				var movedTilePointRowAndCol = promptDataEntry.movedTilePoint.rowAndColumn;
+				var movedTileDestinationRowAndCol = promptDataEntry.movedTileDestinationPoint.rowAndColumn;
+				this.gameLogText += "; Push: ";
+				this.gameLogText += "(" + Ginseng.NotationAdjustmentFunction(movedTilePointRowAndCol.row, movedTilePointRowAndCol.col) + ")-";
+				this.gameLogText += "(" + Ginseng.NotationAdjustmentFunction(movedTileDestinationRowAndCol.row, movedTileDestinationRowAndCol.col) + ")";
+			} else if (promptDataEntry.chosenCapturedTile) {
+				this.gameLogText += "; Exchange with: " + Trifle.Tile.getTileName(promptDataEntry.chosenCapturedTile.code);
+			} else {
+				this.gameLogText += " Ability?";
+			}
+		});
+	}
 };
 
 Ginseng.GameManager.prototype.checkForWin = function() {
