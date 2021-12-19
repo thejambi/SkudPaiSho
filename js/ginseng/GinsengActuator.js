@@ -418,7 +418,7 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 							setTimeout(() => {
 								theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving
 								theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
-							}, pieceAnimationLength/1.5);
+							}, pieceAnimationLength/1.2);
 							movementStepIndex = 1;
 						}
 					}
