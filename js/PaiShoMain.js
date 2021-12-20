@@ -2289,7 +2289,9 @@ var GameType = {
 		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
-		gameOptions: []
+		gameOptions: [
+			// CAPTURE_ABILITY_TARGET_1
+		]
 	},
 	SolitairePaiSho: {
 		id: 4,
@@ -2449,12 +2451,12 @@ var GameType = {
 	},
 	Meadow: {
 		id: 14,
-		name: "Meadow",
-		desc: "Meadow",
+		name: "Medo",
+		desc: "Medo",
 		color: "var(--meadowcolor)",
 		description: "A territory battle on a hexagonal board.",
 		coverImg: "hexagon.png",
-		rulesUrl: "https://www.nickbentley.games/meadow-rules-and-tips/",
+		rulesUrl: "https://www.nickbentley.games/medo-rules-and-tips/",
 		gameOptions: [
 			SHORTER_GAME,
 			FOUR_SIDED_BOARD,
