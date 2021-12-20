@@ -631,6 +631,35 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 	/* Apply Capture and Ability Activation Requirements Rules */
 	Ginseng.applyCaptureAndAbilityActivationRequirementRules(GinsengTiles);
 
+	/* if (gameOptionEnabled(CAPTURE_ABILITY_TARGET_1)) {
+		debug("Change Lion Turtle and Dragon abilities");
+		GinsengTiles[Ginseng.TileCodes.Dragon].abilities = [
+			{
+				type: Trifle.AbilityName.captureTargetTiles,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
+						targetTeams: [Trifle.TileTeam.enemy],
+						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						activationRequirements: [
+							{
+								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [Trifle.TileCategory.thisTile],
+								targetPointTypes: [RED]
+							}
+						]
+					},
+					{
+						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile
+			}
+		];
+	} */
+
 	Ginseng.GinsengTiles = GinsengTiles;
 };
 
@@ -710,8 +739,8 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles
 			],
 			targetTypes: [Trifle.TargetType.triggerTargetTiles]
 		};
-		var protectFromAbilitiesWhileInTempleAbility = {
-			title: "Protect From All Abilities While In Temple",
+		var protectFromEnemyAbilitiesWhileInTempleAbility = {
+			title: "Protect From Enemy Abilities While In Temple",
 			type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
 			triggers: [
 				{
@@ -720,10 +749,25 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRules = function(GinsengTiles
 				}
 			],
 			targetTypes: [Trifle.TargetType.triggerTargetTiles],
-			targetAbilityTypes: [Trifle.AbilityType.all]
+			targetAbilityTypes: [Trifle.AbilityType.all],
+			cancelAbilitiesFromTeam: Trifle.TileTeam.enemy
+		};
+		var protectFromFriendlyPushAbilitiesWhileInTempleAbility = {
+			title: "Protect From Friendly Push Abilities While In Temple",
+			type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
+			triggers: [
+				{
+					triggerType: Trifle.AbilityTriggerType.whileInsideTemple,
+					targetTileTypes: [Trifle.TileCategory.thisTile]
+				}
+			],
+			targetTypes: [Trifle.TargetType.triggerTargetTiles],
+			targetAbilityTypes: [Trifle.AbilityType.moveTargetTile],
+			cancelAbilitiesFromTeam: Trifle.TileTeam.friendly
 		};
 		tileInfo.abilities.push(protectFromCaptureWhileInTempleAbility);
-		tileInfo.abilities.push(protectFromAbilitiesWhileInTempleAbility);
+		tileInfo.abilities.push(protectFromEnemyAbilitiesWhileInTempleAbility);
+		tileInfo.abilities.push(protectFromFriendlyPushAbilitiesWhileInTempleAbility);
 		// ------
 
 	});

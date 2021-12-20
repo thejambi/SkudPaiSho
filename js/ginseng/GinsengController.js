@@ -155,7 +155,7 @@ Ginseng.Controller.prototype.getAdditionalHelpTabDiv = function() {
 
 	settingsDiv.appendChild(document.createElement("br"));
 
-	if (usernameIsOneOf(["SkudPaiSho"])) {
+	if (usernameIsOneOf(["SkudPaiSho"]) || debugOn) {
 		var toggleDebugText = "Enable debug Help display";
 		if (this.showDebugInfo) {
 			toggleDebugText = "Disable debug Help display";
