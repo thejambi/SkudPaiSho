@@ -1682,6 +1682,8 @@ var submitMoveCallback = function submitMoveCallback(resultData, move) {
 
 	startWatchingNumberOfGamesWhereUserTurn();
 
+	closeModal();
+
 	// Removing: Building this into the submit move
 	// onlinePlayEngine.notifyUser(getLoginToken(), currentGameOpponentUsername, emptyCallback);
 };
@@ -2028,6 +2030,14 @@ function closeModal() {
 var confirmMoveToSubmit = null;
 var lockedInNotationTextForUrl = null;
 
+function showCallSubmitMoveModal() {
+	showModal(
+		"Submitting Move",
+		getLoadingModalText(),
+		true
+	);
+}
+
 function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed, move) {
 	if (!lockedInNotationTextForUrl) {
 		lockedInNotationTextForUrl = gameController.gameNotation.notationTextForUrl();
@@ -2038,6 +2048,7 @@ function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed, move) {
 	if (moveIsConfirmed || !isMoveConfirmationRequired()) {	/* Move should be processed */
 		GameClock.stopGameClock();
 		if (!GameClock.currentClockIsOutOfTime()) {
+			showCallSubmitMoveModal();
 			onlinePlayEngine.submitMove(gameId, encodeURIComponent(lockedInNotationTextForUrl), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
 				GameClock.getCurrentGameClockJsonString(), currentGameData.resultId, move);
 			lockedInNotationTextForUrl = null;
