@@ -1548,6 +1548,7 @@ function showResetMoveMessage() {
 }
 
 function resetMove() {
+	lockedInNotationTextForUrl = null;
 	var rerunHandledByController = gameController.resetMove();
 
 	if (!rerunHandledByController) {
@@ -2264,6 +2265,18 @@ var GameType = {
 		],
 		noRankedGames: true
 	},
+	Ginseng: {
+		id: 18,
+		name: "Ginseng Pai Sho",
+		desc: "Ginseng Pai Sho",
+		color: "var(--ginsengcolor)",
+		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
+		coverImg: "ginseng.png",
+		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
+		gameOptions: [
+			// CAPTURE_ABILITY_TARGET_1
+		]
+	},
 	FirePaiSho: {
 		id: 15,
 		name: "Fire Pai Sho",
@@ -2280,18 +2293,6 @@ var GameType = {
 			ETHEREAL_ACCENT_TILES
 		],
 		noRankedGames: true	// Can take out when testing done, game ready to enable ranked games
-	},
-	Ginseng: {
-		id: 18,
-		name: "Ginseng Pai Sho",
-		desc: "Ginseng Pai Sho",
-		color: "var(--ginsengcolor)",
-		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
-		coverImg: "ginseng.png",
-		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
-		gameOptions: [
-			// CAPTURE_ABILITY_TARGET_1
-		]
 	},
 	SolitairePaiSho: {
 		id: 4,
