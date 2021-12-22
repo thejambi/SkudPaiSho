@@ -98,6 +98,10 @@ Trifle.BoardPoint.prototype.isType = function(type) {
 	return this.types.includes(type);
 };
 
+Trifle.BoardPoint.prototype.isOneOrMoreOfTheseTypes = function(types) {
+	return arrayIncludesOneOf(this.types, types);
+};
+
 Trifle.BoardPoint.prototype.setPossibleForMovementType = function(movementInfo) {
 	var movementTypeToAdd = Trifle.BoardPoint.getMovementType(movementInfo);
 	if (!this.possibleMoveTypes.includes(movementTypeToAdd)) {

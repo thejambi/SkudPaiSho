@@ -16,7 +16,8 @@ Trifle.TriggerHelper.prototype.tileIsTargeted = function() {
 			&& this.targetTeamsCheck()
 			&& this.targetTileTypesCheck()
 			&& this.targetTileIdentifiersCheck()
-			&& this.targetTileNamesCheck();
+			&& this.targetTileNamesCheck()
+			&& this.targetTileBoardPointTypesCheck();
 };
 
 Trifle.TriggerHelper.prototype.targetingIsNotCanceledCheck = function() {
@@ -68,6 +69,15 @@ Trifle.TriggerHelper.prototype.targetTileIdentifiersCheck = function() {
 Trifle.TriggerHelper.prototype.targetTileNamesCheck = function() {
 	if (this.triggerInfo.targetTileCodes) {
 		return arrayIncludesOneOf(this.triggerInfo.targetTileCodes, [this.possibleTargetTile.code]);
+	} else {
+		return true;
+	}
+};
+
+Trifle.TriggerHelper.prototype.targetTileBoardPointTypesCheck = function() {
+	if (this.triggerInfo.targetTileBoardPointTypes) {
+		return this.possibleTargetTile && this.possibleTargetTile.seatedPoint 
+			&& this.possibleTargetTile.seatedPoint.isOneOrMoreOfTheseTypes(this.triggerInfo.targetTileBoardPointTypes);
 	} else {
 		return true;
 	}

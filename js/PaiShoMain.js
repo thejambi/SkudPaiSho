@@ -1964,12 +1964,18 @@ function playAiTurn() {
 	  showModal("", "Unable to load.");
   }
   
-function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, yesNoOptions) {
+function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, yesNoOptions, useInvisibleModal) {
 	// Make sure sidenav is closed
 	closeNav();
 
 	// Get the modal
 	var modal = document.getElementById('myMainModal');
+
+	if (!useInvisibleModal) {
+		modal.classList.add('modalDefaultBackground');
+	} else {
+		modal.classList.remove('modalDefaultBackground');
+	}
 
 	// Get the <span> element that closes the modal
 	var span = document.getElementsByClassName("myMainModalClose")[0];
@@ -2034,6 +2040,8 @@ function showCallSubmitMoveModal() {
 	showModal(
 		"Submitting Move",
 		getLoadingModalText(),
+		true,
+		null,
 		true
 	);
 }
@@ -2285,7 +2293,7 @@ var GameType = {
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [
-			// CAPTURE_ABILITY_TARGET_1
+			LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN
 		]
 	},
 	FirePaiSho: {
