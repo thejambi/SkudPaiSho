@@ -481,7 +481,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			"- Can capture any tile by movement except the opponent's Lion Turtle",
 			"",
 			"<strong>Ability</strong>",
-			"- Captures all adjacent Original Benders."
+			gameOptionEnabled(LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN) ? "- Captures all adjacent Original Benders that are touching a red/white garden." : "- Captures all adjacent Original Benders."
 		]
 	};
 
