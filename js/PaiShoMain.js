@@ -119,7 +119,8 @@ var paiShoBoardDesignTypeValuesDefault = {
 	lightmode: "Old Default Light Mode",
 	darkmode: "Old Default Dark Mode",
 	adevar: "Adevăr",
-	adevarrose: "Adevăr Rose",
+	// adevarrose: "Adevăr Rose Old",
+	adevarrose2: "Adevăr Rose",
 	applycustomboard: "Add Custom Board from URL"
 };
 
@@ -2207,6 +2208,8 @@ function userIsLoggedIn() {
 function forgetCurrentGameInfo() {
 	clearAiPlayers();
 
+	lockedInNotationTextForUrl = null;
+
 	if (gameWatchIntervalValue) {
 		clearInterval(gameWatchIntervalValue);
 		gameWatchIntervalValue = null;
@@ -2607,6 +2610,7 @@ function showDefaultGameOpenedMessage(show) {
 
 function setGameController(gameTypeId, keepGameOptions) {
 	setGameLogText('');
+
 	var successResult = true;
 
 	hideConfirmMoveButton();
