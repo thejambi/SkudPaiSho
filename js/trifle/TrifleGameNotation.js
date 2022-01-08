@@ -71,6 +71,14 @@ Trifle.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 		move.offerDraw = true;
 	}
 
+	if (this.endPointMovementPath) {
+		var movementPathNotationPoints = [];
+		this.endPointMovementPath.forEach(boardPoint => {
+			movementPathNotationPoints.push(boardPoint.getNotationPointString());
+		});
+		move.endPointMovementPath = movementPathNotationPoints;
+	}
+
 	return move;
 };
 
@@ -137,10 +145,14 @@ Trifle.GameNotation.prototype.loadMoves = function() {
 };
 
 Trifle.GameNotation.prototype.buildSimplifiedNotationString = function(move) {
+	if (gameController.buildNotationString) {
+		return gameController.buildNotationString(move);
+	}
+
 	var playerCode = getPlayerCodeFromName(move.player);
 	var moveNum = move.moveNum;
 
-	return moveNum + playerCode + ".¯\\_(ツ)_/¯";	// TODO, obviously
+	return moveNum + playerCode + ".¯\\_(ツ)_/¯";
 };
 
 Trifle.GameNotation.prototype.getNotationHtml = function() {

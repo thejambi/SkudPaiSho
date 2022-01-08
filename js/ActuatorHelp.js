@@ -46,7 +46,7 @@ function removeChildren(myNode) {
 	}
 }
 
-function createBoardPointDiv(boardPoint, useSquareSpaces) {
+function createBoardPointDiv(boardPoint, useSquareSpaces, coordinatesAdjustmentFunction) {
 	var theDiv = document.createElement("div");
 
 	theDiv.classList.add("point");
@@ -57,8 +57,14 @@ function createBoardPointDiv(boardPoint, useSquareSpaces) {
 
 	var notationPointString = new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString;
 
+	var title = notationPointString;
+
+	if (coordinatesAdjustmentFunction) {
+		title = coordinatesAdjustmentFunction(boardPoint.row, boardPoint.col);
+	}
+
 	theDiv.setAttribute("name", notationPointString);
-	theDiv.setAttribute("title", "(" + notationPointString + ")");
+	theDiv.setAttribute("title", "(" + title + ")");
 
 	return theDiv;
 }
@@ -288,6 +294,9 @@ function getSkudTilesSrcPath() {
 }
 
 function isSamePoint(movePoint, x, y) {
+	if (typeof movePoint === 'string') {
+		movePoint = new NotationPoint(movePoint);
+	}
 	return movePoint.rowAndColumn.col === x && movePoint.rowAndColumn.row === y;
 }
 

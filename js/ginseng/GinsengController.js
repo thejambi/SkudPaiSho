@@ -73,7 +73,7 @@ Ginseng.Controller.prototype.callActuate = function() {
 	this.theGame.actuate();
 };
 
-Ginseng.Controller.prototype.resetMove = function() {
+Ginseng.Controller.prototype.resetMove = function(skipAnimation) {
 	this.notationBuilder.offerDraw = false;
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// Remove last move
@@ -82,7 +82,7 @@ Ginseng.Controller.prototype.resetMove = function() {
 		// Just rerun
 	}
 
-	rerunAll();
+	rerunAll(null, null, skipAnimation);
 };
 
 Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
@@ -155,7 +155,7 @@ Ginseng.Controller.prototype.getAdditionalHelpTabDiv = function() {
 
 	settingsDiv.appendChild(document.createElement("br"));
 
-	if (usernameIsOneOf(["SkudPaiSho"])) {
+	if (usernameIsOneOf(["SkudPaiSho"]) || debugOn) {
 		var toggleDebugText = "Enable debug Help display";
 		if (this.showDebugInfo) {
 			toggleDebugText = "Disable debug Help display";
@@ -281,7 +281,7 @@ Ginseng.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 				this.notationBuilder.promptTargetData[sourceTileKey][this.notationBuilder.neededPromptTargetInfo.currentPromptTargetId] = tile.getOwnerCodeIdObject();
 				// TODO - Does move require user to choose targets?... 
 				var notationBuilderSave = this.notationBuilder;
-				this.resetMove();
+				this.resetMove(true);
 				this.notationBuilder = notationBuilderSave;
 				this.completeMove();
 			} else {
@@ -309,6 +309,7 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 	var notationPoint = new NotationPoint(npText);
 	var rowCol = notationPoint.rowAndColumn;
 	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+	var currentMovePath = boardPoint.buildMovementPath();
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
@@ -331,7 +332,7 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 
 			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
 				this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
-				// TODO - Does move require user to choose targets?... 
+				this.notationBuilder.endPointMovementPath = currentMovePath;
 				this.completeMove();
 			} else {
 				this.resetNotationBuilder();
@@ -352,7 +353,7 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 				this.notationBuilder.promptTargetData[sourceTileKey][this.notationBuilder.neededPromptTargetInfo.currentPromptTargetId] = new NotationPoint(htmlPoint.getAttribute("name"));
 				// TODO - Does move require user to choose targets?... 
 				var notationBuilderSave = this.notationBuilder;
-				this.resetMove();
+				this.resetMove(true);
 				this.notationBuilder = notationBuilderSave;
 				this.completeMove();
 			} else {
@@ -367,7 +368,8 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 
 Ginseng.Controller.prototype.completeMove = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-	var neededPromptTargetInfo = this.theGame.runNotationMove(move);
+	var skipAnimation = this.notationBuilder.status === Trifle.NotationBuilderStatus.PROMPTING_FOR_TARGET;
+	var neededPromptTargetInfo = this.theGame.runNotationMove(move, true, null, skipAnimation);
 
 	if (neededPromptTargetInfo) {
 		debug("Prompting user for the rest of the move!");
@@ -387,9 +389,11 @@ Ginseng.Controller.prototype.completeMove = function() {
 	} else {
 		this.gameNotation.addMove(move);
 		if (playingOnlineGame()) {
+			lockedInNotationTextForUrl = this.gameNotation.notationTextForUrl();
 			callSubmitMove();
 		} else {
-			finalizeMove();
+			// finalizeMove();
+			quickFinalizeMove();
 		}
 	}
 };
@@ -533,3 +537,39 @@ Ginseng.Controller.prototype.RmbUp = function(htmlPoint) {
 
 	this.callActuate();
 }
+
+Ginseng.Controller.prototype.buildNotationString = function(move) {
+	var playerCode = getPlayerCodeFromName(move.player);
+	var moveNum = move.moveNum;
+
+	var moveNotation = moveNum + playerCode + ".";
+
+	if (move.moveType === MOVE) {
+		var startRowAndCol = new NotationPoint(move.startPoint).rowAndColumn;
+		var endRowAndCol = new NotationPoint(move.endPoint).rowAndColumn;
+		moveNotation += "(" + Ginseng.NotationAdjustmentFunction(startRowAndCol.row, startRowAndCol.col) + ")-";
+		moveNotation += "(" + Ginseng.NotationAdjustmentFunction(endRowAndCol.row, endRowAndCol.col) + ")";
+
+		if (move.promptTargetData) {
+			Object.keys(move.promptTargetData).forEach((key, index) => {
+				var promptDataEntry = move.promptTargetData[key];
+				var keyObject = JSON.parse(key);
+				if (promptDataEntry.movedTilePoint && promptDataEntry.movedTileDestinationPoint) {
+					var movedTilePointRowAndCol = promptDataEntry.movedTilePoint.rowAndColumn;
+					var movedTileDestinationRowAndCol = promptDataEntry.movedTileDestinationPoint.rowAndColumn;
+					moveNotation += "+";
+					moveNotation += "(" + Ginseng.NotationAdjustmentFunction(movedTilePointRowAndCol.row, movedTilePointRowAndCol.col) + ")-";
+					moveNotation += "(" + Ginseng.NotationAdjustmentFunction(movedTileDestinationRowAndCol.row, movedTileDestinationRowAndCol.col) + ")";
+				} else if (promptDataEntry.chosenCapturedTile) {
+					moveNotation += "+" + promptDataEntry.chosenCapturedTile.code;
+				} else {
+					moveNotation += " Ability?";
+				}
+			});
+		}
+	}
+
+	moveNotation = moveNotation;
+
+	return moveNotation;
+};

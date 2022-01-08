@@ -1315,7 +1315,7 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 			if (!abilityActivationFlags.tileRecords.capturedTiles) {
 				abilityActivationFlags.tileRecords.capturedTiles = [];
 			}
-			abilityActivationFlags.tileRecords.capturedTiles = abilityActivationFlags.tileRecords.capturedTiles.concat(nextAbilityActivationFlags.capturedTiles);
+			abilityActivationFlags.tileRecords.capturedTiles = abilityActivationFlags.tileRecords.capturedTiles.concat(nextAbilityActivationFlags.tileRecords.capturedTiles);
 		}
 	}
 
@@ -1684,6 +1684,8 @@ PaiShoGames.Board.prototype.setPossibleMovementPointsFromMovePoints = function(m
 					var movementOk = self.setPointAsPossibleMovement(adjacentPoint, tile, originPoint);
 					if (movementOk) {
 						adjacentPoint.setPossibleForMovementType(movementInfo);
+						// adjacentPoint.setPreviousPointForMovement(movementInfo, recentPoint);
+						adjacentPoint.setPreviousPoint(recentPoint);
 						if (!adjacentPoint.hasTile() || canMoveThroughPoint) {
 							nextPointsConfirmed.push(adjacentPoint);
 						}

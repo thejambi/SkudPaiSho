@@ -119,7 +119,8 @@ var paiShoBoardDesignTypeValuesDefault = {
 	lightmode: "Old Default Light Mode",
 	darkmode: "Old Default Dark Mode",
 	adevar: "Adevăr",
-	adevarrose: "Adevăr Rose",
+	// adevarrose: "Adevăr Rose Old",
+	adevarrose2: "Adevăr Rose",
 	applycustomboard: "Add Custom Board from URL"
 };
 
@@ -1110,7 +1111,7 @@ function rewindAllMoves() {
  * For example, in Skud Pai Sho, there can be multi-step moves when a Harmony Bonus is included. 
  * So when animating beginning at the Harmony Bonus step, the initial Arranging piece of the move will not be animated.
  */
-function playNextMove(withActuate, moveAnimationBeginStep) {
+function playNextMove(withActuate, moveAnimationBeginStep, skipAnimation) {
 	if (currentMoveIndex >= gameController.gameNotation.moves.length) {
 		// no more moves to run
 		isInReplay = false;
@@ -1127,7 +1128,7 @@ function playNextMove(withActuate, moveAnimationBeginStep) {
 				gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], false);
 			}
 		}
-		gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep);
+		gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep, skipAnimation);
 		currentMoveIndex++;
 		if (currentMoveIndex >= gameController.gameNotation.moves.length) {
 			isInReplay = false;
@@ -1166,7 +1167,7 @@ function playPrevMove() {
 	refreshMessage();
 }
 
-function playAllMoves(moveAnimationBeginStep) {
+function playAllMoves(moveAnimationBeginStep, skipAnimation) {
 	pauseRun();
 	if (currentMoveIndex >= gameController.gameNotation.moves.length - 1) {
 		playPrevMove();	// If at end, jump to previous move so that final move can animate
@@ -1174,7 +1175,7 @@ function playAllMoves(moveAnimationBeginStep) {
 	while (currentMoveIndex < gameController.gameNotation.moves.length - 1) {
 		playNextMove(false);
 	}
-	playNextMove(true, moveAnimationBeginStep);
+	playNextMove(true, moveAnimationBeginStep, skipAnimation);
 }
 
 function playPause() {
@@ -1261,13 +1262,13 @@ function refreshMessage() {
 	}
 }
 
-function rerunAll(soundOkToPlay, moveAnimationBeginStep) {
+function rerunAll(soundOkToPlay, moveAnimationBeginStep, skipAnimation) {
 	gameController.resetGameManager();
 	gameController.resetNotationBuilder();
 
 	currentMoveIndex = 0;
 
-	playAllMoves(moveAnimationBeginStep);
+	playAllMoves(moveAnimationBeginStep, skipAnimation);
 
 	if (soundOkToPlay && soundManager.rerunAllSoundsAreEnabled()) {
 		soundManager.playSound(SoundManager.sounds.tileLand);
@@ -1275,7 +1276,10 @@ function rerunAll(soundOkToPlay, moveAnimationBeginStep) {
 	refreshMessage();
 }
 
-/* var quickFinalizeMove = function(soundOkToPlay) {
+var quickFinalizeMove = function(soundOkToPlay) {
+	// gameController.resetGameManager();
+	gameController.resetNotationBuilder();
+	currentMoveIndex++;
 	linkShortenCallback('');
 
 	if (soundOkToPlay && soundManager.rerunAllSoundsAreEnabled()) {
@@ -1283,7 +1287,8 @@ function rerunAll(soundOkToPlay, moveAnimationBeginStep) {
 	}
 
 	refreshMessage();
-}; */
+	showResetMoveMessage();
+};
 
 var finalizeMove = function (moveAnimationBeginStep, ignoreNoEmail, okToUpdateWinInfo) {
   	rerunAll(true, moveAnimationBeginStep);
@@ -1544,6 +1549,7 @@ function showResetMoveMessage() {
 }
 
 function resetMove() {
+	lockedInNotationTextForUrl = null;
 	var rerunHandledByController = gameController.resetMove();
 
 	if (!rerunHandledByController) {
@@ -1676,6 +1682,8 @@ var submitMoveCallback = function submitMoveCallback(resultData, move) {
 	}
 
 	startWatchingNumberOfGamesWhereUserTurn();
+
+	closeModal();
 
 	// Removing: Building this into the submit move
 	// onlinePlayEngine.notifyUser(getLoginToken(), currentGameOpponentUsername, emptyCallback);
@@ -1957,12 +1965,18 @@ function playAiTurn() {
 	  showModal("", "Unable to load.");
   }
   
-function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, yesNoOptions) {
+function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, yesNoOptions, useInvisibleModal) {
 	// Make sure sidenav is closed
 	closeNav();
 
 	// Get the modal
 	var modal = document.getElementById('myMainModal');
+
+	if (!useInvisibleModal) {
+		modal.classList.add('modalDefaultBackground');
+	} else {
+		modal.classList.remove('modalDefaultBackground');
+	}
 
 	// Get the <span> element that closes the modal
 	var span = document.getElementsByClassName("myMainModalClose")[0];
@@ -2019,18 +2033,34 @@ function closeModal() {
 	document.getElementById('myMainModal').style.display = "none";
 	tutorialInProgress = false;
 }
-  
+
 var confirmMoveToSubmit = null;
+var lockedInNotationTextForUrl = null;
+
+function showCallSubmitMoveModal() {
+	showModal(
+		"Submitting Move",
+		getLoadingModalText(),
+		true,
+		null,
+		true
+	);
+}
 
 function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed, move) {
+	if (!lockedInNotationTextForUrl) {
+		lockedInNotationTextForUrl = gameController.gameNotation.notationTextForUrl();
+	}
 	submitMoveData = {
 		moveAnimationBeginStep: moveAnimationBeginStep
 	};
 	if (moveIsConfirmed || !isMoveConfirmationRequired()) {	/* Move should be processed */
 		GameClock.stopGameClock();
 		if (!GameClock.currentClockIsOutOfTime()) {
-			onlinePlayEngine.submitMove(gameId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
+			showCallSubmitMoveModal();
+			onlinePlayEngine.submitMove(gameId, encodeURIComponent(lockedInNotationTextForUrl), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
 				GameClock.getCurrentGameClockJsonString(), currentGameData.resultId, move);
+			lockedInNotationTextForUrl = null;
 		}
 	} else {
 		/* Move needs to be confirmed. Finalize move and show confirm button. */
@@ -2178,6 +2208,8 @@ function userIsLoggedIn() {
 function forgetCurrentGameInfo() {
 	clearAiPlayers();
 
+	lockedInNotationTextForUrl = null;
+
 	if (gameWatchIntervalValue) {
 		clearInterval(gameWatchIntervalValue);
 		gameWatchIntervalValue = null;
@@ -2255,6 +2287,18 @@ var GameType = {
 		],
 		noRankedGames: true
 	},
+	Ginseng: {
+		id: 18,
+		name: "Ginseng Pai Sho",
+		desc: "Ginseng Pai Sho",
+		color: "var(--ginsengcolor)",
+		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
+		coverImg: "ginseng.png",
+		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
+		gameOptions: [
+			LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN
+		]
+	},
 	FirePaiSho: {
 		id: 15,
 		name: "Fire Pai Sho",
@@ -2271,16 +2315,6 @@ var GameType = {
 			ETHEREAL_ACCENT_TILES
 		],
 		noRankedGames: true	// Can take out when testing done, game ready to enable ranked games
-	},
-	Ginseng: {
-		id: 18,
-		name: "Ginseng Pai Sho",
-		desc: "Ginseng Pai Sho",
-		color: "var(--ginsengcolor)",
-		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
-		coverImg: "ginseng.png",
-		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
-		gameOptions: []
 	},
 	SolitairePaiSho: {
 		id: 4,
@@ -2440,12 +2474,12 @@ var GameType = {
 	},
 	Meadow: {
 		id: 14,
-		name: "Meadow",
-		desc: "Meadow",
+		name: "Medo",
+		desc: "Medo",
 		color: "var(--meadowcolor)",
 		description: "A territory battle on a hexagonal board.",
 		coverImg: "hexagon.png",
-		rulesUrl: "https://www.nickbentley.games/meadow-rules-and-tips/",
+		rulesUrl: "https://www.nickbentley.games/medo-rules-and-tips/",
 		gameOptions: [
 			SHORTER_GAME,
 			FOUR_SIDED_BOARD,
@@ -2576,6 +2610,7 @@ function showDefaultGameOpenedMessage(show) {
 
 function setGameController(gameTypeId, keepGameOptions) {
 	setGameLogText('');
+
 	var successResult = true;
 
 	hideConfirmMoveButton();

@@ -1,8 +1,10 @@
 // Ginseng Actuator
 
-Ginseng.Actuator = function(gameContainer, isMobile) {
+Ginseng.Actuator = function(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
+
+	this.animationOn = enableAnimations;
 
 	var containers = setupPaiShoBoard(
 		this.gameContainer, 
@@ -21,17 +23,22 @@ Ginseng.Actuator = function(gameContainer, isMobile) {
 Ginseng.Actuator.hostTeamTilesDivId = "hostTilesContainer";
 Ginseng.Actuator.guestTeamTilesDivId = "guestTilesContainer";
 
-Ginseng.Actuator.prototype.actuate = function(board, tileManager, markingManager) {
+Ginseng.Actuator.prototype.setAnimationOn = function(isOn) {
+	this.animationOn = isOn;
+};
+
+Ginseng.Actuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate, moveDetails) {
 	var self = this;
 
-	// self.printBoard(board);
+	debug("Move to animate: ");
+	debug(moveToAnimate);
 
 	window.requestAnimationFrame(function () {
-		self.htmlify(board, tileManager, markingManager);
+		self.htmlify(board, tileManager, markingManager, moveToAnimate, moveDetails);
 	});
 };
 
-Ginseng.Actuator.prototype.htmlify = function(board, tileManager, markingManager) {
+Ginseng.Actuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate, moveDetails) {
 	this.clearContainer(this.boardContainer);
 	this.clearContainer(this.arrowContainer);
 
@@ -46,7 +53,7 @@ Ginseng.Actuator.prototype.htmlify = function(board, tileManager, markingManager
 				cell.removeType(MARKED);
 			}
 			if (cell) {
-				self.addBoardPoint(cell, board);
+				self.addBoardPoint(cell, board, moveToAnimate, moveDetails);
 			}
 		});
 	});
@@ -210,10 +217,10 @@ Ginseng.Actuator.prototype.addTeamTile = function(tile, player, isForTeamSelecti
 	container.appendChild(theDiv);
 };
 
-Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
+Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board, moveToAnimate, moveDetails) {
 	var self = this;
 
-	var theDiv = createBoardPointDiv(boardPoint);
+	var theDiv = createBoardPointDiv(boardPoint, null, Ginseng.NotationAdjustmentFunction);
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
@@ -262,7 +269,9 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 		}
 	}
 
-	if (boardPoint.hasTile() && !boardPoint.occupiedByAbility) {
+	if ((boardPoint.hasTile() && !boardPoint.occupiedByAbility)
+			|| (moveToAnimate && !boardPoint.hasTile() 
+				&& isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row))) {
 		theDiv.classList.add("hasTile");
 		
 		var theImg = document.createElement("img");
@@ -273,16 +282,57 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 			theImg.elementStyleTransform.adjustValue("rotate", 180, "deg");
 		}
 
-		var moveToAnimate = null;
 		if (moveToAnimate || boardPoint.tile.isGigantic) {
-			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
+			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv, moveDetails);
 		}
 
 		var srcValue = this.getTileSrcPath();
+
+		var tileMoved = boardPoint.tile;
+
+		var showMovedTileDuringAnimation = this.animationOn && moveDetails && moveDetails.movedTile
+											&& isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row);
+		if (showMovedTileDuringAnimation) {
+			tileMoved = moveDetails.movedTile;
+		}
 		
-		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
+		theImg.src = srcValue + tileMoved.getImageName() + ".png";
 		
 		theDiv.appendChild(theImg);
+
+		var capturedTile = this.getCapturedTileFromMove(moveDetails);
+
+		if (showMovedTileDuringAnimation) {
+			setTimeout(function() {
+				requestAnimationFrame(function(){
+					if (boardPoint.hasTile()) {
+						theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
+					} else {
+						theImg.classList.add("gone");
+					}
+				});
+			}, pieceAnimationLength);
+		}
+		if (this.animationOn && moveToAnimate && capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
+			var theImgCaptured = document.createElement("img");
+			theImgCaptured.elementStyleTransform = new ElementStyleTransform(theImgCaptured);
+			theImgCaptured.src = srcValue + capturedTile.getImageName() + ".png";
+			theImgCaptured.classList.add("underneath");
+
+			theImgCaptured.elementStyleTransform.setValue("rotate", 270, "deg");
+			if (Ginseng.Options.viewAsGuest) {
+				theImgCaptured.elementStyleTransform.adjustValue("rotate", 180, "deg");
+			}
+
+			theDiv.appendChild(theImgCaptured);
+
+			/* After animation, hide captured tile */
+			setTimeout(function() {
+				requestAnimationFrame(function() {
+					theImgCaptured.style.visibility = "hidden";
+				});
+			}, pieceAnimationLength);
+		}
 	}
 
 	if (boardPoint.occupiedByAbility) {
@@ -296,6 +346,13 @@ Ginseng.Actuator.prototype.addBoardPoint = function(boardPoint, board) {
 		theBr.classList.add("clear");
 		this.boardContainer.appendChild(theBr);
 	}
+};
+
+Ginseng.Actuator.prototype.getCapturedTileFromMove = function(moveDetails) {
+	if (moveDetails && moveDetails.capturedTiles && moveDetails.capturedTiles.length === 1) {
+		return moveDetails.capturedTiles[0];
+	}
+	return null;
 };
 
 Ginseng.Actuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, boardPoint) {
@@ -326,29 +383,49 @@ Ginseng.Actuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, 
 	theDiv.style.transform = "scale(" + scaleValue + ")";
 };
 
-Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv) {
-	// if (!this.animationOn) return;
+Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv, moveDetails) {
+	if (!this.animationOn) return;
 
-	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y;
+	var startX = boardPoint.col, startY = boardPoint.row, endX = startX, endY = startY;
 
-	/* if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
-		if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
-			x = moveToAnimate.startPoint.rowAndColumn.col;
-			y = moveToAnimate.startPoint.rowAndColumn.row;
-			theImg.style.transform = "scale(1.2)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
+	var movementPath;
+
+	var movementStepIndex = 0;
+
+	if (moveToAnimate.moveType === MOVE && (boardPoint.tile || moveDetails.movedTile)) {
+		if (isSamePoint(moveToAnimate.endPoint, endX, endY)) {	// Piece moved
+			var moveStartPoint = new NotationPoint(moveToAnimate.startPoint);
+			startX = moveStartPoint.rowAndColumn.col;
+			startY = moveStartPoint.rowAndColumn.row;
+			theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving, good idea or no?
 			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
-		}
-	} else if (moveToAnimate.moveType === DEPLOY) {
-		if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
-			if (piecePlaceAnimation === 1) {
-				theImg.style.transform = "scale(2)";
-				theDiv.style.zIndex = 99;
-				requestAnimationFrame(function() {
-					theImg.style.transform = "scale(1)";
+
+			movementPath = moveToAnimate.endPointMovementPath;
+			if (!movementPath && moveToAnimate.movementPath) {
+				movementPath = moveToAnimate.movementPath;
+			}
+		} else {
+			// Not the tile moved... is it tile pushed?
+			if (moveToAnimate.promptTargetData) {
+				Object.keys(moveToAnimate.promptTargetData).forEach((key, index) => {
+					var promptDataEntry = moveToAnimate.promptTargetData[key];
+					var keyObject = JSON.parse(key);
+					if (promptDataEntry.movedTilePoint && promptDataEntry.movedTileDestinationPoint) {
+						if (isSamePoint(promptDataEntry.movedTileDestinationPoint.pointText, endX, endY)) {
+							var moveStartPoint = promptDataEntry.movedTilePoint;
+							startX = moveStartPoint.rowAndColumn.col;
+							startY = moveStartPoint.rowAndColumn.row;
+							setTimeout(() => {
+								theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving
+								theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
+							}, pieceAnimationLength/1.2);
+							movementStepIndex = 1;
+						}
+					}
 				});
 			}
 		}
-	} */
+	}
 
 	var pointSizeMultiplierX = 34;
 	var pointSizeMultiplierY = pointSizeMultiplierX;
@@ -361,44 +438,51 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 		unitString = "vw";
 	}
 
-	var scaleValue = 1;
+	var left = (startX - endX);
+	var top = (startY - endY);
+	
+	/* Begin tile at origin point */
+	theImg.style.left = (left * pointSizeMultiplierX) + unitString;
+	theImg.style.top = (top * pointSizeMultiplierY) + unitString;
 
-	if (boardPoint.tile.isGigantic) {
-		scaleValue = 2;
+	if (movementPath) {
+		var numMovements = movementPath.length - 1;
+		var movementAnimationLength = pieceAnimationLength / numMovements;
+		var cssLength = movementAnimationLength * (1 + (0.05 * numMovements));	// Higher multiplication factor gives smoother transition
+		theImg.style.transition = "left " + cssLength + "ms ease-out, right " + cssLength + "ms ease-out, top " + cssLength + "ms ease-out, bottom " + movementAnimationLength + "ms ease-out, transform 0.5s ease-in, opacity 0.5s";
+		var movementNum = -1;
+		movementPath.forEach(pathPointStr => {
+			var currentMovementAnimationTime = movementAnimationLength * movementNum;
+			setTimeout(function() {
+				requestAnimationFrame(function() {
+					var pathPoint = new NotationPoint(pathPointStr);
+					var pointX = pathPoint.rowAndColumn.col;
+					var pointY = pathPoint.rowAndColumn.row;
+					left = (pointX - endX);
+					top = (pointY - endY);
+					theImg.style.left = (left * pointSizeMultiplierX) + unitString;
+					theImg.style.top = (top * pointSizeMultiplierY) + unitString;
+					debug("time: " + currentMovementAnimationTime + " left: " + left + " top: " + top);
+				});
+			}, currentMovementAnimationTime);
+			movementNum++;
+		});
+	} else {
+		/* Make tile be at it's current point so it animates to that point from start point */
+		setTimeout(() => {
+			requestAnimationFrame(function() {
+				theImg.style.left = "0px";
+				theImg.style.top = "0px";
+			});
+		}, pieceAnimationLength * movementStepIndex);
 	}
 
-	var finalLeft = 0;
-	var finalTop = 0;
-
-	var left = (x - ox);
-	var top = (y - oy);
-	if (boardPoint.tile.isGigantic) {
-		// left += 0.5;
-		// top += 0.5;
-		// finalLeft += 0.5;
-		// finalTop += 0.5;
-
-		left += 0.7;
-		// top += 0.5;
-		finalLeft += 0.7;
-		// finalTop += 0.5;
-
-		theDiv.style.zIndex = 90;
-	}
-	theDiv.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
-	theDiv.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
-
-	theDiv.style.transform = "scale(" + scaleValue + ")";
-
-	requestAnimationFrame(function() {
-		theDiv.style.left = ((finalLeft * cos45 - finalTop * sin45) * pointSizeMultiplierX) + unitString;
-		theDiv.style.top = ((finalTop * cos45 + finalLeft * sin45) * pointSizeMultiplierY) + unitString;
-	});
+	/* Scale back to normal size after animation complete */
 	setTimeout(function() {
 		requestAnimationFrame(function() {
-			theDiv.style.transform = "scale(" + scaleValue + ")";	// This will size back to normal after moving
+			theImg.elementStyleTransform.setValue("scale", 1); // This will size back to normal after moving
 		});
-	}, pieceAnimationLength);
+	}, pieceAnimationLength * (movementStepIndex + 0.5));
 };
 
 Ginseng.Actuator.prototype.getTileSrcPath = function(tile) {
