@@ -2296,7 +2296,7 @@ var GameType = {
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [
-			LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN
+			LION_TURTLE_ABILITY_ANYWHERE
 		]
 	},
 	FirePaiSho: {

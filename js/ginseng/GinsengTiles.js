@@ -464,7 +464,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						triggerType: Trifle.AbilityTriggerType.whenLandsAdjacentToTargetTile,
 						targetTeams: [Trifle.TileTeam.enemy],
 						targetTileTypes: [Ginseng.TileType.originalBender],
-						targetTileBoardPointTypes: gameOptionEnabled(LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN) && [RED, WHITE]
+						targetTileBoardPointTypes: !gameOptionEnabled(LION_TURTLE_ABILITY_ANYWHERE) && [RED, WHITE]
 					},
 					{
 						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
@@ -481,7 +481,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			"- Can capture any tile by movement except the opponent's Lion Turtle",
 			"",
 			"<strong>Ability</strong>",
-			gameOptionEnabled(LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN) ? "- Captures all adjacent Original Benders that are touching a red/white garden." : "- Captures all adjacent Original Benders."
+			gameOptionEnabled(LION_TURTLE_ABILITY_ANYWHERE) ? "- Captures all adjacent Original Benders." : "- Captures all adjacent Original Benders that are touching a red/white garden."
 		]
 	};
 
