@@ -121,7 +121,9 @@ Ginseng.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails)
 	var startPointDisplay = Ginseng.NotationAdjustmentFunction(startPoint.rowAndColumn.row, startPoint.rowAndColumn.col);
 	var endPointDisplay = Ginseng.NotationAdjustmentFunction(endPoint.rowAndColumn.row, endPoint.rowAndColumn.col);
 
-	this.gameLogText = move.player + ' moved ' + Trifle.Tile.getTileName(moveDetails.movedTile.code) + ' from ' + startPointDisplay + ' to ' + endPointDisplay;
+	var moveNumLabel = move.moveNum + "" + getPlayerCodeFromName(move.player);
+
+	this.gameLogText = moveNumLabel + ": " + move.player + ' moved ' + Trifle.Tile.getTileName(moveDetails.movedTile.code) + ' from ' + startPointDisplay + ' to ' + endPointDisplay;
 	if (moveDetails.capturedTiles && moveDetails.capturedTiles.length > 0) {
 		this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ';// + Trifle.Tile.getTileName(moveDetails.capturedTile.code);
 		var first = true;
