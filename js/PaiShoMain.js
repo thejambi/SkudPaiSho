@@ -3386,6 +3386,9 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 		} else {
 			var message = "<div>Do you want to create a game for others to join?</div>";
 			if (!getGameTypeEntryFromId(gameTypeId).noRankedGames) {
+				if (!getBooleanPreference(createNonRankedGamePreferredKey)) {
+					toggleBooleanPreference(createNonRankedGamePreferredKey)
+				}
 				// var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
 				var checkedValue = false;
 				message += "<br /><div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - coming soon - publicly viewable game)</label></div>";
