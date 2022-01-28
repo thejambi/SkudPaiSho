@@ -166,7 +166,7 @@ OvergrowthTileManager.prototype.peekTile = function(playerCode, tileCode, tileId
 OvergrowthTileManager.prototype.drawRandomTile = function(playerName) {
 	var tilePile = this.getTilePile(playerName);
 	if (tilePile.length > 0) {
-		var tile = tilePile[Math.floor(Math.random()*tilePile.length)];
+		var tile = tilePile[Math.floor(getRandomizer().random()*tilePile.length)];
 		return this.peekTile(getPlayerCodeFromName(playerName), tile.code);
 	}
 };

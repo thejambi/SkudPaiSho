@@ -502,14 +502,16 @@ AdevarBoard.prototype.applyTileCapturedTriggers = function(capturingTile, captur
 
 AdevarBoard.prototype.removeSFThatCannotCaptureHT = function(player, targetHiddenTile) {
 	var removedInfo = {};
-	this.forEachBoardPointWithTile(function(boardPoint) {
-		if (boardPoint.tile.type === AdevarTileType.secondFace
+	if (targetHiddenTile.code !== AdevarTileCode.blankHiddenTile) {
+		this.forEachBoardPointWithTile(function(boardPoint) {
+			if (boardPoint.tile.type === AdevarTileType.secondFace
 				&& boardPoint.tile.ownerName === player
 				&& !boardPoint.tile.canCapture(targetHiddenTile)) {
-			removedInfo.pointRemovedFrom = boardPoint;
-			removedInfo.tileRemoved = boardPoint.removeTile();
-		}
-	});
+				removedInfo.pointRemovedFrom = boardPoint;
+				removedInfo.tileRemoved = boardPoint.removeTile();
+			}
+		});
+	}
 	return removedInfo;
 };
 
@@ -1005,6 +1007,17 @@ AdevarBoard.prototype.setPossibleDeployPoints = function(tile) {
 		this.setPossibleDeployPointsAroundTilesOfType(tile, AdevarTileType.basic);
 	}
 };
+
+/*AdevarBoard.prototype.canCaptureAwayGate = function(tile, tileType, onlyHomeGate){
+	var targetTilePoints = this.getTileTypePoints(tile.ownerName, tileType);
+
+	//var self = this;
+	targetTilePoints.forEach(function(targetTilePoint) {
+		if ((onlyHomeGate && targetTilePoint.tile.isHomeGate) || !onlyHomeGate) {
+			return true;
+		}
+	});
+};*/
 
 AdevarBoard.prototype.setPossibleDeployPointsAroundTilesOfType = function(tile, tileType, onlyHomeGate) {
 	var targetTilePoints = this.getTileTypePoints(tile.ownerName, tileType);

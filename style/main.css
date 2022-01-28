@@ -15,6 +15,10 @@
   --input-background: #1b1b19;
   --input-color: #faf8ef;
   --replayControlsColor: #cac8bf;
+  --collapsible-content-bg: #282828;
+  --collapsible-heading-bg: #333;
+  --mark-manager-elements-color: rgba(255, 170, 0, 0.8);
+  /* --mark-manager-elements-color: rgba(0, 0, 0, 0.8); */
 }
 
 [data-theme="dark"] {
@@ -33,6 +37,8 @@
   --hexentafld-bakcground: #000;
   --input-background: #1b1b19;
   --input-color: #faf8ef;
+  --collapsible-content-bg: #282828;
+  --collapsible-heading-bg: #333;
 }
 
 [data-theme="light"] {
@@ -51,6 +57,8 @@
   --hexentafld-bakcground: #3b3b39;
   --input-background: -internal-light-dark-color(white, black);
   --input-color: -internal-light-dark-color(black, white);
+  --collapsible-content-bg: #E1DFD7;
+  --collapsible-heading-bg: #faf8ef;
 }
 
 div {
@@ -231,7 +239,6 @@ div.tab .alertTab, div.tab .alertTab.active {
   max-width: 100px;
   padding: 5px;
   text-align: center;
-
 }
 .button:active {
     box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
@@ -356,6 +363,24 @@ div.tab .alertTab, div.tab .alertTab.active {
   padding: 0; /* reset */
   padding-bottom: 100%;
   border: none;
+  overflow: hidden;
+  position: relative;
+}
+.arrowContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  transform: scale(1,-1);
+  filter: drop-shadow(0px 0px 3px var(--mark-manager-elements-color));
+  pointer-events: none;
+  z-index: 3;
+}
+.arrow {
+  pointer-events: none;
+  stroke-width: 0.1;
+  stroke: var(--mark-manager-elements-color);
 }
 /* .game-container.pixelsho .bg-svg {
   background-image: url(pixelshoboard.png);
@@ -468,7 +493,6 @@ figure > div {
 
   z-index:0;
 }
-
 .vagabondPointRotate {
   -webkit-transform: rotate(315deg);
   -moz-transform: rotate(315deg);
@@ -486,7 +510,6 @@ figure > div {
 
   z-index:0;
 }
-
 .adevarPointRotate {
   -webkit-transform: rotate(225deg);
   -moz-transform: rotate(225deg);
@@ -504,13 +527,46 @@ figure > div {
 
   z-index:0;
 }
-
 .adevarGuestPointRotate {
   -webkit-transform: rotate(45deg);
   -moz-transform: rotate(45deg);
   -o-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
+}
+
+.ginsengBoardRotate {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
+
+  z-index:0;
+}
+.ginsengPointRotate {
+  -webkit-transform: rotate(270deg);
+  -moz-transform: rotate(270deg);
+  -o-transform: rotate(270deg);
+  -ms-transform: rotate(270deg);
+  transform: rotate(270deg);
+}
+
+.ginsengGuestBoardRotate {
+  -webkit-transform: rotate(270deg);
+  -moz-transform: rotate(270deg);
+  -o-transform: rotate(270deg);
+  -ms-transform: rotate(270deg);
+  transform: rotate(270deg);
+
+  z-index:0;
+}
+.ginsengGuestPointRotate {
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 .rotate180 {
@@ -563,9 +619,33 @@ figure > div {
   display: inline;
   float: left;
   position: relative;
+  transform: inherit;
 }
 .activePoint:hover {
   box-shadow: 0px 0px 24px 2px #054;
+}
+.point.pointSquare {
+  border-radius: 0px;
+  transform: inherit;
+}
+
+.markedPoint:before {
+  content: "";
+
+  /* Expand element */
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  border-radius: 17px;
+  /* Enough to sit on top of tiles */
+  z-index: 3;
+
+  /* Disable click events (will fall through to underlying point */
+  pointer-events: none;
+
+  box-shadow: inset 0px 0px 10px 2px var(--mark-manager-elements-color);
 }
 
 .hasTile {
@@ -643,22 +723,70 @@ figure > div {
 }
 
 
-.betweenHarmony {
+/* .betweenHarmony {
   margin: 16px;
   width: 2px;
   height: 2px;
-}
-.bhHost {
+} */
+.bhHost:before {
   box-shadow: 0px 0px 7px 3px #6cc;
   background-color: #6cc;
+  margin: 16px;
+  width: 2px;
+  height: 2px;
+  content: "";
+
+  /* Expand element */
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  border-radius: 17px;
 }
-.bhGuest {
+.bhGuest:before {
   box-shadow: 0px 0px 7px 3px #87f;
   background-color: #87f;
+  margin: 16px;
+  width: 2px;
+  height: 2px;
+  
+  /* Expand element */
+  content: "";
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  border-radius: 17px;
 }
-.bhHost.bhGuest {
+
+.bhHost.bhGuest:before {
+  content: "";
   box-shadow: 0px 0px 7px 3px #77A2E6;
   background-color: #77A2E6;
+  margin: 16px;
+  width: 2px;
+  height: 2px;
+
+  /* Expand element */
+  content: "";
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  border-radius: 17px;
+}
+
+.markedPoint.bhHost {
+  box-shadow: inset 0px 0px 10px 2px var(--mark-manager-elements-color);
+}
+.markedPoint.bhGuest {
+  box-shadow: inset 0px 0px 10px 2px var(--mark-manager-elements-color);
+}
+.markedPoint.bhHost.bhGuest {
+  box-shadow: inset 0px 0px 10px 2px var(--mark-manager-elements-color);
 }
 
 
@@ -827,8 +955,11 @@ input[type=submit] {
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modalDefaultBackground {
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
 /* Modal Content */
@@ -868,6 +999,17 @@ input[type=submit] {
   font-weight: bold;
   margin-bottom: 8px;
   margin-top: 7px;
+}
+
+.collapsibleHeading {
+  padding: 10px;
+  background-color: var(--collapsible-heading-bg);
+}
+
+.collapsibleContent {
+  background-color: var(--collapsible-content-bg);
+  padding: 10px;
+  display: block;
 }
 
 /* Add Animation */
@@ -1080,6 +1222,15 @@ input[type=submit] {
   width: 910px;
   margin: -80px 0 0 -162px;
   transform: scale(0.68);
+}
+
+.blooms10perSide {
+  width: 1120px;
+  margin: -183px 0 0 -260px;
+  transform: scale(0.55);
+}
+.blooms10perSidebottomMargin {
+  margin-bottom: -200px;
 }
 
 .blooms12sidedBoard {
@@ -1299,9 +1450,9 @@ input[type=submit] {
 }
 
 .boardHexhex8 {
-  width: 910px;
-  margin: -65px 0 0 -119px;
-  transform: scale(0.78);
+  width: 1500px;
+  margin: -198px 0 0 -331px;
+  transform: scale(0.55);
 }
 .boardHexhex8bottomMargin {
   margin-bottom: -60px;
@@ -1510,25 +1661,61 @@ textarea {
     box-shadow: 0px 0px 4.2vw 0.3vw #054;
   }
 
-  .betweenHarmony {
-    /*margin: 0;*/
+  /* .betweenHarmony {
+    margin: 0;
     margin: 2.614vw;
     width: 0.3268vw;
     height: 0.3268vw;
-    /*width: 5.5555vw;
-      height: 5.611vw;*/
-  }
-  .bhHost {
+    width: 5.5555vw;
+      height: 5.611vw;
+  } */
+  
+  .bhHost:before {
     box-shadow: 0px 0px 7px 3px #6cc;
     background-color: #6cc;
+    margin: 2.614vw;
+    width: 0.3268vw;
+    height: 0.3268vw;
+    
+
+    /* Expand element */
+    content: "";
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
   }
-  .bhGuest {
+  .bhGuest:before {
     box-shadow: 0px 0px 7px 3px #87f;
     background-color: #87f;
+    margin: 2.614vw;
+    width: 0.3268vw;
+    height: 0.3268vw;
+    
+    /* Expand element */
+    content: "";
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
   }
-   .bhHost.bhGuest {
+  .bhHost.bhGuest:before {
     box-shadow: 0px 0px 7px 3px #77A2E6;
     background-color: #77A2E6;
+    margin: 2.614vw;
+    width: 0.3268vw;
+    height: 0.3268vw;
+
+
+    /* Expand element */
+    content: "";
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
   }
 
   .headerLeft {
@@ -1565,6 +1752,16 @@ textarea {
   width: 160vw;
   margin: -20vw 0 0 -31vw;
   transform: scale(0.65);
+}
+
+.blooms10perSide {
+  width: 196vw;
+  margin: -34vw 0 0 -50vw;
+  transform: scale(0.51);
+}
+
+.blooms10perSidebottomMargin {
+  margin-bottom: -38vw;
 }
 
 .boardHexhex6 {
@@ -1714,22 +1911,58 @@ textarea {
       height: 17px;
     }
 
-    .betweenHarmony {
+    /* .betweenHarmony {
       margin: 8px;
       width: 1px;
       height: 1px;
-    }
-    .bhHost {
+    } */
+    .bhHost:before {
       box-shadow: 0px 0px 7px 3px #6cc;
       background-color: #6cc;
+      margin: 8px;
+      width: 1px;
+      height: 1px;
+      
+  
+      /* Expand element */
+      content: "";
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
     }
-    .bhGuest {
+    .bhGuest:before {
       box-shadow: 0px 0px 7px 3px #87f;
       background-color: #87f;
+      margin: 8px;
+      width: 1px;
+      height: 1px;
+      
+      /* Expand element */
+      content: "";
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
     }
-    .bhHost.bhGuest {
+    .bhHost.bhGuest:before {
       box-shadow: 0px 0px 7px 3px #77A2E6;
       background-color: #77A2E6;
+      margin: 8px;
+      width: 1px;
+      height: 1px;
+
+
+      /* Expand element */
+      content: "";
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
+      border-radius: 8.5px;
     }
 
 }

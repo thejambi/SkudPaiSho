@@ -1,10 +1,14 @@
 /* Trifle specific UI interaction logic */
 
+function PaiShoGames() {}
 function Trifle() {}
 
 Trifle.Controller = function(gameContainer, isMobile) {
-	this.actuator = new TrifleActuator(gameContainer, isMobile);
+	this.actuator = new Trifle.Actuator(gameContainer, isMobile);
 
+	Trifle.TileInfo.initializeTrifleData();
+	PaiShoGames.currentTileMetadata = Trifle.TrifleTiles;
+	PaiShoGames.currentTileCodes = Trifle.TileCodes;
 	this.resetGameManager();
 	this.resetNotationBuilder();
 	this.resetGameNotation();
@@ -12,13 +16,9 @@ Trifle.Controller = function(gameContainer, isMobile) {
 	this.hostAccentTiles = [];
 	this.guestAccentTiles = [];
 
+	this.isInviteOnly = true;
 	this.isPaiShoGame = true;
 }
-
-Trifle.Controller.userIsTrifleDeveloper = function() {
-	return usernameIsOneOf(
-		);
-};
 
 Trifle.Controller.prototype.getGameTypeId = function() {
 	return GameType.Trifle.id;
@@ -33,7 +33,7 @@ Trifle.Controller.prototype.resetNotationBuilder = function() {
 	if (this.notationBuilder) {
 		offerDraw = this.notationBuilder.offerDraw;
 	}
-	this.notationBuilder = new Trifle.NotationBuilder();
+	this.notationBuilder = new OldTrifle.NotationBuilder();
 	if (offerDraw) {
 		this.notationBuilder.offerDraw = true;
 	}
@@ -45,7 +45,7 @@ Trifle.Controller.prototype.resetGameNotation = function() {
 };
 
 Trifle.Controller.prototype.getNewGameNotation = function() {
-	return new Trifle.GameNotation();
+	return new OldTrifle.GameNotation();
 };
 
 Trifle.Controller.getHostTilesContainerDivs = function() {
@@ -152,6 +152,9 @@ Trifle.Controller.prototype.removeDrawOffer = function() {
 };
 
 Trifle.Controller.prototype.unplayedTileClicked = function(tileDiv) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	this.promptToAcceptDraw = false;
 
 	if (this.theGame.hasEnded() && this.notationBuilder.status !== READY_FOR_BONUS) {
@@ -177,21 +180,17 @@ Trifle.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 	if (this.theGame.playersAreSelectingTeams()) {
 		var selectedTile = new Trifle.Tile(tileCode, playerCode);
 		if (tileDiv.classList.contains("selectedFromPile")) {
-			debug("You picked one for the team!");
 			var teamIsNowFull = this.theGame.addTileToTeam(selectedTile);
 			if (teamIsNowFull) {
-				debug("Gotta build notation");
 				this.notationBuilder.moveType = TEAM_SELECTION;
 				this.notationBuilder.teamSelection = this.theGame.getPlayerTeamSelectionTileCodeList(player);
 				this.completeMove();
 			}
-		} else {
+		} else if (!this.theGame.tileManager.playerTeamIsFull(selectedTile.ownerName)) {
 			// Need to remove from team instead
-			debug("You are removing one from your team :(");
 			this.theGame.removeTileFromTeam(selectedTile);
 		}
 	} else if (this.notationBuilder.status === BRAND_NEW) {
-		debug("Yes, begin deploying!");
 		// new Deploy turn
 		tile.selectedFromPile = true;
 
@@ -199,14 +198,43 @@ Trifle.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 		this.notationBuilder.tileType = tileCode;
 		this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
-		this.theGame.revealDeployPoints(tile.ownerName, tileCode);
+		this.theGame.revealDeployPoints(tile);
 	} else {
 		this.theGame.hidePossibleMovePoints();
 		this.resetNotationBuilder();
 	}
 }
 
+Trifle.Controller.prototype.RmbDown = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+}
+
+Trifle.Controller.prototype.RmbUp = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	var mouseEndPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+	if (mouseEndPoint == this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedPoint(mouseEndPoint);
+	}
+	else if (this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedArrow(this.mouseStartPoint, mouseEndPoint);
+	}
+	this.mouseStartPoint = null;
+
+	this.callActuate();
+}
+
 Trifle.Controller.prototype.pointClicked = function(htmlPoint) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	this.promptToAcceptDraw = false;
 
 	if (this.theGame.hasEnded()) {
@@ -283,43 +311,7 @@ Trifle.Controller.prototype.getTheMessage = function(tile, ownerName) {
 
 	var heading = Trifle.Tile.getTileName(tileCode);
 
-	if (tileCode === 'L') {
-		heading = "White Lotus";
-		message.push("Flower Tile");
-		message.push("Can move 1 space");
-	} else if (tileCode === 'S') {
-		heading = "Sky Bison";
-		// message.push("Deployed on the point inside of the small red triangles in the corners of the board");
-		message.push("Deployed on the Temples - the points inside of the small red triangles in the corners of the board");
-		message.push("Can move up to six spaces, turning any number of times, but cannot move into an opponent's Sky Bison's territorial zone");
-		message.push("Cannot move through or off of a space that is adjacent to an opponent's Chrysanthemum tile");
-		message.push("Can capture other tiles");
-		// message.push("A Sky Bison has a territorial zone the size of the area the tile can move within. No other Sky Bison is allowed in this zone once the Sky Bison has moved out of its starting position.");
-		message.push("After the Sky Bison has moved out of its temple and is not trapped by a Chrysanthemum, it creates a territorial zone 6 spaces around it");
-	} else if (tileCode === 'B') {
-		heading = "Badgermole";
-		message.push("Can move only one space in any direction OR move directly adjacent to a Flower Tile if that Flower Tile is in the Badgermole's \"line of sight\" (meaning, the tiles lie on the same line with no other tiles in between)");
-		message.push("Flower Tiles adjacent to a Badgermole are protected from capture");
-	} else if (tileCode === 'W') {
-		heading = "Wheel";
-		message.push("Can move any number of spaces forwards, backwards, left, or right across the spaces of the board as opposed to diagonally on the lines");
-		message.push("Can capture other tiles");
-	} else if (tileCode === 'C') {
-		heading = "Chrysanthemum";
-		message.push("Flower Tile");
-		message.push("Cannot move");
-		message.push("Freezes opponent's Sky Bison tiles in place when adjacent");
-	} else if (tileCode === 'F') {
-		heading = "Fire Lily";
-		message.push("Flower Tile");
-		message.push("Cannot move");
-		message.push("Enables deployment of White Dragon");
-	} else if (tileCode === 'D') {
-		heading = "White Dragon";
-		message.push("Can be deployed in a 5-space area around the Fire Lily");
-		message.push("Can move anywhere inside that 5-space Fire Lily zone");
-		message.push("Can capture other tiles");
-	}
+	message.push(Trifle.TileInfo.getReadableDescription(tileCode));
 
 	return {
 		heading: heading,

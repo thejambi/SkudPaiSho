@@ -6,6 +6,7 @@ function OvergrowthGameManager(actuator, ignoreActuate, isCopy, existingDrawnTil
 	this.actuator = actuator;
 
 	this.tileManager = new OvergrowthTileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.drawnTile = existingDrawnTile;
 	this.lastDrawnTile = existingLastDrawnTile; // Save for Undo
@@ -16,8 +17,8 @@ function OvergrowthGameManager(actuator, ignoreActuate, isCopy, existingDrawnTil
 	this.endGameWinners = [];
 }
 
-OvergrowthGameManager.prototype.drawRandomTile = function() {
-	if (this.mustFetchNewRandomTile()) {
+OvergrowthGameManager.prototype.drawRandomTile = function(forceDrawNew) {
+	if (this.mustFetchNewRandomTile() || forceDrawNew) {
 		var newDrawnTile = this.drawRandomTileFromTileManager(getCurrentPlayer());
 		if (newDrawnTile) {
 			this.lastDrawnTile = this.drawnTile;
@@ -68,7 +69,7 @@ OvergrowthGameManager.prototype.actuate = function() {
 		}
 	}
 
-	this.actuator.actuate(this.board, this, this.drawnTile);
+	this.actuator.actuate(this.board, this, this.markingManager, this.drawnTile);
 };
 
 OvergrowthGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -196,6 +197,9 @@ OvergrowthGameManager.prototype.getScoreSummary = function() {
 
 OvergrowthGameManager.prototype.getWinResultTypeCode = function() {
 	if (this.endGameWinners.length === 1) {
+		if (this.endGameWinners[0] === "BOTH players") {
+			return 4;	// Tie
+		}
 		return 1;
 	}
 };

@@ -2,77 +2,20 @@
 
 // --------------------------------------------- // 
 
-Trifle.NotationMove = function(text) {
+Trifle.NotationBuilderStatus = {
+	PROMPTING_FOR_TARGET = "PROMPTING_FOR_TARGET"
+};
+
+Trifle.NotationMove = function(text, promptTargetData) {
 	this.fullMoveText = text;
 	this.analyzeMove();
+	this.promptTargetData = promptTargetData;
 }
 
 Trifle.NotationMove.prototype.analyzeMove = function() {
 	this.valid = true;
 
-	// Get move number
-	var parts = this.fullMoveText.split(".");
-
-	debug(parts);
-
-	var moveNumAndPlayer = parts[0];
-
-	this.moveNum = parseInt(moveNumAndPlayer.slice(0, -1));
-    this.playerCode = moveNumAndPlayer.charAt(moveNumAndPlayer.length - 1);
-
-    // Get player (Guest or Host)
-	if (this.playerCode === 'G') {
-		this.player = GUEST;
-	} else if (this.playerCode === 'H') {
-		this.player = HOST;
-	}
-
-	var moveText = parts[1];
-
-	// If no move text, ignore and move on to next
-	if (!moveText) {
-		return;
-	}
-
-	// If starts with a ( then it's MOVE
-	var char0 = moveText.charAt(0);
-	if (char0 === '(') {
-		this.moveType = MOVE;
-	} else if (moveText.startsWith(DRAW_ACCEPT)) {	// If move is accepting a draw
-		this.moveType = DRAW_ACCEPT;
-	} else if (this.moveNum < 1) {
-		this.moveType = TEAM_SELECTION;
-		debug("they done selected a teeeem");
- 	} else {
-		this.moveType = DEPLOY;
-	}
-
-	if (this.moveType === TEAM_SELECTION) {
-		this.teamTileCodes = moveText.split(',');
-	} else if (this.moveType === DEPLOY) {
-		var openParenIndex = moveText.indexOf('(');
-		if (openParenIndex > 0) {
-			// debug("parens checks out");
-		} else {
-			debug("Failure to plant");
-			this.valid = false;
-		}
-
-		this.tileType = moveText.substring(0, openParenIndex);
-
-		if (moveText.endsWith(')') || moveText.endsWith(')' + DRAW_OFFER)) {
-			this.endPoint = new NotationPoint(moveText.substring(moveText.indexOf('(')+1, moveText.indexOf(')')));
-		} else {
-			this.valid = false;
-		}
-	} else if (this.moveType === MOVE) {
-		// Get the two points from string like: (-8,0)-(-6,3)
-		var parts = moveText.substring(moveText.indexOf('(')+1).split(')-(');
-		this.startPoint = new NotationPoint(parts[0]);
-		this.endPoint = new NotationPoint(parts[1].substring(0, parts[1].indexOf(')')));
-	}
-
-	this.offerDraw = moveText.endsWith(DRAW_OFFER);
+	this.moveData = JSON.parse(this.fullMoveText);
 };
 
 Trifle.NotationMove.prototype.isValidNotation = function() {
@@ -104,31 +47,50 @@ Trifle.NotationBuilder = function() {
 }
 
 Trifle.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
-	var notationLine = moveNum + player.charAt(0) + ".";
+	var move = {
+		moveNum: moveNum,
+		player: player,
+		moveType: this.moveType
+	};
+
 	if (this.moveType === TEAM_SELECTION) {
-		notationLine += this.teamSelection;
+		move.teamSelection = this.teamSelection;
 	} else if (this.moveType === MOVE) {
-		notationLine += "(" + this.startPoint.pointText + ")-(" + this.endPoint.pointText + ")";
+		move.startPoint = this.startPoint.pointText;
+		move.endPoint = this.endPoint.pointText;
 	} else if (this.moveType === DEPLOY) {
-		notationLine += this.tileType + "(" + this.endPoint.pointText + ")";
-	} else if (this.moveType === DRAW_ACCEPT) {
-		notationLine += DRAW_ACCEPT;
+		move.tileType = this.tileType;
+		move.endPoint = this.endPoint.pointText;
+	}
+
+	if (this.promptTargetData) {
+		move.promptTargetData = this.promptTargetData;
 	}
 
 	if (this.offerDraw) {
-		notationLine += DRAW_OFFER;
+		move.offerDraw = true;
 	}
-	
-	return new Trifle.NotationMove(notationLine);
+
+	if (this.endPointMovementPath) {
+		var movementPathNotationPoints = [];
+		this.endPointMovementPath.forEach(boardPoint => {
+			movementPathNotationPoints.push(boardPoint.getNotationPointString());
+		});
+		move.endPointMovementPath = movementPathNotationPoints;
+	}
+
+	return move;
 };
 
 // --------------------------------------- //
 
 
 
-Trifle.GameNotation = function() {
+Trifle.GameNotation = function(firstPlayer) {
 	this.notationText = "";
 	this.moves = [];
+	this.firstPlayer = firstPlayer;
+	this.secondPlayer = getOpponentName(firstPlayer);
 }
 
 Trifle.GameNotation.prototype.setNotationText = function(text) {
@@ -136,26 +98,18 @@ Trifle.GameNotation.prototype.setNotationText = function(text) {
 	this.loadMoves();
 };
 
-Trifle.GameNotation.prototype.addNotationLine = function(text) {
-	this.notationText += ";" + text.trim();
-	this.loadMoves();
-};
-
 Trifle.GameNotation.prototype.addMove = function(move) {
-	if (this.notationText) {
-		this.notationText += ";" + move.fullMoveText;
-	} else {
-		this.notationText = move.fullMoveText;
-	}
-	this.loadMoves();
+	this.moves.push(move);
 };
 
 Trifle.GameNotation.prototype.removeLastMove = function() {
-	this.notationText = this.notationText.substring(0, this.notationText.lastIndexOf(";"));
-	this.loadMoves();
+	var removedMove = this.moves.pop();
+	
+	debug("Removed Move:");
+	debug(removedMove);
 };
 
-Trifle.GameNotation.prototype.getPlayerMoveNum = function() {
+/* Trifle.GameNotation.prototype.getPlayerMoveNum = function() {
 	var moveNum = 0;
 	var lastMove = this.moves[this.moves.length-1];
 
@@ -166,88 +120,61 @@ Trifle.GameNotation.prototype.getPlayerMoveNum = function() {
 		}
 	}
 	return moveNum;
-};
+}; */	// Can get rid of this?
 
 Trifle.GameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	var moveNum = 0;
-	var player = HOST;
 
 	var lastMove = this.moves[this.moves.length-1];
 
 	if (lastMove) {
 		moveNum = lastMove.moveNum;
-		if (lastMove.player === GUEST) {
+		if (lastMove.player === this.secondPlayer) {
 			moveNum++;
-		} else {
-			player = GUEST;
 		}
 	}
 
-	return builder.getNotationMove(moveNum, player);
+	return builder.getNotationMove(moveNum, builder.currentPlayer);
 };
 
 Trifle.GameNotation.prototype.loadMoves = function() {
 	this.moves = [];
-	var lines = [];
 	if (this.notationText) {
-		if (this.notationText.includes(';')) {
-			lines = this.notationText.split(";");
-		} else {
-			lines = [this.notationText];
-		}
+		this.moves = JSON.parse(this.notationText);
+	}
+};
+
+Trifle.GameNotation.prototype.buildSimplifiedNotationString = function(move) {
+	if (gameController.buildNotationString) {
+		return gameController.buildNotationString(move);
 	}
 
-	var self = this;
-	var lastPlayer = GUEST;
-	lines.forEach(function(line) {
-		var move = new Trifle.NotationMove(line);
-		if (move.isValidNotation() && move.player !== lastPlayer) {
-			self.moves.push(move);
-			lastPlayer = move.player;
-		} else {
-			debug("the player check is broken?");
-		}
-	});
+	var playerCode = getPlayerCodeFromName(move.player);
+	var moveNum = move.moveNum;
+
+	return moveNum + playerCode + ".¯\\_(ツ)_/¯";
 };
 
 Trifle.GameNotation.prototype.getNotationHtml = function() {
-	var lines = [];
-	if (this.notationText) {
-		if (this.notationText.includes(';')) {
-			lines = this.notationText.split(";");
-		} else {
-			lines = [this.notationText];
-		}
-	}
-
 	var notationHtml = "";
 
-	lines.forEach(function (line) {
-		notationHtml += line + "<br />";
+	this.moves.forEach(function(move) {
+		notationHtml += this.buildSimplifiedNotationString(move) + "<br />";
 	});
 
 	return notationHtml;
 };
 
 Trifle.GameNotation.prototype.notationTextForUrl = function() {
-	var str = this.notationText;
+	var str = JSON.stringify(this.moves);
 	return str;
 };
 
 Trifle.GameNotation.prototype.getNotationForEmail = function() {
-	var lines = [];
-	if (this.notationText) {
-		if (this.notationText.includes(';')) {
-			lines = this.notationText.split(";");
-		} else {
-			lines = [this.notationText];
-		}
-	}
-
 	var notationHtml = "";
 
-	lines.forEach(function (line) {
-		notationHtml += line + "[BR]";
+	this.moves.forEach((move) => {
+		notationHtml += this.buildSimplifiedNotationString(move) + "[BR]";
 	});
 
 	return notationHtml;

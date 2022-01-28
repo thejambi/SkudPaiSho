@@ -6,16 +6,22 @@ function PlaygroundActuator(gameContainer, isMobile, enableAnimations) {
 
 	this.animationOn = enableAnimations;
 
+	var rotateType = false;
+	if (gameOptionEnabled(ADEVAR_ROTATE)) rotateType = ADEVAR_ROTATE;
+	if (gameOptionEnabled(VAGABOND_ROTATE)) rotateType = VAGABOND_ROTATE;
+	if (gameOptionEnabled(GINSENG_ROTATE)) rotateType = GINSENG_ROTATE;
+
 	var containers = setupPaiShoBoard(
 		this.gameContainer, 
 		PlaygroundController.getHostTilesContainerDivs(),
 		PlaygroundController.getGuestTilesContainerDivs(), 
-		(gameOptionEnabled(VAGABOND_ROTATE) || gameOptionEnabled(ADEVAR_ROTATE)),
-		(gameOptionEnabled(ADEVAR_ROTATE) ? ADEVAR_ROTATE : false),
+		(gameOptionEnabled(VAGABOND_ROTATE) || gameOptionEnabled(ADEVAR_ROTATE) || gameOptionEnabled(GINSENG_ROTATE)),
+		rotateType,
 		gameOptionEnabled(PLAY_IN_SPACES)
 	);
 
 	this.boardContainer = containers.boardContainer;
+	this.arrowContainer = containers.arrowContainer;
 	this.hostTilesContainer = containers.hostTilesContainer;
 	this.guestTilesContainer = containers.guestTilesContainer;
 
@@ -29,7 +35,7 @@ PlaygroundActuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
 };
 
-PlaygroundActuator.prototype.actuate = function(board, tileManager, actuateOptions, moveToAnimate) {
+PlaygroundActuator.prototype.actuate = function(board, tileManager, markingManager, actuateOptions, moveToAnimate) {
 	var self = this;
 	this.actuateOptions = actuateOptions;
 
@@ -38,22 +44,34 @@ PlaygroundActuator.prototype.actuate = function(board, tileManager, actuateOptio
 	debug(moveToAnimate);
 
 	window.requestAnimationFrame(function () {
-		self.htmlify(board, tileManager, moveToAnimate);
+		self.htmlify(board, tileManager, markingManager, moveToAnimate);
 	});
 };
 
-PlaygroundActuator.prototype.htmlify = function(board, tileManager, moveToAnimate) {
+PlaygroundActuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate) {
 	this.clearContainer(this.boardContainer);
+	this.clearContainer(this.arrowContainer);
 
 	var self = this;
 
 	board.cells.forEach(function(column) {
 		column.forEach(function(cell) {
+			if (markingManager.pointIsMarked(cell) && !cell.isType(MARKED)){
+				cell.addType(MARKED);
+			}
+			else if (!markingManager.pointIsMarked(cell) && cell.isType(MARKED)){
+				cell.removeType(MARKED);
+			}
 			if (cell) {
 				self.addBoardPoint(cell, moveToAnimate);
 			}
 		});
 	});
+
+	// Draw all arrows
+	for (var [_, arrow] of Object.entries(markingManager.arrows)) {
+		this.arrowContainer.appendChild(createBoardArrow(arrow[0], arrow[1]));
+	}
 
 	var fullTileSet = new PlaygroundTileManager(true);
 
@@ -144,12 +162,21 @@ PlaygroundActuator.prototype.htmlify = function(board, tileManager, moveToAnimat
 
 	if (this.actuateOptions.showTileLibrary) {
 		tileManager.hostTileLibrary.forEach(function(tile) {
-			self.addTile(tile, hostTileLibraryContainer, PlaygroundNotationConstants.hostLibraryPile);
+			if (self.shouldShowTile(tile)) {
+				self.addTile(tile, hostTileLibraryContainer, PlaygroundNotationConstants.hostLibraryPile);
+			}
 		});
 		tileManager.guestTileLibrary.forEach(function(tile) {
-			self.addTile(tile, guestTileLibraryContainer, PlaygroundNotationConstants.guestLibraryPile);
+			if (self.shouldShowTile(tile)) {
+				self.addTile(tile, guestTileLibraryContainer, PlaygroundNotationConstants.guestLibraryPile);
+			}
 		});
 	}
+};
+
+PlaygroundActuator.prototype.shouldShowTile = function(tile) {
+	// return tile.code.includes("Skud") || tile.code.includes("Vagabond");
+	return true;
 };
 
 PlaygroundActuator.prototype.clearContainer = function (container) {
@@ -179,6 +206,11 @@ PlaygroundActuator.prototype.addTile = function(tile, tileContainer, pileName) {
 	var theDiv = document.createElement("div");
 
 	theDiv.classList.add("point");
+
+	if (gameOptionEnabled(SQUARE_SPACES)) {
+		theDiv.classList.add("pointSquare");
+	}
+
 	theDiv.classList.add("hasTile");
 
 	if (tile.selectedFromPile || tile.gameType === "PossibleMove") {
@@ -220,8 +252,14 @@ PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
 
 	var gameImgDir;
 	if (tile.gameType === GameType.SkudPaiSho) {
+		if (getUserGamePreference(tileDesignTypeKey) === 'custom') {
+			return SkudPaiShoController.getCustomTileDesignsUrl();
+		}
 		gameImgDir = "SkudPaiSho/" + getUserGamePreference(tileDesignTypeKey);
 	} else if (tile.gameType === GameType.VagabondPaiSho) {
+		if (getUserGamePreference(vagabondTileDesignTypeKey) === 'custom') {
+			return VagabondController.getCustomTileDesignsUrl();
+		}
 		gameImgDir = "Vagabond/" + getUserGamePreference(vagabondTileDesignTypeKey);
 	} else if (tile.gameType === GameType.CapturePaiSho) {
 		gameImgDir = "Capture/" + getUserGamePreference(CapturePreferences.tileDesignKey);
@@ -231,6 +269,10 @@ PlaygroundActuator.prototype.getTileSrcPath = function(tile) {
 		gameImgDir = "Adevar/" + getUserGamePreference(AdevarOptions.tileDesignTypeKey);
 	} else if (tile.gameType === "Warfront") {
 		gameImgDir = "Warfront";
+	} else if (tile.gameType === "Balance") {
+		gameImgDir = "Balance/balance";
+	} else if (tile.gameType === "Spirit") {
+		gameImgDir = "Spirit/original";
 	} else {
 		gameImgDir = tile.gameType;
 	}
@@ -248,10 +290,15 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 	
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
+		if (boardPoint.isType(MARKED)) {
+			theDiv.classList.add("markedPoint");
+		}
 		if (gameOptionEnabled(VAGABOND_ROTATE)) {
 			theDiv.classList.add("vagabondPointRotate");
 		} else if (gameOptionEnabled(ADEVAR_ROTATE)) {
 			theDiv.classList.add("adevarPointRotate");
+		} else if (gameOptionEnabled(GINSENG_ROTATE)) {
+			theDiv.classList.add("ginsengPointRotate");
 		}
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
@@ -271,6 +318,21 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
 			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mousedown', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbDown(theDiv);
+				}
+			});
+			theDiv.addEventListener('mouseup', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbUp(theDiv);
+				}
+			});
+			theDiv.addEventListener('contextmenu', e => {
+					e.preventDefault();
+			});
 		}
 	}
 
@@ -278,6 +340,21 @@ PlaygroundActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate)
 		theDiv.classList.add("hasTile");
 		
 		var theImg = document.createElement("img");
+		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
+
+		if (gameOptionEnabled(ADEVAR_ROTATE)) {
+			theImg.elementStyleTransform.setValue("rotate", 225, "deg");
+		} else if (gameOptionEnabled(VAGABOND_ROTATE)) {
+			theImg.elementStyleTransform.setValue("rotate", 315, "deg");
+		} else if (gameOptionEnabled(GINSENG_ROTATE)) {
+			theImg.elementStyleTransform.setValue("rotate", 270, "deg");
+		} else if (gameOptionEnabled(GINSENG_GUEST_ROTATE)) {
+			theImg.elementStyleTransform.setValue("rotate", 90, "deg");
+		}
+
+		if (boardPoint.tile.getDirectionToFace()) {
+			theImg.elementStyleTransform.adjustValue("rotate", 90*boardPoint.tile.getDirectionToFace(), "deg");
+		}
 
 		if (moveToAnimate) {
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
@@ -323,16 +400,16 @@ PlaygroundActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
 			x = moveToAnimate.startPoint.rowAndColumn.col;
 			y = moveToAnimate.startPoint.rowAndColumn.row;
-			theImg.style.transform = "scale(1.2)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
+			theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving, good idea or no?
 			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
 		}
 	} else if (moveToAnimate.moveType === DEPLOY) {
 		if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
 			if (piecePlaceAnimation === 1) {
-				theImg.style.transform = "scale(2)";
+				theImg.elementStyleTransform.setValue("scale", 2);
 				theDiv.style.zIndex = 99;
 				requestAnimationFrame(function() {
-					theImg.style.transform = "scale(1)";
+					theImg.elementStyleTransform.setValue("scale", 1);
 				});
 			}
 		}
@@ -349,20 +426,27 @@ PlaygroundActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		unitString = "vw";
 	}
 
-	if (gameOptionEnabled(ADEVAR_ROTATE)) {
-		var left = (x - ox);
-		var top = (y - oy);
-		theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
-		theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
-	} else if (gameOptionEnabled(VAGABOND_ROTATE)) {
-		var left = (x - ox);
-		var top = (y - oy);
-		theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
-		theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
-	} else {
-		theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
-		theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
-	}
+	// if (gameOptionEnabled(ADEVAR_ROTATE)) {
+	// 	var left = (x - ox);
+	// 	var top = (y - oy);
+	// 	theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
+	// 	theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
+	// } else if (gameOptionEnabled(VAGABOND_ROTATE)) {
+	// 	var left = (x - ox);
+	// 	var top = (y - oy);
+	// 	theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
+	// 	theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
+	// } else if (gameOptionEnabled(GINSENG_ROTATE)) {
+	// 	var left = (x - ox);
+	// 	var top = (y - oy);
+	// 	theImg.style.left = ((left * cos90 - top * sin90) * pointSizeMultiplierX) + unitString;
+	// 	theImg.style.top = ((top * cos90 + left * sin90) * pointSizeMultiplierY) + unitString;
+	// } else {
+	// 	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	// 	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+	// }
+	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
 
 	requestAnimationFrame(function() {
 		theImg.style.left = "0px";
@@ -370,7 +454,7 @@ PlaygroundActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	});
 	setTimeout(function() {
 		requestAnimationFrame(function() {
-			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
+			theImg.elementStyleTransform.setValue("scale", 1);	// This will size back to normal after moving
 		});
 	}, pieceAnimationLength);
 };

@@ -5,7 +5,8 @@ var CapturePreferences = {
 	tileDesignTypeValues: {
 		original: "Original",
 		chuji: "Chu Ji by Sirstotes",
-		minimalist: "Minimalist by Sirstotes"
+		minimalist: "Minimalist by Sirstotes",
+		canon: "Canon-style"
 	}
 };
 
@@ -130,8 +131,36 @@ CaptureController.prototype.clearCaptureHelpAndActuateIfNeeded = function() {
 	}
 };
 
+CaptureController.prototype.RmbDown = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+}
+
+CaptureController.prototype.RmbUp = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	var mouseEndPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+	if (mouseEndPoint == this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedPoint(mouseEndPoint);
+	}
+	else if (this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedArrow(this.mouseStartPoint, mouseEndPoint);
+	}
+	this.mouseStartPoint = null;
+
+	this.callActuate();
+}
+
 CaptureController.prototype.pointClicked = function(htmlPoint) {
 	this.clearCaptureHelpAndActuateIfNeeded();
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
 
 	if (this.theGame.board.winners.length > 0) {
 		return;

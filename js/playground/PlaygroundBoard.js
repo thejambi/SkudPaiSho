@@ -3,7 +3,14 @@
 function PlaygroundBoard() {
 	this.size = new RowAndColumn(17, 17);
 
-	if (gameOptionEnabled(PLAY_IN_SPACES)) {
+	if (gameOptionEnabled(FULL_GRID)) {
+		if (gameOptionEnabled(PLAY_IN_SPACES)) {
+			this.size = new RowAndColumn(18, 18);
+			this.cells = this.brandNewForFullGridSpaces();
+		} else {
+			this.cells = this.brandNewForFullGrid();
+		}
+	} else if (gameOptionEnabled(PLAY_IN_SPACES)) {
 		this.size = new RowAndColumn(18, 18);
 		this.cells = this.brandNewForSpaces();
 	} else {
@@ -752,6 +759,82 @@ PlaygroundBoard.prototype.brandNew = function () {
 	return cells;
 };
 
+PlaygroundBoard.prototype.brandNewForFullGrid = function () {
+	var cells = [];
+
+	for (var i = 0; i < 17; i++) {
+		cells[i] = this.newRow(17,
+			[PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.redNeutral(), 
+			PlaygroundBoardPoint.red(),
+			PlaygroundBoardPoint.red(),
+			PlaygroundBoardPoint.redWhite(),
+			PlaygroundBoardPoint.white(),
+			PlaygroundBoardPoint.white(),
+			PlaygroundBoardPoint.whiteNeutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral()
+			]
+		);
+	}
+
+	for (var row = 0; row < cells.length; row++) {
+		for (var col = 0; col < cells[row].length; col++) {
+			cells[row][col].row = row;
+			cells[row][col].col = col;
+		}
+	}
+
+	return cells;
+};
+
+PlaygroundBoard.prototype.brandNewForFullGridSpaces = function () {
+	var cells = [];
+
+	for (var i = 0; i < 18; i++) {
+		cells[i] = this.newRow(18,
+			[PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+				PlaygroundBoardPoint.neutral(),
+			PlaygroundBoardPoint.neutral()
+			]
+		);
+	}
+
+	for (var row = 0; row < cells.length; row++) {
+		for (var col = 0; col < cells[row].length; col++) {
+			cells[row][col].row = row;
+			cells[row][col].col = col;
+		}
+	}
+
+	return cells;
+};
+
 PlaygroundBoard.prototype.newRow = function(numColumns, points) {
 	var cells = [];
 
@@ -796,7 +879,7 @@ PlaygroundBoard.prototype.putTileOnPoint = function(tile, notationPoint) {
 };
 
 PlaygroundBoard.prototype.isValidRowCol = function(rowCol) {
-	return rowCol.row >= 0 && rowCol.col >= 0 && rowCol.row <= 16 && rowCol.col <= 16;
+	return rowCol.row >= 0 && rowCol.col >= 0 && rowCol.row <= this.size.row - 1 && rowCol.col <= this.size.col - 1;
 };
 
 PlaygroundBoard.prototype.getClockwiseRowCol = function(center, rowCol) {
@@ -836,11 +919,20 @@ PlaygroundBoard.prototype.pointIsOpenGate = function(notationPoint) {
 	return point.isOpenGate();
 };
 
+PlaygroundBoard.prototype.rotateTileToFaceDirection = function(notationPointStart, directionToFace) {
+	var startRowCol = notationPointStart.rowAndColumn;
+	var boardPointStart = this.cells[startRowCol.row][startRowCol.col];
+
+	if (boardPointStart.hasTile()) {
+		boardPointStart.tile.setDirectionToFace(directionToFace);
+	}
+};
+
 PlaygroundBoard.prototype.moveTile = function(notationPointStart, notationPointEnd) {
 	var startRowCol = notationPointStart.rowAndColumn;
 	var endRowCol = notationPointEnd.rowAndColumn;
 
-	if (startRowCol.row < 0 || startRowCol.row > 16 || endRowCol.row < 0 || endRowCol.row > 16) {
+	if (!this.isValidRowCol(startRowCol) || !this.isValidRowCol(endRowCol)) {
 		debug("That point does not exist. So it's not gonna happen.");
 		return false;
 	}

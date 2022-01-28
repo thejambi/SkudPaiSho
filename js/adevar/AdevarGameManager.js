@@ -172,13 +172,14 @@ function AdevarGameManager(actuator, ignoreActuate, isCopy) {
 	this.actuator = actuator;
 
 	this.tileManager = new AdevarTileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.endGameWinners = [];
 	this.capturedTiles = [];
 	this.playersWhoHaveCapturedReflection = [];
 
 	this.setup(ignoreActuate);
-}
+};
 
 AdevarGameManager.prototype.updateActuator = function(newActuator) {
 	this.actuator = newActuator;
@@ -219,7 +220,7 @@ AdevarGameManager.prototype.actuate = function (moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, this.capturedTiles, moveToAnimate);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager, this.capturedTiles, moveToAnimate);
 
 	setGameLogText(this.gameLogText);
 };
@@ -252,7 +253,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		});
 
 		// Place Gate tiles
-		var homeGateTile = self.tileManager.grabTile(move.player, AdevarTileCode.gate);
+		var homeGateTile = self.tileManager.grabTile(move.player, AdevarTileCode.gateHome);
 		homeGateTile.isHomeGate = true;
 		this.board.placeTile(homeGateTile, AdevarBoardSetupPoints.gate[move.player]);
 		
@@ -275,9 +276,7 @@ AdevarGameManager.prototype.runNotationMove = function(move, withActuate) {
 		});
 
 		// Place Reflection tile
-		if (!gameOptionEnabled(ADEVAR_LITE)) {
-			this.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.reflection), AdevarBoardSetupPoints.reflection[move.player]);
-		}
+		this.board.placeTile(self.tileManager.grabTile(move.player, AdevarTileCode.reflection), AdevarBoardSetupPoints.reflection[move.player]);
 
 		this.buildChooseHiddenTileGameLogText(move);
 	} else if (move.moveType === DEPLOY) {
@@ -429,9 +428,11 @@ AdevarGameManager.prototype.buildDeployGameLogText = function(move, calledTile) 
 
 AdevarGameManager.prototype.buildMoveGameLogText = function(move) {
 	this.gameLogText = this.getGameLogTextStart(move);
-	this.gameLogText += move.player + " moved " + AdevarTile.getTileName(move.moveTileResults.tileMoved.code);
-	if (move.moveTileResults.capturedTile) {
-		this.gameLogText += " and captured " + AdevarTile.getTileName(move.moveTileResults.capturedTile.code);
+	if (move.moveTileResults.tileMoved) {
+		this.gameLogText += move.player + " moved " + AdevarTile.getTileName(move.moveTileResults.tileMoved.code);
+		if (move.moveTileResults.capturedTile) {
+			this.gameLogText += " and captured " + AdevarTile.getTileName(move.moveTileResults.capturedTile.code);
+		}
 	}
 };
 
@@ -481,7 +482,9 @@ AdevarGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
 AdevarGameManager.prototype.opponentNonMatchingHTNotRevealed = function(sfTile) {
 	var opponent = getOpponentName(sfTile.ownerName);
 	return this.playerHiddenTiles[opponent].hidden
-		|| AdevarTile.hiddenTileMatchesSecondFace(this.playerHiddenTiles[opponent], sfTile);
+		|| AdevarTile.hiddenTileMatchesSecondFace(this.playerHiddenTiles[opponent], sfTile)
+		/* Blank Hidden Tile check for Sandbox */
+		|| AdevarTileCode.blankHiddenTile === this.playerHiddenTiles[opponent].code;
 }
 
 AdevarGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
@@ -596,7 +599,7 @@ AdevarGameManager.prototype.playerHasWhiteRoseWin = function(player) {
 	/* Objective: [Old] Capture opponent's Reflection tile */
 	// return this.playersWhoHaveCapturedReflection.includes(player);
 
-	/* Objective: [Beta] Call a Gate completely in opponent's starting Neutral Plot */
+	/* Objective: Call a Gate completely in opponent's starting Neutral Plot */
 	return this.board.playerHasGateInOpponentNeutralPlot(player);
 };
 

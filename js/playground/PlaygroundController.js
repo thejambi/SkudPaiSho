@@ -38,7 +38,7 @@ PlaygroundController.prototype.completeSetup = function() {
 	}
 
 	if (!getUserGamePreference(vagabondTileDesignTypeKey)) {
-		setUserGamePreference(vagabondTileDesignTypeKey, "delion");
+		setUserGamePreference(vagabondTileDesignTypeKey, "tggvagabond");
 	}
 
 	if (!getUserGamePreference(AdevarOptions.tileDesignTypeKey)) {
@@ -122,7 +122,36 @@ PlaygroundController.prototype.getAdditionalMessage = function() {
 		}
 	}
 
+	if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
+		msg += "<span>Rotate tile to face:";
+		msg += " <span class='skipBonus' onClick='gameController.rotateTileToFaceDirection(PlaygroundTileFacingDirection.UP)'>Up</span>";
+		msg += " <span class='skipBonus' onClick='gameController.rotateTileToFaceDirection(PlaygroundTileFacingDirection.DOWN)'>Down</span>";
+		msg += " <span class='skipBonus' onClick='gameController.rotateTileToFaceDirection(PlaygroundTileFacingDirection.LEFT)'>Left</span>";
+		msg += " <span class='skipBonus' onClick='gameController.rotateTileToFaceDirection(PlaygroundTileFacingDirection.RIGHT)'>Right</span>";
+		msg += "</span><br />";
+	}
+
 	return msg;
+};
+
+PlaygroundController.prototype.rotateTileToFaceDirection = function(directionToFace) {
+	if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
+		this.theGame.hidePossibleMovePoints();
+
+		this.notationBuilder.moveType = PlaygroundMoveType.rotateToFaceDirection;
+		this.notationBuilder.directionToFace = directionToFace;
+
+		var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+
+		// Move all set. Add it to the notation!
+		this.gameNotation.addMove(move);
+
+		if (playingOnlineGame()) {
+			callSubmitMove();
+		} else {
+			finalizeMove();
+		}
+	}
 };
 
 PlaygroundController.prototype.hideTileLibraries = function() {
@@ -212,6 +241,9 @@ PlaygroundController.prototype.passTurn = function() {
 }
 
 PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	if (this.theGame.getWinner()) {
 		return;
 	}
@@ -298,7 +330,36 @@ PlaygroundController.prototype.getCurrentPlayingPlayer = function() {
 	}
 };
 
+PlaygroundController.prototype.RmbDown = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+}
+
+PlaygroundController.prototype.RmbUp = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	var mouseEndPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+	if (mouseEndPoint == this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedPoint(mouseEndPoint);
+	}
+	else if (this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedArrow(this.mouseStartPoint, mouseEndPoint);
+	}
+	this.mouseStartPoint = null;
+
+	this.callActuate();
+}
+
 PlaygroundController.prototype.pointClicked = function(htmlPoint) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	if (this.theGame.getWinner()) {
 		return;
 	}
@@ -327,6 +388,7 @@ PlaygroundController.prototype.pointClicked = function(htmlPoint) {
 			this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
 			this.theGame.revealPossibleMovePoints(boardPoint);
+			refreshMessage();
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {

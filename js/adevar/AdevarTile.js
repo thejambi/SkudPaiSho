@@ -14,6 +14,8 @@ var AdevarTileCode = {
 	zinnia: "Zinnia",
 	foxglove: "Foxglove",
 	gate: "Gate",
+	gateHome: "GateHome",
+	gateAway: "GateAway",
 	vanguard: "Vanguard",
 	reflection: "WatersReflection",
 	iris: "Iris",
@@ -40,6 +42,8 @@ var AdevarTileNames = {
 	zinnia: "Zinnia",
 	foxglove: "Foxglove",
 	gate: "Gate",
+	gateHome: "Home Gate",
+	gateAway: "Away Gate",
 	vanguard: "Vanguard",
 	reflection: "Water's Reflection",
 	iris: "Iris",
@@ -58,6 +62,32 @@ var AdevarTileNames = {
 	whiteRoseSF: "White Rose Second Face",
 	blackOrchid: "Black Orchid",
 	blackOrchidSF: "Black Orchid Second Face"
+};
+
+var AdevarInSpaceAlternateNames = {
+	blankHiddenTile: "Hidden Tile",
+	lilac: "A-3 \"Lilac\"",
+	zinnia: "P-4 \"Zinnia\"",
+	foxglove: "S-5 \"Foxglove\"",
+	gate: "Space-Gate Station",
+	gateHome: "Home Space-Gate Station",
+	gateAway: "Away Space-Gate Station",
+	vanguard: "Vanguard Moon",
+	reflection: "Reflection Comet",
+	iris: "Saturn: Mission \"Iris\"",
+	irisSF: "Saturn's Dark Side: \"Iris\"",
+	orientalLily: "Venus: Mission \"Oriental Lily\"",
+	orientalLilySF: "Venus's Dark Side: \"Oriental Lily\"",
+	echeveria: "Mars: Mission \"Echeveria\"",
+	echeveriaSF: "Mars' Dark Side: \"Echeveria\"",
+	whiteLotus: "Earth: Mission \"White Lotus\"",
+	whiteLotusSF: "Earth's Dark Side: \"White Lotus\"",
+	birdOfParadise: "Uranus: Mission \"Bird Of Paradise\"",
+	birdOfParadiseSF: "Uranus' Dark Side: \"Bird Of Paradise\"",
+	whiteRose: "Mercury: Mission \"White Rose\"",
+	whiteRoseSF: "Mercury's Dark Side: \"White Rose\"",
+	blackOrchid: "Jupiter: Mission \"Black Orchid\"",
+	blackOrchidSF: "Jupiter's Dark Side: \"Black Orchid\""
 };
 
 function AdevarTile(code, ownerCode) {
@@ -101,6 +131,12 @@ function AdevarTile(code, ownerCode) {
 		case AdevarTileCode.gate:
 			this.type = AdevarTileType.gate;
 			break;
+		case AdevarTileCode.gateHome:
+			this.type = AdevarTileType.gate;
+			break;
+		case AdevarTileCode.gateAway:
+			this.type = AdevarTileType.gate;
+			break;
 		case AdevarTileCode.vanguard:
 			this.type = AdevarTileType.vanguard;
 			break;
@@ -117,12 +153,15 @@ AdevarTile.prototype.getConsoleDisplay = function() {
 
 AdevarTile.prototype.getImageName = function() {
 	var codeToUse = this.hidden ? "Back" : this.code;
+	if (codeToUse === AdevarTileCode.gateHome || codeToUse === AdevarTileCode.gateAway) {
+		codeToUse = AdevarTileCode.gate;
+	}
 	return this.ownerCode + "" + codeToUse;
 };
 
 AdevarTile.prototype.getNotationName = function() {
 	return this.ownerCode + "" + this.code;
-}
+};
 
 AdevarTile.prototype.getMovementInfo = function() {
 	return {
@@ -165,6 +204,9 @@ AdevarTile.prototype.canCapture = function(targetTile) {
 				&& AdevarTile.hiddenTileMatchesSecondFace(targetTile, this)) {
 			return true;
 		}
+	} else if (this.type === AdevarTileType.reflection 
+				&& targetTile.code === AdevarTileCode.gateAway) {
+		return true;
 	}
 
 	return false;
@@ -204,5 +246,11 @@ AdevarTile.getTileCodeKey = function(tileCode) {
 };
 
 AdevarTile.getTileName = function(tileCode) {
-	return AdevarTileNames[AdevarTile.getTileCodeKey(tileCode)];
+	var tileName = AdevarTileNames[AdevarTile.getTileCodeKey(tileCode)];
+
+	if (AdevarOptions.isSpaceTiles()) {
+		tileName = AdevarInSpaceAlternateNames[AdevarTile.getTileCodeKey(tileCode)];
+	}
+
+	return tileName;
 };

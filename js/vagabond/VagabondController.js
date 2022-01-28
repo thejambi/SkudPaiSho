@@ -1,11 +1,20 @@
 /* Vagabond Pai Sho specific UI interaction logic */
 
+var VagabondConstants = {
+	preferencesKey = "VagabondPreferencesKey"
+};
+var VagabondPreferences = {
+	customTilesUrl: ""
+};
+
 function VagabondController(gameContainer, isMobile) {
 	/* Set default preferences */
 	if (!localStorage.getItem(vagabondTileDesignTypeKey)
 			|| !VagabondController.tileDesignTypeValues[localStorage.getItem(vagabondTileDesignTypeKey)]) {
 		localStorage.setItem(vagabondTileDesignTypeKey, "tggvagabond");
 	}
+
+	VagabondController.loadPreferences();
 
 	this.actuator = new VagabondActuator(gameContainer, isMobile, this.isAnimationsEnabled());
 
@@ -18,6 +27,13 @@ function VagabondController(gameContainer, isMobile) {
 
 	this.isPaiShoGame = true;
 }
+
+VagabondController.loadPreferences = function() {
+	var savedPreferences = JSON.parse(localStorage.getItem(VagabondConstants.preferencesKey));
+	if (savedPreferences) {
+		VagabondPreferences = savedPreferences;
+	}
+};
 
 VagabondController.animationsEnabledKey = "AnimationsEnabled";
 
@@ -33,7 +49,7 @@ VagabondController.prototype.completeSetup = function() {
 	debug("!this.peek...: " + !this.peekAtOpponentMoves);
 
 	if (gameOptionEnabled(SWAP_BISON_WITH_LEMUR)) {
-		VagabondController.setTileDesignsPreference("tggvagabond");
+		VagabondController.setTileDesignsPreference("tggoriginal");
 	}
 };
 
@@ -175,6 +191,9 @@ VagabondController.prototype.removeDrawOffer = function() {
 };
 
 VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	this.promptToAcceptDraw = false;
 
 	if (this.theGame.hasEnded() && this.notationBuilder.status !== READY_FOR_BONUS) {
@@ -224,7 +243,36 @@ VagabondController.prototype.unplayedTileClicked = function(tileDiv) {
 	}
 }
 
+VagabondController.prototype.RmbDown = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+}
+
+VagabondController.prototype.RmbUp = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	var mouseEndPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+	if (mouseEndPoint == this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedPoint(mouseEndPoint);
+	}
+	else if (this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedArrow(this.mouseStartPoint, mouseEndPoint);
+	}
+	this.mouseStartPoint = null;
+
+	this.callActuate();
+}
+
 VagabondController.prototype.pointClicked = function(htmlPoint) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	this.promptToAcceptDraw = false;
 
 	if (this.theGame.hasEnded()) {
@@ -521,20 +569,47 @@ VagabondController.tileDesignTypeValues = {
 	tggkoiwheel: "TGG Koi-Wheel",
 	vescuccikoiwheel: "Vescucci Koi-Wheel",
 	vescuccikoiwheelrustic: "Rustic Vescucci Koi-Wheel",
+	keygyatso: "Key Pai Sho Gyatso Style",
+	keygyatsokoi: "Key Pai Sho Koi-Wheel",
+	keygyatsokoi2: "Key Pai Sho Koi-Wheel Mobile",
 	tggoriginal: "The Garden Gate Designs Original",
 	chujired: "Chuji Red",
 	classic: "Classic Pai Sho Project",
 	water: "Water themed Garden Gate Designs",
 	fire: "Fire themed Garden Gate Designs",
 	canon: "Canon colors Garden Gate Designs",
-	owl: "Order of the White Lotus Garden Gate Designs"
+	owl: "Order of the White Lotus Garden Gate Designs",
+	royal: "TGG Royal",
+	royalkoiwheel: "TGG Royal Koi-Wheel",
+	custom: "Use Custom Designs"
 };
 
 VagabondController.setTileDesignsPreference = function(tileDesignKey) {
-	localStorage.setItem(vagabondTileDesignTypeKey, tileDesignKey);
+	if (tileDesignKey === 'custom') {
+		promptForCustomTileDesigns(GameType.VagabondPaiSho, VagabondPreferences.customTilesUrl);
+	} else {
+		localStorage.setItem(vagabondTileDesignTypeKey, tileDesignKey);
+		if (gameController && gameController.callActuate) {
+			gameController.callActuate();
+		}
+	}
+};
+
+VagabondController.prototype.setCustomTileDesignUrl = function(url) {
+	VagabondPreferences.customTilesUrl = url;
+	localStorage.setItem(VagabondConstants.preferencesKey, JSON.stringify(VagabondPreferences));
+	localStorage.setItem(vagabondTileDesignTypeKey, 'custom');
 	if (gameController && gameController.callActuate) {
 		gameController.callActuate();
 	}
+};
+
+VagabondController.isUsingCustomTileDesigns = function() {
+	return localStorage.getItem(vagabondTileDesignTypeKey) === "custom";
+};
+
+VagabondController.getCustomTileDesignsUrl = function() {
+	return VagabondPreferences.customTilesUrl;
 };
 
 VagabondController.buildTileDesignDropdownDiv = function(alternateLabelText) {

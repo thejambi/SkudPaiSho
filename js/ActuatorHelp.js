@@ -5,6 +5,13 @@ var sin45 = cos45 = Math.sin(Math.PI / 4);
 var sin135 = Math.sin(3 * Math.PI / 4);
 var cos135 = Math.cos(3 * Math.PI / 4);
 
+/* Used in Ginseng Board Rotate */
+var sin90 = 1;
+var cos90 = 0;
+
+/* svg elements source */
+var svgns = "http://www.w3.org/2000/svg";
+
 function createDivWithClass(className) {
 	var div = document.createElement("div");
 	div.classList.add(className);
@@ -39,17 +46,82 @@ function removeChildren(myNode) {
 	}
 }
 
-function createBoardPointDiv(boardPoint) {
+function createBoardPointDiv(boardPoint, useSquareSpaces, coordinatesAdjustmentFunction) {
 	var theDiv = document.createElement("div");
 
 	theDiv.classList.add("point");
 
+	if (gameOptionEnabled(SQUARE_SPACES) || useSquareSpaces) {
+		theDiv.classList.add("pointSquare");
+	}
+
 	var notationPointString = new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString;
 
+	var title = notationPointString;
+
+	if (coordinatesAdjustmentFunction) {
+		title = coordinatesAdjustmentFunction(boardPoint.row, boardPoint.col);
+	}
+
 	theDiv.setAttribute("name", notationPointString);
-	theDiv.setAttribute("title", "(" + notationPointString + ")");
+	theDiv.setAttribute("title", "(" + title + ")");
 
 	return theDiv;
+}
+
+
+function createBoardArrow(startBoardPoint, endBoardPoint) {
+	var arrow = document.createElementNS(svgns, 'line');
+	arrow.classList.add("arrow");
+
+	var startCoord = new RowAndColumn(startBoardPoint.row, startBoardPoint.col);
+	var endCoord = new RowAndColumn(endBoardPoint.row, endBoardPoint.col);
+	var notationPointString = startCoord.notationPointString + "->" + endCoord.notationPointString;
+
+	arrow.setAttribute("name", notationPointString);
+	arrow.setAttribute("x1", startCoord.x);
+	arrow.setAttribute("y1", startCoord.y);
+	arrow.setAttribute("x2", endCoord.x);
+	arrow.setAttribute("y2", endCoord.y);
+	arrow.setAttribute("marker-end", "url(#arrowhead)");
+
+	return arrow;
+}
+
+function createArrowSvg(playInSpaces) {
+	var arrowContainer = document.createElementNS(svgns, 'svg');
+	if (playInSpaces) {
+		arrowContainer.setAttribute("viewBox", "-8.5 -9.5 18 18");
+	}
+	else {
+		arrowContainer.setAttribute("viewBox", "-9 -9 18 18");
+	}
+	arrowContainer.classList.add("arrowContainer");
+
+	// Arrowhead definition
+	var defs = document.createElementNS(svgns, 'defs');
+	var marker = document.createElementNS(svgns, 'marker');
+	marker.setAttribute("id", "arrowhead");
+	marker.setAttribute("markerWidth", "5");
+	marker.setAttribute("markerHeight", "3.5");
+	marker.setAttribute("refX", "5");
+	marker.setAttribute("refY", "1.75");
+	marker.setAttribute("orient", "auto");
+	
+	var polygon = document.createElementNS(svgns, 'polygon');
+	polygon.setAttribute("points", "0 0, 5 1.75, 0 3.5");
+	polygon.setAttribute("fill", getArrowColorRgbaString());
+	
+	marker.appendChild(polygon);
+	defs.appendChild(marker);
+	arrowContainer.appendChild(defs);
+
+	return arrowContainer;
+}
+
+function getArrowColorRgbaString() {
+	return "rgba(255, 170, 0, 0.8)";
+	// return "rgba(0, 0, 0, 0.8)";
 }
 
 function setupPaiShoBoard(gameContainer,
@@ -62,6 +134,8 @@ function setupPaiShoBoard(gameContainer,
 	var addVagabondBoardRotate = false;
 	var addAdevarBoardRotate = false;
 	var addAdevarGuestBoardRotate = false;
+	var addGinsengBoardRotate = false;
+	var addGinsengGuestBoardRotate = false;
 	// Check for existing vagabond class on board...
 	if (document.querySelector(".vagabondBoardRotate")) {
 		addVagabondBoardRotate = true;
@@ -69,6 +143,10 @@ function setupPaiShoBoard(gameContainer,
 		addAdevarBoardRotate = true;
 	} else if (document.querySelector(".adevarGuestBoardRotate")) {
 		addAdevarGuestBoardRotate = true;
+	} else if (document.querySelector(".ginsengBoardRotate")) {
+		addGinsengBoardRotate = true;
+	} else if (document.querySelector(".ginsengGuestBoardRotate")) {
+		addGinsengGuestBoardRotate = true;
 	}
 
 	removeChildren(gameContainer);
@@ -78,11 +156,14 @@ function setupPaiShoBoard(gameContainer,
 		ptContainerClass = "pointContainerForPlayInSpaces"
 	}
 	var boardContainer = createDivWithClass(ptContainerClass);
+	boardContainer.setAttribute("oncontextmenu", "return false;");
 
 	var bcontainer = createDivWithClass("board-container");
 	var svgContainer = createDivWithClass("svgContainer");
 	var svgContainerContainer = createDivWithClass("svgContainerContainer");
 	var bgSvg = createDivWithClass("bg-svg");
+	var arrowSvg = createArrowSvg(playInSpaces);
+	var arrowContainer = document.createElementNS(svgns, 'g');
 
 	applyBoardOptionToBgSvg(bgSvg);
 
@@ -92,8 +173,14 @@ function setupPaiShoBoard(gameContainer,
 		svgContainer.classList.add("adevarBoardRotate");
 	} else if (addAdevarGuestBoardRotate) {
 		svgContainer.classList.add("adevarGuestBoardRotate");
+	} else if (addGinsengBoardRotate) {
+		svgContainer.classList.add("ginsengBoardRotate");
+	} else if (addGinsengGuestBoardRotate) {
+		svgContainer.classList.add("ginsengGuestBoardRotate");
 	}
 
+	arrowSvg.appendChild(arrowContainer);
+	bgSvg.appendChild(arrowSvg);
 	bgSvg.appendChild(boardContainer);
 	svgContainer.appendChild(bgSvg);
 	svgContainerContainer.appendChild(svgContainer);
@@ -128,12 +215,18 @@ function setupPaiShoBoard(gameContainer,
 			rotateClass = "adevarBoardRotate";
 		} else if (rotateType === ADEVAR_GUEST_ROTATE) {
 			rotateClass = "adevarGuestBoardRotate";
+		} else if (rotateType === GINSENG_ROTATE) {
+			rotateClass = "ginsengBoardRotate";
+		} else if (rotateType === GINSENG_GUEST_ROTATE) {
+			rotateClass = "ginsengGuestBoardRotate";
 		}
 		// Set Timeout to get animated board rotation
 		setTimeout(function () {
 			svgContainer.classList.remove("vagabondBoardRotate");
 			svgContainer.classList.remove("adevarBoardRotate");
 			svgContainer.classList.remove("adevarGuestBoardRotate");
+			svgContainer.classList.remove("ginsengBoardRotate");
+			svgContainer.classList.remove("ginsengGuestBoardRotate");
 			svgContainer.classList.add(rotateClass);
 		}, addClassAfterThisManyMs);
 	} else {
@@ -142,11 +235,14 @@ function setupPaiShoBoard(gameContainer,
 			svgContainer.classList.remove("vagabondBoardRotate");
 			svgContainer.classList.remove("adevarBoardRotate");
 			svgContainer.classList.remove("adevarGuestBoardRotate");
+			svgContainer.classList.remove("ginsengBoardRotate");
+			svgContainer.classList.remove("ginsengGuestBoardRotate");
 		}, addClassAfterThisManyMs);
 	}
 
 	return {
 		boardContainer: boardContainer,
+		arrowContainer: arrowContainer,
 		hostTilesContainer: hostTilesContainer,
 		guestTilesContainer: guestTilesContainer
 	}
@@ -190,10 +286,29 @@ function applyBoardOptionToBgSvg(bgSvgIfKnown) {
 }
 
 function getSkudTilesSrcPath() {
-	var srcValue = "images/SkudPaiSho/" + skudTilesKey + "/";
-	return srcValue;
+	if (SkudPaiShoController.isUsingCustomTileDesigns()) {
+		return SkudPaiShoController.getCustomTileDesignsUrl();
+	} else {
+		return "images/SkudPaiSho/" + skudTilesKey + "/";
+	}
 }
 
 function isSamePoint(movePoint, x, y) {
+	if (typeof movePoint === 'string') {
+		movePoint = new NotationPoint(movePoint);
+	}
 	return movePoint.rowAndColumn.col === x && movePoint.rowAndColumn.row === y;
 }
+
+function getTilesForPlayer(tiles, player) {
+	var playerTiles = [];
+	if (tiles && tiles.length > 0) {
+		tiles.forEach(function(tile) {
+			if (tile.ownerName === player) {
+				playerTiles.push(tile);
+			}
+		});
+	}
+	return playerTiles;
+};
+

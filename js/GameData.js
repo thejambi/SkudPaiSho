@@ -23,7 +23,7 @@ var oneGrowingFlower = false;
 var limitedGatesRule = true; // Cannot Plant Basic Flower on Harmony Bonus if already controlling one or more Gates
 var specialFlowerLimitedRule = false; // NOT UI READY, DO NOT SET TO TRUE. Cannot Plant Special Flower on Harmony Bonus if not able to Plant Basic Flower either.
 
-var skudTilesKey = "standard";
+var skudTilesKey = "tgggyatso";
 var paiShoBoardKey = "default";
 var customBoardUrl = null;
 
@@ -44,12 +44,20 @@ var onlinePlayEnabled = false;
 
 
 // Redirect if needed
+if (window.location.href.includes("thegg.games")) {
+  window.location.replace("https://skudpaisho.com");
+}
 if (shouldRedirectIfNotHttps() && window.location.href.includes("http://")) {
   window.location.replace(window.location.href.replace("http://", "https://"));
 }
 
 function shouldRedirectIfNotHttps() {
   return !ios;
+}
+
+function humanYearsToTreeYears(humanAge) {
+  /* f(x)=x+90floor(x/10) */
+  return humanAge + 90 * (Math.floor(humanAge / 10));
 }
 
 
@@ -235,6 +243,13 @@ if (!Array.prototype.includes) {
   };
 }
 
+function arrayIntersection(array1, array2) {
+  var filteredArray = array1.filter(function(n) {
+    return array2.indexOf(n) !== -1;
+  });
+  return filteredArray;
+}
+
 if (!String.prototype.startsWith) {
     String.prototype.startsWith = function(searchString, position){
       position = position || 0;
@@ -285,3 +300,31 @@ Array.prototype.equals = function (array) {
 }
 // Hide method from for-in loops
 Object.defineProperty(Array.prototype, "equals", {enumerable: false});
+
+
+/* Clipboard */
+async function copyTextToClipboard(theText, triggerButton) {
+	if (!navigator.clipboard) {
+		// Clipboard API not available
+		return;
+	}
+	try {
+		await navigator.clipboard.writeText(theText);
+    if (triggerButton) {
+      triggerButton.innerText = "Copied!";
+    }
+	} catch (err) {
+		console.error('Failed to copy!', err);
+	}
+}
+
+/* Date */
+function dateIsBetween(date1MMSlashDDSlashYYYY, date2MMSlashDDSlashYYYY) {
+  var currentDate = new Date();
+
+  var dateRangeBegin = Date.parse(date1MMSlashDDSlashYYYY);
+  var dateRangeEnd = Date.parse(date2MMSlashDDSlashYYYY);
+
+  return currentDate >= dateRangeBegin && currentDate <= dateRangeEnd;
+}
+

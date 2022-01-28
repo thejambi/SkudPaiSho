@@ -7,6 +7,7 @@ function SkudPaiShoGameManager(actuator, ignoreActuate, isCopy) {
 	this.actuator = actuator;
 
 	this.tileManager = new SkudPaiShoTileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
@@ -27,7 +28,7 @@ SkudPaiShoGameManager.prototype.actuate = function (moveToAnimate, moveAnimation
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, moveToAnimate, moveAnimationBeginStep);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager, moveToAnimate, moveAnimationBeginStep);
 	setGameLogText(this.gameLogText);
 };
 
@@ -91,6 +92,11 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate, mo
 		} else if (!moveResults.bonusAllowed && move.hasHarmonyBonus()) {
 			debug("BONUS NOT ALLOWED so I won't give it to you!");
 			errorFound = true;
+		}
+
+		if (gameOptionEnabled(SPECIAL_FLOWERS_BOUNCE) 
+				&& move.capturedTile && move.capturedTile.type === SPECIAL_FLOWER) {
+			this.tileManager.putTileBack(move.capturedTile);
 		}
 
 		this.buildArrangingGameLogText(move, moveResults);

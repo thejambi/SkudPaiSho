@@ -29,6 +29,10 @@ OvergrowthController.prototype.resetGameManager = function() {
 	}
 };
 
+OvergrowthController.prototype.getMoveNumber = function() {
+	return this.gameNotation.moves.length;
+};
+
 OvergrowthController.prototype.resetNotationBuilder = function() {
 	this.notationBuilder = new OvergrowthNotationBuilder();
 };
@@ -67,7 +71,7 @@ OvergrowthController.prototype.resetMove = function() {
 };
 
 OvergrowthController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Overgrowth Pai Sho</h4> <p>A competitive variant of Solitaire Pai Sho.</p><p>Players alternate drawing and placing a tile, following the same placement rules as Solitaire Pai Sho, with these clarifications:<ul><li>Tiles form harmony or disharmony regardless of whose tile it is</li><li>Like tiles form disharmony (for example, Rose (R3) forms disharmony with Rose (R3))</li></ul></p><p>The game ends when all tiles have been played. The winner is as follows: <ul><li>The Host wins if there are more Harmonies on the board</li><li>The Guest wins if there are more Disharmonies on the board</li></ul></p>";
+	return "<h4>Nature’s Grove: Overgrowth</h4> <p>A competitive variant of Nature’s Grove: Respite.</p><p>Players alternate drawing and placing a tile, following the same placement rules as Respite, with these clarifications:<ul><li>Tiles form harmony or disharmony regardless of whose tile it is</li><li>Like tiles form disharmony (for example, Rose (R3) forms disharmony with Rose (R3))</li></ul></p><p>The game ends when all tiles have been played. The winner is as follows: <ul><li>The Host wins if there are more Harmonies on the board</li><li>The Guest wins if there are more Disharmonies on the board</li></ul></p>";
 };
 
 OvergrowthController.prototype.getAdditionalMessage = function() {
@@ -82,6 +86,9 @@ OvergrowthController.prototype.getAdditionalMessage = function() {
 };
 
 OvergrowthController.prototype.unplayedTileClicked = function(tileDiv) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	if (!myTurn()) {
 		return;
 	}
@@ -117,7 +124,36 @@ OvergrowthController.prototype.unplayedTileClicked = function(tileDiv) {
 	}
 };
 
+OvergrowthController.prototype.RmbDown = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+}
+
+OvergrowthController.prototype.RmbUp = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	var mouseEndPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+	if (mouseEndPoint == this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedPoint(mouseEndPoint);
+	}
+	else if (this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedArrow(this.mouseStartPoint, mouseEndPoint);
+	}
+	this.mouseStartPoint = null;
+
+	this.callActuate();
+}
+
 OvergrowthController.prototype.pointClicked = function(htmlPoint) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
 		return;
@@ -246,7 +282,7 @@ OvergrowthController.prototype.setGameNotation = function(newGameNotation) {
 	}
 	this.resetGameManager();
 	this.gameNotation.setNotationText(newGameNotation);
-	this.theGame.drawRandomTile();
+	this.theGame.drawRandomTile(true);
 	this.theGame.actuate();
 };
 

@@ -123,6 +123,46 @@ gameOptionDescriptions[MIDLINE_OPENER] = "Guest midline plant";
 var ETHEREAL_ACCENT_TILES = "EtherealAccentTiles";
 gameOptionDescriptions[ETHEREAL_ACCENT_TILES] = "Ethereal accent tiles";
 
+/* Skud */
+var DIAGONAL_MOVEMENT = "DiagonalMovement";	// April Fools 2021
+gameOptionDescriptions[DIAGONAL_MOVEMENT] = "Diagonal Movement";
+var EVERYTHING_CAPTURE = "EverythingCapture";	// April Fools 2021
+gameOptionDescriptions[EVERYTHING_CAPTURE] = "Everything Captures Everything";
+var NO_WHEELS = "NoWheels";
+gameOptionDescriptions[NO_WHEELS] = "No Wheels";
+var IGNORE_CLASHING = "IgnoreClashing";
+gameOptionDescriptions[IGNORE_CLASHING] = "Ignore Clashing Rule";
+var SPECIAL_FLOWERS_BOUNCE = "SpecialFlowersBounce";
+gameOptionDescriptions[SPECIAL_FLOWERS_BOUNCE] = "Special Flower Reincarnation";
+var VARIABLE_ACCENT_TILES = "VariableAccentTiles";
+gameOptionDescriptions[VARIABLE_ACCENT_TILES] = "Variable Accent Tiles";
+
+var GINSENG_ROTATE = "GinsengBoardRotation";
+gameOptionDescriptions[GINSENG_ROTATE] = "Ginseng Board Rotation";
+var GINSENG_GUEST_ROTATE = "GinsengGuestRotation";
+gameOptionDescriptions[GINSENG_GUEST_ROTATE] = "Ginseng Guest Rotation";
+
+var FULL_GRID = "FullGrid";
+gameOptionDescriptions[FULL_GRID] = "Full Grid";
+
+var SQUARE_SPACES = "SquareSpaces";
+gameOptionDescriptions[SQUARE_SPACES] = "Square Spaces";
+
+var BOTTOMLESS_RESERVES = "BottomlessReserves";
+gameOptionDescriptions[BOTTOMLESS_RESERVES] = "Bottomless Reserves";
+
+var UNDERGROWTH_SIMPLE = "UndergrowthSimple";
+gameOptionDescriptions[UNDERGROWTH_SIMPLE] = "Simplicity (testing)";
+
+var HEXHEX_10 = "Hexhex10Board";
+gameOptionDescriptions[HEXHEX_10] = "Board size: 10 per side";
+
+/* Ginseng */
+var CAPTURE_ABILITY_TARGET_1 = "CaptureAbilityTarget1";
+gameOptionDescriptions[CAPTURE_ABILITY_TARGET_1] = "Lion Turtle and Dragon Capture Limit 1";
+
+var LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN = "LTAbilityTargetTouchingGarden";
+gameOptionDescriptions[LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN] = "Lion Turtle Ability: Captures adjacent Original Benders that are touching a red/white garden";
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {

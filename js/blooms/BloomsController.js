@@ -381,13 +381,20 @@ BloomsController.prototype.playABunchOfRandomMoves = function(howMany) {
 BloomsController.prototype.optionOkToShow = function(option) {
 	if (option === FOUR_SIDED_BOARD) {
 		return !gameOptionEnabled(SIX_SIDED_BOARD)
-			&& !gameOptionEnabled(EIGHT_SIDED_BOARD);
+			&& !gameOptionEnabled(EIGHT_SIDED_BOARD)
+			&& !gameOptionEnabled(HEXHEX_10);
 	} else if (option === SIX_SIDED_BOARD) {
 		return !gameOptionEnabled(FOUR_SIDED_BOARD)
-			&& !gameOptionEnabled(EIGHT_SIDED_BOARD);
+			&& !gameOptionEnabled(EIGHT_SIDED_BOARD)
+			&& !gameOptionEnabled(HEXHEX_10);
 	} else if (option === EIGHT_SIDED_BOARD) {
 		return !gameOptionEnabled(SIX_SIDED_BOARD)
-			&& !gameOptionEnabled(FOUR_SIDED_BOARD);
+			&& !gameOptionEnabled(FOUR_SIDED_BOARD)
+			&& !gameOptionEnabled(HEXHEX_10);
+	} else if (option === HEXHEX_10) {
+		return !gameOptionEnabled(SIX_SIDED_BOARD)
+			&& !gameOptionEnabled(FOUR_SIDED_BOARD)
+			&& !gameOptionEnabled(EIGHT_SIDED_BOARD);
 	} else {
 		return true;
 	}

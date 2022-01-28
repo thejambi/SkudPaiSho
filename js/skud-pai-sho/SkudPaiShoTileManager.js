@@ -28,7 +28,9 @@ SkudPaiShoTileManager.prototype.loadSkudSet = function(ownerCode) {
 	// 2 of each accent tile
 	for (var i = 0; i < 2; i++) {
 		tiles.push(new SkudPaiShoTile('R', ownerCode));
-		tiles.push(new SkudPaiShoTile('W', ownerCode));
+		if (!gameOptionEnabled(NO_WHEELS)) {
+			tiles.push(new SkudPaiShoTile('W', ownerCode));
+		}
 		tiles.push(new SkudPaiShoTile('K', ownerCode));
 		tiles.push(new SkudPaiShoTile('B', ownerCode));
 	}

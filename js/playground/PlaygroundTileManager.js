@@ -102,14 +102,77 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile("Warfront", "Warfront_Lotus", ownerCode));
 	tiles.push(new PlaygroundTile("Warfront", "Warfront_SiegeEngine", ownerCode));
 	tiles.push(new PlaygroundTile("Warfront", "Warfront_Soldier", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Cavalry2", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Guardian2", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Lotus2", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_SiegeEngine2", ownerCode));
+	tiles.push(new PlaygroundTile("Warfront", "Warfront_Soldier2", ownerCode));
 
-	// Chess
+	// Balance --- // TODO - fix so old games missing "Balance_" work...
+	tiles.push(new PlaygroundTile("Balance", "Balance_Air", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Chaos", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Dark", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Earth", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Fire", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Light", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_LionTurtle", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Lotus", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Peace", ownerCode));
+	tiles.push(new PlaygroundTile("Balance", "Balance_Water", ownerCode));
+
+	// Spirit
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_R", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_W", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_L", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_M", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_V", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_H", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_T", ownerCode));
+	tiles.push(new PlaygroundTile("Spirit", "Spirit_K", ownerCode));
+	
+	// Chess (black and white colors)
 	tiles.push(new PlaygroundTile("Chess", "Chess_K", ownerCode));
 	tiles.push(new PlaygroundTile("Chess", "Chess_Q", ownerCode));
 	tiles.push(new PlaygroundTile("Chess", "Chess_R", ownerCode));
 	tiles.push(new PlaygroundTile("Chess", "Chess_N", ownerCode));
 	tiles.push(new PlaygroundTile("Chess", "Chess_B", ownerCode));
 	tiles.push(new PlaygroundTile("Chess", "Chess_P", ownerCode));
+
+	// Sovereign Chess Additional Pieces
+	tiles.push(new PlaygroundTile("Chess", "Chess_KAshSlate", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_QAshSlate", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_RAshSlate", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_NAshSlate", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_BAshSlate", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_PAshSlate", ownerCode));
+
+	tiles.push(new PlaygroundTile("Chess", "Chess_KPinkRed", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_QPinkRed", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_RPinkRed", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_NPinkRed", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_BPinkRed", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_PPinkRed", ownerCode));
+
+	tiles.push(new PlaygroundTile("Chess", "Chess_KOrangeYellow", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_QOrangeYellow", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_ROrangeYellow", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_NOrangeYellow", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_BOrangeYellow", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_POrangeYellow", ownerCode));
+
+	tiles.push(new PlaygroundTile("Chess", "Chess_KGreenCyan", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_QGreenCyan", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_RGreenCyan", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_NGreenCyan", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_BGreenCyan", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_PGreenCyan", ownerCode));
+
+	tiles.push(new PlaygroundTile("Chess", "Chess_KNavyViolet", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_QNavyViolet", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_RNavyViolet", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_NNavyViolet", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_BNavyViolet", ownerCode));
+	tiles.push(new PlaygroundTile("Chess", "Chess_PNavyViolet", ownerCode));
 
 	// Other from Sirstotes
 	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Water", ownerCode));
@@ -121,19 +184,48 @@ PlaygroundTileManager.prototype.loadPlaygroundSet = function(ownerCode) {
 	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Library", ownerCode));
 	tiles.push(new PlaygroundTile(GameType.Playground, "Playground_Temple", ownerCode));
 
-	// Other
-	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_Ginseng", ownerCode));
+	// Ginseng --- // TODO - fix so old games missing "Ginseng_" work...
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_B", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_D", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_FB", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_G", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_K", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_L", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_LT", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_O", ownerCode));
+	tiles.push(new PlaygroundTile("Ginseng", "Ginseng_W", ownerCode));
+
+	// Paiko
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Sword", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Sai", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Bow", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Lotus", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Water", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Earth", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Fire", ownerCode));
+	tiles.push(new PlaygroundTile("Paiko", "Paiko_Air", ownerCode));
 
 	return tiles;
 };
 
+PlaygroundTileManager.adjustTileCode = function(tileCode) {
+	if (tileCode && !tileCode.includes("_")) {
+		if (tileCode.length < 3) {
+			return "Ginseng_" + tileCode;
+		} else {
+			return "Balance_" + tileCode;
+		}
+	}
+	return tileCode;
+};
+
 PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePileName) {
-	if (sourcePileName && this.pilesByName[sourcePileName]) {
+	if (sourcePileName && this.pilesByName[sourcePileName] && !gameOptionEnabled(BOTTOMLESS_RESERVES)) {
 		var tilePile = this.pilesByName[sourcePileName];
 
 		var tile;
 		for (var i = 0; i < tilePile.length; i++) {
-			if (tilePile[i].code === tileCode) {
+			if (tilePile[i].code === tileCode && tilePile[i].ownerCode === player) {
 				newTileArr = tilePile.splice(i, 1);
 				tile = newTileArr[0];
 				break;
@@ -142,6 +234,11 @@ PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePile
 
 		if (!tile) {
 			debug("NONE OF THAT TILE FOUND");
+		}
+
+		if (sourcePileName === PlaygroundNotationConstants.hostLibraryPile
+				|| sourcePileName === PlaygroundNotationConstants.guestLibraryPile) {
+			tile = tile.getCopy();
 		}
 
 		return tile;
@@ -157,10 +254,14 @@ PlaygroundTileManager.prototype.grabTile = function(player, tileCode, sourcePile
 	return this.peekTile(player, tileCode);
 };
 
-PlaygroundTileManager.prototype.peekTile = function(player, tileCode, tileId) {
+PlaygroundTileManager.prototype.peekTile = function(player, tileCode, tileId, sourcePileName) {
 	var tilePile = this.hostTileLibrary;
 	if (player === GUEST) {
 		tilePile = this.guestTileLibrary;
+	}
+
+	if (sourcePileName && this.pilesByName[sourcePileName] && !gameOptionEnabled(BOTTOMLESS_RESERVES)) {
+		tilePile = this.pilesByName[sourcePileName];
 	}
 
 	var tile;
@@ -173,7 +274,8 @@ PlaygroundTileManager.prototype.peekTile = function(player, tileCode, tileId) {
 	}
 
 	for (var i = 0; i < tilePile.length; i++) {
-		if (tilePile[i].code === tileCode) {
+		// Eek. player is a name here but a code in grabTile above
+		if (tilePile[i].code === tileCode && tilePile[i].ownerName === player) {
 			tile = tilePile[i];
 			break;
 		}

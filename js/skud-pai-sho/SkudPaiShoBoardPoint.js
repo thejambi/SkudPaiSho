@@ -5,6 +5,7 @@ var NEUTRAL = "Neutral";
 
 var GATE = "Gate";
 
+var MARKED = "Marked";
 var POSSIBLE_MOVE = "Possible Move";
 var OPEN_GATE = "OPEN GATE";
 
@@ -148,6 +149,16 @@ SkudPaiShoBoardPoint.prototype.betweenPlayerHarmony = function(player) {
 		return this.betweenHarmonyHost;
 	}
 	return false;
+};
+
+SkudPaiShoBoardPoint.prototype.setMoveDistanceRemaining = function(movementInfo, distanceRemaining) {
+	this.moveDistanceRemaining = distanceRemaining;
+};
+SkudPaiShoBoardPoint.prototype.getMoveDistanceRemaining = function(movementInfo) {
+	return this.moveDistanceRemaining;
+};
+SkudPaiShoBoardPoint.prototype.clearPossibleMovementTypes = function() {
+	this.moveDistanceRemaining = null;
 };
 
 SkudPaiShoBoardPoint.prototype.getCopy = function() {

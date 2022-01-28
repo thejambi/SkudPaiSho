@@ -15,6 +15,7 @@ function VagabondActuator(gameContainer, isMobile, enableAnimations) {
 
 	this.boardContainer = containers.boardContainer;
 	this.boardContainer.style.position = "relative";
+	this.arrowContainer = containers.arrowContainer;
 	this.hostTilesContainer = containers.hostTilesContainer;
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
@@ -23,28 +24,40 @@ VagabondActuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
 };
 
-VagabondActuator.prototype.actuate = function(board, tileManager, moveToAnimate) {
+VagabondActuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate) {
 	var self = this;
 	debug(moveToAnimate);
 	// self.printBoard(board);
 
 	window.requestAnimationFrame(function () {
-		self.htmlify(board, tileManager, moveToAnimate);
+		self.htmlify(board, tileManager, markingManager, moveToAnimate);
 	});
 };
 
-VagabondActuator.prototype.htmlify = function(board, tileManager, moveToAnimate) {
+VagabondActuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate) {
 	this.clearContainer(this.boardContainer);
+	this.clearContainer(this.arrowContainer);
 
 	var self = this;
 
 	board.cells.forEach(function(column) {
 		column.forEach(function(cell) {
+			if (markingManager.pointIsMarked(cell) && !cell.isType(MARKED)){
+				cell.addType(MARKED);
+			}
+			else if (!markingManager.pointIsMarked(cell) && cell.isType(MARKED)){
+				cell.removeType(MARKED);
+			}
 			if (cell) {
 				self.addBoardPoint(cell, moveToAnimate);
 			}
 		});
 	});
+
+	// Draw all arrows
+	for (var [_, arrow] of Object.entries(markingManager.arrows)) {
+		this.arrowContainer.appendChild(createBoardArrow(arrow[0], arrow[1]));
+	}
 
 	var fullTileSet = new VagabondTileManager();
 
@@ -121,7 +134,10 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
-		theDiv.classList.add("vagabondPointRotate");
+		// theDiv.classList.add("vagabondPointRotate");
+		if (boardPoint.isType(MARKED)) {
+			theDiv.classList.add("markedPoint");
+		}	
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 		}
@@ -132,6 +148,21 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
 			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mousedown', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbDown(theDiv);
+				}
+			});
+			theDiv.addEventListener('mouseup', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbUp(theDiv);
+				}
+			});
+			theDiv.addEventListener('contextmenu', e => {
+					e.preventDefault();
+				});
 		}
 	}
 
@@ -139,6 +170,10 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		theDiv.classList.add("hasTile");
 
 		var theImg = document.createElement("img");
+		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
+		theImg.elementStyleTransform.setValue("rotate", 315, "deg");
+
+		theImg.style.transform = theImg.rotateTransformStr;
 
 		if (moveToAnimate) {
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
@@ -179,16 +214,16 @@ VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 		if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
 			x = moveToAnimate.startPoint.rowAndColumn.col;
 			y = moveToAnimate.startPoint.rowAndColumn.row;
-			theImg.style.transform = "scale(1.2)";	// Make the pieces look like they're picked up a little when moving, good idea or no?
+			theImg.elementStyleTransform.setValue("scale", "1.2");	// Make the pieces look like they're picked up a little when moving, good idea or no?
 			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
 		}
 	} else if (moveToAnimate.moveType === DEPLOY) {
 		if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
 			if (piecePlaceAnimation === 1) {
-				theImg.style.transform = "scale(2)";
+				theImg.elementStyleTransform.setValue("scale", 2);
 				theDiv.style.zIndex = 99;
 				requestAnimationFrame(function() {
-					theImg.style.transform = "scale(1)";
+					theImg.elementStyleTransform.setValue("scale", 1);
 				});
 			}
 		}
@@ -205,12 +240,12 @@ VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 		unitString = "vw";
 	}
 
-	/*theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
-	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;*/
-	var left = (x - ox);
-	var top = (y - oy);
-	theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
-	theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
+	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+	// var left = (x - ox);
+	// var top = (y - oy);
+	// theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
+	// theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
 
 	requestAnimationFrame(function() {
 		theImg.style.left = "0px";
@@ -218,13 +253,17 @@ VagabondActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 	});
 	setTimeout(function() {
 		requestAnimationFrame(function() {
-			theImg.style.transform = "scale(1)";	// This will size back to normal after moving
+			theImg.elementStyleTransform.setValue("scale", 1);	// This will size back to normal after moving
 		});
 	}, pieceAnimationLength);
 };
 
 VagabondActuator.prototype.getTileImageSourceDir = function() {
-	return "images/Vagabond/" + localStorage.getItem(vagabondTileDesignTypeKey) + "/";
+	if (VagabondController.isUsingCustomTileDesigns()) {
+		return VagabondController.getCustomTileDesignsUrl();
+	} else {
+		return "images/Vagabond/" + localStorage.getItem(vagabondTileDesignTypeKey) + "/";
+	}
 };
 
 VagabondActuator.prototype.printBoard = function(board) {

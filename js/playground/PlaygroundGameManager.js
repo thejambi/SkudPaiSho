@@ -6,6 +6,7 @@ function PlaygroundGameManager(actuator, ignoreActuate, isCopy) {
 	this.actuator = actuator;
 
 	this.tileManager = new PlaygroundTileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
 	this.endGameWinners = [];
@@ -33,7 +34,7 @@ PlaygroundGameManager.prototype.actuate = function (moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, this.actuateOptions, moveToAnimate);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager, this.actuateOptions, moveToAnimate);
 };
 
 PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
@@ -64,6 +65,8 @@ PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 	} else if (move.moveType === PlaygroundMoveType.moveToTilePile) {
 		var tile = this.board.removeTile(move.startPoint);
 		this.tileManager.pilesByName[move.endPileName].push(tile);
+	} else if (move.moveType === PlaygroundMoveType.rotateToFaceDirection) {
+		this.board.rotateTileToFaceDirection(move.startPoint, move.directionToFace);
 	}
 
 	if (withActuate) {

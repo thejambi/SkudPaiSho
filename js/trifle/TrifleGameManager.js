@@ -7,6 +7,7 @@ Trifle.GameManager = function(actuator, ignoreActuate, isCopy) {
 	this.actuator = actuator;
 
 	this.tileManager = new Trifle.TileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.setup(ignoreActuate);
 }
@@ -14,7 +15,12 @@ Trifle.GameManager = function(actuator, ignoreActuate, isCopy) {
 // Set up the game
 Trifle.GameManager.prototype.setup = function (ignoreActuate) {
 
-	this.board = new Trifle.Board();
+	this.board = new PaiShoGames.Board(this.tileManager);
+	this.board.useTrifleTempleRules = true;
+	this.board.useBannerCaptureSystem = true;
+	this.winners = [];
+	this.hostBannerPlayed = false;
+	this.guestBannerPlayed = false;
 
 	// Update the actuator
 	if (!ignoreActuate) {
@@ -27,7 +33,7 @@ Trifle.GameManager.prototype.actuate = function () {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager);
 	setGameLogText(this.gameLogText);
 };
 
@@ -47,9 +53,28 @@ Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
 		var tile = this.tileManager.grabTile(move.player, move.tileType);
 		this.board.placeTile(tile, move.endPoint);
 		this.buildDeployGameLogText(move, tile);
+
+		/* Banner played? Could use this in future, currently in Board. */
+		if (Trifle.TileInfo.tileIsBanner(PaiShoGames.currentTileMetadata[tile.code])) {
+			if (tile.ownerName === HOST) {
+				this.hostBannerPlayed = true;
+			} else {
+				this.guestBannerPlayed = true;
+			}
+		}
 	} else if (move.moveType === MOVE) {
 		var moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint);
 		this.buildMoveGameLogText(move, moveDetails);
+
+		// If tile is capturing a Banner tile, there's a winner
+		if (moveDetails.capturedTiles && moveDetails.capturedTiles.length) {
+			var self = this;
+			moveDetails.capturedTiles.forEach(function(capturedTile) {
+				if (capturedTile && Trifle.TileInfo.tileIsBanner(PaiShoGames.currentTileMetadata[capturedTile.code])) {
+					self.winners.push(getOpponentName(capturedTile.ownerName));
+				}
+			});
+		}
 	} else if (move.moveType === DRAW_ACCEPT) {
 		this.gameHasEndedInDraw = true;
 	}
@@ -60,7 +85,7 @@ Trifle.GameManager.prototype.runNotationMove = function(move, withActuate) {
 };
 
 Trifle.GameManager.prototype.buildTeamSelectionGameLogText = function(move) {
-	this.gameLogText = move.player + "'s team: " + move.teamTileCodes;
+	this.gameLogText = move.player + " selected their team";
 };
 Trifle.GameManager.prototype.buildDeployGameLogText = function(move, tile) {
 	this.gameLogText = move.player + ' placed ' + Trifle.Tile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
@@ -82,7 +107,7 @@ Trifle.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails) 
 };
 
 Trifle.GameManager.prototype.playersAreSelectingTeams = function() {
-	return !this.tileManager.hostTeamIsFull() || !this.tileManager.guestTeamIsFull();
+	return this.tileManager.playersAreSelectingTeams();
 };
 
 Trifle.GameManager.prototype.getPlayerTeamSelectionTileCodeList = function(player) {
@@ -130,8 +155,8 @@ Trifle.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	}
 };
 
-Trifle.GameManager.prototype.revealDeployPoints = function(player, tileCode, ignoreActuate) {
-	this.board.setDeployPointsPossibleMoves(player, tileCode);
+Trifle.GameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
+	this.board.setDeployPointsPossibleMoves(tile);
 	
 	if (!ignoreActuate) {
 		this.actuate();
@@ -139,8 +164,8 @@ Trifle.GameManager.prototype.revealDeployPoints = function(player, tileCode, ign
 };
 
 Trifle.GameManager.prototype.getWinner = function() {
-	if (this.board.winners.length === 1) {
-		return this.board.winners[0];
+	if (this.winners.length === 1) {
+		return this.winners[0];
 	}
 };
 
@@ -149,7 +174,7 @@ Trifle.GameManager.prototype.getWinReason = function() {
 };
 
 Trifle.GameManager.prototype.getWinResultTypeCode = function() {
-	if (this.board.winners.length === 1) {
+	if (this.winners.length === 1) {
 		return 1;	// Standard win is 1
 	} else if (this.gameHasEndedInDraw) {
 		return 4;	// Tie/Draw is 4

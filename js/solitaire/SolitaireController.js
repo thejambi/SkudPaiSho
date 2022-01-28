@@ -100,7 +100,7 @@ SolitaireController.prototype.resetMove = function() {
 };
 
 SolitaireController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Solitaire Pai Sho</h4> <p>Solitaire Pai Sho is a game of harmony, based on Skud Pai Sho. The goal of Solitaire Pai Sho is to place Flower Tiles to create a balance of Harmony and Disharmony on the board.</p> <p>Each turn, you are given a tile that's been drawn for you to place on the board. When all the tiles have been played, the game ends and your score will be calculated.</p> <p><a href='https://skudpaisho.com/site/games/solitaire-pai-sho/'>View the resources page</a> for the rules.</p>";
+	return "<h4>Nature's Grove: Respite</h4> <p>Nature's Grove: Respite is a solitaire Pai Sho game of harmony, based on Skud Pai Sho. The goal of Respite is to place Flower Tiles to create a balance of Harmony and Disharmony on the board.</p> <p>Each turn, you are given a tile that's been drawn for you to place on the board. When all the tiles have been played, the game ends and your score will be calculated.</p> <p><a href='https://skudpaisho.com/site/games/solitaire-pai-sho/'>Read the full rules here</a>.</p>";
 };
 
 SolitaireController.prototype.getAdditionalMessage = function() {
@@ -115,6 +115,9 @@ SolitaireController.prototype.getAdditionalMessage = function() {
 };
 
 SolitaireController.prototype.unplayedTileClicked = function(tileDiv) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	if (!myTurn()) {
 		return;
 	}
@@ -158,7 +161,36 @@ SolitaireController.prototype.unplayedTileClicked = function(tileDiv) {
 	}
 }
 
+SolitaireController.prototype.RmbDown = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+}
+
+SolitaireController.prototype.RmbUp = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	var mouseEndPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+	if (mouseEndPoint == this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedPoint(mouseEndPoint);
+	}
+	else if (this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedArrow(this.mouseStartPoint, mouseEndPoint);
+	}
+	this.mouseStartPoint = null;
+
+	this.callActuate();
+}
+
 SolitaireController.prototype.pointClicked = function(htmlPoint) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	if (currentMoveIndex !== this.gameNotation.moves.length) {
 		debug("Can only interact if all moves are played.");
 		return;

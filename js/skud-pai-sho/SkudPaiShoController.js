@@ -1,7 +1,16 @@
 /* Skud Pai Sho specific UI interaction logic */
 
+var SkudConstants = {
+	preferencesKey = "SkudPaiShoPreferencesKey"
+};
+var SkudPreferences = {
+	customTilesUrl: ""
+};
+
 function SkudPaiShoController(gameContainer, isMobile) {
 	this.actuator = new SkudPaiShoActuator(gameContainer, isMobile, isAnimationsOn());
+
+	SkudPaiShoController.loadPreferences();
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -11,7 +20,15 @@ function SkudPaiShoController(gameContainer, isMobile) {
 	this.guestAccentTiles = [];
 
 	this.isPaiShoGame = true;
+	this.supportsMoveLogMessages = true;
 }
+
+SkudPaiShoController.loadPreferences = function() {
+	var savedPreferences = JSON.parse(localStorage.getItem(SkudConstants.preferencesKey));
+	if (savedPreferences) {
+		SkudPreferences = savedPreferences;
+	}
+};
 
 SkudPaiShoController.hideHarmonyAidsKey = "HideHarmonyAids";
 
@@ -118,6 +135,9 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 		msg += "Plant a Basic Flower Tile.";
 	} else if (!gameOptionEnabled(OPTION_INFORMAL_START) && this.gameNotation.moves.length === 4) {
 		msg += "Now, make the first move of the game.";
+	} else if (this.gameNotation.moves.length > 2
+			&& (gameOptionEnabled(DIAGONAL_MOVEMENT) || gameOptionEnabled(EVERYTHING_CAPTURE))) {
+		msg += "<em>April Fools! I hope you get some entertainment out of the Diagonal Movement and Everything Captures Everything game options today :)&nbsp;</em>";
 	}
 
 	return msg;
@@ -144,6 +164,9 @@ SkudPaiShoController.prototype.showHarmonyBonusMessage = function() {
 };
 
 SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	if (this.theGame.getWinner() && this.notationBuilder.status !== READY_FOR_BONUS) {
 		return;
 	}
@@ -198,6 +221,9 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 			accentTilesNeededToStart = this.theGame.tileManager.numberOfAccentTilesPerPlayerSet();
 		} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
 			accentTilesNeededToStart = accentTilesNeededToStart * 2;
+			if (gameOptionEnabled(NO_WHEELS) && !gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
+				accentTilesNeededToStart = accentTilesNeededToStart - 2;
+			}
 		}
 
 		if (getCurrentPlayer() === HOST) {
@@ -273,7 +299,37 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 	}
 };
 
+
+SkudPaiShoController.prototype.RmbDown = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+}
+
+SkudPaiShoController.prototype.RmbUp = function(htmlPoint) {
+	var npText = htmlPoint.getAttribute("name");
+
+	var notationPoint = new NotationPoint(npText);
+	var rowCol = notationPoint.rowAndColumn;
+	var mouseEndPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+	if (mouseEndPoint == this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedPoint(mouseEndPoint);
+	}
+	else if (this.mouseStartPoint) {
+		this.theGame.markingManager.toggleMarkedArrow(this.mouseStartPoint, mouseEndPoint);
+	}
+	this.mouseStartPoint = null;
+
+	this.callActuate();
+}
+
 SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
+	this.theGame.markingManager.clearMarkings();
+	this.callActuate();
+
 	if (this.theGame.getWinner() && this.notationBuilder.status !== WAITING_FOR_BONUS_ENDPOINT
 			&& this.notationBuilder.status !== WAITING_FOR_BOAT_BONUS_POINT) {
 		return;
@@ -339,7 +395,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 				// Move all set. Add it to the notation!
 				this.gameNotation.addMove(move);
 				if (playingOnlineGame()) {
-					callSubmitMove();
+					callSubmitMove(null, null, move);
 				} else {
 					finalizeMove();
 				}
@@ -367,7 +423,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 
 				this.gameNotation.addMove(move);
 				if (playingOnlineGame()) {
-					callSubmitMove(1);
+					callSubmitMove(1, null, move);
 				} else {
 					finalizeMove(1);
 				}
@@ -386,7 +442,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 			var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 			this.gameNotation.addMove(move);
 			if (playingOnlineGame()) {
-				callSubmitMove(1);
+				callSubmitMove(1, null, move);
 			} else {
 				finalizeMove(1);
 			}
@@ -404,7 +460,7 @@ SkudPaiShoController.prototype.skipHarmonyBonus = function() {
 		var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 		this.gameNotation.addMove(move);
 		if (playingOnlineGame()) {
-			callSubmitMove(1);
+			callSubmitMove(1, null, move);
 		} else {
 			finalizeMove(1);
 		}
@@ -755,4 +811,18 @@ SkudPaiShoController.prototype.toggleHarmonyAids = function() {
 
 SkudPaiShoController.prototype.setAnimationsOn = function(isAnimationsOn) {
 	this.actuator.setAnimationOn(isAnimationsOn);
+};
+
+SkudPaiShoController.isUsingCustomTileDesigns = function() {
+	return skudTilesKey === 'custom';
+};
+
+SkudPaiShoController.getCustomTileDesignsUrl = function() {
+	return SkudPreferences.customTilesUrl;
+};
+
+SkudPaiShoController.prototype.setCustomTileDesignUrl = function(url) {
+	SkudPreferences.customTilesUrl = url;
+	localStorage.setItem(SkudConstants.preferencesKey, JSON.stringify(SkudPreferences));
+	setSkudTilesOption('custom', true);
 };

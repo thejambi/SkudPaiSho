@@ -1,5 +1,7 @@
 // Tile
 
+Trifle.tileId = 1;
+
 Trifle.Tile = function(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
@@ -10,7 +12,7 @@ Trifle.Tile = function(code, ownerCode) {
 	} else {
 		debug("INCORRECT OWNER CODE");
 	}
-	this.id = tileId++;
+	this.id = Trifle.tileId++;
 	this.selectedFromPile = false;
 }
 
@@ -46,6 +48,10 @@ Trifle.Tile.prototype.getName = function() {
 	return Trifle.Tile.getTileName(this.code);
 };
 
+Trifle.Tile.prototype.getNotationName = function() {
+	return this.ownerCode + "" + this.code;
+}
+
 Trifle.Tile.prototype.getCopy = function() {
 	return new Trifle.Tile(this.code, this.ownerCode);
 };
@@ -53,24 +59,12 @@ Trifle.Tile.prototype.getCopy = function() {
 
 Trifle.Tile.getTileName = function(tileCode) {
 	var name = "";
-	
-	if (tileCode === 'L') {
-		name = "White Lotus";
-	} else if (tileCode === 'S') {
-		name = "Sky Bison";
-	} else if (tileCode === 'B') {
-		name = "Badgermole";
-	} else if (tileCode === 'W') {
-		name = "Wheel";
-	} else if (tileCode === 'C') {
-		name = "Chrysanthemum";
-	} else if (tileCode === 'F') {
-		name = "Fire Lily";
-	} else if (tileCode === 'D') {
-		name = "White Dragon";
+
+	if (PaiShoGames.currentTileNames && PaiShoGames.currentTileNames[tileCode]) {
+		name = PaiShoGames.currentTileNames[tileCode];
 	} else {
-		Object.keys(Trifle.TileCodes).forEach(function(key,index) {
-			if (Trifle.TileCodes[key] === tileCode) {
+		Object.keys(PaiShoGames.currentTileCodes).forEach(function(key, index) {
+			if (PaiShoGames.currentTileCodes[key] === tileCode) {
 				name = key;
 			}
 		});
@@ -79,8 +73,19 @@ Trifle.Tile.getTileName = function(tileCode) {
 	return name;
 };
 
+Trifle.Tile.prototype.getOwnerCodeIdObject = function() {
+	return {
+		ownerName: this.ownerName,
+		code: this.code,
+		id: this.id
+	};
+};
+Trifle.Tile.prototype.getOwnerCodeIdObjectString = function() {
+	return JSON.stringify(this.getOwnerCodeIdObject());
+};
+
 Trifle.Tile.getTeamLimitForTile = function(tileCode) {
-	var tileData = TrifleTiles[tileCode];
+	var tileData = PaiShoGames.currentTileMetadata[tileCode];
 	if (tileData) {
 		if (tileData.teamLimit) {
 			return tileData.teamLimit;

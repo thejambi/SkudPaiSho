@@ -59,6 +59,9 @@ AdevarNotationMove.prototype.analyzeMove = function() {
 		this.tileType;
 		if (this.moveType === DEPLOY) {
 			this.tileType = moveText.substring(1, parenIndex);
+			if (this.tileType === AdevarTileType.gate) {
+				this.tileType = AdevarTileCode.gateAway;
+			}
 		}
 
 		if (moveText.charAt(parenIndex) === '(') {

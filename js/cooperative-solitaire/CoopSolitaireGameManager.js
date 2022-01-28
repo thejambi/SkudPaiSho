@@ -6,6 +6,7 @@ function CoopSolitaireGameManager(actuator, ignoreActuate, isCopy, existingDrawn
 	this.actuator = actuator;
 
 	this.tileManager = new CoopSolitaireTileManager();
+	this.markingManager = new PaiShoMarkingManager();
 
 	this.drawnTile = existingDrawnTile;
 	this.lastDrawnTile = existingLastDrawnTile; // Save for Undo
@@ -74,7 +75,7 @@ CoopSolitaireGameManager.prototype.actuate = function() {
 		}
 	}
 
-	this.actuator.actuate(this.board, this, this.drawnTile);
+	this.actuator.actuate(this.board, this, this.markingManager, this.drawnTile);
 };
 
 CoopSolitaireGameManager.prototype.runNotationMove = function(move, withActuate) {

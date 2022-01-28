@@ -481,11 +481,13 @@ SkudPaiShoBoard.prototype.canPlaceWheel = function(boardPoint) {
 	}
 
 	// Does it create Disharmony?
-	var newBoard = this.getCopy();
-	var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
-	newBoard.placeWheel(new SkudPaiShoTile('W', 'G'), notationPoint, true);
-	if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
-		return false;
+	if (!gameOptionEnabled(IGNORE_CLASHING)) {
+		var newBoard = this.getCopy();
+		var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
+		newBoard.placeWheel(new SkudPaiShoTile('W', 'G'), notationPoint, true);
+		if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
+			return false;
+		}
 	}
 
 	return true;
@@ -594,7 +596,7 @@ SkudPaiShoBoard.prototype.canPlaceBoat = function(boardPoint, tile) {
 				// debug("Not played on Knotweed tile");
 				return false;
 			}
-		} else {
+		} else if (!gameOptionEnabled(IGNORE_CLASHING)) {
 			// Ensure no Disharmony
 			var newBoard = this.getCopy();
 			var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
@@ -680,11 +682,13 @@ SkudPaiShoBoard.prototype.canPlaceBamboo = function(boardPoint, tile) {
 	}
 
 	// Does it create Disharmony?
-	var newBoard = this.getCopy();
-	var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
-	newBoard.placeBamboo(new SkudPaiShoTile('M', 'G'), notationPoint, true);
-	if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
-		return false;
+	if (!gameOptionEnabled(IGNORE_CLASHING)) {
+		var newBoard = this.getCopy();
+		var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
+		newBoard.placeBamboo(new SkudPaiShoTile('M', 'G'), notationPoint, true);
+		if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
+			return false;
+		}
 	}
 
 	return true;
@@ -860,7 +864,8 @@ SkudPaiShoBoard.prototype.moveTile = function(player, notationPointStart, notati
 	var boardPointStart = this.cells[startRowCol.row][startRowCol.col];
 	var boardPointEnd = this.cells[endRowCol.row][endRowCol.col];
 
-	if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)) {
+	if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)
+			&& !gameOptionEnabled(DIAGONAL_MOVEMENT)) {
 		debug("Bad move bears");
 		showBadMoveModal();
 		return false;
@@ -882,6 +887,10 @@ SkudPaiShoBoard.prototype.moveTile = function(player, notationPointStart, notati
 
 	// Check for tile "trapped" by opponent Orchid
 	this.flagAllTrappedAndDrainedTiles();
+
+	if (gameOptionEnabled(EVERYTHING_CAPTURE)) {
+		this.refreshRockRowAndCols();
+	}
 
 	// Check for harmonies
 	var newHarmony = this.hasNewHarmony(player, tile, startRowCol, endRowCol);
@@ -1059,6 +1068,10 @@ SkudPaiShoBoard.prototype.orchidVulnerable = function(orchidTile) {
 };
 
 SkudPaiShoBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) {
+	if (gameOptionEnabled(EVERYTHING_CAPTURE)) {
+		return true;
+	}
+
 	var tile = boardPointStart.tile;
 	var otherTile = boardPointEnd.tile;
 
@@ -1105,6 +1118,56 @@ SkudPaiShoBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) 
 			return true;
 		}
 	}
+};
+
+/* Does no verifying that tile can reach target point with standard movement */
+SkudPaiShoBoard.prototype.couldMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
+	// start point must have a tile
+	if (!boardPointStart.hasTile()) {
+		return false;
+	}
+
+	// Tile must belong to player
+	if (boardPointStart.tile.ownerName !== player) {
+		return false;
+	}
+
+	// Cannot move drained or trapped tile
+	if (boardPointStart.tile.trapped) {
+		return false;
+	}
+
+	if (!newKnotweedRules && boardPointStart.tile.drained) {
+		return false;
+	}
+
+	// If endpoint is a Gate, that's wrong.
+	if (boardPointEnd.isType(GATE)) {
+		return false;
+	}
+	
+	var canCapture = false;
+	if (boardPointEnd.hasTile()) {
+		canCapture = this.canCapture(boardPointStart, boardPointEnd);
+	}
+
+	// If endpoint has a tile there that can't be captured, that is wrong.
+	if (boardPointEnd.hasTile() && !canCapture) {
+		return false;
+	}
+
+	if (!boardPointEnd.canHoldTile(boardPointStart.tile, canCapture)) {
+		return false;
+	}
+
+	// What if moving the tile there creates a Disharmony on the board? That can't happen!
+	if (!gameOptionEnabled(IGNORE_CLASHING) 
+			&& this.moveCreatesDisharmony(boardPointStart, boardPointEnd)) {
+		return false;
+	}
+
+	// I guess we made it through
+	return true;
 };
 
 SkudPaiShoBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
@@ -1160,7 +1223,8 @@ SkudPaiShoBoard.prototype.canMoveTileToPoint = function(player, boardPointStart,
 	}
 
 	// What if moving the tile there creates a Disharmony on the board? That can't happen!
-	if (this.moveCreatesDisharmony(boardPointStart, boardPointEnd)) {
+	if (!gameOptionEnabled(IGNORE_CLASHING) 
+			&& this.moveCreatesDisharmony(boardPointStart, boardPointEnd)) {
 		return false;
 	}
 
@@ -1195,13 +1259,15 @@ SkudPaiShoBoard.prototype.canTransportTileToPointWithBoat = function(boardPointS
 	// 	return false;
 	// }	// This disharmony check needs to first pretend that a Boat tile is on the spot the tile being moved was on. Fix is below:
 
-	var newBoard = this.getCopy();
-	var newBoardPointStart = newBoard.cells[boardPointStart.row][boardPointStart.col];
-	var notationPoint = new NotationPoint(new RowAndColumn(newBoardPointStart.row, newBoardPointStart.col).notationPointString);
-	var notationPointEnd = new NotationPoint(new RowAndColumn(boardPointEnd.row, boardPointEnd.col).notationPointString);
-	newBoard.placeBoat(new SkudPaiShoTile('B', 'G'), notationPoint, notationPointEnd, true);
-	if (newBoard.moveCreatesDisharmony(newBoardPointStart, newBoardPointStart)) {
-		return false;
+	if (!gameOptionEnabled(IGNORE_CLASHING)) {
+		var newBoard = this.getCopy();
+		var newBoardPointStart = newBoard.cells[boardPointStart.row][boardPointStart.col];
+		var notationPoint = new NotationPoint(new RowAndColumn(newBoardPointStart.row, newBoardPointStart.col).notationPointString);
+		var notationPointEnd = new NotationPoint(new RowAndColumn(boardPointEnd.row, boardPointEnd.col).notationPointString);
+		newBoard.placeBoat(new SkudPaiShoTile('B', 'G'), notationPoint, notationPointEnd, true);
+		if (newBoard.moveCreatesDisharmony(newBoardPointStart, newBoardPointStart)) {
+			return false;
+		}
 	}
 
 	// I guess we made it through
@@ -1688,7 +1754,197 @@ SkudPaiShoBoard.prototype.hasDisharmonyDown = function(tile, endRowCol) {
 	}
 };
 
+SkudPaiShoBoard.prototype.getAdjacentPointsPotentialPossibleMoves = function(pointAlongTheWay, originPoint, mustPreserveDirection, movementInfo) {
+	var potentialMovePoints = [];
+
+	if (!pointAlongTheWay) {
+		pointAlongTheWay = originPoint;
+	}
+	var rowDifference = originPoint.row - pointAlongTheWay.row;
+	var colDifference = originPoint.col - pointAlongTheWay.col;
+
+	if (pointAlongTheWay.row > 0) {
+		potentialMovePoints.push(this.cells[pointAlongTheWay.row - 1][pointAlongTheWay.col]);
+	}
+	if (pointAlongTheWay.row < paiShoBoardMaxRowOrCol) {
+		potentialMovePoints.push(this.cells[pointAlongTheWay.row + 1][pointAlongTheWay.col]);
+	}
+	if (pointAlongTheWay.col > 0) {
+		potentialMovePoints.push(this.cells[pointAlongTheWay.row][pointAlongTheWay.col - 1]);
+	}
+	if (pointAlongTheWay.col < paiShoBoardMaxRowOrCol) {
+		potentialMovePoints.push(this.cells[pointAlongTheWay.row][pointAlongTheWay.col + 1]);
+	}
+
+	var finalPoints = [];
+
+	potentialMovePoints.forEach(function(potentialMovePoint) {
+		if (!potentialMovePoint.isType(NON_PLAYABLE)) {
+			var newRowDiff = originPoint.row - potentialMovePoint.row;
+			var newColDiff = originPoint.col - potentialMovePoint.col;
+			if (!mustPreserveDirection
+					|| (rowDifference >= 0 && newRowDiff >= 0 && newColDiff === 0)
+					|| (rowDifference <= 0 && newRowDiff <= 0 && newColDiff === 0)
+					|| (colDifference >= 0 && newColDiff >= 0 && newRowDiff === 0)
+					|| (colDifference <= 0 && newColDiff <= 0 && newRowDiff === 0)
+			) {
+				finalPoints.push(potentialMovePoint);
+			}
+		}
+	});
+
+	return finalPoints;
+};
+
+SkudPaiShoBoard.prototype.getAdjacentDiagonalPointsPotentialPossibleMoves = function(pointAlongTheWay, originPoint, mustPreserveDirection, movementInfo) {
+	var diagonalPoints = [];
+
+	if (!pointAlongTheWay) {
+		pointAlongTheWay = originPoint;
+	}
+	var rowDifference = originPoint.row - pointAlongTheWay.row;
+	var colDifference = originPoint.col - pointAlongTheWay.col;
+
+	if (
+			(!mustPreserveDirection || (mustPreserveDirection && rowDifference >= 0 && colDifference >= 0))
+			&& (pointAlongTheWay.row > 0 && pointAlongTheWay.col > 0)
+		) {
+		var adjacentPoint = this.cells[pointAlongTheWay.row - 1][pointAlongTheWay.col - 1];
+		if (!adjacentPoint.isType(NON_PLAYABLE)) {
+			diagonalPoints.push(adjacentPoint);
+		}
+	}
+	if (
+			(!mustPreserveDirection || (mustPreserveDirection && rowDifference <= 0 && colDifference <= 0))
+			&& (pointAlongTheWay.row < paiShoBoardMaxRowOrCol && pointAlongTheWay.col < paiShoBoardMaxRowOrCol)
+		) {
+		var adjacentPoint = this.cells[pointAlongTheWay.row + 1][pointAlongTheWay.col + 1];
+		if (!adjacentPoint.isType(NON_PLAYABLE)) {
+			diagonalPoints.push(adjacentPoint);
+		}
+	}
+	if (
+			(!mustPreserveDirection || (mustPreserveDirection && colDifference >= 0 && rowDifference <= 0))
+			&& (pointAlongTheWay.col > 0 && pointAlongTheWay.row < paiShoBoardMaxRowOrCol)
+		) {
+		var adjacentPoint = this.cells[pointAlongTheWay.row + 1][pointAlongTheWay.col - 1];
+		if (!adjacentPoint.isType(NON_PLAYABLE)) {
+			diagonalPoints.push(adjacentPoint);
+		}
+	}
+	if (
+			(!mustPreserveDirection || (mustPreserveDirection && colDifference <= 0 && rowDifference >= 0))
+			&& (pointAlongTheWay.col < paiShoBoardMaxRowOrCol && pointAlongTheWay.row > 0)
+		) {
+		var adjacentPoint = this.cells[pointAlongTheWay.row - 1][pointAlongTheWay.col + 1];
+		if (!adjacentPoint.isType(NON_PLAYABLE)) {
+			diagonalPoints.push(adjacentPoint);
+		}
+	}
+
+	return diagonalPoints;
+};
+
+SkudPaiShoBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movementInfo, originPoint, targetPoint, isDeploy) {
+	return targetPoint.hasTile()
+		&& this.canCapture(originPoint, targetPoint);
+};
+
+SkudPaiShoBoard.prototype.tileCanCapture = function(tile, movementInfo, fromPoint, targetPoint) {
+	return tile.canCapture(targetPoint.tile)
+		|| (tile.type === AdevarTileType.secondFace && targetPoint.tile.type === AdevarTileType.hiddenTile);	// Allow attempting to capture HT with any SFT
+};
+
+SkudPaiShoBoard.prototype.tileCanMoveThroughPoint = function(tile, movementInfo, targetPoint, fromPoint) {
+	// Can also check anything else that restricts tile movement through spaces on the board
+	return !targetPoint.hasTile();
+};
+
+SkudPaiShoBoard.prototype.canMoveHereMoreEfficientlyAlready = function(boardPoint, distanceRemaining, movementInfo) {
+	return boardPoint.getMoveDistanceRemaining(movementInfo) >= distanceRemaining;
+};
+
 SkudPaiShoBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
+	if (boardPointStart.hasTile()) {
+		this.setPossibleMovesForMovement({ distance: boardPointStart.tile.getMoveDistance() }, boardPointStart);
+	}
+};
+
+SkudPaiShoBoard.prototype.setPossibleMovesForMovement = function(movementInfo, boardPointStart) {
+	if (gameOptionEnabled(DIAGONAL_MOVEMENT)) {
+		this.setPossibleMovementPointsFromMovePoints([boardPointStart], SkudPaiShoBoard.diagonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+	} else {
+		this.setPossibleMovementPointsFromMovePoints([boardPointStart], SkudPaiShoBoard.standardMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+	}
+};
+SkudPaiShoBoard.standardMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
+	var mustPreserveDirection = false;	// True means the tile couldn't turn as it goes
+	return board.getAdjacentPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
+};
+SkudPaiShoBoard.diagonalMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
+	var mustPreserveDirection = false;
+	return board.getAdjacentDiagonalPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
+};
+SkudPaiShoBoard.standardPlusDiagonalMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
+	var mustPreserveDirection = false;
+	var movePoints = board.getAdjacentPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
+	return movePoints.concat(board.getAdjacentDiagonalPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo));
+};
+SkudPaiShoBoard.prototype.setPossibleMovementPointsFromMovePoints = function(movePoints, nextPossibleMovementPointsFunction, tile, movementInfo, originPoint, distanceRemaining, moveStepNumber) {
+	if (distanceRemaining === 0
+			|| !movePoints
+			|| movePoints.length <= 0) {
+		return;	// Complete
+	}
+
+	var self = this;
+	var nextPointsConfirmed = [];
+	movePoints.forEach(function(recentPoint) {
+		var nextPossiblePoints = nextPossibleMovementPointsFunction(self, originPoint, recentPoint, movementInfo, moveStepNumber);
+		nextPossiblePoints.forEach(function(adjacentPoint) {
+			if (!self.canMoveHereMoreEfficientlyAlready(adjacentPoint, distanceRemaining, movementInfo)) {
+				adjacentPoint.setMoveDistanceRemaining(movementInfo, distanceRemaining);
+				
+				var canMoveThroughPoint = self.tileCanMoveThroughPoint(tile, movementInfo, adjacentPoint, recentPoint);
+				
+				/* If cannot move through point, then the distance remaining is 0, none! */
+				if (!canMoveThroughPoint) {
+					adjacentPoint.setMoveDistanceRemaining(movementInfo, 0);
+				}
+				
+				if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint, originPoint)) {
+					var movementOk = self.setPointAsPossibleMovement(adjacentPoint, tile, originPoint);
+					if (movementOk) {
+						if (!adjacentPoint.hasTile() || canMoveThroughPoint) {
+							nextPointsConfirmed.push(adjacentPoint);
+						}
+					}
+				} else if (canMoveThroughPoint) {
+					nextPointsConfirmed.push(adjacentPoint);
+				}
+			}
+		});
+	});
+
+	this.setPossibleMovementPointsFromMovePoints(nextPointsConfirmed,
+		nextPossibleMovementPointsFunction, 
+		tile, 
+		movementInfo, 
+		originPoint,
+		distanceRemaining - 1,
+		moveStepNumber + 1);
+};
+
+SkudPaiShoBoard.prototype.setPointAsPossibleMovement = function(targetPoint, tileBeingMoved, originPoint, currentMovementPath) {
+	targetPoint.addType(POSSIBLE_MOVE);
+	return true;
+};
+
+SkudPaiShoBoard.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targetPoint, fromPoint, originPoint) {
+	return this.couldMoveTileToPoint(tile.ownerName, originPoint, targetPoint);
+};
+
+/* SkudPaiShoBoard.prototype.setPossibleMovePointsOld = function(boardPointStart) {
 	if (!boardPointStart.hasTile()) {
 		return;
 	}
@@ -1701,12 +1957,13 @@ SkudPaiShoBoard.prototype.setPossibleMovePoints = function(boardPointStart) {
 			}
 		}
 	}
-};
+}; */
 
 SkudPaiShoBoard.prototype.removePossibleMovePoints = function() {
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
 			boardPoint.removeType(POSSIBLE_MOVE);
+			boardPoint.clearPossibleMovementTypes();
 		});
 	});
 };
@@ -1730,7 +1987,7 @@ SkudPaiShoBoard.prototype.setOpenGatePossibleMoves = function(player, tile) {
 						var newBoard = this.getCopy();
 						var notationPoint = new NotationPoint(new RowAndColumn(surroundingPoint.row, surroundingPoint.col).notationPointString);
 						newBoard.placeTile(tile, notationPoint);
-						if (!newBoard.moveCreatesDisharmony(notationPoint, notationPoint)) {
+						if (gameOptionEnabled(IGNORE_CLASHING) || !newBoard.moveCreatesDisharmony(notationPoint, notationPoint)) {
 							surroundingPoint.addType(POSSIBLE_MOVE);
 						}
 					}
