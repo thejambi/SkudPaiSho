@@ -161,8 +161,11 @@ gameOptionDescriptions[HEXHEX_10] = "Board size: 10 per side";
 var CAPTURE_ABILITY_TARGET_1 = "CaptureAbilityTarget1";
 gameOptionDescriptions[CAPTURE_ABILITY_TARGET_1] = "Lion Turtle and Dragon Capture Limit 1";
 
-var LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN = "LTAbilityTargetTouchingGarden";
+var LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN = "LTAbilityTargetTouchingGarden";	// Unused
 gameOptionDescriptions[LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN] = "Lion Turtle Ability: Captures adjacent Original Benders that are touching a red/white garden";
+
+var LION_TURTLE_ABILITY_ANYWHERE = "LTAbilityAnywhere";
+gameOptionDescriptions[LION_TURTLE_ABILITY_ANYWHERE] = "Lion Turtle Ability: Captures adjacent Original Benders, whether they are touching central garden or not";
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
