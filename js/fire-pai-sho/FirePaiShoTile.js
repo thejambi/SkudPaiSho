@@ -27,10 +27,12 @@ function FirePaiShoTile(code, ownerCode) {
 	} else if (this.code === 'L' || this.code === 'O') {
 		this.type = SPECIAL_FLOWER;
 		this.setSpecialFlowerInfo();
-	} else if (this.code === 'R' || this.code === 'W' || this.code === 'K' || this.code === 'B'
-				|| this.code === 'P' || this.code === 'M' || this.code === 'T') {
+	} else if (this.code === 'R' || this.code === 'W' || this.code === 'K' || this.code === 'B') {
 		this.type = ACCENT_TILE;
 		this.setAccentInfo();
+	} else if (this.code === 'G' || this.code === 'F' || this.code === 'D' || this.code === 'Y' || this.code === 'T') {
+		this.type = ORIGINAL_BENDER;
+		this.setOriginalBenderInfo();
 	} else {
 		debug("Error: Unknown tile type");
 	}
@@ -45,12 +47,6 @@ FirePaiShoTile.prototype.setAccentInfo = function() {
 		this.accentType = KNOTWEED;
 	} else if (this.code === 'B') {
 		this.accentType = BOAT;
-	} else if (this.code === 'P') {
-		this.accentType = POND;
-	} else if (this.code === 'M') {
-		this.accentType = BAMBOO;
-	} else if (this.code === 'T') {
-		this.accentType = LION_TURTLE;
 	}
 };
 
@@ -60,6 +56,27 @@ FirePaiShoTile.prototype.setSpecialFlowerInfo = function() {
 	} else if (this.code === 'O') {
 		this.specialFlowerType = ORCHID;
 		this.harmonizer = true;
+	}
+};
+
+FirePaiShoTile.prototype.setOriginalBenderInfo = function() {
+	
+		//G badgermole
+		//F flying bison
+		//D dragon
+		//Y koi fish (yin and yang)
+		//L lion turtle
+
+	if (this.code === 'G') {
+		this.originalBenderType = BADGERMOLE;
+	} else if (this.code === 'F') {
+		this.originalBenderType = FLYING_BISON;
+	} else if (this.code === 'D') {
+		this.originalBenderType = DRAGON;
+	} else if (this.code === 'Y') {
+		this.originalBenderType = KOI;
+	} else if (this.code === 'T') {
+		this.originalBenderType = LION_TURTLE;
 	}
 };
 
@@ -75,7 +92,7 @@ FirePaiShoTile.prototype.getImageName = function() {
 	return this.ownerCode + "" + this.code;
 };
 
-FirePaiShoTile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTurtle, isBuffedByRock) {
+FirePaiShoTile.prototype.formsHarmonyWith = function(otherTile, isBuffedByRock) {
 	if (this.type === ACCENT_TILE || otherTile.type === ACCENT_TILE){
 		return false;
 	}
@@ -97,7 +114,7 @@ FirePaiShoTile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTur
 	}
 
 	// For normal Harmonies, tiles must belong to same player
-	if (!surroundsLionTurtle && otherTile.ownerName !== this.ownerName) {
+	if (otherTile.ownerName !== this.ownerName) {
 		return false;
 	}
 
@@ -107,10 +124,10 @@ FirePaiShoTile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTur
 	}
 
 	// Same color and number difference of 1
-	if (this.basicColorCode === otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 1 || surroundsLionTurtle) {
+	if (this.basicColorCode === otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 1) {
 		return true;
 		// if not that, check different color and number difference of 2?
-	} else if (this.basicColorCode !== otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 2 || surroundsLionTurtle) {
+	} else if (this.basicColorCode !== otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 2) {
 		return true;
 	}
 
@@ -136,7 +153,7 @@ FirePaiShoTile.prototype.clashesWith = function(otherTile) {
 FirePaiShoTile.prototype.getMoveDistance = function() {
 	if (this.type === BASIC_FLOWER) {
 		return parseInt(this.basicValue);
-	} else if (this.code === 'L') {
+	} else if (this.code === 'L' || this.type === ORIGINAL_BENDER) {
 		return 2;
 	} else if (this.code === 'O') {
 		return 6;
@@ -202,15 +219,18 @@ FirePaiShoTile.getTileName = function(tileCode) {
 			name = "Orchid";
 		} else if (tileCode === 'L') {
 			name = "White Lotus";
-		} else if (tileCode === 'P') {
-			name = "Pond";
-		} else if (tileCode === 'M') {
-			name = "Bamboo";
+		} else if (tileCode === 'G') {
+			name = "Badgermole";
+		} else if (tileCode === 'F') {
+			name = "Flying Bison";
+		} else if (tileCode === 'D') {
+			name = "Dragon";
+		} else if (tileCode === 'Y') {
+			name = "Koi";
 		} else if (tileCode === 'T') {
 			name = "Lion Turtle";
 		}
 	}
-
 	return name;
 };
 
@@ -223,38 +243,3 @@ FirePaiShoTile.getClashTileCode = function(tileCode) {
 		}
 	}
 };
-
-// Tile.getTileHeading = function(tileCode) {
-// 	var heading = Tile.getTileName(tileCode);
-
-// 	if (tileCode.length ===  1) {
-// 		return heading;
-// 	}
-
-// 	// For Basic Flower Tile, add simple name (like "Red 3")
-
-// 	heading += " (";
-// 	if ()
-// };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

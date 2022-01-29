@@ -32,6 +32,14 @@ FirePaiShoTileManager.prototype.loadLibrary = function(ownerCode) {
 	tiles.push(new FirePaiShoTile('L', ownerCode));
 	tiles.push(new FirePaiShoTile('O', ownerCode));
 
+	// 1 of each original bender (TEMPORARY FOR TESTING)
+	tiles.push(new FirePaiShoTile('G', ownerCode));
+	tiles.push(new FirePaiShoTile('D', ownerCode));
+	tiles.push(new FirePaiShoTile('Y', ownerCode));
+	tiles.push(new FirePaiShoTile('F', ownerCode));
+	tiles.push(new FirePaiShoTile('T', ownerCode));
+
+
 	return tiles;
 }
 
@@ -80,15 +88,6 @@ FirePaiShoTileManager.prototype.loadReserve = function(ownerCode) {
 
 }
 
-/** OLD SKUD LOADING
-FirePaiShoTileManager.prototype.loadTileSet = function(ownerCode) {
-	if (simpleCanonRules) {
-		return this.loadSimpleCanonSet(ownerCode);
-	} else {
-		return this.loadSkudSet(ownerCode);
-	}
-};
-*/
 
 
 

@@ -187,7 +187,7 @@ FirePaiShoActuator.prototype.addTile = function(tile, mainContainer, clickable) 
 
 	var theImg = document.createElement("img");
 
-	var srcValue = getSkudTilesSrcPath();
+	var srcValue = getFireTilesSrcPath();
 	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
 
@@ -336,7 +336,7 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags);
 		}
 
-		var srcValue = getSkudTilesSrcPath();
+		var srcValue = getFireTilesSrcPath();
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 
 		if (boardPoint.tile.harmonyOwners 
@@ -405,7 +405,7 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 			placedOnAccent = true;
 
 			if (moveToAnimate.bonusTileCode === "B" && !moveToAnimate.boatBonusPoint && moveToAnimate.tileRemovedWithBoat && isSamePoint(moveToAnimate.bonusEndPoint, ox, oy)) {// Placement of Boat to remove Accent Tile
-				var srcValue = getSkudTilesSrcPath();
+				var srcValue = getFireTilesSrcPath();
 				theImg.src = srcValue + moveToAnimate.tileRemovedWithBoat.getImageName() + ".png";
 				boatRemovingAccent = true;
 			} else if (moveToAnimate.bonusTileCode === "B" && moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.bonusEndPoint, ox, oy)) {// Placement of Boat to move Flower Tile
@@ -577,3 +577,12 @@ FirePaiShoActuator.prototype.printBoard = function(board) {
 
 	
 };
+
+
+function getFireTilesSrcPath() {
+	if (SkudPaiShoController.isUsingCustomTileDesigns()) {
+		return SkudPaiShoController.getCustomTileDesignsUrl();
+	} else {
+		return "images/Fire/" + skudTilesKey + "/";
+	}
+}

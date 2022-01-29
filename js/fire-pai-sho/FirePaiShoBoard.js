@@ -361,12 +361,6 @@ FirePaiShoBoard.prototype.placeTile = function(tile, notationPoint, tileManager,
 			this.placeKnotweed(tile, notationPoint);
 		} else if (tile.accentType === BOAT) {
 			tileRemovedWithBoat = this.placeBoat(tile, notationPoint, extraBoatPoint);
-		} else if (tile.accentType === BAMBOO) {
-			this.placeBamboo(tile, notationPoint, false, tileManager);
-		} else if (tile.accentType === POND) {
-			this.placePond(tile, notationPoint);
-		} else if (tile.accentType === LION_TURTLE) {
-			this.placeLionTurtle(tile, notationPoint);
 		}
 	} else {
 		this.putTileOnPoint(tile, notationPoint);
@@ -453,6 +447,29 @@ FirePaiShoBoard.prototype.canPlaceFlower = function(boardPoint, tile) {
 	
 	if (boardPoint.hasTile()) {
 		// debug("Flower cannot be played on top of another tile");
+		return false;
+	}
+	if (boardPoint.isType(GATE)) {
+		return false;
+	}
+
+	var newBoard = this.getCopy();
+	var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
+	var code = tile.code;
+	var player = tile.playerCode;
+	var copyTile = new FirePaiShoTile(code, player);
+	newBoard.placeTile(copyTile, notationPoint);
+	if (newBoard.moveCreatesDisharmony(notationPoint, notationPoint)){
+		return false;
+	}
+
+	return true;
+};
+
+FirePaiShoBoard.prototype.canPlaceBender = function(boardPoint, tile) {
+
+	if (boardPoint.hasTile()) {
+		// debug("Original Bender cannot be played on top of another tile");
 		return false;
 	}
 	if (boardPoint.isType(GATE)) {
@@ -825,32 +842,6 @@ FirePaiShoBoard.prototype.placePond = function(tile, notationPoint, ignoreCheck)
 	boardPoint.putTile(tile);
 };
 
-FirePaiShoBoard.prototype.canPlaceLionTurtle = function(boardPoint, tile) {
-	return !boardPoint.hasTile() 
-		&& !boardPoint.isType(GATE);
-};
-
-// FirePaiShoBoard.prototype.pointSurroundsPointSurroundingLionTurtle = function(boardPoint) {
-// 	var rowCols = this.getSurroundingRowAndCols(boardPoint);
-// 	for (var i = 0; i < rowCols.length; i++) {
-// 		if (this.getSurroundingLionTurtleTile(rowCols[i])) {
-// 			return true;
-// 		}
-// 	}
-// 	return false;
-// }
-
-FirePaiShoBoard.prototype.placeLionTurtle = function(tile, notationPoint, ignoreCheck) {
-	var rowAndCol = notationPoint.rowAndColumn;
-	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
-
-	if (!ignoreCheck && !this.canPlaceLionTurtle(boardPoint, tile)) {
-		return false;
-	}
-
-	// Place tile
-	boardPoint.putTile(tile);
-};
 
 FirePaiShoBoard.prototype.getClockwiseRowCol = function(center, rowCol) {
 	if (rowCol.row < center.row && rowCol.col <= center.col) {
@@ -1525,18 +1516,6 @@ FirePaiShoBoard.prototype.analyzeHarmonies = function() {
 	}
 };
 
-FirePaiShoBoard.prototype.getSurroundingLionTurtleTiles = function(boardPoint) {
-	var surroundingLionTurtleTiles = [];
-	var rowCols = this.getSurroundingRowAndCols(boardPoint);
-	for (var i = 0; i < rowCols.length; i++) {
-		var surroundingPoint = this.cells[rowCols[i].row][rowCols[i].col];
-		if (surroundingPoint.hasTile() && surroundingPoint.tile.accentType === LION_TURTLE) {
-			surroundingLionTurtleTiles.push(surroundingPoint.tile);
-		}
-	}
-	return surroundingLionTurtleTiles;
-};
-
 FirePaiShoBoard.prototype.getTileHarmonies = function(boardPoint) {
 	var tile = boardPoint.tile;
 	var rowAndCol = boardPoint;
@@ -1546,27 +1525,24 @@ FirePaiShoBoard.prototype.getTileHarmonies = function(boardPoint) {
 		return tileHarmonies;
 	}
 
-	var surroundingLionTurtleTiles = this.getSurroundingLionTurtleTiles(rowAndCol);
-
-
-	var leftHarmony = this.getHarmonyLeft(tile, rowAndCol, surroundingLionTurtleTiles);
+	var leftHarmony = this.getHarmonyLeft(tile, rowAndCol);
 	if (leftHarmony) {
 		tileHarmonies.push(leftHarmony);
 	}
 
-	var rightHarmony = this.getHarmonyRight(tile, rowAndCol, surroundingLionTurtleTiles);
+	var rightHarmony = this.getHarmonyRight(tile, rowAndCol);
 	if (rightHarmony) {
 		tileHarmonies.push(rightHarmony);
 	}
 
 
 
-	var upHarmony = this.getHarmonyUp(tile, rowAndCol, surroundingLionTurtleTiles);
+	var upHarmony = this.getHarmonyUp(tile, rowAndCol);
 	if (upHarmony) {
 		tileHarmonies.push(upHarmony);
 	}
 
-	var downHarmony = this.getHarmonyDown(tile, rowAndCol, surroundingLionTurtleTiles);
+	var downHarmony = this.getHarmonyDown(tile, rowAndCol);
 	if (downHarmony) {
 		tileHarmonies.push(downHarmony);
 	}
@@ -1575,7 +1551,7 @@ FirePaiShoBoard.prototype.getTileHarmonies = function(boardPoint) {
 	return tileHarmonies;
 };
 
-FirePaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol, surroundingLionTurtleTiles) {
+FirePaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
 	if (gameOptionEnabled(ETHEREAL_ACCENT_TILES)) {
@@ -1593,20 +1569,16 @@ FirePaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol, surrounding
 	if (colToCheck >= 0) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
 
-		var newSurroundingLionTurtles = this.getSurroundingLionTurtleTiles(checkPoint);
-		newSurroundingLionTurtles = newSurroundingLionTurtles.concat(surroundingLionTurtleTiles);
-		var surroundsLionTurtle = newSurroundingLionTurtles.length > 0;
-
 		var checkRowIsBuffed = this.rowBuffedByRock(endRowCol.row);
 
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundsLionTurtle, checkRowIsBuffed)) {
-			var harmony = new FirePaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), newSurroundingLionTurtles);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, checkRowIsBuffed)) {
+			var harmony = new FirePaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
 	}
 };
 
-FirePaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol, surroundingLionTurtleTiles) {
+FirePaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
 
 	if (gameOptionEnabled(ETHEREAL_ACCENT_TILES)) {
@@ -1625,20 +1597,16 @@ FirePaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol, surroundin
 	if (colToCheck <= 16) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
 
-		var newSurroundingLionTurtles = this.getSurroundingLionTurtleTiles(checkPoint);
-		newSurroundingLionTurtles = newSurroundingLionTurtles.concat(surroundingLionTurtleTiles);
-		var surroundsLionTurtle = newSurroundingLionTurtles.length > 0;
-
 		var checkRowIsBuffed = this.rowBuffedByRock(endRowCol.row);
 
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundsLionTurtle, checkRowIsBuffed)) {
-			var harmony = new FirePaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), newSurroundingLionTurtles);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, checkRowIsBuffed)) {
+			var harmony = new FirePaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
 	}
 };
 
-FirePaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol, surroundingLionTurtleTiles) {
+FirePaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
 	if (gameOptionEnabled(ETHEREAL_ACCENT_TILES)) {
@@ -1658,20 +1626,16 @@ FirePaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol, surroundingLi
 	if (rowToCheck >= 0) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
 
-		var newSurroundingLionTurtles = this.getSurroundingLionTurtleTiles(checkPoint);
-		newSurroundingLionTurtles = newSurroundingLionTurtles.concat(surroundingLionTurtleTiles);
-		var surroundsLionTurtle = newSurroundingLionTurtles.length > 0;
-
 		var checkColIsBuffed = this.columnBuffedByRock(endRowCol.col);
 
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundsLionTurtle, checkColIsBuffed)) {
-			var harmony = new FirePaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), newSurroundingLionTurtles);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, checkColIsBuffed)) {
+			var harmony = new FirePaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
 	}
 };
 
-FirePaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol, surroundingLionTurtleTiles) {
+FirePaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
 	if (gameOptionEnabled(ETHEREAL_ACCENT_TILES)) {
@@ -1689,14 +1653,10 @@ FirePaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol, surrounding
 	if (rowToCheck <= 16) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
 
-		var newSurroundingLionTurtles = this.getSurroundingLionTurtleTiles(checkPoint);
-		newSurroundingLionTurtles = newSurroundingLionTurtles.concat(surroundingLionTurtleTiles);
-		var surroundsLionTurtle = newSurroundingLionTurtles.length > 0;
-
 		var checkColIsBuffed = this.columnBuffedByRock(endRowCol.col);
 
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundsLionTurtle, checkColIsBuffed)) {
-			var harmony = new FirePaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), newSurroundingLionTurtles);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, checkColIsBuffed)) {
+			var harmony = new FirePaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
 	}
@@ -1937,15 +1897,9 @@ FirePaiShoBoard.prototype.revealFirstMovePlacement = function() {
 
 	this.cells.forEach(function(row) {
 		row.forEach(function(boardPoint) {
-
-			if (boardPoint.types.includes(CENTER)) {
+			if (boardPoint.types.includes(RED) && boardPoint.types.includes(WHITE)) {
 				boardPoint.addType(POSSIBLE_MOVE);
-			} else if (gameOptionEnabled(MIDLINE_OPENER)){
-				if (boardPoint.types.includes(RED) && boardPoint.types.includes(WHITE)) {
-					boardPoint.addType(POSSIBLE_MOVE);
-				}
 			}
-			
 		});
 	});
 };
@@ -1962,10 +1916,8 @@ FirePaiShoBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 				|| (tile.accentType === WHEEL && self.canPlaceWheel(boardPoint))
 				|| (tile.accentType === KNOTWEED && self.canPlaceKnotweed(boardPoint))
 				|| (tile.accentType === BOAT && self.canPlaceBoat(boardPoint))
-				|| (tile.accentType === BAMBOO && self.canPlaceBamboo(boardPoint, tile))
-				|| (tile.accentType === POND && self.canPlacePond(boardPoint, tile))
-				|| (tile.accentType === LION_TURTLE && self.canPlaceLionTurtle(boardPoint, tile))
-				|| ((tile.type === BASIC_FLOWER || tile.type === SPECIAL_FLOWER) && self.canPlaceFlower(boardPoint, tile)) //is a flower tile
+				|| (tile.type === ORIGINAL_BENDER && self.canPlaceBoat(boardPoint))
+				|| ((tile.type === BASIC_FLOWER || tile.type === SPECIAL_FLOWER) && self.canPlaceFlower(boardPoint, tile)) //is a flower tile or 
 			) {
 				valid = true;
 			}

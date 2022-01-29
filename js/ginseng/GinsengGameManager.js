@@ -1,4 +1,4 @@
-// Trifle Game Manager
+// Ginseng Game Manager
 
 Ginseng.GameManager = function(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';

@@ -2311,10 +2311,9 @@ var GameType = {
 			NO_HARMONY_VISUAL_AIDS,
 			OPTION_DOUBLE_ACCENT_TILES,
 			HIDE_RESERVE_TILES,
-			MIDLINE_OPENER,
-			ETHEREAL_ACCENT_TILES
+			ETHEREAL_ACCENT_TILES,
+			ORIGINAL_BENDER_EXPANSION
 		],
-		noRankedGames: true	// Can take out when testing done, game ready to enable ranked games
 	},
 	SolitairePaiSho: {
 		id: 4,

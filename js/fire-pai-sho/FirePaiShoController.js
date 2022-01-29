@@ -203,19 +203,6 @@ FirePaiShoController.prototype.getExtraHarmonyBonusHelpText = function() {
 	var retstring = " <br /> Your bonus tile is: ";
 	retstring += FirePaiShoController.getTileNameFromCode(this.notationBuilder.bonusTileCode);
 	return retstring; 
-	/** GATES RULE DONT MATTER IN FIRE PAI SHO
-	if (!limitedGatesRule) {
-		if (this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
-			return " <br />You can choose an Accent Tile, Special Flower Tile, or, since you have less than two Growing Flowers, a Basic Flower Tile.";
-		}
-		return " <br />You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have two or more Growing Flowers.";
-	} else {
-		if (this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
-			return " <br />You can choose an Accent Tile or, since you have no Growing Flowers, a Basic or Special Flower Tile.";
-		}
-		return " <br />You can choose an Accent Tile or a Special Flower Tile. You cannot choose a Basic Flower Tile because you have at least one Growing Flower.";
-	}
-*/
 };
 
 FirePaiShoController.prototype.showHarmonyBonusMessage = function() {
@@ -729,9 +716,7 @@ FirePaiShoController.prototype.getHelpMessageForTile = function(tile) {
 		} else if (tileCode === 'W') {
 			heading = "Accent Tile: Wheel";
 			if (rocksUnwheelable || simplest) {
-				message.push("The Wheel rotates all surrounding tiles one space clockwise but cannot move a Rock (cannot move tiles off the board or onto or off of a Gate).");
-			} else {
-				message.push("The Wheel rotates all surrounding tiles one space clockwise (cannot move tiles off the board or onto or off of a Gate).");
+				message.push("The Wheel rotates all surrounding tiles one space clockwise but cannot move a Rock.");
 			}
 		} else if (tileCode === 'K') {
 			heading = "Accent Tile: Knotweed";
@@ -753,41 +738,39 @@ FirePaiShoController.prototype.getHelpMessageForTile = function(tile) {
 			heading = "Special Flower: White Lotus";
 			message.push("Can move up to 2 spaces");
 			message.push("Forms Harmony with all non-Lotus Flower Tiles of either player");
-			if (!lotusNoCapture && !simplest) {
-				message.push("Can be captured by any Flower Tile");
-			}
 		} else if (tileCode === 'O') {
 			heading = "Special Flower: Orchid";
 			message.push("Can move up to 6 spaces");
-			message.push("Forms no natural harmonies of its own, but can form harmony using the special powers of other tiles.");
-			if (!simplest) {
-				message.push("Can capture Flower Tiles if you have a Blooming White Lotus");
-			}
-			if (lotusNoCapture || simplest) {
-				message.push("Can be captured by any Flower Tile if you have a Blooming White Lotus");
-			} else {
-				message.push("Can be captured by any Basic Flower Tile if your White Lotus has been played");
-			}
-		} else if (tileCode === 'M') {
-			heading = "Accent Tile: Bamboo";
-			message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
-			// message.push("When played, return each surrounding tile to owner's hand");
-			message.push("If played on a point surrounding a Blooming Flower Tile belonging to the owner (but not surrounding a tile in a Gate), return each surrounding tile to owner's hand when played.");
-			message.push("Tiles surrounding Bamboo cannot be captured");
-		} else if (tileCode === 'P') {
-			heading = "Accent Tile: Pond";
-			message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
-			message.push("Flower Tiles may be Planted on points surrounding a Pond");
-			message.push("(Tiles are Blooming after being Planted)");
-		} else if (tileCode === 'T') {
-			heading = "Accent Tile: Lion Turtle";
-			message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
-			message.push("Flower tiles surrounding a Lion Turtle form Harmony with all Basic Flower Tiles of either player");
-			message.push("The owner of the Lion Turtle owns the Harmonies that include both players' tiles");
-			message.push("(Overlap with other Lion Turtle tiles can combine this effect, so Harmonies can potentially belong to both players)");
-		}
-	}
+			message.push("Forms no natural Harmony of its own, but can form harmony using the special powers of other tiles.");
 
+		} else if (tileCode === 'T') {
+			heading = "Original Bender: Lion Turtle";
+			message.push("Can move up to 2 spaces");
+			message.push("Forms no natural Harmony of its own, but can form harmony using the special powers of other tiles.");
+			message.push("Original benders may be placed adjacent to the Lion Turtle or move as if their move started at the Lion Turtle.");
+		} else if (tileCode === 'Y') {
+			heading = "Original Bender: Koi";
+			message.push("Can move up to 2 spaces");
+			message.push("Forms Harmony with all white flowers.");
+			message.push("The Koi and all adjacent tiles are ethereal: Harmony lines may pass through them.");
+		} else if (tileCode === 'G') {
+			heading = "Original Bender: Badgermole";
+			message.push("Can move up to 2 spaces");
+			message.push("Forms Harmony with all white flowers.");
+			message.push("After placement or movement, the Badgermole rotates all surrounding tiles one space counterclockwise, if possible, and cannot move a Boat.");
+		} else if (tileCode === 'D') {
+			heading = "Original Bender: Dragon";
+			message.push("Can move up to 2 spaces");
+			message.push("Forms Harmony with all red flowers.");
+			message.push("After placement or movement, the Dragon removes all adjacent accent tiles and Original Benders, if possible, starting with the north piece and moving clockwise.");
+		} else if (tileCode === 'F') {
+			heading = "Original Bender: Flying Bison";
+			message.push("Can move up to 2 spaces");
+			message.push("Forms Harmony with all red flowers.");
+			message.push("After placement or movement, the Bison pushes all tiles one space away from it, if possible, starting with the north piece and moving clockwise.");
+		}
+		
+	}
 	return {
 		heading: heading,
 		message: message
@@ -957,3 +940,4 @@ FirePaiShoController.prototype.toggleBoardRotation = function() {
 FirePaiShoController.prototype.setAnimationsOn = function(isAnimationsOn) {
 	this.actuator.setAnimationOn(isAnimationsOn);
 };
+
