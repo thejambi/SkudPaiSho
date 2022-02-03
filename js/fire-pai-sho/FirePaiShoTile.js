@@ -12,6 +12,7 @@ function FirePaiShoTile(code, ownerCode) {
 	}
 	this.id = tileId++;
 	this.boosted = false;
+	this.ethereal = false;
 	this.selectedFromPile = false;
 
 	if (this.code.length === 2 && (this.code.includes('R') || this.code.includes('W'))) {
@@ -48,6 +49,10 @@ FirePaiShoTile.prototype.setAccentInfo = function() {
 	} else if (this.code === 'B') {
 		this.accentType = BOAT;
 	}
+
+	if (gameOptionEnabled(ETHEREAL_ACCENT_TILES)) {
+		this.etherealize();
+	}
 };
 
 FirePaiShoTile.prototype.setSpecialFlowerInfo = function() {
@@ -61,22 +66,31 @@ FirePaiShoTile.prototype.setSpecialFlowerInfo = function() {
 
 FirePaiShoTile.prototype.setOriginalBenderInfo = function() {
 	
-		//G badgermole
+		//G badgermole (badGermole)
 		//F flying bison
 		//D dragon
-		//Y koi fish (yin and yang)
-		//L lion turtle
+		//Y koi fish (Yin and Yang)
+		//T lion turtle
 
 	if (this.code === 'G') {
 		this.originalBenderType = BADGERMOLE;
+		this.affinityColorName = WHITE;
+		this.harmonizer = true;
 	} else if (this.code === 'F') {
 		this.originalBenderType = FLYING_BISON;
+		this.affinityColorName = RED;
+		this.harmonizer = true;
 	} else if (this.code === 'D') {
 		this.originalBenderType = DRAGON;
+		this.affinityColorName = RED;
+		this.harmonizer = true;
 	} else if (this.code === 'Y') {
 		this.originalBenderType = KOI;
+		this.affinityColorName = WHITE;
+		this.harmonizer = true;
 	} else if (this.code === 'T') {
 		this.originalBenderType = LION_TURTLE;
+		this.harmonizer = true;
 	}
 };
 
@@ -93,15 +107,18 @@ FirePaiShoTile.prototype.getImageName = function() {
 };
 
 FirePaiShoTile.prototype.formsHarmonyWith = function(otherTile, isBuffedByRock) {
+	//Accent tiles don't form harmony
 	if (this.type === ACCENT_TILE || otherTile.type === ACCENT_TILE){
 		return false;
 	}
 	
-	if (!(this.harmonizer || this.code === 'L')
-		|| !(otherTile.harmonizer || otherTile.code === 'L')) {
+	//Each tile has to be a harmonizer or a lotus
+	if (!((this.harmonizer || this.code === 'L')
+		&& (otherTile.harmonizer || otherTile.code === 'L'))) {
 		return false;
 	}
 
+	//If one is a lotus, then the other has to be a harmonizer
 	if ((this.code === 'L' && !otherTile.harmonizer)
 		|| (otherTile.code === 'L' && !this.harmonizer)) {
 		return false;
@@ -123,6 +140,11 @@ FirePaiShoTile.prototype.formsHarmonyWith = function(otherTile, isBuffedByRock) 
 		return true;
 	}
 
+	//Orginal bender with matching color, need to make sure to exclude Lion Turtle, otherwise they will match with other benders (basicColorName === null)
+	if ((this.type === ORIGINAL_BENDER && this.originalBenderType !== LION_TURTLE && this.affinityColorName === otherTile.basicColorName) || (otherTile.type === ORIGINAL_BENDER && otherTile.originalBenderType !== LION_TURTLE && otherTile.affinityColorName === this.basicColorName) ) {
+		return true;
+	}
+
 	// Same color and number difference of 1
 	if (this.basicColorCode === otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 1) {
 		return true;
@@ -131,9 +153,11 @@ FirePaiShoTile.prototype.formsHarmonyWith = function(otherTile, isBuffedByRock) 
 		return true;
 	}
 
+	//Maybe delete this? Super harmonies is an artifact of old Skud???
 	if (superHarmonies && this.basicValue !== otherTile.basicValue) {
 		return true;
 	}
+
 };
 
 FirePaiShoTile.prototype.clashesWith = function(otherTile) {
@@ -167,8 +191,16 @@ FirePaiShoTile.prototype.boost = function() {
 	}
 };
 
+FirePaiShoTile.prototype.etherealize = function() {
+	this.ethereal = true;
+};
+
 FirePaiShoTile.prototype.restore = function() {
 	this.boosted = false;
+};
+
+FirePaiShoTile.prototype.corporealize = function() {
+	this.ethereal = false;
 };
 
 FirePaiShoTile.prototype.getName = function() {

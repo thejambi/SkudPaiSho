@@ -275,69 +275,7 @@ FirePaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 		return;
 	}
 
-	
-	/** FORGET THE CHOOSING ACCENT TILES THINGS 
-	if (this.gameNotation.moves.length <= 1) {
-		// Choosing Accent Tiles
-		if (tile.type !== ACCENT_TILE) {
-			return;
-		}
-
-		if (!tile.selectedFromPile) {
-			tile.selectedFromPile = true;
-			var removeTileCodeFrom = this.hostAccentTiles;
-			if (getCurrentPlayer() === GUEST) {
-				removeTileCodeFrom = this.guestAccentTiles;
-			}
-
-			removeTileCodeFrom.splice(removeTileCodeFrom.indexOf(tileCode), 1);
-
-			this.theGame.actuate();
-			return;
-		}
-
-		tile.selectedFromPile = false;
-
-		var accentTilesNeededToStart = 4;
-		if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
-			accentTilesNeededToStart = this.theGame.tileManager.numberOfAccentTilesPerPlayerSet();
-		} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
-			accentTilesNeededToStart = accentTilesNeededToStart * 2;
-		}
-
-		if (getCurrentPlayer() === HOST) {
-			this.hostAccentTiles.push(tileCode);
-
-			if (this.hostAccentTiles.length === accentTilesNeededToStart || (simpleCanonRules && this.hostAccentTiles.length === 2)) {
-				var move = new FirePaiShoNotationMove("0H." + this.hostAccentTiles.join());
-				this.gameNotation.addMove(move);
-				if (onlinePlayEnabled) {
-					createGameIfThatIsOk(GameType.FirePaiSho.id);
-				} else {
-					finalizeMove();
-				}
-			}
-		} else {
-			this.guestAccentTiles.push(tileCode);
-
-			if (this.guestAccentTiles.length === accentTilesNeededToStart || (simpleCanonRules && this.guestAccentTiles.length === 2)) {
-				var move = new FirePaiShoNotationMove("0G." + this.guestAccentTiles.join());
-				this.gameNotation.addMove(move);
-				// No finalize move because it is still Guest's turn
-				rerunAll();
-				showResetMoveMessage();
-			}
-		}
-		this.theGame.actuate();
-	} 
-	*/
 	if (this.notationBuilder.status === BRAND_NEW) {
-		// new Planting turn, can be basic flower -- NO WAIT CAN BE ANYTHING
-//		if (tile.type !== BASIC_FLOWER) {
-//			debug("Can only Plant a Basic Flower tile. That's not one of them.");
-//			return false;
-//		}
-
 
 		tile.selectedFromPile = true;
 
@@ -353,28 +291,6 @@ FirePaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 		}
 
 	} else if (this.notationBuilder.status === READY_FOR_BONUS) {
-
-
-
-/** CLICKING ON THE TILES SHOULD DO NOTHING WHEN WAITING ON A BONUS, SINCE THE TILE IS ALREADY SELECTED FOR THE PLAYER
-		tile.selectedFromPile = true;
-		// Bonus Plant! Can be any tile
-		//console.log("Was ready for a bonus tile and now you selected one: " + tileCode);
-		this.notationBuilder.bonusTileCode = tileCode;
-		this.notationBuilder.status = WAITING_FOR_BONUS_ENDPOINT;
-		
-//		if (tile.type === BASIC_FLOWER && this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
-//			this.theGame.revealOpenGates(getCurrentPlayer(), tile);
-//		} else if (tile.type === ACCENT_TILE) {
-			this.theGame.revealPossiblePlacementPoints(tile);
-//		} else if (tile.type === SPECIAL_FLOWER) {
-//			if (!specialFlowerLimitedRule
-//				|| (specialFlowerLimitedRule && this.theGame.playerCanBonusPlant(getCurrentPlayer()))) {
-//				this.theGame.revealSpecialFlowerPlacementPoints(getCurrentPlayer(), tile);
-//			}
-//		}
-
-*/
 
 	} else if (this.notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT
 			|| this.notationBuilder.status === WAITING_FOR_BOAT_BONUS_POINT) {
@@ -520,7 +436,7 @@ FirePaiShoController.prototype.pointClicked = function(htmlPoint) {
 			this.theGame.hidePossibleMovePoints();
 			this.notationBuilder.bonusEndPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
-			// If we're placing a boat, and boardPoint is a flower...
+			// If we're placing a boat, and boardPoint is not an accent...
 			if (this.notationBuilder.bonusTileCode.endsWith("B") && (boatOnlyMoves || boardPoint.tile.type !== ACCENT_TILE)) {
 				// Boat played on flower, need to pick flower endpoint
 				this.notationBuilder.status = WAITING_FOR_BOAT_BONUS_POINT;
@@ -559,7 +475,8 @@ FirePaiShoController.prototype.pointClicked = function(htmlPoint) {
 			//IF IT AS IN ILLEGAL MOVE, LET THE BOAT CHOOSE ITS PLACEMENT AGAIN
 			this.theGame.hidePossibleMovePoints();
 			this.notationBuilder.status = WAITING_FOR_BONUS_ENDPOINT;
-			this.theGame.revealPossiblePlacementPoints(this.currentlyDrawnReserve);
+			console.log(this.notationBuilder.bonusTile.code);
+			this.theGame.revealPossiblePlacementPoints(this.notationBuilder.bonusTile);
 		}
 	}
 };
@@ -624,9 +541,12 @@ FirePaiShoController.prototype.getPointMessage = function(htmlPoint) {
 			message.push("<strong>Currently in Harmony with: </strong>" + toBullets(bullets));
 		}
 
-		// boosted? Trapped? Anything else?
+		// boosted? Ethereal?
 		if (boardPoint.tile.boosted) {
 			message.push("Currently <em>boosted</em> by a Knotweed.");
+		}
+		if (boardPoint.tile.ethereal) {
+			message.push("Tile is currently ethereal. Harmony may pass through it.")
 		}
 	}
 	
@@ -751,22 +671,22 @@ FirePaiShoController.prototype.getHelpMessageForTile = function(tile) {
 		} else if (tileCode === 'Y') {
 			heading = "Original Bender: Koi";
 			message.push("Can move up to 2 spaces");
-			message.push("Forms Harmony with all white flowers.");
+			message.push("Forms Harmony with all same-player white flowers, and can form harmony using the special powers of other tiles.");
 			message.push("The Koi and all adjacent tiles are ethereal: Harmony lines may pass through them.");
 		} else if (tileCode === 'G') {
 			heading = "Original Bender: Badgermole";
 			message.push("Can move up to 2 spaces");
-			message.push("Forms Harmony with all white flowers.");
+			message.push("Forms Harmony with all same-player white flowers, and can form harmony using the special powers of other tiles.");
 			message.push("After placement or movement, the Badgermole rotates all surrounding tiles one space counterclockwise, if possible, and cannot move a Boat.");
 		} else if (tileCode === 'D') {
 			heading = "Original Bender: Dragon";
 			message.push("Can move up to 2 spaces");
-			message.push("Forms Harmony with all red flowers.");
+			message.push("Forms Harmony with all same-player red flowers, and can form harmony using the special powers of other tiles.");
 			message.push("After placement or movement, the Dragon removes all adjacent accent tiles and Original Benders, if possible, starting with the north piece and moving clockwise.");
 		} else if (tileCode === 'F') {
 			heading = "Original Bender: Flying Bison";
 			message.push("Can move up to 2 spaces");
-			message.push("Forms Harmony with all red flowers.");
+			message.push("Forms Harmony with all same-player red flowers, and can form harmony using the special powers of other tiles.");
 			message.push("After placement or movement, the Bison pushes all tiles one space away from it, if possible, starting with the north piece and moving clockwise.");
 		}
 		

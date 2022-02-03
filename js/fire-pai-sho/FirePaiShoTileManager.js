@@ -81,6 +81,7 @@ FirePaiShoTileManager.prototype.loadReserve = function(ownerCode) {
 	if (double) {tiles.push(new FirePaiShoTile('W', ownerCode));}
 	tiles.push(new FirePaiShoTile('K', ownerCode));
 	if (double) {tiles.push(new FirePaiShoTile('K', ownerCode));}
+
 	tiles.push(new FirePaiShoTile('B', ownerCode));
 	if (double) {tiles.push(new FirePaiShoTile('B', ownerCode));}
 

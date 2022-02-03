@@ -371,21 +371,27 @@ FirePaiShoBoard.prototype.placeTile = function(tile, notationPoint, tileManager,
 
 	// Things to do after a tile is placed
 	////////// Tile boost updating
+	//First clear all boosting and ethereal
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
 			if (bp.hasTile()) {
 				bp.tile.boosted = false;
+				//If you're playing with ethereal accent tiles, keep them ethereal, otherwise clear it
+				if (!(gameOptionEnabled(ETHEREAL_ACCENT_TILES) && bp.tile.type === ACCENT_TILE)) {bp.tile.ethereal = false;}
 			}
 		}
 	}
-	// Find Orchid tiles, then check surrounding opposite-player Basic Flower tiles and flag them
+	// Find Knotweed and Koi for boosting/ethereal
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
 			this.boostTilesSurroundingPointIfNeeded(bp);
+			this.etherealizeTilesSurroundingPointIfNeeded(bp);
 		}
 	}
+
+
 	/////////////
 	var newHarmony = this.hasNewHarmony(tile.ownerName);
 	this.analyzeHarmonies();
@@ -407,19 +413,22 @@ FirePaiShoBoard.prototype.placeTile = function(tile, notationPoint, tileManager,
 
 FirePaiShoBoard.prototype.flagAllBoostedTiles = function() {
 	// Tile boost updating
+	// Clear all boosts/ethereal
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
 			if (bp.hasTile()) {
 				bp.tile.boosted = false;
+				if (!(gameOptionEnabled(ETHEREAL_ACCENT_TILES) && bp.tile.type === ACCENT_TILE)) {bp.tile.ethereal = false;}
 			}
 		}
 	}
-	// Find Orchid tiles, then check surrounding opposite-player Basic Flower tiles and flag them
+	// Find Knotweed and Koi tiles, then check surrounding Flower tiles and flag them
 	for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
 			this.boostTilesSurroundingPointIfNeeded(bp);
+			this.etherealizeTilesSurroundingPointIfNeeded(bp);
 		}
 	}
 };
@@ -466,23 +475,38 @@ FirePaiShoBoard.prototype.canPlaceFlower = function(boardPoint, tile) {
 	return true;
 };
 
-FirePaiShoBoard.prototype.canPlaceBender = function(boardPoint, tile) {
+FirePaiShoBoard.prototype.canPlaceBender = function(boardPoint, aTile) {
+
+	nextToLionTurtle = false;
+
+	if (gameOptionEnabled(ORIGINAL_BENDER_EXPANSION)) {
+		//Any point that has the player´s lionturtle next to it is legit
+		var rowCols = this.getSurroundingRowAndCols(boardPoint);
+		for (var j = 0; j < rowCols.length; j++) {
+			var otherBp = this.cells[rowCols[j].row][rowCols[j].col];
+			if (otherBp.hasTile() && otherBp.tile.originalBenderType === LION_TURTLE && otherBp.tile.ownerName === aTile.ownerName) {
+				nextToLionTurtle = true;
+			}
+		}
+	}
+
+	//If it is properly in red without being center
+	if (boardPoint.types.includes(RED) && !boardPoint.types.includes(NEUTRAL) && !nextToLionTurtle){
+	
+		return false;
+	}
+
+	//if it is properly in white without being center
+	if (boardPoint.types.includes(WHITE) && !boardPoint.types.includes(NEUTRAL) && !nextToLionTurtle){
+		
+		return false;
+	}
 
 	if (boardPoint.hasTile()) {
 		// debug("Original Bender cannot be played on top of another tile");
 		return false;
 	}
 	if (boardPoint.isType(GATE)) {
-		return false;
-	}
-
-	var newBoard = this.getCopy();
-	var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
-	var code = tile.code;
-	var player = tile.playerCode;
-	var copyTile = new FirePaiShoTile(code, player);
-	newBoard.placeTile(copyTile, notationPoint);
-	if (newBoard.moveCreatesDisharmony(notationPoint, notationPoint)){
 		return false;
 	}
 
@@ -744,104 +768,6 @@ FirePaiShoBoard.prototype.placeBoat = function(tile, notationPoint, extraBoatPoi
 	return tileRemovedWithBoat;
 };
 
-FirePaiShoBoard.prototype.canPlaceBamboo = function(boardPoint, tile) {
-	// if (!boardPoint.hasTile()) {
-	// 	// debug("Bamboo always played on top of another tile");
-	// 	return false;
-	// }
-	// if (boardPoint.isType(GATE)) {
-	// 	return false;
-	// }
-	// return true;
-
-
-	if (boardPoint.hasTile()) {
-		// debug("Bamboo cannot be played on top of another tile");
-		return false;
-	}
-
-	if (boardPoint.isType(GATE)) {
-		return false;
-	}
-
-	// Does it create Disharmony?
-	var newBoard = this.getCopy();
-	var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
-	newBoard.placeBamboo(new FirePaiShoTile('M', 'G'), notationPoint, true);
-	if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
-		return false;
-	}
-
-	return true;
-};
-
-FirePaiShoBoard.prototype.placeBamboo = function(tile, notationPoint, ignoreCheck, tileManager) {
-	var rowAndCol = notationPoint.rowAndColumn;
-	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
-
-	if (!ignoreCheck && !this.canPlaceBamboo(boardPoint, tile)) {
-		return false;
-	}
-
-	// Option 1: Play on top of tile, return to hand
-	// Option 2: All surrounding tiles returned to hand.. crazy, let's try it
-
-	// Place tile
-	boardPoint.putTile(tile);
-
-	var rowCols = this.getSurroundingRowAndCols(rowAndCol);
-
-	var surroundsOwnersFlowerTile = false;
-	var surroundsGrowingFlower = false;
-	for (var i = 0; i < rowCols.length; i++) {
-		var bp = this.cells[rowCols[i].row][rowCols[i].col];
-		if (!bp.isType(GATE)
-			&& bp.hasTile()
-			&& bp.tile.ownerName === tile.ownerName
-			&& bp.tile.type !== ACCENT_TILE) {
-				surroundsOwnersFlowerTile = true;
-		} else if (bp.isType(GATE) && bp.hasTile()) {
-			surroundsGrowingFlower = true;
-		}
-	}
-
-	// Setting these will make it work the old way
-	// surroundsOwnersFlowerTile = true;
-	// surroundsGrowingFlower = false;
-
-	// Return each tile to hand if surrounds Owner's Blooming Flower Tile and no Growing Flowers
-	if (surroundsOwnersFlowerTile && !surroundsGrowingFlower) {
-		for (var i = 0; i < rowCols.length; i++) {
-			var bp = this.cells[rowCols[i].row][rowCols[i].col];
-			if (bp.hasTile()) {
-				// Put it back
-				var removedTile = bp.removeTile();
-				if (tileManager) {
-					tileManager.putTileBack(removedTile);
-				}
-			}
-		}
-	}
-	
-	this.refreshRockRowAndCols();
-};
-
-FirePaiShoBoard.prototype.canPlacePond = function(boardPoint, tile) {
-	return !boardPoint.hasTile() && !boardPoint.isType(GATE);
-};
-
-FirePaiShoBoard.prototype.placePond = function(tile, notationPoint, ignoreCheck) {
-	var rowAndCol = notationPoint.rowAndColumn;
-	var boardPoint = this.cells[rowAndCol.row][rowAndCol.col];
-
-	if (!ignoreCheck && !this.canPlacePond(boardPoint, tile)) {
-		return false;
-	}
-
-	// Place tile
-	boardPoint.putTile(tile);
-};
-
 
 FirePaiShoBoard.prototype.getClockwiseRowCol = function(center, rowCol) {
 	if (rowCol.row < center.row && rowCol.col <= center.col) {
@@ -946,6 +872,7 @@ FirePaiShoBoard.prototype.moveTile = function(player, notationPointStart, notati
 			var bp = this.cells[row][col];
 			if (bp.hasTile()) {
 				bp.tile.boosted = false;
+				if (!(gameOptionEnabled(ETHEREAL_ACCENT_TILES) && bp.tile.type === ACCENT_TILE)) {bp.tile.ethereal = false;}
 			}
 		}
 	}
@@ -954,6 +881,7 @@ FirePaiShoBoard.prototype.moveTile = function(player, notationPointStart, notati
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var bp = this.cells[row][col];
 			this.boostTilesSurroundingPointIfNeeded(bp);
+			this.etherealizeTilesSurroundingPointIfNeeded(bp);
 		}
 	}
 	/////////////////////////
@@ -989,10 +917,34 @@ FirePaiShoBoard.prototype.boostTilesSurroundingPointIfNeeded = function(boardPoi
 	}
 };
 
+FirePaiShoBoard.prototype.etherealizeTilesSurroundingPointIfNeeded = function(boardPoint) {
+
+	if (!boardPoint.hasTile()) {
+		return;
+	}
+	if (boardPoint.tile.originalBenderType !== KOI) {
+		return;
+	}
+
+	//Boost the Koi itself
+	boardPoint.tile.etherealize();
+
+	// get surrounding RowAndColumn values
+	var rowCols = this.getSurroundingRowAndCols(boardPoint);
+
+	for (var i = 0; i < rowCols.length; i++) {
+		var bp = this.cells[rowCols[i].row][rowCols[i].col];
+		if (bp.hasTile() && !bp.isType(GATE)) {
+			bp.tile.etherealize();
+		}
+	}
+};
+
 FirePaiShoBoard.prototype.restoreTileIfNeeded = function(boardPoint){
 	
 	//console.log("Assuming a restore unless I hear otherwise");
 	var restore = true;
+	var corporealize = true;
 	rowCols = this.getSurroundingRowAndCols(boardPoint);
 	for (var i = 0; i < rowCols.length; i++) {
 		var bp = this.cells[rowCols[i].row][rowCols[i].col];
@@ -1001,193 +953,35 @@ FirePaiShoBoard.prototype.restoreTileIfNeeded = function(boardPoint){
 			restore = false;
 		}
 		if (restore) {boardPoint.restoreTile();}
+
+		if (!(gameOptionEnabled(ETHEREAL_ACCENT_TILES) && boardPoint.tile.type === ACCENT_TILE)) {
+			if (bp.hasTile() && bp.tile.originalBenderType === KOI) {
+				//console.log("Nope, there is a koi, or this is an ethereal accent. No restore.");
+				corporealize = false;
+			}
+			if (corporealize) {boardPoint.corporealizeTile();}
+		}
 	}
 }
-
-FirePaiShoBoard.prototype.boostTileIfNeeded = function(boardPoint, tile){
-	
-	var boost = false;
-	rowCols = this.getSurroundingRowAndCols(boardPoint);
-	for (var i = 0; i < rowCols.length; i++) {
-		var bp = this.cells[rowCols[i].row][rowCols[i].col];
-		if (bp.hasTile() && bp.tile.accentType === KNOTWEED) {
-			boost = true;
-		}
-		if (boost) {tile.boost();}
-	}
-}
-
-FirePaiShoBoard.prototype.trapTilesSurroundingPointIfNeeded = function(boardPoint) {
-	if (!boardPoint.hasTile()) {
-		return;
-	}
-	if (boardPoint.tile.specialFlowerType !== ORCHID) {
-		return;
-	}
-
-	var orchidOwner = boardPoint.tile.ownerName;
-
-	// get surrounding RowAndColumn values
-	var rowCols = this.getSurroundingRowAndCols(boardPoint);
-
-	for (var i = 0; i < rowCols.length; i++) {
-		var bp = this.cells[rowCols[i].row][rowCols[i].col];
-		if (bp.hasTile() && !bp.isType(GATE)) {
-			if (bp.tile.ownerName !== orchidOwner && bp.tile.type !== ACCENT_TILE) {
-				bp.tile.trapped = true;
-			}
-		}
-	}
-};
-
-FirePaiShoBoard.prototype.whiteLotusProtected = function(lotusTile) {
-	if (lotusNoCapture || simplest) {
-		return true;
-	}
-
-	if (simpleSpecialFlowerRule) {
-		return true;	// Simplest? Cannot be captured.
-	}
-
-	// Testing Lotus never protected:
-	return false;
-
-	// ----------- //
-
-	// Protected if: player also has Blooming Orchid 
-	var isProtected = false;
-	this.cells.forEach(function(row) {
-		row.forEach(function(boardPoint) {
-			if (boardPoint.hasTile() && boardPoint.tile.specialFlowerType === ORCHID 
-				&& boardPoint.tile.ownerName === lotusTile.ownerName 
-				&& !boardPoint.isType(GATE)) {
-				isProtected = true;
-			}
-		});
-	});
-	return isProtected;
-};
-
-FirePaiShoBoard.prototype.orchidCanCapture = function(orchidTile) {
-	if (simpleSpecialFlowerRule || simplest) {
-		return false;	// Simplest? Never can capture.
-	}
-
-	// Note: This method does not check if other tile is protected from capture.
-	var orchidCanCapture = false;
-	this.cells.forEach(function(row) {
-		row.forEach(function(boardPoint) {
-			if (boardPoint.hasTile() && boardPoint.tile.specialFlowerType === WHITE_LOTUS 
-				&& boardPoint.tile.ownerName === orchidTile.ownerName 
-				&& !boardPoint.isType(GATE)) {
-				orchidCanCapture = true;
-			}
-		});
-	});
-	return orchidCanCapture;
-};
-
-FirePaiShoBoard.prototype.orchidVulnerable = function(orchidTile) {
-	if (newOrchidVulnerableRule) {
-		var orchidVulnerable = false;
-		// Orchid vulnerable if opponent White Lotus is on board
-		this.cells.forEach(function(row) {
-			row.forEach(function(boardPoint) {
-				if (boardPoint.hasTile() && boardPoint.tile.specialFlowerType === WHITE_LOTUS 
-					&& boardPoint.tile.ownerName !== orchidTile.ownerName) {
-					orchidVulnerable = true;
-				}
-			});
-		});
-		return orchidVulnerable;
-	}
-
-	if (simpleSpecialFlowerRule) {
-		return true;	// Simplest? Always vulnerable.
-	}
-
-	if (lotusNoCapture || simplest) {
-		// Changing Orchid vulnerable when player has a Blooming Lotus
-		var orchidVulnerable = false;
-		this.cells.forEach(function(row) {
-			row.forEach(function(boardPoint) {
-				if (!boardPoint.isType(GATE) && boardPoint.hasTile() && boardPoint.tile.specialFlowerType === WHITE_LOTUS 
-					&& boardPoint.tile.ownerName === orchidTile.ownerName) {
-					orchidVulnerable = true;
-				}
-			});
-		});
-		return orchidVulnerable;
-	}
-
-	/* ======= Original Rules: ======= */
-
-	var orchidVulnerable = false;
-	this.playedWhiteLotusTiles.forEach(function(lotus) {
-		if (lotus.ownerName === orchidTile.ownerName) {
-			orchidVulnerable = true;
-		}
-	});
-	if (orchidVulnerable) {
-		return true;
-	}
-};
 
 FirePaiShoBoard.prototype.canCapture = function(boardPointStart, boardPointEnd) {
 	return false;
 }
-/**
- * No capturing in Fire Pai Sho!!!
+
+FirePaiShoBoard.prototype.lionTurtleLocation = function(player) {
+	var location = false;
+	this.cells.forEach(function(row) {
+		row.forEach(function(boardPoint) {
+			if (boardPoint.hasTile() && boardPoint.tile.originalBenderType === LION_TURTLE 
+				&& boardPoint.tile.ownerName === player) {
+				location = boardPoint;
+			}
+		});
+	});
 	
-	var tile = boardPointStart.tile;
-	var otherTile = boardPointEnd.tile;
-
-	if (tile.ownerName === otherTile.ownerName) {
-		return false;	// Cannot capture own tile
-	}
- 
-
-	// Does end point surround Bamboo? Cannot capture tiles surrounding Bamboo
-	var surroundingRowCols = this.getSurroundingRowAndCols(boardPointEnd);
-	for (var i = 0; i < surroundingRowCols.length; i++) {
-		var surroundingPoint = this.cells[surroundingRowCols[i].row][surroundingRowCols[i].col];
-		if (surroundingPoint.hasTile() && surroundingPoint.tile.accentType === BAMBOO) {
-			return false;	// Surrounds Bamboo
-		}
-	}
-
-	// Is tile Orchid that can capture?
-	// If so, Orchid can capture basic or special flower
-	if (tile.specialFlowerType === ORCHID && otherTile.type !== ACCENT_TILE) {
-		if (this.orchidCanCapture(tile)) {
-			return true;
-		}
-	}
-
-	// Check otherTile White Lotus protected from capture
-	if (otherTile.specialFlowerType === WHITE_LOTUS) {
-		if (this.whiteLotusProtected(otherTile)) {
-			return false;	// Cannot capture otherTile any way at all
-		} else if (tile.type === BASIC_FLOWER) {
-			return true;	// If Lotus not protected, basic flower captures. Orchid handled in Orchid checks
-		}
-	}
-
-	// Clashing Basic Flowers check
-	if (tile.clashesWith(otherTile)) {
-		return true;
-	}
-
-	// Orchid checks
-	// Can otherTile Orchid be captured?
-	// If vulnerable, it can be captured by any flower tile
-	if (otherTile.specialFlowerType === ORCHID && tile.type !== ACCENT_TILE) {
-		if (this.orchidVulnerable(otherTile)) {
-			return true;
-		}
-	}
+	return location;
 };
-*/
+
 
 FirePaiShoBoard.prototype.canMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
 	// start point must have a tile
@@ -1222,15 +1016,27 @@ FirePaiShoBoard.prototype.canMoveTileToPoint = function(player, boardPointStart,
 
 	// If endpoint is too far away, that is wrong.
 	var numMoves = boardPointStart.tile.getMoveDistance();
-	if (Math.abs(boardPointStart.row - boardPointEnd.row) + Math.abs(boardPointStart.col - boardPointEnd.col) > numMoves) {
-		// end point is too far away, can't move that far
-		return false;
-	} else {
-		// Move may be possible. But there may be tiles in the way...
-		if (!this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves)) {
-			// debug("Tiles are in the way, so you can't reach that spot.");
-			return false;
+	var closeEnough = false;
+	if (!(Math.abs(boardPointStart.row - boardPointEnd.row) + Math.abs(boardPointStart.col - boardPointEnd.col) > numMoves)) {
+		if (this.verifyAbleToReach(boardPointStart, boardPointEnd, numMoves)) {
+			closeEnough = true;
 		}
+	}
+
+	// But maybe they can get there if they move through lion turtle
+	if (!closeEnough && this.lionTurtleLocation(player) != false) {
+		lionTurtleStart = this.lionTurtleLocation(player);
+		if (!(Math.abs(lionTurtleStart.row - boardPointEnd.row) + Math.abs(lionTurtleStart.col - boardPointEnd.col) > numMoves)) {
+			// Move may be possible. But there may be tiles in the way...
+			if (this.verifyAbleToReach(lionTurtleStart, boardPointEnd, numMoves)) {
+				closeEnough = true;
+			}
+		}
+	}
+
+	// Okay, the endpoint really is too far away.
+	if (!closeEnough) {
+		return false;
 	}
 
 	// What if moving the tile there creates a Disharmony on the board? That can't happen!
@@ -1526,27 +1332,24 @@ FirePaiShoBoard.prototype.getTileHarmonies = function(boardPoint) {
 	}
 
 	var leftHarmony = this.getHarmonyLeft(tile, rowAndCol);
-	if (leftHarmony) {
-		tileHarmonies.push(leftHarmony);
-	}
+	leftHarmony.forEach(harmony => {
+		tileHarmonies.push(harmony);
+	});
 
 	var rightHarmony = this.getHarmonyRight(tile, rowAndCol);
-	if (rightHarmony) {
-		tileHarmonies.push(rightHarmony);
-	}
-
-
+	rightHarmony.forEach(harmony => {
+		tileHarmonies.push(harmony);
+	});
 
 	var upHarmony = this.getHarmonyUp(tile, rowAndCol);
-	if (upHarmony) {
-		tileHarmonies.push(upHarmony);
-	}
+	upHarmony.forEach(harmony => {
+		tileHarmonies.push(harmony);
+	});
 
 	var downHarmony = this.getHarmonyDown(tile, rowAndCol);
-	if (downHarmony) {
-		tileHarmonies.push(downHarmony);
-	}
-
+	downHarmony.forEach(harmony => {
+		tileHarmonies.push(harmony);
+	});
 
 	return tileHarmonies;
 };
@@ -1554,17 +1357,13 @@ FirePaiShoBoard.prototype.getTileHarmonies = function(boardPoint) {
 FirePaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col - 1;
 
-	if (gameOptionEnabled(ETHEREAL_ACCENT_TILES)) {
-		while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasFlowerTile() 
+	harmonies = [];
+
+	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasCorporealTile() 
 		&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
 		colToCheck--;
-		}
-	}else {
-		while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile() 
-			&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
-			colToCheck--;
-		}
 	}
+
 
 	if (colToCheck >= 0) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
@@ -1573,24 +1372,21 @@ FirePaiShoBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
 
 		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, checkRowIsBuffed)) {
 			var harmony = new FirePaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
-			return harmony;
+			harmonies.push(harmony);
 		}
 	}
+
+	return harmonies;
 };
 
 FirePaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
 	var colToCheck = endRowCol.col + 1;
+	
+	harmonies = [];
 
-	if (gameOptionEnabled(ETHEREAL_ACCENT_TILES)) {
-		while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasFlowerTile() 
-			&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
-			colToCheck++;
-		}
-	}else {
-		while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile() 
-			&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
-			colToCheck++;
-		}
+	while (colToCheck  <= 16 && !this.cells[endRowCol.row][colToCheck].hasCorporealTile() 
+		&& !this.cells[endRowCol.row][colToCheck].isType(GATE)) {
+		colToCheck++;
 	}
 
 
@@ -1601,26 +1397,21 @@ FirePaiShoBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
 
 		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, checkRowIsBuffed)) {
 			var harmony = new FirePaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
-			return harmony;
+			harmonies.push(harmony);
 		}
 	}
+	return harmonies;
 };
 
 FirePaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row - 1;
 
-	if (gameOptionEnabled(ETHEREAL_ACCENT_TILES)) {
-		while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasFlowerTile() 
-			&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
-			rowToCheck--;
-		}
-	}else {
-		while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
-			&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
-			rowToCheck--;
-		}
-	}
+	harmonies = [];
 
+	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasCorporealTile() 
+		&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
+		rowToCheck--;
+	}
 
 
 	if (rowToCheck >= 0) {
@@ -1630,24 +1421,21 @@ FirePaiShoBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
 
 		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, checkColIsBuffed)) {
 			var harmony = new FirePaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
-			return harmony;
+			harmonies.push(harmony);
 		}
 	}
+
+	return harmonies;
 };
 
 FirePaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
 	var rowToCheck = endRowCol.row + 1;
 
-	if (gameOptionEnabled(ETHEREAL_ACCENT_TILES)) {
-		while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasFlowerTile() 
-			&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
-			rowToCheck++;
-		}
-	}else {
-		while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
-			&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
-			rowToCheck++;
-		}
+	harmonies = [];
+
+	while (rowToCheck  <= 16 && !this.cells[rowToCheck][endRowCol.col].hasCorporealTile() 
+		&& !this.cells[rowToCheck][endRowCol.col].isType(GATE)) {
+		rowToCheck++;
 	}
 
 	if (rowToCheck <= 16) {
@@ -1657,9 +1445,11 @@ FirePaiShoBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
 
 		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, checkColIsBuffed)) {
 			var harmony = new FirePaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
-			return harmony;
+			harmonies.push(harmony);
 		}
 	}
+
+	return harmonies;
 };
 
 FirePaiShoBoard.prototype.hasNewHarmony = function(player) {
@@ -1912,12 +1702,13 @@ FirePaiShoBoard.prototype.revealPossiblePlacementPoints = function(tile) {
 			var valid = false;
 
 			if (
+				//throwing an error right here. Says tile is undefined.... so not actually passing in tile...
 				(tile.accentType === ROCK && self.canPlaceRock(boardPoint))
 				|| (tile.accentType === WHEEL && self.canPlaceWheel(boardPoint))
 				|| (tile.accentType === KNOTWEED && self.canPlaceKnotweed(boardPoint))
 				|| (tile.accentType === BOAT && self.canPlaceBoat(boardPoint))
-				|| (tile.type === ORIGINAL_BENDER && self.canPlaceBoat(boardPoint))
-				|| ((tile.type === BASIC_FLOWER || tile.type === SPECIAL_FLOWER) && self.canPlaceFlower(boardPoint, tile)) //is a flower tile or 
+				|| (tile.type === ORIGINAL_BENDER && self.canPlaceBender(boardPoint, tile))
+				|| ((tile.type === BASIC_FLOWER || tile.type === SPECIAL_FLOWER) && self.canPlaceFlower(boardPoint, tile))
 			) {
 				valid = true;
 			}
@@ -1952,16 +1743,16 @@ FirePaiShoBoard.prototype.revealBoatBonusPoints = function(boardPoint) {
 	}
 	// The rest is old and outdated...
 	// Apply "possible move point" type to applicable boardPoints
-	for (var row = 0; row < this.cells.length; row++) {
-		for (var col = 0; col < this.cells[row].length; col++) {
-			var boardPointEnd = this.cells[row][col];
-			if (Math.abs(boardPoint.row - boardPointEnd.row) + Math.abs(boardPoint.col - boardPointEnd.col) === 1) {
-				if (this.canMoveTileToPoint(player, boardPoint, boardPointEnd)) {
-					boardPointEnd.addType(POSSIBLE_MOVE);
-				}
-			}
-		}
-	}
+//	for (var row = 0; row < this.cells.length; row++) {
+//		for (var col = 0; col < this.cells[row].length; col++) {
+//			var boardPointEnd = this.cells[row][col];
+//			if (Math.abs(boardPoint.row - boardPointEnd.row) + Math.abs(boardPoint.col - boardPointEnd.col) === 1) {
+//				if (this.canMoveTileToPoint(player, boardPoint, boardPointEnd)) {
+//					boardPointEnd.addType(POSSIBLE_MOVE);
+//				}
+//			}
+//		}
+//	}
 };
 
 FirePaiShoBoard.prototype.getCopy = function() {

@@ -329,6 +329,7 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		var flags = {
 			boostedOnThisTurn: false,
 			wasArranged: false,
+			etherealizedOnThisTurn: false,
 			didBonusMove: false
 		};
 
@@ -362,6 +363,16 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 				}, pieceAnimationLength);
 			} else {
 				theDiv.classList.add("boosted");
+			}
+		}
+
+		if (boardPoint.tile.ethereal) {
+			if (flags.etherealizedOnThisTurn) {
+				setTimeout(function() {
+					theDiv.classList.add("ethereal");
+				}, pieceAnimationLength);
+			} else {
+				theDiv.classList.add("ethereal");
 			}
 		}
 
@@ -431,6 +442,12 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 			if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy && (dx + dy) !== (dx * dy)) {// Boosted by knotweed
 				flags.boostedOnThisTurn = true;
 			}
+		} else if (moveToAnimate.bonusTileCode === "Y") {
+			var dx = x - moveToAnimate.bonusEndPoint.rowAndColumn.col;
+			var dy = y - moveToAnimate.bonusEndPoint.rowAndColumn.row;
+			if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy && (dx + dy) !== (dx * dy)) {// Etherealized by Koi
+				flags.etherealizedOnThisTurn = true;
+			}
 		}
 	}
 
@@ -476,6 +493,10 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 
 	if ((x !== ox || y !== oy) && boardPoint.tile && (boardPoint.tile.boosted)) {
 		flags.boostedOnThisTurn = true;
+	}
+
+	if ((x !== ox || y !== oy) && boardPoint.tile && (boardPoint.tile.ethereal)) {
+		flags.etherealizedOnThisTurn = true;
 	}
 
 	var pointSizeMultiplierX = 34;

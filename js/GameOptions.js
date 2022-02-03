@@ -173,6 +173,11 @@ function getGameOptionDescription(optionName) {
 }
 
 function gameOptionEnabled(optionName) {
+	
+	//FOR TESTING, PleASE DELETEs lkjsahglkjds glkjdshg 
+	if (optionName === ORIGINAL_BENDER_EXPANSION) {	return true;}
+	/////////////////////////////////
+
 	return ggOptions.includes(optionName) || ggOptions.includes(legacyGameOptionsMap[optionName]);
 }
 
