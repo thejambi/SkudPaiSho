@@ -17,10 +17,14 @@ Trifle.AbilityManager.prototype.setAbilitiesWithPromptTargetsNeeded = function(a
 };
 
 Trifle.AbilityManager.prototype.activateReadyAbilitiesOrPromptForTargets = function() {
+	var activateObj = this.activateReadyAbilities();
 	if (this.abilitiesWithPromptTargetsNeeded && this.abilitiesWithPromptTargetsNeeded.length > 0) {
-		return this.promptForNextNeededTargets();
+		// return this.promptForNextNeededTargets();
+		var promptOjb = this.promptForNextNeededTargets();
+		return Object.assign(activateObj, promptOjb);
 	} else {
-		return this.activateReadyAbilities();
+		// return this.activateReadyAbilities();
+		return activateObj;
 	}
 };
 
@@ -122,7 +126,8 @@ Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecor
 	var tilesMovedToPiles = tileRecords.tilesMovedToPiles;
 
 	var boardHasChanged = false;
-	if (!ability.activated) {
+	if (!ability.activated
+			&& !this.abilitiesWithPromptTargetsNeeded.includes(ability)) {
 		var abilityIsReadyToActivate = this.addNewAbility(ability);
 		if (abilityIsReadyToActivate) {
 			ability.activateAbility();
@@ -327,10 +332,12 @@ Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
 		if (promptTargetsExist) {
 			neededPromptInfo.currentPromptTargetId = nextNeededPromptTargetInfo.promptId;
 		} else {
-			debug("No targets available to prompt.. so no prompt needed!");
+			debug("No targets available to prompt.. so no prompt needed! Removing ability from prompt list.");
+			this.abilitiesWithPromptTargetsNeeded.shift();
 		}
 	} else {
-		debug("No prompt needed");
+		debug("No prompt needed, removing ability from prompt list.");
+		this.abilitiesWithPromptTargetsNeeded.shift();
 	}
 
 	return { neededPromptInfo: neededPromptInfo };

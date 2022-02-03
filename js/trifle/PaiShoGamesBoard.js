@@ -1207,17 +1207,19 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 					}
 					var abilityObject = new Trifle.Ability(abilityContext);
 
-					if (!abilityObject.hasNeededPromptTargetInfo()) {
-						abilitiesWithPromptTargetsNeeded.push(abilityObject);
-					}
+					// if (abilityObject.worthy()) {
+						if (!abilityObject.hasNeededPromptTargetInfo()) {
+							abilitiesWithPromptTargetsNeeded.push(abilityObject);
+						}
 
-					var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
+						var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
 
-					if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
-						abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
-					} else {
-						abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
-					}
+						if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
+							abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
+						} else {
+							abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
+						}
+					// }
 				}
 			});
 		}
@@ -1282,17 +1284,19 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 						}
 						var abilityObject = new Trifle.Ability(abilityContext);
 
-						if (!abilityObject.hasNeededPromptTargetInfo()) {
-							abilitiesWithPromptTargetsNeeded.push(abilityObject);
-						}
-	
-						var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
-	
-						if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
-							abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
-						} else {
-							abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
-						}
+						// if (abilityObject.worthy()) {
+							if (!abilityObject.hasNeededPromptTargetInfo()) {
+								abilitiesWithPromptTargetsNeeded.push(abilityObject);
+							}
+
+							var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
+
+							if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
+								abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
+							} else {
+								abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
+							}
+						// }
 					}
 				}
 			});
@@ -1302,7 +1306,13 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 	this.abilityManager.setReadyAbilities(abilitiesToActivate);
 	this.abilityManager.setAbilitiesWithPromptTargetsNeeded(abilitiesWithPromptTargetsNeeded);
 
+	// var promptingExpected = abilitiesWithPromptTargetsNeeded.length > 0;
+
 	var abilityActivationFlags = this.abilityManager.activateReadyAbilitiesOrPromptForTargets();
+
+	// if (promptingExpected && abilityActivationFlags.neededPromptInfo && !abilityActivationFlags.neededPromptInfo.currentPromptTargetId) {
+	// 	abilityActivationFlags = this.abilityManager.activateReadyAbilitiesOrPromptForTargets();
+	// }
 
 	/* Debugging */
 	debug(this.abilityManager.abilities);
@@ -1316,6 +1326,9 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 				abilityActivationFlags.tileRecords.capturedTiles = [];
 			}
 			abilityActivationFlags.tileRecords.capturedTiles = abilityActivationFlags.tileRecords.capturedTiles.concat(nextAbilityActivationFlags.tileRecords.capturedTiles);
+		}
+		if (nextAbilityActivationFlags.neededPromptInfo) {
+			abilityActivationFlags.neededPromptInfo = nextAbilityActivationFlags.neededPromptInfo;
 		}
 	}
 
