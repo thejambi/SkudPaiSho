@@ -385,17 +385,10 @@ FirePaiShoController.prototype.pointClicked = function(htmlPoint) {
 			//console.log("Here's the notation move: " + move);
 			this.theGame.hidePossibleMovePoints(false, move);
 			var bonusAllowed = this.theGame.runNotationMove(move);
-
-//			if (!gameOptionEnabled(OPTION_INFORMAL_START) && this.gameNotation.moves.length === 2) {
-//				// Host auto-copies Guest's first Plant
-//				this.gameNotation.addMove(move);
-//				var hostMoveBuilder = this.notationBuilder.getFirstMoveForHost(this.notationBuilder.plantedFlowerType);
-//				this.gameNotation.addMove(this.gameNotation.getNotationMoveFromBuilder(hostMoveBuilder));
-//				rerunAll(true);
-//				// No finalize move because it's still Guest's turn
-//				showResetMoveMessage();
-//			} else 
 			
+			//If you moved a dragon, capture all legal adjacent tiles.
+
+
 			if (!bonusAllowed) {
 				// Move all set. Add it to the notation!
 				//console.log("about to add the move to the game notation");
@@ -682,7 +675,7 @@ FirePaiShoController.prototype.getHelpMessageForTile = function(tile) {
 			heading = "Original Bender: Dragon";
 			message.push("Can move up to 2 spaces");
 			message.push("Forms Harmony with all same-player red flowers, and can form harmony using the special powers of other tiles.");
-			message.push("After placement or movement, the Dragon removes all adjacent accent tiles and Original Benders, if possible, starting with the north piece and moving clockwise.");
+			message.push("After placement or movement, the Dragon removes all surrounding accent tiles and Original Benders, if possible, starting with the north piece and moving clockwise.");
 		} else if (tileCode === 'F') {
 			heading = "Original Bender: Flying Bison";
 			message.push("Can move up to 2 spaces");
@@ -835,7 +828,7 @@ FirePaiShoController.prototype.buildToggleHarmonyAidsDiv = function() {
 
 FirePaiShoController.prototype.buildBoardRotateDiv = function() {
 	var div = document.createElement("div");
-	var orientation = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true" ? "Adevăr" : "Skud";
+	var orientation = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true" ? "Desert" : "Skud";
 	div.innerHTML = "Board orientation: " + orientation + ": <span class='skipBonus' onclick='gameController.toggleBoardRotation();'>toggle</span>";
 	return div;
 };

@@ -1048,6 +1048,72 @@ FirePaiShoBoard.prototype.canMoveTileToPoint = function(player, boardPointStart,
 	return true;
 };
 
+FirePaiShoBoard.prototype.canClearPointWithDragon = function(boardPoint) {
+	// start point must have a tile
+	if (!boardPoint.hasTile()) {
+		return false;
+	}
+
+	tile = boardPoint.tile;
+
+	// If endpoint is a Gate, that's wrong.
+	if (boardPoint.isType(GATE)) {
+		return false;
+	}
+	
+	// If endpoint has a tile there that can't be captured, that is wrong.
+	if (tile.type !== ACCENT_TILE && tile.type !== ORIGINAL_BENDER) {
+		return false;
+	}
+
+	// What if moving the tile there creates a Disharmony on the board? That can't happen!
+	if (this.clearingCreatesDisharmony(boardPoint)) {
+		return false;
+	}
+
+	// I guess we made it through
+	return true;
+};
+
+FirePaiShoBoard.prototype.clearSurroundingTilesIfPossible = function(boardPoint) {
+	
+	//Check all tiles in clockwise order.
+	row = boardPoint.row;
+	col = boardPoint.col;
+
+	//No idea if this is getting the right points... maybe need to test it...
+	//No idea if this is getting the right points... maybe need to test it...
+	//No idea if this is getting the right points... maybe need to test it...
+	//No idea if this is getting the right points... maybe need to test it...
+	//N (+1, +1)
+	checkPoint = this.cells[row + 1][col + 1]; 
+	if (this.canClearPointWithDragon(checkPoint)){checkPoint.removeTile();}
+	//NE (+1, 0)
+	checkPoint = this.cells[row + 1][col];
+	if (this.canClearPointWithDragon(checkPoint)){checkPoint.removeTile();}
+	//E (+1, -1)
+	checkPoint = this.cells[row + 1][col - 1];
+	if (this.canClearPointWithDragon(checkPoint)){checkPoint.removeTile();}
+	//SE (0, -1)
+	checkPoint = this.cells[row][col - 1];
+	if (this.canClearPointWithDragon(checkPoint)){checkPoint.removeTile();}
+	//S (-1, -1)
+	checkPoint = this.cells[row - 1][col - 1];
+	if (this.canClearPointWithDragon(checkPoint)){checkPoint.removeTile();}
+	//SW (-1,0)
+	checkPoint = this.cells[row + 1][col + 1];
+	if (this.canClearPointWithDragon(checkPoint)){checkPoint.removeTile();}
+	//W (-1, 1)
+	checkPoint = this.cells[row + 1][col + 1];
+	if (this.canClearPointWithDragon(checkPoint)){checkPoint.removeTile();}
+	//NW (0,1)
+	checkPoint = this.cells[row + 1][col + 1];
+	if (this.canClearPointWithDragon(checkPoint)){checkPoint.removeTile();}
+
+
+};
+
+
 FirePaiShoBoard.prototype.canTransportTileToPointWithBoat = function(boardPointStart, boardPointEnd) {
 	// Transport Tile: used in Boat special ability
 
@@ -1118,6 +1184,33 @@ FirePaiShoBoard.prototype.moveCreatesDisharmony = function(boardPointStart, boar
 		boardPointStart.putTile(boardPointEnd.removeTile());
 		boardPointEnd.putTile(endTile);
 	}
+
+	return clashFound;
+};
+
+FirePaiShoBoard.prototype.clearingCreatesDisharmony = function(boardPoint) {
+	// Grab tile and and remove it
+	var tile;
+	tile = boardPoint.removeTile();
+
+	var clashFound = false;
+
+	// Now, analyze board for disharmonies
+	for (var row = 0; row < this.cells.length; row++) {
+		for (var col = 0; col < this.cells[row].length; col++) {
+			var checkPoint = this.cells[row][col];
+			if (checkPoint.hasTile()) {
+				// Check for Disharmonies!
+				if (this.hasDisharmony(checkPoint)) {
+					clashFound = true;
+					break;
+				}
+			}
+		}
+	}
+
+	// Put tiles back the way they were if needed
+	boardPoint.putTile(tile);
 
 	return clashFound;
 };

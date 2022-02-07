@@ -7,7 +7,7 @@ function FirePaiShoActuator(gameContainer, isMobile, enableAnimations) {
 	this.animationOn = enableAnimations;
 
 	this.rotateFacingRedGardens = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true";
-	var rotateType = this.rotateFacingRedGardens ? ADEVAR_ROTATE : null;
+	var rotateType = this.rotateFacingRedGardens ? ADEVAR_GUEST_ROTATE : null;
 	var containers = setupPaiShoBoard(
 		this.gameContainer,
 		FirePaiShoController.getHostTilesContainerDivs(),
@@ -230,7 +230,7 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		theDiv.classList.add("activePoint");
 		//ADEVAR ROTATE
 		if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true"){
-			theDiv.classList.add("adevarPointRotate");
+			theDiv.classList.add("adevarGuestPointRotate");
 		}
 
 		if (boardPoint.isType(MARKED)) {
@@ -510,19 +510,6 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		unitString = "vw";
 	}
 	
-
-	// if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true") {
-	// 	//ADEVAR ROTATION
-	// 	var left = (x - ox);
-	// 	var top = (y - oy);
-	// 	theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
-	// 	theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
-	// } else {
-	// 	// SKUD ROTATION
-	// 	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
-	// 	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
-	// }
-
 	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
 	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
 	
@@ -536,15 +523,7 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	requestAnimationFrame(function() {
 		var left = ax - ox;
 		var top = ay - oy;
-		// if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true") {
-		// 	//ADEVAR ROTATION
-		// 	theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
-		// 	theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
-		// } else {
-		// 	// SKUD ROTATION
-		// 	theImg.style.left = (left * pointSizeMultiplierX) + unitString;
-		// 	theImg.style.top = (top * pointSizeMultiplierY) + unitString;
-		// }
+
 		theImg.style.left = (left * pointSizeMultiplierX) + unitString;
 		theImg.style.top = (top * pointSizeMultiplierY) + unitString;
 	});
