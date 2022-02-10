@@ -389,7 +389,6 @@ Ginseng.Controller.prototype.completeMove = function() {
 	} else {
 		this.gameNotation.addMove(move);
 		if (playingOnlineGame()) {
-			lockedInNotationTextForUrl = this.gameNotation.notationTextForUrl();
 			callSubmitMove();
 		} else {
 			// finalizeMove();
