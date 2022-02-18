@@ -319,7 +319,7 @@ Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
 
 	var nextNeededPromptTargetInfo;
 	abilityObject.abilityInfo.neededPromptTargetsInfo.forEach((neededPromptTargetInfo) => {
-		if (!nextNeededPromptTargetInfo 
+		if (!nextNeededPromptTargetInfo && abilityObject.promptTargetInfo
 				&& (!abilityObject.promptTargetInfo[sourceTileKeyStr] 
 				|| !abilityObject.promptTargetInfo[sourceTileKeyStr][neededPromptTargetInfo.promptId])) {
 			nextNeededPromptTargetInfo = neededPromptTargetInfo;
