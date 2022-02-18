@@ -294,10 +294,12 @@ function getSkudTilesSrcPath() {
 }
 
 function isSamePoint(movePoint, x, y) {
-	if (typeof movePoint === 'string') {
-		movePoint = new NotationPoint(movePoint);
+	if (movePoint) {
+		if (typeof movePoint === 'string') {
+			movePoint = new NotationPoint(movePoint);
+		}
+		return movePoint.rowAndColumn.col === x && movePoint.rowAndColumn.row === y;
 	}
-	return movePoint.rowAndColumn.col === x && movePoint.rowAndColumn.row === y;
 }
 
 function getTilesForPlayer(tiles, player) {
