@@ -17,7 +17,7 @@ Trifle.WhenTargetTileLandsInZoneTriggerBrain = function(triggerContext) {
 Trifle.WhenTargetTileLandsInZoneTriggerBrain.prototype.isTriggerMet = function() {
 	/* Look at the tile that moved, did it just land in this tile's zone? Is it targeted? */
 
-	if (this.possibleTargetTilePoint.tile === this.possibleTargetTile) {
+	if (this.possibleTargetTilePoint && this.possibleTargetTilePoint.tile === this.possibleTargetTile) {
 
 		var zonesPossibleTargetIsIn = this.board.getZonesPointIsWithin(this.possibleTargetTilePoint);
 

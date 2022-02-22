@@ -20,7 +20,7 @@ Trifle.WhenCapturedByTargetTileTriggerBrain.prototype.isTriggerMet = function() 
 	this.targetTiles = [];
 	this.targetTilePoints = [];
 
-	if (this.possibleTargetTilePoint.tile === this.possibleTargetTile) {
+	if (this.possibleTargetTilePoint && this.possibleTargetTilePoint.tile === this.possibleTargetTile) {
 		if (this.capturedTiles.includes(this.thisTile)) {
 			var triggerHelper = new Trifle.TriggerHelper(this.triggerContext, this.possibleTargetTilePoint);
 			if (triggerHelper.tileIsTargeted()) {

@@ -17,7 +17,7 @@ Trifle.WhenTargetTileLandsSurroundingTriggerBrain = function(triggerContext) {
 Trifle.WhenTargetTileLandsSurroundingTriggerBrain.prototype.isTriggerMet = function() {
 	/* Look at the tile that moved, did it just land surrounding this tile? Is it targeted? */
 
-	if (this.possibleTargetTilePoint.tile === this.possibleTargetTile) {
+	if (this.possibleTargetTilePoint && this.possibleTargetTilePoint.tile === this.possibleTargetTile) {
 
 		var surroundingPoints = this.board.getSurroundingBoardPoints(this.thisTilePoint);
 

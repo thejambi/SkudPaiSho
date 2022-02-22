@@ -1320,7 +1320,8 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 	if (abilityActivationFlags.boardHasChanged) {
 		// Need to re-process abilities... 
 		// Pass in some sort of context from the activation flags???
-		var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.tileRecords.capturedTiles, currentMoveInfo, abilityActivationFlags);
+		// /* Was: */ var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.tileRecords.capturedTiles, currentMoveInfo, abilityActivationFlags);
+		/* New: */ var nextAbilityActivationFlags = this.processAbilities(null, null, null, null, abilityActivationFlags.tileRecords.capturedTiles, null, abilityActivationFlags);
 		if (nextAbilityActivationFlags.tileRecords.capturedTiles && nextAbilityActivationFlags.tileRecords.capturedTiles.length) {
 			if (!abilityActivationFlags.tileRecords.capturedTiles) {
 				abilityActivationFlags.tileRecords.capturedTiles = [];
