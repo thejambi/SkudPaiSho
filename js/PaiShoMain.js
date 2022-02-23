@@ -335,6 +335,10 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 		  setGameController(parseInt(QueryString.gameType), true);
   
 		  gameController.setGameNotation(QueryString.game);
+
+		  if (!QueryString.game || QueryString.game.length < 3) {
+			  sandboxFromMove();
+		  }
   
 		  if (gameController.gameNotation.moves.length > 1) {
 			  showReplayControls();
