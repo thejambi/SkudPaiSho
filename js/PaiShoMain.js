@@ -887,7 +887,7 @@ function gameWatchPulse() {
 		GameClock.currentClock.updateSecondsRemaining();
 		onlinePlayEngine.updateGameClock(gameId, GameClock.getCurrentGameClockJsonString(), getLoginToken(), emptyCallback);
 
-		if (GameClock.currentClockIsOutOfTime()) {
+		/* if (GameClock.currentClockIsOutOfTime()) {
 			var hostResultCode = 0.5;
 			if (getCurrentPlayer() === HOST) {
 				hostResultCode = 0;
@@ -900,7 +900,7 @@ function gameWatchPulse() {
 			}
 			onlinePlayEngine.updateGameWinInfo(gameId, getOnlineGameOpponentUsername(), 11, getLoginToken(), emptyCallback, 
 				currentGameData.isRankedGame, newPlayerRatings.hostRating, newPlayerRatings.guestRating, currentGameData.gameTypeId, currentGameData.hostUsername, currentGameData.guestUsername);
-		}
+		} */
 	}
 }
 
@@ -1344,11 +1344,12 @@ function playingOnlineGame() {
 }
 
 function getGameWinner() {
-	if (GameClock.playerIsOutOfTime(HOST)) {
+	/* if (GameClock.playerIsOutOfTime(HOST)) {
 		return GUEST;
 	} else if (GameClock.playerIsOutOfTime(GUEST)) {
 		return HOST;
-	} else if (currentGameData && currentGameData.resultId === 9 && currentGameData.winnerUsername) {
+	} else  */
+	if (currentGameData && currentGameData.resultId === 9 && currentGameData.winnerUsername) {
 		if (currentGameData.hostUsername === currentGameData.winnerUsername) {
 			return HOST;
 		} else {
@@ -1360,9 +1361,10 @@ function getGameWinner() {
 }
 
 function getGameWinReason() {
-	if (GameClock.aPlayerIsOutOfTime()) {
+	/* if (GameClock.aPlayerIsOutOfTime()) {
 		return " won the game due to opponent running out of time";
-	} else if (currentGameData && currentGameData.resultId === 9) {
+	} else  */
+	if (currentGameData && currentGameData.resultId === 9) {
 		return " wins ᕕ( ᐛ )ᕗ! Opponent has resigned.";
 	} else {
 		return gameController.theGame.getWinReason();
@@ -1638,11 +1640,14 @@ function askToJoinGame(gameId, hostUsername, rankedGameInd) {
 	jumpToGame(gameId);
 }
 
-function askToJoinPrivateGame(privateGameId, hostUserName, rankedGameInd) {
+function askToJoinPrivateGame(privateGameId, hostUserName, rankedGameInd, gameClock) {
 	if (userIsLoggedIn()) {
 		var message = "Do you want to join this game hosted by " + hostUserName + "?";
 		if (rankedGameInd === 'y' || rankedGameInd === 'Y') {
 			message += "<br /><br /><strong> This is a ranked game.</strong>";
+		}
+		if (gameClock) {
+			message += "<br /><br /><strong>This game has a game clock (beta): " + gameClock.getLabelText() + "</strong><br /><a href='https://forum.skudpaisho.com/showthread.php?tid=158' target='_blank'>Read about the Game Clock feature.</a>";
 		}
 		message += "<br /><br />";
 		message += "<div class='clickableText' onclick='closeModal(); yesJoinPrivateGame(" + privateGameId + ");'>Yes - join game</div>";
@@ -2056,12 +2061,12 @@ function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed, move) {
 	};
 	if (moveIsConfirmed || !isMoveConfirmationRequired()) {	/* Move should be processed */
 		GameClock.stopGameClock();
-		if (!GameClock.currentClockIsOutOfTime()) {
+		// if (!GameClock.currentClockIsOutOfTime()) {
 			showCallSubmitMoveModal();
 			onlinePlayEngine.submitMove(gameId, encodeURIComponent(lockedInNotationTextForUrl), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
 				GameClock.getCurrentGameClockJsonString(), currentGameData.resultId, move);
 			lockedInNotationTextForUrl = null;
-		}
+		// }
 	} else {
 		/* Move needs to be confirmed. Finalize move and show confirm button. */
 		finalizeMove(submitMoveData.moveAnimationBeginStep);
@@ -2296,7 +2301,7 @@ var GameType = {
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [
-			LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN
+			LION_TURTLE_ABILITY_ANYWHERE
 		]
 	},
 	FirePaiSho: {
@@ -2713,7 +2718,7 @@ var jumpToGameCallback = function jumpToGameCallback(results) {
 
 		/* Ask to join invite link game if present */
 		if (QueryString.joinPrivateGame && gameId && gameId.toString() === QueryString.joinPrivateGame) {
-			askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName, QueryString.rankedGameInd);
+			askToJoinPrivateGame(QueryString.joinPrivateGame, QueryString.hostUserName, QueryString.rankedGameInd, currentGameData.gameClock);
 			/* Once we ask after jumping into a game, we won't need to ask again */
 			QueryString.joinPrivateGame = null;
 		}
@@ -3380,7 +3385,11 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 		} else {
 			var message = "<div>Do you want to create a game for others to join?</div>";
 			if (!getGameTypeEntryFromId(gameTypeId).noRankedGames) {
-				var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
+				if (!getBooleanPreference(createNonRankedGamePreferredKey)) {
+					toggleBooleanPreference(createNonRankedGamePreferredKey)
+				}
+				// var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
+				var checkedValue = false;
 				message += "<br /><div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - coming soon - publicly viewable game)</label></div>";
 			}
 
@@ -3399,6 +3408,9 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 					var timeControlsDiv = document.getElementById("timeControlsDropdownContainer");
 					if (timeControlsDiv) {
 						timeControlsDiv.appendChild(GameClock.getTimeControlsDropdown());
+						var timeControlsLinkSpan = document.createElement("span");
+						timeControlsLinkSpan.innerHTML = "<a href='https://forum.skudpaisho.com/showthread.php?tid=158' target='_blank'>Read about the Game Clock feature.</a>";
+						timeControlsDiv.appendChild(timeControlsLinkSpan);
 					}
 				}, 50);
 			}
@@ -3427,6 +3439,9 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 					var timeControlsDiv = document.getElementById("timeControlsDropdownContainer");
 					if (timeControlsDiv) {
 						timeControlsDiv.appendChild(GameClock.getTimeControlsDropdown());
+						var timeControlsLinkSpan = document.createElement("span");
+						timeControlsLinkSpan.innerHTML = "<a href='https://forum.skudpaisho.com/showthread.php?tid=158' target='_blank'>Read about the Game Clock feature.</a>";
+						timeControlsDiv.appendChild(timeControlsLinkSpan);
 					}
 				}, 50);
 			}
