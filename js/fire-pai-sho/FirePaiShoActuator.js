@@ -228,8 +228,8 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
-		//ADEVAR ROTATE
-		if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true"){
+		//THE DESERT ROTATE
+		if (getUserGamePreference(FirePaiShoController.boardRotationKey) == "true"){
 			theDiv.classList.add("adevarGuestPointRotate");
 		}
 
@@ -307,7 +307,7 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 
 		if (this.rotateFacingRedGardens) {
-			theImg.elementStyleTransform.setValue("rotate", 225, "deg");
+			theImg.elementStyleTransform.setValue("rotate", 45, "deg");
 		}
 
 		if (moveToAnimate) {
@@ -323,7 +323,7 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 
 		if (this.rotateFacingRedGardens) {
-			theImg.elementStyleTransform.setValue("rotate", 225, "deg");
+			theImg.elementStyleTransform.setValue("rotate", 45, "deg");
 		}
 
 		var flags = {

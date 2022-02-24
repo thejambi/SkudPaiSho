@@ -80,6 +80,7 @@ legacyGameOptionsMap[PLAY_IN_SPACES] = "Play In Spaces";
 legacyGameOptionsMap[VAGABOND_ROTATE] = "Vagabond Board Rotation";
 legacyGameOptionsMap[ADEVAR_ROTATE] = "Adevar Board Rotation";
 legacyGameOptionsMap[ADEVAR_GUEST_ROTATE] = "Adevar Board Guest Rotation";
+
 legacyGameOptionsMap[ADEVAR_LITE] = "Lite - Beginner Game";
 
 /* New Game Options Setup */
@@ -174,8 +175,8 @@ function getGameOptionDescription(optionName) {
 
 function gameOptionEnabled(optionName) {
 	
-	//FOR TESTING, PleASE DELETEs lkjsahglkjds glkjdshg 
-	if (optionName === ORIGINAL_BENDER_EXPANSION) {	return true;}
+	//FOR TESTING, PlEASE DELETE
+	//if (optionName === ORIGINAL_BENDER_EXPANSION) {	return true;}
 	/////////////////////////////////
 
 	return ggOptions.includes(optionName) || ggOptions.includes(legacyGameOptionsMap[optionName]);
