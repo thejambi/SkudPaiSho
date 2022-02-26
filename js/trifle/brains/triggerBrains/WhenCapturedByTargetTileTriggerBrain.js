@@ -9,6 +9,10 @@ Trifle.WhenCapturedByTargetTileTriggerBrain = function(triggerContext) {
 	this.possibleTargetTileInfo = triggerContext.lastTurnAction.tileMovedOrPlacedInfo;
 	this.possibleTargetTilePoint = triggerContext.lastTurnAction.boardPointEnd;
 
+	if (!this.possibleTargetTilePoint) {
+		this.possibleTargetTilePoint = triggerContext.lastTurnAction.tileMovedOrPlaced.seatedPoint;
+	}
+
 	this.thisTile = triggerContext.tile;
 	this.thisTileInfo = triggerContext.tileInfo;
 	this.thisTilePoint = triggerContext.pointWithTile;
@@ -22,7 +26,7 @@ Trifle.WhenCapturedByTargetTileTriggerBrain.prototype.isTriggerMet = function() 
 
 	if (this.possibleTargetTilePoint && this.possibleTargetTilePoint.tile === this.possibleTargetTile) {
 		if (this.capturedTiles.includes(this.thisTile)) {
-			var triggerHelper = new Trifle.TriggerHelper(this.triggerContext, this.possibleTargetTilePoint);
+			var triggerHelper = new Trifle.TriggerHelper(this.triggerContext, this.possibleTargetTilePoint, this.possibleTargetTile);
 			if (triggerHelper.tileIsTargeted()) {
 				this.targetTiles.push(this.possibleTargetTilePoint.tile);
 				this.targetTilePoints.push(this.possibleTargetTilePoint);
