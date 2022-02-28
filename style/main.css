@@ -682,7 +682,12 @@ figure > div {
 .boosted
 {
   box-shadow: 0px 0px 6px 3px #fff;
-  filter: saturate(175%);
+  filter: saturate(150%);
+}
+
+.ethereal {
+  opacity: 0.75;
+  filter: saturate(150%);
 }
 
 .possibleMove {
