@@ -6,13 +6,15 @@ Trifle.TriggerHelper = function(triggerContext, possibleTargetTilePoint, possibl
 	} else if (possibleTargetTilePoint) {
 		this.possibleTargetTile = possibleTargetTilePoint.tile;
 	}
-	this.possibleTargetTileInfo = PaiShoGames.currentTileMetadata[this.possibleTargetTile.code];
+	this.possibleTargetTileInfo = this.possibleTargetTile && PaiShoGames.currentTileMetadata[this.possibleTargetTile.code];
 	this.abilityInfo = this.triggerContext.tileAbilityInfo;
 	this.triggerInfo = this.triggerContext.currentTrigger;
 };
 
 Trifle.TriggerHelper.prototype.tileIsTargeted = function() {
-	return this.targetingIsNotCanceledCheck()
+	return this.possibleTargetTile
+			&& this.possibleTargetTileInfo 
+			&& this.targetingIsNotCanceledCheck()
 			&& this.targetTeamsCheck()
 			&& this.targetTileTypesCheck()
 			&& this.targetTileIdentifiersCheck()

@@ -17,7 +17,7 @@ Trifle.WhenTargetTileLandsInTempleTriggerBrain = function(triggerContext) {
 Trifle.WhenTargetTileLandsInTempleTriggerBrain.prototype.isTriggerMet = function() {
 	/* Look at the tile that moved, did it just land in Temple? Is it targeted? */
 	
-	if (this.possibleTargetTilePoint.tile === this.possibleTargetTile) {
+	if (this.possibleTargetTilePoint && this.possibleTargetTilePoint.tile === this.possibleTargetTile) {
 		if (this.possibleTargetTilePoint.isType(TEMPLE)) {
 			var triggerHelper = new Trifle.TriggerHelper(this.triggerContext, this.possibleTargetTilePoint);
 			if (triggerHelper.tileIsTargeted()) {

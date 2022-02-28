@@ -17,7 +17,7 @@ Trifle.WhenTargetTileLandsAdjacentTriggerBrain = function(triggerContext) {
 Trifle.WhenTargetTileLandsAdjacentTriggerBrain.prototype.isTriggerMet = function() {
 	/* Look at the tile that moved, did it just land adjacent to this tile? Is it targeted? */
 
-	if (this.possibleTargetTilePoint.tile === this.possibleTargetTile) {
+	if (this.possibleTargetTilePoint && this.possibleTargetTilePoint.tile === this.possibleTargetTile) {
 
 		var adjacentPoints = this.board.getAdjacentPoints(this.thisTilePoint);
 

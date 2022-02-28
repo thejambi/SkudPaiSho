@@ -335,6 +335,10 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 		  setGameController(parseInt(QueryString.gameType), true);
   
 		  gameController.setGameNotation(QueryString.game);
+
+		  if (!QueryString.game || QueryString.game.length < 3) {
+			  sandboxFromMove();
+		  }
   
 		  if (gameController.gameNotation.moves.length > 1) {
 			  showReplayControls();
@@ -1551,7 +1555,7 @@ function showResetMoveMessage() {
 }
 
 function resetMove() {
-	lockedInNotationTextForUrl = null;
+	lockedInNotationTextForUrlData = null;
 	var rerunHandledByController = gameController.resetMove();
 
 	if (!rerunHandledByController) {
@@ -2040,7 +2044,7 @@ function closeModal() {
 }
 
 var confirmMoveToSubmit = null;
-var lockedInNotationTextForUrl = null;
+var lockedInNotationTextForUrlData = null;
 
 function showCallSubmitMoveModal() {
 	showModal(
@@ -2053,8 +2057,11 @@ function showCallSubmitMoveModal() {
 }
 
 function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed, move) {
-	if (!lockedInNotationTextForUrl) {
-		lockedInNotationTextForUrl = gameController.gameNotation.notationTextForUrl();
+	if (!lockedInNotationTextForUrlData || (playingOnlineGame() && lockedInNotationTextForUrlData.gameId === gameId)) {
+		lockedInNotationTextForUrlData = {
+			gameId: gameId,
+			notationText: gameController.gameNotation.notationTextForUrl()
+		};
 	}
 	submitMoveData = {
 		moveAnimationBeginStep: moveAnimationBeginStep
@@ -2063,9 +2070,9 @@ function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed, move) {
 		GameClock.stopGameClock();
 		// if (!GameClock.currentClockIsOutOfTime()) {
 			showCallSubmitMoveModal();
-			onlinePlayEngine.submitMove(gameId, encodeURIComponent(lockedInNotationTextForUrl), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
+			onlinePlayEngine.submitMove(gameId, encodeURIComponent(lockedInNotationTextForUrlData.notationText), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
 				GameClock.getCurrentGameClockJsonString(), currentGameData.resultId, move);
-			lockedInNotationTextForUrl = null;
+			lockedInNotationTextForUrlData = null;
 		// }
 	} else {
 		/* Move needs to be confirmed. Finalize move and show confirm button. */
@@ -2213,7 +2220,7 @@ function userIsLoggedIn() {
 function forgetCurrentGameInfo() {
 	clearAiPlayers();
 
-	lockedInNotationTextForUrl = null;
+	lockedInNotationTextForUrlData = null;
 
 	if (gameWatchIntervalValue) {
 		clearInterval(gameWatchIntervalValue);

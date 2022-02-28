@@ -136,6 +136,15 @@ Ginseng.Controller.prototype.toggleDebug = function() {
 };
 
 Ginseng.Controller.prototype.startOnlineGame = function() {
+	this.resetNotationBuilder();
+	this.notationBuilder.currentPlayer = HOST;
+	this.notationBuilder.moveType = PASS_TURN;
+
+	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+	this.theGame.runNotationMove(move);
+	// Move all set. Add it to the notation!
+	this.gameNotation.addMove(move);
+
 	createGameIfThatIsOk(GameType.Ginseng.id);
 };
 
@@ -389,7 +398,6 @@ Ginseng.Controller.prototype.completeMove = function() {
 	} else {
 		this.gameNotation.addMove(move);
 		if (playingOnlineGame()) {
-			lockedInNotationTextForUrl = this.gameNotation.notationTextForUrl();
 			callSubmitMove();
 		} else {
 			// finalizeMove();
@@ -471,13 +479,22 @@ Ginseng.Controller.prototype.getAiList = function() {
 Ginseng.Controller.prototype.getCurrentPlayer = function() {
 	if (this.gameNotation.moves.length == 0) {
 		return GUEST;
-	}
-	var lastPlayer = this.gameNotation.moves[this.gameNotation.moves.length - 1].player;
+	} /* else if (this.gameNotation.moves.length > 0
+			&& this.gameNotation.moves[0].moveType === PASS_TURN) {
+		if (currentMoveIndex % 2 === 0) {
+			return HOST;
+		} else {
+			return GUEST;
+		}
+	}  */
+	else {
+		var lastPlayer = this.gameNotation.moves[this.gameNotation.moves.length - 1].player;
 
-	if (lastPlayer === HOST) {
-		return GUEST;
-	} else if (lastPlayer === GUEST) {
-		return HOST;
+		if (lastPlayer === HOST) {
+			return GUEST;
+		} else if (lastPlayer === GUEST) {
+			return HOST;
+		}
 	}
 };
 

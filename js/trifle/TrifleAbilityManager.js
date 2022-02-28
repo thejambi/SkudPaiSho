@@ -17,10 +17,14 @@ Trifle.AbilityManager.prototype.setAbilitiesWithPromptTargetsNeeded = function(a
 };
 
 Trifle.AbilityManager.prototype.activateReadyAbilitiesOrPromptForTargets = function() {
+	var activateObj = this.activateReadyAbilities();
 	if (this.abilitiesWithPromptTargetsNeeded && this.abilitiesWithPromptTargetsNeeded.length > 0) {
-		return this.promptForNextNeededTargets();
+		// return this.promptForNextNeededTargets();
+		var promptOjb = this.promptForNextNeededTargets();
+		return Object.assign(activateObj, promptOjb);
 	} else {
-		return this.activateReadyAbilities();
+		// return this.activateReadyAbilities();
+		return activateObj;
 	}
 };
 
@@ -47,11 +51,11 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	/* Deactivate abilities. New ability list is the ones that are not deactivated. */
 	var newAbilities = [];
 	this.abilities.forEach(function(existingAbility) {
-		if (existingAbility.preserve && !self.abilityIsCanceled(existingAbility)) {
-			newAbilities.push(existingAbility);
-		} else {
+		// if (existingAbility.preserve && !self.abilityIsCanceled(existingAbility)) {
+		// 	newAbilities.push(existingAbility);	// Commenting this out... ability activation priority should take care of this now
+		// } else {
 			existingAbility.deactivate();
-		}
+		// }
 	});
 	this.abilities = newAbilities;
 
@@ -122,7 +126,8 @@ Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecor
 	var tilesMovedToPiles = tileRecords.tilesMovedToPiles;
 
 	var boardHasChanged = false;
-	if (!ability.activated) {
+	if (!ability.activated
+			&& !this.abilitiesWithPromptTargetsNeeded.includes(ability)) {
 		var abilityIsReadyToActivate = this.addNewAbility(ability);
 		if (abilityIsReadyToActivate) {
 			ability.activateAbility();
@@ -314,7 +319,7 @@ Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
 
 	var nextNeededPromptTargetInfo;
 	abilityObject.abilityInfo.neededPromptTargetsInfo.forEach((neededPromptTargetInfo) => {
-		if (!nextNeededPromptTargetInfo 
+		if (!nextNeededPromptTargetInfo && abilityObject.promptTargetInfo
 				&& (!abilityObject.promptTargetInfo[sourceTileKeyStr] 
 				|| !abilityObject.promptTargetInfo[sourceTileKeyStr][neededPromptTargetInfo.promptId])) {
 			nextNeededPromptTargetInfo = neededPromptTargetInfo;
@@ -327,10 +332,12 @@ Trifle.AbilityManager.prototype.promptForNextNeededTargets = function() {
 		if (promptTargetsExist) {
 			neededPromptInfo.currentPromptTargetId = nextNeededPromptTargetInfo.promptId;
 		} else {
-			debug("No targets available to prompt.. so no prompt needed!");
+			debug("No targets available to prompt.. so no prompt needed! Removing ability from prompt list.");
+			this.abilitiesWithPromptTargetsNeeded.shift();
 		}
 	} else {
-		debug("No prompt needed");
+		debug("No prompt needed, removing ability from prompt list.");
+		this.abilitiesWithPromptTargetsNeeded.shift();
 	}
 
 	return { neededPromptInfo: neededPromptInfo };

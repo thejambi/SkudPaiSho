@@ -35,7 +35,7 @@ Trifle.MoveTargetTileAbilityBrain.prototype.activateAbility = function() {
 	}
 };
 
-Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeededPromptTargetInfo, sourceTileKeyStr) {
+Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeededPromptTargetInfo, sourceTileKeyStr, checkForTargetsOnly) {
 	var promptTargetsExist = false;
 
 	debug("Need to prompt for target: " + nextNeededPromptTargetInfo.promptId);
@@ -65,12 +65,15 @@ Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeede
 
 			abilityTargetTilePoints.forEach((targetTilePoint) => {
 				promptTargetsExist = true;
-				targetTilePoint.addType(POSSIBLE_MOVE);
+				if (!checkForTargetsOnly) {
+					targetTilePoint.addType(POSSIBLE_MOVE);
+				}
 			});
 		} else {
 			debug("Prompting not supported yet for this ability");
 		}
-	} else if (nextNeededPromptTargetInfo.promptId === Trifle.TargetPromptId.movedTileDestinationPoint) {
+	} else if (nextNeededPromptTargetInfo.promptId === Trifle.TargetPromptId.movedTileDestinationPoint
+			&& !checkForTargetsOnly) {
 		// this.abilityObject.board.promptForBoardPointInAVeryHackyWay();
 
 		var movedTilePoint = this.abilityObject.promptTargetInfo[sourceTileKeyStr][Trifle.TargetPromptId.movedTilePoint];
