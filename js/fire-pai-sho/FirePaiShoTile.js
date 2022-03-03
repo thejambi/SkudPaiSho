@@ -31,13 +31,27 @@ function FirePaiShoTile(code, ownerCode) {
 	} else if (this.code === 'R' || this.code === 'W' || this.code === 'K' || this.code === 'B') {
 		this.type = ACCENT_TILE;
 		this.setAccentInfo();
-	} else if (this.code === 'G' || this.code === 'F' || this.code === 'D' || this.code === 'Y' || this.code === 'T') {
+	} else if (
+		[FirePaiShoTile.OriginalBenderTileCodes.Badgermole,
+		FirePaiShoTile.OriginalBenderTileCodes.Dragon,
+		FirePaiShoTile.OriginalBenderTileCodes.Bison,
+		FirePaiShoTile.OriginalBenderTileCodes.Koi,
+		FirePaiShoTile.OriginalBenderTileCodes.LionTurtle].includes(this.code)
+	) {
 		this.type = ORIGINAL_BENDER;
 		this.setOriginalBenderInfo();
 	} else {
 		debug("Error: Unknown tile type");
 	}
 }
+
+FirePaiShoTile.OriginalBenderTileCodes = {
+	Badgermole: "Badgermole",
+	Dragon: "Dragon",
+	Koi: "Koi",
+	Bison: "Bison",
+	LionTurtle: "T"
+};
 
 FirePaiShoTile.prototype.setAccentInfo = function() {
 	if (this.code === 'R') {
@@ -72,23 +86,23 @@ FirePaiShoTile.prototype.setOriginalBenderInfo = function() {
 		//Y koi fish (Yin and Yang)
 		//T lion turtle
 
-	if (this.code === 'G') {
+	if (this.code === FirePaiShoTile.OriginalBenderTileCodes.Badgermole) {
 		this.originalBenderType = BADGERMOLE;
 		this.affinityColorName = WHITE;
 		this.harmonizer = true;
-	} else if (this.code === 'F') {
+	} else if (this.code === FirePaiShoTile.OriginalBenderTileCodes.Bison) {
 		this.originalBenderType = FLYING_BISON;
 		this.affinityColorName = RED;
 		this.harmonizer = true;
-	} else if (this.code === 'D') {
+	} else if (this.code === FirePaiShoTile.OriginalBenderTileCodes.Dragon) {
 		this.originalBenderType = DRAGON;
 		this.affinityColorName = RED;
 		this.harmonizer = true;
-	} else if (this.code === 'Y') {
+	} else if (this.code === FirePaiShoTile.OriginalBenderTileCodes.Koi) {
 		this.originalBenderType = KOI;
 		this.affinityColorName = WHITE;
 		this.harmonizer = true;
-	} else if (this.code === 'T') {
+	} else if (this.code === FirePaiShoTile.OriginalBenderTileCodes.LionTurtle) {
 		this.originalBenderType = LION_TURTLE;
 		this.harmonizer = true;
 	}

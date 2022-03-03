@@ -33,11 +33,18 @@ FirePaiShoTileManager.prototype.loadLibrary = function(ownerCode) {
 	tiles.push(new FirePaiShoTile('O', ownerCode));
 
 	// 1 of each original bender (TEMPORARY FOR TESTING)
-	//tiles.push(new FirePaiShoTile('G', ownerCode));
-	//tiles.push(new FirePaiShoTile('D', ownerCode));
-	//tiles.push(new FirePaiShoTile('Y', ownerCode));
-	//tiles.push(new FirePaiShoTile('F', ownerCode));
-	//tiles.push(new FirePaiShoTile('T', ownerCode));
+	if (gameOptionEnabled(ORIGINAL_BENDER_EXPANSION)) {
+		// tiles.push(new FirePaiShoTile('G', ownerCode));
+		// tiles.push(new FirePaiShoTile('D', ownerCode));
+		// tiles.push(new FirePaiShoTile('Y', ownerCode));
+		// tiles.push(new FirePaiShoTile('F', ownerCode));
+		// tiles.push(new FirePaiShoTile('T', ownerCode));
+		tiles.push(new FirePaiShoTile(FirePaiShoTile.OriginalBenderTileCodes.Badgermole, ownerCode));
+		tiles.push(new FirePaiShoTile(FirePaiShoTile.OriginalBenderTileCodes.Dragon, ownerCode));
+		tiles.push(new FirePaiShoTile(FirePaiShoTile.OriginalBenderTileCodes.Koi, ownerCode));
+		tiles.push(new FirePaiShoTile(FirePaiShoTile.OriginalBenderTileCodes.Bison, ownerCode));
+		tiles.push(new FirePaiShoTile(FirePaiShoTile.OriginalBenderTileCodes.LionTurtle, ownerCode));
+	}
 
 
 	return tiles;
