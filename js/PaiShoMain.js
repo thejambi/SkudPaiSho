@@ -432,7 +432,7 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 		  }
 	  }
   
-	//   resetGlobalChats();	"Global Chats" tab is now "Links"
+	  resetGlobalChats();	//"Global Chats" tab is now "Links"
   
 	  initialVerifyLogin();
   
@@ -3538,13 +3538,14 @@ var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(resul
 function resetGlobalChats() {
 	// Clear all global chats..
 	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>.<hr />";
+	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! While Discord is having issues, I have enabled this global chat. Say hello!<hr />";
 }
 
 function fetchInitialGlobalChats() {
-	//   resetGlobalChats();
+	  resetGlobalChats();
 
 	// Fetch global chats..
-	//   onlinePlayEngine.getInitialGlobalChatMessages(getInitialGlobalChatsCallback);
+	  onlinePlayEngine.getInitialGlobalChatMessages(getInitialGlobalChatsCallback);
 }
 
 // var callLogOnlineStatusPulse = function callLogOnlineStatusPulse() {
@@ -3558,14 +3559,14 @@ function fetchInitialGlobalChats() {
 function logOnlineStatusPulse() {
 	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 	verifyLogin();
-	// fetchGlobalChats();
+	fetchGlobalChats();
 }
 
 var LOG_ONLINE_STATUS_INTERVAL = 5000;
 function startLoggingOnlineStatus() {
 	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 
-	// fetchInitialGlobalChats();
+	fetchInitialGlobalChats();
 
 	clearLogOnlineStatusInterval();
 
@@ -3758,12 +3759,12 @@ var sendGlobalChat = function() {
 	}
 }
 
-/* document.getElementById('globalChatMessageInput').onkeypress = function(e){
+document.getElementById('globalChatMessageInput').onkeypress = function(e){
 	 var code = (e.keyCode ? e.keyCode : e.which);
 	  if(code == 13) {
 		sendGlobalChat();
 	  }
-}; */
+};
 
 function htmlEscape(str) {
 	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');

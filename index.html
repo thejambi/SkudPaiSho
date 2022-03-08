@@ -8,7 +8,7 @@
 
   <!-- Images of classic tile designs used in Skud Pai Sho are originally from the Lotus Gambit rules community at http://lotusgambit.pbworks.com/w/page/45592429/Home -->
 
-  <link href="style/main.css?v=20211207-005244" rel="stylesheet" type="text/css">
+  <link href="style/main.css?v=20220308-142407" rel="stylesheet" type="text/css">
   <link id="overrideCSS" href="" rel="stylesheet" type="text/css">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -230,7 +230,7 @@
       <div class="helpContainer" id="help">
         <div class="tab">
           <button class="tablinks" onclick="openTab(event, 'helpTextTab')" id="defaultOpenTab">Help</button>
-          <button id='globalChatTabHeader' class="tablinks" onclick="openTab(event, 'globalChatTab');">Links</button>
+          <button id='globalChatTabHeader' class="tablinks" onclick="openTab(event, 'globalChatTab');">Links/Chat</button>
           <button id='chatTab' class="tablinks" onclick="openTab(event, 'gameChatTab'); dismissChatAlert();">Game Chat</button>
         </div>
 
@@ -239,7 +239,7 @@
           </div>
         </div>
         <div id="globalChatTab" class="tabcontent">
-          <div id="globalChatMessagesDisplay" class="chatMessagesDisplay">
+          <div id="globalChatMessagesDisplayLinks" class="chatMessagesDisplay">
             <a href='https://skudpaisho.com/site/' target='_blank'>The Rules &amp; More Site</a>: For more information about Pai Sho and The Garden Gate, explore <a href='https://skudpaisho.com/site/' target='_blank'>The Rules &amp; More Site</a>.
             <br><br>
             <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>: To join The Garden Gate Community and chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>.
@@ -250,9 +250,12 @@
             <br><br>
             <a href='https://forum.skudpaisho.com/' target='_blank'>Forum</a>: The forum has some important posts as a supplement to the Discord community.
           </div>
+          <hr />
+          <div id="globalChatMessagesDisplay" class="chatMessagesDisplay">
+          </div>
           <div id="globalChatMessageInputContainer" class="chatMessageInputContainer">
-            <!-- <textarea id="globalChatMessageInput" class="chatMessageInput"></textarea>
-            <span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span> -->
+            <textarea id="globalChatMessageInput" class="chatMessageInput"></textarea>
+            <span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span>
           </div>
         </div>
         <div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
@@ -367,7 +370,7 @@
   <!-- <script src="js/lz-string.min.js"></script> -->
 
   <!-- Compressed -->
-  <script src="psmin_20211207-005244.js"></script>
+  <script src="psmin_20220308-142407.js"></script>
 </body>
 
 </html>
