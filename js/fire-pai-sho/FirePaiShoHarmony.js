@@ -1,31 +1,18 @@
 /* Skud Pai Sho Harmony */
 
-function FirePaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn, affectingLionTurtleTiles) {
+function FirePaiShoHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = new RowAndColumn(tile1RowAndColumn.row, tile1RowAndColumn.col);
 	this.tile2 = tile2;
 	this.tile2Pos = new RowAndColumn(tile2RowAndColumn.row, tile2RowAndColumn.col);
 	this.owners = [];
-
-	var overrideOwner = affectingLionTurtleTiles.length > 0 && tile1.ownerCode !== tile2.ownerCode;
-
-	if (overrideOwner) {
-		for (var i = 0; i < affectingLionTurtleTiles.length; i++) {
-			this.addOwner(affectingLionTurtleTiles[i].ownerCode,
-				affectingLionTurtleTiles[i].ownerName);
-		}
+	
+	if (this.tile1.harmonizer) {
+		this.addOwner(this.tile1.ownerCode, this.tile1.ownerName);
+	} else if (this.tile2.harmonizer) {
+		this.addOwner(this.tile2.ownerCode, this.tile2.ownerName);
 	} else {
-		if (this.tile1.harmonizer) {
-			this.addOwner(this.tile1.ownerCode, this.tile1.ownerName);
-		} else if (this.tile2.harmonizer) {
-			this.addOwner(this.tile2.ownerCode, this.tile2.ownerName);
-		} else {
-			debug("ERROR: HARMONY REQUIRES A BASIC FLOWER TILE OR ORCHID");
-		}
-	}
-
-	if (overrideOwner) {
-		this.overwriteOtherHarmonyEntries = true;
+		debug("ERROR: HARMONY REQUIRES A BASIC FLOWER TILE OR ORCHID");
 	}
 }
 

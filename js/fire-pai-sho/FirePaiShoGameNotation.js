@@ -62,11 +62,11 @@ FirePaiShoNotationMove.prototype.analyzeMove = function() {
 		// Planting move stuff
 		//console.log("We're planting!");
 		if (!((char0 === 'R') || (char0 === 'W'))) {
-			this.plantedFlowerType = char0;
-		}
-		else{
-		var char1 = moveText.charAt(1);
-		this.plantedFlowerType = char0 + "" + char1;
+			// this.plantedFlowerType = char0;
+			this.plantedFlowerType = moveText.substring(0,moveText.indexOf('('));
+		} else {
+			var char1 = moveText.charAt(1);
+			this.plantedFlowerType = char0 + "" + char1;
 		}
 
 //		if (moveText.charAt(2) === '(') {
@@ -78,7 +78,6 @@ FirePaiShoNotationMove.prototype.analyzeMove = function() {
 
 		if (moveText.endsWith(')')) {
 			this.endPoint = new NotationPoint(moveText.substring(moveText.indexOf('(')+1, moveText.indexOf(')')));
-			
 		} else {
 			this.valid = false;
 		}

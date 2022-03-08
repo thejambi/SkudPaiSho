@@ -70,6 +70,13 @@ FirePaiShoBoardPoint.prototype.hasTile = function() {
 	return false;
 };
 
+FirePaiShoBoardPoint.prototype.hasCorporealTile = function() {
+	if (this.tile && !this.tile.ethereal) {
+		return true;
+	}
+	return false;
+};
+
 FirePaiShoBoardPoint.prototype.hasFlowerTile = function() {
 	if (this.tile && (this.tile.type !== ACCENT_TILE)) {
 		return true;
@@ -99,9 +106,21 @@ FirePaiShoBoardPoint.prototype.boostTile = function() {
 	}
 };
 
+FirePaiShoBoardPoint.prototype.etherealizeTile = function() {
+	if (this.tile) {
+		this.tile.etherealize();
+	}
+};
+
 FirePaiShoBoardPoint.prototype.restoreTile = function() {
 	if (this.tile) {
 		this.tile.restore();
+	}
+};
+
+FirePaiShoBoardPoint.prototype.corporealizeTile = function() {
+	if (this.tile) {
+		this.tile.corporealize();
 	}
 };
 
@@ -131,6 +150,8 @@ FirePaiShoBoardPoint.prototype.canHoldTile = function(tile, ignoreTileCheck) {
 	} else if (tile.type === SPECIAL_FLOWER) {
 		return true;
 	} else if (tile.type === ACCENT_TILE) {
+		return true;
+	} else if (tile.type === ORIGINAL_BENDER) {
 		return true;
 	}
 
