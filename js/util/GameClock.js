@@ -219,7 +219,7 @@ GameClock.loadGameClock = function(newClock) {
 };
 
 GameClock.userHasGameClockAccess = function() {
-    return true;
+    return false;
     /* return usernameIsOneOf(
         [
             'SkudPaiSho',
