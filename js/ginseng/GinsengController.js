@@ -2,6 +2,13 @@
 
 function Ginseng() {}
 
+Ginseng.Constants = {
+	preferencesKey: "GinsengPreferencesKey"
+};
+Ginseng.Preferences = {
+	customTilesUrl: ""
+};
+
 Ginseng.Controller = function(gameContainer, isMobile) {
 	new Ginseng.Options();	// Initialize
 	this.gameContainer = gameContainer;
@@ -590,3 +597,21 @@ Ginseng.Controller.prototype.buildNotationString = function(move) {
 
 	return moveNotation;
 };
+
+Ginseng.Controller.prototype.setCustomTileDesignUrl = function(url) {
+	Ginseng.Preferences.customTilesUrl = url;
+	localStorage.setItem(Ginseng.Constants.preferencesKey, JSON.stringify(Ginseng.Preferences));
+	localStorage.setItem(Ginseng.Options.tileDesignTypeKey, 'custom');
+	if (gameController && gameController.callActuate) {
+		gameController.callActuate();
+	}
+};
+
+Ginseng.Controller.isUsingCustomTileDesigns = function() {
+	return localStorage.getItem(Ginseng.Options.tileDesignTypeKey) === "custom";
+};
+
+Ginseng.Controller.getCustomTileDesignsUrl = function() {
+	return Ginseng.Preferences.customTilesUrl;
+};
+

@@ -23,12 +23,17 @@ Ginseng.Options.tileDesignTypeValues = {
 	zaofu: "Zaofu",
 	northern: "Agna Qel'a",
 	chuji: "Chu Ji Red",
+	custom: "Use Custom Designs"
 };
 
 Ginseng.Options.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
-	localStorage.setItem(Ginseng.Options.tileDesignTypeKey, tileDesignKey);
-	if (gameController && gameController.callActuate && !ignoreActuate) {
-		gameController.callActuate();
+	if (tileDesignKey === 'custom') {
+		promptForCustomTileDesigns(GameType.Ginseng, Ginseng.Preferences.customTilesUrl);
+	} else {
+		localStorage.setItem(Ginseng.Options.tileDesignTypeKey, tileDesignKey);
+		if (gameController && gameController.callActuate && !ignoreActuate) {
+			gameController.callActuate();
+		}
 	}
 };
 

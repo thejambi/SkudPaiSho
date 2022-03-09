@@ -1,7 +1,7 @@
 /* Vagabond Pai Sho specific UI interaction logic */
 
 var VagabondConstants = {
-	preferencesKey = "VagabondPreferencesKey"
+	preferencesKey: "VagabondPreferencesKey"
 };
 var VagabondPreferences = {
 	customTilesUrl: ""
