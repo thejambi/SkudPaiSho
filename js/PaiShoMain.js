@@ -3539,7 +3539,7 @@ var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(resul
 function resetGlobalChats() {
 	// Clear all global chats..
 	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>.<hr />";
-	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! While Discord is having issues, I have enabled this global chat. Say hello!<hr />";
+	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Welcome! Discord is the best way to chat and get help, but feel free to say hello here in the global chat.<hr />";
 }
 
 function fetchInitialGlobalChats() {
