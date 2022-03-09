@@ -2326,7 +2326,8 @@ var GameType = {
 			ETHEREAL_ACCENT_TILES
 		],
 		secretGameOptions: [
-			ORIGINAL_BENDER_EXPANSION
+			ORIGINAL_BENDER_EXPANSION,
+			MIDLINE_OPENER
 		]
 	},
 	SolitairePaiSho: {
