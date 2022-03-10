@@ -3820,19 +3820,20 @@ function showGameReplayLink() {
 	linkUrl = sandboxUrl + "?" + linkUrl;
 
 	debug("GameReplayLinkUrl: " + linkUrl);
-	var message = "Here is the <a id='gameReplayLink' href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.";
+	var message = "Here is the <a id='gameReplayLink' href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.<button onclick='copyTextToClipboard(\""+linkUrl+"\", this);' class='button'>Copy Link</button> <br /><br />";
 	if (playingOnlineGame()) {
+		var spectateUrl = buildSpectateUrl();
 		message += "<br /><br />";
-		message += "Here is the <a href=\"" + buildSpectateUrl() + "\" target='_blank'>spectate link</a> others can use to watch the game live and participate in the Game Chat.";
+		message += "Here is the <a href=\"" + spectateUrl + "\" target='_blank'>spectate link</a> others can use to watch the game live and participate in the Game Chat. <button onclick='copyTextToClipboard(\""+spectateUrl+"\", this);' class='button'>Copy Link</button> <br /><br />";
 	}
 	showModal("Game Links", message);
 
-	getShortUrl(linkUrl, function(shortUrl) {
-		var linkTag = document.getElementById('gameReplayLink');
-		if (linkTag) {
-			linkTag.setAttribute("href", shortUrl);
-		}
-	});
+	//getShortUrl(linkUrl, function(shortUrl) {
+	//	var linkTag = document.getElementById('gameReplayLink');
+	//	if (linkTag) {
+	//		linkTag.setAttribute("href", shortUrl);
+	//	}
+	//});
 }
 
 function buildSpectateUrl() {
