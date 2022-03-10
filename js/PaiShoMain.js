@@ -3828,12 +3828,12 @@ function showGameReplayLink() {
 	}
 	showModal("Game Links", message);
 
-	//getShortUrl(linkUrl, function(shortUrl) {
-	//	var linkTag = document.getElementById('gameReplayLink');
-	//	if (linkTag) {
-	//		linkTag.setAttribute("href", shortUrl);
-	//	}
-	//});
+	getShortUrl(linkUrl, function(shortUrl) {
+		var linkTag = document.getElementById('gameReplayLink');
+		if (linkTag) {
+			linkTag.setAttribute("href", shortUrl);
+		}
+	});
 }
 
 function buildSpectateUrl() {
