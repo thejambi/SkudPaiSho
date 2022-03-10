@@ -3823,7 +3823,7 @@ function showGameReplayLink() {
 	linkUrl = sandboxUrl + "?" + linkUrl;
 
 	debug("GameReplayLinkUrl: " + linkUrl);
-	var message = "Here is the <a id='gameReplayLink' href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.<button onclick='copyTextToClipboard(\""+linkUrl+"\", this);' class='button'>Copy Link</button> <br /><br />";
+	var message = "Here is the <a id='gameReplayLink' href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.<button id='copyGameLinkButton' disabled class='button gone'>Copy Link</button> <br /><br />";
 	if (playingOnlineGame()) {
 		var spectateUrl = buildSpectateUrl();
 		message += "<br /><br />";
@@ -3835,6 +3835,14 @@ function showGameReplayLink() {
 		var linkTag = document.getElementById('gameReplayLink');
 		if (linkTag) {
 			linkTag.setAttribute("href", shortUrl);
+		}
+		var copyLinkButton = document.getElementById('copyGameLinkButton');
+		if (copyLinkButton) {
+			copyLinkButton.disabled = false;
+			copyLinkButton.classList.remove('gone');
+			copyLinkButton.onclick = function () {
+				copyTextToClipboard(shortUrl, copyLinkButton);
+			};
 		}
 	});
 }
