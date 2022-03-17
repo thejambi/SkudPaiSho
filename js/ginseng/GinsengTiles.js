@@ -139,6 +139,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
 						targetTeams: [Trifle.TileTeam.enemy],
 						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						targetTileBoardPointTypes: gameOptionEnabled(ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE) && [RED, WHITE],
 						activationRequirements: [
 							{
 								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
@@ -207,6 +208,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
 						targetTeams: [Trifle.TileTeam.enemy],
 						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						targetTileBoardPointTypes: gameOptionEnabled(ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE) && [RED, WHITE],
 						activationRequirements: [
 							{
 								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
@@ -259,6 +261,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
 						targetTeams: [Trifle.TileTeam.friendly],
 						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						targetTileBoardPointTypes: gameOptionEnabled(ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE) && [RED, WHITE],
 						activationRequirements: [
 							{
 								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
@@ -270,7 +273,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			},
-			{
+			!gameOptionEnabled(BADGERMOLE_NOT_PREVENT_TRAP_PUSH) && {
 				title: "Protect From Enemy Abilities",
 				type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
 				priority: 2,
@@ -279,6 +282,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
 						targetTeams: [Trifle.TileTeam.friendly],
 						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						targetTileBoardPointTypes: gameOptionEnabled(ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE) && [RED, WHITE],
 						activationRequirements: [
 							{
 								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
@@ -342,6 +346,7 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 					{
 						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
 						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						targetTileBoardPointTypes: gameOptionEnabled(ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE) && [RED, WHITE],
 						activationRequirements: [
 							{
 								type: Trifle.ActivationRequirement.tileIsOnPointOfType,

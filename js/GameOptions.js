@@ -170,6 +170,15 @@ gameOptionDescriptions[LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN] = "Lion Turtl
 var LION_TURTLE_ABILITY_ANYWHERE = "LTAbilityAnywhere";
 gameOptionDescriptions[LION_TURTLE_ABILITY_ANYWHERE] = "Lion Turtle Ability: Captures adjacent Original Benders, whether they are touching central garden or not";
 
+var BADGERMOLE_NOT_PREVENT_TRAP_PUSH = "BadgermoleNotPreventTrapPush";
+gameOptionDescriptions[BADGERMOLE_NOT_PREVENT_TRAP_PUSH] = "Badgermole does not prevent trap/push";
+
+var ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE = "OrigBenderAbilitiesTargetGardenTiles";
+gameOptionDescriptions[ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE] = "Original Bender Abilities only affect tiles touching Central Gardens";
+
+var SWAP_BISON_AND_DRAGON = "SwapBisonDragon";
+gameOptionDescriptions[SWAP_BISON_AND_DRAGON] = "Swap Bison and Dragon";
+
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
 		return gameOptionDescriptions[optionName];

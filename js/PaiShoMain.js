@@ -2308,7 +2308,10 @@ var GameType = {
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [
-			LION_TURTLE_ABILITY_ANYWHERE
+			LION_TURTLE_ABILITY_ANYWHERE,
+			BADGERMOLE_NOT_PREVENT_TRAP_PUSH,
+			ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE,
+			SWAP_BISON_AND_DRAGON
 		]
 	},
 	FirePaiSho: {
