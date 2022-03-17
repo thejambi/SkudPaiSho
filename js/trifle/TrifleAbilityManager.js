@@ -34,6 +34,7 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 		capturedTiles: [],
 		tilesMovedToPiles: []
 	};
+	var abilitiesActivated = [];
 	var self = this;
 
 	/* Mark all existing abilities as do not preserve */
@@ -72,7 +73,7 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 				if (ability.isPriority(currentPriority)) {
 					priorityAbilityFound = true;
 					debug("!!!!Priority " + currentPriority + " Ability!!!! " + ability.getTitle());
-					boardHasChanged = self.doTheActivateThing(ability, tileRecords);
+					boardHasChanged = self.doTheActivateThing(ability, tileRecords, abilitiesActivated);
 					return !boardHasChanged;	// Continue if board has not changed
 				}
 			});
@@ -97,7 +98,7 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 			var readyAbilitiesOfType = self.readyAbilities[abilityName];
 			if (readyAbilitiesOfType && readyAbilitiesOfType.length) {
 				readyAbilitiesOfType.every(ability => {
-					boardHasChanged = self.doTheActivateThing(ability, tileRecords);
+					boardHasChanged = self.doTheActivateThing(ability, tileRecords, abilitiesActivated);
 					return !boardHasChanged;	// Continue if board has not changed
 				});
 			}
@@ -107,7 +108,7 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 		if (!boardHasChanged) {
 			Object.values(this.readyAbilities).every(abilityList => {
 				abilityList.every(ability => {
-					boardHasChanged = self.doTheActivateThing(ability, tileRecords);
+					boardHasChanged = self.doTheActivateThing(ability, tileRecords, abilitiesActivated);
 					return !boardHasChanged;	// Continue if board has not changed
 				});
 				return !boardHasChanged;	// Continue if board has not changed
@@ -116,12 +117,13 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	}
 
 	return {
+		abilitiesActivated: abilitiesActivated,
 		boardHasChanged: boardHasChanged,
 		tileRecords: tileRecords
 	};
 };
 
-Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecords) {
+Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecords, abilitiesActivated) {
 	var capturedTiles = tileRecords.capturedTiles;
 	var tilesMovedToPiles = tileRecords.tilesMovedToPiles;
 
@@ -130,6 +132,7 @@ Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecor
 			&& !this.abilitiesWithPromptTargetsNeeded.includes(ability)) {
 		var abilityIsReadyToActivate = this.addNewAbility(ability);
 		if (abilityIsReadyToActivate) {
+			abilitiesActivated.push(ability);
 			ability.activateAbility();
 
 			if (ability.abilityActivatedResults

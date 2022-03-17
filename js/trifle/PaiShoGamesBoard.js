@@ -1127,6 +1127,9 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 	if (!currentMoveInfo) {
 		currentMoveInfo = {};
 	}
+	if (!existingAbilityActivationFlags) {
+		existingAbilityActivationFlags = {};
+	}
 
 	var abilitiesToActivate = {};
 	var abilitiesWithPromptTargetsNeeded = [];
@@ -1212,12 +1215,14 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 							abilitiesWithPromptTargetsNeeded.push(abilityObject);
 						}
 
-						var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
+						if (!self.abilityInActivatedList(abilityObject, existingAbilityActivationFlags.abilitiesActivated)) {
+							var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
 
-						if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
-							abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
-						} else {
-							abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
+							if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
+								abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
+							} else {
+								abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
+							}
 						}
 					// }
 				}
@@ -1289,12 +1294,14 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 								abilitiesWithPromptTargetsNeeded.push(abilityObject);
 							}
 
-							var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
+							if (!self.abilityInActivatedList(abilityObject, existingAbilityActivationFlags.abilitiesActivated)) {
+								var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
 
-							if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
-								abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
-							} else {
-								abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
+								if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
+									abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
+								} else {
+									abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
+								}
 							}
 						// }
 					}
@@ -1320,8 +1327,8 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 	if (abilityActivationFlags.boardHasChanged) {
 		// Need to re-process abilities... 
 		// Pass in some sort of context from the activation flags???
-		// /* Was: */ var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.tileRecords.capturedTiles, currentMoveInfo, abilityActivationFlags);
-		/* New: */ var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, null, null, abilityActivationFlags.tileRecords.capturedTiles, null, abilityActivationFlags);
+		/* Was: */ var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.tileRecords.capturedTiles, currentMoveInfo, abilityActivationFlags);
+		// /* New: */ var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, null, null, abilityActivationFlags.tileRecords.capturedTiles, null, abilityActivationFlags);
 		if (nextAbilityActivationFlags.tileRecords.capturedTiles && nextAbilityActivationFlags.tileRecords.capturedTiles.length) {
 			if (!abilityActivationFlags.tileRecords.capturedTiles) {
 				abilityActivationFlags.tileRecords.capturedTiles = [];
@@ -1334,6 +1341,22 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 	}
 
 	return abilityActivationFlags;
+};
+
+PaiShoGames.Board.prototype.abilityInActivatedList = function(ability, abilitiesActivated) {
+	var abilityFound = false;
+
+	if (abilitiesActivated) {
+		abilitiesActivated.forEach(existingAbility => {
+			if (ability.abilityType === existingAbility.abilityType
+				&& ability.sourceTile === existingAbility.sourceTile) {
+				abilityFound = true;
+				return abilityFound;
+			}
+		});
+	}
+
+	return abilityFound;
 };
 
 PaiShoGames.Board.prototype.getZonesPointIsWithin = function(boardPoint) {
