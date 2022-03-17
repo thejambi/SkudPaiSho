@@ -1215,7 +1215,7 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 							abilitiesWithPromptTargetsNeeded.push(abilityObject);
 						}
 
-						if (!self.abilityInActivatedList(abilityObject, existingAbilityActivationFlags.abilitiesActivated)) {
+						if (!self.abilityInActivatedList(abilityObject, existingAbilityActivationFlags.abilitiesActivated, Trifle.AbilityCategory.instant)) {
 							var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
 
 							if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
@@ -1294,7 +1294,7 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 								abilitiesWithPromptTargetsNeeded.push(abilityObject);
 							}
 
-							if (!self.abilityInActivatedList(abilityObject, existingAbilityActivationFlags.abilitiesActivated)) {
+							if (!self.abilityInActivatedList(abilityObject, existingAbilityActivationFlags.abilitiesActivated, Trifle.AbilityCategory.instant)) {
 								var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
 
 								if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
@@ -1343,13 +1343,14 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 	return abilityActivationFlags;
 };
 
-PaiShoGames.Board.prototype.abilityInActivatedList = function(ability, abilitiesActivated) {
+PaiShoGames.Board.prototype.abilityInActivatedList = function(ability, abilitiesActivated, abilityCategory) {
 	var abilityFound = false;
 
 	if (abilitiesActivated) {
 		abilitiesActivated.forEach(existingAbility => {
-			if (ability.abilityType === existingAbility.abilityType
-				&& ability.sourceTile === existingAbility.sourceTile) {
+			if (ability.appearsToBeTheSameAs(existingAbility)
+					&& (!abilityCategory ||  Trifle.TileInfo.abilityIsCategory(existingAbility, abilityCategory))
+			) {
 				abilityFound = true;
 				return abilityFound;
 			}

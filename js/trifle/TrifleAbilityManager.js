@@ -52,11 +52,12 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	/* Deactivate abilities. New ability list is the ones that are not deactivated. */
 	var newAbilities = [];
 	this.abilities.forEach(function(existingAbility) {
-		// if (existingAbility.preserve && !self.abilityIsCanceled(existingAbility)) {
-		// 	newAbilities.push(existingAbility);	// Commenting this out... ability activation priority should take care of this now
-		// } else {
+		if (existingAbility.preserve && !self.abilityIsCanceled(existingAbility)) {
+			newAbilities.push(existingAbility);	// Commenting this out... ability activation priority should take care of this now
+												// NOOOOOO We need this!
+		} else {
 			existingAbility.deactivate();
-		// }
+		}
 	});
 	this.abilities = newAbilities;
 

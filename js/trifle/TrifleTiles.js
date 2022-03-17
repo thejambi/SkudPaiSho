@@ -217,6 +217,21 @@ Trifle.AbilityType = {
 	protection: "protection"
 };
 
+Trifle.AbilityCategory = {
+	instant: "instant",
+	ongoing: "ongoing"
+};
+
+Trifle.AbilitiesByCategory = {};
+Trifle.AbilitiesByCategory[Trifle.AbilityCategory.instant] = [
+	Trifle.AbilityName.captureTargetTiles,
+	Trifle.AbilityName.moveTargetTile,
+	Trifle.AbilityName.recordTilePoint,
+	Trifle.AbilityName.moveTileToRecordedPoint,
+	Trifle.AbilityName.moveTargetTileToPile,
+	Trifle.AbilityName.exchangeWithCapturedTile
+];
+
 Trifle.AbilityPriorityLevel = {
 	highest: "highest"
 };
@@ -397,6 +412,12 @@ Trifle.TileInfo.tileAbilityIsTriggeredWhenCaptured = function(tileAbilityInfo) {
 		});
 	}
 	return isTriggeredWhenCaptured;
+};
+
+/* TODO Does not belong in 'TileInfo' space? */
+Trifle.TileInfo.abilityIsCategory = function(abilityObject, abilityCategory) {
+	return Trifle.AbilitiesByCategory[abilityCategory] 
+		&& Trifle.AbilitiesByCategory[abilityCategory].includes(abilityObject.abilityType);
 };
 
 Trifle.TileInfo.initializeTrifleData = function() {
