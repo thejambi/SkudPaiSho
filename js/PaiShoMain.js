@@ -3726,6 +3726,10 @@ var processChatCommands = function(chatMessage) {
 		buildBoardDesignsValues();
 		clearMessage();
 	}
+
+	if (chatMessage.includes("April Fools&apos;!")) {	// April Fools'!
+		Ads.enableAds(true);
+	}
 };
 
 function promptForAgeToTreeYears() {
@@ -4145,8 +4149,14 @@ function addOptionFromInput() {
 }
 
 function promptAddOption() {
+	if (Ads.Options.showAds) {
+		Ads.showRandomPopupAd();
+	}
+
 	var message = "";
 	if (usernameIsOneOf(['SkudPaiSho'])) {
+		Ads.enableAds(true);
+
 		message = "<br /><input type='text' id='optionAddInput' name='optionAddInput' />";
 		message += "<br /><div class='clickableText' onclick='addOptionFromInput()'>Add</div>";
 
