@@ -8,7 +8,7 @@
 
   <!-- Images of classic tile designs used in Skud Pai Sho are originally from the Lotus Gambit rules community at http://lotusgambit.pbworks.com/w/page/45592429/Home -->
 
-  <link href="style/main.css?v=20220309-090742" rel="stylesheet" type="text/css">
+  <link href="style/main.css?v=20220329-001414" rel="stylesheet" type="text/css">
   <link id="overrideCSS" href="" rel="stylesheet" type="text/css">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -69,6 +69,7 @@
       <div class="closebtn" onclick="closeNav();">&nbsp;&times;</div>
       <h1>The Garden Gate</h1>
       <hr />
+      <div id="sideMenuAvContainer" class="gone"></div>
       <div class='sidenavSection odd'>
         <div class='sidenavSectionHeader'>Play</div>
         <div class='sidenavEntry sidenavLink skipBonus' onclick='accountHeaderClicked();'>
@@ -128,6 +129,7 @@
         <div class='sidenavEntry'>
           <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank' class='sidenavLink'>Leave a tip</a>
         </div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='Ads.viewSponsoredMessageClicked();'>View sponsored message</div>
       </div>
       <hr />
       <div class='sidenavSection odd'>
@@ -188,10 +190,10 @@
   </div>
 
   <div id='mainWrapper'>
-
     <div class="game-container-wrapper">
 
       <div id="game-title-container">
+        <div id="topAvContainer" class="gone"></div>
         <h2 id="game-title-heading" class="game-title-text">Loading...</h2>
         <div id="defaultGameMessage" class="gone">
           Try <span id="defaultGameMessageGameTitle" class="game-title-text">Game Title</span> by clicking on tiles below. 
@@ -235,10 +237,12 @@
         </div>
 
         <div id='helpTextTab' class="tabcontent">
+          <div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
           <div id='helpTextContent'>
           </div>
         </div>
         <div id="globalChatTab" class="tabcontent">
+          <div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
           <div id="globalChatMessagesDisplayLinks" class="linksTabLinksDiv">
             <a href='https://skudpaisho.com/site/' target='_blank'>The Rules &amp; More Site</a>: More information about Pai Sho and The Garden Gate.
             <br><br>
@@ -257,6 +261,7 @@
           </div>
         </div>
         <div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
+          <div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
           <div id="chatMessagesHeader" class="chatMessagesHeader"><em>Game Chat messages may be viewed by other players. Abide by the Discord server #rules to be allowed to use Game Chat. Thank you!</em><div class='clickableText' onclick='toggleTimestamps()'>Toggle timestamp display</div><div id='toggleMoveLogDisplayDiv' class='clickableText gone' onclick='toggleMoveLogDisplay()'>Toggle move log messages</div><hr /></div>
           <div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
           <div id="chatMessageInputContainer" class="chatMessageInputContainer">
@@ -271,6 +276,7 @@
   <div class="footer"></div>
 
   <div id="replayControls" class="gone">
+    <div id="footerAvContainer" class="gone"></div>
     <div id='confirmMoveButton' class='gone'>
       <div class="center">
         <span class='replayButton' onclick="confirmMoveClicked()">
@@ -369,7 +375,7 @@
   <script src="js_util/MersenneTwisterRandom.js"></script>
 
   <!-- Compressed TGG Code -->
-  <script src="psmin_20220309-090742.js"></script>
+  <script src="psmin_20220329-001414.js"></script>
 </body>
 
 </html>

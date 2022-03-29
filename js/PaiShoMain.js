@@ -438,7 +438,11 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
   
 	  // Open default help/chat tab
 	  document.getElementById("defaultOpenTab").click();
-  
+
+	  if (dateIsBetween("04/01/2022", "04/01/2022")) {
+		Ads.enableAds(true);
+	  }
+
 	  if (!debugOn && !QueryString.game && (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn())) {
 		  showWelcomeTutorial();
 	  } else {
@@ -3727,7 +3731,7 @@ var processChatCommands = function(chatMessage) {
 		clearMessage();
 	}
 
-	if (chatMessage.includes("April Fools&apos;!")) {	// April Fools'!
+	if (chatMessage.toLowerCase().includes("april fools")) {	// April Fools!
 		Ads.enableAds(true);
 	}
 };
@@ -4149,6 +4153,7 @@ function addOptionFromInput() {
 }
 
 function promptAddOption() {
+	// Ads.enableAds(true);
 	if (Ads.Options.showAds) {
 		Ads.showRandomPopupAd();
 	}
@@ -4169,6 +4174,8 @@ function promptAddOption() {
 			}
 			message += "<br /><div class='clickableText' onclick='clearOptions()'>Clear Options</div>";
 		}
+
+		message += "<br /><div class='clickableText' onclick='Ads.showRandomPopupAd()'>Show Ad</div>";
 
 		showModal("Secrets", message);
 	} else if (usernameIsOneOf(['SkudPaiSho','Adevar'])) {
@@ -5022,6 +5029,10 @@ function showPreferences() {
 	
 	var animationsOnCheckedValue = isAnimationsOn() ? "checked='true'" : "";
 	message += "<div><input id='animationsOnCheckBox' type='checkbox' onclick='toggleAnimationsOn();' " + animationsOnCheckedValue + "'><label for='animationsOnCheckBox'> Move animations enabled?</label></div>";
+
+	if (Ads.Options.showAds) {
+		message += "<br /><div class='clickableText' onclick='Ads.minimalAdsEnabled()'>Minimal sponsored messages</div>";
+	}
 
 	showModal("Device Preferences", message);
 }
