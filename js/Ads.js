@@ -165,17 +165,27 @@ Ads.getAdInfo = function(adKey) {
 	return adInfo;
 };
 
+Ads.getAdDiv = function(adInfo, maxWidthNum, maxHeightNum) {
+	var linkUrl = adInfo.linkUrl;
+	if (!linkUrl) {
+		linkUrl = "https://discord.gg/thegardengate";
+	}
+	var txt = ""
+		+ "<a href='" + linkUrl + "' target='_blank'>"
+		+ "<div style='display:inline-block;position:relative;'>"
+		+ "<img src='" + adInfo.imageUrl + "' style='max-width: " + maxWidthNum + "%; max-height: " + maxHeightNum + "vh' />"
+		+ "<input type='button' value='[X]' style='position:absolute;right:0;top:0;opacity:0.5' />"
+		+ "</div></a>";
+	return txt;
+};
+
 Ads.showAdPopup = function(adKey) {
 	var adInfo = Ads.getAdInfo(adKey);
 
 	if (Ads.Options.showAds && adInfo && adInfo.imageUrl) {
-		var linkUrl = adInfo.linkUrl;
-		if (!linkUrl) {
-			linkUrl = "https://discord.gg/thegardengate";
-		}
 		showModal(
 			"A Message From Our Sponsors",
-			"<a href='" + linkUrl + "' target='_blank'><img src='" + adInfo.imageUrl + "' style='max-width: 98%; max-height: 75vh' /></a>"
+			Ads.getAdDiv(adInfo, 98, 75)
 			+ "<br /><br />Thanks to our sponsors that support The Garden Gate! Be sure to join <a href='https://discord.gg/thegardengate' target='_blank'>The Garden Gate Discord</a> to get more involved in all things Pai Sho. Hide some ads from Device Preferences (My Games list or Side menu).<br /><br />Have a great day ;)"
 		);
 	}
@@ -190,13 +200,9 @@ Ads.showTopAd = function(adKey) {
 	var adInfo = Ads.getAdInfo(adKey);
 
 	if (Ads.Options.showAds && adInfo && adInfo.imageUrl) {
-		var linkUrl = adInfo.linkUrl;
-		if (!linkUrl) {
-			linkUrl = "https://discord.gg/thegardengate";
-		}
 		var topAvContainerDiv = document.getElementById("topAvContainer");
 		if (topAvContainerDiv) {
-			topAvContainerDiv.innerHTML = "<a href='" + linkUrl + "' target='_blank'><img src='" + adInfo.imageUrl + "' style='max-width: 98%; max-height: 15vh' /></a>";
+			topAvContainerDiv.innerHTML = Ads.getAdDiv(adInfo, 98, 15);//"<a href='" + linkUrl + "' target='_blank'><img src='" + adInfo.imageUrl + "' style='max-width: 98%; max-height: 15vh' /></a>";
 		}
 	}
 };
@@ -210,13 +216,9 @@ Ads.showFooterAd = function(adKey) {
 	var adInfo = Ads.getAdInfo(adKey);
 
 	if (Ads.Options.showAds && adInfo && adInfo.imageUrl) {
-		var linkUrl = adInfo.linkUrl;
-		if (!linkUrl) {
-			linkUrl = "https://discord.gg/thegardengate";
-		}
 		var footerAvContainerDiv = document.getElementById("footerAvContainer");
 		if (footerAvContainerDiv) {
-			footerAvContainerDiv.innerHTML = "<a href='" + linkUrl + "' target='_blank'><img src='" + adInfo.imageUrl + "' style='max-width: 98%; max-height: 10vh' /></a>";
+			footerAvContainerDiv.innerHTML = Ads.getAdDiv(adInfo, 98, 10);//"<a href='" + linkUrl + "' target='_blank'><img src='" + adInfo.imageUrl + "' style='max-width: 98%; max-height: 10vh' /></a>";
 		}
 	}
 };
@@ -230,13 +232,9 @@ Ads.showSideMenuAd = function(adKey) {
 	var adInfo = Ads.getAdInfo(adKey);
 
 	if (Ads.Options.showAds && adInfo && adInfo.imageUrl) {
-		var linkUrl = adInfo.linkUrl;
-		if (!linkUrl) {
-			linkUrl = "https://discord.gg/thegardengate";
-		}
 		var footerAvContainerDiv = document.getElementById("sideMenuAvContainer");
 		if (footerAvContainerDiv) {
-			footerAvContainerDiv.innerHTML = "<a href='" + linkUrl + "' target='_blank'><img src='" + adInfo.imageUrl + "' style='max-width: 98%; max-height: 75vh' /></a>";
+			footerAvContainerDiv.innerHTML = Ads.getAdDiv(adInfo, 98, 75);//"<a href='" + linkUrl + "' target='_blank'><img src='" + adInfo.imageUrl + "' style='max-width: 98%; max-height: 75vh' /></a>";
 		}
 	}
 };
@@ -250,15 +248,11 @@ Ads.showChatTabAd = function(adKey) {
 	var adInfo = Ads.getAdInfo(adKey);
 
 	if (Ads.Options.showAds && adInfo && adInfo.imageUrl) {
-		var linkUrl = adInfo.linkUrl;
-		if (!linkUrl) {
-			linkUrl = "https://discord.gg/thegardengate";
-		}
 		var chatTabAvContainerDivList = document.getElementsByClassName("chatTabAvContainer");
 		if (chatTabAvContainerDivList && chatTabAvContainerDivList.length) {
 			for (var i = 0; i < chatTabAvContainerDivList.length; i++) {
 				var chatTabAvContainerDiv = chatTabAvContainerDivList.item(i);
-				chatTabAvContainerDiv.innerHTML = "<a href='" + linkUrl + "' target='_blank'><img src='" + adInfo.imageUrl + "' style='max-width: 98%; max-height: 50vh' /></a>";
+				chatTabAvContainerDiv.innerHTML = Ads.getAdDiv(adInfo, 98, 50);//"<a href='" + linkUrl + "' target='_blank'><img src='" + adInfo.imageUrl + "' style='max-width: 98%; max-height: 50vh' /></a>";
 			}
 		}
 	}
