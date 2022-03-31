@@ -1654,7 +1654,7 @@ function askToJoinPrivateGame(privateGameId, hostUserName, rankedGameInd, gameCl
 		if (rankedGameInd === 'y' || rankedGameInd === 'Y') {
 			message += "<br /><br /><strong> This is a ranked game.</strong>";
 		}
-		if (gameClock) {
+		if (gameClock && GameClock.isEnabled()) {
 			message += "<br /><br /><strong>This game has a game clock (beta): " + gameClock.getLabelText() + "</strong><br /><a href='https://forum.skudpaisho.com/showthread.php?tid=158' target='_blank'>Read about the Game Clock feature.</a>";
 		}
 		message += "<br /><br />";
@@ -5029,6 +5029,9 @@ function showPreferences() {
 	
 	var animationsOnCheckedValue = isAnimationsOn() ? "checked='true'" : "";
 	message += "<div><input id='animationsOnCheckBox' type='checkbox' onclick='toggleAnimationsOn();' " + animationsOnCheckedValue + "'><label for='animationsOnCheckBox'> Move animations enabled?</label></div>";
+
+	var gameClockOnCheckedValue = GameClock.isEnabled() ? "checked='true'" : "";
+	message += "<div><input id='gameClockOnCheckBox' type='checkbox' onclick='GameClock.toggleEnabled();' " + gameClockOnCheckedValue + "'><label for='gameClockOnCheckBox'> (Beta) Game Clock enabled?</label></div>";
 
 	if (Ads.Options.showAds) {
 		message += "<br /><div class='clickableText' onclick='Ads.minimalAdsEnabled()'>Minimal sponsored messages</div>";

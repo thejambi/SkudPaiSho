@@ -1,6 +1,20 @@
 
 function GameClock() {}
 
+GameClock.Preferences = {
+    enabled: "GameClockEnabled"
+};
+GameClock.isEnabled = function() {
+    return localStorage.getItem(GameClock.Preferences.enabled) === "true";
+};
+GameClock.toggleEnabled = function() {
+    if (GameClock.isEnabled()) {
+        localStorage.setItem(GameClock.Preferences.enabled, "false");
+	} else {
+		localStorage.setItem(GameClock.Preferences.enabled, "true");
+	}
+};
+
 /* Time Controls */
 GameClock.Controls = function(secondsStart, increment) {
     this.secondsStart = secondsStart;
@@ -206,7 +220,7 @@ GameClock.getTimeControlsDropdown = function() {
 };
 
 GameClock.loadGameClock = function(newClock) {
-    // if (GameClock.userHasGameClockAccess()) {
+    if (GameClock.userHasGameClockAccess()) {
         if (newClock) {
             if (GameClock.currentClock) {
                 GameClock.stopGameClock();
@@ -215,11 +229,11 @@ GameClock.loadGameClock = function(newClock) {
                 GameClock.currentClock = newClock;
             }
         }
-    // }
+    }
 };
 
 GameClock.userHasGameClockAccess = function() {
-    return false;
+    return GameClock.isEnabled();
     /* return usernameIsOneOf(
         [
             'SkudPaiSho',
@@ -235,7 +249,7 @@ GameClock.userHasGameClockAccess = function() {
 };
 
 GameClock.startClock = function(player) {
-    // if (GameClock.userHasGameClockAccess()) {
+    if (GameClock.userHasGameClockAccess()) {
         if (GameClock.currentClock) {
             GameClock.setGameClockText("Game Clock | Host: " + GameClock.formatSecondsToMinutes(GameClock.currentClock.hostRemainingSeconds)
                         + " vs Guest: " + GameClock.formatSecondsToMinutes(GameClock.currentClock.guestRemainingSeconds));
@@ -249,7 +263,7 @@ GameClock.startClock = function(player) {
                 GameClock.currentClock.isTicking = true;
             }
         }
-    // }
+    }
 };
 
 GameClock.clearCurrentClock = function() {
@@ -284,7 +298,7 @@ GameClock.stopGameClock = function() {
 };
 
 GameClock.currentClockIsTicking = function() {
-    return GameClock.currentClock && GameClock.currentClock.isTicking;
+    return GameClock.userHasGameClockAccess() && GameClock.currentClock && GameClock.currentClock.isTicking;
 };
 
 GameClock.currentClockIsOutOfTime = function() {
@@ -314,11 +328,11 @@ GameClock.getCurrentGameClockJsonString = function() {
 };
 
 GameClock.setGameClockText = function(text) {
-    // if (GameClock.userHasGameClockAccess()) {
+    if (GameClock.userHasGameClockAccess()) {
         var newText = '';
         if (text) {
             newText = text;
         }
         document.getElementById('gameClockContainer').innerText = newText;
-    // }
+    }
 };
