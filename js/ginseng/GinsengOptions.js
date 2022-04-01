@@ -20,6 +20,7 @@ Ginseng.Options.tileDesignTypeValues = {
 	gaoling: "Gaoling",
 	gaipan: "Gaipan",
 	omashu: "Omashu",
+	basingse: "Ba Sing Se",
 	zaofu: "Zaofu",
 	northern: "Agna Qel'a",
 	chuji: "Chu Ji Red",
