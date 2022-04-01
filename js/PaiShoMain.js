@@ -441,6 +441,7 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 
 	  if (dateIsBetween("04/01/2022", "04/01/2022")) {
 		Ads.enableAds(true);
+		GameType.SkudPaiSho.gameOptions.push(DIAGONAL_MOVEMENT, EVERYTHING_CAPTURE);
 	  }
 
 	  if (!debugOn && !QueryString.game && (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn())) {
