@@ -439,7 +439,7 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 	  // Open default help/chat tab
 	  document.getElementById("defaultOpenTab").click();
 
-	  if (dateIsBetween("04/01/2022", "04/01/2022")) {
+	  if (dateIsBetween("04/01/2022", "04/02/2022")) {
 		Ads.enableAds(true);
 		GameType.SkudPaiSho.gameOptions.push(DIAGONAL_MOVEMENT, EVERYTHING_CAPTURE);
 	  }
@@ -2338,6 +2338,19 @@ var GameType = {
 			MIDLINE_OPENER
 		]
 	},
+	KeyPaiSho: {
+		id: 19,
+		name: "Key Pai Sho",
+		desc: "Key Pai Sho",
+		color: "var(--keypaishocolor)",
+		description: "Built to replicate the Pai Sho board states seen in ATLA Book 1.",
+		coverImg: "keypaisho.png",
+		rulesUrl: "https://skudpaisho.com/site/games/key-pai-sho/",
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho'
+		]
+	},
 	SolitairePaiSho: {
 		id: 4,
 		name: "Nature's Grove: Respite",
@@ -2614,6 +2627,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Ginseng.id:
 			controller = new Ginseng.Controller(gameContainerDiv, isMobile);
+			break;
+		case GameType.KeyPaiSho.id:
+			controller = new KeyPaiSho.Controller(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");

@@ -1,16 +1,11 @@
-/* Skud Pai Sho specific UI interaction logic */
+/* Key Pai Sho specific UI interaction logic */
 
-var SkudConstants = {
-	preferencesKey: "SkudPaiShoPreferencesKey"
-};
-var SkudPreferences = {
-	customTilesUrl: ""
-};
+function KeyPaiSho() {}
 
-function SkudPaiShoController(gameContainer, isMobile) {
-	this.actuator = new SkudPaiShoActuator(gameContainer, isMobile, isAnimationsOn());
+KeyPaiSho.Controller = function(gameContainer, isMobile) {
+	this.actuator = new KeyPaiSho.Actuator(gameContainer, isMobile, isAnimationsOn());
 
-	SkudPaiShoController.loadPreferences();
+	// KeyPaiSho.Controller.loadPreferences();
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -23,36 +18,36 @@ function SkudPaiShoController(gameContainer, isMobile) {
 	this.supportsMoveLogMessages = true;
 }
 
-SkudPaiShoController.loadPreferences = function() {
+/* KeyPaiSho.Controller.loadPreferences = function() {
 	var savedPreferences = JSON.parse(localStorage.getItem(SkudConstants.preferencesKey));
 	if (savedPreferences) {
 		SkudPreferences = savedPreferences;
 	}
+}; */
+
+KeyPaiSho.Controller.hideHarmonyAidsKey = "HideHarmonyAids";
+
+KeyPaiSho.Controller.prototype.getGameTypeId = function() {
+	return GameType.KeyPaiSho.id;
 };
 
-SkudPaiShoController.hideHarmonyAidsKey = "HideHarmonyAids";
-
-SkudPaiShoController.prototype.getGameTypeId = function() {
-	return GameType.SkudPaiSho.id;
+KeyPaiSho.Controller.prototype.resetGameManager = function() {
+	this.theGame = new KeyPaiSho.GameManager(this.actuator);
 };
 
-SkudPaiShoController.prototype.resetGameManager = function() {
-	this.theGame = new SkudPaiShoGameManager(this.actuator);
+KeyPaiSho.Controller.prototype.resetNotationBuilder = function() {
+	this.notationBuilder = new KeyPaiSho.NotationBuilder();	// Will be ... KeyPaiSho.NotationBuilder
 };
 
-SkudPaiShoController.prototype.resetNotationBuilder = function() {
-	this.notationBuilder = new SkudPaiShoNotationBuilder();	// Will be ... SkudPaiShoNotationBuilder
-};
-
-SkudPaiShoController.prototype.resetGameNotation = function() {
+KeyPaiSho.Controller.prototype.resetGameNotation = function() {
 	this.gameNotation = this.getNewGameNotation();
 };
 
-SkudPaiShoController.prototype.getNewGameNotation = function() {
-	return new SkudPaiShoGameNotation();
+KeyPaiSho.Controller.prototype.getNewGameNotation = function() {
+	return new KeyPaiSho.GameNotation();
 };
 
-SkudPaiShoController.getHostTilesContainerDivs = function() {
+KeyPaiSho.Controller.getHostTilesContainerDivs = function() {
 	var divs = '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HL"></div> <div class="HO"></div>';
 	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
 		divs += '<br class="clear" /> <div class="HM"></div> <div class="HP"></div> <div class="HT"></div>';
@@ -60,7 +55,7 @@ SkudPaiShoController.getHostTilesContainerDivs = function() {
 	return divs;
 };
 
-SkudPaiShoController.getGuestTilesContainerDivs = function() {
+KeyPaiSho.Controller.getGuestTilesContainerDivs = function() {
 	var divs = '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
 	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
 		divs += '<br class="clear" /> <div class="GM"></div> <div class="GP"></div> <div class="GT"></div>';
@@ -68,11 +63,11 @@ SkudPaiShoController.getGuestTilesContainerDivs = function() {
 	return divs;
 };
 
-SkudPaiShoController.prototype.callActuate = function() {
+KeyPaiSho.Controller.prototype.callActuate = function() {
 	this.theGame.actuate();
 };
 
-SkudPaiShoController.prototype.resetMove = function() {
+KeyPaiSho.Controller.prototype.resetMove = function() {
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// Remove last move
 		this.gameNotation.removeLastMove();
@@ -93,11 +88,11 @@ SkudPaiShoController.prototype.resetMove = function() {
 	}
 };
 
-SkudPaiShoController.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Skud Pai Sho</h4> <p>Skud Pai Sho is a game of harmony. The goal is to arrange your Flower Tiles to create a ring of Harmonies that surrounds the center of the board.</p> <p>Harmonies are created when two of a player's harmonious tiles are on the same line with nothing in between them. But be careful; tiles that clash can never be lined up on the board.</p> <p>Select tiles or points on the board to learn more, and read through the <a href='https://skudpaisho.com/site/games/skud-pai-sho/' target='_blank'>rules page</a> for the full rules.</p>";
+KeyPaiSho.Controller.prototype.getDefaultHelpMessageText = function() {
+	return "<h4>Key Pai Sho</h4> <p>Key Pai Sho is built to replicate the Pai Sho board states seen on screen in ATLA Book 1.</p>";
 };
 
-SkudPaiShoController.prototype.getAdditionalMessage = function() {
+KeyPaiSho.Controller.prototype.getAdditionalMessage = function() {
 	var msg = "";
 
 	if (this.gameNotation.moves.length === 0) {
@@ -120,7 +115,7 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 		}
 
 		if (!playingOnlineGame()) {
-			msg += getGameOptionsMessageHtml(GameType.SkudPaiSho.gameOptions);
+			msg += getGameOptionsMessageHtml(GameType.KeyPaiSho.gameOptions);
 		}
 	} else if (this.gameNotation.moves.length === 1) {
 		if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
@@ -143,7 +138,7 @@ SkudPaiShoController.prototype.getAdditionalMessage = function() {
 	return msg;
 };
 
-SkudPaiShoController.prototype.getExtraHarmonyBonusHelpText = function() {
+KeyPaiSho.Controller.prototype.getExtraHarmonyBonusHelpText = function() {
 	if (!limitedGatesRule) {
 		if (this.theGame.playerCanBonusPlant(getCurrentPlayer())) {
 			return " <br />You can choose an Accent Tile, Special Flower Tile, or, since you have less than two Growing Flowers, a Basic Flower Tile.";
@@ -157,13 +152,13 @@ SkudPaiShoController.prototype.getExtraHarmonyBonusHelpText = function() {
 	}
 };
 
-SkudPaiShoController.prototype.showHarmonyBonusMessage = function() {
+KeyPaiSho.Controller.prototype.showHarmonyBonusMessage = function() {
 	document.querySelector(".gameMessage").innerHTML = "Harmony Bonus! Select a tile to play or <span class='skipBonus' onclick='gameController.skipHarmonyBonus();'>skip</span>."
 	+ this.getExtraHarmonyBonusHelpText()
 	+ getResetMoveText();
 };
 
-SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
+KeyPaiSho.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 	this.theGame.markingManager.clearMarkings();
 	this.callActuate();
 
@@ -230,10 +225,10 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 			this.hostAccentTiles.push(tileCode);
 
 			if (this.hostAccentTiles.length === accentTilesNeededToStart || (simpleCanonRules && this.hostAccentTiles.length === 2)) {
-				var move = new SkudPaiShoNotationMove("0H." + this.hostAccentTiles.join());
+				var move = new KeyPaiSho.NotationMove("0H." + this.hostAccentTiles.join());
 				this.gameNotation.addMove(move);
 				if (onlinePlayEnabled) {
-					createGameIfThatIsOk(GameType.SkudPaiSho.id);
+					createGameIfThatIsOk(GameType.KeyPaiSho.id);
 				} else {
 					finalizeMove();
 				}
@@ -242,7 +237,7 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 			this.guestAccentTiles.push(tileCode);
 
 			if (this.guestAccentTiles.length === accentTilesNeededToStart || (simpleCanonRules && this.guestAccentTiles.length === 2)) {
-				var move = new SkudPaiShoNotationMove("0G." + this.guestAccentTiles.join());
+				var move = new KeyPaiSho.NotationMove("0G." + this.guestAccentTiles.join());
 				this.gameNotation.addMove(move);
 				// No finalize move because it is still Guest's turn
 				rerunAll();
@@ -294,13 +289,13 @@ SkudPaiShoController.prototype.unplayedTileClicked = function(tileDiv) {
 			this.notationBuilder.status = READY_FOR_BONUS;
 			this.showHarmonyBonusMessage();
 		} else {
-			this.notationBuilder = new SkudPaiShoNotationBuilder();
+			this.notationBuilder = new KeyPaiSho.NotationBuilder();
 		}
 	}
 };
 
 
-SkudPaiShoController.prototype.RmbDown = function(htmlPoint) {
+KeyPaiSho.Controller.prototype.RmbDown = function(htmlPoint) {
 	var npText = htmlPoint.getAttribute("name");
 
 	var notationPoint = new NotationPoint(npText);
@@ -308,7 +303,7 @@ SkudPaiShoController.prototype.RmbDown = function(htmlPoint) {
 	this.mouseStartPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 }
 
-SkudPaiShoController.prototype.RmbUp = function(htmlPoint) {
+KeyPaiSho.Controller.prototype.RmbUp = function(htmlPoint) {
 	var npText = htmlPoint.getAttribute("name");
 
 	var notationPoint = new NotationPoint(npText);
@@ -326,7 +321,7 @@ SkudPaiShoController.prototype.RmbUp = function(htmlPoint) {
 	this.callActuate();
 }
 
-SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
+KeyPaiSho.Controller.prototype.pointClicked = function(htmlPoint) {
 	this.theGame.markingManager.clearMarkings();
 	this.callActuate();
 
@@ -405,7 +400,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
-			this.notationBuilder = new SkudPaiShoNotationBuilder();
+			this.notationBuilder = new KeyPaiSho.NotationBuilder();
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
@@ -453,7 +448,7 @@ SkudPaiShoController.prototype.pointClicked = function(htmlPoint) {
 	}
 };
 
-SkudPaiShoController.prototype.skipHarmonyBonus = function() {
+KeyPaiSho.Controller.prototype.skipHarmonyBonus = function() {
 	if (this.notationBuilder.status !== MOVE_DONE) {
 		this.notationBuilder.status = MOVE_DONE;
 		this.notationBuilder.bonusEndPoint = null;
@@ -467,11 +462,11 @@ SkudPaiShoController.prototype.skipHarmonyBonus = function() {
 	}
 };
 
-SkudPaiShoController.prototype.getTileMessage = function(tileDiv) {
+KeyPaiSho.Controller.prototype.getTileMessage = function(tileDiv) {
 	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 
-	var tile = new SkudPaiShoTile(divName.substring(1), divName.charAt(0));
+	var tile = new KeyPaiSho.Tile(divName.substring(1), divName.charAt(0));
 
 	var tileMessage = this.getHelpMessageForTile(tile);
 
@@ -481,7 +476,7 @@ SkudPaiShoController.prototype.getTileMessage = function(tileDiv) {
 	}
 };
 
-SkudPaiShoController.prototype.getPointMessage = function(htmlPoint) {
+KeyPaiSho.Controller.prototype.getPointMessage = function(htmlPoint) {
 	var npText = htmlPoint.getAttribute("name");
 
 	var notationPoint = new NotationPoint(npText);
@@ -540,12 +535,12 @@ SkudPaiShoController.prototype.getPointMessage = function(htmlPoint) {
 	}
 };
 
-SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
+KeyPaiSho.Controller.prototype.getHelpMessageForTile = function(tile) {
 	var message = [];
 
 	var tileCode = tile.code;
 
-	var heading = SkudPaiShoTile.getTileName(tileCode);
+	var heading = KeyPaiSho.Tile.getTileName(tileCode);
 
 	message.push(tile.ownerName + "'s tile");
 
@@ -564,7 +559,7 @@ SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
 			}
 		}
 
-		var harmTile1 = SkudPaiShoTile.getTileName(harmTileColor + harmTileNum);
+		var harmTile1 = KeyPaiSho.Tile.getTileName(harmTileColor + harmTileNum);
 
 		harmTileNum = tileNum + 1;
 		harmTileColor = colorCode;
@@ -577,7 +572,7 @@ SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
 			}
 		}
 
-		var harmTile2 = SkudPaiShoTile.getTileName(harmTileColor + harmTileNum);
+		var harmTile2 = KeyPaiSho.Tile.getTileName(harmTileColor + harmTileNum);
 
 		harmTileNum = tileNum;
 		if (colorCode === 'R') {
@@ -585,7 +580,7 @@ SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
 		} else {
 			harmTileColor = 'R';
 		}
-		var clashTile = SkudPaiShoTile.getTileName(harmTileColor + harmTileNum);
+		var clashTile = KeyPaiSho.Tile.getTileName(harmTileColor + harmTileNum);
 
 		message.push("Basic Flower Tile");
 		message.push("Can move up to " + tileNum + " spaces");
@@ -673,7 +668,7 @@ SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
 	}
 };
 
-SkudPaiShoController.prototype.playAiTurn = function(finalizeMove) {
+KeyPaiSho.Controller.prototype.playAiTurn = function(finalizeMove) {
 	if (this.theGame.getWinner()) {
 		return;
 	}
@@ -714,7 +709,7 @@ SkudPaiShoController.prototype.playAiTurn = function(finalizeMove) {
 	}
 };
 
-SkudPaiShoController.prototype.startAiGame = function(finalizeMove) {
+KeyPaiSho.Controller.prototype.startAiGame = function(finalizeMove) {
 	this.playAiTurn(finalizeMove);
 	if (this.gameNotation.getPlayerMoveNum() === 1) {
 		this.playAiTurn(finalizeMove);
@@ -730,11 +725,11 @@ SkudPaiShoController.prototype.startAiGame = function(finalizeMove) {
 	}
 };
 
-SkudPaiShoController.prototype.getAiList = function() {
-	return [new SkudAIv1()];
+KeyPaiSho.Controller.prototype.getAiList = function() {
+	return [];
 };
 
-SkudPaiShoController.prototype.getCurrentPlayer = function() {
+KeyPaiSho.Controller.prototype.getCurrentPlayer = function() {
 	if (this.gameNotation.moves.length <= 1) {
 		if (this.gameNotation.moves.length === 0) {
 			return HOST;
@@ -754,47 +749,47 @@ SkudPaiShoController.prototype.getCurrentPlayer = function() {
 	}
 };
 
-SkudPaiShoController.prototype.cleanup = function() {
+KeyPaiSho.Controller.prototype.cleanup = function() {
 	// Nothing.
 };
 
-SkudPaiShoController.prototype.isSolitaire = function() {
+KeyPaiSho.Controller.prototype.isSolitaire = function() {
 	return false;
 };
 
-SkudPaiShoController.prototype.setGameNotation = function(newGameNotation) {
+KeyPaiSho.Controller.prototype.setGameNotation = function(newGameNotation) {
 	this.gameNotation.setNotationText(newGameNotation);
 };
 
-SkudPaiShoController.prototype.getAdditionalHelpTabDiv = function() {
+KeyPaiSho.Controller.prototype.getAdditionalHelpTabDiv = function() {
 	var settingsDiv = document.createElement("div");
 
-	var heading = document.createElement("h4");
-	heading.innerText = "Skud Pai Sho Preferences:";
+	// var heading = document.createElement("h4");
+	// heading.innerText = "Key Pai Sho Preferences:";
 
-	settingsDiv.appendChild(heading);
-	settingsDiv.appendChild(SkudPaiShoController.buildTileDesignDropdownDiv());
+	// settingsDiv.appendChild(heading);
+	// settingsDiv.appendChild(KeyPaiSho.Controller.buildTileDesignDropdownDiv());
 
-	settingsDiv.appendChild(document.createElement("br"));
-
-	settingsDiv.appendChild(this.buildToggleHarmonyAidsDiv());
-
-	settingsDiv.appendChild(document.createElement("br"));
+	// settingsDiv.appendChild(document.createElement("br"));
+	
+	// settingsDiv.appendChild(this.buildToggleHarmonyAidsDiv());
+	// settingsDiv.appendChild(document.createElement("br"));
+	
 	return settingsDiv;
 };
 
-SkudPaiShoController.buildTileDesignDropdownDiv = function(alternateLabelText) {
+/* KeyPaiSho.Controller.buildTileDesignDropdownDiv = function(alternateLabelText) {
 	var labelText = alternateLabelText ? alternateLabelText : "Tile Designs";
-	return buildDropdownDiv("skudPaiShoTileDesignDropdown", labelText + ":", tileDesignTypeValues,
+	return buildDropdownDiv("KeyPaiSho.TileDesignDropdown", labelText + ":", tileDesignTypeValues,
 							localStorage.getItem(tileDesignTypeKey),
 							function() {
 								setSkudTilesOption(this.value);
 							});
-};
+}; */
 
-SkudPaiShoController.prototype.buildToggleHarmonyAidsDiv = function() {
+KeyPaiSho.Controller.prototype.buildToggleHarmonyAidsDiv = function() {
 	var div = document.createElement("div");
-	var onOrOff = getUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey) !== "true" ? "on" : "off";
+	var onOrOff = getUserGamePreference(KeyPaiSho.Controller.hideHarmonyAidsKey) !== "true" ? "on" : "off";
 	div.innerHTML = "Harmony aids are " + onOrOff + ": <span class='skipBonus' onclick='gameController.toggleHarmonyAids();'>toggle</span>";
 	if (gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)) {
 		div.innerHTML += " (Will not affect games with " + NO_HARMONY_VISUAL_AIDS + " game option)";
@@ -802,27 +797,27 @@ SkudPaiShoController.prototype.buildToggleHarmonyAidsDiv = function() {
 	return div;
 };
 
-SkudPaiShoController.prototype.toggleHarmonyAids = function() {
-	setUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey, 
-		getUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey) !== "true");
+KeyPaiSho.Controller.prototype.toggleHarmonyAids = function() {
+	setUserGamePreference(KeyPaiSho.Controller.hideHarmonyAidsKey, 
+		getUserGamePreference(KeyPaiSho.Controller.hideHarmonyAidsKey) !== "true");
 	clearMessage();
 	this.callActuate();
 };
 
-SkudPaiShoController.prototype.setAnimationsOn = function(isAnimationsOn) {
+KeyPaiSho.Controller.prototype.setAnimationsOn = function(isAnimationsOn) {
 	this.actuator.setAnimationOn(isAnimationsOn);
 };
 
-SkudPaiShoController.isUsingCustomTileDesigns = function() {
+/* KeyPaiSho.Controller.isUsingCustomTileDesigns = function() {
 	return skudTilesKey === 'custom';
-};
+}; */
 
-SkudPaiShoController.getCustomTileDesignsUrl = function() {
+/* KeyPaiSho.Controller.getCustomTileDesignsUrl = function() {
 	return SkudPreferences.customTilesUrl;
-};
+}; */
 
-SkudPaiShoController.prototype.setCustomTileDesignUrl = function(url) {
+/* KeyPaiSho.Controller.prototype.setCustomTileDesignUrl = function(url) {
 	SkudPreferences.customTilesUrl = url;
 	localStorage.setItem(SkudConstants.preferencesKey, JSON.stringify(SkudPreferences));
 	setSkudTilesOption('custom', true);
-};
+}; */
