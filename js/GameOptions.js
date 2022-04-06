@@ -167,7 +167,7 @@ gameOptionDescriptions[CAPTURE_ABILITY_TARGET_1] = "Lion Turtle and Dragon Captu
 var LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN = "LTAbilityTargetTouchingGarden";	// Unused
 gameOptionDescriptions[LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN] = "Lion Turtle Ability: Captures adjacent Original Benders that are touching a red/white garden";
 
-var LION_TURTLE_ABILITY_ANYWHERE = "LTAbilityAnywhere";
+var LION_TURTLE_ABILITY_ANYWHERE = "LTAbilityAnywhere";	// Defunct
 gameOptionDescriptions[LION_TURTLE_ABILITY_ANYWHERE] = "Lion Turtle Ability: Captures adjacent Original Benders, whether they are touching central garden or not";
 
 var BADGERMOLE_NOT_PREVENT_TRAP_PUSH = "BadgermoleNotPreventTrapPush";

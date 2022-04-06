@@ -3,7 +3,7 @@
 // --------------------------------------------- // 
 
 Trifle.NotationBuilderStatus = {
-	PROMPTING_FOR_TARGET = "PROMPTING_FOR_TARGET"
+	PROMPTING_FOR_TARGET: "PROMPTING_FOR_TARGET"
 };
 
 Trifle.NotationMove = function(text, promptTargetData) {
@@ -53,7 +53,9 @@ Trifle.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 		moveType: this.moveType
 	};
 
-	if (this.moveType === TEAM_SELECTION) {
+	if (this.moveType === SETUP) {
+		move.setupNum = this.boardSetupNum;
+	} if (this.moveType === TEAM_SELECTION) {
 		move.teamSelection = this.teamSelection;
 	} else if (this.moveType === MOVE) {
 		move.startPoint = this.startPoint.pointText;

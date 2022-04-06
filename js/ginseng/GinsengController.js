@@ -142,6 +142,24 @@ Ginseng.Controller.prototype.toggleDebug = function() {
 	clearMessage();
 };
 
+Ginseng.Controller.prototype.completeSetup = function() {
+	// Create initial board setup
+	this.addSetupMove();
+
+	// Finish with actuate
+	rerunAll();
+	this.callActuate();
+};
+
+Ginseng.Controller.prototype.addSetupMove = function() {
+	this.notationBuilder.moveType = SETUP;
+	this.notationBuilder.boardSetupNum = 1;
+	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+	this.theGame.runNotationMove(move);
+	// Move all set. Add it to the notation!
+	this.gameNotation.addMove(move);
+};
+
 Ginseng.Controller.prototype.startOnlineGame = function() {
 	this.resetNotationBuilder();
 	this.notationBuilder.currentPlayer = HOST;
@@ -484,7 +502,8 @@ Ginseng.Controller.prototype.getAiList = function() {
 }
 
 Ginseng.Controller.prototype.getCurrentPlayer = function() {
-	if (this.gameNotation.moves.length == 0) {
+	if (this.gameNotation.moves.length === 0
+			|| (this.gameNotation.moves.length === 1 && this.gameNotation.moves[0].moveType === SETUP)) {
 		return GUEST;
 	} /* else if (this.gameNotation.moves.length > 0
 			&& this.gameNotation.moves[0].moveType === PASS_TURN) {
