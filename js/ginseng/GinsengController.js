@@ -98,10 +98,15 @@ Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
 		+ "<p><a href='https://skudpaisho.com/site/games/ginseng-pai-sho/' target='_blank'>view the full rules</a>.</p>";
 };
 
+Ginseng.Controller.prototype.gameNotBegun = function() {
+	return this.gameNotation.moves.length === 0 
+		|| (this.gameNotation.moves.length === 1 && this.gameNotation.moves[0].moveType === SETUP);
+};
+
 Ginseng.Controller.prototype.getAdditionalMessage = function() {
 	var msg = "";
 	
-	if (this.gameNotation.moves.length === 0 && !playingOnlineGame()) {
+	if (this.gameNotBegun() && !playingOnlineGame()) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
 			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by clicking <strong>Start Online Game<strong> below.";
 		} else {
@@ -129,7 +134,7 @@ Ginseng.Controller.prototype.getAdditionalMessage = function() {
 
 	if (!playingOnlineGame()) {
 		// msg += getGameOptionsMessageHtml(GameType.Ginseng.gameOptions);	// For when there are game options
-		if (onlinePlayEnabled && this.gameNotation.moves.length === 0) {
+		if (onlinePlayEnabled && this.gameNotBegun()) {
 			msg += "<br /><span class='skipBonus' onClick='gameController.startOnlineGame()'>Start Online Game</span><br />";
 		}
 	}
@@ -502,8 +507,7 @@ Ginseng.Controller.prototype.getAiList = function() {
 }
 
 Ginseng.Controller.prototype.getCurrentPlayer = function() {
-	if (this.gameNotation.moves.length === 0
-			|| (this.gameNotation.moves.length === 1 && this.gameNotation.moves[0].moveType === SETUP)) {
+	if (this.gameNotBegun()) {
 		return GUEST;
 	} /* else if (this.gameNotation.moves.length > 0
 			&& this.gameNotation.moves[0].moveType === PASS_TURN) {
