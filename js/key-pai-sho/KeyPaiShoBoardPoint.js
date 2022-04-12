@@ -233,5 +233,12 @@ KeyPaiSho.BoardPoint.whiteNeutral = function() {
 	return point;
 };
 
+KeyPaiSho.BoardPoint.nonPlayable = function() {
+	var point = new KeyPaiSho.BoardPoint();
+	point.addType(NON_PLAYABLE);
+
+	return point;
+};
+
 
 

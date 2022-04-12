@@ -18,7 +18,7 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 		[KeyPaiSho.BoardPoint.neutral(),
 		KeyPaiSho.BoardPoint.neutral(),
 		KeyPaiSho.BoardPoint.gate(),
-		KeyPaiSho.BoardPoint.gate(),
+		KeyPaiSho.BoardPoint.nonPlayable(),
 		KeyPaiSho.BoardPoint.neutral(),
 		KeyPaiSho.BoardPoint.neutral()
 		]);
@@ -28,8 +28,8 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 		KeyPaiSho.BoardPoint.neutral(),
 		KeyPaiSho.BoardPoint.neutral(),
 		KeyPaiSho.BoardPoint.neutral(),
-		KeyPaiSho.BoardPoint.gate(),
-		KeyPaiSho.BoardPoint.gate(),
+		KeyPaiSho.BoardPoint.neutral(),
+		KeyPaiSho.BoardPoint.neutral(),
 		KeyPaiSho.BoardPoint.neutral(),
 		KeyPaiSho.BoardPoint.neutral(),
 		KeyPaiSho.BoardPoint.neutral(),
@@ -170,7 +170,7 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 		]);
 
 	cells[9] = this.newRow(18,
-		[KeyPaiSho.BoardPoint.gate(),
+		[KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.redNeutral(),
 			KeyPaiSho.BoardPoint.red(),
@@ -187,7 +187,7 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 			KeyPaiSho.BoardPoint.white(),
 			KeyPaiSho.BoardPoint.whiteNeutral(),
 			KeyPaiSho.BoardPoint.neutral(),
-			KeyPaiSho.BoardPoint.gate()
+			KeyPaiSho.BoardPoint.nonPlayable()
 		]);
 
 	cells[10] = this.newRow(18,
@@ -319,7 +319,7 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 		[KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.gate(),
-			KeyPaiSho.BoardPoint.gate(),
+			KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.neutral()
 		]);

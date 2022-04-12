@@ -179,12 +179,7 @@ KeyPaiSho.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate,
 };
 
 KeyPaiSho.GameManager.prototype.revealOpenGates = function(player, tile, moveNum, ignoreActuate) {
-	if (!gameOptionEnabled(OPTION_INFORMAL_START) && moveNum === 2) {
-		// guest selecting first tile
-		this.board.setGuestGateOpen();
-	} else {
-		this.board.setOpenGatePossibleMoves(player, tile);
-	}
+	this.board.setOpenGatePossibleMoves(player, tile);
 
 	if (!ignoreActuate) {
 		this.actuate();
