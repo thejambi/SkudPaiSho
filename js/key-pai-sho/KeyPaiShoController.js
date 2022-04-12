@@ -36,7 +36,7 @@ KeyPaiSho.Controller.prototype.resetGameManager = function() {
 };
 
 KeyPaiSho.Controller.prototype.resetNotationBuilder = function() {
-	this.notationBuilder = new KeyPaiSho.NotationBuilder();	// Will be ... KeyPaiSho.NotationBuilder
+	this.notationBuilder = new KeyPaiSho.NotationBuilder();
 };
 
 KeyPaiSho.Controller.prototype.resetGameNotation = function() {
@@ -49,17 +49,11 @@ KeyPaiSho.Controller.prototype.getNewGameNotation = function() {
 
 KeyPaiSho.Controller.getHostTilesContainerDivs = function() {
 	var divs = '<div class="HR3"></div> <div class="HR4"></div> <div class="HR5"></div> <div class="HW3"></div> <div class="HW4"></div> <div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HL"></div> <div class="HO"></div>';
-	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
-		divs += '<br class="clear" /> <div class="HM"></div> <div class="HP"></div> <div class="HT"></div>';
-	}
 	return divs;
 };
 
 KeyPaiSho.Controller.getGuestTilesContainerDivs = function() {
 	var divs = '<div class="GR3"></div> <div class="GR4"></div> <div class="GR5"></div> <div class="GW3"></div> <div class="GW4"></div> <div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GL"></div> <div class="GO"></div>';
-	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
-		divs += '<br class="clear" /> <div class="GM"></div> <div class="GP"></div> <div class="GT"></div>';
-	}
 	return divs;
 };
 

@@ -3625,7 +3625,7 @@ function randomIntFromInterval(min, max) {
 
 function closeGame() {
 	if (gameDevOn) {
-		setGameController(GameType.Ginseng.id);
+		setGameController(GameType.KeyPaiSho.id);
 		return;
 	}
 	var defaultGameTypeIds = [
