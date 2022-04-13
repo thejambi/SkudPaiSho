@@ -3,6 +3,12 @@
 function KeyPaiSho() {}
 
 KeyPaiSho.Controller = function(gameContainer, isMobile) {
+	/* Default game option until Effect Tiles are implemented */
+	addOption(NO_EFFECT_TILES);
+	/* --- */
+
+	new KeyPaiSho.Options();	// Initialize
+
 	this.actuator = new KeyPaiSho.Actuator(gameContainer, isMobile, isAnimationsOn());
 
 	// KeyPaiSho.Controller.loadPreferences();
@@ -26,6 +32,10 @@ KeyPaiSho.Controller = function(gameContainer, isMobile) {
 }; */
 
 KeyPaiSho.Controller.hideHarmonyAidsKey = "HideHarmonyAids";
+
+KeyPaiSho.Controller.prototype.completeSetup = function() {
+	/* Nothing to do */
+};
 
 KeyPaiSho.Controller.prototype.getGameTypeId = function() {
 	return GameType.KeyPaiSho.id;
@@ -104,7 +114,7 @@ KeyPaiSho.Controller.prototype.getAdditionalMessage = function() {
 			} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
 				msg += "Select 8 Accent Tiles to play with.";
 			} else {
-				msg += "Select 4 Accent Tiles to play with.";
+				msg += "Select 6 Effect Tiles to play with.";
 			}
 		}
 
@@ -179,9 +189,9 @@ KeyPaiSho.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 		return;
 	}
 
-	if (this.gameNotation.moves.length <= 1) {
+	if (this.gameNotation.moves.length <= 1 && !gameOptionEnabled(NO_EFFECT_TILES)) {
 		// Choosing Accent Tiles
-		if (tile.type !== ACCENT_TILE) {
+		if (tile.type !== ACCENT_TILE && tile.type !== SPECIAL_FLOWER) {
 			return;
 		}
 
@@ -200,15 +210,7 @@ KeyPaiSho.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 
 		tile.selectedFromPile = false;
 
-		var accentTilesNeededToStart = 4;
-		if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
-			accentTilesNeededToStart = this.theGame.tileManager.numberOfAccentTilesPerPlayerSet();
-		} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
-			accentTilesNeededToStart = accentTilesNeededToStart * 2;
-			if (gameOptionEnabled(NO_WHEELS) && !gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
-				accentTilesNeededToStart = accentTilesNeededToStart - 2;
-			}
-		}
+		var accentTilesNeededToStart = 6;
 
 		if (getCurrentPlayer() === HOST) {
 			this.hostAccentTiles.push(tileCode);
@@ -711,16 +713,18 @@ KeyPaiSho.Controller.prototype.getAiList = function() {
 };
 
 KeyPaiSho.Controller.prototype.getCurrentPlayer = function() {
-	if (this.gameNotation.moves.length <= 1) {
+	if (!gameOptionEnabled(NO_EFFECT_TILES) && this.gameNotation.moves.length <= 1) {
 		if (this.gameNotation.moves.length === 0) {
 			return HOST;
 		} else {
 			return GUEST;
 		}
 	}
-	if (this.gameNotation.moves.length <= 2) {
-		return GUEST;
+
+	if (this.gameNotation.moves.length < 1) {
+		return HOST;
 	}
+	
 	var lastPlayer = this.gameNotation.moves[this.gameNotation.moves.length - 1].player;
 
 	if (lastPlayer === HOST) {
@@ -789,9 +793,9 @@ KeyPaiSho.Controller.prototype.setAnimationsOn = function(isAnimationsOn) {
 	this.actuator.setAnimationOn(isAnimationsOn);
 };
 
-/* KeyPaiSho.Controller.isUsingCustomTileDesigns = function() {
-	return skudTilesKey === 'custom';
-}; */
+KeyPaiSho.Controller.isUsingCustomTileDesigns = function() {
+	return localStorage.getItem(KeyPaiSho.Options.tileDesignTypeKey) === "custom";
+};
 
 /* KeyPaiSho.Controller.getCustomTileDesignsUrl = function() {
 	return SkudPreferences.customTilesUrl;

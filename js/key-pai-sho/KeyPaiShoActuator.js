@@ -8,8 +8,8 @@ KeyPaiSho.Actuator = function(gameContainer, isMobile, enableAnimations) {
 
 	var containers = setupPaiShoBoard(
 		this.gameContainer,
-		SkudPaiShoController.getHostTilesContainerDivs(),
-		SkudPaiShoController.getGuestTilesContainerDivs(),
+		KeyPaiSho.Controller.getHostTilesContainerDivs(),
+		KeyPaiSho.Controller.getGuestTilesContainerDivs(),
 		false,
 		false,
 		true
@@ -71,7 +71,7 @@ KeyPaiSho.Actuator.prototype.htmlify = function(board, tileManager, markingManag
 		this.arrowContainer.appendChild(createBoardArrow(arrow[0], arrow[1]));
 	}
 
-	var fullTileSet = new SkudPaiShoTileManager(true);
+	var fullTileSet = new KeyPaiSho.TileManager(true);
 
 	// Go through tile piles and clear containers
 	fullTileSet.hostTiles.forEach(function(tile) {
@@ -120,7 +120,7 @@ KeyPaiSho.Actuator.prototype.addTile = function(tile, mainContainer) {
 
 	var theImg = document.createElement("img");
 
-	var srcValue = getSkudTilesSrcPath();
+	var srcValue = this.getTileSrcPath();
 	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
 
@@ -136,6 +136,17 @@ KeyPaiSho.Actuator.prototype.addTile = function(tile, mainContainer) {
 	}
 
 	container.appendChild(theDiv);
+};
+
+KeyPaiSho.Actuator.prototype.getTileSrcPath = function(tile) {
+	if (KeyPaiSho.Controller.isUsingCustomTileDesigns()) {
+		return KeyPaiSho.Controller.getCustomTileDesignsUrl();
+	} else {
+		var srcValue = "images/";
+		var gameImgDir = "KeyPaiSho/" + localStorage.getItem(KeyPaiSho.Options.tileDesignTypeKey);
+		srcValue = srcValue + gameImgDir + "/";
+		return srcValue;
+	}
 };
 
 KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep) {
@@ -158,7 +169,7 @@ KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 			theDiv.classList.add("possibleMove");
 		} else if (boardPoint.betweenHarmony 
 				&& !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)
-				&& getUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey) !== "true") {
+				&& getUserGamePreference(KeyPaiSho.Controller.hideHarmonyAidsKey) !== "true") {
 			var boatRemovingPointClassesToAddAfterAnimation = [];
 			if (isAnimationPointOfBoatRemovingAccentTile) {
 				boatRemovingPointClassesToAddAfterAnimation.push("betweenHarmony");
@@ -232,12 +243,12 @@ KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags);
 		}
 
-		var srcValue = getSkudTilesSrcPath();
+		var srcValue = this.getTileSrcPath();
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 
 		if (boardPoint.tile.harmonyOwners 
 				&& !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)
-				&& getUserGamePreference(SkudPaiShoController.hideHarmonyAidsKey) !== "true") {
+				&& getUserGamePreference(KeyPaiSho.Controller.hideHarmonyAidsKey) !== "true") {
 			if (this.animationOn && (flags.didBonusMove || flags.wasArranged)) {
 				setTimeout(function() {//Delay harmony outline until after a piece has moved
 					for (var i = 0; i < boardPoint.tile.harmonyOwners.length; i++) {

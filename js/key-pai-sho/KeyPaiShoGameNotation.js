@@ -31,7 +31,7 @@ KeyPaiSho.NotationMove.prototype.analyzeMove = function() {
 		return;
 	}
 
-	if (this.moveNum === 0) {
+	if (!gameOptionEnabled(NO_EFFECT_TILES) && this.moveNum === 0) {
 		// Keep the accent tiles listed in move
 		// Examples: 0H.R,R,B,K ; 0G.B,W,K,K ;
 		this.accentTiles = moveText.split(',');
@@ -206,11 +206,13 @@ KeyPaiSho.GameNotation.prototype.getPlayerMoveNum = function() {
 	if (lastMove) {
 		moveNum = lastMove.moveNum;
 		// At game beginning:
-		if (lastMove.moveNum === 0 && lastMove.player === HOST) {
-			player = GUEST;
-		} else if (lastMove.moveNum === 0 && lastMove.player === GUEST) {
-			moveNum++;
-			player = GUEST;
+		if (!gameOptionEnabled(NO_EFFECT_TILES)) {
+			if (lastMove.moveNum === 0 && lastMove.player === HOST) {
+				player = GUEST;
+			} else if (lastMove.moveNum === 0 && lastMove.player === GUEST) {
+				moveNum++;
+				player = GUEST;
+			}
 		} else if (lastMove.player === HOST) {	// Usual
 			moveNum++;
 		} else {
@@ -223,23 +225,17 @@ KeyPaiSho.GameNotation.prototype.getPlayerMoveNum = function() {
 KeyPaiSho.GameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	// Example simple Arranging move: 7G.(8,0)-(7,1)
 
-	var moveNum = 1;
-	var player = GUEST;
+	var moveNum = 0;
+	var player = HOST;
 
 	var lastMove = this.moves[this.moves.length-1];
 
 	if (lastMove) {
 		moveNum = lastMove.moveNum;
-		// At game beginning:
-		if (lastMove.moveNum === 0 && lastMove.player === HOST) {
-			player = GUEST;
-		} else if (lastMove.moveNum === 0 && lastMove.player === GUEST) {
-			moveNum++;
-			player = GUEST;
-		} else if (lastMove.player === HOST) {	// Usual
+		if (lastMove.player === GUEST) {
 			moveNum++;
 		} else {
-			player = HOST;
+			player = GUEST;
 		}
 	}
 
@@ -258,12 +254,10 @@ KeyPaiSho.GameNotation.prototype.loadMoves = function() {
 	}
 
 	var self = this;
-	var lastPlayer = HOST;
+	var lastPlayer = GUEST;
 	lines.forEach(function(line) {
 		var move = new KeyPaiSho.NotationMove(line);
-		if (move.moveNum === 0 && move.isValidNotation()) {
-			self.moves.push(move);
-		} else if (move.isValidNotation() && move.player !== lastPlayer) {
+		if (move.isValidNotation() && move.player !== lastPlayer) {
 			self.moves.push(move);
 			lastPlayer = move.player;
 		} else {

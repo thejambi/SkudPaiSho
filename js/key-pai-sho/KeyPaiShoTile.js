@@ -128,13 +128,31 @@ KeyPaiSho.Tile.prototype.clashesWith = function(otherTile) {
 
 KeyPaiSho.Tile.prototype.getMoveDistance = function() {
 	if (this.type === BASIC_FLOWER) {
-		return parseInt(this.basicValue);
+		var tileValue = parseInt(this.basicValue);
+		if (tileValue === 4) {
+			tileValue++;
+		}
+		return tileValue;
 	} else if (this.code === 'L') {
 		return 2;
 	} else if (this.code === 'O') {
 		return 6;
 	}
 	return 0;
+};
+
+KeyPaiSho.Tile.prototype.hasOrthogonalMovement = function() {
+	if (this.type === BASIC_FLOWER) {
+		var tileValue = parseInt(this.basicValue);
+		return tileValue === 3 || tileValue === 4;
+	}
+};
+
+KeyPaiSho.Tile.prototype.hasDiagonalMovement = function() {
+	if (this.type === BASIC_FLOWER) {
+		var tileValue = parseInt(this.basicValue);
+		return tileValue === 3 || tileValue === 5;
+	}
 };
 
 KeyPaiSho.Tile.prototype.drain = function() {

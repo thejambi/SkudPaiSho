@@ -2345,7 +2345,9 @@ var GameType = {
 		description: "Built to replicate the Pai Sho board states seen in ATLA Book 1.",
 		coverImg: "keypaisho.png",
 		rulesUrl: "https://skudpaisho.com/site/games/key-pai-sho/",
-		gameOptions: [],
+		gameOptions: [
+			NO_EFFECT_TILES
+		],
 		usersWithAccess: [
 			'SkudPaiSho'
 		]

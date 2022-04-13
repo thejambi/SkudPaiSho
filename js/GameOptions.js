@@ -179,6 +179,10 @@ gameOptionDescriptions[ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE] = "O
 var SWAP_BISON_AND_DRAGON = "SwapBisonDragon";
 gameOptionDescriptions[SWAP_BISON_AND_DRAGON] = "Swap Bison and Dragon";
 
+/* Key Pai Sho */
+var NO_EFFECT_TILES = "NoEffectTiles";
+gameOptionDescriptions[NO_EFFECT_TILES] = "No Effect Tiles";
+
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
 		return gameOptionDescriptions[optionName];

@@ -40,7 +40,7 @@ KeyPaiSho.GameManager.prototype.runNotationMove = function(move, withActuate, mo
 
 	if (move.moveNum === 0 && move.accentTiles) {
 		var self = this;
-		var allAccentCodes = ['R','W','K','B','R','W','K','B','M','P','T'];
+		var allAccentCodes = ['R','W','K','B','L','O'];
 		move.accentTiles.forEach(function(tileCode) {
 			var i = allAccentCodes.indexOf(tileCode);
 			if (i >= 0) {

@@ -862,24 +862,21 @@ KeyPaiSho.Board.prototype.pointIsOpenAndSurroundsPond = function(boardPoint) {
 	return false;
 };
 
+KeyPaiSho.Board.prototype.isValidRowCol = function(rowCol) {
+	return rowCol.row >= 0 && rowCol.col >= 0 && rowCol.row <= this.size.row - 1 && rowCol.col <= this.size.col - 1;
+};
+
 KeyPaiSho.Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
 	var startRowCol = notationPointStart.rowAndColumn;
 	var endRowCol = notationPointEnd.rowAndColumn;
 
-	if (startRowCol.row < 0 || startRowCol.row > 16 || endRowCol.row < 0 || endRowCol.row > 16) {
+	if (!this.isValidRowCol(startRowCol) || !this.isValidRowCol(endRowCol)) {
 		debug("That point does not exist. So it's not gonna happen.");
 		return false;
 	}
 
 	var boardPointStart = this.cells[startRowCol.row][startRowCol.col];
 	var boardPointEnd = this.cells[endRowCol.row][endRowCol.col];
-
-	if (!this.canMoveTileToPoint(player, boardPointStart, boardPointEnd)
-			&& !gameOptionEnabled(DIAGONAL_MOVEMENT)) {
-		debug("Bad move bears");
-		showBadMoveModal();
-		return false;
-	}
 
 	var tile = boardPointStart.removeTile();
 	var capturedTile = boardPointEnd.tile;
@@ -1876,19 +1873,25 @@ KeyPaiSho.Board.prototype.canMoveHereMoreEfficientlyAlready = function(boardPoin
 
 KeyPaiSho.Board.prototype.setPossibleMovePoints = function(boardPointStart) {
 	if (boardPointStart.hasTile()) {
-		this.setPossibleMovesForMovement({ distance: boardPointStart.tile.getMoveDistance() }, boardPointStart);
+		this.setPossibleMovesForMovement(
+			{
+				distance: boardPointStart.tile.getMoveDistance(),
+				orthogonalMovement: boardPointStart.tile.hasOrthogonalMovement(),
+				diagonalMovement: boardPointStart.tile.hasDiagonalMovement()
+			}, boardPointStart);
 	}
 };
 
 KeyPaiSho.Board.prototype.setPossibleMovesForMovement = function(movementInfo, boardPointStart) {
-	if (gameOptionEnabled(DIAGONAL_MOVEMENT)) {
-		this.setPossibleMovementPointsFromMovePoints([boardPointStart], KeyPaiSho.Board.diagonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
-	} else {
+	if (movementInfo.orthogonalMovement) {
 		this.setPossibleMovementPointsFromMovePoints([boardPointStart], KeyPaiSho.Board.standardMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+	}
+	if (movementInfo.diagonalMovement) {
+		this.setPossibleMovementPointsFromMovePoints([boardPointStart], KeyPaiSho.Board.diagonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
 	}
 };
 KeyPaiSho.Board.standardMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
-	var mustPreserveDirection = false;	// True means the tile couldn't turn as it goes
+	var mustPreserveDirection = true;	// True means the tile couldn't turn as it goes
 	return board.getAdjacentPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
 };
 KeyPaiSho.Board.diagonalMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {

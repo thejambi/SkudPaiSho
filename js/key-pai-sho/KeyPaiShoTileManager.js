@@ -15,36 +15,23 @@ KeyPaiSho.TileManager = function(forActuating) {
 }
 
 KeyPaiSho.TileManager.prototype.loadTileSet = function(ownerCode) {
-	if (simpleCanonRules) {
-		return this.loadSimpleCanonSet(ownerCode);
-	} else {
-		return this.loadSkudSet(ownerCode);
-	}
-};
-
-KeyPaiSho.TileManager.prototype.loadSkudSet = function(ownerCode) {
 	var tiles = [];
 
-	// 2 of each accent tile
-	for (var i = 0; i < 2; i++) {
+	if (!gameOptionEnabled(NO_EFFECT_TILES)) {
+		// 1 of each accent tile
 		tiles.push(new KeyPaiSho.Tile('R', ownerCode));
-		if (!gameOptionEnabled(NO_WHEELS)) {
-			tiles.push(new KeyPaiSho.Tile('W', ownerCode));
-		}
+		tiles.push(new KeyPaiSho.Tile('W', ownerCode));
 		tiles.push(new KeyPaiSho.Tile('K', ownerCode));
 		tiles.push(new KeyPaiSho.Tile('B', ownerCode));
-	}
 
-	/* 1 of each Ancient Oasis Accent Tile if expansion enabled */
-	if (gameOptionEnabled(OPTION_ANCIENT_OASIS_EXPANSION)) {
-		tiles.push(new KeyPaiSho.Tile('P', ownerCode));
-		tiles.push(new KeyPaiSho.Tile('M', ownerCode));
-		tiles.push(new KeyPaiSho.Tile('T', ownerCode));
-	}
+		// 1 of each special flower
+		tiles.push(new KeyPaiSho.Tile('L', ownerCode));
+		tiles.push(new KeyPaiSho.Tile('O', ownerCode));
 
-	tiles.forEach(function(tile) {
-		tile.selectedFromPile = true;
-	});
+		tiles.forEach(function(tile) {
+			tile.selectedFromPile = true;
+		});
+	}
 
 	// 3 of each basic flower
 	for (var i = 0; i < 3; i++) {
@@ -55,10 +42,6 @@ KeyPaiSho.TileManager.prototype.loadSkudSet = function(ownerCode) {
 		tiles.push(new KeyPaiSho.Tile("W4", ownerCode));
 		tiles.push(new KeyPaiSho.Tile("W5", ownerCode));
 	}
-
-	// 1 of each special flower
-	tiles.push(new KeyPaiSho.Tile('L', ownerCode));
-	tiles.push(new KeyPaiSho.Tile('O', ownerCode));
 
 	return tiles;
 };
@@ -146,7 +129,7 @@ KeyPaiSho.TileManager.prototype.grabTile = function(player, tileCode) {
 };
 
 KeyPaiSho.TileManager.prototype.numberOfAccentTilesPerPlayerSet = function() {
-	var tileSet = this.loadSkudSet(hostPlayerCode);
+	var tileSet = this.loadTileSet(hostPlayerCode);
 	var accentTileCount = 0;
 	for (var i = 0; i < tileSet.length; i++) {
 		if (tileSet[i].type === ACCENT_TILE) {
