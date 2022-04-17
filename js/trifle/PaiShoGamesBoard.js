@@ -986,7 +986,7 @@ PaiShoGames.Board.prototype.getPointsForTilesInLineOfSight = function(originPoin
 	}
 
 	tileFound = false;
-	for (var col = originPoint.col + 1; col <+ paiShoBoardMaxRowOrCol && !tileFound; col++) {
+	for (var col = originPoint.col + 1; col <= paiShoBoardMaxRowOrCol && !tileFound; col++) {
 		var checkPoint = this.cells[originPoint.row][col];
 		if (checkPoint.hasTile()) {
 			tileFound = true;
