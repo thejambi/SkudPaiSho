@@ -16,10 +16,10 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 
 	cells[0] = this.newRow(6,
 		[KeyPaiSho.BoardPoint.neutral(),
-		KeyPaiSho.BoardPoint.neutral(),
+		KeyPaiSho.BoardPoint.nonPlayable(),
 		KeyPaiSho.BoardPoint.gate(),
 		KeyPaiSho.BoardPoint.nonPlayable(),
-		KeyPaiSho.BoardPoint.neutral(),
+		KeyPaiSho.BoardPoint.nonPlayable(),
 		KeyPaiSho.BoardPoint.neutral()
 		]);
 
@@ -28,8 +28,8 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 		KeyPaiSho.BoardPoint.neutral(),
 		KeyPaiSho.BoardPoint.neutral(),
 		KeyPaiSho.BoardPoint.neutral(),
-		KeyPaiSho.BoardPoint.neutral(),
-		KeyPaiSho.BoardPoint.neutral(),
+		KeyPaiSho.BoardPoint.nonPlayable(),
+		KeyPaiSho.BoardPoint.nonPlayable(),
 		KeyPaiSho.BoardPoint.neutral(),
 		KeyPaiSho.BoardPoint.neutral(),
 		KeyPaiSho.BoardPoint.neutral(),
@@ -128,7 +128,7 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 		]);
 
 	cells[7] = this.newRow(18,
-		[KeyPaiSho.BoardPoint.neutral(),
+		[KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.whiteNeutral(),
@@ -145,12 +145,12 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 			KeyPaiSho.BoardPoint.redNeutral(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.neutral(),
-			KeyPaiSho.BoardPoint.neutral()
+			KeyPaiSho.BoardPoint.nonPlayable()
 		]);
 
 	cells[8] = this.newRow(18,
 		[KeyPaiSho.BoardPoint.gate(),
-			KeyPaiSho.BoardPoint.neutral(),
+			KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.whiteNeutral(),
 			KeyPaiSho.BoardPoint.white(),
 			KeyPaiSho.BoardPoint.white(),
@@ -165,13 +165,13 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 			KeyPaiSho.BoardPoint.red(),
 			KeyPaiSho.BoardPoint.red(),
 			KeyPaiSho.BoardPoint.redNeutral(),
-			KeyPaiSho.BoardPoint.neutral(),
+			KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.gate()
 		]);
 
 	cells[9] = this.newRow(18,
 		[KeyPaiSho.BoardPoint.nonPlayable(),
-			KeyPaiSho.BoardPoint.neutral(),
+			KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.redNeutral(),
 			KeyPaiSho.BoardPoint.red(),
 			KeyPaiSho.BoardPoint.red(),
@@ -186,12 +186,12 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 			KeyPaiSho.BoardPoint.white(),
 			KeyPaiSho.BoardPoint.white(),
 			KeyPaiSho.BoardPoint.whiteNeutral(),
-			KeyPaiSho.BoardPoint.neutral(),
+			KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.nonPlayable()
 		]);
 
 	cells[10] = this.newRow(18,
-		[KeyPaiSho.BoardPoint.neutral(),
+		[KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.redNeutral(),
@@ -208,7 +208,7 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 			KeyPaiSho.BoardPoint.whiteNeutral(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.neutral(),
-			KeyPaiSho.BoardPoint.neutral()
+			KeyPaiSho.BoardPoint.nonPlayable()
 		]);
 
 	cells[11] = this.newRow(18,
@@ -307,8 +307,8 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.neutral(),
-			KeyPaiSho.BoardPoint.neutral(),
-			KeyPaiSho.BoardPoint.neutral(),
+			KeyPaiSho.BoardPoint.nonPlayable(),
+			KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.neutral(),
@@ -317,10 +317,10 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 
 	cells[17] = this.newRow(6,
 		[KeyPaiSho.BoardPoint.neutral(),
-			KeyPaiSho.BoardPoint.neutral(),
+			KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.gate(),
 			KeyPaiSho.BoardPoint.nonPlayable(),
-			KeyPaiSho.BoardPoint.neutral(),
+			KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.neutral()
 		]);
 
@@ -357,6 +357,23 @@ KeyPaiSho.Board.prototype.newRow = function(numColumns, points) {
 	}
 
 	return cells;
+};
+
+KeyPaiSho.Board.prototype.forEachBoardPoint = function(forEachFunc) {
+	this.cells.forEach(function(row) {
+		row.forEach(function(boardPoint) {
+			if (!boardPoint.isType(NON_PLAYABLE)) {
+				forEachFunc(boardPoint);
+			}
+		});
+	});
+};
+KeyPaiSho.Board.prototype.forEachBoardPointWithTile = function(forEachFunc) {
+	this.forEachBoardPoint(function(boardPoint) {
+		if (boardPoint.hasTile()) {
+			forEachFunc(boardPoint);
+		}
+	});
 };
 
 KeyPaiSho.Board.prototype.placeTile = function(tile, notationPoint, tileManager, extraBoatPoint) {
@@ -900,10 +917,9 @@ KeyPaiSho.Board.prototype.moveTile = function(player, notationPointStart, notati
 	}
 
 	// Check for harmonies
-	var newHarmony = this.hasNewHarmony(player, tile, startRowCol, endRowCol);
+	this.analyzeHarmonies();
 
 	return {
-		bonusAllowed: newHarmony,
 		movedTile: tile,
 		capturedTile: capturedTile
 	}
@@ -1128,23 +1144,26 @@ KeyPaiSho.Board.prototype.canCapture = function(boardPointStart, boardPointEnd) 
 };
 
 /* Does no verifying that tile can reach target point with standard movement */
-KeyPaiSho.Board.prototype.couldMoveTileToPoint = function(player, boardPointStart, boardPointEnd) {
-	// start point must have a tile
-	if (!boardPointStart.hasTile()) {
+KeyPaiSho.Board.prototype.couldMoveTileToPoint = function(player, boardPointStart, boardPointEnd, tile) {
+	// must have a tile
+	if (!tile && boardPointStart.hasTile()) {
+		tile = boardPointStart.tile;
+	}
+	if (!tile) {
 		return false;
 	}
 
 	// Tile must belong to player
-	if (boardPointStart.tile.ownerName !== player) {
+	if (tile.ownerName !== player) {
 		return false;
 	}
 
 	// Cannot move drained or trapped tile
-	if (boardPointStart.tile.trapped) {
+	if (tile.trapped) {
 		return false;
 	}
 
-	if (!newKnotweedRules && boardPointStart.tile.drained) {
+	if (!newKnotweedRules && tile.drained) {
 		return false;
 	}
 
@@ -1163,7 +1182,7 @@ KeyPaiSho.Board.prototype.couldMoveTileToPoint = function(player, boardPointStar
 		return false;
 	}
 
-	if (!boardPointEnd.canHoldTile(boardPointStart.tile, canCapture)) {
+	if (!boardPointEnd.canHoldTile(tile, canCapture)) {
 		return false;
 	}
 
@@ -1541,7 +1560,8 @@ KeyPaiSho.Board.prototype.getTileHarmonies = function(boardPoint) {
 		return tileHarmonies;
 	}
 
-	var surroundingLionTurtleTiles = this.getSurroundingLionTurtleTiles(rowAndCol);
+	// var surroundingLionTurtleTiles = this.getSurroundingLionTurtleTiles(rowAndCol);
+	var surroundingLionTurtleTiles = [];
 
 	if (!this.rowBlockedByRock(rowAndCol.row)) {
 		var leftHarmony = this.getHarmonyLeft(tile, rowAndCol, surroundingLionTurtleTiles);
@@ -1871,31 +1891,97 @@ KeyPaiSho.Board.prototype.canMoveHereMoreEfficientlyAlready = function(boardPoin
 	return boardPoint.getMoveDistanceRemaining(movementInfo) >= distanceRemaining;
 };
 
-KeyPaiSho.Board.prototype.setPossibleMovePoints = function(boardPointStart) {
-	if (boardPointStart.hasTile()) {
-		this.setPossibleMovesForMovement(
-			{
-				distance: boardPointStart.tile.getMoveDistance(),
-				orthogonalMovement: boardPointStart.tile.hasOrthogonalMovement(),
-				diagonalMovement: boardPointStart.tile.hasDiagonalMovement()
-			}, boardPointStart);
+KeyPaiSho.Board.prototype.getStartPointsFromGatePoint = function(boardPoint) {
+	if (boardPoint.isType(GATE)) {
+		var moveStartPoints = [];
+		if (boardPoint.row === 17 && boardPoint.col === 8) {
+			moveStartPoints = [
+				this.cells[16][7],
+				this.cells[15][7],
+				this.cells[15][8],
+				this.cells[15][9],
+				this.cells[15][10],
+				this.cells[16][10]
+			];
+		} else if (boardPoint.row === 8 && boardPoint.col === 17) {
+			moveStartPoints = [
+				this.cells[10][16],
+				this.cells[10][15],
+				this.cells[9][15],
+				this.cells[8][15],
+				this.cells[7][15],
+				this.cells[7][16]
+			];
+		} else if (boardPoint.row === 0 && boardPoint.col === 8) {
+			moveStartPoints = [
+				this.cells[1][7],
+				this.cells[2][7],
+				this.cells[2][8],
+				this.cells[2][9],
+				this.cells[2][10],
+				this.cells[1][10]
+			];
+		} else if (boardPoint.row === 8 && boardPoint.col === 0) {
+			moveStartPoints = [
+				this.cells[7][1],
+				this.cells[7][2],
+				this.cells[8][2],
+				this.cells[9][2],
+				this.cells[10][2],
+				this.cells[10][1]
+			];
+		}
+		return moveStartPoints;
 	}
 };
 
-KeyPaiSho.Board.prototype.setPossibleMovesForMovement = function(movementInfo, boardPointStart) {
+KeyPaiSho.Board.prototype.setPossibleMovePoints = function(boardPointStart) {
+	if (boardPointStart.hasTile()) {
+		if (boardPointStart.isType(GATE)) {
+			var moveStartPoints = this.getStartPointsFromGatePoint(boardPointStart);
+			moveStartPoints.forEach(startPoint => {
+				if (!startPoint.hasTile() && this.tileCanMoveOntoPoint(boardPointStart.tile, null, startPoint, boardPointStart, boardPointStart)) {
+					this.setPointAsPossibleMovement(startPoint, boardPointStart.tile, boardPointStart);
+					this.setPossibleMovesForMovement(
+						{
+							distance: boardPointStart.tile.getMoveDistance() - 1,
+							orthogonalMovement: boardPointStart.tile.hasOrthogonalMovement(),
+							diagonalMovement: boardPointStart.tile.hasDiagonalMovement(),
+							mustPreserveDirection: true	// TODO: Will be based on tile for special tiles...
+						}, startPoint,
+						boardPointStart.tile);
+					this.forEachBoardPoint(boardPoint => { boardPoint.clearPossibleMovementTypes(); });
+				}
+			});
+		} else {
+			this.setPossibleMovesForMovement(
+				{
+					distance: boardPointStart.tile.getMoveDistance(),
+					orthogonalMovement: boardPointStart.tile.hasOrthogonalMovement(),
+					diagonalMovement: boardPointStart.tile.hasDiagonalMovement(),
+					mustPreserveDirection: true	// TODO: Will be based on tile for special tiles...
+				}, boardPointStart);
+		}
+	}
+};
+
+KeyPaiSho.Board.prototype.setPossibleMovesForMovement = function(movementInfo, boardPointStart, tile) {
+	if (!tile) {
+		tile = boardPointStart.tile;
+	}
 	if (movementInfo.orthogonalMovement) {
-		this.setPossibleMovementPointsFromMovePoints([boardPointStart], KeyPaiSho.Board.standardMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+		this.setPossibleMovementPointsFromMovePoints([boardPointStart], KeyPaiSho.Board.standardMovementFunction, tile, movementInfo, boardPointStart, movementInfo.distance, 0);
 	}
 	if (movementInfo.diagonalMovement) {
-		this.setPossibleMovementPointsFromMovePoints([boardPointStart], KeyPaiSho.Board.diagonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+		this.setPossibleMovementPointsFromMovePoints([boardPointStart], KeyPaiSho.Board.diagonalMovementFunction, tile, movementInfo, boardPointStart, movementInfo.distance, 0);
 	}
 };
 KeyPaiSho.Board.standardMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
-	var mustPreserveDirection = true;	// True means the tile couldn't turn as it goes
+	var mustPreserveDirection = movementInfo.mustPreserveDirection;	// True means the tile couldn't turn as it goes
 	return board.getAdjacentPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
 };
 KeyPaiSho.Board.diagonalMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
-	var mustPreserveDirection = false;
+	var mustPreserveDirection = movementInfo.mustPreserveDirection;
 	return board.getAdjacentDiagonalPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
 };
 KeyPaiSho.Board.standardPlusDiagonalMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
@@ -1954,7 +2040,7 @@ KeyPaiSho.Board.prototype.setPointAsPossibleMovement = function(targetPoint, til
 };
 
 KeyPaiSho.Board.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targetPoint, fromPoint, originPoint) {
-	return this.couldMoveTileToPoint(tile.ownerName, originPoint, targetPoint);
+	return this.couldMoveTileToPoint(tile.ownerName, originPoint, targetPoint, tile);
 };
 
 /* KeyPaiSho.Board.prototype.setPossibleMovePointsOld = function(boardPointStart) {
