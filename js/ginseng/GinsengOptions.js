@@ -23,6 +23,7 @@ Ginseng.Options.tileDesignTypeValues = {
 	basingse: "Ba Sing Se",
 	zaofu: "Zaofu",
 	northern: "Agna Qel'a",
+	patola: "Patola Mountain Range",
 	chuji: "Chu Ji Red",
 	custom: "Use Custom Designs"
 };
