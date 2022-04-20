@@ -1077,7 +1077,9 @@ KeyPaiSho.Board.prototype.orchidVulnerable = function(orchidTile) {
 };
 
 KeyPaiSho.Board.prototype.canCapture = function(boardPointStart, boardPointEnd) {
-	if (gameOptionEnabled(EVERYTHING_CAPTURE)) {
+	return false;
+
+	/* if (gameOptionEnabled(EVERYTHING_CAPTURE)) {
 		return true;
 	}
 
@@ -1126,7 +1128,7 @@ KeyPaiSho.Board.prototype.canCapture = function(boardPointStart, boardPointEnd) 
 		if (this.orchidVulnerable(otherTile)) {
 			return true;
 		}
-	}
+	} */
 };
 
 /* Does no verifying that tile can reach target point with standard movement */
@@ -1604,7 +1606,7 @@ KeyPaiSho.Board.prototype.getTileHarmonies = function(boardPoint) {
 	var tileHarmonies = [];
 
 	if (this.cells[rowAndCol.row][rowAndCol.col].isType(GATE)
-			&& tile.type === BASIC_FLOWER) {
+			|| tile.type !== BASIC_FLOWER) {
 		return tileHarmonies;
 	}
 

@@ -632,51 +632,30 @@ KeyPaiSho.HarmonyManager.prototype.isCenterInsideShapeOld = function(shapePoints
 
 /* Based on Winding Number algorithm https://gist.github.com/thejambi/6ae53b6ab2636c8aff367195efeb4f44 */
 KeyPaiSho.HarmonyManager.prototype.isCenterInsideShape = function(vs) {
-	var x = 0;
-	var y = 0;
+	var x = .5;
+	var y = -.5;
 
 	var wn = 0;
-	// var crossesCenterCount = 0;
-	// var crossesCenterAllowed = 0;
 
-    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-		// if (i === 7) {
-		// 	crossesCenterAllowed++;
-		// }
+	for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+		var xi = parseFloat(vs[i][0]), yi = parseFloat(vs[i][1]);
+		var xj = parseFloat(vs[j][0]), yj = parseFloat(vs[j][1]);
 
-      var xi = parseFloat(vs[i][0]), yi = parseFloat(vs[i][1]);
-	  var xj = parseFloat(vs[j][0]), yj = parseFloat(vs[j][1]);
-	  
-	  // If on the line, doesn't count...
-		if ((xi === 0 && xj === 0 && yi * yj < 0)
-		|| (yi === 0 && yj === 0 && xi * xj < 0)) {
-		debug("Crosses center, cannot count");	// Consider allowing a maximum number of "crossing center" harmonies depending on number of harmonies in chain. 4? None allowed. How many can allow for one?
-		return false;
-		// crossesCenterCount++;
+		if (yj <= y) {
+			if (yi > y) {
+				if (this.isLeft([xj, yj], [xi, yi], [x, y]) > 0) {
+					wn++;
+				}
+			}
+		} else {
+			if (yi <= y) {
+				if (this.isLeft([xj, yj], [xi, yi], [x, y]) < 0) {
+					wn--;
+				}
+			}
+		}
 	}
 
-	// If one of the points is 0,0 that won't count...
-	if ((xi === 0 && yi === 0) || (xj === 0 && yj === 0)) {
-		debug("On center point, cannot count");
-		return false;
-	}
-
-      if (yj <= y) {
-        if (yi > y) {
-          if (this.isLeft([xj, yj], [xi, yi], [x,y]) > 0) {
-            wn++;
-          }
-        }
-      } else {
-        if (yi <= y) {
-          if (this.isLeft([xj, yj], [xi, yi], [x, y]) < 0) {
-            wn--;
-          }
-        }
-      }
-    }
-
-	// return wn != 0 && crossesCenterCount <= crossesCenterAllowed;
 	return wn != 0;
 };
 KeyPaiSho.HarmonyManager.prototype.isLeft = function(P0, P1, P2) {
