@@ -1444,7 +1444,7 @@ KeyPaiSho.Board.prototype.markSpacesBetweenHarmonies = function() {
 		
 		var row = firstRow;
 		var col = firstCol;
-		while (row !== lastRow && col !== lastCol) {
+		while (row !== lastRow || col !== lastCol) {
 			self.cells[row][col].betweenHarmony = true;
 			if (harmony.hasOwner(GUEST)) {
 				self.cells[row][col].betweenHarmonyGuest = true;
