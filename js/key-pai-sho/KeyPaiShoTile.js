@@ -110,6 +110,9 @@ KeyPaiSho.Tile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTur
 	if (superHarmonies && this.basicValue !== otherTile.basicValue) {
 		return true;
 	} */
+	if (otherTile.ownerName !== this.ownerName) {
+		return false;
+	}
 	return true;
 };
 
