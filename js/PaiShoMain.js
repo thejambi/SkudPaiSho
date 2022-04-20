@@ -2349,7 +2349,8 @@ var GameType = {
 			NO_EFFECT_TILES
 		],
 		usersWithAccess: [
-			'SkudPaiSho'
+			'SkudPaiSho',
+			'TheOneWhoKnocks'
 		]
 	},
 	SolitairePaiSho: {

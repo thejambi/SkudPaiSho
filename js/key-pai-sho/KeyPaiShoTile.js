@@ -74,7 +74,7 @@ KeyPaiSho.Tile.prototype.getImageName = function() {
 };
 
 KeyPaiSho.Tile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTurtle) {
-		if (!(this.type === BASIC_FLOWER || this.code === 'L')
+	/* 	if (!(this.type === BASIC_FLOWER || this.code === 'L')
 			|| !(otherTile.type === BASIC_FLOWER || otherTile.code === 'L')) {
 			return false;
 		}
@@ -109,7 +109,8 @@ KeyPaiSho.Tile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTur
 
 	if (superHarmonies && this.basicValue !== otherTile.basicValue) {
 		return true;
-	}
+	} */
+	return true;
 };
 
 KeyPaiSho.Tile.prototype.clashesWith = function(otherTile) {

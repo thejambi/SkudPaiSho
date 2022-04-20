@@ -4,7 +4,7 @@ KeyPaiSho.Board = function() {
 	this.size = new RowAndColumn(18, 18);
 	this.cells = this.brandNew();
 
-	this.harmonyManager = new SkudPaiShoHarmonyManager();
+	this.harmonyManager = new KeyPaiSho.HarmonyManager();
 
 	this.rockRowAndCols = [];
 	this.playedWhiteLotusTiles = [];
@@ -507,21 +507,7 @@ KeyPaiSho.Board.prototype.canPlaceWheel = function(boardPoint) {
 		}
 	}
 
-	// Does it create Disharmony?
-	if (!gameOptionEnabled(IGNORE_CLASHING)) {
-		var newBoard = this.getCopy();
-		var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
-		newBoard.placeWheel(new SkudPaiShoTile('W', 'G'), notationPoint, true);
-		if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
-			return false;
-		}
-	}
-
 	return true;
-};
-
-KeyPaiSho.Board.prototype.isValidRowCol = function(rowCol) {
-	return rowCol.row >= 0 && rowCol.col >= 0 && rowCol.row <= 16 && rowCol.col <= 16;
 };
 
 KeyPaiSho.Board.prototype.placeWheel = function(tile, notationPoint, ignoreCheck) {
@@ -606,7 +592,7 @@ KeyPaiSho.Board.prototype.placeKnotweed = function(tile, notationPoint) {
 };
 
 KeyPaiSho.Board.prototype.canPlaceBoat = function(boardPoint, tile) {
-	if (!boardPoint.hasTile()) {
+	/* if (!boardPoint.hasTile()) {
 		// debug("Boat always played on top of another tile");
 		return false;
 	}
@@ -635,7 +621,7 @@ KeyPaiSho.Board.prototype.canPlaceBoat = function(boardPoint, tile) {
 		}
 	}
 
-	return true;
+	return true; */
 };
 
 KeyPaiSho.Board.prototype.placeBoat = function(tile, notationPoint, extraBoatPoint, ignoreCheck) {
@@ -689,7 +675,7 @@ KeyPaiSho.Board.prototype.placeBoat = function(tile, notationPoint, extraBoatPoi
 };
 
 KeyPaiSho.Board.prototype.canPlaceBamboo = function(boardPoint, tile) {
-	// if (!boardPoint.hasTile()) {
+	/* // if (!boardPoint.hasTile()) {
 	// 	// debug("Bamboo always played on top of another tile");
 	// 	return false;
 	// }
@@ -718,7 +704,7 @@ KeyPaiSho.Board.prototype.canPlaceBamboo = function(boardPoint, tile) {
 		}
 	}
 
-	return true;
+	return true; */
 };
 
 KeyPaiSho.Board.prototype.placeBamboo = function(tile, notationPoint, ignoreCheck, tileManager) {
@@ -880,7 +866,7 @@ KeyPaiSho.Board.prototype.pointIsOpenAndSurroundsPond = function(boardPoint) {
 };
 
 KeyPaiSho.Board.prototype.isValidRowCol = function(rowCol) {
-	return rowCol.row >= 0 && rowCol.col >= 0 && rowCol.row <= this.size.row - 1 && rowCol.col <= this.size.col - 1;
+	return rowCol && rowCol.row >= 0 && rowCol.col >= 0 && rowCol.row <= this.size.row - 1 && rowCol.col <= this.size.col - 1;
 };
 
 KeyPaiSho.Board.prototype.moveTile = function(player, notationPointStart, notationPointEnd) {
@@ -1186,12 +1172,6 @@ KeyPaiSho.Board.prototype.couldMoveTileToPoint = function(player, boardPointStar
 		return false;
 	}
 
-	// What if moving the tile there creates a Disharmony on the board? That can't happen!
-	if (!gameOptionEnabled(IGNORE_CLASHING) 
-			&& this.moveCreatesDisharmony(boardPointStart, boardPointEnd)) {
-		return false;
-	}
-
 	// I guess we made it through
 	return true;
 };
@@ -1440,8 +1420,46 @@ KeyPaiSho.Board.prototype.markSpacesBetweenHarmonies = function() {
 	var self = this;
 	this.harmonyManager.harmonies.forEach(function(harmony) {
 		// harmony.tile1Pos.row (for example)
-		// Harmony will be in same row or same col
-		if (harmony.tile1Pos.row === harmony.tile2Pos.row) {
+		// Harmony will be in same row or same col OR diagonal
+		
+		var firstCol = harmony.tile1Pos.col;
+		var lastCol = harmony.tile2Pos.col;
+
+		var colChange = 0;
+		if (lastCol > firstCol) {
+			colChange = 1;
+		} else if (firstCol > lastCol) {
+			colChange = -1;
+		}
+
+		var firstRow = harmony.tile1Pos.row;
+		var lastRow = harmony.tile2Pos.row;
+		
+		var rowChange = 0;
+		if (lastRow > firstRow) {
+			rowChange = 1;
+		} else if (firstRow > lastRow) {
+			rowChange = -1;
+		}
+		
+		var row = firstRow;
+		var col = firstCol;
+		while (row !== lastRow && col !== lastCol) {
+			self.cells[row][col].betweenHarmony = true;
+			if (harmony.hasOwner(GUEST)) {
+				self.cells[row][col].betweenHarmonyGuest = true;
+			}
+			if (harmony.hasOwner(HOST)) {
+				self.cells[row][col].betweenHarmonyHost = true;
+			}
+
+			row += rowChange;
+			col += colChange;
+		}
+		
+
+
+		/* if (harmony.tile1Pos.row === harmony.tile2Pos.row) {
 			// Get smaller of the two
 			var row = harmony.tile1Pos.row;
 			var firstCol = harmony.tile1Pos.col;
@@ -1477,7 +1495,7 @@ KeyPaiSho.Board.prototype.markSpacesBetweenHarmonies = function() {
 					self.cells[row][col].betweenHarmonyHost = true;
 				}
 			}
-		}
+		} */
 	});
 };
 
@@ -1487,7 +1505,36 @@ KeyPaiSho.Board.prototype.analyzeHarmonies = function() {
 	// Check along all rows, then along all columns.. Or just check all tiles?
 	this.harmonyManager.clearList();
 
-	for (var row = 0; row < this.cells.length; row++) {
+	this.forEachBoardPointWithTile(boardPoint => {
+		var tileHarmonies = this.getTileHarmonies(boardPoint);
+		this.harmonyManager.addHarmonies(tileHarmonies);
+
+		boardPoint.tile.harmonyOwners = [];
+
+		for (var i = 0; i < tileHarmonies.length; i++) {
+			for (var j = 0; j < tileHarmonies[i].owners.length; j++) {
+				var harmonyOwnerName = tileHarmonies[i].owners[j].ownerName;
+				var harmonyTile1 = tileHarmonies[i].tile1;
+				var harmonyTile2 = tileHarmonies[i].tile2;
+
+				if (!harmonyTile1.harmonyOwners) {
+					harmonyTile1.harmonyOwners = [];
+				}
+				if (!harmonyTile2.harmonyOwners) {
+					harmonyTile2.harmonyOwners = [];
+				}
+
+				if (!harmonyTile1.harmonyOwners.includes(harmonyOwnerName)) {
+					harmonyTile1.harmonyOwners.push(harmonyOwnerName);
+				}
+				if (!harmonyTile2.harmonyOwners.includes(harmonyOwnerName)) {
+					harmonyTile2.harmonyOwners.push(harmonyOwnerName);
+				}
+			}
+		}
+	});
+
+	/* for (var row = 0; row < this.cells.length; row++) {
 		for (var col = 0; col < this.cells[row].length; col++) {
 			var boardPoint = this.cells[row][col];
 			if (boardPoint.hasTile()) {
@@ -1521,7 +1568,7 @@ KeyPaiSho.Board.prototype.analyzeHarmonies = function() {
 				}
 			}
 		}
-	}
+	} */
 
 	this.markSpacesBetweenHarmonies();
 
@@ -1556,41 +1603,82 @@ KeyPaiSho.Board.prototype.getTileHarmonies = function(boardPoint) {
 	var rowAndCol = boardPoint;
 	var tileHarmonies = [];
 
-	if (this.cells[rowAndCol.row][rowAndCol.col].isType(GATE)) {
+	if (this.cells[rowAndCol.row][rowAndCol.col].isType(GATE)
+			&& tile.type === BASIC_FLOWER) {
 		return tileHarmonies;
 	}
 
-	// var surroundingLionTurtleTiles = this.getSurroundingLionTurtleTiles(rowAndCol);
-	var surroundingLionTurtleTiles = [];
+	var moveDistance = tile.getMoveDistance();
 
-	if (!this.rowBlockedByRock(rowAndCol.row)) {
-		var leftHarmony = this.getHarmonyLeft(tile, rowAndCol, surroundingLionTurtleTiles);
-		if (leftHarmony) {
-			tileHarmonies.push(leftHarmony);
+	if (tile.hasOrthogonalMovement()) {
+		var harmony = this.getHarmonyInDirection(tile, boardPoint, 0, -1, moveDistance);
+		if (harmony) {
+			tileHarmonies.push(harmony);
 		}
 
-		var rightHarmony = this.getHarmonyRight(tile, rowAndCol, surroundingLionTurtleTiles);
-		if (rightHarmony) {
-			tileHarmonies.push(rightHarmony);
+		harmony = this.getHarmonyInDirection(tile, boardPoint, 0, 1, moveDistance);
+		if (harmony) {
+			tileHarmonies.push(harmony);
+		}
+
+		harmony = this.getHarmonyInDirection(tile, boardPoint, -1, 0, moveDistance);
+		if (harmony) {
+			tileHarmonies.push(harmony);
+		}
+
+		var harmony = this.getHarmonyInDirection(tile, boardPoint, 1, 0, moveDistance);
+		if (harmony) {
+			tileHarmonies.push(harmony);
 		}
 	}
 
-	if (!this.columnBlockedByRock(rowAndCol.col)) {
-		var upHarmony = this.getHarmonyUp(tile, rowAndCol, surroundingLionTurtleTiles);
-		if (upHarmony) {
-			tileHarmonies.push(upHarmony);
+	if (tile.hasDiagonalMovement()) {
+		var harmony = this.getHarmonyInDirection(tile, boardPoint, 1, -1, moveDistance);
+		if (harmony) {
+			tileHarmonies.push(harmony);
 		}
 
-		var downHarmony = this.getHarmonyDown(tile, rowAndCol, surroundingLionTurtleTiles);
-		if (downHarmony) {
-			tileHarmonies.push(downHarmony);
+		harmony = this.getHarmonyInDirection(tile, boardPoint, 1, 1, moveDistance);
+		if (harmony) {
+			tileHarmonies.push(harmony);
+		}
+
+		harmony = this.getHarmonyInDirection(tile, boardPoint, -1, 1, moveDistance);
+		if (harmony) {
+			tileHarmonies.push(harmony);
+		}
+
+		harmony = this.getHarmonyInDirection(tile, boardPoint, -1, -1, moveDistance);
+		if (harmony) {
+			tileHarmonies.push(harmony);
 		}
 	}
 
 	return tileHarmonies;
 };
 
-KeyPaiSho.Board.prototype.getHarmonyLeft = function(tile, endRowCol, surroundingLionTurtleTiles) {
+KeyPaiSho.Board.prototype.getHarmonyInDirection = function(tile, fromPoint, rowChange, colChange, maxDistance) {
+	var rowToCheck = fromPoint.row + rowChange;
+	var colToCheck = fromPoint.col + colChange;
+	var distance = 1;
+
+	var checkPoint = this.cells[rowToCheck][colToCheck];
+
+	while (this.isValidRowCol(checkPoint) && !checkPoint.hasTile() && !checkPoint.isType(GATE) && distance <= maxDistance) {
+		distance++;
+		rowToCheck += rowChange;
+		colToCheck += colChange;
+		checkPoint = this.cells[rowToCheck] && this.cells[rowToCheck][colToCheck];
+	}
+
+	if (distance <= maxDistance && this.isValidRowCol(checkPoint) 
+			&& !checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile)) {
+		var harmony = new KeyPaiSho.Harmony(tile, fromPoint, checkPoint.tile, checkPoint);
+		return harmony;
+	}
+};
+
+KeyPaiSho.Board.prototype.getHarmonyLeft = function(tile, endRowCol, maxDistance) {
 	var colToCheck = endRowCol.col - 1;
 
 	while (colToCheck >= 0 && !this.cells[endRowCol.row][colToCheck].hasTile() 
@@ -1601,18 +1689,14 @@ KeyPaiSho.Board.prototype.getHarmonyLeft = function(tile, endRowCol, surrounding
 	if (colToCheck >= 0) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
 
-		var newSurroundingLionTurtles = this.getSurroundingLionTurtleTiles(checkPoint);
-		newSurroundingLionTurtles = newSurroundingLionTurtles.concat(surroundingLionTurtleTiles);
-		var surroundsLionTurtle = newSurroundingLionTurtles.length > 0;
-
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundsLionTurtle)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), newSurroundingLionTurtles);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile)) {
+			var harmony = new KeyPaiSho.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
 	}
 };
 
-KeyPaiSho.Board.prototype.getHarmonyRight = function(tile, endRowCol, surroundingLionTurtleTiles) {
+KeyPaiSho.Board.prototype.getHarmonyRight = function(tile, endRowCol, maxDistance) {
 	var colToCheck = endRowCol.col + 1;
 
 	while (colToCheck <= 16 && !this.cells[endRowCol.row][colToCheck].hasTile() 
@@ -1623,18 +1707,14 @@ KeyPaiSho.Board.prototype.getHarmonyRight = function(tile, endRowCol, surroundin
 	if (colToCheck <= 16) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
 
-		var newSurroundingLionTurtles = this.getSurroundingLionTurtleTiles(checkPoint);
-		newSurroundingLionTurtles = newSurroundingLionTurtles.concat(surroundingLionTurtleTiles);
-		var surroundsLionTurtle = newSurroundingLionTurtles.length > 0;
-
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundsLionTurtle)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck), newSurroundingLionTurtles);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile)) {
+			var harmony = new KeyPaiSho.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
 	}
 };
 
-KeyPaiSho.Board.prototype.getHarmonyUp = function(tile, endRowCol, surroundingLionTurtleTiles) {
+KeyPaiSho.Board.prototype.getHarmonyUp = function(tile, endRowCol, maxDistance) {
 	var rowToCheck = endRowCol.row - 1;
 
 	while (rowToCheck >= 0 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
@@ -1645,18 +1725,14 @@ KeyPaiSho.Board.prototype.getHarmonyUp = function(tile, endRowCol, surroundingLi
 	if (rowToCheck >= 0) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
 
-		var newSurroundingLionTurtles = this.getSurroundingLionTurtleTiles(checkPoint);
-		newSurroundingLionTurtles = newSurroundingLionTurtles.concat(surroundingLionTurtleTiles);
-		var surroundsLionTurtle = newSurroundingLionTurtles.length > 0;
-
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundsLionTurtle)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), newSurroundingLionTurtles);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile)) {
+			var harmony = new KeyPaiSho.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
 	}
 };
 
-KeyPaiSho.Board.prototype.getHarmonyDown = function(tile, endRowCol, surroundingLionTurtleTiles) {
+KeyPaiSho.Board.prototype.getHarmonyDown = function(tile, endRowCol, maxDistance) {
 	var rowToCheck = endRowCol.row + 1;
 
 	while (rowToCheck <= 16 && !this.cells[rowToCheck][endRowCol.col].hasTile() 
@@ -1667,12 +1743,8 @@ KeyPaiSho.Board.prototype.getHarmonyDown = function(tile, endRowCol, surrounding
 	if (rowToCheck <= 16) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
 
-		var newSurroundingLionTurtles = this.getSurroundingLionTurtleTiles(checkPoint);
-		newSurroundingLionTurtles = newSurroundingLionTurtles.concat(surroundingLionTurtleTiles);
-		var surroundsLionTurtle = newSurroundingLionTurtles.length > 0;
-
-		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile, surroundsLionTurtle)) {
-			var harmony = new SkudPaiShoHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col), newSurroundingLionTurtles);
+		if (!checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile)) {
+			var harmony = new KeyPaiSho.Harmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
 	}
@@ -2082,13 +2154,7 @@ KeyPaiSho.Board.prototype.setOpenGatePossibleMoves = function(player, tile) {
 				for (var i = 0; i < rowCols.length; i++) {
 					var surroundingPoint = this.cells[rowCols[i].row][rowCols[i].col];
 					if (surroundingPoint.canHoldTile(tile)) {
-						// If does not cause clash...
-						var newBoard = this.getCopy();
-						var notationPoint = new NotationPoint(new RowAndColumn(surroundingPoint.row, surroundingPoint.col).notationPointString);
-						newBoard.placeTile(tile, notationPoint);
-						if (gameOptionEnabled(IGNORE_CLASHING) || !newBoard.moveCreatesDisharmony(notationPoint, notationPoint)) {
-							surroundingPoint.addType(POSSIBLE_MOVE);
-						}
+						surroundingPoint.addType(POSSIBLE_MOVE);
 					}
 				}
 			}
