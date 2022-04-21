@@ -1660,9 +1660,10 @@ KeyPaiSho.Board.prototype.getTileHarmonies = function(boardPoint) {
 };
 
 KeyPaiSho.Board.prototype.getHarmonyInDirection = function(tile, fromPoint, rowChange, colChange, maxDistance) {
-	var rowToCheck = fromPoint.row + rowChange;
-	var colToCheck = fromPoint.col + colChange;
-	var distance = 1;
+	/* Possible Harmony begins two steps away */
+	var rowToCheck = fromPoint.row + rowChange*2;
+	var colToCheck = fromPoint.col + colChange*2;
+	var distance = 2;
 
 	var checkPoint = this.cells[rowToCheck][colToCheck];
 
