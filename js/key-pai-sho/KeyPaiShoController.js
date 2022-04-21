@@ -238,8 +238,8 @@ KeyPaiSho.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 		this.theGame.actuate();
 	} else if (this.notationBuilder.status === BRAND_NEW) {
 		// new Planting turn, can be basic flower
-		if (tile.type !== BASIC_FLOWER) {
-			debug("Can only Plant a Basic Flower tile. That's not one of them.");
+		if (tile.type !== BASIC_FLOWER && tile.type !== SPECIAL_FLOWER) {
+			debug("Can only Plant a Flower tile. That's not one of them.");
 			return false;
 		}
 
