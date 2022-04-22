@@ -1,5 +1,10 @@
 /* Key Pai Sho Tile */
 
+KeyPaiSho.TileCodes = {
+	Lotus: 'LO',
+	Orchid: 'OR'
+};
+
 KeyPaiSho.Tile = function(code, ownerCode) {
 	this.code = code;
 	this.ownerCode = ownerCode;
@@ -14,7 +19,10 @@ KeyPaiSho.Tile = function(code, ownerCode) {
 	this.drained = false;
 	this.selectedFromPile = false;
 
-	if (this.code.length === 2 && (this.code.includes('R') || this.code.includes('W'))) {
+	if (this.code === KeyPaiSho.TileCodes.Lotus || this.code === KeyPaiSho.TileCodes.Orchid) {
+		this.type = SPECIAL_FLOWER;
+		this.setSpecialFlowerInfo();
+	} else if (this.code.length === 2 && (this.code.includes('R') || this.code.includes('W'))) {
 		this.type = BASIC_FLOWER;
 		this.basicColorCode = this.code.charAt(0);
 		this.basicValue = this.code.charAt(1);
@@ -23,9 +31,6 @@ KeyPaiSho.Tile = function(code, ownerCode) {
 		} else if (this.basicColorCode === 'W') {
 			this.basicColorName = WHITE;
 		}
-	} else if (this.code === 'L' || this.code === 'O') {
-		this.type = SPECIAL_FLOWER;
-		this.setSpecialFlowerInfo();
 	} else if (this.code === 'R' || this.code === 'W' || this.code === 'K' || this.code === 'B'
 				|| this.code === 'P' || this.code === 'M' || this.code === 'T') {
 		this.type = ACCENT_TILE;
@@ -54,9 +59,9 @@ KeyPaiSho.Tile.prototype.setAccentInfo = function() {
 };
 
 KeyPaiSho.Tile.prototype.setSpecialFlowerInfo = function() {
-	if (this.code === 'L') {
+	if (this.code === KeyPaiSho.TileCodes.Lotus) {
 		this.specialFlowerType = WHITE_LOTUS;
-	} else if (this.code === 'O') {
+	} else if (this.code === KeyPaiSho.TileCodes.Orchid) {
 		this.specialFlowerType = ORCHID;
 	}
 };
@@ -74,13 +79,13 @@ KeyPaiSho.Tile.prototype.getImageName = function() {
 };
 
 KeyPaiSho.Tile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTurtle) {
-	/* 	if (!(this.type === BASIC_FLOWER || this.code === 'L')
-			|| !(otherTile.type === BASIC_FLOWER || otherTile.code === 'L')) {
+	/* 	if (!(this.type === BASIC_FLOWER || this.code === KeyPaiSho.TileCodes.Lotus)
+			|| !(otherTile.type === BASIC_FLOWER || otherTile.code === KeyPaiSho.TileCodes.Lotus)) {
 			return false;
 		}
 
-	if ((this.code === 'L' && otherTile.type !== BASIC_FLOWER)
-		|| (otherTile.code === 'L' && this.type !== BASIC_FLOWER)) {
+	if ((this.code === KeyPaiSho.TileCodes.Lotus && otherTile.type !== BASIC_FLOWER)
+		|| (otherTile.code === KeyPaiSho.TileCodes.Lotus && this.type !== BASIC_FLOWER)) {
 		return false;
 	}
 
@@ -89,8 +94,8 @@ KeyPaiSho.Tile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTur
 	}
 
 	// Check White Lotus (Lotus can belong to either player)
-	if ((this.code === 'L' && otherTile.type === BASIC_FLOWER) 
-		|| (otherTile.code === 'L' && this.type == BASIC_FLOWER)) {
+	if ((this.code === KeyPaiSho.TileCodes.Lotus && otherTile.type === BASIC_FLOWER) 
+		|| (otherTile.code === KeyPaiSho.TileCodes.Lotus && this.type == BASIC_FLOWER)) {
 		return true;
 	}
 
@@ -110,7 +115,13 @@ KeyPaiSho.Tile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTur
 	if (superHarmonies && this.basicValue !== otherTile.basicValue) {
 		return true;
 	} */
-	if (otherTile.ownerName !== this.ownerName) {
+
+	if (this.type !== BASIC_FLOWER && this.code !== KeyPaiSho.TileCodes.Lotus) {
+		return false;
+	}
+
+	if (otherTile.ownerName !== this.ownerName 
+		&& !(otherTile.code === KeyPaiSho.TileCodes.Lotus || this.code === KeyPaiSho.TileCodes.Lotus)) {
 		return false;
 	}
 	return true;
@@ -137,18 +148,28 @@ KeyPaiSho.Tile.prototype.getMoveDistance = function() {
 			tileValue++;
 		}
 		return tileValue;
-	} else if (this.code === 'L') {
+	} else if (this.code === KeyPaiSho.TileCodes.Lotus) {
 		return 2;
-	} else if (this.code === 'O') {
-		return 6;
+	} else if (this.code === KeyPaiSho.TileCodes.Orchid) {
+		return 1;
 	}
 	return 0;
+};
+
+KeyPaiSho.Tile.prototype.getHarmonyDistance = function() {
+	if (this.type === BASIC_FLOWER) {
+		return this.getMoveDistance();
+	} else if (this.code === KeyPaiSho.TileCodes.Lotus) {
+		return 20;
+	}
 };
 
 KeyPaiSho.Tile.prototype.hasOrthogonalMovement = function() {
 	if (this.type === BASIC_FLOWER) {
 		var tileValue = parseInt(this.basicValue);
 		return tileValue === 3 || tileValue === 4;
+	} else {
+		return this.code === KeyPaiSho.TileCodes.Lotus;
 	}
 };
 
@@ -156,6 +177,16 @@ KeyPaiSho.Tile.prototype.hasDiagonalMovement = function() {
 	if (this.type === BASIC_FLOWER) {
 		var tileValue = parseInt(this.basicValue);
 		return tileValue === 3 || tileValue === 5;
+	} else {
+		return this.code === KeyPaiSho.TileCodes.Lotus;
+	}
+};
+
+KeyPaiSho.Tile.prototype.movementMustPreserveDirection = function() {
+	if (this.code === KeyPaiSho.TileCodes.Lotus) {
+		return false;
+	} else {
+		return true;
 	}
 };
 
@@ -213,9 +244,9 @@ KeyPaiSho.Tile.getTileName = function(tileCode) {
 			name = "Knotweed";
 		} else if (tileCode === 'B') {
 			name = "Boat";
-		} else if (tileCode === 'O') {
+		} else if (tileCode === KeyPaiSho.TileCodes.Orchid) {
 			name = "Orchid";
-		} else if (tileCode === 'L') {
+		} else if (tileCode === KeyPaiSho.TileCodes.Lotus) {
 			name = "White Lotus";
 		} else if (tileCode === 'P') {
 			name = "Pond";

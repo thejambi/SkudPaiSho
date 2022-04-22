@@ -68,6 +68,10 @@ KeyPaiSho.BoardPoint.prototype.hasTile = function() {
 	return false;
 };
 
+KeyPaiSho.BoardPoint.prototype.hasTileOfType = function(types) {
+	return this.tile && types && types.includes(this.tile.type);
+};
+
 KeyPaiSho.BoardPoint.prototype.isType = function(type) {
 	return this.types.includes(type);
 };

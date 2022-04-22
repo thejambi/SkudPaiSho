@@ -1606,51 +1606,51 @@ KeyPaiSho.Board.prototype.getTileHarmonies = function(boardPoint) {
 	var tileHarmonies = [];
 
 	if (this.cells[rowAndCol.row][rowAndCol.col].isType(GATE)
-			|| tile.type !== BASIC_FLOWER) {
+			|| (tile.type !== BASIC_FLOWER && tile.code !== KeyPaiSho.TileCodes.Lotus)) {
 		return tileHarmonies;
 	}
 
-	var moveDistance = tile.getMoveDistance();
+	var harmonyDistance = tile.getHarmonyDistance();
 
 	if (tile.hasOrthogonalMovement()) {
-		var harmony = this.getHarmonyInDirection(tile, boardPoint, 0, -1, moveDistance);
+		var harmony = this.getHarmonyInDirection(tile, boardPoint, 0, -1, harmonyDistance);
 		if (harmony) {
 			tileHarmonies.push(harmony);
 		}
 
-		harmony = this.getHarmonyInDirection(tile, boardPoint, 0, 1, moveDistance);
+		harmony = this.getHarmonyInDirection(tile, boardPoint, 0, 1, harmonyDistance);
 		if (harmony) {
 			tileHarmonies.push(harmony);
 		}
 
-		harmony = this.getHarmonyInDirection(tile, boardPoint, -1, 0, moveDistance);
+		harmony = this.getHarmonyInDirection(tile, boardPoint, -1, 0, harmonyDistance);
 		if (harmony) {
 			tileHarmonies.push(harmony);
 		}
 
-		var harmony = this.getHarmonyInDirection(tile, boardPoint, 1, 0, moveDistance);
+		var harmony = this.getHarmonyInDirection(tile, boardPoint, 1, 0, harmonyDistance);
 		if (harmony) {
 			tileHarmonies.push(harmony);
 		}
 	}
 
 	if (tile.hasDiagonalMovement()) {
-		var harmony = this.getHarmonyInDirection(tile, boardPoint, 1, -1, moveDistance);
+		var harmony = this.getHarmonyInDirection(tile, boardPoint, 1, -1, harmonyDistance);
 		if (harmony) {
 			tileHarmonies.push(harmony);
 		}
 
-		harmony = this.getHarmonyInDirection(tile, boardPoint, 1, 1, moveDistance);
+		harmony = this.getHarmonyInDirection(tile, boardPoint, 1, 1, harmonyDistance);
 		if (harmony) {
 			tileHarmonies.push(harmony);
 		}
 
-		harmony = this.getHarmonyInDirection(tile, boardPoint, -1, 1, moveDistance);
+		harmony = this.getHarmonyInDirection(tile, boardPoint, -1, 1, harmonyDistance);
 		if (harmony) {
 			tileHarmonies.push(harmony);
 		}
 
-		harmony = this.getHarmonyInDirection(tile, boardPoint, -1, -1, moveDistance);
+		harmony = this.getHarmonyInDirection(tile, boardPoint, -1, -1, harmonyDistance);
 		if (harmony) {
 			tileHarmonies.push(harmony);
 		}
@@ -1667,7 +1667,7 @@ KeyPaiSho.Board.prototype.getHarmonyInDirection = function(tile, fromPoint, rowC
 
 	var checkPoint = this.cells[rowToCheck][colToCheck];
 
-	while (this.isValidRowCol(checkPoint) && !checkPoint.hasTile() && !checkPoint.isType(GATE) && distance <= maxDistance) {
+	while (this.isValidRowCol(checkPoint) && !checkPoint.hasTileOfType([BASIC_FLOWER, SPECIAL_FLOWER]) && !checkPoint.isType(GATE) && distance <= maxDistance) {
 		distance++;
 		rowToCheck += rowChange;
 		colToCheck += colChange;
@@ -2022,7 +2022,7 @@ KeyPaiSho.Board.prototype.setPossibleMovePoints = function(boardPointStart) {
 							distance: boardPointStart.tile.getMoveDistance() - 1,
 							orthogonalMovement: boardPointStart.tile.hasOrthogonalMovement(),
 							diagonalMovement: boardPointStart.tile.hasDiagonalMovement(),
-							mustPreserveDirection: true	// TODO: Will be based on tile for special tiles...
+							mustPreserveDirection: boardPointStart.tile.movementMustPreserveDirection()
 						}, startPoint,
 						boardPointStart.tile);
 					this.forEachBoardPoint(boardPoint => { boardPoint.clearPossibleMovementTypes(); });
@@ -2034,7 +2034,7 @@ KeyPaiSho.Board.prototype.setPossibleMovePoints = function(boardPointStart) {
 					distance: boardPointStart.tile.getMoveDistance(),
 					orthogonalMovement: boardPointStart.tile.hasOrthogonalMovement(),
 					diagonalMovement: boardPointStart.tile.hasDiagonalMovement(),
-					mustPreserveDirection: true	// TODO: Will be based on tile for special tiles...
+					mustPreserveDirection: boardPointStart.tile.movementMustPreserveDirection()
 				}, boardPointStart);
 		}
 	}
@@ -2044,11 +2044,14 @@ KeyPaiSho.Board.prototype.setPossibleMovesForMovement = function(movementInfo, b
 	if (!tile) {
 		tile = boardPointStart.tile;
 	}
-	if (movementInfo.orthogonalMovement) {
-		this.setPossibleMovementPointsFromMovePoints([boardPointStart], KeyPaiSho.Board.standardMovementFunction, tile, movementInfo, boardPointStart, movementInfo.distance, 0);
-	}
-	if (movementInfo.diagonalMovement) {
-		this.setPossibleMovementPointsFromMovePoints([boardPointStart], KeyPaiSho.Board.diagonalMovementFunction, tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+	if (movementInfo.orthogonalMovement && movementInfo.diagonalMovement && !movementInfo.mustPreserveDirection) {
+		this.setPossibleMovementPointsFromMovePoints([boardPointStart], KeyPaiSho.Board.standardPlusDiagonalMovementFunction, tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+	} else {
+		if (movementInfo.orthogonalMovement) {
+			this.setPossibleMovementPointsFromMovePoints([boardPointStart], KeyPaiSho.Board.standardMovementFunction, tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+		} if (movementInfo.diagonalMovement) {
+			this.setPossibleMovementPointsFromMovePoints([boardPointStart], KeyPaiSho.Board.diagonalMovementFunction, tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+		}
 	}
 };
 KeyPaiSho.Board.standardMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
@@ -2060,7 +2063,8 @@ KeyPaiSho.Board.diagonalMovementFunction = function(board, originPoint, boardPoi
 	return board.getAdjacentDiagonalPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
 };
 KeyPaiSho.Board.standardPlusDiagonalMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
-	var mustPreserveDirection = false;
+	/* Preserve direction is not working for this... */
+	var mustPreserveDirection = movementInfo.mustPreserveDirection;
 	var movePoints = board.getAdjacentPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
 	return movePoints.concat(board.getAdjacentDiagonalPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo));
 };

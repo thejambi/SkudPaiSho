@@ -112,6 +112,7 @@ Trifle.SpecialDeployType = {
 Trifle.MovementType = {
 	standard: "standard",
 	diagonal: "diagonal",
+	orthAndDiag: "orthAndDiag",
 	jumpAlongLineOfSight: "jumpAlongLineOfSight",
 	withinFriendlyTileZone: "withinFriendlyTileZone",
 	anywhere: "anywhere",
@@ -1335,24 +1336,28 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 	/* Random tile ideas or unused tiles */
 
 	TrifleTiles[Trifle.TileCodes.AirGlider] = {
-		available: false,
+		available: true,
 		types: [Trifle.TileType.traveler],
 		deployTypes: [Trifle.DeployType.temple, Trifle.DeployType.anywhere],
 		movements: [
+			// {
+			// 	type: Trifle.MovementType.travelShape,
+			// 	shape: [
+			// 		Trifle.MoveDirection.any,
+			// 		Trifle.MoveDirection.turn,
+			// 		Trifle.MoveDirection.straight,
+			// 		Trifle.MoveDirection.straight,
+			// 		Trifle.MoveDirection.straight
+			// 	],
+			// 	captureTypes: [Trifle.CaptureType.all]
+			// },
+			// {
+			// 	type: Trifle.MovementType.anywhere,
+			// 	captureTypes: [Trifle.CaptureType.all]
+			// }
 			{
-				type: Trifle.MovementType.travelShape,
-				shape: [
-					Trifle.MoveDirection.any,
-					Trifle.MoveDirection.turn,
-					Trifle.MoveDirection.straight,
-					Trifle.MoveDirection.straight,
-					Trifle.MoveDirection.straight
-				],
-				captureTypes: [Trifle.CaptureType.all]
-			},
-			{
-				type: Trifle.MovementType.anywhere,
-				captureTypes: [Trifle.CaptureType.all]
+				type: Trifle.MovementType.orthAndDiag,
+				distance: 2
 			}
 		], // Ability testing...
 		abilities: [

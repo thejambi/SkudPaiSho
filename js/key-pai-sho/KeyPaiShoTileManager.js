@@ -25,13 +25,16 @@ KeyPaiSho.TileManager.prototype.loadTileSet = function(ownerCode) {
 		tiles.push(new KeyPaiSho.Tile('B', ownerCode));
 
 		// 1 of each special flower
-		tiles.push(new KeyPaiSho.Tile('L', ownerCode));
-		tiles.push(new KeyPaiSho.Tile('O', ownerCode));
+		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Lotus, ownerCode));
+		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Orchid, ownerCode));
 
 		tiles.forEach(function(tile) {
 			tile.selectedFromPile = true;
 		});
 	}
+
+	/* Keep the next line to test White Lotus */
+	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Lotus, ownerCode));
 
 	// 3 of each basic flower
 	for (var i = 0; i < 3; i++) {
@@ -92,8 +95,8 @@ KeyPaiSho.TileManager.prototype.loadOneOfEach = function(ownerCode) {
 	tiles.push(new KeyPaiSho.Tile("W4", ownerCode));
 	tiles.push(new KeyPaiSho.Tile("W5", ownerCode));
 
-	tiles.push(new KeyPaiSho.Tile('L', ownerCode));
-	tiles.push(new KeyPaiSho.Tile('O', ownerCode));
+	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Lotus, ownerCode));
+	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Orchid, ownerCode));
 
 	return tiles;
 };

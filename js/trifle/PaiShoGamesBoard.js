@@ -1627,6 +1627,9 @@ PaiShoGames.Board.prototype.setPossibleMovesForMovement = function(movementInfo,
 		} else if (movementInfo.type === Trifle.MovementType.diagonal) {
 			/* Diagonal movement, jumping across the lines up/down/left/right as looking at the board */
 			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.diagonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+		} else if (movementInfo.type === Trifle.MovementType.orthAndDiag) {
+			/* Orthogonal and Diagonal movement (surrounding spaces) */
+			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.orthAndDiagMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
 		} else if (movementInfo.type === Trifle.MovementType.jumpAlongLineOfSight) {
 			/* Jump to tiles along line of sight */
 			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.jumpAlongLineOfSightMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, 1, 0);
@@ -1657,6 +1660,12 @@ PaiShoGames.Board.standardMovementFunction = function(board, originPoint, boardP
 PaiShoGames.Board.diagonalMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
 	var mustPreserveDirection = Trifle.TileInfo.movementMustPreserveDirection(movementInfo);
 	return board.getAdjacentDiagonalPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
+};
+PaiShoGames.Board.orthAndDiagMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
+	/* TODO: Test preserve direction */
+	var mustPreserveDirection = Trifle.TileInfo.movementMustPreserveDirection(movementInfo);
+	return board.getAdjacentPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo)
+			.concat(board.getAdjacentDiagonalPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo));
 };
 PaiShoGames.Board.jumpAlongLineOfSightMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
 	return board.getPointsNextToTilesInLineOfSight(movementInfo, originPoint);

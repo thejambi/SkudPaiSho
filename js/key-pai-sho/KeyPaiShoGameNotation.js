@@ -38,12 +38,12 @@ KeyPaiSho.NotationMove.prototype.analyzeMove = function() {
 		return;
 	}
 
-	// If starts with an R or W, then it's Planting
+	/* Set Move Type */
 	var char0 = moveText.charAt(0);
-	if (char0 === 'R' || char0 === 'W') {
-		this.moveType = PLANTING;
-	} else if (char0 === '(') {
+	if (char0 === '(') {
 		this.moveType = ARRANGING;
+	} else {
+		this.moveType = PLANTING;
 	}
 
 	if (this.moveType === PLANTING) {
