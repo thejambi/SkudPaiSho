@@ -43,6 +43,7 @@ var QueryString = function () {
   var tileDesignTypeValues = {
 	  // hlowe: "Modern Tiles v1",
 	  tgggyatso: "The Garden Gate Gyatso Tiles",
+	  gaoling: "TGG Gaoling",
 	  tggproject: "TGG Pai Sho Project",
 	  hlowenew: "Modern Tiles",
 	  vescucci: "Vescucci Tiles",
