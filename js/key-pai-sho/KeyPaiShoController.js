@@ -468,18 +468,13 @@ KeyPaiSho.Controller.prototype.getPointMessage = function(htmlPoint) {
 
 	var heading;
 	var message = [];
-	if (boardPoint.hasTile()) {
+	/* if (boardPoint.hasTile()) {
 		var tileMessage = this.getHelpMessageForTile(boardPoint.tile);
 		tileMessage.message.forEach(function(messageString){
 			message.push(messageString);
 		});
 		heading = tileMessage.heading;
-		// Specific tile message
-		/**
-		Rose
-		* In Harmony with Chrysanthemum to the north
-		* Trapped by Orchid
-		*/
+		
 		var tileHarmonies = this.theGame.board.harmonyManager.getHarmoniesWithThisTile(boardPoint.tile);
 		if (tileHarmonies.length > 0) {
 			var bullets = [];
@@ -510,7 +505,7 @@ KeyPaiSho.Controller.prototype.getPointMessage = function(htmlPoint) {
 		message.push(getWhitePointMessage());
 	} else if (boardPoint.isType(GATE)) {
 		message.push(getGatePointMessage());
-	}
+	} */
 
 	return {
 		heading: heading,
@@ -521,7 +516,7 @@ KeyPaiSho.Controller.prototype.getPointMessage = function(htmlPoint) {
 KeyPaiSho.Controller.prototype.getHelpMessageForTile = function(tile) {
 	var message = [];
 
-	var tileCode = tile.code;
+	/* var tileCode = tile.code;
 
 	var heading = KeyPaiSho.Tile.getTileName(tileCode);
 
@@ -643,7 +638,7 @@ KeyPaiSho.Controller.prototype.getHelpMessageForTile = function(tile) {
 			message.push("The owner of the Lion Turtle owns the Harmonies that include both players' tiles");
 			message.push("(Overlap with other Lion Turtle tiles can combine this effect, so Harmonies can potentially belong to both players)");
 		}
-	}
+	} */
 
 	return {
 		heading: heading,

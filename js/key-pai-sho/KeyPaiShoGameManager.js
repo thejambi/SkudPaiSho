@@ -17,6 +17,8 @@ KeyPaiSho.GameManager = function(actuator, ignoreActuate, isCopy) {
 KeyPaiSho.GameManager.prototype.setup = function (ignoreActuate) {
 	this.board = new KeyPaiSho.Board();
 
+	this.board.setHarmonyMinima(4);	// Default value
+
 	// Update the actuator
 	if (!ignoreActuate) {
 		this.actuate();
@@ -179,8 +181,14 @@ KeyPaiSho.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate,
 };
 
 KeyPaiSho.GameManager.prototype.revealOpenGates = function(player, tile, moveNum, ignoreActuate) {
-	this.board.setOpenGatePossibleMoves(player, tile);
+	if (this.board.playerControlsLessThanTwoGates(player)
+			&& !this.board.playerHasCenterPointGate(player)) {
+		this.board.setOpenGatePossibleMoves(player, tile);
 
+		if (tile.code === KeyPaiSho.TileCodes.Lotus) {
+			this.board.setCenterPointGatePossibleMove(player, tile);
+		}
+	}
 	if (!ignoreActuate) {
 		this.actuate();
 	}

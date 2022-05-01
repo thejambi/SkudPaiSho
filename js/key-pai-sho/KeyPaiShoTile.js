@@ -79,44 +79,11 @@ KeyPaiSho.Tile.prototype.getImageName = function() {
 };
 
 KeyPaiSho.Tile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTurtle) {
-	/* 	if (!(this.type === BASIC_FLOWER || this.code === KeyPaiSho.TileCodes.Lotus)
-			|| !(otherTile.type === BASIC_FLOWER || otherTile.code === KeyPaiSho.TileCodes.Lotus)) {
-			return false;
-		}
-
-	if ((this.code === KeyPaiSho.TileCodes.Lotus && otherTile.type !== BASIC_FLOWER)
-		|| (otherTile.code === KeyPaiSho.TileCodes.Lotus && this.type !== BASIC_FLOWER)) {
-		return false;
-	}
-
-	if (this.drained || otherTile.drained) {
-		return false;
-	}
-
-	// Check White Lotus (Lotus can belong to either player)
-	if ((this.code === KeyPaiSho.TileCodes.Lotus && otherTile.type === BASIC_FLOWER) 
-		|| (otherTile.code === KeyPaiSho.TileCodes.Lotus && this.type == BASIC_FLOWER)) {
-		return true;
-	}
-
-	// For normal Harmonies, tiles must belong to same player
-	if (!surroundsLionTurtle && otherTile.ownerName !== this.ownerName) {
-		return false;
-	}
-
-	// Same color and number difference of 1
-	if (this.basicColorCode === otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 1 || surroundsLionTurtle) {
-		return true;
-		// if not that, check different color and number difference of 2?
-	} else if (this.basicColorCode !== otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 2 || surroundsLionTurtle) {
-		return true;
-	}
-
-	if (superHarmonies && this.basicValue !== otherTile.basicValue) {
-		return true;
-	} */
-
 	if (this.type !== BASIC_FLOWER && this.code !== KeyPaiSho.TileCodes.Lotus) {
+		return false;
+	}
+	
+	if (this.type === BASIC_FLOWER && otherTile.type === BASIC_FLOWER && this.code === otherTile.code) {
 		return false;
 	}
 

@@ -9,7 +9,11 @@ KeyPaiSho.Board = function() {
 	this.rockRowAndCols = [];
 	this.playedWhiteLotusTiles = [];
 	this.winners = [];
-}
+};
+
+KeyPaiSho.Board.prototype.setHarmonyMinima = function(harmonyMinima) {
+	this.harmonyManager.setHarmonyMinima(harmonyMinima);
+};
 
 KeyPaiSho.Board.prototype.brandNew = function () {
 	var cells = [];
@@ -1661,9 +1665,13 @@ KeyPaiSho.Board.prototype.getTileHarmonies = function(boardPoint) {
 
 KeyPaiSho.Board.prototype.getHarmonyInDirection = function(tile, fromPoint, rowChange, colChange, maxDistance) {
 	/* Possible Harmony begins two steps away */
-	var rowToCheck = fromPoint.row + rowChange*2;
-	var colToCheck = fromPoint.col + colChange*2;
-	var distance = 2;
+	var startDistance = 2;
+	if (tile.code === KeyPaiSho.TileCodes.Lotus) {
+		startDistance = 1;
+	}
+	var rowToCheck = fromPoint.row + rowChange * startDistance;
+	var colToCheck = fromPoint.col + colChange * startDistance;
+	var distance = startDistance;
 
 	var checkPoint = this.cells[rowToCheck][colToCheck];
 
@@ -2194,6 +2202,13 @@ KeyPaiSho.Board.prototype.playerHasNoGrowingFlowers = function(player) {
 	}
 
 	return true;
+};
+
+KeyPaiSho.Board.prototype.playerHasCenterPointGate = function(player) {
+	var centerPoint = this.cells[8][8];
+	return centerPoint.isType(GATE) 
+		&& centerPoint.hasTile() 
+		&& centerPoint.tile.ownerName === player;
 };
 
 KeyPaiSho.Board.prototype.revealSpecialFlowerPlacementPoints = function(player) {
