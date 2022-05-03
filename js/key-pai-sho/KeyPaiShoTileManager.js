@@ -34,7 +34,7 @@ KeyPaiSho.TileManager.prototype.loadTileSet = function(ownerCode) {
 	}
 
 	/* Keep the next line to test White Lotus */
-	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Lotus, ownerCode));
+	// tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Lotus, ownerCode));
 
 	// 3 of each basic flower
 	for (var i = 0; i < 3; i++) {

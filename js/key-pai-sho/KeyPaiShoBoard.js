@@ -1673,7 +1673,7 @@ KeyPaiSho.Board.prototype.getHarmonyInDirection = function(tile, fromPoint, rowC
 	var colToCheck = fromPoint.col + colChange * startDistance;
 	var distance = startDistance;
 
-	var checkPoint = this.cells[rowToCheck][colToCheck];
+	var checkPoint = this.cells[rowToCheck] && this.cells[rowToCheck][colToCheck];
 
 	while (this.isValidRowCol(checkPoint) && !checkPoint.hasTileOfType([BASIC_FLOWER, SPECIAL_FLOWER]) && !checkPoint.isType(GATE) && distance <= maxDistance) {
 		distance++;

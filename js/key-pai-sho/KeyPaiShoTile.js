@@ -149,6 +149,20 @@ KeyPaiSho.Tile.prototype.hasDiagonalMovement = function() {
 	}
 };
 
+KeyPaiSho.Tile.prototype.getMovementDirectionWording = function() {
+	var directionWording = "";
+	if (this.hasOrthogonalMovement()) {
+		directionWording += "Horizontally/Vertically";
+	}
+	if (this.hasDiagonalMovement()) {
+		if (directionWording.length > 1) {
+			directionWording += " and ";
+		}
+		directionWording += "Diagonally";
+	}
+	return directionWording;
+};
+
 KeyPaiSho.Tile.prototype.movementMustPreserveDirection = function() {
 	if (this.code === KeyPaiSho.TileCodes.Lotus) {
 		return false;

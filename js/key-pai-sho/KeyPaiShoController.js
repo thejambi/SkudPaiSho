@@ -93,7 +93,16 @@ KeyPaiSho.Controller.prototype.resetMove = function() {
 };
 
 KeyPaiSho.Controller.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Key Pai Sho</h4> <p>Key Pai Sho is built to replicate the Pai Sho board states seen on screen in ATLA Book 1.</p>";
+	return "<h4>Key Pai Sho</h4>"
+		+ "<p>This game is still being programmed, but can be played with the tiles currently available. Effect Tiles will be added periodically until the complete set is available. Thank you.</p>"
+		+ "<p>Key Pai Sho is a game of harmony and skill. The aim is to form an unbroken chain of harmonies around the center of the board. Harmonies follow 4 important Rules:</p>"
+		+ "<ul>"
+		+ "<li>Formed if one Player's Key Flower can move to another of their Flowers' squares."
+		+ "Blocked by opposing Flower Tiles.</li>"
+		+ "<li>Need at least one space in between the Flowers.</li>"
+		+ "<li>Cannot form between Flowers of the same type.</li>"
+		+ "</ul>"
+		+ "<p>During a turn a player can either Plant a Flower in a Gate or Move one of their Tiles. A player can have up to 2 Planted Flowers at once.</p>";
 };
 
 KeyPaiSho.Controller.prototype.getAdditionalMessage = function() {
@@ -516,129 +525,25 @@ KeyPaiSho.Controller.prototype.getPointMessage = function(htmlPoint) {
 KeyPaiSho.Controller.prototype.getHelpMessageForTile = function(tile) {
 	var message = [];
 
-	/* var tileCode = tile.code;
+	var tileCode = tile.code;
 
 	var heading = KeyPaiSho.Tile.getTileName(tileCode);
 
 	message.push(tile.ownerName + "'s tile");
 
-	if (tileCode.length > 1) {
+	if (tile.type === BASIC_FLOWER) {
 		var colorCode = tileCode.charAt(0);
-		var tileNum = parseInt(tileCode.charAt(1));
 
-		var harmTileNum = tileNum - 1;
-		var harmTileColor = colorCode;
-		if (harmTileNum < 3) {
-			harmTileNum = 5;
-			if (colorCode === 'R') {
-				harmTileColor = 'W';
-			} else {
-				harmTileColor = 'R';
-			}
+		var noLandInColor = "Red";
+		if (colorCode === "R") {
+			noLandInColor = "White";
 		}
 
-		var harmTile1 = KeyPaiSho.Tile.getTileName(harmTileColor + harmTileNum);
-
-		harmTileNum = tileNum + 1;
-		harmTileColor = colorCode;
-		if (harmTileNum > 5) {
-			harmTileNum = 3;
-			if (colorCode === 'R') {
-				harmTileColor = 'W';
-			} else {
-				harmTileColor = 'R';
-			}
-		}
-
-		var harmTile2 = KeyPaiSho.Tile.getTileName(harmTileColor + harmTileNum);
-
-		harmTileNum = tileNum;
-		if (colorCode === 'R') {
-			harmTileColor = 'W';
-		} else {
-			harmTileColor = 'R';
-		}
-		var clashTile = KeyPaiSho.Tile.getTileName(harmTileColor + harmTileNum);
-
-		message.push("Basic Flower Tile");
-		message.push("Can move up to " + tileNum + " spaces");
-		message.push("Forms Harmony with " + harmTile1 + " and " + harmTile2);
-		message.push("Clashes with " + clashTile);
-	} else {
-		if (tileCode === 'R') {
-			heading = "Accent Tile: Rock";
-			if (simplest) {
-				message.push("The Rock disrupts Harmonies and cannot be moved by a Wheel.");
-			} else if (rocksUnwheelable) {
-				if (simpleRocks) {
-					message.push("The Rock blocks Harmonies and cannot be moved by a Wheel.");
-				} else {
-					message.push("The Rock cancels Harmonies on horizontal and vertical lines it lies on. A Rock cannot be moved by a Wheel.");
-				}
-			} else {
-				message.push("The Rock cancels Harmonies on horizontal and vertical lines it lies on.");
-			}
-		} else if (tileCode === 'W') {
-			heading = "Accent Tile: Wheel";
-			if (rocksUnwheelable || simplest) {
-				message.push("The Wheel rotates all surrounding tiles one space clockwise but cannot move a Rock (cannot move tiles off the board or onto or off of a Gate).");
-			} else {
-				message.push("The Wheel rotates all surrounding tiles one space clockwise (cannot move tiles off the board or onto or off of a Gate).");
-			}
-		} else if (tileCode === 'K') {
-			heading = "Accent Tile: Knotweed";
-			if (newKnotweedRules) {
-				message.push("The Knotweed drains surrounding Flower Tiles so they are unable to form Harmony.");
-			} else {
-				message.push("The Knotweed drains surrounding Basic Flower Tiles so they are unable to move or form Harmony.");
-			}
-		} else if (tileCode === 'B') {
-			heading = "Accent Tile: Boat";
-			if (simplest || rocksUnwheelable) {
-				message.push("The Boat moves a Flower Tile to a surrounding space or removes an Accent tile.");
-			} else if (rocksUnwheelable) {
-				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Rock or Knotweed tile.");
-			} else {
-				message.push("The Boat moves a Flower Tile to a surrounding space or removes a Knotweed tile.");
-			}
-		} else if (tileCode === 'L') {
-			heading = "Special Flower: White Lotus";
-			message.push("Can move up to 2 spaces");
-			message.push("Forms Harmony with all Basic Flower Tiles of either player");
-			if (!lotusNoCapture && !simplest) {
-				message.push("Can be captured by any Flower Tile");
-			}
-		} else if (tileCode === 'O') {
-			heading = "Special Flower: Orchid";
-			message.push("Can move up to 6 spaces");
-			message.push("Traps opponent's surrounding Blooming Flower Tiles so they cannot move");
-			if (!simplest) {
-				message.push("Can capture Flower Tiles if you have a Blooming White Lotus");
-			}
-			if (lotusNoCapture || simplest) {
-				message.push("Can be captured by any Flower Tile if you have a Blooming White Lotus");
-			} else {
-				message.push("Can be captured by any Basic Flower Tile if your White Lotus has been played");
-			}
-		} else if (tileCode === 'M') {
-			heading = "Accent Tile: Bamboo";
-			message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
-			// message.push("When played, return each surrounding tile to owner's hand");
-			message.push("If played on a point surrounding a Blooming Flower Tile belonging to the owner (but not surrounding a tile in a Gate), return each surrounding tile to owner's hand when played.");
-			message.push("Tiles surrounding Bamboo cannot be captured");
-		} else if (tileCode === 'P') {
-			heading = "Accent Tile: Pond";
-			message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
-			message.push("Flower Tiles may be Planted on points surrounding a Pond");
-			message.push("(Tiles are Blooming after being Planted)");
-		} else if (tileCode === 'T') {
-			heading = "Accent Tile: Lion Turtle";
-			message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
-			message.push("Flower tiles surrounding a Lion Turtle form Harmony with all Basic Flower Tiles of either player");
-			message.push("The owner of the Lion Turtle owns the Harmonies that include both players' tiles");
-			message.push("(Overlap with other Lion Turtle tiles can combine this effect, so Harmonies can potentially belong to both players)");
-		}
-	} */
+		message.push("Key Flower Tile");
+		message.push("Cannot enter fully " + noLandInColor + " Garden Squares");
+		message.push("Cannot Move over other Tiles");
+		message.push("Can Move and Harmonize up to " + tile.getMoveDistance() + " spaces " + tile.getMovementDirectionWording());
+	}
 
 	return {
 		heading: heading,
