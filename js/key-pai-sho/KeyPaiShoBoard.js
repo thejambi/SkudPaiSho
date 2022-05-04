@@ -169,8 +169,8 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 			KeyPaiSho.BoardPoint.red(),
 			KeyPaiSho.BoardPoint.red(),
 			KeyPaiSho.BoardPoint.redNeutral(),
-			KeyPaiSho.BoardPoint.nonPlayable(),
-			KeyPaiSho.BoardPoint.gate()
+			KeyPaiSho.BoardPoint.gate(),
+			KeyPaiSho.BoardPoint.nonPlayable()
 		]);
 
 	cells[9] = this.newRow(18,
@@ -311,7 +311,7 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.neutral(),
-			KeyPaiSho.BoardPoint.nonPlayable(),
+			KeyPaiSho.BoardPoint.gate(),
 			KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.neutral(),
@@ -322,7 +322,7 @@ KeyPaiSho.Board.prototype.brandNew = function () {
 	cells[17] = this.newRow(6,
 		[KeyPaiSho.BoardPoint.neutral(),
 			KeyPaiSho.BoardPoint.nonPlayable(),
-			KeyPaiSho.BoardPoint.gate(),
+			KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.nonPlayable(),
 			KeyPaiSho.BoardPoint.neutral()
@@ -1977,7 +1977,7 @@ KeyPaiSho.Board.prototype.canMoveHereMoreEfficientlyAlready = function(boardPoin
 KeyPaiSho.Board.prototype.getStartPointsFromGatePoint = function(boardPoint) {
 	if (boardPoint.isType(GATE)) {
 		var moveStartPoints = [];
-		if (boardPoint.row === 17 && boardPoint.col === 8) {
+		if (boardPoint.row === 16 && boardPoint.col === 8) {
 			moveStartPoints = [
 				this.cells[16][7],
 				this.cells[15][7],
@@ -1986,7 +1986,7 @@ KeyPaiSho.Board.prototype.getStartPointsFromGatePoint = function(boardPoint) {
 				this.cells[15][10],
 				this.cells[16][10]
 			];
-		} else if (boardPoint.row === 8 && boardPoint.col === 17) {
+		} else if (boardPoint.row === 8 && boardPoint.col === 16) {
 			moveStartPoints = [
 				this.cells[10][16],
 				this.cells[10][15],

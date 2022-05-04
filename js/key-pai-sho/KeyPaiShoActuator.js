@@ -161,6 +161,11 @@ KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 					&& isSamePoint(moveToAnimate.bonusEndPoint, boardPoint.col, boardPoint.row);
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
+
+		if (boardPoint.isType(GATE)) {
+			this.adjustGatePointLocation(boardPoint, theDiv);
+		}
+
 		theDiv.classList.add("activePoint");
 		if (boardPoint.isType(MARKED)) {
 			theDiv.classList.add("markedPoint");
@@ -305,7 +310,12 @@ KeyPaiSho.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		return;
 	}
 
-	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y, placedOnAccent = false, boatRemovingAccent = false;
+	var x = boardPoint.col;
+	var y = boardPoint.row;
+	var ox = x;
+	var oy = y;
+	var placedOnAccent = false;
+	var boatRemovingAccent = false;
 
 	if (moveToAnimate.hasHarmonyBonus()) {
 		debug(moveToAnimate.bonusTileCode);
@@ -399,6 +409,10 @@ KeyPaiSho.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	ax = ((ax - ox) * pointSizeMultiplierX);
 	ay = ((ay - oy) * pointSizeMultiplierY);
 	requestAnimationFrame(function() {
+		if (boardPoint.isType(GATE)) {
+			ax += 0.5;
+			ay += 0.5;
+		}
 		theImg.style.left = ax+unitString;
 		theImg.style.top = ay+unitString;
 		// theImg.style.transform = "scale(1)";	// This will size back to normal while moving after "picked up" scale
@@ -427,6 +441,22 @@ KeyPaiSho.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 			}
 		});
 	}, moveAnimationBeginStep === 0 ? pieceAnimationLength : 0);
+};
+
+KeyPaiSho.Actuator.prototype.adjustGatePointLocation = function(boardPoint, theDiv) {
+	var pointSizeMultiplierX = 34;
+	var pointSizeMultiplierY = pointSizeMultiplierX;
+	var unitString = "px";
+
+	/* For small screen size using dynamic vw units */
+	if (window.innerWidth <= 612) {
+		pointSizeMultiplierX = 5.5555;
+		pointSizeMultiplierY = 5.611;
+		unitString = "vw";
+	}
+	
+	theDiv.style.left = (0.5 * pointSizeMultiplierX) + unitString;
+	theDiv.style.top = (0.5 * pointSizeMultiplierY) + unitString;
 };
 
 KeyPaiSho.Actuator.prototype.printBoard = function(board) {

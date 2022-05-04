@@ -502,24 +502,42 @@ KeyPaiSho.Controller.prototype.getPointMessage = function(htmlPoint) {
 		if (boardPoint.tile.trapped) {
 			message.push("Currently <em>trapped</em> by an Orchid.")
 		}
-	}
+	} */
 	
 	if (boardPoint.isType(NEUTRAL)) {
-		message.push(getNeutralPointMessage());
-	} else if (boardPoint.isType(RED) && boardPoint.isType(WHITE)) {
-		message.push(getRedWhitePointMessage());
+		message.push(this.getNeutralSpaceMessage());
 	} else if (boardPoint.isType(RED)) {
-		message.push(getRedPointMessage());
+		message.push(this.getRedSpaceMessage());
 	} else if (boardPoint.isType(WHITE)) {
-		message.push(getWhitePointMessage());
+		message.push(this.getWhiteSpaceMessage());
 	} else if (boardPoint.isType(GATE)) {
-		message.push(getGatePointMessage());
-	} */
+		message.push(this.getGatePointMessage());
+	}
 
 	return {
 		heading: heading,
 		message: message
 	}
+};
+
+KeyPaiSho.Controller.prototype.getNeutralSpaceMessage = function() {
+	var msg = "<h4>Neutral Square</h4>";
+	return msg;
+};
+
+KeyPaiSho.Controller.prototype.getRedSpaceMessage = function() {
+	var msg = "<h4>Red Square</h4>";
+	return msg;
+};
+
+KeyPaiSho.Controller.prototype.getWhiteSpaceMessage = function() {
+	var msg = "<h4>White Square</h4>";
+	return msg;
+};
+
+KeyPaiSho.Controller.prototype.getGatePointMessage = function() {
+	var msg = "<h4>Gate</h4>";
+	return msg;
 };
 
 KeyPaiSho.Controller.prototype.getHelpMessageForTile = function(tile) {
@@ -534,9 +552,9 @@ KeyPaiSho.Controller.prototype.getHelpMessageForTile = function(tile) {
 	if (tile.type === BASIC_FLOWER) {
 		var colorCode = tileCode.charAt(0);
 
-		var noLandInColor = "Red";
+		var noLandInColor = "Dark";
 		if (colorCode === "R") {
-			noLandInColor = "White";
+			noLandInColor = "Light";
 		}
 
 		message.push("Key Flower Tile");
