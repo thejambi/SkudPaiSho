@@ -27,6 +27,7 @@ KeyPaiSho.Actuator.prototype.setAnimationOn = function(isOn) {
 
 KeyPaiSho.Actuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep) {
 	var self = this;
+	this.board = board;
 	// debugStackTrace();
 	// self.printBoard(board);
 
@@ -161,6 +162,7 @@ KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 					&& isSamePoint(moveToAnimate.bonusEndPoint, boardPoint.col, boardPoint.row);
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
+		theDiv.style.zIndex = 3;
 
 		if (boardPoint.isType(GATE)) {
 			this.adjustGatePointLocation(boardPoint, theDiv);
@@ -222,6 +224,8 @@ KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 					e.preventDefault();
 				});
 		}
+	} else {
+		theDiv.style.zIndex = 1;
 	}
 
 	if (isAnimationPointOfBoatRemovingAccentTile) {
@@ -317,6 +321,8 @@ KeyPaiSho.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	var placedOnAccent = false;
 	var boatRemovingAccent = false;
 
+	var self = this;
+
 	if (moveToAnimate.hasHarmonyBonus()) {
 		debug(moveToAnimate.bonusTileCode);
 		if (isSamePoint(moveToAnimate.bonusEndPoint, ox, oy)) {// Placed on bonus turn
@@ -397,8 +403,19 @@ KeyPaiSho.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		unitString = "vw";
 	}
 
-	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
-	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+	var xOffset = 0;
+	var yOffset = 0;
+	var startPointRowAndCol = moveToAnimate.startPoint && moveToAnimate.startPoint.rowAndColumn;
+	if (startPointRowAndCol) {
+		var originalBoardPoint = self.board.cells[startPointRowAndCol.row] && self.board.cells[startPointRowAndCol.row][startPointRowAndCol.col];
+		if (originalBoardPoint && originalBoardPoint.isType(GATE)
+				&& isSamePoint(moveToAnimate.endPoint, ox, oy)) {
+			xOffset += 0.5;
+			yOffset += 0.5;
+		}
+	}
+	theImg.style.left = ((x - ox + xOffset) * pointSizeMultiplierX) + unitString;
+	theImg.style.top = ((y - oy + yOffset) * pointSizeMultiplierY) + unitString;
 	if (placedOnAccent && !boatRemovingAccent) {
 		theImg.style.visibility = "hidden";
 		if (piecePlaceAnimation === 1) {
@@ -409,10 +426,6 @@ KeyPaiSho.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	ax = ((ax - ox) * pointSizeMultiplierX);
 	ay = ((ay - oy) * pointSizeMultiplierY);
 	requestAnimationFrame(function() {
-		if (boardPoint.isType(GATE)) {
-			ax += 0.5;
-			ay += 0.5;
-		}
 		theImg.style.left = ax+unitString;
 		theImg.style.top = ay+unitString;
 		// theImg.style.transform = "scale(1)";	// This will size back to normal while moving after "picked up" scale
