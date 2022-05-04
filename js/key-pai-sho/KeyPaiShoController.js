@@ -110,37 +110,14 @@ KeyPaiSho.Controller.prototype.getAdditionalMessage = function() {
 
 	if (this.gameNotation.moves.length === 0) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-			if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting ALL of your Accent Tiles. <br />";
-			} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting 8 of your Accent Tiles. <br />";
-			} else {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by selecting your 4 Accent Tiles. <br />";
-			}
+			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making the first move. <br />";
 		} else {
-			if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
-				msg += "Select ALL Accent Tiles to begin the game.";
-			} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
-				msg += "Select 8 Accent Tiles to play with.";
-			} else {
-				msg += "Select 6 Effect Tiles to play with.";
-			}
+			msg += "Select 6 Effect Tiles to play with.";
 		}
 
 		if (!playingOnlineGame()) {
 			msg += getGameOptionsMessageHtml(GameType.KeyPaiSho.gameOptions);
 		}
-	} else if (this.gameNotation.moves.length === 1) {
-		if (gameOptionEnabled(OPTION_ALL_ACCENT_TILES)) {
-			msg += "Select ALL Accent Tiles to play with,";
-		} else if (gameOptionEnabled(OPTION_DOUBLE_ACCENT_TILES)) {
-			msg += "Select 8 Accent Tiles to play with,";
-		} else {
-			msg += "Select 4 Accent Tiles to play with,";
-		}
-		msg += " then Plant a Basic Flower Tile."
-	} else if (this.gameNotation.moves.length === 2) {
-		msg += "Plant a Basic Flower Tile.";
 	}
 
 	return msg;
