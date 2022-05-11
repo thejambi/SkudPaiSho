@@ -205,16 +205,14 @@ KeyPaiSho.Tile.getTileName = function(tileCode) {
 			} else if (tileNum === '5') {
 				name = "Rhododendron";
 			}
-			name += " (Red " + tileNum + ")";
 		} else if (colorCode === 'W') {
 			if (tileNum === '3') {
-				name = "Jasmine";
-			} else if (tileNum === '4') {
 				name = "Lily";
+			} else if (tileNum === '4') {
+				name = "Jasmine";
 			} else if (tileNum === '5') {
 				name = "White Jade";
 			}
-			name += " (White " + tileNum + ")";
 		}
 	} else {
 		if (tileCode === 'R') {
