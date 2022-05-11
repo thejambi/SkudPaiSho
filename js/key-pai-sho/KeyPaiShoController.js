@@ -58,12 +58,12 @@ KeyPaiSho.Controller.prototype.getNewGameNotation = function() {
 };
 
 KeyPaiSho.Controller.getHostTilesContainerDivs = function() {
-	var divs = '<div class="HR3"></div><div class="HW3"></div> <div class="HR4"></div><div class="HW4"></div> <div class="HR5"></div><div class="HW5"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HLO"></div> <div class="HOR"></div>';
+	var divs = '<div class="HR3"></div><div class="HW3"></div> <div class="HRO"></div><div class="HWO"></div> <div class="HRD"></div><div class="HWD"></div> <br class="clear" /> <div class="HR"></div> <div class="HW"></div> <div class="HK"></div> <div class="HB"></div> <div class="HLO"></div> <div class="HOR"></div>';
 	return divs;
 };
 
 KeyPaiSho.Controller.getGuestTilesContainerDivs = function() {
-	var divs = '<div class="GR3"></div><div class="GW3"></div> <div class="GR4"></div><div class="GW4"></div> <div class="GR5"></div><div class="GW5"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GLO"></div> <div class="GOR"></div>';
+	var divs = '<div class="GR3"></div><div class="GW3"></div> <div class="GRO"></div><div class="GWO"></div> <div class="GRD"></div><div class="GWD"></div> <br class="clear" /> <div class="GR"></div> <div class="GW"></div> <div class="GK"></div> <div class="GB"></div> <div class="GLO"></div> <div class="GOR"></div>';
 	return divs;
 };
 
@@ -158,7 +158,7 @@ KeyPaiSho.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 		return;
 	}
 
-	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
+	var divName = tileDiv.getAttribute("name");	// Like: GWD or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 	var playerCode = divName.charAt(0);
 	var tileCode = divName.substring(1);
@@ -432,7 +432,7 @@ KeyPaiSho.Controller.prototype.skipHarmonyBonus = function() {
 };
 
 KeyPaiSho.Controller.prototype.getTileMessage = function(tileDiv) {
-	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
+	var divName = tileDiv.getAttribute("name");	// Like: GWD or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 
 	var tile = new KeyPaiSho.Tile(divName.substring(1), divName.charAt(0));

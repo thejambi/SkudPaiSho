@@ -1,6 +1,12 @@
 /* Key Pai Sho Tile */
 
 KeyPaiSho.TileCodes = {
+	Red3: 'R3',
+	RedO: 'RO',	// Red "Orthogonal"
+	RedD: 'RD',	// Red "Diagonal"
+	White3: 'W3',
+	WhiteO: 'WO',
+	WhiteD: 'WD',
 	Lotus: 'LO',
 	Orchid: 'OR'
 };
@@ -110,11 +116,11 @@ KeyPaiSho.Tile.prototype.clashesWith = function(otherTile) {
 
 KeyPaiSho.Tile.prototype.getMoveDistance = function() {
 	if (this.type === BASIC_FLOWER) {
-		var tileValue = parseInt(this.basicValue);
-		if (tileValue === 4) {
-			tileValue++;
+		if (this.basicValue === '3') {
+			return 3;
+		} else {
+			return 5
 		}
-		return tileValue;
 	} else if (this.code === KeyPaiSho.TileCodes.Lotus) {
 		return 2;
 	} else if (this.code === KeyPaiSho.TileCodes.Orchid) {
@@ -133,8 +139,7 @@ KeyPaiSho.Tile.prototype.getHarmonyDistance = function() {
 
 KeyPaiSho.Tile.prototype.hasOrthogonalMovement = function() {
 	if (this.type === BASIC_FLOWER) {
-		var tileValue = parseInt(this.basicValue);
-		return tileValue === 3 || tileValue === 4;
+		return this.basicValue === '3' || this.basicValue === 'O';
 	} else {
 		return this.code === KeyPaiSho.TileCodes.Lotus;
 	}
@@ -142,8 +147,7 @@ KeyPaiSho.Tile.prototype.hasOrthogonalMovement = function() {
 
 KeyPaiSho.Tile.prototype.hasDiagonalMovement = function() {
 	if (this.type === BASIC_FLOWER) {
-		var tileValue = parseInt(this.basicValue);
-		return tileValue === 3 || tileValue === 5;
+		return this.basicValue === '3' || this.basicValue === 'D';
 	} else {
 		return this.code === KeyPaiSho.TileCodes.Lotus;
 	}
@@ -200,17 +204,17 @@ KeyPaiSho.Tile.getTileName = function(tileCode) {
 		if (colorCode === 'R') {
 			if (tileNum === '3') {
 				name = "Rose";
-			} else if (tileNum === '4') {
+			} else if (tileNum === 'O') {
 				name = "Chrysanthemum";
-			} else if (tileNum === '5') {
+			} else if (tileNum === 'D') {
 				name = "Rhododendron";
 			}
 		} else if (colorCode === 'W') {
 			if (tileNum === '3') {
 				name = "Lily";
-			} else if (tileNum === '4') {
+			} else if (tileNum === 'O') {
 				name = "Jasmine";
-			} else if (tileNum === '5') {
+			} else if (tileNum === 'D') {
 				name = "White Jade";
 			}
 		}

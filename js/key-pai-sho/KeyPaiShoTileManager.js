@@ -38,12 +38,12 @@ KeyPaiSho.TileManager.prototype.loadTileSet = function(ownerCode) {
 
 	// 3 of each basic flower
 	for (var i = 0; i < 3; i++) {
-		tiles.push(new KeyPaiSho.Tile("R3", ownerCode));
-		tiles.push(new KeyPaiSho.Tile("R4", ownerCode));
-		tiles.push(new KeyPaiSho.Tile("R5", ownerCode));
-		tiles.push(new KeyPaiSho.Tile("W3", ownerCode));
-		tiles.push(new KeyPaiSho.Tile("W4", ownerCode));
-		tiles.push(new KeyPaiSho.Tile("W5", ownerCode));
+		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Red3, ownerCode));
+		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.RedO, ownerCode));
+		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.RedD, ownerCode));
+		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.White3, ownerCode));
+		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.WhiteO, ownerCode));
+		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.WhiteD, ownerCode));
 	}
 
 	return tiles;
@@ -88,12 +88,12 @@ KeyPaiSho.TileManager.prototype.loadOneOfEach = function(ownerCode) {
 		tiles.push(new KeyPaiSho.Tile('T', ownerCode));
 	}
 
-	tiles.push(new KeyPaiSho.Tile("R3", ownerCode));
-	tiles.push(new KeyPaiSho.Tile("R4", ownerCode));
-	tiles.push(new KeyPaiSho.Tile("R5", ownerCode));
-	tiles.push(new KeyPaiSho.Tile("W3", ownerCode));
-	tiles.push(new KeyPaiSho.Tile("W4", ownerCode));
-	tiles.push(new KeyPaiSho.Tile("W5", ownerCode));
+	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Red3, ownerCode));
+	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.RedO, ownerCode));
+	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.RedD, ownerCode));
+	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.White3, ownerCode));
+	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.WhiteO, ownerCode));
+	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.WhiteD, ownerCode));
 
 	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Lotus, ownerCode));
 	tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Orchid, ownerCode));
