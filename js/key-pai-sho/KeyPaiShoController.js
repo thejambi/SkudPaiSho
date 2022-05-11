@@ -358,10 +358,14 @@ KeyPaiSho.Controller.prototype.pointClicked = function(htmlPoint) {
 			if (!bonusAllowed) {
 				// Move all set. Add it to the notation!
 				this.gameNotation.addMove(move);
-				if (playingOnlineGame()) {
-					callSubmitMove(null, null, move);
+				if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
+					createGameIfThatIsOk(GameType.KeyPaiSho.id);
 				} else {
-					finalizeMove();
+					if (playingOnlineGame()) {
+						callSubmitMove(null, null, move);
+					} else {
+						finalizeMove();
+					}
 				}
 			} else {
 				this.notationBuilder.status = READY_FOR_BONUS;
