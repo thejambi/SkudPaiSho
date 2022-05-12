@@ -1701,7 +1701,7 @@ KeyPaiSho.Board.prototype.getHarmonyInDirection = function(tile, fromPoint, rowC
 	var rowToCheck = fromPoint.row + rowChange;
 	var colToCheck = fromPoint.col + colChange;
 
-	var distance = startDistance;
+	var distance = 1;
 
 	var checkPoint = this.getBoardPoint(rowToCheck, colToCheck);
 
