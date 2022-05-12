@@ -25,7 +25,7 @@ KeyPaiSho.Actuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
 };
 
-KeyPaiSho.Actuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep) {
+KeyPaiSho.Actuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
 	var self = this;
 	this.board = board;
 	// debugStackTrace();
@@ -36,11 +36,11 @@ KeyPaiSho.Actuator.prototype.actuate = function(board, tileManager, markingManag
 	}
 
 	window.requestAnimationFrame(function() {
-		self.htmlify(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep);
+		self.htmlify(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile);
 	});
 };
 
-KeyPaiSho.Actuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep) {
+KeyPaiSho.Actuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
 	this.clearContainer(this.boardContainer);
 	this.clearContainer(this.arrowContainer);
 
@@ -62,7 +62,7 @@ KeyPaiSho.Actuator.prototype.htmlify = function(board, tileManager, markingManag
 				else if (!markingManager.pointIsMarked(cell) && cell.isType(MARKED)){
 					cell.removeType(MARKED);
 				}
-				self.addBoardPoint(cell, moveToAnimate, moveAnimationBeginStep);
+				self.addBoardPoint(cell, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile);
 			}
 		});
 	});
@@ -150,7 +150,7 @@ KeyPaiSho.Actuator.prototype.getTileSrcPath = function(tile) {
 	}
 };
 
-KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep) {
+KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
 	var self = this;
 
 	var theDiv = createBoardPointDiv(boardPoint);
@@ -238,7 +238,9 @@ KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 				{});
 		}
 		theDiv.appendChild(theImg);
-	} else if (boardPoint.hasTile()) {
+	} else if (boardPoint.hasTile()
+			&& !(hideCenterPointTile && boardPoint.row === 8 && boardPoint.col === 8)
+		) {
 		theDiv.classList.add("hasTile");
 
 		var theImg = document.createElement("img");

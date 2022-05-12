@@ -28,11 +28,11 @@ KeyPaiSho.GameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-KeyPaiSho.GameManager.prototype.actuate = function (moveToAnimate, moveAnimationBeginStep) {
+KeyPaiSho.GameManager.prototype.actuate = function (moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, this.markingManager, moveToAnimate, moveAnimationBeginStep);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile);
 	setGameLogText(this.gameLogText);
 };
 
@@ -176,12 +176,20 @@ KeyPaiSho.GameManager.prototype.revealPossibleMovePoints = function(player, boar
 	if (!boardPoint.hasTile()) {
 		return;
 	}
+
+	var hideCenterPointTile = false;
+
 	if (!this.board.playerHasCenterPointGate(player) || (boardPoint.row === 8 && boardPoint.col === 8)) {
+		if (boardPoint.row === 8 && boardPoint.col === 8
+				&& boardPoint.isType(GATE)) {
+			hideCenterPointTile = true;
+		}
+
 		this.board.setPossibleMovePoints(boardPoint);
 	}
 
 	if (!ignoreActuate) {
-		this.actuate();
+		this.actuate(null, null, hideCenterPointTile);
 	}
 };
 
