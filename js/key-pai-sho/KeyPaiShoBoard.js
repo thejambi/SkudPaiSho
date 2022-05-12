@@ -1697,20 +1697,22 @@ KeyPaiSho.Board.prototype.getHarmonyInDirection = function(tile, fromPoint, rowC
 	if (tile.code === KeyPaiSho.TileCodes.Lotus) {
 		startDistance = 1;
 	}
-	var rowToCheck = fromPoint.row + rowChange * startDistance;
-	var colToCheck = fromPoint.col + colChange * startDistance;
+	
+	var rowToCheck = fromPoint.row + rowChange;
+	var colToCheck = fromPoint.col + colChange;
+
 	var distance = startDistance;
 
-	var checkPoint = this.cells[rowToCheck] && this.cells[rowToCheck][colToCheck];
+	var checkPoint = this.getBoardPoint(rowToCheck, colToCheck);
 
 	while (this.isValidRowCol(checkPoint) && !checkPoint.hasTileOfType([BASIC_FLOWER, SPECIAL_FLOWER]) && !checkPoint.isType(GATE) && distance <= maxDistance) {
 		distance++;
 		rowToCheck += rowChange;
 		colToCheck += colChange;
-		checkPoint = this.cells[rowToCheck] && this.cells[rowToCheck][colToCheck];
+		checkPoint = this.getBoardPoint(rowToCheck, colToCheck);
 	}
 
-	if (distance <= maxDistance && this.isValidRowCol(checkPoint) 
+	if (distance >= startDistance && distance <= maxDistance && this.isValidRowCol(checkPoint) 
 			&& !checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile)) {
 		var harmony = new KeyPaiSho.Harmony(tile, fromPoint, checkPoint.tile, checkPoint);
 		return harmony;
