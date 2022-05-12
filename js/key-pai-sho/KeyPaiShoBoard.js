@@ -402,7 +402,9 @@ KeyPaiSho.Board.prototype.placeTile = function(tile, notationPoint, tileManager,
 			this.placeLionTurtle(tile, notationPoint);
 		}
 	} else {
-		if (tile.code === KeyPaiSho.TileCodes.Lotus) {
+		if (tile.code === KeyPaiSho.TileCodes.Lotus 
+				&& notationPoint.rowAndColumn.row === 8
+				&& notationPoint.rowAndColumn.col === 8) {
 			this.openTheGardenGate();
 			returnValues.openGardenGate = true;
 		}
