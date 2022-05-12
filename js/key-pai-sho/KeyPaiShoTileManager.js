@@ -25,7 +25,7 @@ KeyPaiSho.TileManager.prototype.loadTileSet = function(ownerCode) {
 		tiles.push(new KeyPaiSho.Tile('B', ownerCode));
 
 		// 1 of each special flower
-		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Lotus, ownerCode));
+		// tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Lotus, ownerCode));
 		tiles.push(new KeyPaiSho.Tile(KeyPaiSho.TileCodes.Orchid, ownerCode));
 
 		tiles.forEach(function(tile) {
