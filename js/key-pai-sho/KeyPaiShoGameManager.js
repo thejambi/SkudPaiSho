@@ -19,6 +19,8 @@ KeyPaiSho.GameManager.prototype.setup = function (ignoreActuate) {
 
 	this.board.setHarmonyMinima(4);	// Default value
 
+	this.centerGateActive = false;
+
 	// Update the actuator
 	if (!ignoreActuate) {
 		this.actuate();
@@ -36,6 +38,10 @@ KeyPaiSho.GameManager.prototype.actuate = function (moveToAnimate, moveAnimation
 
 KeyPaiSho.GameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep) {
 	debug("Running Move(" + (withActuate ? "" : "Not ") + "Actuated): " + move.fullMoveText);
+
+	if (this.centerGateActive && move.player === this.board.getBoardPoint(8, 8).tile.ownerName) {
+		this.centerGateActive = false;
+	}
 
 	var errorFound = false;
 	var bonusAllowed = false;
@@ -62,16 +68,21 @@ KeyPaiSho.GameManager.prototype.runNotationMove = function(move, withActuate, mo
 
 	if (move.moveType === PLANTING) {
 		// // Check if valid plant
-		if (!this.board.pointIsOpenGate(move.endPoint)) {
+		if (!this.board.pointIsOpenGate(move.endPoint)
+				&& !this.board.pointIsOpenCenterGate(move.endPoint)) {
 			// invalid
-			debug("Invalid planting point: " + move.endPoint.pointText);
+			debug("Key Pai Sho Invalid planting point: " + move.endPoint.pointText);
 			errorFound = true;
 			return false;
 		}
 		// Just placing tile on board
 		var tile = this.tileManager.grabTile(move.player, move.plantedFlowerType);
 
-		this.board.placeTile(tile, move.endPoint, this.tileManager);
+		var placeTileResults = this.board.placeTile(tile, move.endPoint, this.tileManager);
+
+		if (placeTileResults.openGardenGate) {
+			this.centerGateActive = true;
+		}
 
 		this.buildPlantingGameLogText(move, tile);
 	} else if (move.moveType === ARRANGING) {
@@ -161,11 +172,13 @@ KeyPaiSho.GameManager.prototype.buildArrangingGameLogText = function(move, moveR
 	}
 };
 
-KeyPaiSho.GameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {
+KeyPaiSho.GameManager.prototype.revealPossibleMovePoints = function(player, boardPoint, ignoreActuate) {
 	if (!boardPoint.hasTile()) {
 		return;
 	}
-	this.board.setPossibleMovePoints(boardPoint);
+	if (!this.board.playerHasCenterPointGate(player) || (boardPoint.row === 8 && boardPoint.col === 8)) {
+		this.board.setPossibleMovePoints(boardPoint);
+	}
 
 	if (!ignoreActuate) {
 		this.actuate();
@@ -175,6 +188,13 @@ KeyPaiSho.GameManager.prototype.revealPossibleMovePoints = function(boardPoint, 
 KeyPaiSho.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate, moveToAnimate) {
 	this.board.removePossibleMovePoints();
 	this.tileManager.removeSelectedTileFlags();
+
+	if (this.centerGateActive) {
+		var centerTile = this.board.getBoardPoint(8, 8).removeTile();
+		this.board.openTheGardenGate();
+		this.board.getBoardPoint(8, 8).putTile(centerTile);
+	}
+
 	if (!ignoreActuate) {
 		this.actuate(moveToAnimate);
 	}

@@ -383,6 +383,8 @@ KeyPaiSho.Board.prototype.forEachBoardPointWithTile = function(forEachFunc) {
 KeyPaiSho.Board.prototype.placeTile = function(tile, notationPoint, tileManager, extraBoatPoint) {
 	var tileRemovedWithBoat;
 
+	var returnValues = {};
+
 	if (tile.type === ACCENT_TILE) {
 		if (tile.accentType === ROCK) {
 			this.placeRock(tile, notationPoint);
@@ -400,20 +402,23 @@ KeyPaiSho.Board.prototype.placeTile = function(tile, notationPoint, tileManager,
 			this.placeLionTurtle(tile, notationPoint);
 		}
 	} else {
-		this.putTileOnPoint(tile, notationPoint);
-		if (tile.specialFlowerType === WHITE_LOTUS) {
-			this.playedWhiteLotusTiles.push(tile);
+		if (tile.code === KeyPaiSho.TileCodes.Lotus) {
+			this.openTheGardenGate();
+			returnValues.openGardenGate = true;
 		}
+		this.putTileOnPoint(tile, notationPoint);
 	}
 	// Things to do after a tile is placed
 	this.flagAllTrappedAndDrainedTiles();
 	this.analyzeHarmonies();
 
-	if (tile.accentType === BOAT) {
+	/* if (tile.accentType === BOAT) {
 		return {
 			tileRemovedWithBoat: tileRemovedWithBoat
 		};
-	}
+	} */
+
+	return returnValues;
 };
 
 KeyPaiSho.Board.prototype.putTileOnPoint = function(tile, notationPoint) {
@@ -852,7 +857,24 @@ KeyPaiSho.Board.prototype.pointIsOpenGate = function(notationPoint) {
 	var point = notationPoint.rowAndColumn;
 	point = this.cells[point.row][point.col];
 
-	return point.isOpenGate() || this.pointIsOpenAndSurroundsPond(point);
+	/* return point.isOpenGate() || this.pointIsOpenAndSurroundsPond(point); */
+	return point.isOpenGate();
+};
+
+KeyPaiSho.Board.prototype.pointIsOpenCenterGate = function(notationPoint) {
+	var point = notationPoint.rowAndColumn;
+	var centerPoint = this.getBoardPoint(point.row, point.col);
+
+	if (!centerPoint.hasTile() && centerPoint.row == 8 && centerPoint.col == 8) {
+		var centerPoint2 = this.getBoardPoint(8, 9);
+		var centerPoint3 = this.getBoardPoint(9, 8);
+		var centerPoint4 = this.getBoardPoint(9, 9);
+		
+		return !centerPoint2.hasTile()
+			&& !centerPoint3.hasTile()
+			&& !centerPoint4.hasTile();
+	}
+	return false;
 };
 
 KeyPaiSho.Board.prototype.pointIsOpenAndSurroundsPond = function(boardPoint) {
@@ -890,6 +912,10 @@ KeyPaiSho.Board.prototype.moveTile = function(player, notationPointStart, notati
 
 	if (!tile) {
 		debug("Error: No tile to move!");
+	}
+
+	if (this.getBoardPoint(8, 8).isType(GATE)) {
+		this.closeTheGardenGate();
 	}
 
 	var error = boardPointEnd.putTile(tile);
@@ -2013,6 +2039,13 @@ KeyPaiSho.Board.prototype.getStartPointsFromGatePoint = function(boardPoint) {
 				this.cells[10][2],
 				this.cells[10][1]
 			];
+		} else if (boardPoint.row === 8 && boardPoint.col === 8) {
+			moveStartPoints = [
+				this.cells[8][8],
+				this.cells[8][9],
+				this.cells[9][8],
+				this.cells[9][9]
+			];
 		}
 		return moveStartPoints;
 	}
@@ -2022,20 +2055,29 @@ KeyPaiSho.Board.prototype.setPossibleMovePoints = function(boardPointStart) {
 	if (boardPointStart.hasTile()) {
 		if (boardPointStart.isType(GATE)) {
 			var moveStartPoints = this.getStartPointsFromGatePoint(boardPointStart);
+			var movingTile = boardPointStart.tile;
+			if (boardPointStart.row === 8 && boardPointStart.col === 8) {
+				boardPointStart.removeTile();
+				this.closeTheGardenGate();
+			}
 			moveStartPoints.forEach(startPoint => {
-				if (!startPoint.hasTile() && this.tileCanMoveOntoPoint(boardPointStart.tile, null, startPoint, boardPointStart, boardPointStart)) {
-					this.setPointAsPossibleMovement(startPoint, boardPointStart.tile, boardPointStart);
+				if (!startPoint.hasTile() 
+						&& this.tileCanMoveOntoPoint(movingTile, null, startPoint, boardPointStart, boardPointStart)) {
+					this.setPointAsPossibleMovement(startPoint, movingTile, boardPointStart);
 					this.setPossibleMovesForMovement(
 						{
-							distance: boardPointStart.tile.getMoveDistance() - 1,
-							orthogonalMovement: boardPointStart.tile.hasOrthogonalMovement(),
-							diagonalMovement: boardPointStart.tile.hasDiagonalMovement(),
-							mustPreserveDirection: boardPointStart.tile.movementMustPreserveDirection()
+							distance: movingTile.getMoveDistance() - 1,
+							orthogonalMovement: movingTile.hasOrthogonalMovement(),
+							diagonalMovement: movingTile.hasDiagonalMovement(),
+							mustPreserveDirection: movingTile.movementMustPreserveDirection()
 						}, startPoint,
-						boardPointStart.tile);
+						movingTile);
 					this.forEachBoardPoint(boardPoint => { boardPoint.clearPossibleMovementTypes(); });
 				}
 			});
+			if (boardPointStart.row === 8 && boardPointStart.col === 8) {
+				boardPointStart.putTile(movingTile);
+			}
 		} else {
 			this.setPossibleMovesForMovement(
 				{
@@ -2163,7 +2205,7 @@ KeyPaiSho.Board.prototype.setOpenGatePossibleMoves = function(player, tile) {
 				this.cells[row][col].addType(POSSIBLE_MOVE);
 			}
 
-			// If Pond, mark surrounding points
+			/* // If Pond, mark surrounding points
 			if (tile && bp.hasTile() && bp.tile.accentType === POND) {
 				var rowCols = this.getSurroundingRowAndCols(bp);
 				for (var i = 0; i < rowCols.length; i++) {
@@ -2172,9 +2214,53 @@ KeyPaiSho.Board.prototype.setOpenGatePossibleMoves = function(player, tile) {
 						surroundingPoint.addType(POSSIBLE_MOVE);
 					}
 				}
-			}
+			} */
 		}
 	}
+};
+
+KeyPaiSho.Board.prototype.setCenterPointGatePossibleMove = function(player, tile) {
+	var centerPoint = this.openTheGardenGate();
+	if (centerPoint) {
+		centerPoint.addType(POSSIBLE_MOVE);
+	}
+};
+
+KeyPaiSho.Board.prototype.openTheGardenGate = function() {
+	/* Lotus: Opening The Garden Gate */
+	var centerPoint = this.getBoardPoint(8, 8);
+	var centerPoint2 = this.getBoardPoint(8, 9);
+	var centerPoint3 = this.getBoardPoint(9, 8);
+	var centerPoint4 = this.getBoardPoint(9, 9);
+
+	if (!centerPoint.hasTile() && !centerPoint2.hasTile() && !centerPoint3.hasTile() && !centerPoint4.hasTile()) {
+		centerPoint.addType(GATE);
+		centerPoint2.addType(NON_PLAYABLE);
+		centerPoint3.addType(NON_PLAYABLE);
+		centerPoint4.addType(NON_PLAYABLE);
+
+		return centerPoint;
+	}
+};
+
+KeyPaiSho.Board.prototype.closeTheGardenGate = function() {
+	var centerPoint = this.getBoardPoint(8, 8);
+	var centerPoint2 = this.getBoardPoint(8, 9);
+	var centerPoint3 = this.getBoardPoint(9, 8);
+	var centerPoint4 = this.getBoardPoint(9, 9);
+
+	if (!centerPoint.hasTile() && !centerPoint2.hasTile() && !centerPoint3.hasTile() && !centerPoint4.hasTile()) {
+		centerPoint.removeType(GATE);
+		centerPoint2.removeType(NON_PLAYABLE);
+		centerPoint3.removeType(NON_PLAYABLE);
+		centerPoint4.removeType(NON_PLAYABLE);
+
+		return centerPoint;
+	}
+};
+
+KeyPaiSho.Board.prototype.getBoardPoint = function(row, col) {
+	return this.cells[row] && this.cells[row][col];
 };
 
 KeyPaiSho.Board.prototype.playerControlsLessThanTwoGates = function(player) {

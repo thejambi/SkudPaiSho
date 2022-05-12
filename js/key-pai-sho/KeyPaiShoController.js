@@ -343,7 +343,7 @@ KeyPaiSho.Controller.prototype.pointClicked = function(htmlPoint) {
 			this.notationBuilder.moveType = ARRANGING;
 			this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
-			this.theGame.revealPossibleMovePoints(boardPoint);
+			this.theGame.revealPossibleMovePoints(getCurrentPlayer(), boardPoint);
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
