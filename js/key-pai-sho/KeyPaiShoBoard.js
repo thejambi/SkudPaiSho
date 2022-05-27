@@ -1713,9 +1713,33 @@ KeyPaiSho.Board.prototype.getHarmonyInDirection = function(tile, fromPoint, rowC
 	}
 
 	if (distance >= startDistance && distance <= maxDistance && this.isValidRowCol(checkPoint) 
-			&& !checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile)) {
+			&& !checkPoint.isType(GATE) && tile.formsHarmonyWith(checkPoint.tile)
+			&& !this.slopeCrossesCenterPoint(fromPoint, checkPoint)) {
 		var harmony = new KeyPaiSho.Harmony(tile, fromPoint, checkPoint.tile, checkPoint);
 		return harmony;
+	}
+};
+
+KeyPaiSho.Board.prototype.calculateSlopeBetweenPoints = function(p1, p2) {
+	var rise = p2.row - p1.row;
+	var run = p2.col - p1.col;
+	var slope = run === 0 ? 0 : rise / run;
+	return slope;
+};
+
+KeyPaiSho.Board.prototype.slopeCrossesCenterPoint = function(p1, p2) {
+	var slope = this.calculateSlopeBetweenPoints(p1, p2);
+	if (slope === 1 || slope === -1) {
+		debug("slope might cross center point");
+		var rowAndCol1 = new RowAndColumn(p1.row, p1.col);
+		var rowAndCol2 = new RowAndColumn(p2.row, p2.col);
+		rowAndCol1.x = rowAndCol1.x - 0.5;
+		rowAndCol1.y = rowAndCol1.y + 0.5;
+		rowAndCol2.x = rowAndCol2.x - 0.5;
+		rowAndCol2.y = rowAndCol2.y + 0.5;
+		
+		return (rowAndCol1.x === rowAndCol1.y && rowAndCol2.x === rowAndCol2.y)
+			|| (-rowAndCol1.x === rowAndCol1.y && -rowAndCol2.x === rowAndCol2.y);
 	}
 };
 
