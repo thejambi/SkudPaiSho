@@ -179,7 +179,7 @@ KeyPaiSho.GameManager.prototype.revealPossibleMovePoints = function(player, boar
 
 	var hideCenterPointTile = false;
 
-	if (!this.board.playerHasCenterPointGate(player) || (boardPoint.row === 8 && boardPoint.col === 8)) {
+	if (!this.playerMustMoveCenterLotus(player) || (boardPoint.row === 8 && boardPoint.col === 8)) {
 		if (boardPoint.row === 8 && boardPoint.col === 8
 				&& boardPoint.isType(GATE)) {
 			hideCenterPointTile = true;
@@ -191,6 +191,10 @@ KeyPaiSho.GameManager.prototype.revealPossibleMovePoints = function(player, boar
 	if (!ignoreActuate) {
 		this.actuate(null, null, hideCenterPointTile);
 	}
+};
+
+KeyPaiSho.GameManager.prototype.playerMustMoveCenterLotus = function(player) {
+	return this.board.playerHasCenterPointGate(player);
 };
 
 KeyPaiSho.GameManager.prototype.hidePossibleMovePoints = function(ignoreActuate, moveToAnimate) {

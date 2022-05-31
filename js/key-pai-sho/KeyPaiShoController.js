@@ -120,6 +120,10 @@ KeyPaiSho.Controller.prototype.getAdditionalMessage = function() {
 		}
 	}
 
+	if (this.theGame.playerMustMoveCenterLotus(this.getCurrentPlayer())) {
+		msg += "<br />Lotus must move out of the center Gate.<br />";
+	}
+
 	return msg;
 };
 
