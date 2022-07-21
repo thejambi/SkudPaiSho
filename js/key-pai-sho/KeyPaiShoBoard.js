@@ -2254,6 +2254,13 @@ KeyPaiSho.Board.prototype.setCenterPointGatePossibleMove = function(player, tile
 	}
 };
 
+KeyPaiSho.Board.prototype.ensureCenterPointGateNotPossibleMove = function(player, tile) {
+	var centerPoint = this.closeTheGardenGate();
+	if (centerPoint) {
+		centerPoint.removeType(POSSIBLE_MOVE);
+	}
+};
+
 KeyPaiSho.Board.prototype.openTheGardenGate = function() {
 	/* Lotus: Opening The Garden Gate */
 	var centerPoint = this.getBoardPoint(8, 8);

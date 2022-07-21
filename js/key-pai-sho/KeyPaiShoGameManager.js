@@ -219,6 +219,8 @@ KeyPaiSho.GameManager.prototype.revealOpenGates = function(player, tile, moveNum
 
 		if (tile.code === KeyPaiSho.TileCodes.Lotus) {
 			this.board.setCenterPointGatePossibleMove(player, tile);
+		} else {
+			this.board.ensureCenterPointGateNotPossibleMove(player, tile);
 		}
 	}
 	if (!ignoreActuate) {
