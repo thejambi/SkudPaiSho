@@ -2348,10 +2348,6 @@ var GameType = {
 		rulesUrl: "https://skudpaisho.com/site/games/key-pai-sho/",
 		gameOptions: [
 			NO_EFFECT_TILES
-		],
-		usersWithAccess: [
-			'SkudPaiSho',
-			'TheOneWhoKnocks'
 		]
 	},
 	SolitairePaiSho: {
