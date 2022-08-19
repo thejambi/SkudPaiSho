@@ -220,6 +220,7 @@ var customBgColorKey = "customBgColorKey";
 var url;
 
 var defaultHelpMessageText;
+var defaultPreferencesMessageText = "No Preference Options available at this time.";
 var defaultEmailMessageText;
 
 var localStorage;
@@ -1645,25 +1646,22 @@ var submitMoveCallback = function submitMoveCallback(resultData, move) {
 };
 
 function clearMessage() {
-	var helpTabContentDiv = document.getElementById("helpTextContent");
+	var aboutTabContentDiv = document.getElementById("aboutContent");
+	var preferencesTabContentDiv = document.getElementById("preferencesContent");
 
 	// if (!defaultHelpMessageText) {	// Load help message every time
 	defaultHelpMessageText = gameController.getDefaultHelpMessageText();
 	// }
-	helpTabContentDiv.innerHTML = defaultHelpMessageText;
-
-	var message = getTournamentText() +
-		helpTabContentDiv.innerHTML;
-
-	helpTabContentDiv.innerHTML = message;
-
-	if (gameController.getAdditionalHelpTabDiv) {
-		var additionalDiv = gameController.getAdditionalHelpTabDiv();
-		helpTabContentDiv.appendChild(additionalDiv);
-	}
+	aboutTabContentDiv.innerHTML = getTournamentText() + defaultHelpMessageText;
+	preferencesTabContentDiv.innerHTML = defaultPreferencesMessageText;
 
 	if (gameController.isPaiShoGame) {
-		helpTabContentDiv.appendChild(buildPaiShoSettingsDiv());
+		preferencesTabContentDiv.innerHTML = "";
+		preferencesTabContentDiv.appendChild(buildPaiShoSettingsDiv());
+	}
+	if (gameController.getAdditionalHelpTabDiv) {
+		var additionalDiv = gameController.getAdditionalHelpTabDiv();
+		preferencesTabContentDiv.appendChild(additionalDiv);
 	}
 }
 
@@ -1719,10 +1717,10 @@ function showPointMessage(htmlPoint) {
 }
 
 function setMessage(msg) {
-	if (msg === document.getElementById("helpTextContent").innerHTML) {
+	if (msg === document.getElementById("aboutContent").innerHTML) {
 		clearMessage();
 	} else {
-		document.getElementById("helpTextContent").innerHTML = getTournamentText() + msg;
+		document.getElementById("aboutContent").innerHTML = getTournamentText() + msg;
 	}
 }
 

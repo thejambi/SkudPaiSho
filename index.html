@@ -95,32 +95,23 @@
       </div>
       <hr />
       <div class='sidenavSection even'>
-        <div class='sidenavSectionHeader'>Current Game</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleReplayControls();'>Toggle replay controls</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameReplayLink();'>Get game link</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameNotationModal();'>Show game notation</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='quitOnlineGameClicked();'>Mark game inactive</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='resignOnlineGameClicked();'>Resign game</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='closeGame();'>Close this game</div>
-      </div>
-      <hr />
-      <div class='sidenavSection odd'>
-        <div class='sidenavSectionHeader'>About</div>
+        <div class='sidenavSectionHeader'>Links</div>
         <div class='sidenavEntry sidenavLink skipBonus' onclick='aboutClicked();'>About
           <em>The Garden Gate</em>
         </div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='showWelcomeTutorial();'>Show welcome screens</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='openShop();'>Buy Pai Sho sets</div>
+        <div class='sidenavEntry'>
+          <a href='https://skudpaisho.com/site/' target='_blank' class='sidenavLink'>The Garden Gate Website</a>
+        </div>
         <div class='sidenavEntry'>
           <a href='https://discord.gg/thegardengate' target='_blank' class='sidenavLink'>Join Discord Server</a>
         </div>
         <div class='sidenavEntry'>
           <a href='https://forum.skudpaisho.com/' target='_blank' class='sidenavLink'>The Garden Gate Forum</a>
         </div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='openShop();'>Buy Pai Sho sets</div>
       </div>
       <hr />
-      <div class='sidenavSection even'>
+      <div class='sidenavSection odd'>
         <div class='sidenavSectionHeader'>Support The Garden Gate</div>
         <div class='sidenavEntry'>
           <a href='https://www.patreon.com/SkudPaiSho' target='_blank' class='sidenavLink'>Support on Patreon</a>
@@ -130,10 +121,11 @@
         </div>
       </div>
       <hr />
-      <div class='sidenavSection odd'>
+      <div class='sidenavSection even'>
       <div class='sidenavSectionHeader'>
         <div onClick='promptAddOption()'>Other</div>
       </div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='showWelcomeTutorial();'>Show welcome screens</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='showPreferences();'>Device Preferences</div>
       <!-- <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleSoundOn();'>Toggle Sound On/Off</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleAnimationsOn();'>Toggle Animations On/Off</div>
@@ -188,7 +180,6 @@
   </div>
 
   <div id='mainWrapper'>
-
     <div class="game-container-wrapper">
 
       <div id="game-title-container">
@@ -229,38 +220,49 @@
       </div> -->
       <div class="helpContainer" id="help">
         <div class="tab">
-          <button class="tablinks" onclick="openTab(event, 'helpTextTab')" id="defaultOpenTab">Help</button>
-          <button id='globalChatTabHeader' class="tablinks" onclick="openTab(event, 'globalChatTab');">Links</button>
-          <button id='chatTab' class="tablinks" onclick="openTab(event, 'gameChatTab'); dismissChatAlert();">Game Chat</button>
+          <button class="tablinks" onclick="openTab(event, 'aboutTab')" id="defaultOpenTab">About</button>
+          <button class="tablinks" onclick="openTab(event, 'chatTab'); dismissChatAlert();">Chat</button>
+          <button class="tablinks" onclick="openTab(event, 'preferencesTab');">Preferences</button>
+          <button class="tablinks" onclick="openTab(event, 'currentGameTab');">Current Game</button>
         </div>
 
-        <div id='helpTextTab' class="tabcontent">
-          <div id='helpTextContent'>
+        <div id='aboutTab' class="tabcontent">
+          <div id='aboutContent'>
           </div>
         </div>
-        <div id="globalChatTab" class="tabcontent">
-          <div id="globalChatMessagesDisplay" class="chatMessagesDisplay">
-            <a href='https://skudpaisho.com/site/' target='_blank'>The Rules &amp; More Site</a>: For more information about Pai Sho and The Garden Gate, explore <a href='https://skudpaisho.com/site/' target='_blank'>The Rules &amp; More Site</a>.
-            <br><br>
-            <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>: To join The Garden Gate Community and chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>.
-            <br><br>
-            <a href='https://skudpaisho.com/site/buying-pai-sho/' target='_blank'>Buying Pai Sho page</a>: For information about buying a Pai Sho set, the free print-and-play set, and information about making your own Pai Sho set, visit the <a href='https://skudpaisho.com/site/buying-pai-sho/' target='_blank'>Buying Pai Sho page</a>.
-            <br><br>
-            <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a>: Support The Garden Gate monthly on <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a> or <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank'>leave a one-time tip</a>.
-            <br><br>
-            <a href='https://forum.skudpaisho.com/' target='_blank'>Forum</a>: The forum has some important posts as a supplement to the Discord community.
-          </div>
-          <div id="globalChatMessageInputContainer" class="chatMessageInputContainer">
-            <!-- <textarea id="globalChatMessageInput" class="chatMessageInput"></textarea>
-            <span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span> -->
-          </div>
-        </div>
-        <div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
+        <div id="chatTab" class="tabcontent" onclick='dismissChatAlert();'>
           <div id="chatMessagesHeader" class="chatMessagesHeader"><em>Game Chat messages may be viewed by other players. Abide by the Discord server #rules to be allowed to use Game Chat. Thank you!</em><div class='clickableText' onclick='toggleTimestamps()'>Toggle timestamp display</div><div class='clickableText' onclick='toggleMoveLogDisplay()'>Toggle move log messages</div><hr /></div>
           <div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
           <div id="chatMessageInputContainer" class="chatMessageInputContainer">
             <textarea id="chatMessageInput" class="chatMessageInput"></textarea>
             <span id="sendChatMessageButton" class="button" onclick='sendChat();'>Send</span>
+          </div>
+        </div>
+        <div id='preferencesTab' class="tabcontent">
+          <div id='preferencesContent'>
+          </div>
+        </div>
+        <div id="currentGameTab" class="tabcontent">
+          <a onclick='toggleReplayControls();'>- Toggle replay controls</a><br><br>
+          <a onclick='sandboxFromMove();'>- Sandbox this game</a><br><br>
+          <a onclick='showGameReplayLink();'>- Get game link</a><br><br>
+          <a onclick='showGameNotationModal();'>- Show game notation</a><br><br>
+          <a onclick='quitOnlineGameClicked();'>- Mark game inactive</a><br><br>
+          <a onclick='resignOnlineGameClicked();'>- Resign game</a><br><br>
+          <a onclick='closeGame();'>- Close this game</a><br>
+          <!--  
+          <a class="button linksTabButton" href='https://skudpaisho.com/site/' target='_blank'>Find rules for all Pai Sho games here</a><br>
+            <p>More information about different Pai Sho games and other exciting stuff at the The Garden Gate Website!</p><br>
+            <a class="button linksTabButton" href='https://discord.gg/thegardengate' target='_blank'>Join our Discord server</a><br>
+            <p>Join The Garden Gate Discord server to engage in an active community where you can chat, learn about upcoming tournaments, ask questions, and have fun!</p><br>
+            <a class="button linksTabButton" href='https://skudpaisho.com/site/buying-pai-sho/' target='_blank'>Buy real Pai Sho tiles and boards</a><br>
+            <p>Information about buying a Pai Sho set, the free print-and-play set, and all about making your own Pai Sho set!</p><br>
+            <a class="button linksTabButton" href='https://www.patreon.com/SkudPaiSho' target='_blank'>Support us on Patreon</a><br>
+            <p>Support us monthly on Patreon or leave a one-time tip. Thanks!</p><br>-->
+          </div>
+          <div id="globalChatMessageInputContainer" class="chatMessageInputContainer">
+            <!-- <textarea id="globalChatMessageInput" class="chatMessageInput"></textarea>
+            <span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span> -->
           </div>
         </div>
       </div>
@@ -367,7 +369,7 @@
   <!-- <script src="js/lz-string.min.js"></script> -->
 
   <!-- Compressed -->
-  <script src="psmin_20210512.js"></script>
+  <script src="psmin_01.js"></script>
 </body>
 
 </html>

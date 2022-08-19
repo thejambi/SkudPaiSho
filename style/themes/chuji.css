@@ -296,7 +296,7 @@ input, textarea, select {
 }
 table { 
     border-collapse: separate; 
-    width:95%; 
+    width:100%; 
     border-spacing: 0;
 }
 td {
@@ -451,6 +451,8 @@ div.tab .alertTab, div.tab .alertTab.active {
 .chatMessageContainer {
     display:flex;
     flex-direction: column;
+}
+.chatMessagesDisplay {
     background-color: var(--secondary);
     border-radius:0.8em;
     padding:5px;
