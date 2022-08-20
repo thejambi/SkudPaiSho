@@ -29,6 +29,16 @@ GameClock.Clock = function(controls, hostRemainingSeconds, guestRemainingSeconds
     this.currentTimerPlayer = null;
 };
 
+GameClock.Clock.prototype.getLabelText = function() {
+    var labelText;
+    Object.keys(GameClock.timeControlsList).forEach((key, index) => {
+		if (GameClock.timeControlsList[key] && GameClock.timeControlsList[key].secondsStart === this.controls.secondsStart) {
+            labelText = GameClock.timeControlsLabelValues[key];
+        }
+	});
+    return labelText;
+};
+
 GameClock.Clock.prototype.startTimer = function(player, tickCallback) {
     this.currentTimerPlayer = player;
     this.currentTimer = new GameClock.Timer();
@@ -209,8 +219,8 @@ GameClock.loadGameClock = function(newClock) {
 };
 
 GameClock.userHasGameClockAccess = function() {
-    // return true;
-    return usernameIsOneOf(
+    return true;
+    /* return usernameIsOneOf(
         [
             'SkudPaiSho',
             'Zach',
@@ -221,7 +231,7 @@ GameClock.userHasGameClockAccess = function() {
             'tree',
             'sirstotes',
             'yugandda'
-        ]);
+        ]); */
 };
 
 GameClock.startClock = function(player) {

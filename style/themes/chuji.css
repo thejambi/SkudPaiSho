@@ -468,7 +468,7 @@ div.tab .alertTab, div.tab .alertTab.active {
     color:var(--spectator-chat-text);
     border-radius:0.8em;
     border-bottom-left-radius:0;
-    padding:3px 8px;
+    padding:6px 0.8em;
     margin-top:1px;
     display:inline-block;
 }

@@ -6,16 +6,29 @@ Trifle.TriggerHelper = function(triggerContext, possibleTargetTilePoint, possibl
 	} else if (possibleTargetTilePoint) {
 		this.possibleTargetTile = possibleTargetTilePoint.tile;
 	}
-	this.possibleTargetTileInfo = PaiShoGames.currentTileMetadata[this.possibleTargetTile.code];
+	this.possibleTargetTileInfo = this.possibleTargetTile && PaiShoGames.currentTileMetadata[this.possibleTargetTile.code];
 	this.abilityInfo = this.triggerContext.tileAbilityInfo;
 	this.triggerInfo = this.triggerContext.currentTrigger;
 };
 
 Trifle.TriggerHelper.prototype.tileIsTargeted = function() {
-	return this.targetTeamsCheck()
+	return this.possibleTargetTile
+			&& this.possibleTargetTileInfo 
+			&& this.targetingIsNotCanceledCheck()
+			&& this.targetTeamsCheck()
 			&& this.targetTileTypesCheck()
 			&& this.targetTileIdentifiersCheck()
-			&& this.targetTileNamesCheck();
+			&& this.targetTileNamesCheck()
+			&& this.targetTileBoardPointTypesCheck();
+};
+
+Trifle.TriggerHelper.prototype.targetingIsNotCanceledCheck = function() {
+	/* var abilityManager = this.triggerContext.board.abilityManager;
+	var abilitySourceTile = this.triggerContext.tile;
+	var abilityType = this.triggerContext.tileAbilityInfo.type;
+	var targetingIsCanceled = abilityManager.targetingIsCanceled(abilitySourceTile, abilityType, this.possibleTargetTile);
+	return !targetingIsCanceled; */
+	return true;	// TODO... this checks if *ability* targeting is canceled.. what if the trigger targets a tile but the ability doesn't? Did you even THINK OF THAT
 };
 
 Trifle.TriggerHelper.prototype.targetTeamsCheck = function() {
@@ -58,6 +71,15 @@ Trifle.TriggerHelper.prototype.targetTileIdentifiersCheck = function() {
 Trifle.TriggerHelper.prototype.targetTileNamesCheck = function() {
 	if (this.triggerInfo.targetTileCodes) {
 		return arrayIncludesOneOf(this.triggerInfo.targetTileCodes, [this.possibleTargetTile.code]);
+	} else {
+		return true;
+	}
+};
+
+Trifle.TriggerHelper.prototype.targetTileBoardPointTypesCheck = function() {
+	if (this.triggerInfo.targetTileBoardPointTypes) {
+		return this.possibleTargetTile && this.possibleTargetTile.seatedPoint 
+			&& this.possibleTargetTile.seatedPoint.isOneOrMoreOfTheseTypes(this.triggerInfo.targetTileBoardPointTypes);
 	} else {
 		return true;
 	}

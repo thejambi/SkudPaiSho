@@ -59,15 +59,15 @@ Ginseng.GameManager.prototype.setup = function (ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-Ginseng.GameManager.prototype.actuate = function () {
+Ginseng.GameManager.prototype.actuate = function(moveToAnimate, moveDetails) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, this.markingManager);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager, moveToAnimate, moveDetails);
 	setGameLogText(this.gameLogText);
 };
 
-Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
+Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep_unused, skipAnimation) {
 	debug("Runining Move:");
 	debug(move);
 
@@ -75,13 +75,10 @@ Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
 
 	var neededPromptInfo;
 
-	if (move.moveType === DEPLOY) {
-		var tile = this.tileManager.grabTile(move.player, move.tileType);
-		var placeTileResults = this.board.placeTile(tile, move.endPoint);
-		this.tileManager.addToCapturedTiles(placeTileResults.capturedTiles);
-		this.buildDeployGameLogText(move, tile);
-	} else if (move.moveType === MOVE) {
-		var moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint, move);
+	var moveDetails;
+
+	if (move.moveType === MOVE) {
+		moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint, move);
 		this.tileManager.addToCapturedTiles(moveDetails.capturedTiles);
 
 		var abilityActivationFlags = moveDetails.abilityActivationFlags;
@@ -108,33 +105,85 @@ Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate) {
 		this.gameHasEndedInDraw = true;
 	}
 
-	if (withActuate) {
+	/* if (withActuate && neededPromptInfo) {
 		this.actuate();
+	} else  */
+	if (withActuate && !skipAnimation) {
+		this.actuate(move, moveDetails);
 	}
 
 	return neededPromptInfo;
 };
 
-Ginseng.GameManager.prototype.buildTeamSelectionGameLogText = function(move) {
-	// this.gameLogText = move.player + " selected their team";
-};
-Ginseng.GameManager.prototype.buildDeployGameLogText = function(move, tile) {
-	// this.gameLogText = move.player + ' placed ' + Trifle.Tile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
-};
 Ginseng.GameManager.prototype.buildMoveGameLogText = function(move, moveDetails) {
-	/* this.gameLogText = move.player + ' moved ' + Trifle.Tile.getTileName(moveDetails.movedTile.code) + ' from ' + move.startPoint.pointText + ' to ' + move.endPoint.pointText;
+	var startPoint = new NotationPoint(move.startPoint);
+	var endPoint = new NotationPoint(move.endPoint);
+	var startPointDisplay = Ginseng.NotationAdjustmentFunction(startPoint.rowAndColumn.row, startPoint.rowAndColumn.col);
+	var endPointDisplay = Ginseng.NotationAdjustmentFunction(endPoint.rowAndColumn.row, endPoint.rowAndColumn.col);
+
+	var moveNumLabel = move.moveNum + "" + getPlayerCodeFromName(move.player);
+
+	this.gameLogText = moveNumLabel + ". " + move.player + ' moved ' + Trifle.Tile.getTileName(moveDetails.movedTile.code) + ' from ' + startPointDisplay + ' to ' + endPointDisplay;
 	if (moveDetails.capturedTiles && moveDetails.capturedTiles.length > 0) {
 		this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ';// + Trifle.Tile.getTileName(moveDetails.capturedTile.code);
 		var first = true;
-		moveDetails.capturedTiles.forEach(function(capturedTile) {
+		moveDetails.capturedTiles.forEach(capturedTile => {
 			if (!first) {
-				this.gameLogText += ',';
+				this.gameLogText += ', ';
 			} else {
 				first = false;
 			}
 			this.gameLogText += Trifle.Tile.getTileName(capturedTile.code);
 		});
-	} */
+	}
+	if (moveDetails.abilityActivationFlags && moveDetails.abilityActivationFlags.tileRecords
+		&& moveDetails.abilityActivationFlags.tileRecords.capturedTiles
+		&& moveDetails.abilityActivationFlags.tileRecords.capturedTiles.length > 0) {
+		this.gameLogText += "; ";
+		var first = true;
+		moveDetails.abilityActivationFlags.tileRecords.capturedTiles.forEach(movedTile => {
+			if (!first) {
+				this.gameLogText += ", ";
+			} else {
+				first = false;
+			}
+			this.gameLogText += movedTile.ownerName + "'s " + Trifle.Tile.getTileName(movedTile.code);
+		});
+		this.gameLogText += " moved to captured pile";
+	}
+	if (moveDetails.abilityActivationFlags && moveDetails.abilityActivationFlags.tileRecords
+		&& moveDetails.abilityActivationFlags.tileRecords.tilesMovedToPiles
+		&& moveDetails.abilityActivationFlags.tileRecords.tilesMovedToPiles.length > 0) {
+		this.gameLogText += "; ";
+		var first = true;
+		moveDetails.abilityActivationFlags.tileRecords.tilesMovedToPiles.forEach(movedTile => {
+			if (!first) {
+				this.gameLogText += ", ";
+			} else {
+				first = false;
+			}
+			this.gameLogText += movedTile.ownerName + "'s " + Trifle.Tile.getTileName(movedTile.code);
+		});
+		this.gameLogText += " banished";
+	}
+
+	if (move.promptTargetData) {
+		Object.keys(move.promptTargetData).forEach((key, index) => {
+			var promptDataEntry = move.promptTargetData[key];
+			var keyObject = JSON.parse(key);
+			if (promptDataEntry.movedTilePoint && promptDataEntry.movedTileDestinationPoint) {
+				var movedTilePointRowAndCol = promptDataEntry.movedTilePoint.rowAndColumn;
+				var movedTileDestinationRowAndCol = promptDataEntry.movedTileDestinationPoint.rowAndColumn;
+				this.gameLogText += "; Push: ";
+				this.gameLogText += "(" + Ginseng.NotationAdjustmentFunction(movedTilePointRowAndCol.row, movedTilePointRowAndCol.col) + ")-";
+				this.gameLogText += "(" + Ginseng.NotationAdjustmentFunction(movedTileDestinationRowAndCol.row, movedTileDestinationRowAndCol.col) + ")";
+			} else if (promptDataEntry.chosenCapturedTile) {
+				this.gameLogText += "; Exchange with: " + Trifle.Tile.getTileName(promptDataEntry.chosenCapturedTile.code);
+			} else {
+				this.gameLogText += " Ability?";
+			}
+		});
+	}
 };
 
 Ginseng.GameManager.prototype.checkForWin = function() {
@@ -259,4 +308,10 @@ Ginseng.GameManager.prototype.getCopy = function() {
 	copyGame.board = this.board.getCopy();
 	copyGame.tileManager = this.tileManager.getCopy();
 	return copyGame;
+};
+
+Ginseng.NotationAdjustmentFunction = function(row, col) {
+	/* Return string displaying point notation for this game */
+	// return "row:" + row + " col:" + col;
+	return new RowAndColumn(col, 16 - row).notationPointString;
 };

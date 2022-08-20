@@ -132,7 +132,9 @@ Trifle.MovementRestriction = {
 	// restrictedByOpponentTileZones: "restrictedByOpponentTileZones",
 	// immobilizedByAdjacentOpponentTile: "immobilizedByAdjacentOpponentTile", // unused
 	// immobilizedByOpponentTileZones: "immobilizedByOpponentTileZones",
-	mustPreserveDirection: "mustPreserveDirection"
+	mustPreserveDirection: "mustPreserveDirection",
+	restrictMovementOntoPoints: "restrictMovementOntoPoints",
+	restrictMovementOntoRecordedTilePoint: "restrictMovementOntoRecordedTilePoint"
 };
 
 Trifle.MovementAbility = {

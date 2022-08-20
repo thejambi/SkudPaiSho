@@ -20,6 +20,7 @@ function SkudPaiShoController(gameContainer, isMobile) {
 	this.guestAccentTiles = [];
 
 	this.isPaiShoGame = true;
+	this.supportsMoveLogMessages = true;
 }
 
 SkudPaiShoController.loadPreferences = function() {

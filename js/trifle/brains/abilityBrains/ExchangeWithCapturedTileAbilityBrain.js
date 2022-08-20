@@ -35,6 +35,8 @@ Trifle.ExchangeWithCapturedTileAbilityBrain.prototype.activateAbility = function
 };
 
 Trifle.ExchangeWithCapturedTileAbilityBrain.prototype.promptForTarget = function(nextNeededPromptTargetInfo, sourceTileKeyStr) {
+	var promptTargetsExist = false;
+
 	debug("Need to prompt for target: " + nextNeededPromptTargetInfo.promptId);
 
 	/*
@@ -49,9 +51,13 @@ Trifle.ExchangeWithCapturedTileAbilityBrain.prototype.promptForTarget = function
 		var abilityTargetTiles = this.abilityObject.abilityTargetTiles;
 
 		abilityTargetTiles.forEach(targetTile => {
+			promptTargetsExist = true;
 			targetTile.tileIsSelectable = true;
 		});
 	} else {
 		debug("Prompting not supported yet for this ability");
 	}
+
+	debug("promptTargetsExist for exchange with captured tile ability prompt? : " + promptTargetsExist);
+	return promptTargetsExist;
 };

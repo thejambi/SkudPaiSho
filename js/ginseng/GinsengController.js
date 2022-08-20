@@ -18,7 +18,6 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 	this.hostAccentTiles = [];
 	this.guestAccentTiles = [];
 
-	this.isInviteOnly = true;
 	this.isPaiShoGame = true;
 
 	this.showDebugInfo = false;
@@ -59,7 +58,7 @@ Ginseng.Controller.prototype.resetGameNotation = function() {
 };
 
 Ginseng.Controller.prototype.getNewGameNotation = function() {
-	return new Trifle.GameNotation();
+	return new Trifle.GameNotation(GUEST);
 };
 
 Ginseng.Controller.getHostTilesContainerDivs = function() {
@@ -74,7 +73,7 @@ Ginseng.Controller.prototype.callActuate = function() {
 	this.theGame.actuate();
 };
 
-Ginseng.Controller.prototype.resetMove = function() {
+Ginseng.Controller.prototype.resetMove = function(skipAnimation) {
 	this.notationBuilder.offerDraw = false;
 	if (this.notationBuilder.status === BRAND_NEW) {
 		// Remove last move
@@ -83,11 +82,13 @@ Ginseng.Controller.prototype.resetMove = function() {
 		// Just rerun
 	}
 
-	rerunAll();
+	rerunAll(null, null, skipAnimation);
 };
 
 Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Ginseng Pai Sho (beta testing)</h4><p><h4>Objective</h4><p>The objective of Ginseng Pai Sho is to cross the Border with your White Lotus tile. The first player to achieve this, wins the game. The Border is the midline between Host and Guest tiles.</p><h4>Temple Rules</h4><p>Tiles are protected when inside of the Eastern or Western Temple. Protected tiles cannot be captured, trapped, or pushed. A tile inside of a Temple can still use its abilities.</p><p><em>Reminder: A Temple is not a Garden.</em></p><h4>White Lotus Rules</h4><p><strong>When your White Lotus is inside of a Temple:</strong></p><ul><li>You cannot capture tiles by movement</li><li>Your tiles’ abilities are not in effect</li></ul><p><strong>When only your White Lotus is outside of a Temple:</strong></p><ul><li>You cannot capture tiles by movement</li><li>Your tiles’ abilities are in effect</li></ul><p><strong>When both White Lotuses are outside of a Temple:</strong></p><ul><li>You can capture tiles by movement</li><li>Your tiles’ abilities are in effect</li></ul></p><p><a href='https://skudpaisho.com/site/games/ginseng-pai-sho/' target='_blank'>view the full rules</a>.</p>";
+	return "<h4>Ginseng Pai Sho</h4>"
+		+ "<p>The first player to cross the Border with their White Lotus tile wins. The Border is the midline between Host and Guest tiles.</p><h4>Temple Rules</h4><p>Tiles are protected when inside of the Eastern or Western Temple. Protected tiles cannot be captured, trapped, or pushed. A tile inside of a Temple can still use its abilities.</p><h4>White Lotus Rules</h4><p>When your White Lotus is inside of a Temple:</p><ul><li>You cannot capture tiles by movement</li><li>Your tiles’ abilities are not in effect</li></ul><p>When only your White Lotus is outside of a Temple:</p><ul><li>You cannot capture tiles by movement</li><li>Your tiles’ abilities are in effect</li></ul><p>When both White Lotuses are outside of a Temple:</p><ul><li>You can capture tiles by movement</li><li>Your tiles’ abilities are in effect</li></ul>"
+		+ "<p><a href='https://skudpaisho.com/site/games/ginseng-pai-sho/' target='_blank'>view the full rules</a>.</p>";
 };
 
 Ginseng.Controller.prototype.getAdditionalMessage = function() {
@@ -135,6 +136,15 @@ Ginseng.Controller.prototype.toggleDebug = function() {
 };
 
 Ginseng.Controller.prototype.startOnlineGame = function() {
+	this.resetNotationBuilder();
+	this.notationBuilder.currentPlayer = HOST;
+	this.notationBuilder.moveType = PASS_TURN;
+
+	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+	this.theGame.runNotationMove(move);
+	// Move all set. Add it to the notation!
+	this.gameNotation.addMove(move);
+
 	createGameIfThatIsOk(GameType.Ginseng.id);
 };
 
@@ -154,18 +164,21 @@ Ginseng.Controller.prototype.getAdditionalHelpTabDiv = function() {
 
 	settingsDiv.appendChild(document.createElement("br"));
 
-	var toggleDebugText = "Enable debug Help display";
-	if (this.showDebugInfo) {
-		toggleDebugText = "Disable debug Help display";
+	if (usernameIsOneOf(["SkudPaiSho"]) || debugOn) {
+		var toggleDebugText = "Enable debug Help display";
+		if (this.showDebugInfo) {
+			toggleDebugText = "Disable debug Help display";
+		}
+		var toggleDebugSpan = document.createElement("span");
+		toggleDebugSpan.classList.add("skipBonus");
+		toggleDebugSpan.setAttribute("onclick", "gameController.toggleDebug();");
+		toggleDebugSpan.innerText = toggleDebugText;
+
+		settingsDiv.appendChild(toggleDebugSpan);
+
+		settingsDiv.appendChild(document.createElement("br"));
 	}
-	var toggleDebugSpan = document.createElement("span");
-	toggleDebugSpan.classList.add("skipBonus");
-	toggleDebugSpan.setAttribute("onclick", "gameController.toggleDebug();");
-	toggleDebugSpan.innerText = toggleDebugText;
 
-	settingsDiv.appendChild(toggleDebugSpan);
-
-	settingsDiv.appendChild(document.createElement("br"));
 	settingsDiv.appendChild(document.createElement("br"));
 
 	return settingsDiv;
@@ -277,7 +290,7 @@ Ginseng.Controller.prototype.unplayedTileClicked = function(tileDiv) {
 				this.notationBuilder.promptTargetData[sourceTileKey][this.notationBuilder.neededPromptTargetInfo.currentPromptTargetId] = tile.getOwnerCodeIdObject();
 				// TODO - Does move require user to choose targets?... 
 				var notationBuilderSave = this.notationBuilder;
-				this.resetMove();
+				this.resetMove(true);
 				this.notationBuilder = notationBuilderSave;
 				this.completeMove();
 			} else {
@@ -305,6 +318,7 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 	var notationPoint = new NotationPoint(npText);
 	var rowCol = notationPoint.rowAndColumn;
 	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+	var currentMovePath = boardPoint.buildMovementPath();
 
 	if (this.notationBuilder.status === BRAND_NEW) {
 		if (boardPoint.hasTile()) {
@@ -327,7 +341,7 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 
 			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
 				this.notationBuilder.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
-				// TODO - Does move require user to choose targets?... 
+				this.notationBuilder.endPointMovementPath = currentMovePath;
 				this.completeMove();
 			} else {
 				this.resetNotationBuilder();
@@ -348,7 +362,7 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 				this.notationBuilder.promptTargetData[sourceTileKey][this.notationBuilder.neededPromptTargetInfo.currentPromptTargetId] = new NotationPoint(htmlPoint.getAttribute("name"));
 				// TODO - Does move require user to choose targets?... 
 				var notationBuilderSave = this.notationBuilder;
-				this.resetMove();
+				this.resetMove(true);
 				this.notationBuilder = notationBuilderSave;
 				this.completeMove();
 			} else {
@@ -363,7 +377,8 @@ Ginseng.Controller.prototype.pointClicked = function(htmlPoint) {
 
 Ginseng.Controller.prototype.completeMove = function() {
 	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-	var neededPromptTargetInfo = this.theGame.runNotationMove(move);
+	var skipAnimation = this.notationBuilder.status === Trifle.NotationBuilderStatus.PROMPTING_FOR_TARGET;
+	var neededPromptTargetInfo = this.theGame.runNotationMove(move, true, null, skipAnimation);
 
 	if (neededPromptTargetInfo) {
 		debug("Prompting user for the rest of the move!");
@@ -372,7 +387,11 @@ Ginseng.Controller.prototype.completeMove = function() {
 		
 		if (neededPromptTargetInfo.sourceAbility.abilityInfo.optional) {
 			refreshMessage();
-			showSkipButtonMessage("Skip optional ability");
+			var abilityTitle = neededPromptTargetInfo.sourceAbility.abilityInfo.title;
+			if (!abilityTitle) {
+				abilityTitle = neededPromptTargetInfo.sourceAbility.abilityInfo.type;
+			}
+			showSkipButtonMessage("Skip ability: " + abilityTitle);
 		}
 
 		showResetMoveMessage();
@@ -381,7 +400,8 @@ Ginseng.Controller.prototype.completeMove = function() {
 		if (playingOnlineGame()) {
 			callSubmitMove();
 		} else {
-			finalizeMove();
+			// finalizeMove();
+			quickFinalizeMove();
 		}
 	}
 };
@@ -459,13 +479,22 @@ Ginseng.Controller.prototype.getAiList = function() {
 Ginseng.Controller.prototype.getCurrentPlayer = function() {
 	if (this.gameNotation.moves.length == 0) {
 		return GUEST;
-	}
-	var lastPlayer = this.gameNotation.moves[this.gameNotation.moves.length - 1].player;
+	} /* else if (this.gameNotation.moves.length > 0
+			&& this.gameNotation.moves[0].moveType === PASS_TURN) {
+		if (currentMoveIndex % 2 === 0) {
+			return HOST;
+		} else {
+			return GUEST;
+		}
+	}  */
+	else {
+		var lastPlayer = this.gameNotation.moves[this.gameNotation.moves.length - 1].player;
 
-	if (lastPlayer === HOST) {
-		return GUEST;
-	} else if (lastPlayer === GUEST) {
-		return HOST;
+		if (lastPlayer === HOST) {
+			return GUEST;
+		} else if (lastPlayer === GUEST) {
+			return HOST;
+		}
 	}
 };
 
@@ -525,3 +554,39 @@ Ginseng.Controller.prototype.RmbUp = function(htmlPoint) {
 
 	this.callActuate();
 }
+
+Ginseng.Controller.prototype.buildNotationString = function(move) {
+	var playerCode = getPlayerCodeFromName(move.player);
+	var moveNum = move.moveNum;
+
+	var moveNotation = moveNum + playerCode + ".";
+
+	if (move.moveType === MOVE) {
+		var startRowAndCol = new NotationPoint(move.startPoint).rowAndColumn;
+		var endRowAndCol = new NotationPoint(move.endPoint).rowAndColumn;
+		moveNotation += "(" + Ginseng.NotationAdjustmentFunction(startRowAndCol.row, startRowAndCol.col) + ")-";
+		moveNotation += "(" + Ginseng.NotationAdjustmentFunction(endRowAndCol.row, endRowAndCol.col) + ")";
+
+		if (move.promptTargetData) {
+			Object.keys(move.promptTargetData).forEach((key, index) => {
+				var promptDataEntry = move.promptTargetData[key];
+				var keyObject = JSON.parse(key);
+				if (promptDataEntry.movedTilePoint && promptDataEntry.movedTileDestinationPoint) {
+					var movedTilePointRowAndCol = promptDataEntry.movedTilePoint.rowAndColumn;
+					var movedTileDestinationRowAndCol = promptDataEntry.movedTileDestinationPoint.rowAndColumn;
+					moveNotation += "+";
+					moveNotation += "(" + Ginseng.NotationAdjustmentFunction(movedTilePointRowAndCol.row, movedTilePointRowAndCol.col) + ")-";
+					moveNotation += "(" + Ginseng.NotationAdjustmentFunction(movedTileDestinationRowAndCol.row, movedTileDestinationRowAndCol.col) + ")";
+				} else if (promptDataEntry.chosenCapturedTile) {
+					moveNotation += "+" + promptDataEntry.chosenCapturedTile.code;
+				} else {
+					moveNotation += " Ability?";
+				}
+			});
+		}
+	}
+
+	moveNotation = moveNotation;
+
+	return moveNotation;
+};

@@ -19,6 +19,7 @@ var INITIAL_SETUP = "Initial Setup";
 var DRAW_OFFER = "~~"; //"≈";
 var DRAW_REFUSE = "=/="; //"≠";
 var DRAW_ACCEPT = "==";
+var PASS_TURN = "--";
 
 // ---------
 

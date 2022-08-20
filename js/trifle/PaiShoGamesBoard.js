@@ -326,8 +326,7 @@ PaiShoGames.Board.prototype.brandNew = function () {
 
 	for (var row = 0; row < cells.length; row++) {
 		for (var col = 0; col < cells[row].length; col++) {
-			cells[row][col].row = row;
-			cells[row][col].col = col;
+			cells[row][col].setRowAndCol(row, col);
 		}
 	}
 
@@ -1208,17 +1207,19 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 					}
 					var abilityObject = new Trifle.Ability(abilityContext);
 
-					if (!abilityObject.hasNeededPromptTargetInfo()) {
-						abilitiesWithPromptTargetsNeeded.push(abilityObject);
-					}
+					// if (abilityObject.worthy()) {
+						if (!abilityObject.hasNeededPromptTargetInfo()) {
+							abilitiesWithPromptTargetsNeeded.push(abilityObject);
+						}
 
-					var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
+						var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
 
-					if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
-						abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
-					} else {
-						abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
-					}
+						if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
+							abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
+						} else {
+							abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
+						}
+					// }
 				}
 			});
 		}
@@ -1283,17 +1284,19 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 						}
 						var abilityObject = new Trifle.Ability(abilityContext);
 
-						if (!abilityObject.hasNeededPromptTargetInfo()) {
-							abilitiesWithPromptTargetsNeeded.push(abilityObject);
-						}
-	
-						var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
-	
-						if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
-							abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
-						} else {
-							abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
-						}
+						// if (abilityObject.worthy()) {
+							if (!abilityObject.hasNeededPromptTargetInfo()) {
+								abilitiesWithPromptTargetsNeeded.push(abilityObject);
+							}
+
+							var thisKindOfAbilityList = abilitiesToActivate[tileAbilityInfo.type];
+
+							if (thisKindOfAbilityList && thisKindOfAbilityList.length) {
+								abilitiesToActivate[tileAbilityInfo.type].push(abilityObject);
+							} else {
+								abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
+							}
+						// }
 					}
 				}
 			});
@@ -1303,7 +1306,13 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 	this.abilityManager.setReadyAbilities(abilitiesToActivate);
 	this.abilityManager.setAbilitiesWithPromptTargetsNeeded(abilitiesWithPromptTargetsNeeded);
 
+	// var promptingExpected = abilitiesWithPromptTargetsNeeded.length > 0;
+
 	var abilityActivationFlags = this.abilityManager.activateReadyAbilitiesOrPromptForTargets();
+
+	// if (promptingExpected && abilityActivationFlags.neededPromptInfo && !abilityActivationFlags.neededPromptInfo.currentPromptTargetId) {
+	// 	abilityActivationFlags = this.abilityManager.activateReadyAbilitiesOrPromptForTargets();
+	// }
 
 	/* Debugging */
 	debug(this.abilityManager.abilities);
@@ -1311,12 +1320,16 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 	if (abilityActivationFlags.boardHasChanged) {
 		// Need to re-process abilities... 
 		// Pass in some sort of context from the activation flags???
-		var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.tileRecords.capturedTiles, currentMoveInfo, abilityActivationFlags);
+		// /* Was: */ var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.tileRecords.capturedTiles, currentMoveInfo, abilityActivationFlags);
+		/* New: */ var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, null, null, abilityActivationFlags.tileRecords.capturedTiles, null, abilityActivationFlags);
 		if (nextAbilityActivationFlags.tileRecords.capturedTiles && nextAbilityActivationFlags.tileRecords.capturedTiles.length) {
 			if (!abilityActivationFlags.tileRecords.capturedTiles) {
 				abilityActivationFlags.tileRecords.capturedTiles = [];
 			}
-			abilityActivationFlags.tileRecords.capturedTiles = abilityActivationFlags.tileRecords.capturedTiles.concat(nextAbilityActivationFlags.capturedTiles);
+			abilityActivationFlags.tileRecords.capturedTiles = abilityActivationFlags.tileRecords.capturedTiles.concat(nextAbilityActivationFlags.tileRecords.capturedTiles);
+		}
+		if (nextAbilityActivationFlags.neededPromptInfo) {
+			abilityActivationFlags.neededPromptInfo = nextAbilityActivationFlags.neededPromptInfo;
 		}
 	}
 
@@ -1685,6 +1698,8 @@ PaiShoGames.Board.prototype.setPossibleMovementPointsFromMovePoints = function(m
 					var movementOk = self.setPointAsPossibleMovement(adjacentPoint, tile, originPoint);
 					if (movementOk) {
 						adjacentPoint.setPossibleForMovementType(movementInfo);
+						// adjacentPoint.setPreviousPointForMovement(movementInfo, recentPoint);
+						adjacentPoint.setPreviousPoint(recentPoint);
 						if (!adjacentPoint.hasTile() || canMoveThroughPoint) {
 							nextPointsConfirmed.push(adjacentPoint);
 						}
@@ -1796,8 +1811,9 @@ PaiShoGames.Board.prototype.setMovePointsAnywhere = function(boardPointStart, mo
 };
 
 PaiShoGames.Board.prototype.tileMovementIsImmobilized = function(tile, movementInfo, boardPointStart) {
-	return this.tileMovementIsImmobilizedByMovementRestriction(tile, movementInfo, boardPointStart)
-		|| this.abilityManager.abilityTargetingTileExists(Trifle.AbilityName.immobilizeTiles, tile);
+	return !movementInfo.regardlessOfImmobilization
+		&& (this.tileMovementIsImmobilizedByMovementRestriction(tile, movementInfo, boardPointStart)
+		|| this.abilityManager.abilityTargetingTileExists(Trifle.AbilityName.immobilizeTiles, tile));
 };
 
 PaiShoGames.Board.prototype.tileMovementIsImmobilizedByTileZoneAbility = function(zoneAbility, tilePoint, tileBeingMoved, tileBeingMovedInfo, movementStartPoint) {
@@ -1922,7 +1938,51 @@ PaiShoGames.Board.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, 
 	return (!targetPoint.hasTile() || canCaptureTarget || (targetPoint.tile === tile && targetPoint.occupiedByAbility))
 		&& (!this.useTrifleTempleRules || !targetPoint.isType(TEMPLE) || canCaptureTarget)
 		&& !this.tileZonedOutOfSpace(tile, movementInfo, targetPoint, canCaptureTarget)
-		&& !this.tileMovementIsImmobilized(tile, movementInfo, fromPoint);
+		&& !this.tileMovementIsImmobilized(tile, movementInfo, fromPoint)
+		&& !this.tilePreventedFromPointByMovementRestriction(tile, movementInfo, targetPoint, fromPoint);
+};
+
+PaiShoGames.Board.prototype.tilePreventedFromPointByMovementRestriction = function(tile, movementInfo, targetPoint, fromPoint) {
+	var isRestricted = false;
+	if (movementInfo.restrictions) {
+		movementInfo.restrictions.every(restrictionInfo => {
+			if (restrictionInfo.type === Trifle.MovementRestriction.restrictMovementOntoRecordedTilePoint) {
+				/* Currently supporting when has these required properties:
+				 * - targetTileCode
+				 * - targetTeams
+				 */
+				/* Is targetPoint recorded? */
+				var recordedPointsOfType = this.recordedTilePoints[restrictionInfo.recordTilePointType];
+				if (recordedPointsOfType) {
+					var targetTileOwnerName = null;
+					if (restrictionInfo.targetTeams.length === 1 && restrictionInfo.targetTeams.includes(Trifle.TileTeam.enemy)) {
+						targetTileOwnerName = getOpponentName(tile.ownerName);
+					} else if (restrictionInfo.targetTeams.length === 1 && restrictionInfo.targetTeams.includes(Trifle.TileTeam.friendly)) {
+						targetTileOwnerName = tile.ownerName;
+					}
+					var tileKey = {
+						ownerName: targetTileOwnerName,
+						code: restrictionInfo.targetTileCode
+					};
+					
+					Object.keys(recordedPointsOfType).forEach(function(key, index) {
+						var keyObject = JSON.parse(key);
+						if (keyObject.code === tileKey.code
+								&& (targetTileOwnerName === null || keyObject.ownerName === targetTileOwnerName)) {
+							if (recordedPointsOfType[key] === targetPoint) {
+								isRestricted = true;
+							}
+						}
+					});
+				}
+				return !isRestricted;	// Check next restriction if not restricted
+			} else {
+				debug("Movement restriction not handled here: " + restrictionInfo.type);
+				return true;	// Continue to next restriction
+			}
+		});
+	}
+	return isRestricted;
 };
 
 PaiShoGames.Board.prototype.targetPointIsEmptyOrCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint) {
@@ -2638,7 +2698,7 @@ PaiShoGames.Board.prototype.recordTilePoint = function(boardPoint, recordTilePoi
 	if (!this.recordedTilePoints[recordTilePointType]) {
 		this.recordedTilePoints[recordTilePointType] = {};
 	}
-	this.recordedTilePoints[recordTilePointType][boardPoint.tile.id] = boardPoint;
+	this.recordedTilePoints[recordTilePointType][boardPoint.tile.getOwnerCodeIdObjectString()] = boardPoint;
 };
 
 PaiShoGames.Board.prototype.promptForBoardPointInAVeryHackyWay = function() {

@@ -35,7 +35,9 @@ Trifle.MoveTargetTileAbilityBrain.prototype.activateAbility = function() {
 	}
 };
 
-Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeededPromptTargetInfo, sourceTileKeyStr) {
+Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeededPromptTargetInfo, sourceTileKeyStr, checkForTargetsOnly) {
+	var promptTargetsExist = false;
+
 	debug("Need to prompt for target: " + nextNeededPromptTargetInfo.promptId);
 
 	/*
@@ -62,12 +64,16 @@ Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeede
 			}
 
 			abilityTargetTilePoints.forEach((targetTilePoint) => {
-				targetTilePoint.addType(POSSIBLE_MOVE);
+				promptTargetsExist = true;
+				if (!checkForTargetsOnly) {
+					targetTilePoint.addType(POSSIBLE_MOVE);
+				}
 			});
 		} else {
 			debug("Prompting not supported yet for this ability");
 		}
-	} else if (nextNeededPromptTargetInfo.promptId === Trifle.TargetPromptId.movedTileDestinationPoint) {
+	} else if (nextNeededPromptTargetInfo.promptId === Trifle.TargetPromptId.movedTileDestinationPoint
+			&& !checkForTargetsOnly) {
 		// this.abilityObject.board.promptForBoardPointInAVeryHackyWay();
 
 		var movedTilePoint = this.abilityObject.promptTargetInfo[sourceTileKeyStr][Trifle.TargetPromptId.movedTilePoint];
@@ -76,9 +82,15 @@ Trifle.MoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeede
 			this.abilityObject.abilityInfo.targetTileMovements.forEach((movementInfo) => {
 				movementInfo.targetTilePoint = this.abilityObject.sourceTilePoint;	// TODO targetTileTypes not being checked yet...
 				this.abilityObject.board.setPossibleMovesForMovement(movementInfo, this.abilityObject.board.getBoardPointFromRowAndCol(movedTilePoint.rowAndColumn));
+
+				// Can check for any possible movements that were marked.. but for now, assume there are some
+				promptTargetsExist = true;
 			});
 		} else {
 			debug("Missing targetTileMovements");
 		}
 	}
+
+	debug("promptTargetsExist for move target tile ability prompt? : " + promptTargetsExist);
+	return promptTargetsExist;
 };

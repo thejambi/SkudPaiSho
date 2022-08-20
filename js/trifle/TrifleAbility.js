@@ -41,7 +41,14 @@ Trifle.Ability.prototype.hasNeededPromptTargetInfo = function() {
 			}
 		})
 	}
+
 	return hasPromptInfo;
+};
+
+Trifle.Ability.prototype.worthy = function() {
+	return !this.abilityInfo.neededPromptTargetsInfo
+		|| (this.abilityInfo.neededPromptTargetsInfo
+		&& this.promptTargetsExist());
 };
 
 Trifle.Ability.prototype.promptTargetInfoPresent = function(neededPromptTargetInfo) {
@@ -53,6 +60,35 @@ Trifle.Ability.prototype.promptTargetInfoPresent = function(neededPromptTargetIn
 		&& this.promptTargetInfo[sourceTileKey]
 		&& (this.promptTargetInfo[sourceTileKey].skipped
 			|| this.promptTargetInfo[sourceTileKey][neededPromptTargetInfo.promptId]);
+};
+
+Trifle.Ability.prototype.promptTargetsExist = function() {
+	var promptTargetsExist = false;
+
+	var abilityObject = this;
+
+	var neededPromptInfo = {};
+
+	neededPromptInfo.abilitySourceTile = abilityObject.sourceTile;
+	neededPromptInfo.sourceAbility = abilityObject;
+	neededPromptInfo.sourceTileKey = Trifle.AbilityManager.buildSourceTileKeyObject(abilityObject.sourceTile);
+	var sourceTileKeyStr = JSON.stringify(neededPromptInfo.sourceTileKey);
+
+	var nextNeededPromptTargetInfo = abilityObject.abilityInfo.neededPromptTargetsInfo[0];
+	// abilityObject.abilityInfo.neededPromptTargetsInfo.forEach((neededPromptTargetInfo) => {
+	// 	if (!nextNeededPromptTargetInfo 
+	// 			&& (!abilityObject.promptTargetInfo[sourceTileKeyStr] 
+	// 			|| !abilityObject.promptTargetInfo[sourceTileKeyStr][neededPromptTargetInfo.promptId])) {
+	// 		nextNeededPromptTargetInfo = neededPromptTargetInfo;
+	// 	}
+	// });
+
+	if (nextNeededPromptTargetInfo) {
+		var abilityBrain = Trifle.BrainFactory.createAbilityBrain(abilityObject.abilityType, abilityObject);
+		promptTargetsExist = abilityBrain.promptForTarget(nextNeededPromptTargetInfo, sourceTileKeyStr, true);
+	}
+
+	return promptTargetsExist;
 };
 
 Trifle.Ability.prototype.setAbilityTargetTiles = function() {

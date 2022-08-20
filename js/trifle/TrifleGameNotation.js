@@ -71,6 +71,14 @@ Trifle.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 		move.offerDraw = true;
 	}
 
+	if (this.endPointMovementPath) {
+		var movementPathNotationPoints = [];
+		this.endPointMovementPath.forEach(boardPoint => {
+			movementPathNotationPoints.push(boardPoint.getNotationPointString());
+		});
+		move.endPointMovementPath = movementPathNotationPoints;
+	}
+
 	return move;
 };
 
@@ -78,9 +86,11 @@ Trifle.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 
 
 
-Trifle.GameNotation = function() {
+Trifle.GameNotation = function(firstPlayer) {
 	this.notationText = "";
 	this.moves = [];
+	this.firstPlayer = firstPlayer;
+	this.secondPlayer = getOpponentName(firstPlayer);
 }
 
 Trifle.GameNotation.prototype.setNotationText = function(text) {
@@ -115,11 +125,6 @@ Trifle.GameNotation.prototype.removeLastMove = function() {
 Trifle.GameNotation.prototype.getNotationMoveFromBuilder = function(builder) {
 	var moveNum = 0;
 
-	if (this.moves.length === 0) {
-		this.firstPlayer = builder.currentPlayer;
-		this.secondPlayer = getOpponentName(this.firstPlayer);
-	}
-
 	var lastMove = this.moves[this.moves.length-1];
 
 	if (lastMove) {
@@ -140,10 +145,14 @@ Trifle.GameNotation.prototype.loadMoves = function() {
 };
 
 Trifle.GameNotation.prototype.buildSimplifiedNotationString = function(move) {
+	if (gameController.buildNotationString) {
+		return gameController.buildNotationString(move);
+	}
+
 	var playerCode = getPlayerCodeFromName(move.player);
 	var moveNum = move.moveNum;
 
-	return moveNum + playerCode + ".¯\\_(ツ)_/¯";	// TODO, obviously
+	return moveNum + playerCode + ".¯\\_(ツ)_/¯";
 };
 
 Trifle.GameNotation.prototype.getNotationHtml = function() {
