@@ -44,6 +44,7 @@ var QueryString = function () {
   var tileDesignTypeValues = {
 	  // hlowe: "Modern Tiles v1",
 	  tgggyatso: "The Garden Gate Gyatso Tiles",
+	  gaoling: "TGG Gaoling",
 	  tggproject: "TGG Pai Sho Project",
 	  hlowenew: "Modern Tiles",
 	  vescucci: "Vescucci Tiles",
@@ -434,13 +435,18 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 		  }
 	  }
   
-	//   resetGlobalChats();	"Global Chats" tab is now "Links"
+	  resetGlobalChats();	//"Global Chats" tab is now "Links"
   
 	  initialVerifyLogin();
   
 	  // Open default help/chat tab
 	  document.getElementById("defaultOpenTab").click();
-  
+
+	  if (dateIsBetween("04/01/2022", "04/02/2022")) {
+		Ads.enableAds(true);
+		GameType.SkudPaiSho.gameOptions.push(DIAGONAL_MOVEMENT, EVERYTHING_CAPTURE);
+	  }
+
 	  if (!debugOn && !QueryString.game && (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn())) {
 		  showWelcomeTutorial();
 	  } else {
@@ -1655,7 +1661,7 @@ function askToJoinPrivateGame(privateGameId, hostUserName, rankedGameInd, gameCl
 		if (rankedGameInd === 'y' || rankedGameInd === 'Y') {
 			message += "<br /><br /><strong> This is a ranked game.</strong>";
 		}
-		if (gameClock) {
+		if (gameClock && GameClock.isEnabled()) {
 			message += "<br /><br /><strong>This game has a game clock (beta): " + gameClock.getLabelText() + "</strong><br /><a href='https://forum.skudpaisho.com/showthread.php?tid=158' target='_blank'>Read about the Game Clock feature.</a>";
 		}
 		message += "<br /><br />";
@@ -2309,8 +2315,10 @@ var GameType = {
 		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
-		gameOptions: [
-			LION_TURTLE_ABILITY_ANYWHERE
+		gameOptions: [],
+		secretGameOptions: [
+			LION_TURTLE_ABILITY_ANYWHERE,
+			SWAP_BISON_AND_DRAGON
 		]
 	},
 	FirePaiSho: {
@@ -2325,10 +2333,24 @@ var GameType = {
 			NO_HARMONY_VISUAL_AIDS,
 			OPTION_DOUBLE_ACCENT_TILES,
 			HIDE_RESERVE_TILES,
-			MIDLINE_OPENER,
 			ETHEREAL_ACCENT_TILES
 		],
-		noRankedGames: true	// Can take out when testing done, game ready to enable ranked games
+		secretGameOptions: [
+			ORIGINAL_BENDER_EXPANSION,
+			MIDLINE_OPENER
+		]
+	},
+	KeyPaiSho: {
+		id: 19,
+		name: "Key Pai Sho",
+		desc: "Key Pai Sho",
+		color: "var(--keypaishocolor)",
+		description: "Built to replicate the Pai Sho board states seen in ATLA Book 1.",
+		coverImg: "keypaisho.png",
+		rulesUrl: "https://skudpaisho.com/site/games/key-pai-sho/",
+		gameOptions: [
+			NO_EFFECT_TILES
+		]
 	},
 	SolitairePaiSho: {
 		id: 4,
@@ -2606,6 +2628,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Ginseng.id:
 			controller = new Ginseng.Controller(gameContainerDiv, isMobile);
+			break;
+		case GameType.KeyPaiSho.id:
+			controller = new KeyPaiSho.Controller(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
@@ -3400,7 +3425,7 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 				}
 				// var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
 				var checkedValue = false;
-				message += "<br /><div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - coming soon - publicly viewable game)</label></div>";
+				message += "<br /><div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - in the future - publicly viewable game)</label></div>";
 			}
 
 			if (GameClock.userHasGameClockAccess()) {
@@ -3540,13 +3565,14 @@ var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(resul
 function resetGlobalChats() {
 	// Clear all global chats..
 	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>.<hr />";
+	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Welcome! Discord is the best way to chat and get help, but feel free to say hello here in the global chat.<hr />";
 }
 
 function fetchInitialGlobalChats() {
-	//   resetGlobalChats();
+	  resetGlobalChats();
 
 	// Fetch global chats..
-	//   onlinePlayEngine.getInitialGlobalChatMessages(getInitialGlobalChatsCallback);
+	  onlinePlayEngine.getInitialGlobalChatMessages(getInitialGlobalChatsCallback);
 }
 
 // var callLogOnlineStatusPulse = function callLogOnlineStatusPulse() {
@@ -3560,14 +3586,14 @@ function fetchInitialGlobalChats() {
 function logOnlineStatusPulse() {
 	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 	verifyLogin();
-	// fetchGlobalChats();
+	fetchGlobalChats();
 }
 
 var LOG_ONLINE_STATUS_INTERVAL = 5000;
 function startLoggingOnlineStatus() {
 	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 
-	// fetchInitialGlobalChats();
+	fetchInitialGlobalChats();
 
 	clearLogOnlineStatusInterval();
 
@@ -3601,7 +3627,7 @@ function randomIntFromInterval(min, max) {
 
 function closeGame() {
 	if (gameDevOn) {
-		setGameController(GameType.Ginseng.id);
+		setGameController(GameType.KeyPaiSho.id);
 		return;
 	}
 	var defaultGameTypeIds = [
@@ -3722,6 +3748,10 @@ var processChatCommands = function(chatMessage) {
 		buildBoardDesignsValues();
 		clearMessage();
 	}
+
+	if (chatMessage.toLowerCase().includes("april fools")) {	// April Fools!
+		Ads.enableAds(true);
+	}
 };
 
 function promptForAgeToTreeYears() {
@@ -3760,12 +3790,12 @@ var sendGlobalChat = function() {
 	}
 }
 
-/* document.getElementById('globalChatMessageInput').onkeypress = function(e){
+document.getElementById('globalChatMessageInput').onkeypress = function(e){
 	 var code = (e.keyCode ? e.keyCode : e.which);
 	  if(code == 13) {
 		sendGlobalChat();
 	  }
-}; */
+};
 
 function htmlEscape(str) {
 	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
@@ -3822,10 +3852,11 @@ function showGameReplayLink() {
 	linkUrl = sandboxUrl + "?" + linkUrl;
 
 	debug("GameReplayLinkUrl: " + linkUrl);
-	var message = "Here is the <a id='gameReplayLink' href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.";
+	var message = "Here is the <a id='gameReplayLink' href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.<button id='copyGameLinkButton' disabled class='button gone'>Copy Link</button> <br /><br />";
 	if (playingOnlineGame()) {
+		var spectateUrl = buildSpectateUrl();
 		message += "<br /><br />";
-		message += "Here is the <a href=\"" + buildSpectateUrl() + "\" target='_blank'>spectate link</a> others can use to watch the game live and participate in the Game Chat.";
+		message += "Here is the <a href=\"" + spectateUrl + "\" target='_blank'>spectate link</a> others can use to watch the game live and participate in the Game Chat. <button onclick='copyTextToClipboard(\""+spectateUrl+"\", this);' class='button'>Copy Link</button> <br /><br />";
 	}
 	showModal("Game Links", message);
 
@@ -3833,6 +3864,14 @@ function showGameReplayLink() {
 		var linkTag = document.getElementById('gameReplayLink');
 		if (linkTag) {
 			linkTag.setAttribute("href", shortUrl);
+		}
+		var copyLinkButton = document.getElementById('copyGameLinkButton');
+		if (copyLinkButton) {
+			copyLinkButton.disabled = false;
+			copyLinkButton.classList.remove('gone');
+			copyLinkButton.onclick = function () {
+				copyTextToClipboard(shortUrl, copyLinkButton);
+			};
 		}
 	});
 }
@@ -4132,8 +4171,15 @@ function addOptionFromInput() {
 }
 
 function promptAddOption() {
+	// Ads.enableAds(true);
+	if (Ads.Options.showAds) {
+		Ads.showRandomPopupAd();
+	}
+
 	var message = "";
 	if (usernameIsOneOf(['SkudPaiSho'])) {
+		Ads.enableAds(true);
+
 		message = "<br /><input type='text' id='optionAddInput' name='optionAddInput' />";
 		message += "<br /><div class='clickableText' onclick='addOptionFromInput()'>Add</div>";
 
@@ -4146,6 +4192,8 @@ function promptAddOption() {
 			}
 			message += "<br /><div class='clickableText' onclick='clearOptions()'>Clear Options</div>";
 		}
+
+		message += "<br /><div class='clickableText' onclick='Ads.showRandomPopupAd()'>Show Ad</div>";
 
 		showModal("Secrets", message);
 	} else if (usernameIsOneOf(['SkudPaiSho','Adevar'])) {
@@ -4999,6 +5047,13 @@ function showPreferences() {
 	
 	var animationsOnCheckedValue = isAnimationsOn() ? "checked='true'" : "";
 	message += "<div><input id='animationsOnCheckBox' type='checkbox' onclick='toggleAnimationsOn();' " + animationsOnCheckedValue + "'><label for='animationsOnCheckBox'> Move animations enabled?</label></div>";
+
+	var gameClockOnCheckedValue = GameClock.isEnabled() ? "checked='true'" : "";
+	message += "<div><input id='gameClockOnCheckBox' type='checkbox' onclick='GameClock.toggleEnabled();' " + gameClockOnCheckedValue + "'><label for='gameClockOnCheckBox'> (Beta) Game Clock enabled?</label></div>";
+
+	if (Ads.Options.showAds) {
+		message += "<br /><div class='clickableText' onclick='Ads.minimalAdsEnabled()'>Minimal sponsored messages</div>";
+	}
 
 	showModal("Device Preferences", message);
 }

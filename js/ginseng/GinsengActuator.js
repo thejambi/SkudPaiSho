@@ -486,10 +486,14 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 };
 
 Ginseng.Actuator.prototype.getTileSrcPath = function(tile) {
-	var srcValue = "images/";
-	var gameImgDir = "Ginseng/" + localStorage.getItem(Ginseng.Options.tileDesignTypeKey);
-	srcValue = srcValue + gameImgDir + "/";
-	return srcValue;
+	if (Ginseng.Controller.isUsingCustomTileDesigns()) {
+		return Ginseng.Controller.getCustomTileDesignsUrl();
+	} else {
+		var srcValue = "images/";
+		var gameImgDir = "Ginseng/" + localStorage.getItem(Ginseng.Options.tileDesignTypeKey);
+		srcValue = srcValue + gameImgDir + "/";
+		return srcValue;
+	}
 };
 
 Ginseng.Actuator.prototype.printBoard = function(board) {

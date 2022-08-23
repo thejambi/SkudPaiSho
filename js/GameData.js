@@ -92,6 +92,7 @@ function masterDebug(str) {
 var BASIC_FLOWER = "Basic Flower";
 var ACCENT_TILE = "Accent Tile";
 var SPECIAL_FLOWER = "Special Flower";
+var ORIGINAL_BENDER = "Original Bender";
 
 var ROCK = "Rock";
 var WHEEL = "Wheel";
@@ -105,6 +106,10 @@ var LION_TURTLE = "Lion Turtle";
 var WHITE_LOTUS = "White Lotus";
 var ORCHID = "Orchid";
 
+var BADGERMOLE = "Badgermole";
+var FLYING_BISON = "Flying Bison";
+var KOI = "Koi";
+var DRAGON = "Dragon";
 
 /* Helpful methods, polyfills, etc */
 function TwoWayMap(map) {

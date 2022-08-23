@@ -2,6 +2,13 @@
 
 function Ginseng() {}
 
+Ginseng.Constants = {
+	preferencesKey: "GinsengPreferencesKey"
+};
+Ginseng.Preferences = {
+	customTilesUrl: ""
+};
+
 Ginseng.Controller = function(gameContainer, isMobile) {
 	new Ginseng.Options();	// Initialize
 	this.gameContainer = gameContainer;
@@ -91,10 +98,15 @@ Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
 		+ "<p><a href='https://skudpaisho.com/site/games/ginseng-pai-sho/' target='_blank'>view the full rules</a>.</p>";
 };
 
+Ginseng.Controller.prototype.gameNotBegun = function() {
+	return this.gameNotation.moves.length === 0 
+		|| (this.gameNotation.moves.length === 1 && this.gameNotation.moves[0].moveType === SETUP);
+};
+
 Ginseng.Controller.prototype.getAdditionalMessage = function() {
 	var msg = "";
 	
-	if (this.gameNotation.moves.length === 0 && !playingOnlineGame()) {
+	if (this.gameNotBegun() && !playingOnlineGame()) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
 			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by clicking <strong>Start Online Game<strong> below.";
 		} else {
@@ -122,7 +134,7 @@ Ginseng.Controller.prototype.getAdditionalMessage = function() {
 
 	if (!playingOnlineGame()) {
 		// msg += getGameOptionsMessageHtml(GameType.Ginseng.gameOptions);	// For when there are game options
-		if (onlinePlayEnabled && this.gameNotation.moves.length === 0) {
+		if (onlinePlayEnabled && this.gameNotBegun()) {
 			msg += "<br /><span class='skipBonus' onClick='gameController.startOnlineGame()'>Start Online Game</span><br />";
 		}
 	}
@@ -133,6 +145,24 @@ Ginseng.Controller.prototype.getAdditionalMessage = function() {
 Ginseng.Controller.prototype.toggleDebug = function() {
 	this.showDebugInfo = !this.showDebugInfo;
 	clearMessage();
+};
+
+Ginseng.Controller.prototype.completeSetup = function() {
+	// Create initial board setup
+	this.addSetupMove();
+
+	// Finish with actuate
+	rerunAll();
+	this.callActuate();
+};
+
+Ginseng.Controller.prototype.addSetupMove = function() {
+	this.notationBuilder.moveType = SETUP;
+	this.notationBuilder.boardSetupNum = 1;
+	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+	this.theGame.runNotationMove(move);
+	// Move all set. Add it to the notation!
+	this.gameNotation.addMove(move);
 };
 
 Ginseng.Controller.prototype.startOnlineGame = function() {
@@ -477,7 +507,7 @@ Ginseng.Controller.prototype.getAiList = function() {
 }
 
 Ginseng.Controller.prototype.getCurrentPlayer = function() {
-	if (this.gameNotation.moves.length == 0) {
+	if (this.gameNotBegun()) {
 		return GUEST;
 	} /* else if (this.gameNotation.moves.length > 0
 			&& this.gameNotation.moves[0].moveType === PASS_TURN) {
@@ -590,3 +620,21 @@ Ginseng.Controller.prototype.buildNotationString = function(move) {
 
 	return moveNotation;
 };
+
+Ginseng.Controller.prototype.setCustomTileDesignUrl = function(url) {
+	Ginseng.Preferences.customTilesUrl = url;
+	localStorage.setItem(Ginseng.Constants.preferencesKey, JSON.stringify(Ginseng.Preferences));
+	localStorage.setItem(Ginseng.Options.tileDesignTypeKey, 'custom');
+	if (gameController && gameController.callActuate) {
+		gameController.callActuate();
+	}
+};
+
+Ginseng.Controller.isUsingCustomTileDesigns = function() {
+	return localStorage.getItem(Ginseng.Options.tileDesignTypeKey) === "custom";
+};
+
+Ginseng.Controller.getCustomTileDesignsUrl = function() {
+	return Ginseng.Preferences.customTilesUrl;
+};
+

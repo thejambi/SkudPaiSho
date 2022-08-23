@@ -1,4 +1,4 @@
-// Trifle Game Manager
+// Ginseng Game Manager
 
 Ginseng.GameManager = function(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';
@@ -25,32 +25,9 @@ Ginseng.GameManager.prototype.setup = function (ignoreActuate) {
 	this.hostBannerPlayed = false;
 	this.guestBannerPlayed = false;
 
-	/* Initial setup */
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.WhiteLotus), new NotationPoint("8,0"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Koi), new NotationPoint("7,-1"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Dragon), new NotationPoint("7,1"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Badgermole), new NotationPoint("6,-2"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Bison), new NotationPoint("6,2"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.LionTurtle), new NotationPoint("4,0"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Wheel), new NotationPoint("5,-3"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Wheel), new NotationPoint("5,3"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Ginseng), new NotationPoint("4,-4"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Ginseng), new NotationPoint("4,4"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Orchid), new NotationPoint("4,-5"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Orchid), new NotationPoint("4,5"));
-
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.WhiteLotus), new NotationPoint("-8,0"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Koi), new NotationPoint("-7,1"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Dragon), new NotationPoint("-7,-1"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Badgermole), new NotationPoint("-6,2"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Bison), new NotationPoint("-6,-2"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.LionTurtle), new NotationPoint("-4,0"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Wheel), new NotationPoint("-5,-3"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Wheel), new NotationPoint("-5,3"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Ginseng), new NotationPoint("-4,-4"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Ginseng), new NotationPoint("-4,4"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Orchid), new NotationPoint("-4,-5"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Orchid), new NotationPoint("-4,5"));
+	// Initial setup?
+	this.gameHasSetupMove = false;
+	this.doBoardSetup(0);
 
 	// Update the actuator
 	if (!ignoreActuate) {
@@ -68,7 +45,7 @@ Ginseng.GameManager.prototype.actuate = function(moveToAnimate, moveDetails) {
 };
 
 Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep_unused, skipAnimation) {
-	debug("Runining Move:");
+	debug("Running Move:");
 	debug(move);
 
 	this.board.tickDurationAbilities();
@@ -77,7 +54,9 @@ Ginseng.GameManager.prototype.runNotationMove = function(move, withActuate, move
 
 	var moveDetails;
 
-	if (move.moveType === MOVE) {
+	if (move.moveType === SETUP) {
+		this.doBoardSetup(move.setupNum);
+	} else if (move.moveType === MOVE) {
 		moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint, move);
 		this.tileManager.addToCapturedTiles(moveDetails.capturedTiles);
 
@@ -301,6 +280,55 @@ Ginseng.GameManager.prototype.buildAbilitySummaryLines = function() {
 	});
 
 	return abilitySummaryLines;
+};
+
+Ginseng.GameManager.prototype.doBoardSetup = function(setupNum) {
+	/* Remove all tiles from board, then set up board. */
+	this.board.forEachBoardPointWithTile(boardPoint => {
+		this.tileManager.putTileBack(boardPoint.removeTile());
+	});
+
+	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.WhiteLotus), new NotationPoint("8,0"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Koi), new NotationPoint("7,-1"));
+	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
+		this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Bison), new NotationPoint("7,1"));
+	} else {
+		this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Dragon), new NotationPoint("7,1"));
+	}
+	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Badgermole), new NotationPoint("6,-2"));
+	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
+		this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Dragon), new NotationPoint("6,2"));
+	} else {
+		this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Bison), new NotationPoint("6,2"));
+	}
+	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.LionTurtle), new NotationPoint("4,0"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Wheel), new NotationPoint("5,-3"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Wheel), new NotationPoint("5,3"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Ginseng), new NotationPoint("4,-4"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Ginseng), new NotationPoint("4,4"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Orchid), new NotationPoint("4,-5"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Orchid), new NotationPoint("4,5"));
+
+	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.WhiteLotus), new NotationPoint("-8,0"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Koi), new NotationPoint("-7,1"));
+	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
+		this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Bison), new NotationPoint("-7,-1"));
+	} else {
+		this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Dragon), new NotationPoint("-7,-1"));
+	}
+	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Badgermole), new NotationPoint("-6,2"));
+	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
+		this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Dragon), new NotationPoint("-6,-2"));
+	} else {
+		this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Bison), new NotationPoint("-6,-2"));
+	}
+	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.LionTurtle), new NotationPoint("-4,0"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Wheel), new NotationPoint("-5,-3"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Wheel), new NotationPoint("-5,3"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Ginseng), new NotationPoint("-4,-4"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Ginseng), new NotationPoint("-4,4"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Orchid), new NotationPoint("-4,-5"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Orchid), new NotationPoint("-4,5"));
 };
 
 Ginseng.GameManager.prototype.getCopy = function() {

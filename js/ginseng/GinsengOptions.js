@@ -20,15 +20,24 @@ Ginseng.Options.tileDesignTypeValues = {
 	gaoling: "Gaoling",
 	gaipan: "Gaipan",
 	omashu: "Omashu",
+	basingse: "Ba Sing Se",
 	zaofu: "Zaofu",
 	northern: "Agna Qel'a",
+	patola: "Patola Mountain Range",
+	shujing: "Shu Jing",
+	shujingpiandao: "Shu Jing Piandao",
 	chuji: "Chu Ji Red",
+	custom: "Use Custom Designs"
 };
 
 Ginseng.Options.setTileDesignsPreference = function(tileDesignKey, ignoreActuate) {
-	localStorage.setItem(Ginseng.Options.tileDesignTypeKey, tileDesignKey);
-	if (gameController && gameController.callActuate && !ignoreActuate) {
-		gameController.callActuate();
+	if (tileDesignKey === 'custom') {
+		promptForCustomTileDesigns(GameType.Ginseng, Ginseng.Preferences.customTilesUrl);
+	} else {
+		localStorage.setItem(Ginseng.Options.tileDesignTypeKey, tileDesignKey);
+		if (gameController && gameController.callActuate && !ignoreActuate) {
+			gameController.callActuate();
+		}
 	}
 };
 

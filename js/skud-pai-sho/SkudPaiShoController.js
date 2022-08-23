@@ -1,7 +1,7 @@
 /* Skud Pai Sho specific UI interaction logic */
 
 var SkudConstants = {
-	preferencesKey = "SkudPaiShoPreferencesKey"
+	preferencesKey: "SkudPaiShoPreferencesKey"
 };
 var SkudPreferences = {
 	customTilesUrl: ""

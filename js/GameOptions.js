@@ -80,6 +80,7 @@ legacyGameOptionsMap[PLAY_IN_SPACES] = "Play In Spaces";
 legacyGameOptionsMap[VAGABOND_ROTATE] = "Vagabond Board Rotation";
 legacyGameOptionsMap[ADEVAR_ROTATE] = "Adevar Board Rotation";
 legacyGameOptionsMap[ADEVAR_GUEST_ROTATE] = "Adevar Board Guest Rotation";
+
 legacyGameOptionsMap[ADEVAR_LITE] = "Lite - Beginner Game";
 
 /* New Game Options Setup */
@@ -118,10 +119,12 @@ gameOptionDescriptions[DYNAMIC_GROUP_LIMIT] = "Group limit based on board size";
 /* Fire */
 var HIDE_RESERVE_TILES = "HideReserveTiles";
 gameOptionDescriptions[HIDE_RESERVE_TILES] = "Hide reserve tiles";
-var MIDLINE_OPENER = "MidlineOpener";
-gameOptionDescriptions[MIDLINE_OPENER] = "Guest midline plant";
+var MIDLINE_OPENER = "MidlineOpener";							// 
+gameOptionDescriptions[MIDLINE_OPENER] = "Guest midline plant";	// Old game option
 var ETHEREAL_ACCENT_TILES = "EtherealAccentTiles";
 gameOptionDescriptions[ETHEREAL_ACCENT_TILES] = "Ethereal accent tiles";
+var ORIGINAL_BENDER_EXPANSION = "OriginalBenderExpansion"
+gameOptionDescriptions[ORIGINAL_BENDER_EXPANSION] = "EXPANSION: Original Benders";
 
 /* Skud */
 var DIAGONAL_MOVEMENT = "DiagonalMovement";	// April Fools 2021
@@ -164,8 +167,21 @@ gameOptionDescriptions[CAPTURE_ABILITY_TARGET_1] = "Lion Turtle and Dragon Captu
 var LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN = "LTAbilityTargetTouchingGarden";	// Unused
 gameOptionDescriptions[LION_TURTLE_ABILITY_TARGET_TOUCHING_GARDEN] = "Lion Turtle Ability: Captures adjacent Original Benders that are touching a red/white garden";
 
-var LION_TURTLE_ABILITY_ANYWHERE = "LTAbilityAnywhere";
+var LION_TURTLE_ABILITY_ANYWHERE = "LTAbilityAnywhere";	// Defunct
 gameOptionDescriptions[LION_TURTLE_ABILITY_ANYWHERE] = "Lion Turtle Ability: Captures adjacent Original Benders, whether they are touching central garden or not";
+
+var BADGERMOLE_NOT_PREVENT_TRAP_PUSH = "BadgermoleNotPreventTrapPush";
+gameOptionDescriptions[BADGERMOLE_NOT_PREVENT_TRAP_PUSH] = "Badgermole does not prevent trap/push";
+
+var ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE = "OrigBenderAbilitiesTargetGardenTiles";
+gameOptionDescriptions[ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE] = "Original Bender Abilities only affect tiles touching Central Gardens";
+
+var SWAP_BISON_AND_DRAGON = "SwapBisonDragon";
+gameOptionDescriptions[SWAP_BISON_AND_DRAGON] = "Swap Bison and Dragon";
+
+/* Key Pai Sho */
+var NO_EFFECT_TILES = "NoEffectTiles";
+gameOptionDescriptions[NO_EFFECT_TILES] = "No Effect Tiles";
 
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
