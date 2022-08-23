@@ -18,6 +18,7 @@
     --vagabondcolor: #88bd38;
     --adevarcolor: #ab6bff;
     --ginsengcolor: #e69e1a;
+    --ginsengcolor: #c0146d;
     --capturecolor: #3860ce;
     --spiritcolor: #1d94da;
     --streetcolor: #464444;
@@ -296,7 +297,7 @@ input, textarea, select {
 }
 table { 
     border-collapse: separate; 
-    width:95%; 
+    width:100%; 
     border-spacing: 0;
 }
 td {
@@ -451,6 +452,8 @@ div.tab .alertTab, div.tab .alertTab.active {
 .chatMessageContainer {
     display:flex;
     flex-direction: column;
+}
+.chatMessagesDisplay {
     background-color: var(--secondary);
     border-radius:0.8em;
     padding:5px;

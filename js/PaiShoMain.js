@@ -1,5 +1,6 @@
 // Pai Sho Main
 
+google.charts.load('current', {'packages':['corechart']});
 var QueryString = function () {
 	var query_string = {};
 	var query = window.location.search.substring(1);
@@ -222,6 +223,7 @@ var customBgColorKey = "customBgColorKey";
 var url;
 
 var defaultHelpMessageText;
+var defaultPreferencesMessageText = "No Preference Options available at this time.";
 var defaultEmailMessageText;
 
 var localStorage;
@@ -484,6 +486,9 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 			break;
 		case "Ginseng Pai Sho":
 			return "var(--ginsengcolor)";
+			break;
+		case "Key Pai Sho":
+			return "var(--keycolor)";
 			break;
         case "Capture Pai Sho":
             return "var(--capturecolor)";
@@ -1705,25 +1710,22 @@ var submitMoveCallback = function submitMoveCallback(resultData, move) {
 };
 
 function clearMessage() {
-	var helpTabContentDiv = document.getElementById("helpTextContent");
+	var aboutTabContentDiv = document.getElementById("aboutContent");
+	var preferencesTabContentDiv = document.getElementById("preferencesContent");
 
 	// if (!defaultHelpMessageText) {	// Load help message every time
 	defaultHelpMessageText = gameController.getDefaultHelpMessageText();
 	// }
-	helpTabContentDiv.innerHTML = defaultHelpMessageText;
-
-	var message = getTournamentText() +
-		helpTabContentDiv.innerHTML;
-
-	helpTabContentDiv.innerHTML = message;
-
-	if (gameController.getAdditionalHelpTabDiv) {
-		var additionalDiv = gameController.getAdditionalHelpTabDiv();
-		helpTabContentDiv.appendChild(additionalDiv);
-	}
+	aboutTabContentDiv.innerHTML = getTournamentText() + defaultHelpMessageText;
+	preferencesTabContentDiv.innerHTML = defaultPreferencesMessageText;
 
 	if (gameController.isPaiShoGame) {
-		helpTabContentDiv.appendChild(buildPaiShoSettingsDiv());
+		preferencesTabContentDiv.innerHTML = "";
+		preferencesTabContentDiv.appendChild(buildPaiShoSettingsDiv());
+	}
+	if (gameController.getAdditionalHelpTabDiv) {
+		var additionalDiv = gameController.getAdditionalHelpTabDiv();
+		preferencesTabContentDiv.appendChild(additionalDiv);
 	}
 }
 
@@ -1779,10 +1781,10 @@ function showPointMessage(htmlPoint) {
 }
 
 function setMessage(msg) {
-	if (msg === document.getElementById("helpTextContent").innerHTML) {
+	if (msg === document.getElementById("aboutContent").innerHTML) {
 		clearMessage();
 	} else {
-		document.getElementById("helpTextContent").innerHTML = getTournamentText() + msg;
+		document.getElementById("aboutContent").innerHTML = getTournamentText() + msg;
 	}
 }
 
@@ -5127,22 +5129,50 @@ function showGameStats(showWins) {
 					var message = getUsername() + "'s total completed games against other players:<br />";
 
 					var stats = resultData.stats;
+					var statsArray = [['Game Type', 'Games Completed']];
+					var colorsArray = [];
 
 					for (var i = 0; i < stats.length; i++) {
 						var totalWins = stats[i].totalWins ? stats[i].totalWins : 0;
 						var winPercent = Math.round(totalWins / stats[i].totalGamesCompleted * 100);
 						if (showWins) {
+							statsArray.push([stats[i].gameType + " Wins ("+winPercent+"%)", stats[i].totalWins]);
+							statsArray.push([stats[i].gameType + " Losses ("+(100-winPercent)+"%)", stats[i].totalGamesCompleted-stats[i].totalWins]);
+							colorsArray.push(getComputedStyle(document.documentElement,null).getPropertyValue(getGameColor(stats[i].gameType).replace("var(", "").replace(")", "")).replace(" ", "").toUpperCase());
+							colorsArray.push(getComputedStyle(document.documentElement,null).getPropertyValue(getGameColor(stats[i].gameType).replace("var(", "").replace(")", "")).replace(" ", "").toUpperCase());
+						} else {
+							statsArray.push([stats[i].gameType, stats[i].totalGamesCompleted]);
+							colorsArray.push(getComputedStyle(document.documentElement,null).getPropertyValue(getGameColor(stats[i].gameType).replace("var(", "").replace(")", "")).replace(" ", "").toUpperCase());
+						}
+						/*if (showWins) {
 							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " wins, " + winPercent + "%)";
 						} else {
 							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted;
-						}
+						}*/
 					}
+					message = "<div id='piechart' style='width:90%;height:500px;border-radius: 20px;'></div>"
 
-					if (!showWins) {
+					if (showWins) {
+						message += "<br /><br /><span class='skipBonus' onclick='showGameStats(false);'>Hide number of wins for each game</span>";
+					} else {
 						message += "<br /><br /><span class='skipBonus' onclick='showGameStats(true);'>Show number of wins for each game</span>";
 					}
 
-					showModal("Completed Games Stats", message);
+					showModal("Completed Game Stats", message);
+					//console.log(statsArray);
+					var data = google.visualization.arrayToDataTable(statsArray);
+					console.log(colorsArray);
+					var options = {
+						title: 'Completed Games',
+						backgroundColor: '#343131',
+						colors:colorsArray,
+						legend:{textStyle: {color: 'white'}},
+						titleTextStyle:{color: 'white',fontSize:16,bold:true}
+					};
+			
+					var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+			
+					chart.draw(data, options);
 				}
 			}
 		}

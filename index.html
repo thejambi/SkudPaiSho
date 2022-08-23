@@ -14,22 +14,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
-<link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
-<link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
-<link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
-<link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
-<link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
-<link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
-<link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
-<link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/manifest.json">
-<meta name="msapplication-TileColor" content="#ffffff">
-<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
-<meta name="theme-color" content="#ffffff">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192"  href="/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+  <meta name="theme-color" content="#ffffff">
 
   <!-- <link href="favicon.ico" rel="shortcut icon"> -->
   <!-- <link href="meta/apple-touch-icon.png" rel="apple-touch-icon"> -->
@@ -47,6 +47,7 @@
   <meta name="apple-itunes-app" content="app-id=1302567785">
 
   <script src="https://use.fontawesome.com/8d1446c26f.js"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
   <!-- Global site tag (gtag.js) - Google AdWords: 972849224 -->
   <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=AW-972849224"></script>
@@ -96,32 +97,23 @@
       </div>
       <hr />
       <div class='sidenavSection even'>
-        <div class='sidenavSectionHeader'>Current Game</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleReplayControls();'>Toggle replay controls</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameReplayLink();'>Get game link</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameNotationModal();'>Show game notation</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='quitOnlineGameClicked();'>Mark game inactive</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='resignOnlineGameClicked();'>Resign game</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='closeGame();'>Close this game</div>
-      </div>
-      <hr />
-      <div class='sidenavSection odd'>
-        <div class='sidenavSectionHeader'>About</div>
+        <div class='sidenavSectionHeader'>Links</div>
         <div class='sidenavEntry sidenavLink skipBonus' onclick='aboutClicked();'>About
           <em>The Garden Gate</em>
         </div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='showWelcomeTutorial();'>Show welcome screens</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='openShop();'>Buy Pai Sho sets</div>
+        <div class='sidenavEntry'>
+          <a href='https://skudpaisho.com/site/' target='_blank' class='sidenavLink'>The Garden Gate Website</a>
+        </div>
         <div class='sidenavEntry'>
           <a href='https://discord.gg/thegardengate' target='_blank' class='sidenavLink'>Join Discord Server</a>
         </div>
         <div class='sidenavEntry'>
           <a href='https://forum.skudpaisho.com/' target='_blank' class='sidenavLink'>The Garden Gate Forum</a>
         </div>
+        <div class='sidenavEntry sidenavLink skipBonus' onclick='openShop();'>Buy Pai Sho sets</div>
       </div>
       <hr />
-      <div class='sidenavSection even'>
+      <div class='sidenavSection odd'>
         <div class='sidenavSectionHeader'>Support The Garden Gate</div>
         <div class='sidenavEntry'>
           <a href='https://www.patreon.com/SkudPaiSho' target='_blank' class='sidenavLink'>Support on Patreon</a>
@@ -132,10 +124,11 @@
         <div class='sidenavEntry sidenavLink skipBonus' onclick='Ads.viewSponsoredMessageClicked();'>View sponsored message</div>
       </div>
       <hr />
-      <div class='sidenavSection odd'>
+      <div class='sidenavSection even'>
       <div class='sidenavSectionHeader'>
         <div onClick='promptAddOption()'>Other</div>
       </div>
+      <div class='sidenavEntry sidenavLink skipBonus' onclick='showWelcomeTutorial();'>Show welcome screens</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='showPreferences();'>Device Preferences</div>
       <!-- <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleSoundOn();'>Toggle Sound On/Off</div>
       <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleAnimationsOn();'>Toggle Animations On/Off</div>
@@ -231,42 +224,51 @@
       </div> -->
       <div class="helpContainer" id="help">
         <div class="tab">
-          <button class="tablinks" onclick="openTab(event, 'helpTextTab')" id="defaultOpenTab">Help</button>
-          <button id='globalChatTabHeader' class="tablinks" onclick="openTab(event, 'globalChatTab');">Links/Chat</button>
-          <button id='chatTab' class="tablinks" onclick="openTab(event, 'gameChatTab'); dismissChatAlert();">Game Chat</button>
+
+          <button class="tablinks" onclick="openTab(event, 'aboutTab')" id="defaultOpenTab">About</button>
+          <button class="tablinks" onclick="openTab(event, 'chatTab'); dismissChatAlert();">Chat</button>
+          <button class="tablinks" onclick="openTab(event, 'preferencesTab');">Preferences</button>
+          <button class="tablinks" onclick="openTab(event, 'currentGameTab');">Current Game</button>
         </div>
 
-        <div id='helpTextTab' class="tabcontent">
-          <div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
-          <div id='helpTextContent'>
+        <div id='aboutTab' class="tabcontent">
+          <div id='aboutContent'>
           </div>
         </div>
-        <div id="globalChatTab" class="tabcontent">
-          <div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
-          <div id="globalChatMessagesDisplayLinks" class="linksTabLinksDiv">
-            <a href='https://skudpaisho.com/site/' target='_blank'>The Rules &amp; More Site</a>: More information about Pai Sho and The Garden Gate.
-            <br><br>
-            <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>: Join The Garden Gate Community and chat or ask questions.
-            <br><br>
-            <a href='https://skudpaisho.com/site/buying-pai-sho/' target='_blank'>Buying Pai Sho page</a>: Information about buying a Pai Sho set, the free print-and-play set, and all about making your own Pai Sho set.
-            <br><br>
-            <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a>: Support The Garden Gate monthly on <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a> or <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank'>leave a one-time tip</a>.
-          </div>
-          <hr />
-          <div id="globalChatMessagesDisplay" class="chatMessagesDisplay">
-          </div>
-          <div id="globalChatMessageInputContainer" class="chatMessageInputContainer">
-            <textarea id="globalChatMessageInput" class="chatMessageInput"></textarea>
-            <span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span>
-          </div>
-        </div>
-        <div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
-          <div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
-          <div id="chatMessagesHeader" class="chatMessagesHeader"><em>Game Chat messages may be viewed by other players. Abide by the Discord server #rules to be allowed to use Game Chat. Thank you!</em><div class='clickableText' onclick='toggleTimestamps()'>Toggle timestamp display</div><div id='toggleMoveLogDisplayDiv' class='clickableText gone' onclick='toggleMoveLogDisplay()'>Toggle move log messages</div><hr /></div>
+        <div id="chatTab" class="tabcontent" onclick='dismissChatAlert();'>
+          <div id="chatMessagesHeader" class="chatMessagesHeader"><em>Game Chat messages may be viewed by other players. Abide by the Discord server #rules to be allowed to use Game Chat. Thank you!</em><div class='clickableText' onclick='toggleTimestamps()'>Toggle timestamp display</div><div class='clickableText' onclick='toggleMoveLogDisplay()'>Toggle move log messages</div><hr /></div>
+
           <div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
           <div id="chatMessageInputContainer" class="chatMessageInputContainer">
             <textarea id="chatMessageInput" class="chatMessageInput"></textarea>
             <span id="sendChatMessageButton" class="button" onclick='sendChat();'>Send</span>
+          </div>
+        </div>
+        <div id='preferencesTab' class="tabcontent">
+          <div id='preferencesContent'>
+          </div>
+        </div>
+        <div id="currentGameTab" class="tabcontent">
+          <a onclick='toggleReplayControls();'>- Toggle replay controls</a><br><br>
+          <a onclick='sandboxFromMove();'>- Sandbox this game</a><br><br>
+          <a onclick='showGameReplayLink();'>- Get game link</a><br><br>
+          <a onclick='showGameNotationModal();'>- Show game notation</a><br><br>
+          <a onclick='quitOnlineGameClicked();'>- Mark game inactive</a><br><br>
+          <a onclick='resignOnlineGameClicked();'>- Resign game</a><br><br>
+          <a onclick='closeGame();'>- Close this game</a><br>
+          <!--  
+          <a class="button linksTabButton" href='https://skudpaisho.com/site/' target='_blank'>Find rules for all Pai Sho games here</a><br>
+            <p>More information about different Pai Sho games and other exciting stuff at the The Garden Gate Website!</p><br>
+            <a class="button linksTabButton" href='https://discord.gg/thegardengate' target='_blank'>Join our Discord server</a><br>
+            <p>Join The Garden Gate Discord server to engage in an active community where you can chat, learn about upcoming tournaments, ask questions, and have fun!</p><br>
+            <a class="button linksTabButton" href='https://skudpaisho.com/site/buying-pai-sho/' target='_blank'>Buy real Pai Sho tiles and boards</a><br>
+            <p>Information about buying a Pai Sho set, the free print-and-play set, and all about making your own Pai Sho set!</p><br>
+            <a class="button linksTabButton" href='https://www.patreon.com/SkudPaiSho' target='_blank'>Support us on Patreon</a><br>
+            <p>Support us monthly on Patreon or leave a one-time tip. Thanks!</p><br>-->
+          </div>
+          <div id="globalChatMessageInputContainer" class="chatMessageInputContainer">
+            <!-- <textarea id="globalChatMessageInput" class="chatMessageInput"></textarea>
+            <span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span> -->
           </div>
         </div>
       </div>
@@ -374,8 +376,10 @@
   <script src="js_util/0_lz-string.min.js"></script>
   <script src="js_util/MersenneTwisterRandom.js"></script>
 
+
   <!-- Compressed TGG Code -->
   <script src="psmin_20220329-001414.js"></script>
+
 </body>
 
 </html>
