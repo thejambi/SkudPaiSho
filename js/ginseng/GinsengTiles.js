@@ -201,7 +201,8 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			}
 		],
 		abilities: [
-			{
+			!gameOptionEnabled(DRAGON_CANCELS_ABILITIES) 
+			? {
 				type: Trifle.AbilityName.captureTargetTiles,
 				triggers: [
 					{
@@ -224,6 +225,27 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile
+			} 
+			: {
+				type: Trifle.AbilityName.cancelAbilities,
+				triggers: [
+					{
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+						targetTeams: [Trifle.TileTeam.enemy],
+						targetTileTypes: [Trifle.TileCategory.allTileTypes],
+						targetTileBoardPointTypes: [RED, WHITE],
+						activationRequirements: [
+							{
+								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [Trifle.TileCategory.thisTile],
+								targetPointTypes: [RED]
+							}
+						]
+					}
+				],
+				targetTypes: [Trifle.TargetType.triggerTargetTiles],
+				triggerTypeToTarget: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+				targetAbilityTypes: [Trifle.AbilityType.all]
 			}
 		],
 		textLines: [
@@ -234,7 +256,9 @@ Ginseng.TileInfo.defineGinsengTiles = function() {
 			"- Can capture any tile by movement.",
 			"",
 			"<strong>Ability</strong>",
-			"- Captures all surrounding tiles when it is touching either Red Garden."
+			!gameOptionEnabled(DRAGON_CANCELS_ABILITIES) 
+				? "- Captures all surrounding tiles when it is touching either Red Garden."
+				: "- Cancels abilities of surrounding tiles when it is touching either Red Garden."
 		]
 	};
 

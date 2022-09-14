@@ -80,18 +80,20 @@ var customBoardUrlArrayKey = "customBoardUrlArrayKey";
 var defaultBoardDesignKey = "tgg20211007";
 var paiShoBoardDesignTypeValuesDefault = {
 	tgg20211007: "The Garden Gate",
-	nomadic: "Nomadic",
+	tenzin: "Tenzin",
+	gaoling: "Gaoling",
 	classy: "Classy Vescucci",
+	nomadic: "Nomadic",
 	chuji: "Chu Ji",
 	mayfair: "Mayfair Filter",
 	skudShop: "The Garden Gate Shop",
 	// vescucci: "Vescucci Style",
-	xiangqi: "Xiangqi-Style Tile Colors",
-	// pixelsho: "Pixel-Sho",
+	// xiangqi: "Xiangqi-Style Tile Colors",
+	pixelsho: "Pixel-Sho",
 	remix: "Remix",
 	nomadsky: "Nomad's Sky by Morbius",
 	water: "Water by Monk_Gyatso",
-	watertribe: "Northern Water Tribe",
+	// watertribe: "Northern Water Tribe",
 	// earth: "Earth by BoomerangGuy",
 	fire: "Fire by BoomerangGuy",
 	airnomad: "Air Nomads by Monk_Gyatso",
@@ -2313,7 +2315,9 @@ var GameType = {
 		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
-		gameOptions: [],
+		gameOptions: [
+			// DRAGON_CANCELS_ABILITIES
+		],
 		secretGameOptions: [
 			LION_TURTLE_ABILITY_ANYWHERE,
 			SWAP_BISON_AND_DRAGON

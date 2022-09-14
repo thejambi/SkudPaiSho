@@ -179,6 +179,9 @@ gameOptionDescriptions[ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE] = "O
 var SWAP_BISON_AND_DRAGON = "SwapBisonDragon";
 gameOptionDescriptions[SWAP_BISON_AND_DRAGON] = "Swap Bison and Dragon";
 
+var DRAGON_CANCELS_ABILITIES = "DragonCancelsAbilities";
+gameOptionDescriptions[DRAGON_CANCELS_ABILITIES] = "Dragon Cancels Abilities";
+
 /* Key Pai Sho */
 var NO_EFFECT_TILES = "NoEffectTiles";
 gameOptionDescriptions[NO_EFFECT_TILES] = "No Effect Tiles";
