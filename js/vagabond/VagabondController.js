@@ -60,7 +60,8 @@ VagabondController.tileDesignSupportsLemur = function(designKey) {
 	}
 	return [
 		'tggvagabond',
-		'tggoriginal'
+		'tggoriginal',
+		'gaoling'
 	].includes(designKey);
 };
 
