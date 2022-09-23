@@ -124,6 +124,10 @@ function TwoWayMap(map) {
 TwoWayMap.prototype.lookup = function(key){ return this.map[key]; };
 TwoWayMap.prototype.reverseLookup = function(key){ return this.reverseMap[key]; };
 
+function randomIntFromInterval(min, max) {
+	return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 function arrayIncludesAll(array1, array2) {
   for (var i = 0; i < array2.length; i++) {
     if (!array1.includes(array2[i])) {

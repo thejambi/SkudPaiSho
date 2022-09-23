@@ -3623,10 +3623,6 @@ function setSidenavNewGameSection() {
 	document.getElementById("sidenavNewGameSection").innerHTML = message;
 }
 
-function randomIntFromInterval(min, max) {
-	return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
 function closeGame() {
 	if (gameDevOn) {
 		setGameController(GameType.KeyPaiSho.id);
@@ -3709,7 +3705,7 @@ function startWatchingNumberOfGamesWhereUserTurn() {
 		}
 	}, USER_TURN_GAME_WATCH_INTERVAL);
 }
-  
+
 var sendChatCallback = function sendChatCallback(result) {
 	document.getElementById('sendChatMessageButton').innerHTML = "Send";
 	var chatMsg = document.getElementById('chatMessageInput').value;
@@ -3719,7 +3715,7 @@ var sendChatCallback = function sendChatCallback(result) {
 		document.getElementById('chatMessageInput').value = "---Message blocked by filter--- " + chatMsg;
 	}
 };
-  
+
 var sendChat = function(chatMessageIfDifferentFromInput) {
 	var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value).trim();
 	if (chatMessageIfDifferentFromInput) {
@@ -3727,14 +3723,34 @@ var sendChat = function(chatMessageIfDifferentFromInput) {
 	}
 	chatMessage = chatMessage.replace(/\n/g, ' ');	// Convert newlines to spaces.
 	if (chatMessage) {
-		document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
-		onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, sendChatCallback);
+		var chatCommandsProcessed = processChatCommands(chatMessage);
+		if (!chatCommandsProcessed) {
+			document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
+			if (playingOnlineGame()) {
+				onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, sendChatCallback);
+			} else {
+				getNewChatMessagesCallback('na||| |||' + chatMessage);
+				sendChatCallback();
+			}
+		} else {
+			sendChatCallback();
+		}
 	}
 
-	processChatCommands(chatMessage);
+	processChatEasterEggCommands(chatMessage);
 }
 
 var processChatCommands = function(chatMessage) {
+	if (chatMessage.toLowerCase().includes('/d6')) {
+		document.getElementById("rollD6LinkAboveChat").classList.remove('gone');
+		sendChat((getUsername() !== null ? getUsername() : "Player") + " rolled: " + randomIntFromInterval(1,6).toString());
+		return true;
+	}
+
+	return false;
+};
+
+var processChatEasterEggCommands = function(chatMessage) {
 	/* Secret easter eggs... */
 	if (chatMessage.toLowerCase().includes('spoopy')) {
 		new AdevarOptions();
