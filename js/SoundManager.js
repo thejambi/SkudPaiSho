@@ -4,6 +4,8 @@
 function SoundManager() {
 	this.isUnlocked = false;
 
+	this.webAudioError = false;
+
 	this.storageManager = new LocalSoundStorageManager();
 	
 	this.audioArray = new Array();
@@ -36,7 +38,7 @@ SoundManager.sounds = {
 };
 
 SoundManager.prototype.playFileData = function (fileData) {
-	if (this.context) {
+	if (this.context && !this.webAudioError) {
 		this.playFileDataWebAudio(fileData);
 	} else {
 		this.playFileDataHtml5(fileData);
@@ -77,16 +79,20 @@ SoundManager.prototype.playSound = function (soundType) {
 }
 
 SoundManager.prototype.playFileDataWebAudio = function (fileData) {
-	var self = this;
-	var byteArray = Base64Binary.decodeArrayBuffer(fileData); 
-	this.context.decodeAudioData(byteArray, function(buffer) {
-		var source = self.context.createBufferSource();
-		source.buffer = buffer;
-		//source.connect(self.context.destination);
-		
-		source.connect(self.regNode);
-		source.start(0);
-	}, function(err) { alert("err(decodeAudioData): "+err); });
+	try {
+		var self = this;
+		var byteArray = Base64Binary.decodeArrayBuffer(fileData);
+		this.context.decodeAudioData(byteArray, function(buffer) {
+			var source = self.context.createBufferSource();
+			source.buffer = buffer;
+			//source.connect(self.context.destination);
+
+			source.connect(self.regNode);
+			source.start(0);
+		}, function(err) { alert("err(decodeAudioData): " + err); });
+	} catch(err) {
+		this.webAudioError = true;
+	}
 };
 
 SoundManager.prototype.playFileDataHtml5 = function (fileData) {
