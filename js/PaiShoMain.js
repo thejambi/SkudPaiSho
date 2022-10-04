@@ -3741,9 +3741,11 @@ var sendChat = function(chatMessageIfDifferentFromInput) {
 }
 
 var processChatCommands = function(chatMessage) {
-	if (chatMessage.toLowerCase().includes('/d6')) {
+	if (chatMessage.toLowerCase().includes('/d6 2')) {
 		document.getElementById("rollD6LinkAboveChat").classList.remove('gone');
-		sendChat((getUsername() !== null ? getUsername() : "Player") + " rolled: " + randomIntFromInterval(1,6).toString());
+		sendChat((getUsername() !== null ? getUsername() : "Player") 
+			+ " rolled: " + randomIntFromInterval(1,6).toString()
+			+ " & " + randomIntFromInterval(1,6).toString());
 		return true;
 	}
 
