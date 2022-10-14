@@ -3625,7 +3625,7 @@ function setSidenavNewGameSection() {
 
 function closeGame() {
 	if (gameDevOn) {
-		setGameController(GameType.KeyPaiSho.id);
+		setGameController(GameType.Trifle.id);
 		return;
 	}
 	var defaultGameTypeIds = [

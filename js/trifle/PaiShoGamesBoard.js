@@ -1968,7 +1968,8 @@ PaiShoGames.Board.prototype.canMoveHereMoreEfficientlyAlready = function(boardPo
 PaiShoGames.Board.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targetPoint, fromPoint) {
 	var tileInfo = this.tileMetadata[tile.code];
 	var canCaptureTarget = this.targetPointHasTileTileThatCanBeCaptured(tile, movementInfo, fromPoint, targetPoint);
-	return (!targetPoint.hasTile() || canCaptureTarget || (targetPoint.tile === tile && targetPoint.occupiedByAbility))
+	return this.tileCanOccupyPoint(tile, targetPoint)
+		&& (!targetPoint.hasTile() || canCaptureTarget || (targetPoint.tile === tile && targetPoint.occupiedByAbility))
 		&& (!this.useTrifleTempleRules || !targetPoint.isType(TEMPLE) || canCaptureTarget)
 		&& !this.tileZonedOutOfSpace(tile, movementInfo, targetPoint, canCaptureTarget)
 		&& !this.tileMovementIsImmobilized(tile, movementInfo, fromPoint)
@@ -2474,7 +2475,7 @@ PaiShoGames.Board.prototype.tileCanOccupyPoint = function(tile, boardPoint) {
 		var canOccupy = giganticPoints && giganticPoints.length ? true : false;
 		if (giganticPoints) {
 			giganticPoints.forEach(function(giganticPoint) {
-				if (giganticPoint.hasTile()) {
+				if (giganticPoint.hasTile() && giganticPoint.tile !== tile) {
 					canOccupy = false;
 				}
 			});
