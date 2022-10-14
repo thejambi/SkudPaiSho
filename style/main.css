@@ -1456,8 +1456,8 @@ input[type=submit] {
 
 .boardHexhex8 {
   width: 1500px;
-  margin: -138px 0 0 -331px;
-  transform: scale(0.55);
+  margin: -75px 0 0 -200px;
+  transform: scale(0.75);
 }
 .boardHexhex8bottomMargin {
   margin-bottom: -60px;
