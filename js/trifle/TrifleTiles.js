@@ -1357,7 +1357,8 @@ Trifle.TileInfo.defineTrifleTiles = function() {
 			// }
 			{
 				type: Trifle.MovementType.standard,
-				distance: 4
+				distance: 4,
+				captureTypes: [Trifle.CaptureType.all]
 			}
 		], // Ability testing...
 		abilities: [

@@ -1968,7 +1968,7 @@ PaiShoGames.Board.prototype.canMoveHereMoreEfficientlyAlready = function(boardPo
 PaiShoGames.Board.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, targetPoint, fromPoint) {
 	var tileInfo = this.tileMetadata[tile.code];
 	var canCaptureTarget = this.targetPointHasTileTileThatCanBeCaptured(tile, movementInfo, fromPoint, targetPoint);
-	return this.tileCanOccupyPoint(tile, targetPoint)
+	return (this.tileCanOccupyPoint(tile, targetPoint) || canCaptureTarget)	// TODO work still needed...
 		&& (!targetPoint.hasTile() || canCaptureTarget || (targetPoint.tile === tile && targetPoint.occupiedByAbility))
 		&& (!this.useTrifleTempleRules || !targetPoint.isType(TEMPLE) || canCaptureTarget)
 		&& !this.tileZonedOutOfSpace(tile, movementInfo, targetPoint, canCaptureTarget)
