@@ -6,6 +6,7 @@ Trifle.NotationBuilderStatus = {
 	PROMPTING_FOR_TARGET: "PROMPTING_FOR_TARGET"
 };
 
+/* Because it's just json, the NotationMove object here might not be used */
 Trifle.NotationMove = function(text, promptTargetData) {
 	this.fullMoveText = text;
 	this.analyzeMove();
@@ -79,6 +80,11 @@ Trifle.NotationBuilder.prototype.getNotationMove = function(moveNum, player) {
 			movementPathNotationPoints.push(boardPoint.getNotationPointString());
 		});
 		move.endPointMovementPath = movementPathNotationPoints;
+	}
+
+	/* Catch all generic move data */
+	if (this.moveData) {
+		move.moveData = this.moveData;
 	}
 
 	return move;

@@ -186,6 +186,14 @@ gameOptionDescriptions[DRAGON_CANCELS_ABILITIES] = "Dragon Cancels Abilities";
 var NO_EFFECT_TILES = "NoEffectTiles";
 gameOptionDescriptions[NO_EFFECT_TILES] = "No Effect Tiles";
 
+/* Beyond The Edges of The Maps */
+var EDGES_12x12_GAME = "12x12Game";
+gameOptionDescriptions[EDGES_12x12_GAME] = "Shorter game (12x12 board)";
+
+
+
+/* -------- */
+
 function getGameOptionDescription(optionName) {
 	if (gameOptionDescriptions.hasOwnProperty(optionName)) {
 		return gameOptionDescriptions[optionName];

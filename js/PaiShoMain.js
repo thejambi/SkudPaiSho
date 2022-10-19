@@ -942,7 +942,7 @@ function startWatchingGameRealTime() {
 		}
 	}, REAL_TIME_GAME_WATCH_INTERVAL);
 }
-  
+
 /* Pai Sho Board Switches */
 function setPaiShoBoardOption(newPaiShoBoardKey, isTemporary) {
 	if (!paiShoBoardDesignTypeValues[newPaiShoBoardKey]) {
@@ -957,7 +957,9 @@ function setPaiShoBoardOption(newPaiShoBoardKey, isTemporary) {
 	var newClassName = paiShoBoardKey + "Board";
 	gameContainerDiv.classList.add(newClassName);
 
-	applyBoardOptionToBgSvg();
+	if (gameController.isPaiShoGame) {
+		applyBoardOptionToBgSvg();
+	}
 
 	clearMessage(); // Refresh Help tab text
 }
@@ -2494,6 +2496,21 @@ var GameType = {
 		],
 		noRankedGames: true
 	},
+	BeyondTheMaps: {
+		id: 20,
+		name: "Beyond The Edges of The Maps",
+		desc: "Beyond The Edges of The Maps",
+		color: "var(--edgescolor)",
+		description: "Explore the land beyond the maps.",
+		coverImg: "edges.png",
+		rulesUrl: "https://skudpaisho.com/site/games/beyond-the-edges-of-the-maps/",
+		gameOptions: [
+			EDGES_12x12_GAME
+		],
+		usersWithAccess: [
+			'SkudPaiSho'
+		]
+	},
 	Blooms: {
 		id: 9,
 		name: "Blooms",
@@ -2633,6 +2650,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.KeyPaiSho.id:
 			controller = new KeyPaiSho.Controller(gameContainerDiv, isMobile);
+			break;
+		case GameType.BeyondTheMaps.id:
+			controller = new BeyondTheMaps.Controller(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
@@ -3625,7 +3645,7 @@ function setSidenavNewGameSection() {
 
 function closeGame() {
 	if (gameDevOn) {
-		setGameController(GameType.Trifle.id);
+		setGameController(GameType.BeyondTheMaps.id);
 		return;
 	}
 	var defaultGameTypeIds = [
