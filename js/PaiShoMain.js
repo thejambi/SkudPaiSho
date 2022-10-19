@@ -1139,10 +1139,18 @@ function playNextMove(withActuate, moveAnimationBeginStep, skipAnimation) {
 		if (gameController.getSkipToIndex) {
 			var newMoveIndex = gameController.getSkipToIndex(currentMoveIndex);
 			for (currentMoveIndex; currentMoveIndex < newMoveIndex; currentMoveIndex++) {
-				gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], false);
+				if (gameController.runMove) {
+					gameController.runMove(gameController.gameNotation.moves[currentMoveIndex], false);
+				} else {
+					gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], false);
+				}
 			}
 		}
-		gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep, skipAnimation);
+		if (gameController.runMove) {
+			gameController.runMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep, skipAnimation);
+		} else {
+			gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep, skipAnimation);
+		}
 		currentMoveIndex++;
 		if (currentMoveIndex >= gameController.gameNotation.moves.length) {
 			isInReplay = false;

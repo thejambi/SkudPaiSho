@@ -35,13 +35,13 @@ BeyondTheMaps.GameManager = class {
 		this.actuator.actuate(this.board, this.markingManager, moveToAnimate);
 	}
 
-	runNotationMove(move, withActuate) {
+	runNotationMove(move, phaseIndex, withActuate) {
 		debug("Running Move: ");
-		var moveData = move.moveData;
+		var moveData = move.moveData.phases[phaseIndex];
 
-		if (move.moveType === BeyondTheMaps.MoveType.EXPLORE_SEA) {
+		if (moveData.moveType === BeyondTheMaps.MoveType.EXPLORE_SEA) {
 			this.board.moveShip(moveData.startPoint, moveData.endPoint, moveData.landPoint);
-		} else if (move.moveType === BeyondTheMaps.MoveType.EXPLORE_LAND) {
+		} else if (moveData.moveType === BeyondTheMaps.MoveType.EXPLORE_LAND) {
 			this.board.placeLandPiecesForPlayer(move.player, moveData.landPoints);
 		}
 	

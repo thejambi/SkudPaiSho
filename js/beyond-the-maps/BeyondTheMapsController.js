@@ -1,6 +1,6 @@
 /* Beyond The Edges of The Maps specific UI interaction logic */
 
-function BeyondTheMaps() { }
+function BeyondTheMaps() {}
 
 BeyondTheMaps.Controller = class {
 	constructor(gameContainer, isMobile) {
@@ -23,6 +23,8 @@ BeyondTheMaps.Controller = class {
 		/* Purposely using Trifle game notation as it is generic and json */
 		this.notationBuilder = new Trifle.NotationBuilder();
 		this.notationBuilder.moveData = {};
+		this.notationBuilder.moveData.phases = [];
+		this.notationBuilder.phaseIndex = -1;
 	}
 
 	resetGameNotation() {
@@ -93,25 +95,20 @@ BeyondTheMaps.Controller = class {
 		// Nothing to do
 	}
 
+	beginNewMovePhase() {
+		this.notationBuilder.phaseIndex++;
+		this.notationBuilder.moveData.phases[this.notationBuilder.phaseIndex] = {};
+	}
+	getCurrentMovePhase() {
+		return this.notationBuilder.moveData.phases[this.notationBuilder.phaseIndex];
+	}
+
 	pointClicked(htmlPoint) {
 		this.theGame.markingManager.clearMarkings();
 		this.callActuate();
 
-		if (this.theGame.getWinner()) {
-			return;
-		}
-
-		if (!myTurn()) {
-			return;
-		}
-
-		if (currentMoveIndex !== this.gameNotation.moves.length) {
-			debug("Can only interact if all moves are played.");
-			return;
-		}
-
-		if (playingOnlineGame() && !iAmPlayerInCurrentOnlineGame()) {
-			debug("Player not allowed to play.");
+		if (this.theGame.getWinner() || !myTurn() || currentMoveIndex !== this.gameNotation.moves.length
+				|| (playingOnlineGame() && !iAmPlayerInCurrentOnlineGame())) {
 			return;
 		}
 
@@ -128,9 +125,11 @@ BeyondTheMaps.Controller = class {
 					return;
 				}
 				this.notationBuilder.status = WAITING_FOR_ENDPOINT;
-				this.notationBuilder.moveType = BeyondTheMaps.MoveType.EXPLORE_SEA;
+				this.beginNewMovePhase();
+				this.getCurrentMovePhase().moveType = BeyondTheMaps.MoveType.EXPLORE_SEA;
+				// this.notationBuilder.moveType = BeyondTheMaps.MoveType.EXPLORE_SEA;
 				this.notationBuilder.player = this.getCurrentPlayer();
-				this.notationBuilder.moveData.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
+				this.getCurrentMovePhase().startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 				this.notationBuilder.startBoardPoint = boardPoint;
 
 				this.theGame.revealPossibleMovePoints(boardPoint);
@@ -140,14 +139,12 @@ BeyondTheMaps.Controller = class {
 			if (boardPoint.isType(POSSIBLE_MOVE)) {
 				// They're trying to move there! And they can! Exciting!
 				// Need the notation!
-				this.notationBuilder.moveData.endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
-				//this.theGame.findPathsBetweenBoardPoints(this.notationBuilder.startBoardPoint, boardPoint);
+				this.getCurrentMovePhase().endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 				var possiblePaths = boardPoint.possibleMovementPaths;
-				debug("Possible paths: " + possiblePaths.length);
 				this.theGame.hidePossibleMovePoints();
 
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-				this.theGame.runNotationMove(move);
+				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex);
 
 				var landPointsPossible = this.theGame.markPossibleLandPointsForMovement(boardPoint, possiblePaths, this.notationBuilder.player);
 
@@ -156,7 +153,7 @@ BeyondTheMaps.Controller = class {
 					this.notationBuilder.status = WAITING_FOR_BONUS_ENDPOINT;
 				} else {
 					if (landPointsPossible.length > 0) {
-						this.notationBuilder.moveData.landPoint = new NotationPoint(landPointsPossible[0].getNotationPointString());
+						this.getCurrentMovePhase().landPoint = new NotationPoint(landPointsPossible[0].getNotationPointString());
 					}
 					this.completeMove();
 				}
@@ -167,7 +164,7 @@ BeyondTheMaps.Controller = class {
 		} else if (this.notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT) {
 			if (boardPoint.isType(POSSIBLE_MOVE)) {
 				this.theGame.hidePossibleMovePoints();
-				this.notationBuilder.moveData.landPoint = new NotationPoint(htmlPoint.getAttribute("name"));
+				this.getCurrentMovePhase().landPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 				this.completeMove();
 			}
 		}
@@ -273,6 +270,12 @@ BeyondTheMaps.Controller = class {
 
 	setAnimationsOn(isAnimationsOn) {
 		this.actuator.setAnimationOn(isAnimationsOn);
+	}
+
+	runMove(move, withActuate, moveAnimationBeginStep, skipAnimation) {
+		for (var phaseIndex = 0; phaseIndex < move.moveData.phases.length; phaseIndex++) {
+			this.theGame.runNotationMove(move, phaseIndex, withActuate);
+		}
 	}
 
 	cleanup() {
