@@ -355,6 +355,7 @@ Ginseng.Actuator.prototype.getCapturedTileFromMove = function(moveDetails) {
 	return null;
 };
 
+/* Can remove? */
 Ginseng.Actuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, boardPoint) {
 	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y;
 

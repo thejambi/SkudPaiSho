@@ -91,7 +91,10 @@ BeyondTheMaps.Board = class {
 	};
 
 	isValidRowCol(rowCol) {
-		return rowCol.row >= 0 && rowCol.col >= 0 && rowCol.row <= this.size.row - 1 && rowCol.col <= this.size.col - 1;
+		return rowCol.row >= 0 
+			&& rowCol.col >= 0 
+			&& rowCol.row <= BeyondTheMaps.FULL_BOARD_SIZE_LENGTH - 1 
+			&& rowCol.col <= BeyondTheMaps.FULL_BOARD_SIZE_LENGTH - 1;
 	};
 
 	getSurroundingRowAndCols(rowAndCol) {
@@ -149,7 +152,7 @@ BeyondTheMaps.Board = class {
 		return boardPointStart !== boardPointEnd;
 	}
 
-	setPossibleMovePoints(boardPointStart) {
+	setPossibleMovePoints(boardPointStart, moveDistance) {
 		/* if (!boardPointStart.hasTile()) {
 			return;
 		}
@@ -163,7 +166,7 @@ BeyondTheMaps.Board = class {
 		} */
 
 		if (boardPointStart.hasTile()) {
-			this.setPossibleMovesForMovement({ title: "Btm", distance: boardPointStart.tile.getMoveDistance() }, boardPointStart);
+			this.setPossibleMovesForMovement({ title: "Btm", distance: moveDistance }, boardPointStart);
 		}
 	}
 
@@ -446,8 +449,35 @@ BeyondTheMaps.Board = class {
 		});
 	}
 
-	findPathsBetweenPoints(startPoint, endPoint, moveDistance) {
-		//
+	findPathForMovement(notationPointStart, notationPointEnd, notationPointLand, moveDistance) {
+		var startPoint = this.getBoardPointFromNotationPoint(notationPointStart);
+		var endPoint = this.getBoardPointFromNotationPoint(notationPointEnd);
+		var landPoint = this.getBoardPointFromNotationPoint(notationPointLand);
+		this.setPossibleMovePoints(startPoint, moveDistance - 1);
+
+		var lastStepPoint = this.getPointOpposite(endPoint, landPoint);
+
+		var movementPath = getShortestArrayFromArrayOfArrays(lastStepPoint.possibleMovementPaths);
+
+		/* Done using marked points, clear now */
+		this.removePossibleMovePoints();
+
+		movementPath.push(lastStepPoint);
+		movementPath.push(endPoint);
+
+		return movementPath;
+	}
+
+	getPointOpposite(centerPoint, knownSidePoint) {
+		if (centerPoint.row === knownSidePoint.row) {
+			var row = centerPoint.row;
+			var col = centerPoint.col + (centerPoint.col - knownSidePoint.col);
+			return this.cells[row][col];
+		} else if (centerPoint.col === knownSidePoint.col) {
+			var col = centerPoint.col;
+			var row = centerPoint.row + (centerPoint.row - knownSidePoint.row);
+			return this.cells[row][col];
+		}
 	}
 
 	markLandPointAtEndOfPathPossibleMove(moveEndPoint, lastStepPoint, player) {

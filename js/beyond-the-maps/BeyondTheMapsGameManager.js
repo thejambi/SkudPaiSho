@@ -28,25 +28,29 @@ BeyondTheMaps.GameManager = class {
 		}
 	}
 
-	actuate(moveToAnimate) {
+	actuate(moveToAnimate, phaseIndex) {
 		if (this.isCopy) {
 			return;
 		}
-		this.actuator.actuate(this.board, this.markingManager, moveToAnimate);
+		this.actuator.actuate(this.board, this.markingManager, moveToAnimate, phaseIndex);
 	}
 
-	runNotationMove(move, phaseIndex, withActuate) {
-		debug("Running Move: ");
+	runNotationMove(move, phaseIndex, withActuate, ignorePathFinding) {
 		var moveData = move.moveData.phases[phaseIndex];
 
 		if (moveData.moveType === BeyondTheMaps.MoveType.EXPLORE_SEA) {
+			if (withActuate && !ignorePathFinding) {
+				// Discover the movement path
+				var moveDistance = moveData.moveDistance ? moveData.moveDistance : 6;
+				moveData.movementPath = this.board.findPathForMovement(moveData.startPoint, moveData.endPoint, moveData.landPoint, moveDistance);
+			}
 			this.board.moveShip(moveData.startPoint, moveData.endPoint, moveData.landPoint);
 		} else if (moveData.moveType === BeyondTheMaps.MoveType.EXPLORE_LAND) {
 			this.board.placeLandPiecesForPlayer(move.player, moveData.landPoints);
 		}
 	
 		if (withActuate) {
-			this.actuate(move);
+			this.actuate(move, phaseIndex);
 		}
 	}
 
@@ -55,11 +59,11 @@ BeyondTheMaps.GameManager = class {
 		this.actuate();
 	}
 
-	revealPossibleMovePoints(boardPoint, ignoreActuate) {
+	revealPossibleMovePoints(boardPoint, ignoreActuate, moveDistance) {
 		if (!boardPoint.hasTile()) {
 			return;
 		}
-		this.board.setPossibleMovePoints(boardPoint);
+		this.board.setPossibleMovePoints(boardPoint, moveDistance);
 		
 		if (!ignoreActuate) {
 			this.actuate();

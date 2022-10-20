@@ -132,7 +132,10 @@ BeyondTheMaps.Controller = class {
 				this.getCurrentMovePhase().startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 				this.notationBuilder.startBoardPoint = boardPoint;
 
-				this.theGame.revealPossibleMovePoints(boardPoint);
+				//
+				var moveDistance = 6;
+
+				this.theGame.revealPossibleMovePoints(boardPoint, false, moveDistance);
 				refreshMessage();
 			}
 		} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
@@ -144,7 +147,7 @@ BeyondTheMaps.Controller = class {
 				this.theGame.hidePossibleMovePoints();
 
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex);
+				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true);
 
 				var landPointsPossible = this.theGame.markPossibleLandPointsForMovement(boardPoint, possiblePaths, this.notationBuilder.player);
 
@@ -273,9 +276,23 @@ BeyondTheMaps.Controller = class {
 	}
 
 	runMove(move, withActuate, moveAnimationBeginStep, skipAnimation) {
-		for (var phaseIndex = 0; phaseIndex < move.moveData.phases.length; phaseIndex++) {
-			this.theGame.runNotationMove(move, phaseIndex, withActuate);
+		var numPhases = move.moveData.phases.length;
+		var phaseIndex = 0;
+		this.theGame.runNotationMove(move, phaseIndex, withActuate);
+		phaseIndex++;
+		if (numPhases > phaseIndex) {
+			debug("MORE THAN ONE PHASE");
+			var phaseInterval = setTimeout(() => {
+				this.theGame.runNotationMove(move, phaseIndex, withActuate);
+				phaseIndex++;
+				if (phaseIndex >= numPhases) {
+					clearInterval(phaseInterval);
+				}
+			}, replayIntervalLength / numPhases);
 		}
+		// for (var phaseIndex = 0; phaseIndex < move.moveData.phases.length; phaseIndex++) {
+		// 	this.theGame.runNotationMove(move, phaseIndex, withActuate);
+		// }
 	}
 
 	cleanup() {

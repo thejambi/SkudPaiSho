@@ -35,26 +35,33 @@ BeyondTheMaps.Actuator = class {
 		this.animationOn = isOn;
 	}
 
-	actuate(board, markingManager, moveToAnimate) {
+	actuate(board, markingManager, moveToAnimate, phaseIndex) {
 		var self = this;
 
 		this.tileContainerTileDivs = {}
 
-		debug(moveToAnimate);
+		if (moveToAnimate) {
+			debug("Actuating: ");
+			debug(moveToAnimate);
+			debug("PhaseIndex: " + phaseIndex);
+		}
+
+		this.board = board;
+		this.moveToAnimate = moveToAnimate;
+		this.phaseIndex = phaseIndex;
+		this.movePhaseData = this.moveToAnimate && this.moveToAnimate.moveData.phases[this.phaseIndex];
 
 		window.requestAnimationFrame(function() {
-			self.htmlify(board, markingManager, moveToAnimate);
+			self.htmlify(markingManager);
 		});
 	}
 
-	htmlify(board, markingManager, moveToAnimate) {
+	htmlify(markingManager) {
 		this.clearContainer(this.boardContainer);
 		this.clearContainer(this.arrowContainer);
 
-		var self = this;
-
-		board.cells.forEach(function(column) {
-			column.forEach(function(cell) {
+		this.board.cells.forEach(column => {
+			column.forEach(cell => {
 				if (markingManager.pointIsMarked(cell) && !cell.isType(MARKED)) {
 					cell.addType(MARKED);
 				}
@@ -62,7 +69,7 @@ BeyondTheMaps.Actuator = class {
 					cell.removeType(MARKED);
 				}
 				if (cell) {
-					self.addBoardPoint(cell, moveToAnimate);
+					this.addBoardPoint(cell);
 				}
 			});
 		});
@@ -72,8 +79,8 @@ BeyondTheMaps.Actuator = class {
 			this.arrowContainer.appendChild(createBoardArrow(arrow[0], arrow[1]));
 		}
 
-		self.clearContainerWithId(BeyondTheMaps.Actuator.hostTeamTilesDivId);
-		self.clearContainerWithId(BeyondTheMaps.Actuator.guestTeamTilesDivId);
+		this.clearContainerWithId(BeyondTheMaps.Actuator.hostTeamTilesDivId);
+		this.clearContainerWithId(BeyondTheMaps.Actuator.guestTeamTilesDivId);
 
 		// Go through tile piles and display
 		
@@ -157,7 +164,7 @@ BeyondTheMaps.Actuator = class {
 		return srcValue;
 	}
 
-	addBoardPoint(boardPoint, moveToAnimate) {
+	addBoardPoint(boardPoint) {
 		var self = this;
 
 		var theDiv = createBoardPointDiv(boardPoint);
@@ -167,23 +174,12 @@ BeyondTheMaps.Actuator = class {
 			if (boardPoint.isType(MARKED)) {
 				theDiv.classList.add("markedPoint");
 			}
-			if (gameOptionEnabled(VAGABOND_ROTATE)) {
-				theDiv.classList.add("vagabondPointRotate");
-			} else if (gameOptionEnabled(ADEVAR_ROTATE)) {
-				theDiv.classList.add("adevarPointRotate");
-			} else if (gameOptionEnabled(GINSENG_ROTATE)) {
-				theDiv.classList.add("ginsengPointRotate");
-			}
+			// If we do this eventually
+			/* if (gameOptionEnabled(SKUD_180_ROTATE)) {
+				theDiv.classList.add("skud180PointRotate");
+			} */
 			if (boardPoint.isType(POSSIBLE_MOVE)) {
 				theDiv.classList.add("possibleMove");
-			} else if (boardPoint.betweenHarmony) {
-				theDiv.classList.add("betweenHarmony");
-				if (boardPoint.betweenHarmonyHost) {
-					theDiv.classList.add("bhHost");
-				}
-				if (boardPoint.betweenHarmonyGuest) {
-					theDiv.classList.add("bhGuest");
-				}
 			}
 
 			if (this.mobile) {
@@ -216,18 +212,18 @@ BeyondTheMaps.Actuator = class {
 			var theImg = document.createElement("img");
 			theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 
-			if (gameOptionEnabled(ADEVAR_ROTATE)) {
-				theImg.elementStyleTransform.setValue("rotate", 225, "deg");
-			} else if (gameOptionEnabled(VAGABOND_ROTATE)) {
-				theImg.elementStyleTransform.setValue("rotate", 315, "deg");
-			} else if (gameOptionEnabled(GINSENG_ROTATE)) {
-				theImg.elementStyleTransform.setValue("rotate", 270, "deg");
-			} else if (gameOptionEnabled(GINSENG_GUEST_ROTATE)) {
-				theImg.elementStyleTransform.setValue("rotate", 90, "deg");
-			}
+			// if (gameOptionEnabled(ADEVAR_ROTATE)) {
+			// 	theImg.elementStyleTransform.setValue("rotate", 225, "deg");
+			// } else if (gameOptionEnabled(VAGABOND_ROTATE)) {
+			// 	theImg.elementStyleTransform.setValue("rotate", 315, "deg");
+			// } else if (gameOptionEnabled(GINSENG_ROTATE)) {
+			// 	theImg.elementStyleTransform.setValue("rotate", 270, "deg");
+			// } else if (gameOptionEnabled(GINSENG_GUEST_ROTATE)) {
+			// 	theImg.elementStyleTransform.setValue("rotate", 90, "deg");
+			// }
 
-			if (moveToAnimate) {
-				this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
+			if (this.moveToAnimate && this.movePhaseData) {
+				this.doAnimateBoardPoint(boardPoint, theImg, theDiv);
 			}
 
 			var srcValue = this.getTileSrcPath(boardPoint.tile);
@@ -235,10 +231,10 @@ BeyondTheMaps.Actuator = class {
 
 			theDiv.appendChild(theImg);
 
-			if (this.animationOn && moveToAnimate && moveToAnimate.capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
-				debug("Captured " + moveToAnimate.capturedTile.code);
+			if (this.animationOn && this.movePhaseData && this.movePhaseData.capturedTile && isSamePoint(this.movePhaseData.endPoint, boardPoint.col, boardPoint.row)) {
+				debug("Captured " + this.movePhaseData.capturedTile.code);
 				var theImgCaptured = document.createElement("img");
-				theImgCaptured.src = srcValue + moveToAnimate.capturedTile.getImageName() + ".png";
+				theImgCaptured.src = srcValue + this.movePhaseData.capturedTile.getImageName() + ".png";
 				theImgCaptured.classList.add("underneath");
 				theDiv.appendChild(theImgCaptured);
 
@@ -260,55 +256,137 @@ BeyondTheMaps.Actuator = class {
 		}
 	}
 
-	doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv) {
-		debug("Animating? " + this.animationOn);
+	doAnimateBoardPoint(boardPoint, theImg, theDiv) {
 		if (!this.animationOn) return;
-
-		var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y;
-
-		if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
-			if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
-				x = moveToAnimate.startPoint.rowAndColumn.col;
-				y = moveToAnimate.startPoint.rowAndColumn.row;
+	
+		var startX = boardPoint.col, startY = boardPoint.row, endX = startX, endY = startY;
+	
+		var movementPath;
+	
+		var movementStepIndex = 0;
+	
+		if (this.movePhaseData.moveType === BeyondTheMaps.MoveType.EXPLORE_SEA && boardPoint.tile) {
+			if (isSamePoint(this.movePhaseData.endPoint, endX, endY)) {	// Piece moved
+				var moveStartPoint = this.movePhaseData.startPoint;
+				startX = moveStartPoint.rowAndColumn.col;
+				startY = moveStartPoint.rowAndColumn.row;
 				theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving, good idea or no?
 				theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
-			}
-		} else if (moveToAnimate.moveType === DEPLOY) {
-			if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
-				if (piecePlaceAnimation === 1) {
-					theImg.elementStyleTransform.setValue("scale", 2);
-					theDiv.style.zIndex = 99;
-					requestAnimationFrame(function() {
-						theImg.elementStyleTransform.setValue("scale", 1);
-					});
+	
+				movementPath = this.movePhaseData.endPointMovementPath;
+				if (!movementPath && this.movePhaseData.movementPath) {
+					movementPath = this.movePhaseData.movementPath;
 				}
 			}
 		}
-
+	
 		var pointSizeMultiplierX = 34;
 		var pointSizeMultiplierY = pointSizeMultiplierX;
 		var unitString = "px";
-
+	
 		/* For small screen size using dynamic vw units */
 		if (window.innerWidth <= 612) {
 			pointSizeMultiplierX = 5.5555;
 			pointSizeMultiplierY = 5.611;
 			unitString = "vw";
 		}
-
-		theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
-		theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
-
-		requestAnimationFrame(function() {
-			theImg.style.left = "0px";
-			theImg.style.top = "0px";
-		});
+	
+		var left = (startX - endX);
+		var top = (startY - endY);
+		
+		/* Begin tile at origin point */
+		theImg.style.left = (left * pointSizeMultiplierX) + unitString;
+		theImg.style.top = (top * pointSizeMultiplierY) + unitString;
+	
+		if (movementPath) {
+			var numMovements = movementPath.length - 1;
+			var movementAnimationLength = pieceAnimationLength / numMovements;
+			var cssLength = movementAnimationLength * (1 + (0.05 * numMovements));	// Higher multiplication factor gives smoother transition
+			theImg.style.transition = "left " + cssLength + "ms ease-out, right " + cssLength + "ms ease-out, top " + cssLength + "ms ease-out, bottom " + movementAnimationLength + "ms ease-out, transform 0.5s ease-in, opacity 0.5s";
+			var movementNum = -1;
+			movementPath.forEach(pathPoint => {
+				var currentMovementAnimationTime = movementAnimationLength * movementNum;
+				setTimeout(function() {
+					requestAnimationFrame(function() {
+						// var pathPoint = new NotationPoint(pathPointStr);
+						var pointX = pathPoint.col;
+						var pointY = pathPoint.row;
+						left = (pointX - endX);
+						top = (pointY - endY);
+						theImg.style.left = (left * pointSizeMultiplierX) + unitString;
+						theImg.style.top = (top * pointSizeMultiplierY) + unitString;
+						debug("time: " + currentMovementAnimationTime + " left: " + left + " top: " + top);
+					});
+				}, currentMovementAnimationTime);
+				movementNum++;
+			});
+		} else {
+			/* Make tile be at it's current point so it animates to that point from start point */
+			setTimeout(() => {
+				requestAnimationFrame(function() {
+					theImg.style.left = "0px";
+					theImg.style.top = "0px";
+				});
+			}, pieceAnimationLength * movementStepIndex);
+		}
+	
+		/* Scale back to normal size after animation complete */
 		setTimeout(function() {
 			requestAnimationFrame(function() {
-				theImg.elementStyleTransform.setValue("scale", 1);	// This will size back to normal after moving
+				theImg.elementStyleTransform.setValue("scale", 1); // This will size back to normal after moving
 			});
-		}, pieceAnimationLength);
+		}, pieceAnimationLength * (movementStepIndex + 0.5));
 	}
+
+	// doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv) {
+	// 	debug("Animating? " + this.animationOn);
+	// 	if (!this.animationOn) return;
+
+	// 	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y;
+
+	// 	if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
+	// 		if (isSamePoint(moveToAnimate.endPoint, x, y)) {// Piece moved
+	// 			x = moveToAnimate.startPoint.rowAndColumn.col;
+	// 			y = moveToAnimate.startPoint.rowAndColumn.row;
+	// 			theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving, good idea or no?
+	// 			theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
+	// 		}
+	// 	} else if (moveToAnimate.moveType === DEPLOY) {
+	// 		if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
+	// 			if (piecePlaceAnimation === 1) {
+	// 				theImg.elementStyleTransform.setValue("scale", 2);
+	// 				theDiv.style.zIndex = 99;
+	// 				requestAnimationFrame(function() {
+	// 					theImg.elementStyleTransform.setValue("scale", 1);
+	// 				});
+	// 			}
+	// 		}
+	// 	}
+
+	// 	var pointSizeMultiplierX = 34;
+	// 	var pointSizeMultiplierY = pointSizeMultiplierX;
+	// 	var unitString = "px";
+
+	// 	/* For small screen size using dynamic vw units */
+	// 	if (window.innerWidth <= 612) {
+	// 		pointSizeMultiplierX = 5.5555;
+	// 		pointSizeMultiplierY = 5.611;
+	// 		unitString = "vw";
+	// 	}
+
+	// 	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	// 	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+
+	// 	requestAnimationFrame(function() {
+	// 		theImg.style.left = "0px";
+	// 		theImg.style.top = "0px";
+	// 	});
+	// 	setTimeout(function() {
+	// 		requestAnimationFrame(function() {
+	// 			theImg.elementStyleTransform.setValue("scale", 1);	// This will size back to normal after moving
+	// 		});
+	// 	}, pieceAnimationLength);
+	// }
 
 	getRandomTilePileDiv(pileName) {
 		return peekRandomFromArray(this.tileContainerTileDivs[pileName]);
