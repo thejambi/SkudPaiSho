@@ -260,9 +260,7 @@ BeyondTheMaps.Actuator = class {
 		if (!this.animationOn) return;
 	
 		var startX = boardPoint.col, startY = boardPoint.row, endX = startX, endY = startY;
-	
 		var movementPath;
-	
 		var movementStepIndex = 0;
 	
 		if (this.movePhaseData.moveType === BeyondTheMaps.MoveType.EXPLORE_SEA && boardPoint.tile) {
@@ -277,7 +275,21 @@ BeyondTheMaps.Actuator = class {
 				if (!movementPath && this.movePhaseData.movementPath) {
 					movementPath = this.movePhaseData.movementPath;
 				}
+			} else if (isSamePoint(this.movePhaseData.landPoint, endX, endY)) {
+				movementStepIndex = 0.7;
+				theImg.style.visibility = "hidden";
+				theImg.style.transform = "scale(1.5)";
 			}
+		} else if (this.movePhaseData.moveType === BeyondTheMaps.MoveType.EXPLORE_LAND && boardPoint.tile) {
+			var landPointIndex = 0;
+			this.movePhaseData.landPoints.forEach(landPoint => {
+				if (isSamePoint(landPoint, endX, endY)) {
+					movementStepIndex = (landPointIndex / this.movePhaseData.landPoints.length) * 0.9;
+					theImg.style.visibility = "hidden";
+					theImg.style.transform = "scale(1.5)";
+				}
+				landPointIndex++;
+			});
 		}
 	
 		var pointSizeMultiplierX = 34;
@@ -300,7 +312,7 @@ BeyondTheMaps.Actuator = class {
 	
 		if (movementPath) {
 			var numMovements = movementPath.length - 1;
-			var movementAnimationLength = pieceAnimationLength / numMovements;
+			var movementAnimationLength = (pieceAnimationLength / numMovements) * 0.7;
 			var cssLength = movementAnimationLength * (1 + (0.05 * numMovements));	// Higher multiplication factor gives smoother transition
 			theImg.style.transition = "left " + cssLength + "ms ease-out, right " + cssLength + "ms ease-out, top " + cssLength + "ms ease-out, bottom " + movementAnimationLength + "ms ease-out, transform 0.5s ease-in, opacity 0.5s";
 			var movementNum = -1;
@@ -326,6 +338,8 @@ BeyondTheMaps.Actuator = class {
 				requestAnimationFrame(function() {
 					theImg.style.left = "0px";
 					theImg.style.top = "0px";
+					theImg.style.visibility = "visible";
+					theImg.style.transform = "scale(1)";
 				});
 			}, pieceAnimationLength * movementStepIndex);
 		}

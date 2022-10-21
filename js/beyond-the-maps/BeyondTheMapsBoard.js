@@ -17,6 +17,8 @@ BeyondTheMaps.Board = class {
 		}
 
 		this.winners = [];
+		this.seaGroups = [];
+		this.knownSeaPoints = [];
 	}
 
 	getArrayOfBoardPoints() {
@@ -153,18 +155,6 @@ BeyondTheMaps.Board = class {
 	}
 
 	setPossibleMovePoints(boardPointStart, moveDistance) {
-		/* if (!boardPointStart.hasTile()) {
-			return;
-		}
-		var player = boardPointStart.tile.ownerName;
-		for (var row = 0; row < this.cells.length; row++) {
-			for (var col = 0; col < this.cells[row].length; col++) {
-				if (this.canMoveTileToPoint(player, boardPointStart, this.cells[row][col])) {
-					this.cells[row][col].addType(POSSIBLE_MOVE);
-				}
-			}
-		} */
-
 		if (boardPointStart.hasTile()) {
 			this.setPossibleMovesForMovement({ title: "Btm", distance: moveDistance }, boardPointStart);
 		}
@@ -452,20 +442,45 @@ BeyondTheMaps.Board = class {
 	findPathForMovement(notationPointStart, notationPointEnd, notationPointLand, moveDistance) {
 		var startPoint = this.getBoardPointFromNotationPoint(notationPointStart);
 		var endPoint = this.getBoardPointFromNotationPoint(notationPointEnd);
-		var landPoint = this.getBoardPointFromNotationPoint(notationPointLand);
+		var landPoint = notationPointLand ? this.getBoardPointFromNotationPoint(notationPointLand) : null;
 		this.setPossibleMovePoints(startPoint, moveDistance - 1);
 
-		var lastStepPoint = this.getPointOpposite(endPoint, landPoint);
+		var pointWithPossiblePaths = endPoint;
 
-		var movementPath = getShortestArrayFromArrayOfArrays(lastStepPoint.possibleMovementPaths);
+		if (landPoint) {
+			pointWithPossiblePaths = this.getPointOpposite(endPoint, landPoint);
+
+			pointWithPossiblePaths.possibleMovementPaths.forEach(path => {
+				path.push(pointWithPossiblePaths);
+				path.push(endPoint);
+			});
+		} else {
+			endPoint.possibleMovementPaths.forEach(path => {
+				path.push(endPoint);
+			});
+		}
+
+		var movementPath = this.decidePathToUse(pointWithPossiblePaths.possibleMovementPaths);
 
 		/* Done using marked points, clear now */
 		this.removePossibleMovePoints();
 
-		movementPath.push(lastStepPoint);
-		movementPath.push(endPoint);
-
 		return movementPath;
+	}
+
+	decidePathToUse(possibleMovementPaths) {
+		var pathsWithoutDuplicates = [];
+		possibleMovementPaths.forEach(path => {
+			if (!arrayContainsDuplicates(path)) {
+				debug("NO duppppees");
+				pathsWithoutDuplicates.push(path);
+			}
+		});
+		if (pathsWithoutDuplicates.length > 0) {
+			return getShortestArrayFromArrayOfArrays(pathsWithoutDuplicates);
+		} else {
+			return getShortestArrayFromArrayOfArrays(possibleMovementPaths);
+		}
 	}
 
 	getPointOpposite(centerPoint, knownSidePoint) {
@@ -494,6 +509,179 @@ BeyondTheMaps.Board = class {
 			}
 		}
 		return landPoint;
+	}
+
+	setPossibleExploreLandPointsForPlayer(playerName) {
+		// Get all "peninsulas"
+		var peninsulaPoints = [];
+		this.forEachBoardPointWithTile(pointWithTile => {
+			if (this.pointIsPeninsulaForPlayer(pointWithTile, playerName)) {
+				peninsulaPoints.push(pointWithTile);
+			}
+		});
+
+		if (peninsulaPoints.length) {
+			debug("El peninsulas!");
+			peninsulaPoints.forEach(peninsulaPoint => {
+				var adjacentPoints = this.getAdjacentPoints(peninsulaPoint);
+				adjacentPoints.forEach(adjacentPoint => {
+					if (!adjacentPoint.hasTile()) {
+						adjacentPoint.addType(POSSIBLE_MOVE);
+					}
+				});
+			});
+		}
+	}
+
+	setPossibleContinueExploreLandPointsForPlayer(playerName, boardPoint) {
+		var possiblePointsFound = false;
+		var adjacentPoints = this.getAdjacentPoints(boardPoint);
+		adjacentPoints.forEach(adjacentPoint => {
+			if (!adjacentPoint.hasTile()) {
+				adjacentPoint.addType(POSSIBLE_MOVE);
+				possiblePointsFound = true;
+			}
+		});
+		return possiblePointsFound;
+	}
+
+	pointIsPeninsulaForPlayer(boardPoint, playerName) {
+		if (boardPoint.hasTile() 
+				&& boardPoint.tile.tileType === BeyondTheMaps.TileType.LAND
+				&& boardPoint.tile.ownerName === playerName) {
+			// if adjacent to <= 1 lands of same player, yes
+			var adjacentFriendlyLandCount = 0;
+			this.getAdjacentPoints(boardPoint).forEach(adjacentPoint => {
+				if (adjacentPoint.hasTile() 
+						&& adjacentPoint.tile.tileType === BeyondTheMaps.TileType.LAND
+						&& adjacentPoint.tile.ownerName === playerName) {
+					adjacentFriendlyLandCount++;
+				}
+			});
+			return adjacentFriendlyLandCount <= 1;
+		}
+		return false;
+	}
+
+	fillEnclosedLandForPlayer(playerName) {
+		var landfillPoints = [];
+
+		return landfillPoints;
+	}
+
+	analyzeSeaGroups() {
+		this.seaGroups = [];
+		this.knownSeaPoints = [];
+		this.shipSea = null;
+	 
+		this.forEachBoardPoint(bp => {
+			if (this.pointIsEmptyOrShip(bp)) {
+				if (!this.knownSeaPoints.includes(bp.getNotationPointString())) {
+					var seaGroup = [];
+
+					if (bp.hasTile()) {
+						this.shipSea = seaGroup;
+					}
+
+					seaGroup.push(bp);
+					bp.seaGroupId = this.seaGroups.length;
+
+					this.knownSeaPoints.push(bp.getNotationPointString());
+
+					this.collectAdjacentPointsInSeaGroup(bp, seaGroup);
+
+					this.seaGroups.push(seaGroup);
+				}
+			} else {
+				bp.seaGroupId = null;
+			}
+		});
+	
+		debug("# of Sea Groups: " + this.seaGroups.length);
+	}
+
+	collectAdjacentPointsInSeaGroup(bp, seaGroup) {
+		var adjacentPoints = this.getAdjacentPoints(bp);
+
+		adjacentPoints.forEach(nextPoint => {
+			if (!this.knownSeaPoints.includes(nextPoint.getNotationPointString())
+					&& this.pointIsEmptyOrShip(nextPoint)) {
+				if (nextPoint.hasTile()) {
+					this.shipSea = seaGroup;
+				}
+				seaGroup.push(nextPoint);
+				nextPoint.seaGroupId = bp.seaGroupId;
+				this.knownSeaPoints.push(nextPoint.getNotationPointString());
+				this.collectAdjacentPointsInSeaGroup(nextPoint, seaGroup);
+			}
+		});
+	}
+
+	pointIsEmptyOrShip(point) {
+		return !point.hasTile()
+			|| (point.hasTile() && point.tile.tileType === BeyondTheMaps.TileType.SHIP);
+	}
+
+	getAdjacentRowAndCols(rowAndCol) {
+		var rowAndCols = [];
+	
+		if (rowAndCol.row > 0) {
+			var adjacentPoint = this.cells[rowAndCol.row - 1][rowAndCol.col];
+			if (!adjacentPoint.isType(NON_PLAYABLE)) {
+				rowAndCols.push(adjacentPoint);
+			}
+		}
+		if (rowAndCol.row < BeyondTheMaps.FULL_BOARD_SIZE_LENGTH - 1) {
+			var adjacentPoint = this.cells[rowAndCol.row + 1][rowAndCol.col];
+			if (!adjacentPoint.isType(NON_PLAYABLE)) {
+				rowAndCols.push(adjacentPoint);
+			}
+		}
+		if (rowAndCol.col > 0) {
+			var adjacentPoint = this.cells[rowAndCol.row][rowAndCol.col - 1];
+			if (!adjacentPoint.isType(NON_PLAYABLE)) {
+				rowAndCols.push(adjacentPoint);
+			}
+		}
+		if (rowAndCol.col < BeyondTheMaps.FULL_BOARD_SIZE_LENGTH - 1) {
+			var adjacentPoint = this.cells[rowAndCol.row][rowAndCol.col + 1];
+			if (!adjacentPoint.isType(NON_PLAYABLE)) {
+				rowAndCols.push(adjacentPoint);
+			}
+		}
+	
+		return rowAndCols;
+	}
+	getAdjacentPoints(boardPointStart) {
+		return this.getAdjacentRowAndCols(boardPointStart);
+	}
+
+	forEachBoardPoint(forEachFunc) {
+		this.cells.forEach(function(row) {
+			row.forEach(function(boardPoint) {
+				if (!boardPoint.isType(NON_PLAYABLE)) {
+					forEachFunc(boardPoint);
+				}
+			});
+		});
+	}
+	forEachBoardPointDoMany(forEachFuncList) {
+		this.cells.forEach(function(row) {
+			row.forEach(function(boardPoint) {
+				if (!boardPoint.isType(NON_PLAYABLE)) {
+					forEachFuncList.forEach(function(forEachFunc) {
+						forEachFunc(boardPoint);
+					});
+				}
+			});
+		});
+	}
+	forEachBoardPointWithTile(forEachFunc) {
+		this.forEachBoardPoint(function(boardPoint) {
+			if (boardPoint.hasTile()) {
+				forEachFunc(boardPoint);
+			}
+		});
 	}
 
 	getCopy() {

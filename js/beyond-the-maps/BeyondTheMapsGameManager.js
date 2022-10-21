@@ -48,6 +48,9 @@ BeyondTheMaps.GameManager = class {
 		} else if (moveData.moveType === BeyondTheMaps.MoveType.EXPLORE_LAND) {
 			this.board.placeLandPiecesForPlayer(move.player, moveData.landPoints);
 		}
+
+		/* Check for enclosed land for player */
+		moveData.landfillPoints = this.board.fillEnclosedLandForPlayer(move.player);
 	
 		if (withActuate) {
 			this.actuate(move, phaseIndex);
@@ -68,6 +71,24 @@ BeyondTheMaps.GameManager = class {
 		if (!ignoreActuate) {
 			this.actuate();
 		}
+	}
+
+	revealPossibleExploreLandPoints(playerName, ignoreActuate) {
+		this.board.setPossibleExploreLandPointsForPlayer(playerName);
+
+		if (!ignoreActuate) {
+			this.actuate();
+		}
+	}
+
+	revealPossibleContinueExploreLandPoints(playerName, boardPoint, ignoreActuate) {
+		var possiblePointsFound = this.board.setPossibleContinueExploreLandPointsForPlayer(playerName, boardPoint);
+
+		if (!ignoreActuate) {
+			this.actuate();
+		}
+
+		return possiblePointsFound;
 	}
 
 	hidePossibleMovePoints(ignoreActuate) {
@@ -113,7 +134,9 @@ BeyondTheMaps.GameManager = class {
 
 			possibleLastStepPoints.forEach(lastStepPoint => {
 				var possiblePoint = this.board.markLandPointAtEndOfPathPossibleMove(boardPointEnd, lastStepPoint, player);
-				possibleLandPoints.push(possiblePoint);
+				if (possiblePoint) {
+					possibleLandPoints.push(possiblePoint);
+				}
 			});
 		}
 		return possibleLandPoints;
