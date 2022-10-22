@@ -282,14 +282,16 @@ BeyondTheMaps.Actuator = class {
 			}
 		} else if (this.movePhaseData.moveType === BeyondTheMaps.MoveType.EXPLORE_LAND && boardPoint.tile) {
 			var landPointIndex = 0;
-			this.movePhaseData.landPoints.forEach(landPoint => {
-				if (isSamePoint(landPoint, endX, endY)) {
-					movementStepIndex = (landPointIndex / this.movePhaseData.landPoints.length) * 0.9;
-					theImg.style.visibility = "hidden";
-					theImg.style.transform = "scale(1.5)";
-				}
-				landPointIndex++;
-			});
+			if (this.movePhaseData.landPoints && this.movePhaseData.landPoints.length > 0) {
+				this.movePhaseData.landPoints.forEach(landPoint => {
+					if (isSamePoint(landPoint, endX, endY)) {
+						movementStepIndex = (landPointIndex / this.movePhaseData.landPoints.length) * 0.9;
+						theImg.style.visibility = "hidden";
+						theImg.style.transform = "scale(1.5)";
+					}
+					landPointIndex++;
+				});
+			}
 		}
 	
 		var pointSizeMultiplierX = 34;

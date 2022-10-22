@@ -13,6 +13,7 @@ BeyondTheMaps.Controller = class {
 		this.resetGameManager();
 		this.resetNotationBuilder();
 		this.resetGameNotation();
+		this.messageToPlayer = "";
 
 		showReplayControls();
 	}
@@ -97,7 +98,8 @@ BeyondTheMaps.Controller = class {
 
 			msg += getGameOptionsMessageHtml(GameType.BeyondTheMaps.gameOptions);
 		} else {
-			// 
+			msg += "<br /><br />";
+			msg += this.messageToPlayer;
 		}
 
 		return msg;
@@ -176,14 +178,22 @@ BeyondTheMaps.Controller = class {
 					refreshMessage();
 				} else if (boardPoint.tile.tileType === BeyondTheMaps.TileType.LAND
 						&& this.canExploreLand()) {
-					this.notationBuilder.status = WAITING_FOR_ENDPOINT; //BeyondTheMaps.Status.WaitingForLandPoint;	// Only if land possible?
-
+					this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 					this.beginNewMovePhase();
 					this.getCurrentMovePhase().moveType = BeyondTheMaps.MoveType.EXPLORE_LAND;
 					this.notationBuilder.player = this.getCurrentPlayer();
 					this.notationBuilder.currentPlayer = this.getCurrentPlayer();
 
-					this.theGame.revealPossibleExploreLandPoints(this.getCurrentPlayer());
+					var possiblePointsFound = this.theGame.revealPossibleExploreLandPoints(this.getCurrentPlayer());
+
+					if (!possiblePointsFound) {
+						if (this.notationBuilder.phaseIndex === 0) {
+							this.messageToPlayer = "Explore Sea first";
+						} else {
+							this.completeMovePhase();
+						}
+						this.resetNotationBuilderPhase();
+					}
 
 					refreshMessage();
 				}
@@ -267,7 +277,9 @@ BeyondTheMaps.Controller = class {
 	}
 
 	completeMovePhase() {
-		// var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+		this.messageToPlayer = "";
+		refreshMessage();
+
 		var moveIsComplete = this.notationBuilder.moveData.phases.length >= 2;
 
 		this.notationBuilder.status = BRAND_NEW;

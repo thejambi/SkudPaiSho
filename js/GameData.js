@@ -173,6 +173,29 @@ function copyObject(mainObject) {
   return objectCopy;
 }
 
+function getLongestArrayFromArrayOfArrays(arrayOfArrays) {
+  var longestYet = null;
+  arrayOfArrays.forEach(arr => {
+    if (!longestYet || longestYet.length < arr.length) {
+      longestYet = arr;
+    }
+  });
+  return longestYet;
+}
+function getShortestArrayFromArrayOfArrays(arrayOfArrays) {
+  var shortestYet = null;
+  arrayOfArrays.forEach(arr => {
+    if (!shortestYet || shortestYet.length > arr.length) {
+      shortestYet = arr;
+    }
+  });
+  return shortestYet;
+}
+
+function arrayContainsDuplicates(array) {
+  return array.length !== new Set(array).size;
+}
+
 // Array shuffle
 function shuffleArray(array) {
   var i = 0

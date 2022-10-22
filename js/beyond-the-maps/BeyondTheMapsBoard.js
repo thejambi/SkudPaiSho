@@ -433,10 +433,12 @@ BeyondTheMaps.Board = class {
 	}
 
 	placeLandPiecesForPlayer(playerName, landNotationPoints) {
-		landNotationPoints.forEach(landNotationPoint => {
-			var tile = new BeyondTheMaps.Tile(BeyondTheMaps.TileType.LAND, getPlayerCodeFromName(playerName));
-			this.placeTile(tile, landNotationPoint);
-		});
+		if (landNotationPoints && landNotationPoints.length > 0) {
+			landNotationPoints.forEach(landNotationPoint => {
+				var tile = new BeyondTheMaps.Tile(BeyondTheMaps.TileType.LAND, getPlayerCodeFromName(playerName));
+				this.placeTile(tile, landNotationPoint);
+			});
+		}
 	}
 
 	findPathForMovement(notationPointStart, notationPointEnd, notationPointLand, moveDistance) {
@@ -501,8 +503,8 @@ BeyondTheMaps.Board = class {
 		var nextPointArr = this.getAdjacentPointsPotentialPossibleMoves(moveEndPoint, lastStepPoint, true, null);
 		if (nextPointArr && nextPointArr.length > 0) {
 			var possibleLandPoint = nextPointArr[0];
-			if (!possibleLandPoint.hasTile() 
-				|| (possibleLandPoint.tile.tileType === BeyondTheMaps.TileType.LAND && possibleLandPoint.tile.ownerName !== player)
+			if ((!possibleLandPoint.hasTile() && !this.placingLandSeparatesShips(possibleLandPoint))
+				|| (possibleLandPoint.hasTile() && possibleLandPoint.tile.tileType === BeyondTheMaps.TileType.LAND && possibleLandPoint.tile.ownerName !== player)
 			) {
 				landPoint = possibleLandPoint;
 				landPoint.addType(POSSIBLE_MOVE);
@@ -511,7 +513,15 @@ BeyondTheMaps.Board = class {
 		return landPoint;
 	}
 
+	placingLandSeparatesShips(boardPoint) {
+		var newBoard = this.getCopy();
+		newBoard.placeLandPiecesForPlayer(HOST, [boardPoint]);
+		newBoard.analyzeSeaGroups();
+		return newBoard.shipPoints[HOST].seaGroupId !== newBoard.shipPoints[GUEST].seaGroupId;
+	}
+
 	setPossibleExploreLandPointsForPlayer(playerName) {
+		var possibleLandPointsFound = false;
 		// Get all "peninsulas"
 		var peninsulaPoints = [];
 		this.forEachBoardPointWithTile(pointWithTile => {
@@ -525,19 +535,22 @@ BeyondTheMaps.Board = class {
 			peninsulaPoints.forEach(peninsulaPoint => {
 				var adjacentPoints = this.getAdjacentPoints(peninsulaPoint);
 				adjacentPoints.forEach(adjacentPoint => {
-					if (!adjacentPoint.hasTile()) {
+					if (!adjacentPoint.hasTile() && !this.placingLandSeparatesShips(adjacentPoint)) {
 						adjacentPoint.addType(POSSIBLE_MOVE);
+						possibleLandPointsFound = true;
 					}
 				});
 			});
 		}
+
+		return possibleLandPointsFound;
 	}
 
 	setPossibleContinueExploreLandPointsForPlayer(playerName, boardPoint) {
 		var possiblePointsFound = false;
 		var adjacentPoints = this.getAdjacentPoints(boardPoint);
 		adjacentPoints.forEach(adjacentPoint => {
-			if (!adjacentPoint.hasTile()) {
+			if (!adjacentPoint.hasTile() && !this.placingLandSeparatesShips(adjacentPoint)) {
 				adjacentPoint.addType(POSSIBLE_MOVE);
 				possiblePointsFound = true;
 			}
@@ -566,21 +579,23 @@ BeyondTheMaps.Board = class {
 	fillEnclosedLandForPlayer(playerName) {
 		var landfillPoints = [];
 
+		this.analyzeSeaGroups();
+
 		return landfillPoints;
 	}
 
 	analyzeSeaGroups() {
 		this.seaGroups = [];
 		this.knownSeaPoints = [];
-		this.shipSea = null;
-	 
+		this.shipPoints = {};
+
 		this.forEachBoardPoint(bp => {
 			if (this.pointIsEmptyOrShip(bp)) {
 				if (!this.knownSeaPoints.includes(bp.getNotationPointString())) {
 					var seaGroup = [];
 
 					if (bp.hasTile()) {
-						this.shipSea = seaGroup;
+						this.shipPoints[bp.tile.ownerName] = bp;
 					}
 
 					seaGroup.push(bp);
@@ -607,7 +622,7 @@ BeyondTheMaps.Board = class {
 			if (!this.knownSeaPoints.includes(nextPoint.getNotationPointString())
 					&& this.pointIsEmptyOrShip(nextPoint)) {
 				if (nextPoint.hasTile()) {
-					this.shipSea = seaGroup;
+					this.shipPoints[nextPoint.tile.ownerName] = nextPoint;
 				}
 				seaGroup.push(nextPoint);
 				nextPoint.seaGroupId = bp.seaGroupId;

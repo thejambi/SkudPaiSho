@@ -74,11 +74,13 @@ BeyondTheMaps.GameManager = class {
 	}
 
 	revealPossibleExploreLandPoints(playerName, ignoreActuate) {
-		this.board.setPossibleExploreLandPointsForPlayer(playerName);
+		var possiblePointsFound = this.board.setPossibleExploreLandPointsForPlayer(playerName);
 
 		if (!ignoreActuate) {
 			this.actuate();
 		}
+
+		return possiblePointsFound;
 	}
 
 	revealPossibleContinueExploreLandPoints(playerName, boardPoint, ignoreActuate) {
