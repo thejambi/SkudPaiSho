@@ -273,6 +273,8 @@ BeyondTheMaps.Controller = class {
 
 		if (playingOnlineGame()) {
 			callSubmitMove();
+		} else if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
+			this.startOnlineGame();
 		} else {
 			finalizeMove();
 		}
