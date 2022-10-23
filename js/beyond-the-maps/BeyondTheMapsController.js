@@ -207,7 +207,7 @@ BeyondTheMaps.Controller = class {
 				this.theGame.hidePossibleMovePoints();
 
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true);
+				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true, true);
 
 				var landPointsPossible = this.theGame.markPossibleLandPointsForMovement(boardPoint, possiblePaths, this.notationBuilder.player);
 
@@ -218,6 +218,7 @@ BeyondTheMaps.Controller = class {
 					if (landPointsPossible.length > 0) {
 						this.getCurrentMovePhase().landPoint = new NotationPoint(landPointsPossible[0].getNotationPointString());
 						this.theGame.board.placeLandPiecesForPlayer(this.getCurrentPlayer(), [this.getCurrentMovePhase().landPoint]);
+						this.theGame.board.fillEnclosedLandForPlayer(this.getCurrentPlayer());
 					}
 					this.theGame.hidePossibleMovePoints();
 					this.completeMovePhase();
@@ -232,7 +233,7 @@ BeyondTheMaps.Controller = class {
 				this.getCurrentMovePhase().landPoints.push(new NotationPoint(htmlPoint.getAttribute("name")));
 
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true);
+				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true, true);
 
 				// Deciding number?
 				var exploreLandNumber = 3;
@@ -256,6 +257,7 @@ BeyondTheMaps.Controller = class {
 				this.getCurrentMovePhase().landPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 				
 				this.theGame.board.placeLandPiecesForPlayer(this.getCurrentPlayer(), [this.getCurrentMovePhase().landPoint]);
+				this.theGame.board.fillEnclosedLandForPlayer(this.getCurrentPlayer());
 				this.theGame.hidePossibleMovePoints();
 				
 				this.completeMovePhase();

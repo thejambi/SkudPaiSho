@@ -35,7 +35,7 @@ BeyondTheMaps.GameManager = class {
 		this.actuator.actuate(this.board, this.markingManager, moveToAnimate, phaseIndex);
 	}
 
-	runNotationMove(move, phaseIndex, withActuate, ignorePathFinding) {
+	runNotationMove(move, phaseIndex, withActuate, ignorePathFinding, ignoreWinCheck) {
 		var moveData = move.moveData.phases[phaseIndex];
 
 		if (moveData.moveType === BeyondTheMaps.MoveType.EXPLORE_SEA) {
@@ -51,10 +51,36 @@ BeyondTheMaps.GameManager = class {
 
 		/* Check for enclosed land for player */
 		moveData.landfillPoints = this.board.fillEnclosedLandForPlayer(move.player);
+
+		if (!ignoreWinCheck) {
+			var playersSurrounded = this.board.aShipIsSurrounded();
+			if (playersSurrounded) {
+				// End of game, calculate scores to find winner
+				this.setEndOfGameWinners(playersSurrounded);
+			}
+		}
 	
 		if (withActuate) {
 			this.actuate(move, phaseIndex);
 		}
+	}
+
+	setEndOfGameWinners(playersSurrounded) {
+		var hostScore = this.calculatePlayerScore(HOST);
+		var guestScore = this.calculatePlayerScore(GUEST);
+
+		debug("HOST: " + hostScore + " vs GUEST: " + guestScore);
+
+		if (hostScore >= guestScore) {
+			this.endGameWinners.push(HOST);
+		}
+		if (guestScore >= hostScore) {
+			this.endGameWinners.push(GUEST);
+		}
+	}
+
+	calculatePlayerScore(playerName) {
+		return this.board.countPlayerLandPieces(playerName);
 	}
 
 	revealAllPointsAsPossible() {

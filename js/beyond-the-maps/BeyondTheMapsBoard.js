@@ -503,7 +503,7 @@ BeyondTheMaps.Board = class {
 		var nextPointArr = this.getAdjacentPointsPotentialPossibleMoves(moveEndPoint, lastStepPoint, true, null);
 		if (nextPointArr && nextPointArr.length > 0) {
 			var possibleLandPoint = nextPointArr[0];
-			if ((!possibleLandPoint.hasTile() && !this.placingLandSeparatesShips(possibleLandPoint))
+			if ((!possibleLandPoint.hasTile() && !this.placingLandSeparatesShipsWithoutSurroundingOne(possibleLandPoint))
 				|| (possibleLandPoint.hasTile() && possibleLandPoint.tile.tileType === BeyondTheMaps.TileType.LAND && possibleLandPoint.tile.ownerName !== player)
 			) {
 				landPoint = possibleLandPoint;
@@ -513,11 +513,50 @@ BeyondTheMaps.Board = class {
 		return landPoint;
 	}
 
-	placingLandSeparatesShips(boardPoint) {
+	placingLandSeparatesShipsWithoutSurroundingOne(boardPoint) {
 		var newBoard = this.getCopy();
+
 		newBoard.placeLandPiecesForPlayer(HOST, [boardPoint]);
 		newBoard.analyzeSeaGroups();
-		return newBoard.shipPoints[HOST].seaGroupId !== newBoard.shipPoints[GUEST].seaGroupId;
+		newBoard.fillEnclosedLandForPlayer(HOST);
+		newBoard.fillEnclosedLandForPlayer(GUEST);
+
+		return newBoard.shipsSeparatedAndAShipHasNotBeenSurrounded();
+	}
+
+	shipsSeparatedAndAShipHasNotBeenSurrounded() {
+		return this.shipPoints[HOST].seaGroupId !== this.shipPoints[GUEST].seaGroupId	// Ships separated
+			&& !(																		// AND NOT:
+					this.shipPoints.length < 2 											// (A ship has been captured
+					|| this.aShipIsSurrounded()											// OR a ship is cannot move)
+				);
+	}
+
+	aShipIsSurrounded() {
+		var playersSurrounded = [];
+		if (this.playerShipSurrounded(HOST)) {
+			playersSurrounded.push(HOST);
+		}
+		if (this.playerShipSurrounded(GUEST)) {
+			playersSurrounded.push(GUEST);
+		}
+		return playersSurrounded.length > 0 && playersSurrounded;
+	}
+
+	playerShipSurrounded(playerName) {
+		var shipPoint = this.shipPoints[playerName];
+		if (shipPoint) {
+			var adjacentPoints = this.getAdjacentPoints(shipPoint);
+			var allAdjPointsFilled = true;
+			adjacentPoints.forEach(adjPoint => {
+				if (!adjPoint.hasTile()) {
+					allAdjPointsFilled = false;
+				}
+			});
+			return allAdjPointsFilled;
+		} else {
+			return true;	// No ship, must have been captured (counts as surrounded)
+		}
 	}
 
 	setPossibleExploreLandPointsForPlayer(playerName) {
@@ -535,7 +574,7 @@ BeyondTheMaps.Board = class {
 			peninsulaPoints.forEach(peninsulaPoint => {
 				var adjacentPoints = this.getAdjacentPoints(peninsulaPoint);
 				adjacentPoints.forEach(adjacentPoint => {
-					if (!adjacentPoint.hasTile() && !this.placingLandSeparatesShips(adjacentPoint)) {
+					if (!adjacentPoint.hasTile() && !this.placingLandSeparatesShipsWithoutSurroundingOne(adjacentPoint)) {
 						adjacentPoint.addType(POSSIBLE_MOVE);
 						possibleLandPointsFound = true;
 					}
@@ -550,7 +589,7 @@ BeyondTheMaps.Board = class {
 		var possiblePointsFound = false;
 		var adjacentPoints = this.getAdjacentPoints(boardPoint);
 		adjacentPoints.forEach(adjacentPoint => {
-			if (!adjacentPoint.hasTile() && !this.placingLandSeparatesShips(adjacentPoint)) {
+			if (!adjacentPoint.hasTile() && !this.placingLandSeparatesShipsWithoutSurroundingOne(adjacentPoint)) {
 				adjacentPoint.addType(POSSIBLE_MOVE);
 				possiblePointsFound = true;
 			}
@@ -576,10 +615,39 @@ BeyondTheMaps.Board = class {
 		return false;
 	}
 
+	seaGroupIsSurroundedByAPlayer(seaGroup) {
+		var surroundingPlayers = new Set();
+		var touchesEdge = false;
+		seaGroup.forEach(seaPoint => {
+			if (!touchesEdge) {
+				var adjacentPoints = this.getAdjacentPoints(seaPoint);
+				if (adjacentPoints.length !== 4) {
+					debug("Group touches edge, means it is not surrounded");
+					touchesEdge = true;
+				} else {
+					adjacentPoints.forEach(adjacentPoint => {
+						if (adjacentPoint.hasTile() && adjacentPoint.tile.tileType === BeyondTheMaps.TileType.LAND) {
+							surroundingPlayers.add(adjacentPoint.tile.ownerName);
+						}
+					});
+				}
+			}
+		});
+
+		return !touchesEdge && surroundingPlayers.size === 1;
+	}
+
 	fillEnclosedLandForPlayer(playerName) {
 		var landfillPoints = [];
 
 		this.analyzeSeaGroups();
+
+		this.seaGroups.forEach(seaGroup => {
+			if (this.seaGroupIsSurroundedByAPlayer(seaGroup)) {
+				this.placeLandPiecesForPlayer(playerName, seaGroup);
+				landfillPoints = landfillPoints.concat(seaGroup);
+			}
+		});
 
 		return landfillPoints;
 	}
@@ -635,6 +703,16 @@ BeyondTheMaps.Board = class {
 	pointIsEmptyOrShip(point) {
 		return !point.hasTile()
 			|| (point.hasTile() && point.tile.tileType === BeyondTheMaps.TileType.SHIP);
+	}
+
+	countPlayerLandPieces(playerName) {
+		var landCount = 0;
+		this.forEachBoardPointWithTile(bp => {
+			if (bp.tile.ownerName === playerName && bp.tile.tileType === BeyondTheMaps.TileType.LAND) {
+				landCount++;
+			}
+		});
+		return landCount;
 	}
 
 	getAdjacentRowAndCols(rowAndCol) {

@@ -293,6 +293,16 @@ BeyondTheMaps.Actuator = class {
 				});
 			}
 		}
+
+		if (this.movePhaseData.landfillPoints) {
+			this.movePhaseData.landfillPoints.forEach(landfillPoint => {
+				if (isSamePoint(landfillPoint, endX, endY)) {
+					movementStepIndex = 0.6;
+					theImg.style.visibility = "hidden";
+					theImg.style.transform = "scale(1.5)";
+				}
+			});
+		}
 	
 		var pointSizeMultiplierX = 34;
 		var pointSizeMultiplierY = pointSizeMultiplierX;
