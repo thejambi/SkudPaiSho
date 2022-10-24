@@ -35,7 +35,7 @@ BeyondTheMaps.Actuator = class {
 		this.animationOn = isOn;
 	}
 
-	actuate(board, markingManager, moveToAnimate, phaseIndex) {
+	actuate(board, markingManager, moveToAnimate, phaseIndex, actuateMoveData) {
 		var self = this;
 
 		this.tileContainerTileDivs = {}
@@ -50,6 +50,7 @@ BeyondTheMaps.Actuator = class {
 		this.moveToAnimate = moveToAnimate;
 		this.phaseIndex = phaseIndex;
 		this.movePhaseData = this.moveToAnimate && this.moveToAnimate.moveData.phases[this.phaseIndex];
+		this.actuateMoveData = actuateMoveData;
 
 		window.requestAnimationFrame(function() {
 			self.htmlify(markingManager);
@@ -264,18 +265,18 @@ BeyondTheMaps.Actuator = class {
 		var movementStepIndex = 0;
 	
 		if (this.movePhaseData.moveType === BeyondTheMaps.MoveType.EXPLORE_SEA && boardPoint.tile) {
-			if (isSamePoint(this.movePhaseData.endPoint, endX, endY)) {	// Piece moved
-				var moveStartPoint = this.movePhaseData.startPoint;
+			if (isSamePoint(new NotationPoint(this.movePhaseData.endPoint), endX, endY)) {	// Piece moved
+				var moveStartPoint = new NotationPoint(this.movePhaseData.startPoint);
 				startX = moveStartPoint.rowAndColumn.col;
 				startY = moveStartPoint.rowAndColumn.row;
 				theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving, good idea or no?
 				theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
 	
-				movementPath = this.movePhaseData.endPointMovementPath;
-				if (!movementPath && this.movePhaseData.movementPath) {
-					movementPath = this.movePhaseData.movementPath;
+				movementPath = this.actuateMoveData.endPointMovementPath;
+				if (!movementPath && this.actuateMoveData.movementPath) {
+					movementPath = this.actuateMoveData.movementPath;
 				}
-			} else if (isSamePoint(this.movePhaseData.landPoint, endX, endY)) {
+			} else if (isSamePoint(new NotationPoint(this.movePhaseData.landPoint), endX, endY)) {
 				movementStepIndex = 0.7;
 				theImg.style.visibility = "hidden";
 				theImg.style.transform = "scale(1.5)";
@@ -294,8 +295,8 @@ BeyondTheMaps.Actuator = class {
 			}
 		}
 
-		if (this.movePhaseData.landfillPoints) {
-			this.movePhaseData.landfillPoints.forEach(landfillPoint => {
+		if (this.actuateMoveData.landfillPoints) {
+			this.actuateMoveData.landfillPoints.forEach(landfillPoint => {
 				if (isSamePoint(landfillPoint, endX, endY)) {
 					movementStepIndex = 0.6;
 					theImg.style.visibility = "hidden";

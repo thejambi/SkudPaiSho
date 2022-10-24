@@ -28,21 +28,23 @@ BeyondTheMaps.GameManager = class {
 		}
 	}
 
-	actuate(moveToAnimate, phaseIndex) {
+	actuate(moveToAnimate, phaseIndex, actuateMoveData) {
 		if (this.isCopy) {
 			return;
 		}
-		this.actuator.actuate(this.board, this.markingManager, moveToAnimate, phaseIndex);
+		this.actuator.actuate(this.board, this.markingManager, moveToAnimate, phaseIndex, actuateMoveData);
 	}
 
 	runNotationMove(move, phaseIndex, withActuate, ignorePathFinding, ignoreWinCheck) {
 		var moveData = move.moveData.phases[phaseIndex];
 
+		var actuateMoveData = {};
+
 		if (moveData.moveType === BeyondTheMaps.MoveType.EXPLORE_SEA) {
 			if (withActuate && !ignorePathFinding) {
 				// Discover the movement path
 				var moveDistance = moveData.moveDistance ? moveData.moveDistance : 6;
-				moveData.movementPath = this.board.findPathForMovement(moveData.startPoint, moveData.endPoint, moveData.landPoint, moveDistance);
+				actuateMoveData.movementPath = this.board.findPathForMovement(moveData.startPoint, moveData.endPoint, moveData.landPoint, moveDistance);
 			}
 			this.board.moveShip(moveData.startPoint, moveData.endPoint, moveData.landPoint);
 		} else if (moveData.moveType === BeyondTheMaps.MoveType.EXPLORE_LAND) {
@@ -50,7 +52,7 @@ BeyondTheMaps.GameManager = class {
 		}
 
 		/* Check for enclosed land for player */
-		moveData.landfillPoints = this.board.fillEnclosedLandForPlayer(move.player);
+		actuateMoveData.landfillPoints = this.board.fillEnclosedLandForPlayer(move.player);
 
 		if (!ignoreWinCheck) {
 			var playersSurrounded = this.board.aShipIsSurrounded();
@@ -61,7 +63,7 @@ BeyondTheMaps.GameManager = class {
 		}
 	
 		if (withActuate) {
-			this.actuate(move, phaseIndex);
+			this.actuate(move, phaseIndex, actuateMoveData);
 		}
 	}
 

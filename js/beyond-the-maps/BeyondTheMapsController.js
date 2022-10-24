@@ -169,7 +169,7 @@ BeyondTheMaps.Controller = class {
 					this.getCurrentMovePhase().moveType = BeyondTheMaps.MoveType.EXPLORE_SEA;
 					this.notationBuilder.player = this.getCurrentPlayer();
 					this.notationBuilder.currentPlayer = this.getCurrentPlayer();
-					this.getCurrentMovePhase().startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
+					this.getCurrentMovePhase().startPoint = npText;
 
 					//	Deciding distance?
 					var moveDistance = 6;
@@ -202,7 +202,7 @@ BeyondTheMaps.Controller = class {
 			if (boardPoint.isType(POSSIBLE_MOVE) 
 					&& this.getCurrentMovePhase().moveType === BeyondTheMaps.MoveType.EXPLORE_SEA) {
 				// They're trying to move their Ship there! And they can! Exciting!
-				this.getCurrentMovePhase().endPoint = new NotationPoint(htmlPoint.getAttribute("name"));
+				this.getCurrentMovePhase().endPoint = npText;
 				var possiblePaths = boardPoint.possibleMovementPaths;
 				this.theGame.hidePossibleMovePoints();
 
@@ -216,7 +216,7 @@ BeyondTheMaps.Controller = class {
 					this.notationBuilder.status = WAITING_FOR_BONUS_ENDPOINT;
 				} else {
 					if (landPointsPossible.length > 0) {
-						this.getCurrentMovePhase().landPoint = new NotationPoint(landPointsPossible[0].getNotationPointString());
+						this.getCurrentMovePhase().landPoint = landPointsPossible[0].getNotationPointString();
 						this.theGame.board.placeLandPiecesForPlayer(this.getCurrentPlayer(), [this.getCurrentMovePhase().landPoint]);
 						this.theGame.board.fillEnclosedLandForPlayer(this.getCurrentPlayer());
 					}
@@ -230,7 +230,7 @@ BeyondTheMaps.Controller = class {
 				if (!this.getCurrentMovePhase().landPoints) {
 					this.getCurrentMovePhase().landPoints = [];
 				}
-				this.getCurrentMovePhase().landPoints.push(new NotationPoint(htmlPoint.getAttribute("name")));
+				this.getCurrentMovePhase().landPoints.push(htmlPoint.getAttribute("name"));
 
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true, true);
@@ -254,7 +254,7 @@ BeyondTheMaps.Controller = class {
 			// }
 		} else if (this.notationBuilder.status === WAITING_FOR_BONUS_ENDPOINT) {
 			if (boardPoint.isType(POSSIBLE_MOVE)) {
-				this.getCurrentMovePhase().landPoint = new NotationPoint(htmlPoint.getAttribute("name"));
+				this.getCurrentMovePhase().landPoint = npText;
 				
 				this.theGame.board.placeLandPiecesForPlayer(this.getCurrentPlayer(), [this.getCurrentMovePhase().landPoint]);
 				this.theGame.board.fillEnclosedLandForPlayer(this.getCurrentPlayer());

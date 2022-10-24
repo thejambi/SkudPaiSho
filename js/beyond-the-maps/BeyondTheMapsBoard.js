@@ -75,8 +75,7 @@ BeyondTheMaps.Board = class {
 	};
 
 	placeTile(tile, notationPoint) {
-		var point = notationPoint.rowAndColumn;
-		point = this.cells[point.row][point.col];
+		var point = this.getBoardPointFromNotationPoint(notationPoint);
 
 		var capturedTile = point.tile;
 
@@ -86,8 +85,7 @@ BeyondTheMaps.Board = class {
 	};
 
 	putTileOnPoint(tile, notationPoint) {
-		var point = notationPoint.rowAndColumn;
-		point = this.cells[point.row][point.col];
+		var point = this.getBoardPointFromNotationPoint(notationPoint);
 
 		point.putTile(tile);
 	};
@@ -400,6 +398,9 @@ BeyondTheMaps.Board = class {
 	}
 
 	getBoardPointFromNotationPoint(notationPoint) {
+		if (typeof notationPoint === 'string') {
+			notationPoint = new NotationPoint(notationPoint);
+		}
 		var rowAndCol = notationPoint.rowAndColumn;
 
 		if (!this.isValidRowCol(rowAndCol)) {
