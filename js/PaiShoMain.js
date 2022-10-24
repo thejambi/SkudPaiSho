@@ -2058,6 +2058,11 @@ function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, 
   
 function closeModal() {
 	document.getElementById('myMainModal').style.display = "none";
+
+	if (tutorialInProgress) {
+		OnboardingFunctions.showOnLoadAnnouncements();
+	}
+
 	tutorialInProgress = false;
 }
 
