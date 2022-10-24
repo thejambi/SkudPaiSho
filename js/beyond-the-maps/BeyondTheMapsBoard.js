@@ -517,7 +517,7 @@ BeyondTheMaps.Board = class {
 		var newBoard = this.getCopy();
 
 		newBoard.placeLandPiecesForPlayer(HOST, [boardPoint]);
-		newBoard.analyzeSeaGroups();
+		newBoard.analyzeSeaAndLandGroups();
 		newBoard.fillEnclosedLandForPlayer(HOST);
 		newBoard.fillEnclosedLandForPlayer(GUEST);
 
@@ -616,6 +616,13 @@ BeyondTheMaps.Board = class {
 	}
 
 	seaGroupIsSurroundedByAPlayer(seaGroup) {
+		var surroundedCheckResults = this.getSurroundingInfo(seaGroup);
+
+		return !surroundedCheckResults.touchesEdge 
+			&& surroundedCheckResults.surroundingPlayers.size === 1;
+	}
+
+	getSurroundingInfo(seaGroup) {
 		var surroundingPlayers = new Set();
 		var touchesEdge = false;
 		seaGroup.forEach(seaPoint => {
@@ -634,13 +641,16 @@ BeyondTheMaps.Board = class {
 			}
 		});
 
-		return !touchesEdge && surroundingPlayers.size === 1;
+		return {
+			surroundingPlayers: surroundingPlayers,
+			touchesEdge: touchesEdge
+		}
 	}
 
 	fillEnclosedLandForPlayer(playerName) {
 		var landfillPoints = [];
 
-		this.analyzeSeaGroups();
+		this.analyzeSeaAndLandGroups();
 
 		this.seaGroups.forEach(seaGroup => {
 			if (this.seaGroupIsSurroundedByAPlayer(seaGroup)) {
@@ -649,7 +659,99 @@ BeyondTheMaps.Board = class {
 			}
 		});
 
+		// Check for captures.... yay
+		landfillPoints = landfillPoints.concat(this.processCaptures());
+
 		return landfillPoints;
+	}
+
+	processCaptures() {
+		var landfillPoints = [];
+		/* Check for Host lands + seas it is touching, see if that is surrounded by Guest */
+
+		/* For each land group, group it together with any seas it is touching,
+		then check to see if that land+seas group is surrounded by opponent of land group. */
+		
+		this.landGroups.forEach(landGroup => {
+			var groupOwner = landGroup[0].tile.ownerName;
+			var landAndSeasGroup = this.buildLandAndSeasGroup(landGroup);
+			var groupIsSurrounded = false;
+			var surroundedCheckResults = this.getSurroundingInfo(landAndSeasGroup);
+			var opponent = getOpponentName(groupOwner);
+			groupIsSurrounded = surroundedCheckResults.surroundingPlayers.has(opponent)
+									&& !surroundedCheckResults.touchesEdge;
+			if (groupIsSurrounded) {
+				debug("OH mana alaskdfj;alk group surrounded!");
+				landfillPoints = landfillPoints.concat(this.doCaptureGroup(landAndSeasGroup, opponent));
+			}
+		});
+
+		return landfillPoints;
+	}
+
+	doCaptureGroup(landAndSeasGroup, capturingPlayer) {
+		var landfillPoints = [];
+
+		/* Fill in spaces and capture ships first */
+		landAndSeasGroup.forEach(point => {
+			if (this.pointIsEmptyOrShip(point)) {
+				this.placeLandPiecesForPlayer(capturingPlayer, [point]);
+				landfillPoints.push(point);
+			}
+		});
+
+		landfillPoints = landfillPoints.concat(this.capturePeninsulasInGroup(landAndSeasGroup, capturingPlayer, []));
+
+		return landfillPoints;
+	}
+
+	capturePeninsulasInGroup(landAndSeasGroup, capturingPlayer, landfillPoints) {
+		var captureHappened = false;
+		landAndSeasGroup.forEach(point => {
+			if (this.pointIsPeninsulaForPlayer(point, getOpponentName(capturingPlayer))) {
+				this.placeLandPiecesForPlayer(capturingPlayer, [point]);
+				landfillPoints.push(point);
+				captureHappened = true;
+			}
+		});
+
+		if (captureHappened) {
+			return this.capturePeninsulasInGroup(landAndSeasGroup, capturingPlayer, landfillPoints);
+		} else {
+			// Done with recursion
+			return landfillPoints;
+		}
+	}
+
+	buildLandAndSeasGroup(landGroup) {
+		var landAndSeasGroup = landGroup;
+		
+		var touchingSeaGroupIds = this.getSeaGroupIdsTouchingLandGroup(landGroup);
+
+		touchingSeaGroupIds.forEach(seaGroupId => {
+			var seaGroup = this.seaGroups[seaGroupId];
+			landAndSeasGroup = landAndSeasGroup.concat(seaGroup);
+		});
+
+		return landAndSeasGroup;
+	}
+
+	getSeaGroupIdsTouchingLandGroup(landGroup) {
+		var touchingSeaIds = [];
+		landGroup.forEach(landPoint => {
+			var adjacentPoints = this.getAdjacentPoints(landPoint);
+			adjacentPoints.forEach(adjacentPoint => {
+				if (this.pointIsEmptyOrShip(adjacentPoint)
+						&& !touchingSeaIds.includes(adjacentPoint.seaGroupId)) {
+					touchingSeaIds.push(adjacentPoint.seaGroupId);
+				}
+			});
+		});
+		return touchingSeaIds;
+	}
+
+	analyzeSeaAndLandGroups() {
+		this.analyzeSeaGroups();	// It does both, don't tell anyone :D
 	}
 
 	analyzeSeaGroups() {
@@ -657,8 +759,12 @@ BeyondTheMaps.Board = class {
 		this.knownSeaPoints = [];
 		this.shipPoints = {};
 
+		this.landGroups = [];
+		this.knownLandPoints = [];
+
 		this.forEachBoardPoint(bp => {
 			if (this.pointIsEmptyOrShip(bp)) {
+				this.landGroupId = null;
 				if (!this.knownSeaPoints.includes(bp.getNotationPointString())) {
 					var seaGroup = [];
 
@@ -675,12 +781,29 @@ BeyondTheMaps.Board = class {
 
 					this.seaGroups.push(seaGroup);
 				}
-			} else {
+			} else if (bp.hasTile() && bp.tile.tileType === BeyondTheMaps.TileType.LAND) {
 				bp.seaGroupId = null;
+				if (!this.knownLandPoints.includes(bp.getNotationPointString())) {
+					var landGroup = [];
+
+					landGroup.push(bp);
+					bp.landGroupId = this.landGroups.length;
+
+					this.knownLandPoints.push(bp.getNotationPointString());
+
+					this.collectAdjacentPointsInLandGroup(bp, landGroup);
+
+					this.landGroups.push(landGroup);
+				}
+			} else {
+				// Not ever happen, eh?
+				bp.seaGroupId = null;
+				bp.landGroupId = null;
 			}
 		});
 	
 		debug("# of Sea Groups: " + this.seaGroups.length);
+		debug("# of Land Groups: " + this.landGroups.length);
 	}
 
 	collectAdjacentPointsInSeaGroup(bp, seaGroup) {
@@ -696,6 +819,21 @@ BeyondTheMaps.Board = class {
 				nextPoint.seaGroupId = bp.seaGroupId;
 				this.knownSeaPoints.push(nextPoint.getNotationPointString());
 				this.collectAdjacentPointsInSeaGroup(nextPoint, seaGroup);
+			}
+		});
+	}
+
+	collectAdjacentPointsInLandGroup(bp, landGroup) {
+		var adjacentPoints = this.getAdjacentPoints(bp);
+
+		adjacentPoints.forEach(nextPoint => {
+			if (!this.knownLandPoints.includes(nextPoint.getNotationPointString())
+					&& nextPoint.hasTile() && nextPoint.tile.tileType === BeyondTheMaps.TileType.LAND
+					&& nextPoint.tile.ownerName === bp.tile.ownerName) {
+				landGroup.push(nextPoint);
+				nextPoint.landGroupId = bp.landGroupId;
+				this.knownLandPoints.push(nextPoint.getNotationPointString());
+				this.collectAdjacentPointsInLandGroup(nextPoint, landGroup);
 			}
 		});
 	}
