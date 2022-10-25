@@ -545,18 +545,20 @@ BeyondTheMaps.Board = class {
 	}
 
 	playerShipSurrounded(playerName) {
-		var shipPoint = this.shipPoints[playerName];
-		if (shipPoint) {
-			var adjacentPoints = this.getAdjacentPoints(shipPoint);
-			var allAdjPointsFilled = true;
-			adjacentPoints.forEach(adjPoint => {
-				if (!adjPoint.hasTile()) {
-					allAdjPointsFilled = false;
-				}
-			});
-			return allAdjPointsFilled;
-		} else {
-			return true;	// No ship, must have been captured (counts as surrounded)
+		if (this.shipPoints) {
+			var shipPoint = this.shipPoints[playerName];
+			if (shipPoint) {
+				var adjacentPoints = this.getAdjacentPoints(shipPoint);
+				var allAdjPointsFilled = true;
+				adjacentPoints.forEach(adjPoint => {
+					if (!adjPoint.hasTile()) {
+						allAdjPointsFilled = false;
+					}
+				});
+				return allAdjPointsFilled;
+			} else {
+				return true;	// No ship, must have been captured (counts as surrounded)
+			}
 		}
 	}
 
@@ -623,6 +625,14 @@ BeyondTheMaps.Board = class {
 			&& surroundedCheckResults.surroundingPlayers.size === 1;
 	}
 
+	seaGroupIsSurroundedByCertainPlayer(seaGroup, playerName) {
+		var surroundedCheckResults = this.getSurroundingInfo(seaGroup);
+
+		return !surroundedCheckResults.touchesEdge 
+			&& surroundedCheckResults.surroundingPlayers.size === 1
+			&& surroundedCheckResults.surroundingPlayers.has(playerName);
+	}
+
 	getSurroundingInfo(seaGroup) {
 		var surroundingPlayers = new Set();
 		var touchesEdge = false;
@@ -654,19 +664,19 @@ BeyondTheMaps.Board = class {
 		this.analyzeSeaAndLandGroups();
 
 		this.seaGroups.forEach(seaGroup => {
-			if (this.seaGroupIsSurroundedByAPlayer(seaGroup)) {
+			if (this.seaGroupIsSurroundedByCertainPlayer(seaGroup, playerName)) {
 				this.placeLandPiecesForPlayer(playerName, seaGroup);
 				landfillPoints = landfillPoints.concat(seaGroup);
 			}
 		});
 
 		// Check for captures.... yay
-		landfillPoints = landfillPoints.concat(this.processCaptures());
+		landfillPoints = landfillPoints.concat(this.processCaptures(playerName));
 
 		return landfillPoints;
 	}
 
-	processCaptures() {
+	processCaptures(capturingPlayer) {
 		var landfillPoints = [];
 		/* Check for Host lands + seas it is touching, see if that is surrounded by Guest */
 
@@ -675,15 +685,17 @@ BeyondTheMaps.Board = class {
 		
 		this.landGroups.forEach(landGroup => {
 			var groupOwner = landGroup[0].tile.ownerName;
-			var landAndSeasGroup = this.buildLandAndSeasGroup(landGroup);
-			var groupIsSurrounded = false;
-			var surroundedCheckResults = this.getSurroundingInfo(landAndSeasGroup);
-			var opponent = getOpponentName(groupOwner);
-			groupIsSurrounded = surroundedCheckResults.surroundingPlayers.has(opponent)
-									&& !surroundedCheckResults.touchesEdge;
-			if (groupIsSurrounded) {
-				debug("OH mana alaskdfj;alk group surrounded!");
-				landfillPoints = landfillPoints.concat(this.doCaptureGroup(landAndSeasGroup, opponent));
+			var playerBeingCaptured = getOpponentName(capturingPlayer);
+			if (groupOwner === playerBeingCaptured) {
+				var landAndSeasGroup = this.buildLandAndSeasGroup(landGroup);
+				var groupIsSurrounded = false;
+				var surroundedCheckResults = this.getSurroundingInfo(landAndSeasGroup);
+				groupIsSurrounded = surroundedCheckResults.surroundingPlayers.has(capturingPlayer)
+										&& !surroundedCheckResults.touchesEdge;
+				if (groupIsSurrounded) {
+					debug("OH mana alaskdfj;alk group surrounded!");
+					landfillPoints = landfillPoints.concat(this.doCaptureGroup(landAndSeasGroup, capturingPlayer));
+				}
 			}
 		});
 

@@ -52,7 +52,9 @@ BeyondTheMaps.GameManager = class {
 		}
 
 		/* Check for enclosed land for player */
-		actuateMoveData.landfillPoints = this.board.fillEnclosedLandForPlayer(move.player);
+		if (!ignoreWinCheck) {
+			actuateMoveData.landfillPoints = this.board.fillEnclosedLandForPlayer(move.player);
+		}
 
 		if (!ignoreWinCheck) {
 			var playersSurrounded = this.board.aShipIsSurrounded();
