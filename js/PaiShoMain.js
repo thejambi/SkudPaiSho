@@ -2059,11 +2059,12 @@ function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, 
 function closeModal() {
 	document.getElementById('myMainModal').style.display = "none";
 
-	if (tutorialInProgress) {
+	if (tutorialInProgress || tutorialOpen) {
 		OnboardingFunctions.showOnLoadAnnouncements();
 	}
 
 	tutorialInProgress = false;
+	tutorialOpen = false;
 }
 
 var confirmMoveToSubmit = null;
@@ -4100,9 +4101,11 @@ function showWelcomeScreensClicked() {
 }
   
 var tutorialInProgress = false;
+var tutorialOpen = false;
 
 function showWelcomeTutorial() {
 	tutorialInProgress = true;
+	tutorialOpen = true;
 	showModal("The Garden Gate", "<div id='tutorialContent'></div>");
 	setTimeout(function() { runTutorial(); }, 400);
 }
