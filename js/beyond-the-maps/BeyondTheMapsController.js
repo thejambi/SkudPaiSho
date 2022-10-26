@@ -83,7 +83,13 @@ BeyondTheMaps.Controller = class {
 	}
 
 	getDefaultHelpMessageText() {
-		return "<h4>Beyond The Edges of The Maps</h4> <p>A game from the world of Aerwiar.</p>";
+		return "<h4>Beyond The Edges of The Maps</h4>"
+			+ "<p>A fan-made game inspired by the world of Aerwiar from <a href='https://www.wingfeathersaga.com/' target='_blank'>The Wingfeather Saga by Andrew Peterson</a>.</p>"
+			+ "<p>Players attempt to sail beyond the edges of the maps to discover the most land as they draw ever closer to each other and one of the ships is immobilized. Whoever has the most discovered land at the end of the game wins.</p>"
+			+ "<p>On a turn, players explore by sea and explore by land.</p>"
+			+ "<p>Click on your ship to explore by sea, click on your land to explore by land.</p>"
+			+ "<p>The starting player begins by exploring by sea only.</p>"
+			+ "<p>View <a href='https://skudpaisho.com/site/games/beyond-the-edges-of-the-maps/' target='_blank'>the full rules</a> for more.</p>"
 	}
 
 	getAdditionalMessage() {
@@ -91,15 +97,19 @@ BeyondTheMaps.Controller = class {
 
 		if (this.gameNotation.moves.length === 0) {
 			if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
-				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by making a move. <br />";
+				msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by exploring by sea as Host (the light colored ship). <br />";
 			} else {
-				msg += "Sign in to enable online gameplay. Or, start playing a local game by making a move. <br />";
+				msg += "Sign in to enable online gameplay. Or, start playing a local game by exploring by sea as Host (the light colored ship). <br />";
 			}
 
 			msg += getGameOptionsMessageHtml(GameType.BeyondTheMaps.gameOptions);
 		} else {
+			if (this.messageToPlayer) {
+				msg += "<br /><br />";
+				msg += this.messageToPlayer;
+			}
 			msg += "<br /><br />";
-			msg += this.messageToPlayer;
+			msg += "Click your ship to explore by sea, click your land to explore by land.";
 		}
 
 		return msg;
@@ -287,7 +297,8 @@ BeyondTheMaps.Controller = class {
 		this.messageToPlayer = "";
 		refreshMessage();
 
-		var moveIsComplete = this.notationBuilder.moveData.phases.length >= 2;
+		var moveIsComplete = this.notationBuilder.moveData.phases.length >= 2
+							|| this.gameNotation.moves.length === 0;
 
 		this.notationBuilder.status = BRAND_NEW;
 
