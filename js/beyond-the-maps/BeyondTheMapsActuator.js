@@ -276,7 +276,8 @@ BeyondTheMaps.Actuator = class {
 				if (!movementPath && this.actuateMoveData.movementPath) {
 					movementPath = this.actuateMoveData.movementPath;
 				}
-			} else if (isSamePoint(new NotationPoint(this.movePhaseData.landPoint), endX, endY)) {
+			} else if (this.movePhaseData.landPoint
+						&& isSamePoint(new NotationPoint(this.movePhaseData.landPoint), endX, endY)) {
 				movementStepIndex = 0.7;
 				theImg.style.visibility = "hidden";
 				theImg.style.transform = "scale(1.5)";

@@ -218,6 +218,7 @@ BeyondTheMaps.Controller = class {
 					if (landPointsPossible.length > 0) {
 						this.getCurrentMovePhase().landPoint = landPointsPossible[0].getNotationPointString();
 						this.theGame.board.placeLandPiecesForPlayer(this.getCurrentPlayer(), [this.getCurrentMovePhase().landPoint]);
+						// this.theGame.board.analyzeSeaAndLandGroups();
 						this.theGame.board.fillEnclosedLandForPlayer(this.getCurrentPlayer());
 					}
 					this.theGame.hidePossibleMovePoints();
@@ -257,6 +258,7 @@ BeyondTheMaps.Controller = class {
 				this.getCurrentMovePhase().landPoint = npText;
 				
 				this.theGame.board.placeLandPiecesForPlayer(this.getCurrentPlayer(), [this.getCurrentMovePhase().landPoint]);
+				// this.theGame.board.analyzeSeaAndLandGroups();
 				this.theGame.board.fillEnclosedLandForPlayer(this.getCurrentPlayer());
 				this.theGame.hidePossibleMovePoints();
 				

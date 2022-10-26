@@ -51,6 +51,8 @@ BeyondTheMaps.GameManager = class {
 			this.board.placeLandPiecesForPlayer(move.player, moveData.landPoints);
 		}
 
+		// this.board.analyzeSeaAndLandGroups();
+
 		/* Check for enclosed land for player */
 		if (!ignoreWinCheck) {
 			actuateMoveData.landfillPoints = this.board.fillEnclosedLandForPlayer(move.player);

@@ -519,18 +519,22 @@ BeyondTheMaps.Board = class {
 
 		newBoard.placeLandPiecesForPlayer(HOST, [boardPoint]);
 		newBoard.analyzeSeaAndLandGroups();
-		newBoard.fillEnclosedLandForPlayer(HOST);
-		newBoard.fillEnclosedLandForPlayer(GUEST);
+		// newBoard.fillEnclosedLandForPlayer(HOST);
+		// newBoard.fillEnclosedLandForPlayer(GUEST);
 
 		return newBoard.shipsSeparatedAndAShipHasNotBeenSurrounded();
 	}
 
 	shipsSeparatedAndAShipHasNotBeenSurrounded() {
-		return this.shipPoints[HOST].seaGroupId !== this.shipPoints[GUEST].seaGroupId	// Ships separated
-			&& !(																		// AND NOT:
-					this.shipPoints.length < 2 											// (A ship has been captured
-					|| this.aShipIsSurrounded()											// OR a ship is cannot move)
-				);
+		var hostSeaGroupId = this.shipPoints[HOST] && this.shipPoints[HOST].seaGroupId;
+		var guestSeaGroupId = this.shipPoints[GUEST] && this.shipPoints[GUEST].seaGroupId;
+		var bothShipsPresent = hostSeaGroupId >= 0 && guestSeaGroupId >= 0;
+		return (
+			bothShipsPresent && hostSeaGroupId !== guestSeaGroupId)		// Ships separated and present
+			&& !(														// AND NOT:
+				!bothShipsPresent		 								// (A ship has been captured
+				|| this.aShipIsSurrounded()								// OR a ship is cannot move)
+			);
 	}
 
 	aShipIsSurrounded() {
@@ -678,6 +682,7 @@ BeyondTheMaps.Board = class {
 
 	processCaptures(capturingPlayer) {
 		var landfillPoints = [];
+		var playerBeingCaptured = getOpponentName(capturingPlayer);
 		/* Check for Host lands + seas it is touching, see if that is surrounded by Guest */
 
 		/* For each land group, group it together with any seas it is touching,
@@ -685,13 +690,13 @@ BeyondTheMaps.Board = class {
 		
 		this.landGroups.forEach(landGroup => {
 			var groupOwner = landGroup[0].tile.ownerName;
-			var playerBeingCaptured = getOpponentName(capturingPlayer);
 			if (groupOwner === playerBeingCaptured) {
 				var landAndSeasGroup = this.buildLandAndSeasGroup(landGroup);
 				var groupIsSurrounded = false;
 				var surroundedCheckResults = this.getSurroundingInfo(landAndSeasGroup);
 				groupIsSurrounded = surroundedCheckResults.surroundingPlayers.has(capturingPlayer)
-										&& !surroundedCheckResults.touchesEdge;
+									&& !surroundedCheckResults.surroundingPlayers.has(playerBeingCaptured)
+									&& !surroundedCheckResults.touchesEdge;
 				if (groupIsSurrounded) {
 					debug("OH mana alaskdfj;alk group surrounded!");
 					landfillPoints = landfillPoints.concat(this.doCaptureGroup(landAndSeasGroup, capturingPlayer));
@@ -817,6 +822,9 @@ BeyondTheMaps.Board = class {
 	
 		debug("# of Sea Groups: " + this.seaGroups.length);
 		debug("# of Land Groups: " + this.landGroups.length);
+
+		debug("Ship Points:");
+		debug(this.shipPoints);
 	}
 
 	collectAdjacentPointsInSeaGroup(bp, seaGroup) {
