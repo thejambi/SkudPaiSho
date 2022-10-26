@@ -648,7 +648,8 @@ BeyondTheMaps.Board = class {
 					touchesEdge = true;
 				} else {
 					adjacentPoints.forEach(adjacentPoint => {
-						if (adjacentPoint.hasTile() && adjacentPoint.tile.tileType === BeyondTheMaps.TileType.LAND
+						if (!seaGroup.includes(adjacentPoint)
+								&& adjacentPoint.hasTile() && adjacentPoint.tile.tileType === BeyondTheMaps.TileType.LAND
 								&& !surroundingPlayers.has(adjacentPoint.tile.ownerName)) {
 							surroundingPlayers.add(adjacentPoint.tile.ownerName);
 						}
