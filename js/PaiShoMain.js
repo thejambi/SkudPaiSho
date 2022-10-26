@@ -1335,7 +1335,24 @@ var finalizeMove = function (moveAnimationBeginStep, ignoreNoEmail, okToUpdateWi
 
   		linkUrl = url + "?" + linkUrl;
 
-  		linkShortenCallback(linkUrl, ignoreNoEmail, okToUpdateWinInfo);
+		if (gameController.runMove && gameController.isStillRunningMove && gameController.isStillRunningMove()) {
+			debug("Move still running");
+			var checkCount = 0;
+			var checkRunningInterval = setInterval(() => {
+				checkCount++;
+				if (!gameController.isStillRunningMove()) {
+					debug("Move done running");
+					linkShortenCallback(linkUrl, ignoreNoEmail, okToUpdateWinInfo);
+					clearInterval(checkRunningInterval);
+				}
+				if (checkCount > 4) {
+					clearInterval(checkRunningInterval);
+					showModal("Error submitting move", "Error finalizing move. Sorry about that :(");
+				}
+			}, replayIntervalLength / 2);
+		} else {
+  			linkShortenCallback(linkUrl, ignoreNoEmail, okToUpdateWinInfo);
+		}
   	} else {
   		linkShortenCallback('', ignoreNoEmail, okToUpdateWinInfo);
   	}

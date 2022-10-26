@@ -53,7 +53,7 @@ BeyondTheMaps.Controller = class {
 	}
 
 	completeSetup() {
-		// Nothing
+		// Nothing to do
 	}
 
 	getNewGameNotation() {
@@ -145,7 +145,8 @@ BeyondTheMaps.Controller = class {
 		this.callActuate();
 
 		if (this.theGame.getWinner() || !myTurn() || currentMoveIndex !== this.gameNotation.moves.length
-				|| (playingOnlineGame() && !iAmPlayerInCurrentOnlineGame())) {
+				|| (playingOnlineGame() && !iAmPlayerInCurrentOnlineGame())
+				|| this.isStillRunningMove()) {
 			return;
 		}
 
@@ -388,6 +389,7 @@ BeyondTheMaps.Controller = class {
 	}
 
 	runMove(move, withActuate, moveAnimationBeginStep, skipAnimation) {
+		this.currentlyRunningMove = true;
 		if (withActuate && !skipAnimation) {
 			var numPhases = move.moveData.phases.length;
 			var phaseIndex = 0;
@@ -400,14 +402,22 @@ BeyondTheMaps.Controller = class {
 					phaseIndex++;
 					if (phaseIndex >= numPhases) {
 						clearInterval(phaseInterval);
+						this.currentlyRunningMove = false;
 					}
 				}, replayIntervalLength / numPhases);
+			} else {
+				this.currentlyRunningMove = false;
 			}
 		} else {
 			for (var phaseIndex = 0; phaseIndex < move.moveData.phases.length; phaseIndex++) {
 				this.theGame.runNotationMove(move, phaseIndex, withActuate);
 			}
+			this.currentlyRunningMove = false;
 		}
+	}
+
+	isStillRunningMove() {
+		return this.currentlyRunningMove;
 	}
 
 	cleanup() {

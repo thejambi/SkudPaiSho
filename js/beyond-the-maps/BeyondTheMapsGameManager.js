@@ -132,29 +132,6 @@ BeyondTheMaps.GameManager = class {
 		}
 	}
 
-	revealOpenGates(player, moveNum, ignoreActuate) {
-		if (moveNum === 2) {
-			// guest selecting first tile
-			this.board.setGuestGateOpen();
-		} else {
-			this.board.setOpenGatePossibleMoves(player);
-		}
-		
-		if (!ignoreActuate) {
-			this.actuate();
-		}
-	}
-
-	revealPossiblePlacementPoints(tile) {
-		this.board.revealPossiblePlacementPoints(tile);
-		this.actuate();
-	}
-
-	revealBoatBonusPoints(boardPoint) {
-		this.board.revealBoatBonusPoints(boardPoint);
-		this.actuate();
-	}
-
 	markPossibleLandPointsForMovement(boardPointEnd, possiblePaths, player) {
 		var possibleLandPoints = [];
 		if (possiblePaths && possiblePaths.length > 0) {
@@ -177,11 +154,7 @@ BeyondTheMaps.GameManager = class {
 	}
 
 	getWinner() {
-		if (this.board.winners.length === 1) {
-			return this.board.winners[0];
-		} else if (this.board.winners.length > 1) {
-			return "BOTH players";
-		} else if (this.endGameWinners.length === 1) {
+		if (this.endGameWinners.length === 1) {
 			return this.endGameWinners[0];
 		} else if (this.endGameWinners.length > 1) {
 			return "BOTH players";
@@ -189,17 +162,15 @@ BeyondTheMaps.GameManager = class {
 	}
 
 	getWinReason() {
-		if (this.board.winners.length === 1) {
-			return " wins! The game has ended.";
-		} else if (this.endGameWinners.length === 1) {
-			
+		if (this.endGameWinners.length === 1) {
+			return " discovered more land to win!";
+		} else if (this.endGameWinners.length > 1) {
+			return " discovered much land together!";
 		}
 	}
 
 	getWinResultTypeCode() {
-		if (this.board.winners.length === 1) {
-			return 1;	// Harmony Ring is 1
-		} else if (this.endGameWinners.length === 1) {
+		if (this.endGameWinners.length === 1) {
 			return 1; // ?
 		} else if (this.endGameWinners.length > 1) {
 			return 4;	// Tie
