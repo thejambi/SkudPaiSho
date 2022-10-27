@@ -2398,7 +2398,7 @@ var GameType = {
 		desc: "Key Pai Sho",
 		color: "var(--keypaishocolor)",
 		description: "Built to replicate the Pai Sho board states seen in ATLA Book 1.",
-		coverImg: "keypaisho.png",
+		coverImg: "lotus.png",
 		rulesUrl: "https://skudpaisho.com/site/games/key-pai-sho/",
 		gameOptions: [
 			NO_EFFECT_TILES
@@ -2408,7 +2408,8 @@ var GameType = {
 		id: 4,
 		name: "Nature's Grove: Respite",
 		desc: "Respite - Solitaire Pai Sho",
-		color: "var(--solitairecolor)",
+		// color: "var(--solitairecolor)",
+		color: "var(--othercolor)",
 		description: "Arrange random flowers into position to achieve the highest score possible.",
 		coverImg: "rose.png",
 		rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/",
@@ -2548,15 +2549,13 @@ var GameType = {
 		id: 20,
 		name: "Beyond The Edges of The Maps",
 		desc: "Beyond The Edges of The Maps",
-		color: "var(--edgescolor)",
+		// color: "var(--edgescolor)",
+		color: "var(--othercolor)",
 		description: "Explore the land beyond the maps.",
-		coverImg: "edges.png",
+		coverImg: "boat.png",
 		rulesUrl: "https://skudpaisho.com/site/games/beyond-the-edges-of-the-maps/",
 		gameOptions: [
 			EDGES_12x12_GAME
-		],
-		usersWithAccess: [
-			'SkudPaiSho'
 		]
 	},
 	Blooms: {
