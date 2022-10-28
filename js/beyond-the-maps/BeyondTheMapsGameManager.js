@@ -137,7 +137,7 @@ BeyondTheMaps.GameManager = class {
 		if (possiblePaths && possiblePaths.length > 0) {
 			var possibleLastStepPoints = [];
 			possiblePaths.forEach(path => {
-				var lastPoint = path.at(-1);
+				var lastPoint = path[path.length - 1];
 				if (!possibleLastStepPoints.includes(lastPoint)) {
 					possibleLastStepPoints.push(lastPoint);
 				}
