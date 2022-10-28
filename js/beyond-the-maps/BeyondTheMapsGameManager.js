@@ -77,10 +77,10 @@ BeyondTheMaps.GameManager = class {
 
 		debug("HOST: " + hostScore + " vs GUEST: " + guestScore);
 
-		if (hostScore >= guestScore) {
+		if (hostScore >= guestScore && !this.endGameWinners.includes(HOST)) {
 			this.endGameWinners.push(HOST);
 		}
-		if (guestScore >= hostScore) {
+		if (guestScore >= hostScore && !this.endGameWinners.includes(GUEST)) {
 			this.endGameWinners.push(GUEST);
 		}
 	}

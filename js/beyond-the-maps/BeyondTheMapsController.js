@@ -103,7 +103,7 @@ BeyondTheMaps.Controller = class {
 			}
 
 			msg += getGameOptionsMessageHtml(GameType.BeyondTheMaps.gameOptions);
-		} else {
+		} else if (!this.theGame.getWinner()) {
 			if (this.messageToPlayer) {
 				msg += "<br /><br />";
 				msg += this.messageToPlayer;
@@ -405,11 +405,13 @@ BeyondTheMaps.Controller = class {
 			var numPhases = move.moveData.phases.length;
 			var phaseIndex = 0;
 			this.theGame.runNotationMove(move, phaseIndex, withActuate);
+			// refreshMessage();
 			phaseIndex++;
 			if (numPhases > phaseIndex) {
 				debug("MORE THAN ONE PHASE");
 				var phaseInterval = setTimeout(() => {
 					this.theGame.runNotationMove(move, phaseIndex, withActuate);
+					refreshMessage();
 					phaseIndex++;
 					if (phaseIndex >= numPhases) {
 						clearInterval(phaseInterval);
