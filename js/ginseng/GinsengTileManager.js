@@ -184,7 +184,7 @@ Ginseng.TileManager.prototype.getPlayerTilePile = function(player) {
 };
 
 Ginseng.TileManager.prototype.getAllTiles = function() {
-	return this.hostTeam.concat(this.guestTeam);
+	return this.hostTiles.concat(this.guestTiles);
 };
 
 Ginseng.TileManager.prototype.getCopy = function() {
