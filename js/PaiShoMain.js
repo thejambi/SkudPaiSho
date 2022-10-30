@@ -2366,11 +2366,29 @@ var GameType = {
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [
-			// DRAGON_CANCELS_ABILITIES
+			// None
 		],
 		secretGameOptions: [
 			LION_TURTLE_ABILITY_ANYWHERE,
 			SWAP_BISON_AND_DRAGON
+		]
+	},
+	Ginseng2: {
+		id: 21,
+		name: "Ginseng 2.0",
+		desc: "Ginseng 2.0",
+		color: "var(--ginsengcolor)",
+		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
+		coverImg: "ginseng.png",
+		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
+		gameOptions: [
+			// None
+		],
+		secretGameOptions: [
+			//
+		],
+		usersWithAccess: [
+			'SkudPaiSho'
 		]
 	},
 	FirePaiSho: {
@@ -2380,7 +2398,7 @@ var GameType = {
 		color: "var(--firecolor)",
 		description: "Like Skud Pai Sho, but with a twist: tiles are chosen randomly.",
 		coverImg: "rose.png",
-		rulesUrl: "https://drive.google.com/file/d/1C3A5Mx0P8vrpKc-X5QbRHuLt27yoMqBj/view?usp=sharing",
+		rulesUrl: "https://skudpaisho.com/site/games/fire-pai-sho/",
 		gameOptions: [
 			NO_HARMONY_VISUAL_AIDS,
 			OPTION_DOUBLE_ACCENT_TILES,
@@ -2694,6 +2712,9 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Ginseng.id:
 			controller = new Ginseng.Controller(gameContainerDiv, isMobile);
+			break;
+		case GameType.Ginseng2.id:
+			controller = new Ginseng2.Controller(gameContainerDiv, isMobile);
 			break;
 		case GameType.KeyPaiSho.id:
 			controller = new KeyPaiSho.Controller(gameContainerDiv, isMobile);
@@ -3692,7 +3713,7 @@ function setSidenavNewGameSection() {
 
 function closeGame() {
 	if (gameDevOn) {
-		setGameController(GameType.BeyondTheMaps.id);
+		setGameController(GameType.Ginseng2.id);
 		return;
 	}
 	var defaultGameTypeIds = [
