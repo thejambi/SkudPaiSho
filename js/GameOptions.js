@@ -182,6 +182,9 @@ gameOptionDescriptions[SWAP_BISON_AND_DRAGON] = "Swap Bison and Dragon";
 var DRAGON_CANCELS_ABILITIES = "DragonCancelsAbilities";
 gameOptionDescriptions[DRAGON_CANCELS_ABILITIES] = "Dragon Cancels Abilities";
 
+var GINSENG_2_POINT_0 = "Ginseng2_0";
+gameOptionDescriptions[GINSENG_2_POINT_0] = "Ginseng 2.0";
+
 /* Key Pai Sho */
 var NO_EFFECT_TILES = "NoEffectTiles";
 gameOptionDescriptions[NO_EFFECT_TILES] = "No Effect Tiles";

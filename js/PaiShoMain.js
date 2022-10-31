@@ -2370,25 +2370,8 @@ var GameType = {
 		],
 		secretGameOptions: [
 			LION_TURTLE_ABILITY_ANYWHERE,
-			SWAP_BISON_AND_DRAGON
-		]
-	},
-	Ginseng2: {
-		id: 21,
-		name: "Ginseng 2.0",
-		desc: "Ginseng 2.0",
-		color: "var(--ginsengcolor)",
-		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
-		coverImg: "ginseng.png",
-		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
-		gameOptions: [
-			// None
-		],
-		secretGameOptions: [
-			//
-		],
-		usersWithAccess: [
-			'SkudPaiSho'
+			SWAP_BISON_AND_DRAGON,
+			GINSENG_2_POINT_0
 		]
 	},
 	FirePaiSho: {
@@ -2712,9 +2695,6 @@ function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Ginseng.id:
 			controller = new Ginseng.Controller(gameContainerDiv, isMobile);
-			break;
-		case GameType.Ginseng2.id:
-			controller = new Ginseng2.Controller(gameContainerDiv, isMobile);
 			break;
 		case GameType.KeyPaiSho.id:
 			controller = new KeyPaiSho.Controller(gameContainerDiv, isMobile);
@@ -3713,7 +3693,8 @@ function setSidenavNewGameSection() {
 
 function closeGame() {
 	if (gameDevOn) {
-		setGameController(GameType.Ginseng2.id);
+		setGameController(GameType.Ginseng.id);
+		addGameOption(GINSENG_2_POINT_0);
 		return;
 	}
 	var defaultGameTypeIds = [
