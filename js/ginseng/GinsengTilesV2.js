@@ -538,8 +538,8 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whileInsideTemple,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
+						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsInLineOfSight,
+						targetTeams: [Trifle.TileTeam.friendly]
 					}
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
@@ -573,51 +573,26 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				]
 			}
 		],
-		abilities: [
-			{
-				type: Trifle.AbilityName.moveTargetTileToPile,
-				destinationPile: Ginseng.TilePileNames.banish,
-				triggers: [
-					{
-						triggerType: Trifle.AbilityTriggerType.whenCapturingTargetTile,
-						targetTeams: [Trifle.TileTeam.enemy]
-					},
-					{
-						triggerType: Trifle.AbilityTriggerType.whenActiveMovement
-					}
-				],
-				targetTypes: [
-					Trifle.TargetType.triggerTargetTiles,
-					Trifle.TargetType.thisTile
-				],
-				triggerTypeToTarget: Trifle.AbilityTriggerType.whenCapturingTargetTile
-			},
-			{
-				title: "Exchange With Captured Tile",
-				type: Trifle.AbilityName.exchangeWithCapturedTile,
-				optional: true,
-				neededPromptTargetsInfo: [
-					{
-						title: "exchangedTile",
-						promptId: Trifle.TargetPromptId.chosenCapturedTile,
-						targetType: Trifle.PromptTargetType.capturedTile
-					}
-				],
-				triggers: [
-					{
-						triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsInTemple,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
-					},
-					{
-						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
-					}
-				],
-				targetTypes: [Trifle.TargetType.chosenCapturedTile],
-				targetTeams: [Trifle.TileTeam.friendly],
-				promptTargetTitle: "exchangedTile"
-			}
-		],
+		// abilities: [
+		// 	{
+		// 		type: Trifle.AbilityName.moveTargetTileToPile,
+		// 		destinationPile: Ginseng.TilePileNames.banish,
+		// 		triggers: [
+		// 			{
+		// 				triggerType: Trifle.AbilityTriggerType.whenCapturingTargetTile,
+		// 				targetTeams: [Trifle.TileTeam.enemy]
+		// 			},
+		// 			{
+		// 				triggerType: Trifle.AbilityTriggerType.whenActiveMovement
+		// 			}
+		// 		],
+		// 		targetTypes: [
+		// 			Trifle.TargetType.triggerTargetTiles,
+		// 			Trifle.TargetType.thisTile
+		// 		],
+		// 		triggerTypeToTarget: Trifle.AbilityTriggerType.whenCapturingTargetTile
+		// 	}
+		// ],
 		textLines: [
 			"<strong>Movement</strong>",
 			"- Can move 6 spaces",
@@ -766,9 +741,35 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 			targetAbilityTypes: [Trifle.AbilityType.moveTargetTile],
 			cancelAbilitiesFromTeam: Trifle.TileTeam.friendly
 		};
+		var exchangeForCapturedTileIntempleAbility = {
+			title: "Exchange With Captured Tile",
+			type: Trifle.AbilityName.exchangeWithCapturedTile,
+			optional: true,
+			neededPromptTargetsInfo: [
+				{
+					title: "exchangedTile",
+					promptId: Trifle.TargetPromptId.chosenCapturedTile,
+					targetType: Trifle.PromptTargetType.capturedTile
+				}
+			],
+			triggers: [
+				{
+					triggerType: Trifle.AbilityTriggerType.whenTargetTileLandsInTemple,
+					targetTileTypes: [Trifle.TileCategory.thisTile]
+				},
+				{
+					triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
+					targetTileTypes: [Trifle.TileCategory.thisTile]
+				}
+			],
+			targetTypes: [Trifle.TargetType.chosenCapturedTile],
+			targetTeams: [Trifle.TileTeam.friendly],
+			promptTargetTitle: "exchangedTile"
+		};
 		tileInfo.abilities.push(protectFromCaptureWhileInTempleAbility);
 		tileInfo.abilities.push(protectFromEnemyAbilitiesWhileInTempleAbility);
 		tileInfo.abilities.push(protectFromFriendlyPushAbilitiesWhileInTempleAbility);
+		tileInfo.abilities.push(exchangeForCapturedTileIntempleAbility);
 		// ------
 
 	});
