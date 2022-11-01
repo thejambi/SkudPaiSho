@@ -24,6 +24,8 @@ Ginseng.Options.tileDesignTypeValues = {
 	zaofu: "Zaofu",
 	northern: "Agna Qel'a",
 	patola: "Patola Mountain Range",
+	hirokucanyon: "Hiroku Canyon",
+	spiritworld: "Spirit World",
 	shujing: "Shu Jing",
 	shujingpiandao: "Shu Jing Piandao",
 	chuji: "Chu Ji Red",
