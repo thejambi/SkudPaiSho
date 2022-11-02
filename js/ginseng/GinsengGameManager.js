@@ -289,18 +289,34 @@ Ginseng.GameManager.prototype.doBoardSetup = function(setupNum) {
 	});
 
 	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.WhiteLotus), new NotationPoint("8,0"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Koi), new NotationPoint("7,-1"));
-	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
-		this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Bison), new NotationPoint("7,1"));
-	} else {
-		this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Dragon), new NotationPoint("7,1"));
+	var nextTileCode = Ginseng.TileCodes.Koi;
+	if (gameOptionEnabled(GINSENG_2_POINT_0)) {
+		nextTileCode = Ginseng.TileCodes.Badgermole;
 	}
-	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Badgermole), new NotationPoint("6,-2"));
+	this.board.placeTile(this.tileManager.grabTile(HOST, nextTileCode), new NotationPoint("7,-1"));
 	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
-		this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Dragon), new NotationPoint("6,2"));
+		nextTileCode = Ginseng.TileCodes.Bison;
 	} else {
-		this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Bison), new NotationPoint("6,2"));
+		nextTileCode = Ginseng.TileCodes.Dragon;
 	}
+	if (gameOptionEnabled(GINSENG_2_POINT_0)) {
+		nextTileCode = Ginseng.TileCodes.Dragon;
+	}
+	this.board.placeTile(this.tileManager.grabTile(HOST, nextTileCode), new NotationPoint("7,1"));
+	nextTileCode = Ginseng.TileCodes.Badgermole;
+	if (gameOptionEnabled(GINSENG_2_POINT_0)) {
+		nextTileCode = Ginseng.TileCodes.Koi;
+	}
+	this.board.placeTile(this.tileManager.grabTile(HOST, nextTileCode), new NotationPoint("6,-2"));
+	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
+		nextTileCode = Ginseng.TileCodes.Dragon;
+	} else {
+		nextTileCode = Ginseng.TileCodes.Bison;
+	}
+	if (gameOptionEnabled(GINSENG_2_POINT_0)) {
+		nextTileCode = Ginseng.TileCodes.Bison;
+	}
+	this.board.placeTile(this.tileManager.grabTile(HOST, nextTileCode), new NotationPoint("6,2"));
 	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.LionTurtle), new NotationPoint("4,0"));
 	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Wheel), new NotationPoint("5,-3"));
 	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Wheel), new NotationPoint("5,3"));
@@ -310,18 +326,34 @@ Ginseng.GameManager.prototype.doBoardSetup = function(setupNum) {
 	this.board.placeTile(this.tileManager.grabTile(HOST, Ginseng.TileCodes.Orchid), new NotationPoint("4,5"));
 
 	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.WhiteLotus), new NotationPoint("-8,0"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Koi), new NotationPoint("-7,1"));
-	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
-		this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Bison), new NotationPoint("-7,-1"));
-	} else {
-		this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Dragon), new NotationPoint("-7,-1"));
+	nextTileCode = Ginseng.TileCodes.Koi;
+	if (gameOptionEnabled(GINSENG_2_POINT_0)) {
+		nextTileCode = Ginseng.TileCodes.Badgermole;
 	}
-	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Badgermole), new NotationPoint("-6,2"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, nextTileCode), new NotationPoint("-7,1"));
 	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
-		this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Dragon), new NotationPoint("-6,-2"));
+		nextTileCode = Ginseng.TileCodes.Bison;
 	} else {
-		this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Bison), new NotationPoint("-6,-2"));
+		nextTileCode = Ginseng.TileCodes.Dragon;
 	}
+	if (gameOptionEnabled(GINSENG_2_POINT_0)) {
+		nextTileCode = Ginseng.TileCodes.Dragon;
+	}
+	this.board.placeTile(this.tileManager.grabTile(GUEST, nextTileCode), new NotationPoint("-7,-1"));
+	nextTileCode = Ginseng.TileCodes.Badgermole;
+	if (gameOptionEnabled(GINSENG_2_POINT_0)) {
+		nextTileCode = Ginseng.TileCodes.Koi;
+	}
+	this.board.placeTile(this.tileManager.grabTile(GUEST, nextTileCode), new NotationPoint("-6,2"));
+	if (setupNum === 1 || gameOptionEnabled(SWAP_BISON_AND_DRAGON)) {
+		nextTileCode = Ginseng.TileCodes.Dragon;
+	} else {
+		nextTileCode = Ginseng.TileCodes.Bison;
+	}
+	if (gameOptionEnabled(GINSENG_2_POINT_0)) {
+		nextTileCode = Ginseng.TileCodes.Bison;
+	}
+	this.board.placeTile(this.tileManager.grabTile(GUEST, nextTileCode), new NotationPoint("-6,-2"));
 	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.LionTurtle), new NotationPoint("-4,0"));
 	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Wheel), new NotationPoint("-5,-3"));
 	this.board.placeTile(this.tileManager.grabTile(GUEST, Ginseng.TileCodes.Wheel), new NotationPoint("-5,3"));

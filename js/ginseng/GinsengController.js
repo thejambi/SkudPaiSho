@@ -149,7 +149,9 @@ Ginseng.Controller.prototype.toggleDebug = function() {
 
 Ginseng.Controller.prototype.completeSetup = function() {
 	// Create initial board setup
-	this.addSetupMove();
+	if (!gameOptionEnabled(GINSENG_2_POINT_0)) {
+		this.addSetupMove();
+	}
 
 	// Finish with actuate
 	rerunAll();

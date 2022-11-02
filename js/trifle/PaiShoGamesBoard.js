@@ -908,6 +908,22 @@ PaiShoGames.Board.prototype.getAwayFromTileDiagonalPossibleMoves = function(targ
 	return movePoints;
 };
 
+PaiShoGames.Board.prototype.getJumpTargetTilePossibleMoves = function(targetTilePoint, originPoint, boardPointAlongTheWay) {
+	var movePoints = [];
+
+	// Calculate flip point
+	var flipPointRow = targetTilePoint.row + (targetTilePoint.row - originPoint.row);
+	var flipPointCol = targetTilePoint.col + (targetTilePoint.col - originPoint.col);
+
+	var flipPoint = this.cells[flipPointRow][flipPointCol];
+	
+	if (!flipPoint.hasTile()) {
+		movePoints.push(flipPoint);
+	}
+
+	return movePoints;
+};
+
 PaiShoGames.Board.prototype.getPointsNextToTilesInLineOfSight = function(movementInfo, originPoint) {
 	var jumpPoints = [];
 	if (movementInfo.type === Trifle.MovementType.jumpAlongLineOfSight && movementInfo.targetTileTypes) {
@@ -1649,6 +1665,8 @@ PaiShoGames.Board.prototype.setPossibleMovesForMovement = function(movementInfo,
 			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.awayFromTargetTileOrthogonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
 		} else if (movementInfo.type === Trifle.MovementType.awayFromTargetTileDiagonal) {
 			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.awayFromTargetTileDiagonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
+		} else if (movementInfo.type === Trifle.MovementType.jumpTargetTile) {
+			this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGames.Board.jumpTargetTileMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementInfo.distance, 0);
 		}
 	}
 	// debug("Movement Point Checks: " + this.movementPointChecks);
@@ -1699,6 +1717,13 @@ PaiShoGames.Board.awayFromTargetTileOrthogonalMovementFunction = function(board,
 PaiShoGames.Board.awayFromTargetTileDiagonalMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
 	if (movementInfo.targetTilePoint) {
 		return board.getAwayFromTileDiagonalPossibleMoves(movementInfo.targetTilePoint, originPoint, boardPointAlongTheWay);
+	} else {
+		debug("Missing targetTilePoint");
+	}
+};
+PaiShoGames.Board.jumpTargetTileMovementFunction = function(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
+	if (movementInfo.targetTilePoint) {
+		return board.getJumpTargetTilePossibleMoves(movementInfo.targetTilePoint, originPoint, boardPointAlongTheWay);
 	} else {
 		debug("Missing targetTilePoint");
 	}

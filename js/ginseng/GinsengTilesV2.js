@@ -237,37 +237,48 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 			}
 		],
 		abilities: [
+			// {
+			// 	type: Trifle.AbilityName.protectFromCapture,
+			// 	priority: 2,
+			// 	triggers: [
+			// 		{
+			// 			triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+			// 			targetTeams: [Trifle.TileTeam.friendly],
+			// 			targetTileTypes: [Trifle.TileCategory.allTileTypes],
+			// 			targetTileBoardPointTypes: [RED, WHITE],
+			// 			activationRequirements: [
+			// 				{
+			// 					type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+			// 					targetTileTypes: [Trifle.TileCategory.thisTile],
+			// 					targetPointTypes: [WHITE]
+			// 				}
+			// 			]
+			// 		}
+			// 	],
+			// 	targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			// }
 			{
-				type: Trifle.AbilityName.protectFromCapture,
-				priority: 2,
-				triggers: [
+				title: "Active Badgermole Flip",
+				type: Trifle.AbilityName.moveTargetTile,
+				// priority: ?,
+				isPassiveMovement: true,
+				optional: true,
+				neededPromptTargetsInfo: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
-						targetTeams: [Trifle.TileTeam.friendly],
-						targetTileTypes: [Trifle.TileCategory.allTileTypes],
-						targetTileBoardPointTypes: [RED, WHITE],
-						activationRequirements: [
-							{
-								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-								targetTileTypes: [Trifle.TileCategory.thisTile],
-								targetPointTypes: [WHITE]
-							}
-						]
+						title: "flippedTile",
+						promptId: Trifle.TargetPromptId.movedTilePoint,
+						targetType: Trifle.PromptTargetType.boardPoint
+					},
+					{
+						title: "flipLanding",
+						promptId: Trifle.TargetPromptId.movedTileDestinationPoint,
+						targetType: Trifle.PromptTargetType.boardPoint
 					}
 				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles]
-			}
-			/* ,
-			!gameOptionEnabled(BADGERMOLE_NOT_PREVENT_TRAP_PUSH) && {
-				title: "Protect From Enemy Abilities",
-				type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
-				priority: 2,
 				triggers: [
 					{
-						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
-						targetTeams: [Trifle.TileTeam.friendly],
+						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
 						targetTileTypes: [Trifle.TileCategory.allTileTypes],
-						targetTileBoardPointTypes: [RED, WHITE],
 						activationRequirements: [
 							{
 								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
@@ -275,12 +286,25 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 								targetPointTypes: [WHITE]
 							}
 						]
+					},
+					{
+						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [Trifle.TileCategory.thisTile]
 					}
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
-				targetAbilityTypes: [Trifle.AbilityType.all],
-				cancelAbilitiesFromTeam: Trifle.TileTeam.enemy
-			} */
+				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
+				numberOfTargetTiles: 1,
+				promptTargetTitle: "flippedTile",
+				targetTileMovements: [
+					{
+						type: Trifle.MovementType.jumpTargetTile,
+						distance: 1,
+						targetTileTypes: [Trifle.TileCategory.tileWithAbility],
+						regardlessOfImmobilization: true
+					}
+				]
+			}
 		],
 		textLines: [
 			"<em>Original Bender</em>",
