@@ -376,7 +376,7 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				targetTileMovements: [
 					{
 						type: Trifle.MovementType.awayFromTargetTileOrthogonal,
-						distance: 2,
+						distance: 1,
 						targetTileTypes: [Trifle.TileCategory.tileWithAbility],
 						regardlessOfImmobilization: true
 					},

@@ -1173,6 +1173,9 @@ PaiShoGames.Board.prototype.processAbilities = function(tileMovedOrPlaced, tileM
 		var tile = pointWithTile.tile;
 		var tileInfo = self.tileMetadata[tile.code];
 		if (tileInfo.abilities) {
+			if (tile.code === Ginseng.TileCodes.LionTurtle) {
+				// debug("LION TURTLE"); // Can set breakpoint here
+			}
 			tileInfo.abilities.forEach(function(tileAbilityInfo) {
 				var allTriggerConditionsMet = true;
 
