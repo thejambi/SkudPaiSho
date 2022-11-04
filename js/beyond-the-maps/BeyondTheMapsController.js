@@ -112,6 +112,11 @@ BeyondTheMaps.Controller = class {
 			msg += "Click your ship to explore by sea, click your land to explore by land.";
 		}
 
+		msg += "<br /><br />";
+		msg += "Host land: " + this.theGame.calculatePlayerScore(HOST);
+		msg += "<br />";
+		msg += "Guest land: " + this.theGame.calculatePlayerScore(GUEST);
+
 		return msg;
 	}
 
