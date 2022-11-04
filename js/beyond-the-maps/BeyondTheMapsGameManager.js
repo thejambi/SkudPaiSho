@@ -35,7 +35,7 @@ BeyondTheMaps.GameManager = class {
 		this.actuator.actuate(this.board, this.markingManager, moveToAnimate, phaseIndex, actuateMoveData);
 	}
 
-	runNotationMove(move, phaseIndex, withActuate, ignorePathFinding, ignoreWinCheck) {
+	runNotationMove(move, phaseIndex, withActuate, ignorePathFinding, ignoreWinCheck, ignoreLandfill) {
 		var moveData = move.moveData.phases[phaseIndex];
 
 		var actuateMoveData = {};
@@ -54,7 +54,7 @@ BeyondTheMaps.GameManager = class {
 		// this.board.analyzeSeaAndLandGroups();
 
 		/* Check for enclosed land for player */
-		if (!ignoreWinCheck) {
+		if (ignoreLandfill) {
 			actuateMoveData.landfillPoints = this.board.fillEnclosedLandForPlayer(move.player);
 		}
 
@@ -72,6 +72,7 @@ BeyondTheMaps.GameManager = class {
 	}
 
 	setEndOfGameWinners(playersSurrounded) {
+		this.endGameWinners = [];
 		var hostScore = this.calculatePlayerScore(HOST);
 		var guestScore = this.calculatePlayerScore(GUEST);
 
@@ -162,11 +163,21 @@ BeyondTheMaps.GameManager = class {
 	}
 
 	getWinReason() {
-		if (this.endGameWinners.length === 1) {
-			return " discovered more land to win!";
-		} else if (this.endGameWinners.length > 1) {
-			return " discovered much land together!";
+		var msg;
+
+		if (this.endGameWinners.length > 0) {
+			if (this.endGameWinners.length === 1) {
+				msg = " discovered more land to win!";
+			} else if (this.endGameWinners.length > 1) {
+				msg = " discovered much land together!";
+			}
+			msg += "<br /><br />";
+			msg += "Host land: " + this.calculatePlayerScore(HOST);
+			msg += "<br />";
+			msg += "Guest land: " + this.calculatePlayerScore(GUEST);
 		}
+
+		return msg;
 	}
 
 	getWinResultTypeCode() {

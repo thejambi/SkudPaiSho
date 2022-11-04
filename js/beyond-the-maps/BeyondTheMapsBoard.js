@@ -504,7 +504,7 @@ BeyondTheMaps.Board = class {
 		var nextPointArr = this.getAdjacentPointsPotentialPossibleMoves(moveEndPoint, lastStepPoint, true, null);
 		if (nextPointArr && nextPointArr.length > 0) {
 			var possibleLandPoint = nextPointArr[0];
-			if ((!possibleLandPoint.hasTile() && !this.placingLandSeparatesShipsWithoutSurroundingOne(possibleLandPoint))
+			if ((!possibleLandPoint.hasTile() && !this.placingLandSeparatesShipsWithoutSurroundingEnemy(possibleLandPoint, player))
 				|| (possibleLandPoint.hasTile() && possibleLandPoint.tile.tileType === BeyondTheMaps.TileType.LAND && possibleLandPoint.tile.ownerName !== player)
 			) {
 				landPoint = possibleLandPoint;
@@ -514,13 +514,20 @@ BeyondTheMaps.Board = class {
 		return landPoint;
 	}
 
+	placingLandSeparatesShipsWithoutSurroundingEnemy(boardPoint, player) {
+		var newBoard = this.getCopy();
+
+		newBoard.placeLandPiecesForPlayer(HOST, [boardPoint]);
+		newBoard.analyzeSeaAndLandGroups();
+
+		return newBoard.shipsSeparatedAndPlayerHasNotBeenSurrounded(getOpponentName(player));
+	}
+
 	placingLandSeparatesShipsWithoutSurroundingOne(boardPoint) {
 		var newBoard = this.getCopy();
 
 		newBoard.placeLandPiecesForPlayer(HOST, [boardPoint]);
 		newBoard.analyzeSeaAndLandGroups();
-		// newBoard.fillEnclosedLandForPlayer(HOST);
-		// newBoard.fillEnclosedLandForPlayer(GUEST);
 
 		return newBoard.shipsSeparatedAndAShipHasNotBeenSurrounded();
 	}
@@ -534,6 +541,18 @@ BeyondTheMaps.Board = class {
 			&& !(														// AND NOT:
 				!bothShipsPresent		 								// (A ship has been captured
 				|| this.aShipIsSurrounded()								// OR a ship is cannot move)
+			);
+	}
+
+	shipsSeparatedAndPlayerHasNotBeenSurrounded(player) {
+		var hostSeaGroupId = this.shipPoints[HOST] && this.shipPoints[HOST].seaGroupId;
+		var guestSeaGroupId = this.shipPoints[GUEST] && this.shipPoints[GUEST].seaGroupId;
+		var bothShipsPresent = hostSeaGroupId >= 0 && guestSeaGroupId >= 0;
+		return (
+			bothShipsPresent && hostSeaGroupId !== guestSeaGroupId)		// Ships separated and present
+			&& !(														// AND NOT:
+				!bothShipsPresent		 								// (A ship has been captured
+				|| this.playerShipSurrounded(player)								// OR a ship is cannot move)
 			);
 	}
 
@@ -581,7 +600,7 @@ BeyondTheMaps.Board = class {
 			peninsulaPoints.forEach(peninsulaPoint => {
 				var adjacentPoints = this.getAdjacentPoints(peninsulaPoint);
 				adjacentPoints.forEach(adjacentPoint => {
-					if (!adjacentPoint.hasTile() && !this.placingLandSeparatesShipsWithoutSurroundingOne(adjacentPoint)) {
+					if (!adjacentPoint.hasTile() && !this.placingLandSeparatesShipsWithoutSurroundingEnemy(adjacentPoint, playerName)) {
 						adjacentPoint.addType(POSSIBLE_MOVE);
 						possibleLandPointsFound = true;
 					}
@@ -596,7 +615,7 @@ BeyondTheMaps.Board = class {
 		var possiblePointsFound = false;
 		var adjacentPoints = this.getAdjacentPoints(boardPoint);
 		adjacentPoints.forEach(adjacentPoint => {
-			if (!adjacentPoint.hasTile() && !this.placingLandSeparatesShipsWithoutSurroundingOne(adjacentPoint)) {
+			if (!adjacentPoint.hasTile() && !this.placingLandSeparatesShipsWithoutSurroundingEnemy(adjacentPoint, playerName)) {
 				adjacentPoint.addType(POSSIBLE_MOVE);
 				possiblePointsFound = true;
 			}

@@ -110,12 +110,12 @@ BeyondTheMaps.Controller = class {
 			}
 			msg += "<br /><br />";
 			msg += "Click your ship to explore by sea, click your land to explore by land.";
-		}
 
-		msg += "<br /><br />";
-		msg += "Host land: " + this.theGame.calculatePlayerScore(HOST);
-		msg += "<br />";
-		msg += "Guest land: " + this.theGame.calculatePlayerScore(GUEST);
+			msg += "<br /><br />";
+			msg += "Host land: " + this.theGame.calculatePlayerScore(HOST);
+			msg += "<br />";
+			msg += "Guest land: " + this.theGame.calculatePlayerScore(GUEST);
+		}
 
 		return msg;
 	}
@@ -223,7 +223,7 @@ BeyondTheMaps.Controller = class {
 				this.theGame.hidePossibleMovePoints();
 
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true, true);
+				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true, true, true);
 
 				var landPointsPossible = this.theGame.markPossibleLandPointsForMovement(boardPoint, possiblePaths, this.notationBuilder.player);
 
@@ -250,7 +250,7 @@ BeyondTheMaps.Controller = class {
 				this.getCurrentMovePhase().landPoints.push(htmlPoint.getAttribute("name"));
 
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true, true);
+				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true, true, true);
 
 				// Deciding number?
 				var exploreLandNumber = 3;
@@ -409,7 +409,7 @@ BeyondTheMaps.Controller = class {
 		if (withActuate && !skipAnimation) {
 			var numPhases = move.moveData.phases.length;
 			var phaseIndex = 0;
-			this.theGame.runNotationMove(move, phaseIndex, withActuate);
+			this.theGame.runNotationMove(move, phaseIndex, withActuate, false, phaseIndex !== (numPhases - 1));
 			// refreshMessage();
 			phaseIndex++;
 			if (numPhases > phaseIndex) {
