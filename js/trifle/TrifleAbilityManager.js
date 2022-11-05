@@ -18,6 +18,7 @@ Trifle.AbilityManager.prototype.setAbilitiesWithPromptTargetsNeeded = function(a
 
 Trifle.AbilityManager.prototype.activateReadyAbilitiesOrPromptForTargets = function() {
 	var activateObj = this.activateReadyAbilities();
+	this.ensurePromptsStillNeeded();
 	if (this.abilitiesWithPromptTargetsNeeded && this.abilitiesWithPromptTargetsNeeded.length > 0) {
 		// return this.promptForNextNeededTargets();
 		var promptOjb = this.promptForNextNeededTargets();
@@ -25,6 +26,27 @@ Trifle.AbilityManager.prototype.activateReadyAbilitiesOrPromptForTargets = funct
 	} else {
 		// return this.activateReadyAbilities();
 		return activateObj;
+	}
+};
+
+Trifle.AbilityManager.prototype.ensurePromptsStillNeeded = function() {
+	if (this.abilitiesWithPromptTargetsNeeded && this.abilitiesWithPromptTargetsNeeded.length > 0) {
+		var index = 0;
+		var removeThese = [];
+		this.abilitiesWithPromptTargetsNeeded.forEach(ability => {
+			if (this.abilityIsCanceled(ability)) {
+				removeThese.push(index);
+			}
+			index++;
+		});
+		if (removeThese.length > 0) {
+			for (var i = removeThese.length - 1; i >= 0; i--) {
+				var indexToRemove = removeThese[i];
+				var abilityRemoved = this.abilitiesWithPromptTargetsNeeded.splice(indexToRemove, 1)[0];
+				debug("No need to prompt for ability: ");
+				debug(abilityRemoved);
+			}
+		}
 	}
 };
 

@@ -196,6 +196,7 @@ Trifle.AbilityName = {
 	removeEffects: "removeEffects",
 	protectFromCapture: "protectFromCapture",
 	grantBonusMovement: "grantBonusMovement",
+	extendMovement: "extendMovement",
 	lureTiles: "lureTiles",
 	drawTilesAlongLineOfSight: "drawTilesAlongLineOfSight",
 	cancelZone: "cancelZone",
