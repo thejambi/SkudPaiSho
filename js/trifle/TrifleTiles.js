@@ -1549,7 +1549,7 @@ Trifle.TileInfo.getReadableDescription = function(tileCode) {
 
 		if (tileInfo.movements) {
 			tileInfo.movements.forEach(function(movementInfo) {
-				tileHtml += "<br /><br />";
+				tileHtml += "<br />";
 				tileHtml += "Movement type: " + movementInfo.type;
 				if (movementInfo.shape) tileHtml += "</br />- Shape: " + movementInfo.shape;
 				if (movementInfo.distance) tileHtml += "<br />- Distance: " + (movementInfo.distance === 99 ? "unlimited" : movementInfo.distance);
@@ -1581,7 +1581,7 @@ Trifle.TileInfo.getReadableDescription = function(tileCode) {
 		}
 
 		if (tileInfo.territorialZone) {
-			tileHtml += "<br /><br />Zone Size: " + tileInfo.territorialZone.size;
+			tileHtml += "<br />Zone Size: " + tileInfo.territorialZone.size;
 			if (tileInfo.territorialZone.abilities) {
 				tileInfo.territorialZone.abilities.forEach(function(ZoneAbilityInfo) {
 					tileHtml += "<br />Zone Ability: " + ZoneAbilityInfo.type;
@@ -1594,8 +1594,9 @@ Trifle.TileInfo.getReadableDescription = function(tileCode) {
 		
 		if (tileInfo.abilities) {
 			tileInfo.abilities.forEach(function(abilityInfo) {
-				tileHtml += "<br /><br />";
-				tileHtml += "Ability: " + abilityInfo.type;
+				tileHtml += "<br />";
+				/* tileHtml += "Ability: " + abilityInfo.type;
+
 				abilityInfo.triggers.forEach(function(triggerInfo) {
 					tileHtml += "<br />- Trigger: " + triggerInfo.triggerType;
 					if (triggerInfo.targetTeams) tileHtml += "<br />-- Target Tiles: " + triggerInfo.targetTeams;
@@ -1604,10 +1605,11 @@ Trifle.TileInfo.getReadableDescription = function(tileCode) {
 				});
 				tileHtml += "<br />- Ability Target Types: " + abilityInfo.targetTypes;
 				if (abilityInfo.targetTeams) tileHtml += "<br />-- Target Tiles: " + abilityInfo.targetTeams;
-				if (abilityInfo.targetTileTypes) tileHtml += "<br />-- Target Tiles: " + abilityInfo.targetTileTypes;
+				if (abilityInfo.targetTileTypes) tileHtml += "<br />-- Target Tiles: " + abilityInfo.targetTileTypes; */
+
+				tileHtml += Trifle.TileInfo.getObjectSummary("Ability", abilityInfo, 0);
 			});
 		}
-
 
 		tileHtml += "<br />";
 	} else {

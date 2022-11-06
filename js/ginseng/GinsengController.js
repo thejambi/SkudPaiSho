@@ -28,6 +28,10 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 	this.isPaiShoGame = true;
 
 	this.showDebugInfo = false;
+
+	if (gameOptionEnabled(GINSENG_2_POINT_0)) {
+		this.isInviteOnly = true;
+	}
 }
 
 Ginseng.Controller.prototype.createActuator = function() {
