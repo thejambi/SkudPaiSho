@@ -1620,6 +1620,10 @@ Trifle.TileInfo.getReadableDescription = function(tileCode) {
 };
 
 Trifle.TileInfo.getObjectSummary = function(origKey, theObject, indentDepth) {
+	if (theObject instanceof Trifle.BoardPoint) {
+		return "<br />" + origKey + ": (BoardPoint object)";
+	}
+
 	var indentDashStr = "";
 	for (var i = 0; i < indentDepth; i++) {
 		indentDashStr += "-";
