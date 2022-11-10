@@ -61,18 +61,19 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				recordedPointType: Trifle.RecordTilePointType.startPoint,
 				inevitable: true
 			}
-		]/* ,
+		],
 		textLines: [
-			"<strong>Movement</strong>",
-			"- Moves by jumping over any tiles that are diagonal to it. Can be continued as a chain.",
-			"",
-			"<strong>Ability</strong>",
-			"- White Lotus cannot be captured when Ginseng is in harmony with it.",
-			"",
-			"<strong>Other</strong>",
-			"- Cannot capture.",
-			"- When your White Lotus is captured, it is returned to its starting point."
-		] */
+            "<strong>Movement Phase</strong>",
+            "- Moves by jumping over any tiles that are diagonal to it. Can be continued as a chain.",
+            "- Cannot capture.",
+            "",
+            "<strong>Effect Phase</strong>",
+            "- None.",
+            "",
+            "<strong>Note</strong>",
+            "- Capturing is only allowed when <strong>both</strong> White Lotus tiles are outside Temples.",
+            "- When captured, White Lotus is returned to its Temple."
+        ]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Koi] = {
@@ -110,7 +111,7 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 					}
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
-			},
+			}/* ,
 			{
 				title: "Prevent Enemy Pushing Trapped Tiles",
 				type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
@@ -132,8 +133,16 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				cancelAbilitiesFromTeam: Trifle.TileTeam.enemy,
 				cancelAbilitiesFromTileCodes: [Ginseng.TileCodes.Bison]
-			}
-		]
+			} */
+		],
+		textLines: [
+            "<strong>Movement Phase</strong>",
+            "- Can move 5 spaces.",
+            "- Can capture.",
+            "",
+            "<strong>Effect Phase (static ability)</strong>",
+            "- Traps all surrounding enemy tiles when it is touching a White Garden."
+        ]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Dragon] = {
@@ -171,19 +180,15 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				targetTeams: [Trifle.TileTeam.friendly]
 			}
-		]/* ,
+		],
 		textLines: [
-			"<em>Original Bender</em>",
-			"",
-			"<strong>Movement</strong>",
-			"- Can move 5 spaces",
-			"- Can capture any tile by movement.",
-			"",
-			"<strong>Ability</strong>",
-			!gameOptionEnabled(DRAGON_CANCELS_ABILITIES) 
-				? "- Captures all surrounding tiles when it is touching either Red Garden."
-				: "- Cancels abilities of surrounding tiles when it is touching either Red Garden."
-		] */
+            "<strong>Movement Phase</strong>",
+            "- Can move 5 spaces.",
+            "- Can capture.",
+            "",
+            "<strong>Effect Phase (static ability)</strong>",
+            "- All surrounding friendly tiles are boosted with +1 movement when it is touching a Red Garden. <em>(does not affect White Lotus and Wheel)</em>"
+        ]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Badgermole] = {
@@ -249,17 +254,15 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 					}
 				]
 			}
-		]/* ,
+		],
 		textLines: [
-			"<em>Original Bender</em>",
-			"",
-			"<strong>Movement</strong>",
-			"- Can move 5 spaces",
-			"- Can capture any tile by movement.",
-			"",
-			"<strong>Ability</strong>",
-			"- Protects all surrounding friendly tiles when it is touching either White Garden"
-		] */
+            "<strong>Movement Phase</strong>",
+            "- Can move 5 spaces.",
+            "- Can capture.",
+            "",
+            "<strong>Effect Phase (dynamic ability)</strong>",
+            "- May move any one surrounding tile over itself when it is touching a White Garden."
+        ]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Bison] = {
@@ -332,18 +335,15 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 					}
 				]
 			}
-		]/* ,
+		],
 		textLines: [
-			"<em>Original Bender</em>",
-			"",
-			"<strong>Movement</strong>",
-			"- Can move 5 spaces",
-			"- Can capture any tile by movement.",
-			"",
-			"<strong>Ability</strong>",
-			"- Pushes a single surrounding tile in a straight line away from itself when it is touching either Red Garden.",
-			// "- If you move a tile to a point surrounding your Flying Bison, you may push that tile."
-		] */
+            "<strong>Movement Phase</strong>",
+            "- Can move 5 spaces.",
+            "- Can capture.",
+            "",
+            "<strong>Effect Phase (dynamic ability)</strong>",
+            "- May push any one surrounding tile 1 space away from itself when it is touching a Red Garden."
+        ]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.LionTurtle] = {
@@ -373,15 +373,15 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				targetTypes: [Trifle.TargetType.triggerTargetTiles],
 				targetAbilityTypes: [Trifle.AbilityType.all]
 			}
-		]/* ,
+		],
 		textLines: [
-			"<strong>Movement</strong>",
-			"- Can move 5 spaces",
-			"- Can capture any tile by movement except the opponent's Lion Turtle",
-			"",
-			"<strong>Ability</strong>",
-			gameOptionEnabled(LION_TURTLE_ABILITY_ANYWHERE) ? "- Captures all adjacent Original Benders." : "- Captures all adjacent Original Benders that are touching a red/white garden."
-		] */
+            "<strong>Movement Phase</strong>",
+            "- Can move 5 spaces.",
+            "- Can capture.",
+            "",
+            "<strong>Effect Phase (static ability)</strong>",
+            "- Removes all abilities of surrounding enemy tiles."
+        ]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Wheel] = {
@@ -402,12 +402,15 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 					}
 				]
 			}
-		]/* ,
+		],
 		textLines: [
-			"<strong>Movement</strong>",
-			"- Can move unlimited spaces in one direction on the horizontal or vertical lines.",
-			"- Can capture any tile by movement."
-		] */
+            "<strong>Movement Phase</strong>",
+            "- Can move unlimited spaces in one direction on the horizontal and vertical lines.",
+            "- Can capture.",
+            "",
+            "<strong>Effect Phase</strong>",
+            "- None."
+        ]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Ginseng] = {
@@ -430,16 +433,15 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				],
 				targetTypes: [Trifle.TargetType.triggerTargetTiles]
 			}
-		]/* ,
+		],
 		textLines: [
-			"<strong>Movement</strong>",
-			"- Can move 6 spaces",
-			"- Cannot capture.",
-			"",
-			"<strong>Ability</strong>",
-			"- White Lotus cannot be captured when Ginseng is in harmony with it.",
-			"- May retrieve a captured tile by being exchanged at either the Eastern or Western Temples."
-		] */
+            "<strong>Movement Phase</strong>",
+            "- Can move 5 spaces.",
+            "- Cannot capture.",
+            "",
+            "<strong>Effect Phase (static ability)</strong>",
+            "- Protects all friendly tiles from capture that are in line of sight. <em>(tiles in \"line of sight\" are tiles on the same line and with no tiles between them)</em>"
+        ]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Orchid] = {
@@ -451,8 +453,7 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				distance: 5,
 				captureTypes: [
 					{
-						type: Trifle.CaptureType.allExcludingCertainTiles,
-						excludedTileCodes: [Ginseng.TileCodes.WhiteLotus]
+						type: Trifle.CaptureType.all
 					}
 				]
 			}
@@ -468,16 +469,15 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 				],
 				targetTypes: [Trifle.TargetType.thisTile]
 			}
-		]/* ,
+		],
 		textLines: [
-			"<strong>Movement</strong>",
-			"- Can move 6 spaces",
-			"- Unique Capture: Orchid banishes the tile it captures and itself. Banished tiles cannot be retrieved.",
-			"- Cannot capture/banish the White Lotus.",
-			"",
-			"<strong>Ability</strong>",
-			"- May retrieve a captured tile by being exchanged at either the Eastern or Western Temples."
-		] */
+            "<strong>Movement Phase</strong>",
+            "- Can move 5 spaces.",
+            "- Can capture.",
+            "",
+            "<strong>Effect Phase (dynamic ability)</strong>",
+            "- When Orchid captures a tile, it also captures itself. <em>(ie, it is also removed from the board)</em>"
+        ]
 	};
 
 	/* Apply Capture and Ability Activation Requirements Rules */
