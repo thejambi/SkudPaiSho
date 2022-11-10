@@ -63,17 +63,17 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 			}
 		],
 		textLines: [
-            "<strong>Movement Phase</strong>",
-            "- Moves by jumping over any tiles that are diagonal to it. Can be continued as a chain.",
-            "- Cannot capture.",
-            "",
-            "<strong>Effect Phase</strong>",
-            "- None.",
-            "",
-            "<strong>Note</strong>",
-            "- Capturing is only allowed when <strong>both</strong> White Lotus tiles are outside Temples.",
-            "- When captured, White Lotus is returned to its Temple."
-        ]
+			"<strong>Movement Phase</strong>",
+			"- Moves by jumping over any tiles that are diagonal to it. Can be continued as a chain.",
+			"- Cannot capture.",
+			"",
+			"<strong>Effect Phase</strong>",
+			"- None.",
+			"",
+			"<strong>Note</strong>",
+			"- Capturing is only allowed when <strong>both</strong> White Lotus tiles are outside Temples.",
+			"- When captured, White Lotus is returned to its Temple."
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Koi] = {
@@ -136,13 +136,13 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 			} */
 		],
 		textLines: [
-            "<strong>Movement Phase</strong>",
-            "- Can move 5 spaces.",
-            "- Can capture.",
-            "",
-            "<strong>Effect Phase (static ability)</strong>",
-            "- Traps all surrounding enemy tiles when it is touching a White Garden."
-        ]
+			"<strong>Movement Phase</strong>",
+			"- Can move 5 spaces.",
+			"- Can capture.",
+			"",
+			"<strong>Effect Phase (static ability)</strong>",
+			"- Traps all surrounding enemy tiles when it is touching a White Garden."
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Dragon] = {
@@ -182,13 +182,13 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 			}
 		],
 		textLines: [
-            "<strong>Movement Phase</strong>",
-            "- Can move 5 spaces.",
-            "- Can capture.",
-            "",
-            "<strong>Effect Phase (static ability)</strong>",
-            "- All surrounding friendly tiles are boosted with +1 movement when it is touching a Red Garden. <em>(does not affect White Lotus and Wheel)</em>"
-        ]
+			"<strong>Movement Phase</strong>",
+			"- Can move 5 spaces.",
+			"- Can capture.",
+			"",
+			"<strong>Effect Phase (static ability)</strong>",
+			"- All surrounding friendly tiles are boosted with +1 movement when it is touching a Red Garden. <em>(does not affect White Lotus and Wheel)</em>"
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Badgermole] = {
@@ -256,13 +256,13 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 			}
 		],
 		textLines: [
-            "<strong>Movement Phase</strong>",
-            "- Can move 5 spaces.",
-            "- Can capture.",
-            "",
-            "<strong>Effect Phase (dynamic ability)</strong>",
-            "- May move any one surrounding tile over itself when it is touching a White Garden."
-        ]
+			"<strong>Movement Phase</strong>",
+			"- Can move 5 spaces.",
+			"- Can capture.",
+			"",
+			"<strong>Effect Phase (dynamic ability)</strong>",
+			"- May move any one surrounding tile over itself when it is touching a White Garden."
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Bison] = {
@@ -337,13 +337,13 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 			}
 		],
 		textLines: [
-            "<strong>Movement Phase</strong>",
-            "- Can move 5 spaces.",
-            "- Can capture.",
-            "",
-            "<strong>Effect Phase (dynamic ability)</strong>",
-            "- May push any one surrounding tile 1 space away from itself when it is touching a Red Garden."
-        ]
+			"<strong>Movement Phase</strong>",
+			"- Can move 5 spaces.",
+			"- Can capture.",
+			"",
+			"<strong>Effect Phase (dynamic ability)</strong>",
+			"- May push any one surrounding tile 1 space away from itself when it is touching a Red Garden."
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.LionTurtle] = {
@@ -375,13 +375,13 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 			}
 		],
 		textLines: [
-            "<strong>Movement Phase</strong>",
-            "- Can move 5 spaces.",
-            "- Can capture.",
-            "",
-            "<strong>Effect Phase (static ability)</strong>",
-            "- Removes all abilities of surrounding enemy tiles."
-        ]
+			"<strong>Movement Phase</strong>",
+			"- Can move 5 spaces.",
+			"- Can capture.",
+			"",
+			"<strong>Effect Phase (static ability)</strong>",
+			"- Removes all abilities of surrounding enemy tiles."
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Wheel] = {
@@ -404,13 +404,13 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 			}
 		],
 		textLines: [
-            "<strong>Movement Phase</strong>",
-            "- Can move unlimited spaces in one direction on the horizontal and vertical lines.",
-            "- Can capture.",
-            "",
-            "<strong>Effect Phase</strong>",
-            "- None."
-        ]
+			"<strong>Movement Phase</strong>",
+			"- Can move unlimited spaces in one direction on the horizontal and vertical lines.",
+			"- Can capture.",
+			"",
+			"<strong>Effect Phase</strong>",
+			"- None."
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Ginseng] = {
@@ -435,13 +435,13 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 			}
 		],
 		textLines: [
-            "<strong>Movement Phase</strong>",
-            "- Can move 5 spaces.",
-            "- Cannot capture.",
-            "",
-            "<strong>Effect Phase (static ability)</strong>",
-            "- Protects all friendly tiles from capture that are in line of sight. <em>(tiles in \"line of sight\" are tiles on the same line and with no tiles between them)</em>"
-        ]
+			"<strong>Movement Phase</strong>",
+			"- Can move 5 spaces.",
+			"- Cannot capture.",
+			"",
+			"<strong>Effect Phase (static ability)</strong>",
+			"- Protects all friendly tiles from capture that are in line of sight. <em>(tiles in \"line of sight\" are tiles on the same line and with no tiles between them)</em>"
+		]
 	};
 
 	GinsengTiles[Ginseng.TileCodes.Orchid] = {
@@ -471,13 +471,13 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 			}
 		],
 		textLines: [
-            "<strong>Movement Phase</strong>",
-            "- Can move 5 spaces.",
-            "- Can capture.",
-            "",
-            "<strong>Effect Phase (dynamic ability)</strong>",
-            "- When Orchid captures a tile, it also captures itself. <em>(ie, it is also removed from the board)</em>"
-        ]
+			"<strong>Movement Phase</strong>",
+			"- Can move 5 spaces.",
+			"- Can capture.",
+			"",
+			"<strong>Effect Phase (dynamic ability)</strong>",
+			"- When Orchid captures a tile, it also captures itself. <em>(ie, it is also removed from the board)</em>"
+		]
 	};
 
 	/* Apply Capture and Ability Activation Requirements Rules */
