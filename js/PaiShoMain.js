@@ -2716,6 +2716,13 @@ function showDefaultGameOpenedMessage(show) {
 	}
 }
 
+function setGameTitleText(gameTitle) {
+	var gameTitleElements = document.getElementsByClassName('game-title-text');
+	for (i = 0; i < gameTitleElements.length; i++) {
+		gameTitleElements[i].innerText = gameTitle;
+	};
+}
+
 function setGameController(gameTypeId, keepGameOptions) {
 	setGameLogText('');
 
@@ -2744,19 +2751,18 @@ function setGameController(gameTypeId, keepGameOptions) {
 		showModal("Cannot Load Game", "This game is unavailable. Try Vagabond Pai Sho instead :)<br /><br />To know why the selected game is unavailable, ask in The Garden Gate Discord. Perhaps you have selected a new game that is coming soon!");
 		successResult = false;
 	}
+
+	setGameTitleText(getGameTypeEntryFromId(gameTypeId).desc);
+	
 	if (gameController.completeSetup) {
 		gameController.completeSetup();
 	}
+	
 	if (gameController.supportsMoveLogMessages) {
 		document.getElementById("toggleMoveLogDisplayDiv").classList.remove("gone");
 	} else {
 		document.getElementById("toggleMoveLogDisplayDiv").classList.add("gone");
 	}
-
-	var gameTitleElements = document.getElementsByClassName('game-title-text');
-	for (i = 0; i < gameTitleElements.length; i++) {
-		gameTitleElements[i].innerText = getGameTypeEntryFromId(gameTypeId).desc;
-	};
 
 	isInReplay = false;
 

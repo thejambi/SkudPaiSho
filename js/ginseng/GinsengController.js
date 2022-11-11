@@ -188,6 +188,10 @@ Ginseng.Controller.prototype.completeSetup = function() {
 	// Finish with actuate
 	rerunAll();
 	this.callActuate();
+
+	if (gameOptionEnabled(GINSENG_1_POINT_0)) {
+		setGameTitleText("Ginseng Pai Sho 1.0");
+	}
 };
 
 Ginseng.Controller.prototype.addSetupMove = function() {
