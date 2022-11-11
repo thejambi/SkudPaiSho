@@ -2366,7 +2366,7 @@ var GameType = {
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [
-			GINSENG_2_POINT_0
+			GINSENG_1_POINT_0
 		],
 		secretGameOptions: [
 			LION_TURTLE_ABILITY_ANYWHERE,
@@ -3439,7 +3439,7 @@ function viewGameSeeksClicked() {
 
 var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
 	var activeCountDiv = document.getElementById('activeGamesCountDisplay');
-	if (activeCountDiv) {
+	if (activeCountDiv && activeCountDiv < 500) {	// TODO remove the limit
 		activeCountDiv.innerText = count + " games active in the past 24 hours!";
 	}
 };
@@ -3692,8 +3692,7 @@ function setSidenavNewGameSection() {
 
 function closeGame() {
 	if (gameDevOn) {
-		setGameController(GameType.Ginseng.id);
-		addGameOption(GINSENG_2_POINT_0);
+		setGameController(GameType.Trifle.id);
 		return;
 	}
 	var defaultGameTypeIds = [

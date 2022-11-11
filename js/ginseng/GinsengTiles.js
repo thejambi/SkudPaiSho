@@ -27,7 +27,7 @@ Ginseng.TileInfo.initializeTrifleData = function() {
 
 	Trifle.TileInfo.initializeTrifleData();
 
-	if (gameOptionEnabled(GINSENG_2_POINT_0)) {
+	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
 		Ginseng.TileInfo.defineGinsengTilesV2();
 	} else {
 		Ginseng.TileInfo.defineGinsengTiles();

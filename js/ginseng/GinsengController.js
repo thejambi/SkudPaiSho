@@ -29,9 +29,9 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 
 	this.showDebugInfo = false;
 
-	if (gameOptionEnabled(GINSENG_2_POINT_0)) {
-		this.isInviteOnly = true;
-	}
+	// if (gameOptionEnabled(GINSENG_1_POINT_0)) {
+	// 	this.isInviteOnly = true;
+	// }
 }
 
 Ginseng.Controller.prototype.createActuator = function() {
@@ -97,7 +97,7 @@ Ginseng.Controller.prototype.resetMove = function(skipAnimation) {
 };
 
 Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
-	if (gameOptionEnabled(GINSENG_2_POINT_0)) {
+	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
 		return '<h4>Ginseng Pai Sho</h4>'
 			+ '<p><strong>Objective</strong></p>'
 			+ '<ul>'
@@ -181,7 +181,7 @@ Ginseng.Controller.prototype.toggleDebug = function() {
 
 Ginseng.Controller.prototype.completeSetup = function() {
 	// Create initial board setup
-	if (!gameOptionEnabled(GINSENG_2_POINT_0)) {
+	if (gameOptionEnabled(GINSENG_1_POINT_0)) {
 		this.addSetupMove();
 	}
 

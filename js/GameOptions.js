@@ -185,6 +185,9 @@ gameOptionDescriptions[DRAGON_CANCELS_ABILITIES] = "Dragon Cancels Abilities";
 var GINSENG_2_POINT_0 = "Ginseng2_0";
 gameOptionDescriptions[GINSENG_2_POINT_0] = "Ginseng 2.0";
 
+var GINSENG_1_POINT_0 = "Ginseng1_0";
+gameOptionDescriptions[GINSENG_1_POINT_0] = "Ginseng 1.0";
+
 /* Key Pai Sho */
 var NO_EFFECT_TILES = "NoEffectTiles";
 gameOptionDescriptions[NO_EFFECT_TILES] = "No Effect Tiles";
