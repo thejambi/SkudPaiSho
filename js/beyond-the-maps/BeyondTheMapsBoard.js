@@ -287,8 +287,11 @@ BeyondTheMaps.Board = class {
 		nextPossiblePoints.forEach(function(adjacentPoint) {
 			self.movementPointChecks++;
 			var canMoveThroughPoint = self.tileCanMoveThroughPoint(tile, movementInfo, adjacentPoint, recentPoint);
+			if (canMoveThroughPoint) {
+				adjacentPoint.addPossibleMovementPath(currentMovementPath);
+			}
 			if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint)) {
-				var movementOk = self.setPointAsPossibleMovement(adjacentPoint, originPoint.tile, originPoint, currentMovementPath);
+				var movementOk = self.setPointAsPossibleMovement(adjacentPoint, originPoint.tile, originPoint);
 				if (movementOk) {
 					adjacentPoint.setPossibleForMovementType(movementInfo);
 					if (!adjacentPoint.hasTile() || canMoveThroughPoint) {
@@ -364,9 +367,8 @@ BeyondTheMaps.Board = class {
 	// 		moveStepNumber + 1);
 	// }
 
-	setPointAsPossibleMovement = function(targetPoint, tileBeingMoved, originPoint, currentMovementPath) {
+	setPointAsPossibleMovement = function(targetPoint, tileBeingMoved, originPoint) {
 		targetPoint.addType(POSSIBLE_MOVE);
-		targetPoint.addPossibleMovementPath(currentMovementPath);
 		return true;
 	}
 
@@ -466,7 +468,6 @@ BeyondTheMaps.Board = class {
 		var pathsWithoutDuplicates = [];
 		possibleMovementPaths.forEach(path => {
 			if (!arrayContainsDuplicates(path)) {
-				debug("NO duppppees");
 				pathsWithoutDuplicates.push(path);
 			}
 		});
