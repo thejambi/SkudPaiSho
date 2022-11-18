@@ -6,7 +6,8 @@ var OnBoardingKeys = {
 	gameCrafterCrowdSaleDismissed: "gameCrafterCrowdSaleDismissed",
 	joinDiscord20211028Dismissed: "joinDiscord20211028Dismissed",
 	gameCrafter202210Dissmissed: "gameCrafter202210Dismissed",
-	ginseng2_0Dismissed: "ginseng2_0Dismissed"
+	ginseng2_0Dismissed: "ginseng2_0Dismissed",
+	gameCrafterGiveaway202211Dismissed: "gameCrafterGiveaway202211Dismissed"
 };
 
 function OnboardingFunctions() {
@@ -20,6 +21,10 @@ OnboardingFunctions.showOnLoadAnnouncements = function() {
 
 	if (dateIsBetween("11/11/2022", "12/30/2022")) {
 		OnboardingFunctions.showGinseng2_0Announcement();
+	}
+
+	if (dateIsBetween("11/12/2022", "11/18/2022")) {
+		OnboardingFunctions.showTheGameCrafterGiveaway202211Announcement();
 	}
 
 	// Most priority last:
@@ -106,6 +111,25 @@ OnboardingFunctions.showJoinDiscord20211028Announcement = function() {
 			"Hi! If you didn't know, there is an active Discord community for The Garden Gate. "
 			+ "Members of the community are planning a real life Pai Sho Con and want to invite you to participate in person or virtually via Discord! <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord server</a> today to find out more and get involved.<br />"
 			+ "<br /><br /><div align='center'><img src='https://cdn.discordapp.com/attachments/904911184803807273/904911232023265300/0001.jpg' width='90%' style='max-width:480px'></div>",
+			false,
+			yesNoOptions);
+	}
+};
+
+OnboardingFunctions.showTheGameCrafterGiveaway202211Announcement = function() {
+	if (localStorage.getItem(OnBoardingKeys.gameCrafterGiveaway202211Dismissed) !== "true") {
+		var yesNoOptions = {};
+		yesNoOptions.yesText = "OK - Don't show again";
+		yesNoOptions.yesFunction = function() {
+			localStorage.setItem(OnBoardingKeys.gameCrafterGiveaway202211Dismissed, "true");
+			OnboardingFunctions.closeCurrentAnnouncement();
+		};
+	yesNoOptions.noText = "Close";
+		showModal(
+			"Pai Sho Set Giveaway!",
+			"At the end of this week, I'll draw a name and give away a The Garden Gate TheGameCrafter Pai Sho set! <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a> to find details on how to enter."
+			+ "<br /><br /><a href='https://www.thegamecrafter.com/games/the-garden-gate-pai-sho-set' target='_blank'>See more details about The Garden Gate TheGameCrafter set here</a> - The most affordable Pai Sho set! Includes the full Skud Pai Sho rulebook and tiles for Skud, Vagabond, Adevar, and Ginseng Pai Sho"
+			+ "<br /><br /><div align='center'><img src='https://cdn.discordapp.com/attachments/747893391907618927/817419423106203738/image0.jpg' width='90%' style='max-width:450px'></div>",
 			false,
 			yesNoOptions);
 	}

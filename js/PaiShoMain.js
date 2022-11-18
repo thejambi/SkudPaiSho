@@ -2757,7 +2757,7 @@ function setGameController(gameTypeId, keepGameOptions) {
 	if (gameController.completeSetup) {
 		gameController.completeSetup();
 	}
-	
+
 	if (gameController.supportsMoveLogMessages) {
 		document.getElementById("toggleMoveLogDisplayDiv").classList.remove("gone");
 	} else {
@@ -3445,7 +3445,7 @@ function viewGameSeeksClicked() {
 
 var getActiveGamesCountCallback = function getActiveGamesCountCallback(count) {
 	var activeCountDiv = document.getElementById('activeGamesCountDisplay');
-	if (activeCountDiv && activeCountDiv < 500) {	// TODO remove the limit
+	if (activeCountDiv) {
 		activeCountDiv.innerText = count + " games active in the past 24 hours!";
 	}
 };

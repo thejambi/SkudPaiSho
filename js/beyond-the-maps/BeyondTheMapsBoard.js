@@ -256,13 +256,6 @@ BeyondTheMaps.Board = class {
 	};
 
 	setPossibleMovesForMovement(movementInfo, boardPointStart) {
-		// this.setPossibleMovementPointsFromMovePoints([boardPointStart], 
-		// 	BeyondTheMaps.Board.standardMovementFunction, 
-		// 	boardPointStart.tile, 
-		// 	movementInfo, 
-		// 	boardPointStart, 
-		// 	movementInfo.distance, 
-		// 	0);
 		this.inceptionCount = 0;
 		this.setPossibleMovementPointsFromMovePointsOnePathAtATime(
 			BeyondTheMaps.Board.standardMovementFunction,
@@ -293,85 +286,83 @@ BeyondTheMaps.Board = class {
 		originPoint.setMoveDistanceRemaining(movementInfo, distanceRemaining);
 		nextPossiblePoints.forEach(function(adjacentPoint) {
 			self.movementPointChecks++;
-			// if (!self.canMoveHereMoreEfficientlyAlready(adjacentPoint, distanceRemaining, movementInfo)) {
-				var canMoveThroughPoint = self.tileCanMoveThroughPoint(tile, movementInfo, adjacentPoint, recentPoint);
-				if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint)) {
-					var movementOk = self.setPointAsPossibleMovement(adjacentPoint, originPoint.tile, originPoint, currentMovementPath);
-					if (movementOk) {
-						adjacentPoint.setPossibleForMovementType(movementInfo);
-						if (!adjacentPoint.hasTile() || canMoveThroughPoint) {
-							self.setPossibleMovementPointsFromMovePointsOnePathAtATime(
-								nextPossibleMovementPointsFunction,
-								tile,
-								movementInfo,
-								originPoint,
-								adjacentPoint,
-								distanceRemaining - 1,
-								moveStepNumber + 1,
-								currentMovementPath.concat([adjacentPoint])
-							);
-						}
+			var canMoveThroughPoint = self.tileCanMoveThroughPoint(tile, movementInfo, adjacentPoint, recentPoint);
+			if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint)) {
+				var movementOk = self.setPointAsPossibleMovement(adjacentPoint, originPoint.tile, originPoint, currentMovementPath);
+				if (movementOk) {
+					adjacentPoint.setPossibleForMovementType(movementInfo);
+					if (!adjacentPoint.hasTile() || canMoveThroughPoint) {
+						self.setPossibleMovementPointsFromMovePointsOnePathAtATime(
+							nextPossibleMovementPointsFunction,
+							tile,
+							movementInfo,
+							originPoint,
+							adjacentPoint,
+							distanceRemaining - 1,
+							moveStepNumber + 1,
+							currentMovementPath.concat([adjacentPoint])
+						);
 					}
-				} else if (canMoveThroughPoint) {
-					self.setPossibleMovementPointsFromMovePointsOnePathAtATime(
-						nextPossibleMovementPointsFunction,
-						tile,
-						movementInfo,
-						originPoint,
-						adjacentPoint,
-						distanceRemaining - 1,
-						moveStepNumber + 1,
-						currentMovementPath.concat([adjacentPoint])
-					);
 				}
-			// }
+			} else if (canMoveThroughPoint) {
+				self.setPossibleMovementPointsFromMovePointsOnePathAtATime(
+					nextPossibleMovementPointsFunction,
+					tile,
+					movementInfo,
+					originPoint,
+					adjacentPoint,
+					distanceRemaining - 1,
+					moveStepNumber + 1,
+					currentMovementPath.concat([adjacentPoint])
+				);
+			}
 		});
 	}
 
-	setPossibleMovementPointsFromMovePoints(movePoints, nextPossibleMovementPointsFunction, tile, movementInfo, originPoint, distanceRemaining, moveStepNumber) {
-		if (distanceRemaining === 0
-				|| !movePoints
-				|| movePoints.length <= 0) {
-			return;	// Complete
-		}
+	// setPossibleMovementPointsFromMovePoints(movePoints, nextPossibleMovementPointsFunction, tile, movementInfo, originPoint, distanceRemaining, moveStepNumber) {
+	// 	if (distanceRemaining === 0
+	// 			|| !movePoints
+	// 			|| movePoints.length <= 0) {
+	// 		return;	// Complete
+	// 	}
 	
-		var self = this;
-		var nextPointsConfirmed = [];
-		movePoints.forEach(function(recentPoint) {
-			var nextPossiblePoints = nextPossibleMovementPointsFunction(self, originPoint, recentPoint, movementInfo, moveStepNumber);
-			nextPossiblePoints.forEach(function(adjacentPoint) {
-				//if (!self.canMoveHereMoreEfficientlyAlready(adjacentPoint, distanceRemaining, movementInfo)) {
-					adjacentPoint.setMoveDistanceRemaining(movementInfo, distanceRemaining);
+	// 	var self = this;
+	// 	var nextPointsConfirmed = [];
+	// 	movePoints.forEach(function(recentPoint) {
+	// 		var nextPossiblePoints = nextPossibleMovementPointsFunction(self, originPoint, recentPoint, movementInfo, moveStepNumber);
+	// 		nextPossiblePoints.forEach(function(adjacentPoint) {
+	// 			//if (!self.canMoveHereMoreEfficientlyAlready(adjacentPoint, distanceRemaining, movementInfo)) {
+	// 				adjacentPoint.setMoveDistanceRemaining(movementInfo, distanceRemaining);
 					
-					var canMoveThroughPoint = self.tileCanMoveThroughPoint(tile, movementInfo, adjacentPoint, recentPoint);
+	// 				var canMoveThroughPoint = self.tileCanMoveThroughPoint(tile, movementInfo, adjacentPoint, recentPoint);
 					
-					/* If cannot move through point, then the distance remaining is 0, none! */
-					if (!canMoveThroughPoint) {
-						adjacentPoint.setMoveDistanceRemaining(movementInfo, 0);
-					}
+	// 				/* If cannot move through point, then the distance remaining is 0, none! */
+	// 				if (!canMoveThroughPoint) {
+	// 					adjacentPoint.setMoveDistanceRemaining(movementInfo, 0);
+	// 				}
 					
-					if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint, originPoint)) {
-						var movementOk = self.setPointAsPossibleMovement(adjacentPoint, tile, originPoint);
-						if (movementOk) {
-							if (!adjacentPoint.hasTile() || canMoveThroughPoint) {
-								nextPointsConfirmed.push(adjacentPoint);
-							}
-						}
-					} else if (canMoveThroughPoint) {
-						nextPointsConfirmed.push(adjacentPoint);
-					}
-				//}
-			});
-		});
+	// 				if (self.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint, originPoint)) {
+	// 					var movementOk = self.setPointAsPossibleMovement(adjacentPoint, tile, originPoint);
+	// 					if (movementOk) {
+	// 						if (!adjacentPoint.hasTile() || canMoveThroughPoint) {
+	// 							nextPointsConfirmed.push(adjacentPoint);
+	// 						}
+	// 					}
+	// 				} else if (canMoveThroughPoint) {
+	// 					nextPointsConfirmed.push(adjacentPoint);
+	// 				}
+	// 			//}
+	// 		});
+	// 	});
 	
-		this.setPossibleMovementPointsFromMovePoints(nextPointsConfirmed,
-			nextPossibleMovementPointsFunction, 
-			tile, 
-			movementInfo, 
-			originPoint,
-			distanceRemaining - 1,
-			moveStepNumber + 1);
-	}
+	// 	this.setPossibleMovementPointsFromMovePoints(nextPointsConfirmed,
+	// 		nextPossibleMovementPointsFunction, 
+	// 		tile, 
+	// 		movementInfo, 
+	// 		originPoint,
+	// 		distanceRemaining - 1,
+	// 		moveStepNumber + 1);
+	// }
 
 	setPointAsPossibleMovement = function(targetPoint, tileBeingMoved, originPoint, currentMovementPath) {
 		targetPoint.addType(POSSIBLE_MOVE);
@@ -384,7 +375,7 @@ BeyondTheMaps.Board = class {
 	}
 
 	tileCanMoveThroughPoint(tile, movementInfo, targetPoint, fromPoint) {
-		return !targetPoint.hasTile() || targetPoint.tile === tile;
+		return !targetPoint.hasTile() || targetPoint.tile.tileType === BeyondTheMaps.TileType.SHIP;
 	}
 
 	removePossibleMovePoints() {
@@ -568,21 +559,34 @@ BeyondTheMaps.Board = class {
 	}
 
 	playerShipSurrounded(playerName) {
+		/* A ship is surrounded if all adjacent points are land or the sea with both ships in it is size 2 */
+
+		/* Check if surrounded by land */
+		var allAdjacentPointsAreLand = false;
 		if (this.shipPoints) {
 			var shipPoint = this.shipPoints[playerName];
 			if (shipPoint) {
 				var adjacentPoints = this.getAdjacentPoints(shipPoint);
 				var allAdjPointsFilled = true;
 				adjacentPoints.forEach(adjPoint => {
-					if (!adjPoint.hasTile()) {
+					if (!(adjPoint.hasTile() && adjPoint.tile.tileType === BeyondTheMaps.TileType.LAND)) {
 						allAdjPointsFilled = false;
 					}
 				});
-				return allAdjPointsFilled;
+				allAdjacentPointsAreLand = allAdjPointsFilled;
 			} else {
 				return true;	// No ship, must have been captured (counts as surrounded)
 			}
 		}
+
+		/* Ships in sea of size 2 (they cannot move past each other and both are trapped) */
+		var shipSeaIsSmallAsCanBe = false;
+		var hostSeaGroupId = this.shipPoints[HOST] && this.shipPoints[HOST].seaGroupId;
+		var guestSeaGroupId = this.shipPoints[GUEST] && this.shipPoints[GUEST].seaGroupId;
+		var shipsInSameSea = hostSeaGroupId === guestSeaGroupId;
+		shipSeaIsSmallAsCanBe = shipsInSameSea && this.seaGroups[hostSeaGroupId].length === 2;
+
+		return allAdjacentPointsAreLand || shipSeaIsSmallAsCanBe;
 	}
 
 	setPossibleExploreLandPointsForPlayer(playerName) {
