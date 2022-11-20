@@ -302,7 +302,6 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 					{
 						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
 						targetTileTypes: [Trifle.TileCategory.allTileTypes],
-						targetTileBoardPointTypes: [RED, WHITE],
 						activationRequirements: [
 							{
 								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
@@ -483,35 +482,6 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 	/* Apply Capture and Ability Activation Requirements Rules */
 	Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2(GinsengTiles);
 
-	/* if (gameOptionEnabled(CAPTURE_ABILITY_TARGET_1)) {
-		debug("Change Lion Turtle and Dragon abilities");
-		GinsengTiles[Ginseng.TileCodes.Dragon].abilities = [
-			{
-				type: Trifle.AbilityName.captureTargetTiles,
-				triggers: [
-					{
-						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
-						targetTeams: [Trifle.TileTeam.enemy],
-						targetTileTypes: [Trifle.TileCategory.allTileTypes],
-						activationRequirements: [
-							{
-								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-								targetTileTypes: [Trifle.TileCategory.thisTile],
-								targetPointTypes: [RED]
-							}
-						]
-					},
-					{
-						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
-					}
-				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles],
-				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile
-			}
-		];
-	} */
-
 	Ginseng.GinsengTiles = GinsengTiles;
 };
 
@@ -555,27 +525,6 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 			});
 		}
 
-		// if (tileInfo.abilities && tileInfo.abilities.length) {
-		// 	tileInfo.abilities.forEach(function(abilityInfo) {
-		// 		/* Add Ability Activation Requirement: Friendly Lotus Not In A Temple */
-		// 		if (abilityInfo.type !== Trifle.AbilityName.recordTilePoint 
-		// 				&& abilityInfo.triggers && abilityInfo.triggers.length) {
-		// 			abilityInfo.triggers.forEach(function(triggerInfo) {
-		// 				var triggerActivationRequirement = {
-		// 					type: Trifle.ActivationRequirement.tilesNotInTemple,
-		// 					targetTileCodes: [Ginseng.TileCodes.WhiteLotus],
-		// 					targetTeams: [Trifle.TileTeam.friendly]
-		// 				};
-		// 				if (triggerInfo.activationRequirements) {
-		// 					triggerInfo.activationRequirements.push(triggerActivationRequirement);
-		// 				} else {
-		// 					triggerInfo["activationRequirements"] = [triggerActivationRequirement];
-		// 				}
-		// 			});
-		// 		}
-		// 	});
-		// }
-
 		/* Add Ability: Protect Tiles While In A Temple */
 		if (!tileInfo.abilities) {
 			tileInfo.abilities = [];
@@ -591,8 +540,8 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 			],
 			targetTypes: [Trifle.TargetType.triggerTargetTiles]
 		};
-		var protectFromEnemyAbilitiesWhileInTempleAbility = {
-			title: "Protect From Enemy Abilities While In Temple",
+		var protectFromAbilitiesWhileInTempleAbility = {
+			title: "Protect From Abilities While In Temple",
 			type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
 			triggers: [
 				{
@@ -601,10 +550,9 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 				}
 			],
 			targetTypes: [Trifle.TargetType.triggerTargetTiles],
-			targetAbilityTypes: [Trifle.AbilityType.all],
-			cancelAbilitiesFromTeam: Trifle.TileTeam.enemy
+			targetAbilityTypes: [Trifle.AbilityType.all]
 		};
-		var protectFromFriendlyPushAbilitiesWhileInTempleAbility = {
+		/* var protectFromFriendlyPushAbilitiesWhileInTempleAbility = {
 			title: "Protect From Friendly Push Abilities While In Temple",
 			type: Trifle.AbilityName.cancelAbilitiesTargetingTiles,
 			triggers: [
@@ -614,13 +562,14 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 				}
 			],
 			targetTypes: [Trifle.TargetType.triggerTargetTiles],
-			targetAbilityTypes: [Trifle.AbilityType.moveTargetTile],
+			targetAbilityTypes: [Trifle.AbilityName.moveTargetTile],
 			cancelAbilitiesFromTeam: Trifle.TileTeam.friendly
-		};
+		}; */
 		var exchangeForCapturedTileIntempleAbility = {
 			title: "Exchange With Captured Tile",
 			type: Trifle.AbilityName.exchangeWithCapturedTile,
 			optional: true,
+			inevitable: true,
 			neededPromptTargetsInfo: [
 				{
 					title: "exchangedTile",
@@ -643,8 +592,8 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 			promptTargetTitle: "exchangedTile"
 		};
 		tileInfo.abilities.push(protectFromCaptureWhileInTempleAbility);
-		tileInfo.abilities.push(protectFromEnemyAbilitiesWhileInTempleAbility);
-		tileInfo.abilities.push(protectFromFriendlyPushAbilitiesWhileInTempleAbility);
+		tileInfo.abilities.push(protectFromAbilitiesWhileInTempleAbility);
+		// tileInfo.abilities.push(protectFromFriendlyPushAbilitiesWhileInTempleAbility);
 		tileInfo.abilities.push(exchangeForCapturedTileIntempleAbility);
 		// ------
 

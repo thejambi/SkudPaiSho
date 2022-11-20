@@ -260,12 +260,14 @@ Trifle.AbilityManager.prototype.abilityIsCanceled = function(abilityObject) {
 	affectingCancelAbilities.forEach(function(cancelingAbility) {
 		// Does canceling ability affecting tile cancel this kind of ability?
 		if (cancelingAbility.abilityInfo.targetAbilityTypes.includes(Trifle.AbilityType.all)) {
-			isCanceled = true;	// Dat is for sure
+			isCanceled = true;
 		}
 
 		cancelingAbility.abilityInfo.targetAbilityTypes.forEach(function(canceledAbilityType) {
 			var abilitiesForType = Trifle.AbilitiesForType[canceledAbilityType];
 			if (abilitiesForType && abilitiesForType.length && abilitiesForType.includes(abilityObject.abilityInfo.type)) {
+				isCanceled = true;
+			} else if (abilityObject.abilityInfo.type === canceledAbilityType) {
 				isCanceled = true;
 			}
 		});
@@ -288,12 +290,14 @@ Trifle.AbilityManager.prototype.targetingIsCanceled = function(abilitySourceTile
 			if (cancelingAbility.abilityInfo.targetAbilityTypes) {
 				// Does canceling ability affecting tile cancel this kind of ability?
 				if (cancelingAbility.abilityInfo.targetAbilityTypes.includes(Trifle.AbilityType.all)) {
-					isCanceled = true;	// Dat is for sure
+					isCanceled = true;
 				}
 
 				cancelingAbility.abilityInfo.targetAbilityTypes.forEach(function(canceledAbilityType) {
 					var abilitiesForType = Trifle.AbilitiesForType[canceledAbilityType];
 					if (abilitiesForType && abilitiesForType.length && abilitiesForType.includes(abilityType)) {
+						isCanceled = true;
+					} else if (abilityType === canceledAbilityType) {
 						isCanceled = true;
 					}
 				});

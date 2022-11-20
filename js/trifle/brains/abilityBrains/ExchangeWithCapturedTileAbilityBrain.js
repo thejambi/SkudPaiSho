@@ -1,3 +1,6 @@
+/*
+Should this ability target the tile on board in addition to the tile it's switching to?
+*/
 
 Trifle.ExchangeWithCapturedTileAbilityBrain = function(abilityObject) {
 	this.abilityObject = abilityObject;
