@@ -4292,13 +4292,17 @@ function promptAddOption() {
 
 		showModal("Secrets", message);
 	} else if (usernameIsOneOf(['SkudPaiSho','Adevar'])) {
-		message = "Enter list of names:";
-		message += "<br /><textarea rows = '11' cols = '40' name = 'description' id='giveawayNamesTextbox'></textarea>";
-		message += "<br /><div class='clickableText' onclick='Giveaway.doIt()'>Choose name</div>";
-		message += "<br /><div id='giveawayResults'>:)</div>";
-
-		showModal("Giveaway Winner Chooser!", message);
+		showGiveawayDrawingModal();
 	}
+}
+
+function showGiveawayDrawingModal() {
+	message = "Enter list of names:";
+	message += "<br /><textarea rows = '11' cols = '40' name = 'description' id='giveawayNamesTextbox'></textarea>";
+	message += "<br /><div class='clickableText' onclick='Giveaway.doIt()'>Choose name</div>";
+	message += "<br /><div id='giveawayResults'>:)</div>";
+
+	showModal("Giveaway Winner Chooser!", message);
 }
   
   function addGameOption(option) {
