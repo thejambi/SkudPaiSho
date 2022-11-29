@@ -2322,7 +2322,8 @@ var GameType = {
 			OPTION_ANCIENT_OASIS_EXPANSION,
 			NO_HARMONY_VISUAL_AIDS,
 			NO_WHEELS,
-			SPECIAL_FLOWERS_BOUNCE
+			SPECIAL_FLOWERS_BOUNCE,
+			NO_ALT_WIN
 		],
 		secretGameOptions: [
 			DIAGONAL_MOVEMENT,
@@ -2366,11 +2367,11 @@ var GameType = {
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [
-			GINSENG_1_POINT_0
 		],
 		secretGameOptions: [
 			LION_TURTLE_ABILITY_ANYWHERE,
-			SWAP_BISON_AND_DRAGON
+			SWAP_BISON_AND_DRAGON,
+			GINSENG_1_POINT_0
 		]
 	},
 	FirePaiSho: {

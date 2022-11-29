@@ -139,6 +139,8 @@ var SPECIAL_FLOWERS_BOUNCE = "SpecialFlowersBounce";
 gameOptionDescriptions[SPECIAL_FLOWERS_BOUNCE] = "Special Flower Reincarnation";
 var VARIABLE_ACCENT_TILES = "VariableAccentTiles";
 gameOptionDescriptions[VARIABLE_ACCENT_TILES] = "Variable Accent Tiles";
+var NO_ALT_WIN = "NoAltWin";
+gameOptionDescriptions[NO_ALT_WIN] = "No Alt Win Condition";
 
 var GINSENG_ROTATE = "GinsengBoardRotation";
 gameOptionDescriptions[GINSENG_ROTATE] = "Ginseng Board Rotation";
