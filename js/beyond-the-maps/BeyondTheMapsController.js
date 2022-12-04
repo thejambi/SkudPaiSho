@@ -225,7 +225,7 @@ BeyondTheMaps.Controller = class {
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true, true, true);
 
-				var landPointsPossible = this.theGame.markPossibleLandPointsForMovement(boardPoint, possiblePaths, this.notationBuilder.player);
+				var landPointsPossible = this.theGame.markPossibleLandPointsForMovement(this.getCurrentMovePhase().startPoint, boardPoint, possiblePaths, this.notationBuilder.player);
 
 				if (landPointsPossible.length > 1) {
 					// Land points are marked on the board as Possible points now

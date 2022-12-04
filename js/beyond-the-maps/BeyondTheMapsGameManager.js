@@ -133,9 +133,12 @@ BeyondTheMaps.GameManager = class {
 		}
 	}
 
-	markPossibleLandPointsForMovement(boardPointEnd, possiblePaths, player) {
+	markPossibleLandPointsForMovement(startPointNotationText, boardPointEnd, possiblePaths, player) {
+		var boardPointStart = this.board.getBoardPointFromNotationPoint(startPointNotationText);
 		var possibleLandPoints = [];
-		if (possiblePaths && possiblePaths.length > 0) {
+		if (boardPointStart === boardPointEnd) {
+			possibleLandPoints = this.board.markLandPointsPossibleMovesForNoMovement(boardPointEnd, player);
+		} else if (possiblePaths && possiblePaths.length > 0) {
 			var possibleLastStepPoints = [];
 			possiblePaths.forEach(path => {
 				var lastPoint = path[path.length - 1];

@@ -155,6 +155,7 @@ BeyondTheMaps.Board = class {
 	setPossibleMovePoints(boardPointStart, moveDistance) {
 		if (boardPointStart.hasTile()) {
 			this.setPossibleMovesForMovement({ title: "Btm", distance: moveDistance }, boardPointStart);
+			boardPointStart.addType(POSSIBLE_MOVE);
 		}
 	}
 
@@ -438,6 +439,11 @@ BeyondTheMaps.Board = class {
 	findPathForMovement(notationPointStart, notationPointEnd, notationPointLand, moveDistance) {
 		var startPoint = this.getBoardPointFromNotationPoint(notationPointStart);
 		var endPoint = this.getBoardPointFromNotationPoint(notationPointEnd);
+
+		if (startPoint === endPoint) {
+			return [];
+		}
+
 		var landPoint = notationPointLand ? this.getBoardPointFromNotationPoint(notationPointLand) : null;
 		this.setPossibleMovePoints(startPoint, moveDistance - 1);
 
@@ -504,6 +510,22 @@ BeyondTheMaps.Board = class {
 			}
 		}
 		return landPoint;
+	}
+
+	markLandPointsPossibleMovesForNoMovement(moveEndPoint, player) {
+		var landPoints = [];
+		var nextPointArr = this.getAdjacentPointsPotentialPossibleMoves(moveEndPoint, moveEndPoint, false, null);
+		if (nextPointArr && nextPointArr.length > 0) {
+			nextPointArr.forEach(possibleLandPoint => {
+				if ((!possibleLandPoint.hasTile() && !this.placingLandSeparatesShipsWithoutSurroundingEnemy(possibleLandPoint, player))
+					|| (possibleLandPoint.hasTile() && possibleLandPoint.tile.tileType === BeyondTheMaps.TileType.LAND && possibleLandPoint.tile.ownerName !== player)
+				) {
+					landPoints.push(possibleLandPoint);
+					possibleLandPoint.addType(POSSIBLE_MOVE);
+				}
+			});
+		}
+		return landPoints;
 	}
 
 	placingLandSeparatesShipsWithoutSurroundingEnemy(boardPoint, player) {
