@@ -2558,7 +2558,8 @@ var GameType = {
 		coverImg: "boat.png",
 		rulesUrl: "https://skudpaisho.com/site/games/beyond-the-edges-of-the-maps/",
 		gameOptions: [
-			EDGES_12x12_GAME
+			EDGES_12x12_GAME,
+			EDGES_MOVE_4_2
 		]
 	},
 	Blooms: {

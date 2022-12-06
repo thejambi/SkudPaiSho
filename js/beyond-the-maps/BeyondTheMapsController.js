@@ -187,8 +187,10 @@ BeyondTheMaps.Controller = class {
 					this.notationBuilder.currentPlayer = this.getCurrentPlayer();
 					this.getCurrentMovePhase().startPoint = npText;
 
-					//	Deciding distance?
 					var moveDistance = 6;
+					if (gameOptionEnabled(EDGES_MOVE_4_2)) {
+						moveDistance = 4;
+					}
 
 					this.theGame.revealPossibleMovePoints(boardPoint, false, moveDistance);
 					refreshMessage();
@@ -252,8 +254,10 @@ BeyondTheMaps.Controller = class {
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 				this.theGame.runNotationMove(move, this.notationBuilder.phaseIndex, false, true, true, true);
 
-				// Deciding number?
 				var exploreLandNumber = 3;
+				if (gameOptionEnabled(EDGES_MOVE_4_2)) {
+					exploreLandNumber = 2;
+				}
 
 				if (this.getCurrentMovePhase().landPoints.length < exploreLandNumber) {
 					// More!

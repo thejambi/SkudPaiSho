@@ -43,7 +43,11 @@ BeyondTheMaps.GameManager = class {
 		if (moveData.moveType === BeyondTheMaps.MoveType.EXPLORE_SEA) {
 			if (withActuate && !ignorePathFinding) {
 				// Discover the movement path
-				var moveDistance = moveData.moveDistance ? moveData.moveDistance : 6;
+				var moveDistance = moveData.moveDistance 
+					? moveData.moveDistance 
+					: gameOptionEnabled(EDGES_MOVE_4_2) 
+						? 4 
+						: 6;
 				actuateMoveData.movementPath = this.board.findPathForMovement(moveData.startPoint, moveData.endPoint, moveData.landPoint, moveDistance);
 			}
 			this.board.moveShip(moveData.startPoint, moveData.endPoint, moveData.landPoint);

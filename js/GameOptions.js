@@ -196,8 +196,10 @@ gameOptionDescriptions[NO_EFFECT_TILES] = "No Effect Tiles";
 
 /* Beyond The Edges of The Maps */
 var EDGES_12x12_GAME = "12x12Game";
-gameOptionDescriptions[EDGES_12x12_GAME] = "Shorter game (12x12 board)";
+gameOptionDescriptions[EDGES_12x12_GAME] = "Smaller game (12x12 board)";
 
+var EDGES_MOVE_4_2 = "Move4_2";
+gameOptionDescriptions[EDGES_MOVE_4_2] = "Less movement (4 and 2)";
 
 
 /* -------- */

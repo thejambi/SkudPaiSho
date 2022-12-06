@@ -33,7 +33,7 @@ BeyondTheMaps.Tile = class {
 	}
 
 	getMoveDistance() {
-		return 6;	// Default ship movement
+		return gameOptionEnabled(EDGES_MOVE_4_2) ? 4 : 6;
 	}
 
 	getCopy() {
