@@ -221,6 +221,8 @@ var welcomeTutorialDismissedKey = "welcomeTutorialDismissedKey";
 
 var customBgColorKey = "customBgColorKey";
 
+var markGameInactiveWithoutDialogKey = "markGameInactiveWithoutDialogKey";
+
 var url;
 
 var defaultHelpMessageText;
@@ -4089,6 +4091,35 @@ function quitOnlineGameClicked() {
 	showModal("Quit Current Online Game", message);
 }
 
+function doNotShowMarkInactiveDialogAgain() {
+	localStorage.setItem(markGameInactiveWithoutDialogKey, 'true');
+}
+
+function markGameInactiveClicked() {
+	// Do they want to have it take immediate action? Or do they want the dialog to show?
+	var message = "";
+	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame()
+		&& !getGameWinner()
+		&& (currentGameData.hostUsername === currentGameData.guestUsername
+			|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
+	) {
+		if (localStorage.getItem(markGameInactiveWithoutDialogKey) === 'true') {
+			quitInactiveOnlineGame();
+		} else {
+			message = "<div>Are you sure you want mark this game inactive? The game will appear as Inactive in your Completed Games list, but will become active again when your opponent plays.</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - mark current game inactive</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal(); doNotShowMarkInactiveDialogAgain(); quitInactiveOnlineGame();'>Yes - mark current game inactive and don't show this again</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+		}
+	} else {
+		message = "When playing an unfinished inactive online game, this is where you can mark the game inactive to hide it from your My Games list.";
+	}
+
+	if (message.length > 0) {
+		showModal("Mark Current Game Inactive", message);
+	}
+}
+
 function resignOnlineGame() {
 	if (playingOnlineGame()
 		&& iAmPlayerInCurrentOnlineGame()
@@ -4137,6 +4168,9 @@ function buildDateFromTimestamp(timestampStr) {
 
 function showWelcomeScreensClicked() {
 	OnboardingFunctions.resetOnBoarding();
+
+	localStorage.setItem(markGameInactiveWithoutDialogKey, 'false');
+	
 	showWelcomeTutorial();
 }
   
@@ -4358,6 +4392,7 @@ function showGiveawayDrawingModal() {
   }
   
   var showTournamentsCallback = function showTournamentsCallback(results) {
+	var dialogHeading = "Tournaments and Events";
 	  var message = "No current tournaments.";
 	  if (results) {
 		  message = "";
@@ -4373,7 +4408,7 @@ function showGiveawayDrawingModal() {
 		  } catch (error) {
 			  debug("Error parsing tournament data");
 			  closeModal();
-			  showModal("Tournaments", "Error getting tournament data.");
+			  showModal(dialogHeading, "Error getting tournament data.");
 		  }
   
 		  debug(tourneyList);
@@ -4417,12 +4452,12 @@ function showGiveawayDrawingModal() {
   
 	  }
   
-	  showModal("Tournaments", message);
+	  showModal(dialogHeading, message);
   };
   
   function viewTournamentsClicked() {
 	  // showModal("Tournaments", "Tournaments are coming soon! Join the Discord and Forums to get involved!");
-	  showModal("Tournaments", getLoadingModalText());
+	  showModal("Tournaments and Events", getLoadingModalText());
 	  onlinePlayEngine.getCurrentTournaments(getLoginToken(), showTournamentsCallback);
   }
   
@@ -4456,7 +4491,7 @@ function showGiveawayDrawingModal() {
   
 		  modalTitle = tournamentInfo.name;
   
-		  message += "<div class='modalContentHeading'>" + tournamentInfo.status + " Tournament" + "</div>";
+		  message += "<div class='modalContentHeading'>Event status: " + tournamentInfo.status + "</div>";
   
 		  if (tournamentInfo.details) {
 			  message += "<br />";
