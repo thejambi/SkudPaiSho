@@ -4676,6 +4676,7 @@ function showGiveawayDrawingModal() {
 	  var hostUsername = manageTournamentActionData.newMatchData.hostUsername;
 	  var guestUsername = manageTournamentActionData.newMatchData.guestUsername;
 	  var options = JSON.stringify(ggOptions);
+	  var isRanked = currentGameData.isRankedGame;
   
 	  onlinePlayEngine.createTournamentRoundMatch(
 		  getLoginToken(),
@@ -4684,6 +4685,7 @@ function showGiveawayDrawingModal() {
 		  hostUsername,
 		  guestUsername,
 		  options,
+		  isRanked,
 		  goToManageTournamentCallback
 	  );
   }
@@ -4807,6 +4809,7 @@ function showGiveawayDrawingModal() {
 		  var currentGameTypeEntry = getGameTypeEntryFromId(currentGameData.gameTypeId);
 		  message += "<br /><em>Game:</em> " + htmlEscape(currentGameTypeEntry.desc);
 		  message += "<br /><em>Options:</em> " + JSON.stringify(ggOptions);
+		  message += "<br /><em>Is Ranked?:</em> " + currentGameData.isRankedGame === 'Y' ? "Yes" : "No";
 		  message += "<div class='clickableText' onclick='createNewTournamentMatch();'>Create Match</div>";
   
 		  message += "<br /><br />";

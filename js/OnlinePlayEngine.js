@@ -616,7 +616,7 @@ OnlinePlayEngine.prototype.changeTournamentStatus = function(loginToken, tournam
     );
 };
 
-OnlinePlayEngine.prototype.createTournamentRoundMatch = function(loginToken, roundId, gameTypeId, hostUsername, guestUsername, options, callback) {
+OnlinePlayEngine.prototype.createTournamentRoundMatch = function(loginToken, roundId, gameTypeId, hostUsername, guestUsername, options, isRanked, callback) {
     $.post("backend/createTournamentRoundMatch.php",
         {
             userId: loginToken.userId,
@@ -627,7 +627,8 @@ OnlinePlayEngine.prototype.createTournamentRoundMatch = function(loginToken, rou
             gameTypeId: gameTypeId,
             hostUsername: hostUsername,
             guestUsername: guestUsername,
-            options: options
+            options: options,
+            isRanked: isRanked
         },
         function(data, status){
             OnlinePlayEngine.callCallback(data, status, callback);
