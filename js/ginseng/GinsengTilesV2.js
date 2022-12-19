@@ -100,7 +100,6 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
 						targetTeams: [Trifle.TileTeam.enemy],
 						targetTileTypes: [Trifle.TileCategory.allTileTypes],
-						targetTileBoardPointTypes: [RED, WHITE],
 						activationRequirements: [
 							{
 								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
