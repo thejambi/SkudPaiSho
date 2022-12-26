@@ -465,7 +465,8 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 						targetTileTypes: [Trifle.TileCategory.allTileTypes]
 					}
 				],
-				targetTypes: [Trifle.TargetType.thisTile]
+				targetTypes: [Trifle.TargetType.thisTile],
+				regardlessOfCaptureProtection: true
 			}
 		],
 		textLines: [

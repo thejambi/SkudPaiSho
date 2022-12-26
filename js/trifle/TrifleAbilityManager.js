@@ -150,11 +150,16 @@ Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecor
 	var capturedTiles = tileRecords.capturedTiles;
 	var tilesMovedToPiles = tileRecords.tilesMovedToPiles;
 
+	var abilitiesTriggeredBySameAction = [];
+
 	var boardHasChanged = false;
 	if (!ability.activated
+			// && ability.triggerStillMet()	// I guess not this
 			&& !this.abilitiesWithPromptTargetsNeeded.includes(ability)) {
 		var abilityIsReadyToActivate = this.addNewAbility(ability);
 		if (abilityIsReadyToActivate) {
+			abilitiesTriggeredBySameAction = this.getReadyAbilitiesWithTriggeringActions(ability.getTriggeringActions());
+
 			abilitiesActivated.push(ability);
 			ability.activateAbility();
 
@@ -177,8 +182,40 @@ Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecor
 		if (ability.boardChangedAfterActivation()) {
 			boardHasChanged = true;
 		}
+
+		// Now activate abilities triggered by same event
+		if (abilitiesTriggeredBySameAction && abilitiesTriggeredBySameAction.length > 0) {
+			abilitiesTriggeredBySameAction.forEach(otherAbility => {
+				this.doTheActivateThing(otherAbility, tileRecords, abilitiesActivated);
+			});
+		}
 	}
 	return boardHasChanged;
+};
+
+Trifle.AbilityManager.prototype.getReadyAbilitiesWithTriggeringActions = function(triggeringActions) {
+	var matchingReadyAbilities = [];
+
+	if (triggeringActions && triggeringActions.length > 0) {
+		Object.values(this.readyAbilities).forEach(abilityList => {
+			abilityList.forEach(readyAbility => {
+				if (!readyAbility.activated) {
+					var readyAbilityTriggeringActions = readyAbility.getTriggeringActions();
+					if (readyAbilityTriggeringActions && readyAbilityTriggeringActions.length > 0) {
+						readyAbilityTriggeringActions.forEach(triggeringAction => {
+							triggeringActions.forEach(tAction1 => {
+								if (JSON.stringify(tAction1) == JSON.stringify(triggeringAction)) {
+									matchingReadyAbilities.push(readyAbility);
+								}
+							});
+						});
+					}
+				}
+			});
+		});
+	}
+
+	return matchingReadyAbilities;
 };
 
 /**
