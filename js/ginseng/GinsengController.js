@@ -29,9 +29,9 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 
 	this.showDebugInfo = false;
 
-	// if (gameOptionEnabled(GINSENG_1_POINT_0)) {
-	// 	this.isInviteOnly = true;
-	// }
+	if (gameOptionEnabled(GINSENG_1_POINT_0)) {
+		this.isInviteOnly = true;
+	}
 }
 
 Ginseng.Controller.prototype.createActuator = function() {
