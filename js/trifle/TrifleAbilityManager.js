@@ -65,11 +65,11 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	});
 
 	/* Mark abilities to preserve based on matching ready abilities */
-	Object.values(this.readyAbilities).forEach(function(abilityList) {
-		abilityList.forEach(function(ability) {
-			self.markExistingMatchingAbility(ability);
-		});
-	});
+	// Object.values(this.readyAbilities).forEach(function(abilityList) {
+	// 	abilityList.forEach(function(ability) {
+	// 		self.markExistingMatchingAbility(ability);
+	// 	});
+	// });
 
 	/* Deactivate abilities. New ability list is the ones that are not deactivated. */
 	var newAbilities = [];
