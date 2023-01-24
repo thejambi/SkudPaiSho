@@ -4913,13 +4913,13 @@ function setWebsiteTheme(theme) {
 		// Remove | Dividers
 		var x = document.getElementsByClassName("headerRight");
 		for(var i = 0; i < x.length; i ++) {
-			if (x[i].innerHTML == "&nbsp;|&nbsp;") {
-				x[i].remove();
+			if (x[i].innerHTML.includes("|")) {
+				x[i].classList.add("gone");
 			}
 			if (x[i].innerText == "") {
-				x[i].innerHTML = '<i class="fa fa-shopping-cart" aria-hidden="true"></i> Shop';
+				// x[i].innerHTML = '<i class="fa fa-shopping-cart" aria-hidden="true"></i> Shop';
 				if (window.mobileAndTabletcheck()) {
-					x[i].remove();
+					x[i].classList.add("gone")
 				}
 		  	}
 		}
