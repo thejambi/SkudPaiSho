@@ -4285,6 +4285,10 @@ function openShop() {
 	openLink("https://skudpaisho.com/site/buying-pai-sho/");
 }
 
+function discordLinkClicked() {
+	openLink("https://discord.gg/thegardengate");
+}
+
 /* Options */
 var ggOptions = [];
 

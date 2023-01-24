@@ -8,7 +8,7 @@
 
   <!-- Images of classic tile designs used in Skud Pai Sho are originally from the Lotus Gambit rules community at http://lotusgambit.pbworks.com/w/page/45592429/Home -->
 
-  <link href="style/main.css?v=20221205-232331" rel="stylesheet" type="text/css">
+  <link href="style/main.css?v=20230123-095547" rel="stylesheet" type="text/css">
   <link id="overrideCSS" href="" rel="stylesheet" type="text/css">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -46,7 +46,7 @@
 
   <meta name="apple-itunes-app" content="app-id=1302567785">
 
-  <script src="https://use.fontawesome.com/8d1446c26f.js"></script>
+  <script src="https://kit.fontawesome.com/9df52878c1.js" crossorigin="anonymous"></script>
 
   <!-- Global site tag (gtag.js) - Google AdWords: 972849224 -->
   <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=AW-972849224"></script>
@@ -88,6 +88,9 @@
         <div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameRankingsClicked();'>
           <i class="fa fa-tachometer" aria-hidden="true"></i> Game Rankings
         </div>
+        <div class='sidenavEntry'>
+          <a href='https://discord.gg/thegardengate' target='_blank' class='sidenavLink'><i class="fa-brands fa-discord"></i> Join Discord Server</a>
+        </div>
       </div>
       <div class='gone'>
         <hr />
@@ -114,7 +117,7 @@
         <div class='sidenavEntry sidenavLink skipBonus' onclick='showWelcomeScreensClicked();'>Show welcome screens</div>
         <div class='sidenavEntry sidenavLink skipBonus' onclick='openShop();'>Buy Pai Sho sets</div>
         <div class='sidenavEntry'>
-          <a href='https://discord.gg/thegardengate' target='_blank' class='sidenavLink'>Join Discord Server</a>
+          <a href='https://discord.gg/thegardengate' target='_blank' class='sidenavLink'><i class="fa-brands fa-discord"></i> Join Discord Server</a>
         </div>
         <div class='sidenavEntry'>
           <a href='https://forum.skudpaisho.com/' target='_blank' class='sidenavLink'>The Garden Gate Forum</a>
@@ -124,12 +127,12 @@
       <div class='sidenavSection even'>
         <div class='sidenavSectionHeader'>Support The Garden Gate</div>
         <div class='sidenavEntry'>
-          <a href='https://www.patreon.com/SkudPaiSho' target='_blank' class='sidenavLink'>Support on Patreon</a>
+          <a href='https://www.patreon.com/SkudPaiSho' target='_blank' class='sidenavLink'><i class="fa-brands fa-patreon"></i> Support on Patreon</a>
         </div>
         <div class='sidenavEntry'>
-          <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank' class='sidenavLink'>Leave a tip</a>
+          <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank' class='sidenavLink'><i class="fa-solid fa-mug-saucer"></i> Leave a tip</a>
         </div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='Ads.viewSponsoredMessageClicked();'>View sponsored message</div>
+        <!-- <div class='sidenavEntry sidenavLink skipBonus' onclick='Ads.viewSponsoredMessageClicked();'>View sponsored message</div> -->
       </div>
       <hr />
       <div class='sidenavSection odd'>
@@ -186,6 +189,10 @@
       <span class="headerRight clickableText" onclick='openShop();'>
         <i class="fa fa-shopping-cart" aria-hidden="true"></i>
       </span>
+      <div class="headerRight">&nbsp;|&nbsp;</div>
+      <span class="headerRight clickableText" onclick='discordLinkClicked();'>
+        <i class="fa-brands fa-discord"></i>
+      </span>
     </div>
   </div>
 
@@ -232,7 +239,7 @@
       <div class="helpContainer" id="help">
         <div class="tab">
           <button class="tablinks" onclick="openTab(event, 'helpTextTab')" id="defaultOpenTab">Help</button>
-          <button id='globalChatTabHeader' class="tablinks" onclick="openTab(event, 'globalChatTab');">Links/Chat</button>
+          <button id='globalChatTabHeader' class="tablinks" onclick="openTab(event, 'globalChatTab');">Links/Chat <i class="fa-brands fa-discord"></i></button>
           <button id='chatTab' class="tablinks" onclick="openTab(event, 'gameChatTab'); dismissChatAlert();">Game Chat</button>
         </div>
 
@@ -244,13 +251,14 @@
         <div id="globalChatTab" class="tabcontent">
           <div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
           <div id="globalChatMessagesDisplayLinks" class="linksTabLinksDiv">
-            <a href='https://skudpaisho.com/site/' target='_blank'>The Rules &amp; More Site</a>: More information about Pai Sho and The Garden Gate.
+            <br>
+            <a href='https://discord.gg/thegardengate' target='_blank'><i class="fa-brands fa-discord"></i> Discord server</a>: Join The Garden Gate Community and chat or ask questions.
             <br><br>
-            <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>: Join The Garden Gate Community and chat or ask questions.
+            <a href='https://skudpaisho.com/site/' target='_blank'>The Rules &amp; More Site</a>: More information about Pai Sho and The Garden Gate.
             <br><br>
             <a href='https://skudpaisho.com/site/buying-pai-sho/' target='_blank'>Buying Pai Sho page</a>: Information about buying a Pai Sho set, the free print-and-play set, and all about making your own Pai Sho set.
             <br><br>
-            <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a>: Support The Garden Gate monthly on <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a> or <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank'>leave a one-time tip</a>.
+            <a href='https://www.patreon.com/SkudPaiSho' target='_blank'><i class="fa-brands fa-patreon"></i> Patreon</a>: Support The Garden Gate monthly on <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a> or <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank'>leave a one-time tip</a>.
           </div>
           <hr />
           <div id="globalChatMessagesDisplay" class="chatMessagesDisplay">
@@ -375,7 +383,7 @@
   <script src="js_util/MersenneTwisterRandom.js"></script>
 
   <!-- Compressed TGG Code -->
-  <script src="psmin_20221205-232331.js"></script>
+  <script src="psmin_20230123-095547.js"></script>
 </body>
 
 </html>
