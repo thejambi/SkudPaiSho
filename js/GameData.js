@@ -92,6 +92,7 @@ function masterDebug(str) {
 var BASIC_FLOWER = "Basic Flower";
 var ACCENT_TILE = "Accent Tile";
 var SPECIAL_FLOWER = "Special Flower";
+var ORIGINAL_BENDER = "Original Bender";
 
 var ROCK = "Rock";
 var WHEEL = "Wheel";
@@ -105,6 +106,10 @@ var LION_TURTLE = "Lion Turtle";
 var WHITE_LOTUS = "White Lotus";
 var ORCHID = "Orchid";
 
+var BADGERMOLE = "Badgermole";
+var FLYING_BISON = "Flying Bison";
+var KOI = "Koi";
+var DRAGON = "Dragon";
 
 /* Helpful methods, polyfills, etc */
 function TwoWayMap(map) {
@@ -118,6 +123,10 @@ function TwoWayMap(map) {
 }
 TwoWayMap.prototype.lookup = function(key){ return this.map[key]; };
 TwoWayMap.prototype.reverseLookup = function(key){ return this.reverseMap[key]; };
+
+function randomIntFromInterval(min, max) {
+	return Math.floor(Math.random() * (max - min + 1) + min);
+}
 
 function arrayIncludesAll(array1, array2) {
   for (var i = 0; i < array2.length; i++) {
@@ -162,6 +171,29 @@ function copyObject(mainObject) {
     objectCopy[key] = mainObject[key]; // copies each property to the objectCopy object
   }
   return objectCopy;
+}
+
+function getLongestArrayFromArrayOfArrays(arrayOfArrays) {
+  var longestYet = null;
+  arrayOfArrays.forEach(arr => {
+    if (!longestYet || longestYet.length < arr.length) {
+      longestYet = arr;
+    }
+  });
+  return longestYet;
+}
+function getShortestArrayFromArrayOfArrays(arrayOfArrays) {
+  var shortestYet = null;
+  arrayOfArrays.forEach(arr => {
+    if (!shortestYet || shortestYet.length > arr.length) {
+      shortestYet = arr;
+    }
+  });
+  return shortestYet;
+}
+
+function arrayContainsDuplicates(array) {
+  return array.length !== new Set(array).size;
 }
 
 // Array shuffle

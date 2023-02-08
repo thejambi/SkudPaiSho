@@ -1,7 +1,7 @@
 /* Skud Pai Sho specific UI interaction logic */
 
 var SkudConstants = {
-	preferencesKey = "SkudPaiShoPreferencesKey"
+	preferencesKey: "SkudPaiShoPreferencesKey"
 };
 var SkudPreferences = {
 	customTilesUrl: ""
@@ -649,18 +649,18 @@ SkudPaiShoController.prototype.getHelpMessageForTile = function(tile) {
 			}
 		} else if (tileCode === 'M') {
 			heading = "Accent Tile: Bamboo";
-			message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
+			// message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
 			// message.push("When played, return each surrounding tile to owner's hand");
 			message.push("If played on a point surrounding a Blooming Flower Tile belonging to the owner (but not surrounding a tile in a Gate), return each surrounding tile to owner's hand when played.");
 			message.push("Tiles surrounding Bamboo cannot be captured");
 		} else if (tileCode === 'P') {
 			heading = "Accent Tile: Pond";
-			message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
+			// message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
 			message.push("Flower Tiles may be Planted on points surrounding a Pond");
 			message.push("(Tiles are Blooming after being Planted)");
 		} else if (tileCode === 'T') {
 			heading = "Accent Tile: Lion Turtle";
-			message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
+			// message.push("<em>--- Ancient Oasis Expansion rules subject to change ---</em>")
 			message.push("Flower tiles surrounding a Lion Turtle form Harmony with all Basic Flower Tiles of either player");
 			message.push("The owner of the Lion Turtle owns the Harmonies that include both players' tiles");
 			message.push("(Overlap with other Lion Turtle tiles can combine this effect, so Harmonies can potentially belong to both players)");

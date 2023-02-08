@@ -4,7 +4,10 @@ var OnBoardingKeys = {
 	confirmMoveButtonHelpDismissed: "confirmMoveButtonHelpDismissed",
 	gameCrafterAnnouncementDissmissed: "gameCrafterAnnouncementDismissed",
 	gameCrafterCrowdSaleDismissed: "gameCrafterCrowdSaleDismissed",
-	joinDiscord20211028Dismissed: "joinDiscord20211028Dismissed"
+	joinDiscord20211028Dismissed: "joinDiscord20211028Dismissed",
+	gameCrafter202210Dissmissed: "gameCrafter202210Dismissed",
+	ginseng2_0Dismissed: "ginseng2_0Dismissed",
+	gameCrafterGiveaway202211Dismissed: "gameCrafterGiveaway202211Dismissed"
 };
 
 function OnboardingFunctions() {
@@ -15,6 +18,24 @@ OnboardingFunctions.showOnLoadAnnouncements = function() {
 	if (dateIsBetween("11/01/2021", "01/24/2022")) {
 		OnboardingFunctions.showJoinDiscord20211028Announcement();
 	}
+
+	if (dateIsBetween("11/11/2022", "12/30/2022")) {
+		OnboardingFunctions.showGinseng2_0Announcement();
+	}
+
+	if (dateIsBetween("11/12/2022", "11/18/2022")) {
+		OnboardingFunctions.showTheGameCrafterGiveaway202211Announcement();
+	}
+
+	// Most priority last:
+	if (dateIsBetween("10/24/2022", "11/21/2022")) {
+		OnboardingFunctions.showTheGameCrafterSet202210Announcement();
+	}
+};
+
+OnboardingFunctions.closeCurrentAnnouncement = function() {
+	closeModal();
+	OnboardingFunctions.showOnLoadAnnouncements();
 };
 
 OnboardingFunctions.resetOnBoarding = function() {
@@ -28,8 +49,8 @@ OnboardingFunctions.showConfirmMoveButtonHelp = function() {
 		var yesNoOptions = {};
 		yesNoOptions.yesText = "OK - Don't show again";
 		yesNoOptions.yesFunction = function() {
-			closeModal();
 			localStorage.setItem(OnBoardingKeys.confirmMoveButtonHelpDismissed, "true");
+			OnboardingFunctions.closeCurrentAnnouncement();
 		};
 		yesNoOptions.noText = "Close";
 		showModal(
@@ -45,8 +66,8 @@ OnboardingFunctions.showTheGameCrafterSetAnnouncement = function() {
 		var yesNoOptions = {};
 		yesNoOptions.yesText = "OK - Don't show again";
 		yesNoOptions.yesFunction = function() {
-			closeModal();
 			localStorage.setItem(OnBoardingKeys.gameCrafterAnnouncementDissmissed, "true");
+			OnboardingFunctions.closeCurrentAnnouncement();
 		};
 	yesNoOptions.noText = "Close";
 		showModal(
@@ -63,8 +84,8 @@ OnboardingFunctions.showTheGameCrafterCrowdSaleAnnouncement = function() {
 		var yesNoOptions = {};
 		yesNoOptions.yesText = "OK - Don't show again";
 		yesNoOptions.yesFunction = function() {
-			closeModal();
 			localStorage.setItem(OnBoardingKeys.gameCrafterCrowdSaleDismissed, "true");
+			OnboardingFunctions.closeCurrentAnnouncement();
 		};
 	yesNoOptions.noText = "Close";
 		showModal(
@@ -81,8 +102,8 @@ OnboardingFunctions.showJoinDiscord20211028Announcement = function() {
 		var yesNoOptions = {};
 		yesNoOptions.yesText = "OK - Don't show again";
 		yesNoOptions.yesFunction = function() {
-			closeModal();
 			localStorage.setItem(OnBoardingKeys.joinDiscord20211028Dismissed, "true");
+			OnboardingFunctions.closeCurrentAnnouncement();
 		};
 		yesNoOptions.noText = "Close";
 		showModal(
@@ -90,6 +111,66 @@ OnboardingFunctions.showJoinDiscord20211028Announcement = function() {
 			"Hi! If you didn't know, there is an active Discord community for The Garden Gate. "
 			+ "Members of the community are planning a real life Pai Sho Con and want to invite you to participate in person or virtually via Discord! <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord server</a> today to find out more and get involved.<br />"
 			+ "<br /><br /><div align='center'><img src='https://cdn.discordapp.com/attachments/904911184803807273/904911232023265300/0001.jpg' width='90%' style='max-width:480px'></div>",
+			false,
+			yesNoOptions);
+	}
+};
+
+OnboardingFunctions.showTheGameCrafterGiveaway202211Announcement = function() {
+	if (localStorage.getItem(OnBoardingKeys.gameCrafterGiveaway202211Dismissed) !== "true") {
+		var yesNoOptions = {};
+		yesNoOptions.yesText = "OK - Don't show again";
+		yesNoOptions.yesFunction = function() {
+			localStorage.setItem(OnBoardingKeys.gameCrafterGiveaway202211Dismissed, "true");
+			OnboardingFunctions.closeCurrentAnnouncement();
+		};
+	yesNoOptions.noText = "Close";
+		showModal(
+			"Pai Sho Set Giveaway!",
+			"At the end of this week, I'll draw a name and give away a The Garden Gate TheGameCrafter Pai Sho set! <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a> to find details on how to enter."
+			+ "<br /><br /><a href='https://www.thegamecrafter.com/games/the-garden-gate-pai-sho-set' target='_blank'>See more details about The Garden Gate TheGameCrafter set here</a> - The most affordable Pai Sho set! Includes the full Skud Pai Sho rulebook and tiles for Skud, Vagabond, Adevar, and Ginseng Pai Sho"
+			+ "<br /><br /><div align='center'><img src='https://cdn.discordapp.com/attachments/747893391907618927/817419423106203738/image0.jpg' width='90%' style='max-width:450px'></div>",
+			false,
+			yesNoOptions);
+	}
+};
+
+OnboardingFunctions.showTheGameCrafterSet202210Announcement = function() {
+	if (localStorage.getItem(OnBoardingKeys.gameCrafter202210Dissmissed) !== "true") {
+		var yesNoOptions = {};
+		yesNoOptions.yesText = "OK - Don't show again";
+		yesNoOptions.yesFunction = function() {
+			localStorage.setItem(OnBoardingKeys.gameCrafter202210Dissmissed, "true");
+			OnboardingFunctions.closeCurrentAnnouncement();
+		};
+	yesNoOptions.noText = "Close";
+		showModal(
+			"Get your TheGameCrafter Sets now!",
+			"Soon, TheGameCrafter needs to raise prices of due to rising costs of components. If you are interested in getting one of the TheGameCrafter sets we have, now is the time before the prices go up! "
+			+ "<br /><br /><a href='https://www.thegamecrafter.com/games/the-garden-gate-pai-sho-set' target='_blank'>The Garden Gate Pai Sho Set</a> - The most affordable Pai Sho set! Includes the full Skud Pai Sho rulebook and tiles for Skud, Vagabond, Adevar, and Ginseng Pai Sho"
+			+ "<br /><br /><a href='https://www.thegamecrafter.com/games/adev%C4%83r-pai-sho-rose-edition' target='_blank'>Adevar Pai Sho - Rose Edition</a> - An Adevar specific set with special edition board and tiles"
+			+ "<br /><br /><a href='https://www.thegamecrafter.com/games/key-pai-sho-deluxe-edition-' target='_blank'>Key Pai Sho Set</a> - A beautiful Key Pai Sho specific set, also good for playing Skud and Vagabond"
+			+ "<br /><br /><a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a> to get in touch and ask any questions about the different sets."
+			+ "<br /><br /><div align='center'><img src='https://cdn.discordapp.com/attachments/747893391907618927/817419423106203738/image0.jpg' width='90%' style='max-width:450px'></div>",
+			false,
+			yesNoOptions);
+	}
+};
+
+OnboardingFunctions.showGinseng2_0Announcement = function() {
+	if (localStorage.getItem(OnBoardingKeys.ginseng2_0Dismissed) !== "true") {
+		var yesNoOptions = {};
+		yesNoOptions.yesText = "OK - Don't show again";
+		yesNoOptions.yesFunction = function() {
+			localStorage.setItem(OnBoardingKeys.ginseng2_0Dismissed, "true");
+			OnboardingFunctions.closeCurrentAnnouncement();
+		};
+	yesNoOptions.noText = "Close";
+		showModal(
+			"Ginseng Pai Sho 2.0 is here!",
+			"Ginseng Pai Sho is now Ginseng 2.0! Check out the changes to the rules in the Help tab of a new Ginseng game - remember to hover over the tiles to see their descriptions."
+			+ "<br /><br /><a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a> to join The Garden Gate community and learn more about all things Pai Sho!"
+			+ "<br /><br /><div align='center'><img src='images/Ginseng/gaoling/GG.png' width='30%' style='max-width:450px'></div>",
 			false,
 			yesNoOptions);
 	}

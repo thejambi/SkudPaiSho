@@ -182,6 +182,7 @@ Trifle.Ability.prototype.appearsToBeTheSameAs = function(otherAbility) {
 		&& this.abilityType === otherAbility.abilityType
 		&& this.sourceTile.id === otherAbility.sourceTile.id
 		&& this.triggerTargetTiles.equals(otherAbility.triggerTargetTiles)
+		&& this.triggerTargetTilePoints.equals(otherAbility.triggerTargetTilePoints)
 		&& this.sourceTilePoint === otherAbility.sourceTilePoint;
 };
 
@@ -228,5 +229,48 @@ Trifle.Ability.prototype.getSummaryLines = function() {
 	lines.push("- Target Tiles:" + targetTileNames);
 
 	return lines;
+};
+
+Trifle.Ability.prototype.triggerStillMet = function() {
+	var triggers = this.abilityInfo.triggers;
+	if (triggers && triggers.length
+			&& this.sourceTilePoint.tile === this.sourceTile) {
+		var allTriggerConditionsMet = true;
+
+		triggers.forEach(triggerInfo => {
+			// if (Trifle.TriggerHelper.hasInfo(triggerInfo)) {
+			// 	triggerContext.currentTrigger = triggerInfo;
+			// 	var brain = self.brainFactory.createTriggerBrain(triggerInfo, triggerContext);
+			// 	if (brain && brain.isTriggerMet && self.activationRequirementsAreMet(triggerInfo, tile, triggerContext)) {
+			// 		if (allTriggerConditionsMet && brain.isTriggerMet()) {
+			// 			triggerBrainMap[triggerInfo.triggerType] = brain;
+			// 		} else {
+			// 			allTriggerConditionsMet = false;
+			// 		}
+			// 	} else {
+			// 		allTriggerConditionsMet = false;
+			// 	}
+			// }
+			debug("Trigger type: " + triggerInfo.triggerType);
+			var triggerBrain = this.triggerBrainMap[triggerInfo.triggerType];
+			allTriggerConditionsMet = allTriggerConditionsMet && triggerBrain.isTriggerMet();
+			debug("allTriggerConditionsMet: " + allTriggerConditionsMet);
+		});
+		return allTriggerConditionsMet;
+	}
+	debug("Returning false");
+	return false;
+};
+
+Trifle.Ability.prototype.getTriggeringActions = function() {
+	var allTriggeringActions = [];
+
+	Object.values(this.triggerBrainMap).forEach(triggerBrain => {
+		if (triggerBrain.triggeringAction) {
+			allTriggeringActions.push(triggerBrain.triggeringAction);
+		}
+	});
+
+	return allTriggeringActions;
 };
 

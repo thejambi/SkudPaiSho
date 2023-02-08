@@ -12,6 +12,7 @@ function FirePaiShoTile(code, ownerCode) {
 	}
 	this.id = tileId++;
 	this.boosted = false;
+	this.ethereal = false;
 	this.selectedFromPile = false;
 
 	if (this.code.length === 2 && (this.code.includes('R') || this.code.includes('W'))) {
@@ -27,14 +28,30 @@ function FirePaiShoTile(code, ownerCode) {
 	} else if (this.code === 'L' || this.code === 'O') {
 		this.type = SPECIAL_FLOWER;
 		this.setSpecialFlowerInfo();
-	} else if (this.code === 'R' || this.code === 'W' || this.code === 'K' || this.code === 'B'
-				|| this.code === 'P' || this.code === 'M' || this.code === 'T') {
+	} else if (this.code === 'R' || this.code === 'W' || this.code === 'K' || this.code === 'B') {
 		this.type = ACCENT_TILE;
 		this.setAccentInfo();
+	} else if (
+		[FirePaiShoTile.OriginalBenderTileCodes.Badgermole,
+		FirePaiShoTile.OriginalBenderTileCodes.Dragon,
+		FirePaiShoTile.OriginalBenderTileCodes.Bison,
+		FirePaiShoTile.OriginalBenderTileCodes.Koi,
+		FirePaiShoTile.OriginalBenderTileCodes.LionTurtle].includes(this.code)
+	) {
+		this.type = ORIGINAL_BENDER;
+		this.setOriginalBenderInfo();
 	} else {
 		debug("Error: Unknown tile type");
 	}
 }
+
+FirePaiShoTile.OriginalBenderTileCodes = {
+	Badgermole: "Badgermole",
+	Dragon: "Dragon",
+	Koi: "Koi",
+	Bison: "Bison",
+	LionTurtle: "T"
+};
 
 FirePaiShoTile.prototype.setAccentInfo = function() {
 	if (this.code === 'R') {
@@ -45,12 +62,10 @@ FirePaiShoTile.prototype.setAccentInfo = function() {
 		this.accentType = KNOTWEED;
 	} else if (this.code === 'B') {
 		this.accentType = BOAT;
-	} else if (this.code === 'P') {
-		this.accentType = POND;
-	} else if (this.code === 'M') {
-		this.accentType = BAMBOO;
-	} else if (this.code === 'T') {
-		this.accentType = LION_TURTLE;
+	}
+
+	if (gameOptionEnabled(ETHEREAL_ACCENT_TILES)) {
+		this.etherealize();
 	}
 };
 
@@ -59,6 +74,36 @@ FirePaiShoTile.prototype.setSpecialFlowerInfo = function() {
 		this.specialFlowerType = WHITE_LOTUS;
 	} else if (this.code === 'O') {
 		this.specialFlowerType = ORCHID;
+		this.harmonizer = true;
+	}
+};
+
+FirePaiShoTile.prototype.setOriginalBenderInfo = function() {
+	
+		//G badgermole (badGermole)
+		//F flying bison
+		//D dragon
+		//Y koi fish (Yin and Yang)
+		//T lion turtle
+
+	if (this.code === FirePaiShoTile.OriginalBenderTileCodes.Badgermole) {
+		this.originalBenderType = BADGERMOLE;
+		this.affinityColorName = WHITE;
+		this.harmonizer = true;
+	} else if (this.code === FirePaiShoTile.OriginalBenderTileCodes.Bison) {
+		this.originalBenderType = FLYING_BISON;
+		this.affinityColorName = RED;
+		this.harmonizer = true;
+	} else if (this.code === FirePaiShoTile.OriginalBenderTileCodes.Dragon) {
+		this.originalBenderType = DRAGON;
+		this.affinityColorName = RED;
+		this.harmonizer = true;
+	} else if (this.code === FirePaiShoTile.OriginalBenderTileCodes.Koi) {
+		this.originalBenderType = KOI;
+		this.affinityColorName = WHITE;
+		this.harmonizer = true;
+	} else if (this.code === FirePaiShoTile.OriginalBenderTileCodes.LionTurtle) {
+		this.originalBenderType = LION_TURTLE;
 		this.harmonizer = true;
 	}
 };
@@ -75,16 +120,19 @@ FirePaiShoTile.prototype.getImageName = function() {
 	return this.ownerCode + "" + this.code;
 };
 
-FirePaiShoTile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTurtle, isBuffedByRock) {
+FirePaiShoTile.prototype.formsHarmonyWith = function(otherTile, isBuffedByRock) {
+	//Accent tiles don't form harmony
 	if (this.type === ACCENT_TILE || otherTile.type === ACCENT_TILE){
 		return false;
 	}
 	
-	if (!(this.harmonizer || this.code === 'L')
-		|| !(otherTile.harmonizer || otherTile.code === 'L')) {
+	//Each tile has to be a harmonizer or a lotus
+	if (!((this.harmonizer || this.code === 'L')
+		&& (otherTile.harmonizer || otherTile.code === 'L'))) {
 		return false;
 	}
 
+	//If one is a lotus, then the other has to be a harmonizer
 	if ((this.code === 'L' && !otherTile.harmonizer)
 		|| (otherTile.code === 'L' && !this.harmonizer)) {
 		return false;
@@ -97,7 +145,7 @@ FirePaiShoTile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTur
 	}
 
 	// For normal Harmonies, tiles must belong to same player
-	if (!surroundsLionTurtle && otherTile.ownerName !== this.ownerName) {
+	if (otherTile.ownerName !== this.ownerName) {
 		return false;
 	}
 
@@ -106,17 +154,24 @@ FirePaiShoTile.prototype.formsHarmonyWith = function(otherTile, surroundsLionTur
 		return true;
 	}
 
-	// Same color and number difference of 1
-	if (this.basicColorCode === otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 1 || surroundsLionTurtle) {
-		return true;
-		// if not that, check different color and number difference of 2?
-	} else if (this.basicColorCode !== otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 2 || surroundsLionTurtle) {
+	//Orginal bender with matching color, need to make sure to exclude Lion Turtle, otherwise they will match with other benders (basicColorName === null)
+	if ((this.type === ORIGINAL_BENDER && this.originalBenderType !== LION_TURTLE && this.affinityColorName === otherTile.basicColorName) || (otherTile.type === ORIGINAL_BENDER && otherTile.originalBenderType !== LION_TURTLE && otherTile.affinityColorName === this.basicColorName) ) {
 		return true;
 	}
 
+	// Same color and number difference of 1
+	if (this.basicColorCode === otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 1) {
+		return true;
+		// if not that, check different color and number difference of 2?
+	} else if (this.basicColorCode !== otherTile.basicColorCode && Math.abs(this.basicValue - otherTile.basicValue) === 2) {
+		return true;
+	}
+
+	//Maybe delete this? Super harmonies is an artifact of old Skud???
 	if (superHarmonies && this.basicValue !== otherTile.basicValue) {
 		return true;
 	}
+
 };
 
 FirePaiShoTile.prototype.clashesWith = function(otherTile) {
@@ -136,7 +191,7 @@ FirePaiShoTile.prototype.clashesWith = function(otherTile) {
 FirePaiShoTile.prototype.getMoveDistance = function() {
 	if (this.type === BASIC_FLOWER) {
 		return parseInt(this.basicValue);
-	} else if (this.code === 'L') {
+	} else if (this.code === 'L' || this.type === ORIGINAL_BENDER) {
 		return 2;
 	} else if (this.code === 'O') {
 		return 6;
@@ -150,8 +205,16 @@ FirePaiShoTile.prototype.boost = function() {
 	}
 };
 
+FirePaiShoTile.prototype.etherealize = function() {
+	this.ethereal = true;
+};
+
 FirePaiShoTile.prototype.restore = function() {
 	this.boosted = false;
+};
+
+FirePaiShoTile.prototype.corporealize = function() {
+	this.ethereal = false;
 };
 
 FirePaiShoTile.prototype.getName = function() {
@@ -202,15 +265,18 @@ FirePaiShoTile.getTileName = function(tileCode) {
 			name = "Orchid";
 		} else if (tileCode === 'L') {
 			name = "White Lotus";
-		} else if (tileCode === 'P') {
-			name = "Pond";
-		} else if (tileCode === 'M') {
-			name = "Bamboo";
+		} else if (tileCode === 'G') {
+			name = "Badgermole";
+		} else if (tileCode === 'F') {
+			name = "Flying Bison";
+		} else if (tileCode === 'D') {
+			name = "Dragon";
+		} else if (tileCode === 'Y') {
+			name = "Koi";
 		} else if (tileCode === 'T') {
 			name = "Lion Turtle";
 		}
 	}
-
 	return name;
 };
 
@@ -223,38 +289,3 @@ FirePaiShoTile.getClashTileCode = function(tileCode) {
 		}
 	}
 };
-
-// Tile.getTileHeading = function(tileCode) {
-// 	var heading = Tile.getTileName(tileCode);
-
-// 	if (tileCode.length ===  1) {
-// 		return heading;
-// 	}
-
-// 	// For Basic Flower Tile, add simple name (like "Red 3")
-
-// 	heading += " (";
-// 	if ()
-// };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

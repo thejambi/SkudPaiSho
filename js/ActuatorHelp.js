@@ -64,7 +64,11 @@ function createBoardPointDiv(boardPoint, useSquareSpaces, coordinatesAdjustmentF
 	}
 
 	theDiv.setAttribute("name", notationPointString);
-	theDiv.setAttribute("title", "(" + title + ")");
+	if (debugOn) {
+		theDiv.setAttribute("title", "(" + title + ") row: "+boardPoint.row + ", col: "+boardPoint.col);
+	} else {
+		theDiv.setAttribute("title", "(" + title + ")");
+	}
 
 	return theDiv;
 }
@@ -129,14 +133,15 @@ function setupPaiShoBoard(gameContainer,
 	guestTilesContainerDivs,
 	rotateBoard,
 	rotateType,
-	playInSpaces) {
+	playInSpaces,
+	overrideBoardName) {
 
 	var addVagabondBoardRotate = false;
 	var addAdevarBoardRotate = false;
 	var addAdevarGuestBoardRotate = false;
 	var addGinsengBoardRotate = false;
 	var addGinsengGuestBoardRotate = false;
-	// Check for existing vagabond class on board...
+	// Check for existing class on board...
 	if (document.querySelector(".vagabondBoardRotate")) {
 		addVagabondBoardRotate = true;
 	} else if (document.querySelector(".adevarBoardRotate")) {
@@ -165,7 +170,7 @@ function setupPaiShoBoard(gameContainer,
 	var arrowSvg = createArrowSvg(playInSpaces);
 	var arrowContainer = document.createElementNS(svgns, 'g');
 
-	applyBoardOptionToBgSvg(bgSvg);
+	applyBoardOptionToBgSvg(bgSvg, overrideBoardName);
 
 	if (addVagabondBoardRotate) {
 		svgContainer.classList.add("vagabondBoardRotate");
@@ -248,7 +253,7 @@ function setupPaiShoBoard(gameContainer,
 	}
 }
 
-function applyBoardOptionToBgSvg(bgSvgIfKnown) {
+function applyBoardOptionToBgSvg(bgSvgIfKnown, overrideBoardName) {
 	var bgSvg = bgSvgIfKnown;
 	if (!bgSvg) {
 		var bgsvgs = document.getElementsByClassName("bg-svg");
@@ -258,18 +263,20 @@ function applyBoardOptionToBgSvg(bgSvgIfKnown) {
 	}
 
 	if (bgSvg) {
+		var boardKeyToUse = overrideBoardName ? overrideBoardName : paiShoBoardKey;
+
 		var extension = ".png";
-		if (svgBoardDesigns.includes(paiShoBoardKey)) {
+		if (svgBoardDesigns.includes(boardKeyToUse)) {
 			extension = ".svg";
 		}
 
-		var boardUrl = "style/board_" + paiShoBoardKey + extension;
+		var boardUrl = "style/board_" + boardKeyToUse + extension;
 
-		if (paiShoBoardKey.includes("customBoard")) {
+		if (boardKeyToUse.includes("customBoard")) {
 			var customBoardArray = JSON.parse(localStorage.getItem(customBoardUrlArrayKey));
 			if (customBoardArray && customBoardArray.length) {
 				for (var i = 0; i < customBoardArray.length; i++) {
-					if (customBoardArray[i].name.replace(/ /g,'_') === paiShoBoardKey.substring(11)) {
+					if (customBoardArray[i].name.replace(/ /g,'_') === boardKeyToUse.substring(11)) {
 						boardUrl = customBoardArray[i].url;
 					}
 				}
@@ -277,12 +284,16 @@ function applyBoardOptionToBgSvg(bgSvgIfKnown) {
 		}
 
 		var customBoardUrl = localStorage.getItem(customBoardUrlKey);
-		if (paiShoBoardKey === 'applycustomboard' && customBoardUrl) {
+		if (boardKeyToUse === 'applycustomboard' && customBoardUrl) {
 			boardUrl = customBoardUrl;
 		}
 
 		bgSvg.style.backgroundImage = "url('" + boardUrl + "')";
 	}
+}
+
+function setBoardImage(boardName) {
+	applyBoardOptionToBgSvg(null, boardName);
 }
 
 function getSkudTilesSrcPath() {

@@ -7,7 +7,7 @@ function FirePaiShoActuator(gameContainer, isMobile, enableAnimations) {
 	this.animationOn = enableAnimations;
 
 	this.rotateFacingRedGardens = getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true";
-	var rotateType = this.rotateFacingRedGardens ? ADEVAR_ROTATE : null;
+	var rotateType = this.rotateFacingRedGardens ? ADEVAR_GUEST_ROTATE : null;
 	var containers = setupPaiShoBoard(
 		this.gameContainer,
 		FirePaiShoController.getHostTilesContainerDivs(),
@@ -187,7 +187,7 @@ FirePaiShoActuator.prototype.addTile = function(tile, mainContainer, clickable) 
 
 	var theImg = document.createElement("img");
 
-	var srcValue = getSkudTilesSrcPath();
+	var srcValue = getSkudTilesSrcPath(); //getFireTilesSrcPath();
 	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
 
@@ -228,9 +228,9 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
 		theDiv.classList.add("activePoint");
-		//ADEVAR ROTATE
-		if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true"){
-			theDiv.classList.add("adevarPointRotate");
+		//THE DESERT ROTATE
+		if (getUserGamePreference(FirePaiShoController.boardRotationKey) == "true"){
+			theDiv.classList.add("adevarGuestPointRotate");
 		}
 
 		if (boardPoint.isType(MARKED)) {
@@ -307,7 +307,7 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 
 		if (this.rotateFacingRedGardens) {
-			theImg.elementStyleTransform.setValue("rotate", 225, "deg");
+			theImg.elementStyleTransform.setValue("rotate", 45, "deg");
 		}
 
 		if (moveToAnimate) {
@@ -323,12 +323,13 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 
 		if (this.rotateFacingRedGardens) {
-			theImg.elementStyleTransform.setValue("rotate", 225, "deg");
+			theImg.elementStyleTransform.setValue("rotate", 45, "deg");
 		}
 
 		var flags = {
 			boostedOnThisTurn: false,
 			wasArranged: false,
+			etherealizedOnThisTurn: false,
 			didBonusMove: false
 		};
 
@@ -336,7 +337,7 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags);
 		}
 
-		var srcValue = getSkudTilesSrcPath();
+		var srcValue = getSkudTilesSrcPath(); //getFireTilesSrcPath();
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 
 		if (boardPoint.tile.harmonyOwners 
@@ -362,6 +363,16 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 				}, pieceAnimationLength);
 			} else {
 				theDiv.classList.add("boosted");
+			}
+		}
+
+		if (boardPoint.tile.ethereal) {
+			if (flags.etherealizedOnThisTurn) {
+				setTimeout(function() {
+					theDiv.classList.add("ethereal");
+				}, pieceAnimationLength);
+			} else {
+				theDiv.classList.add("ethereal");
 			}
 		}
 
@@ -405,7 +416,7 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 			placedOnAccent = true;
 
 			if (moveToAnimate.bonusTileCode === "B" && !moveToAnimate.boatBonusPoint && moveToAnimate.tileRemovedWithBoat && isSamePoint(moveToAnimate.bonusEndPoint, ox, oy)) {// Placement of Boat to remove Accent Tile
-				var srcValue = getSkudTilesSrcPath();
+				var srcValue = getSkudTilesSrcPath(); //getFireTilesSrcPath();
 				theImg.src = srcValue + moveToAnimate.tileRemovedWithBoat.getImageName() + ".png";
 				boatRemovingAccent = true;
 			} else if (moveToAnimate.bonusTileCode === "B" && moveToAnimate.boatBonusPoint && isSamePoint(moveToAnimate.bonusEndPoint, ox, oy)) {// Placement of Boat to move Flower Tile
@@ -430,6 +441,12 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 			var dy = y - moveToAnimate.bonusEndPoint.rowAndColumn.row;
 			if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy && (dx + dy) !== (dx * dy)) {// Boosted by knotweed
 				flags.boostedOnThisTurn = true;
+			}
+		} else if (moveToAnimate.bonusTileCode === "Y") {
+			var dx = x - moveToAnimate.bonusEndPoint.rowAndColumn.col;
+			var dy = y - moveToAnimate.bonusEndPoint.rowAndColumn.row;
+			if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy && (dx + dy) !== (dx * dy)) {// Etherealized by Koi
+				flags.etherealizedOnThisTurn = true;
 			}
 		}
 	}
@@ -478,6 +495,10 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		flags.boostedOnThisTurn = true;
 	}
 
+	if ((x !== ox || y !== oy) && boardPoint.tile && (boardPoint.tile.ethereal)) {
+		flags.etherealizedOnThisTurn = true;
+	}
+
 	var pointSizeMultiplierX = 34;
 	var pointSizeMultiplierY = pointSizeMultiplierX;
 	var unitString = "px";
@@ -489,19 +510,6 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		unitString = "vw";
 	}
 	
-
-	// if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true") {
-	// 	//ADEVAR ROTATION
-	// 	var left = (x - ox);
-	// 	var top = (y - oy);
-	// 	theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
-	// 	theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
-	// } else {
-	// 	// SKUD ROTATION
-	// 	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
-	// 	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
-	// }
-
 	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
 	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
 	
@@ -515,15 +523,7 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	requestAnimationFrame(function() {
 		var left = ax - ox;
 		var top = ay - oy;
-		// if (getUserGamePreference(FirePaiShoController.boardRotationKey) !== "true") {
-		// 	//ADEVAR ROTATION
-		// 	theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
-		// 	theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
-		// } else {
-		// 	// SKUD ROTATION
-		// 	theImg.style.left = (left * pointSizeMultiplierX) + unitString;
-		// 	theImg.style.top = (top * pointSizeMultiplierY) + unitString;
-		// }
+
 		theImg.style.left = (left * pointSizeMultiplierX) + unitString;
 		theImg.style.top = (top * pointSizeMultiplierY) + unitString;
 	});
@@ -577,3 +577,12 @@ FirePaiShoActuator.prototype.printBoard = function(board) {
 
 	
 };
+
+
+/* function getFireTilesSrcPath() {
+	if (SkudPaiShoController.isUsingCustomTileDesigns()) {
+		return SkudPaiShoController.getCustomTileDesignsUrl();
+	} else {
+		return "images/Fire/" + skudTilesKey + "/";
+	}
+} */

@@ -1,6 +1,6 @@
 // Actuator
 
-function FirePaiShoActuator(gameContainer, isMobile, enableAnimations) {
+KeyPaiSho.Actuator = function(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
 
@@ -8,24 +8,26 @@ function FirePaiShoActuator(gameContainer, isMobile, enableAnimations) {
 
 	var containers = setupPaiShoBoard(
 		this.gameContainer,
-		FirePaiShoController.getHostLibraryTilesContainerDivs(),
-		FirePaiShoController.getGuestLibraryTilesContainerDivs(),
-		true,
-		ADEVAR_ROTATE,
-		false
+		KeyPaiSho.Controller.getHostTilesContainerDivs(),
+		KeyPaiSho.Controller.getGuestTilesContainerDivs(),
+		false,
+		false,
+		true
 	);
 
 	this.boardContainer = containers.boardContainer;
-	this.hostLibraryTilesContainer = containers.hostLibraryTilesContainer;
-	this.guestLibraryTilesContainer = containers.guestLibraryTilesContainer;
+	this.arrowContainer = containers.arrowContainer;
+	this.hostTilesContainer = containers.hostTilesContainer;
+	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-FirePaiShoActuator.prototype.setAnimationOn = function(isOn) {
+KeyPaiSho.Actuator.prototype.setAnimationOn = function(isOn) {
 	this.animationOn = isOn;
 };
 
-FirePaiShoActuator.prototype.actuate = function(board, tileManager, moveToAnimate, moveAnimationBeginStep) {
+KeyPaiSho.Actuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
 	var self = this;
+	this.board = board;
 	// debugStackTrace();
 	// self.printBoard(board);
 
@@ -34,12 +36,13 @@ FirePaiShoActuator.prototype.actuate = function(board, tileManager, moveToAnimat
 	}
 
 	window.requestAnimationFrame(function() {
-		self.htmlify(board, tileManager, moveToAnimate, moveAnimationBeginStep);
+		self.htmlify(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile);
 	});
 };
 
-FirePaiShoActuator.prototype.htmlify = function(board, tileManager, moveToAnimate, moveAnimationBeginStep) {
+KeyPaiSho.Actuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
 	this.clearContainer(this.boardContainer);
+	this.clearContainer(this.arrowContainer);
 
 	if (moveToAnimate && moveToAnimate.moveType === ARRANGING) {
 		var cell = board.cells[moveToAnimate.endPoint.rowAndColumn.row][moveToAnimate.endPoint.rowAndColumn.col];
@@ -53,16 +56,23 @@ FirePaiShoActuator.prototype.htmlify = function(board, tileManager, moveToAnimat
 	board.cells.forEach(function(column) {
 		column.forEach(function(cell) {
 			if (cell) {
-				self.addBoardPoint(cell, moveToAnimate, moveAnimationBeginStep);
+				if (markingManager.pointIsMarked(cell) && !cell.isType(MARKED)){
+					cell.addType(MARKED);
+				}
+				else if (!markingManager.pointIsMarked(cell) && cell.isType(MARKED)){
+					cell.removeType(MARKED);
+				}
+				self.addBoardPoint(cell, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile);
 			}
 		});
 	});
 
-	var fullTileSet = new FirePaiShoTileManager(true);
+	// Draw all arrows
+	for (var [_, arrow] of Object.entries(markingManager.arrows)) {
+		this.arrowContainer.appendChild(createBoardArrow(arrow[0], arrow[1]));
+	}
 
-
-
-
+	var fullTileSet = new KeyPaiSho.TileManager(true);
 
 	// Go through tile piles and clear containers
 	fullTileSet.hostTiles.forEach(function(tile) {
@@ -73,60 +83,28 @@ FirePaiShoActuator.prototype.htmlify = function(board, tileManager, moveToAnimat
 	});
 
 	// Go through tile piles and display
-
-//	hostLibraryTilesContainer.classList.add("tileLibrary");
-//	var hostLibraryLabel = document.createElement("span");
-//	hostLibraryLabel.innerText = "--Host Tile Library--";
-//	hostLibraryTilesContainer.appendChild(hostLibraryLabel);
-//	hostLibraryTilesContainer.appendChild(document.createElement("br"));
-
-//This part was already there....
-	tileManager.hostLibraryTiles.forEach(function(tile) {
-		self.addTile(tile, self.hostLibraryTilesContainer);
+	tileManager.hostTiles.forEach(function(tile) {
+		self.addTile(tile, this.hostTilesContainer);
 	});
-
-//This part I just added
-	// Host Tile Reserve
-	var hostReserveTilesContainer = document.createElement("span");
-	hostReserveTilesContainer.classList.add("tileLibrary");
-	var hostReserveTilesLabel = document.createElement("span");
-	hostReserveTilesLabel.innerText = "--Host Tile Reserve--";
-	hostReserveTilesContainer.appendChild(hostReserveTilesLabel);
-	hostReserveTilesContainer.appendChild(document.createElement("br"));
-	tileManager.hostReserveTiles.forEach(function(tile) {
-		self.addTile(tile, self.hostReserveTilesContainer);
+	tileManager.guestTiles.forEach(function(tile) {
+		self.addTile(tile, this.guestTilesContainer);
 	});
-	this.hostLibraryTilesContainer.appendChild(hostReserveTilesContainer);
-
-//	tileManager.hostReserveTiles.forEach(function(tile) {
-//		self.addTile(tile, this.hostReserveTilesContainer);
-//	});
-
-
-	tileManager.guestLibraryTiles.forEach(function(tile) {
-		self.addTile(tile, this.guestLibraryTilesContainer);
-	});
-//	tileManager.guestReserveTiles.forEach(function(tile) {
-//		self.addTile(tile, this.guestReserveTilesContainer);
-//	});
-
-
 };
 
-FirePaiShoActuator.prototype.clearContainer = function (container) {
+KeyPaiSho.Actuator.prototype.clearContainer = function (container) {
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-FirePaiShoActuator.prototype.clearTileContainer = function (tile) {
+KeyPaiSho.Actuator.prototype.clearTileContainer = function (tile) {
 	var container = document.querySelector("." + tile.getImageName());
 	while (container.firstChild) {
 		container.removeChild(container.firstChild);
 	}
 };
 
-FirePaiShoActuator.prototype.addTile = function(tile, mainContainer) {
+KeyPaiSho.Actuator.prototype.addTile = function(tile, mainContainer) {
 	var self = this;
 
 	var container = document.querySelector("." + tile.getImageName());
@@ -138,12 +116,12 @@ FirePaiShoActuator.prototype.addTile = function(tile, mainContainer) {
 
 	if (tile.selectedFromPile) {
 		theDiv.classList.add("selectedFromPile");
-		theDiv.classList.add("boosted");
+		theDiv.classList.add("drained");
 	}
 
 	var theImg = document.createElement("img");
 
-	var srcValue = getSkudTilesSrcPath();
+	var srcValue = this.getTileSrcPath();
 	theImg.src = srcValue + tile.getImageName() + ".png";
 	theDiv.appendChild(theImg);
 
@@ -161,7 +139,18 @@ FirePaiShoActuator.prototype.addTile = function(tile, mainContainer) {
 	container.appendChild(theDiv);
 };
 
-FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep) {
+KeyPaiSho.Actuator.prototype.getTileSrcPath = function(tile) {
+	if (KeyPaiSho.Controller.isUsingCustomTileDesigns()) {
+		return KeyPaiSho.Controller.getCustomTileDesignsUrl();
+	} else {
+		var srcValue = "images/";
+		var gameImgDir = "KeyPaiSho/" + localStorage.getItem(KeyPaiSho.Options.tileDesignTypeKey);
+		srcValue = srcValue + gameImgDir + "/";
+		return srcValue;
+	}
+};
+
+KeyPaiSho.Actuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep, hideCenterPointTile) {
 	var self = this;
 
 	var theDiv = createBoardPointDiv(boardPoint);
@@ -173,16 +162,21 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 					&& isSamePoint(moveToAnimate.bonusEndPoint, boardPoint.col, boardPoint.row);
 
 	if (!boardPoint.isType(NON_PLAYABLE)) {
-		theDiv.classList.add("activePoint");
-		//ADEVAR ROTATE
-		theDiv.classList.add("adevarPointRotate");
-//	theDiv.classList.add("vagabondPointRotate");
+		theDiv.style.zIndex = 3;
 
+		if (boardPoint.isType(GATE)) {
+			this.adjustGatePointLocation(boardPoint, theDiv);
+		}
+
+		theDiv.classList.add("activePoint");
+		if (boardPoint.isType(MARKED)) {
+			theDiv.classList.add("markedPoint");
+		}	
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 		} else if (boardPoint.betweenHarmony 
 				&& !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)
-				&& getUserGamePreference(FirePaiShoController.hideHarmonyAidsKey) !== "true") {
+				&& getUserGamePreference(KeyPaiSho.Controller.hideHarmonyAidsKey) !== "true") {
 			var boatRemovingPointClassesToAddAfterAnimation = [];
 			if (isAnimationPointOfBoatRemovingAccentTile) {
 				boatRemovingPointClassesToAddAfterAnimation.push("betweenHarmony");
@@ -214,7 +208,24 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 			theDiv.setAttribute("onclick", "pointClicked(this);");
 			theDiv.setAttribute("onmouseover", "showPointMessage(this);");
 			theDiv.setAttribute("onmouseout", "clearMessage();");
+			theDiv.addEventListener('mousedown', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbDown(theDiv);
+				}
+			});
+			theDiv.addEventListener('mouseup', e => {
+				 // Right Mouse Button
+				if (e.button == 2) {
+					RmbUp(theDiv);
+				}
+			});
+			theDiv.addEventListener('contextmenu', e => {
+					e.preventDefault();
+				});
 		}
+	} else {
+		theDiv.style.zIndex = 1;
 	}
 
 	if (isAnimationPointOfBoatRemovingAccentTile) {
@@ -227,12 +238,14 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 				{});
 		}
 		theDiv.appendChild(theImg);
-	} else if (boardPoint.hasTile()) {
+	} else if (boardPoint.hasTile()
+			&& !(hideCenterPointTile && boardPoint.row === 8 && boardPoint.col === 8)
+		) {
 		theDiv.classList.add("hasTile");
 
 		var theImg = document.createElement("img");
 		var flags = {
-			boostedOnThisTurn: false,
+			drainedOnThisTurn: false,
 			wasArranged: false,
 			didBonusMove: false
 		};
@@ -241,12 +254,12 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags);
 		}
 
-		var srcValue = getSkudTilesSrcPath();
+		var srcValue = this.getTileSrcPath();
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
 
 		if (boardPoint.tile.harmonyOwners 
 				&& !gameOptionEnabled(NO_HARMONY_VISUAL_AIDS)
-				&& getUserGamePreference(FirePaiShoController.hideHarmonyAidsKey) !== "true") {
+				&& getUserGamePreference(KeyPaiSho.Controller.hideHarmonyAidsKey) !== "true") {
 			if (this.animationOn && (flags.didBonusMove || flags.wasArranged)) {
 				setTimeout(function() {//Delay harmony outline until after a piece has moved
 					for (var i = 0; i < boardPoint.tile.harmonyOwners.length; i++) {
@@ -260,13 +273,13 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 			}
 		}
 
-		if (boardPoint.tile.boosted) {
-			if (flags.boostedOnThisTurn) {
+		if (boardPoint.tile.drained || boardPoint.tile.trapped) {
+			if (flags.drainedOnThisTurn) {
 				setTimeout(function() {
-					theDiv.classList.add("boosted");
+					theDiv.classList.add("drained");
 				}, pieceAnimationLength);
 			} else {
-				theDiv.classList.add("boosted");
+				theDiv.classList.add("drained");
 			}
 		}
 
@@ -298,12 +311,19 @@ FirePaiShoActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate,
 	}
 };
 
-FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags) {
+KeyPaiSho.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, moveAnimationBeginStep, theImg, flags) {
 	if (!this.animationOn) {
 		return;
 	}
 
-	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y, placedOnAccent = false, boatRemovingAccent = false;
+	var x = boardPoint.col;
+	var y = boardPoint.row;
+	var ox = x;
+	var oy = y;
+	var placedOnAccent = false;
+	var boatRemovingAccent = false;
+
+	var self = this;
 
 	if (moveToAnimate.hasHarmonyBonus()) {
 		debug(moveToAnimate.bonusTileCode);
@@ -334,8 +354,8 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		} else if (moveToAnimate.bonusTileCode === "K") {
 			var dx = x - moveToAnimate.bonusEndPoint.rowAndColumn.col;
 			var dy = y - moveToAnimate.bonusEndPoint.rowAndColumn.row;
-			if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy && (dx + dy) !== (dx * dy)) {// Boosted by knotweed
-				flags.boostedOnThisTurn = true;
+			if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy && (dx + dy) !== (dx * dy)) {// Trapped by knotweed
+				flags.drainedOnThisTurn = true;
 			}
 		}
 	}
@@ -353,6 +373,9 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 			} else if (moveToAnimate.isOrchidMove) {
 				var dx = x - moveToAnimate.endPoint.rowAndColumn.col;
 				var dy = y - moveToAnimate.endPoint.rowAndColumn.row;
+				if (-1 <= dx && 1 >= dx && -1 <= dy && 1 >= dy) {// Trapped by orchid
+					flags.drainedOnThisTurn = true;
+				}
 			}
 		} else if (moveToAnimate.moveType === PLANTING) {
 			if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {// Piece planted
@@ -367,8 +390,8 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		}
 	}
 
-	if ((x !== ox || y !== oy) && boardPoint.tile && (boardPoint.tile.boosted)) {
-		flags.boostedOnThisTurn = true;
+	if ((x !== ox || y !== oy) && boardPoint.tile && (boardPoint.tile.drained || boardPoint.tile.trapped)) {
+		flags.drainedOnThisTurn = true;
 	}
 
 	var pointSizeMultiplierX = 34;
@@ -382,25 +405,19 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 		unitString = "vw";
 	}
 
-	// SKUD ROTATION
-//	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
-//	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
-
-//console.log("I'm hitting the point in the code where the rotation happens.");
-	//ADEVAR ROTATION
-
-	var left = (x - ox);
-	var top = (y - oy);
-	theImg.style.left = ((left * cos135 - top * sin135) * pointSizeMultiplierX) + unitString;
-	theImg.style.top = ((top * cos135 + left * sin135) * pointSizeMultiplierY) + unitString;
-
-	//VAGABOND ROTATION
-//	var left = (x - ox);
-//	var top = (y - oy);
-//	theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
-//	theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
-
-	
+	var xOffset = 0;
+	var yOffset = 0;
+	var startPointRowAndCol = moveToAnimate.startPoint && moveToAnimate.startPoint.rowAndColumn;
+	if (startPointRowAndCol) {
+		var originalBoardPoint = self.board.cells[startPointRowAndCol.row] && self.board.cells[startPointRowAndCol.row][startPointRowAndCol.col];
+		if (originalBoardPoint && originalBoardPoint.isType(GATE)
+				&& isSamePoint(moveToAnimate.endPoint, ox, oy)) {
+			xOffset += 0.5;
+			yOffset += 0.5;
+		}
+	}
+	theImg.style.left = ((x - ox + xOffset) * pointSizeMultiplierX) + unitString;
+	theImg.style.top = ((y - oy + yOffset) * pointSizeMultiplierY) + unitString;
 	if (placedOnAccent && !boatRemovingAccent) {
 		theImg.style.visibility = "hidden";
 		if (piecePlaceAnimation === 1) {
@@ -441,7 +458,23 @@ FirePaiShoActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAn
 	}, moveAnimationBeginStep === 0 ? pieceAnimationLength : 0);
 };
 
-FirePaiShoActuator.prototype.printBoard = function(board) {
+KeyPaiSho.Actuator.prototype.adjustGatePointLocation = function(boardPoint, theDiv) {
+	var pointSizeMultiplierX = 34;
+	var pointSizeMultiplierY = pointSizeMultiplierX;
+	var unitString = "px";
+
+	/* For small screen size using dynamic vw units */
+	if (window.innerWidth <= 612) {
+		pointSizeMultiplierX = 5.5555;
+		pointSizeMultiplierY = 5.611;
+		unitString = "vw";
+	}
+	
+	theDiv.style.left = (0.5 * pointSizeMultiplierX) + unitString;
+	theDiv.style.top = (0.5 * pointSizeMultiplierY) + unitString;
+};
+
+KeyPaiSho.Actuator.prototype.printBoard = function(board) {
 
 	debug("");
 	var rowNum = 0;
@@ -462,6 +495,4 @@ FirePaiShoActuator.prototype.printBoard = function(board) {
 		rowNum++;
 	});
 	debug("");
-
-	
 };

@@ -1,7 +1,7 @@
 /* Vagabond Pai Sho specific UI interaction logic */
 
 var VagabondConstants = {
-	preferencesKey = "VagabondPreferencesKey"
+	preferencesKey: "VagabondPreferencesKey"
 };
 var VagabondPreferences = {
 	customTilesUrl: ""
@@ -48,9 +48,22 @@ VagabondController.prototype.completeSetup = function() {
 	debug("Peeky?: " + this.peekAtOpponentMoves);
 	debug("!this.peek...: " + !this.peekAtOpponentMoves);
 
-	if (gameOptionEnabled(SWAP_BISON_WITH_LEMUR)) {
-		VagabondController.setTileDesignsPreference("tggoriginal");
+	if (gameOptionEnabled(SWAP_BISON_WITH_LEMUR)
+			&& !VagabondController.tileDesignSupportsLemur()) {
+		VagabondController.setTileDesignsPreference("tggvagabond");
 	}
+};
+
+VagabondController.tileDesignSupportsLemur = function(designKey) {
+	if (!designKey) {
+		designKey = localStorage.getItem(vagabondTileDesignTypeKey);
+	}
+	return [
+		'tggvagabond',
+		'tggoriginal',
+		'gaoling',
+		'gaolingkoiwheel'
+	].includes(designKey);
 };
 
 VagabondController.prototype.resetGameManager = function() {
@@ -564,22 +577,24 @@ VagabondController.prototype.isAnimationsEnabled = function() {
 /* Vagabond tile designs */
 VagabondController.tileDesignTypeValues = {
 	tggvagabond: "The Garden Gate Designs",
-	tggclassic: "TGG Classic",
+	gaoling: "Gaoling",
 	tgggyatso: "Gyatso TGG Classic",
-	tggkoiwheel: "TGG Koi-Wheel",
-	vescuccikoiwheel: "Vescucci Koi-Wheel",
-	vescuccikoiwheelrustic: "Rustic Vescucci Koi-Wheel",
 	keygyatso: "Key Pai Sho Gyatso Style",
-	keygyatsokoi: "Key Pai Sho Koi-Wheel",
-	keygyatsokoi2: "Key Pai Sho Koi-Wheel Mobile",
 	tggoriginal: "The Garden Gate Designs Original",
 	chujired: "Chuji Red",
+	tggclassic: "TGG Classic",
 	classic: "Classic Pai Sho Project",
 	water: "Water themed Garden Gate Designs",
 	fire: "Fire themed Garden Gate Designs",
 	canon: "Canon colors Garden Gate Designs",
 	owl: "Order of the White Lotus Garden Gate Designs",
 	royal: "TGG Royal",
+	gaolingkoiwheel: "Gaoling Koi-Wheel",
+	keygyatsokoi: "Key Pai Sho Koi-Wheel",
+	keygyatsokoi2: "Key Pai Sho Koi-Wheel Mobile",
+	tggkoiwheel: "TGG Koi-Wheel",
+	vescuccikoiwheel: "Vescucci Koi-Wheel",
+	vescuccikoiwheelrustic: "Rustic Vescucci Koi-Wheel",
 	royalkoiwheel: "TGG Royal Koi-Wheel",
 	custom: "Use Custom Designs"
 };
@@ -614,11 +629,23 @@ VagabondController.getCustomTileDesignsUrl = function() {
 
 VagabondController.buildTileDesignDropdownDiv = function(alternateLabelText) {
 	var labelText = alternateLabelText ? alternateLabelText : "Tile Designs";
-	return buildDropdownDiv("vagabondPaiShoTileDesignDropdown", labelText + ":", VagabondController.tileDesignTypeValues,
+	return buildDropdownDiv("vagabondPaiShoTileDesignDropdown", labelText + ":", 
+							VagabondController.buildDesignTypeValuesForDropdown(),
 							localStorage.getItem(vagabondTileDesignTypeKey),
 							function() {
 								VagabondController.setTileDesignsPreference(this.value);
 							});
+};
+
+VagabondController.buildDesignTypeValuesForDropdown = function() {
+	var designValues = {};
+	Object.keys(VagabondController.tileDesignTypeValues).forEach(function(key, index) {
+		if (!gameOptionEnabled(SWAP_BISON_WITH_LEMUR) 
+				|| VagabondController.tileDesignSupportsLemur(key)) {
+			designValues[key] = VagabondController.tileDesignTypeValues[key];
+		}
+	});
+	return designValues;
 };
 
 VagabondController.prototype.setAnimationsOn = function(isAnimationsOn) {

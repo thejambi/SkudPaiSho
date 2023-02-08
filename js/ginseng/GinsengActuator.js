@@ -355,6 +355,7 @@ Ginseng.Actuator.prototype.getCapturedTileFromMove = function(moveDetails) {
 	return null;
 };
 
+/* Can remove? */
 Ginseng.Actuator.prototype.adjustBoardPointForGiganticDeploy = function(theDiv, boardPoint) {
 	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y;
 
@@ -417,7 +418,7 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 							startY = moveStartPoint.rowAndColumn.row;
 							setTimeout(() => {
 								theImg.elementStyleTransform.setValue("scale", 1.2);	// Make the pieces look like they're picked up a little when moving
-								theDiv.style.zIndex = 99;	// Make sure "picked up" pieces show up above others
+								theDiv.style.zIndex = 105;	// Make sure "picked up" pieces show up above others
 							}, pieceAnimationLength/1.2);
 							movementStepIndex = 1;
 						}
@@ -486,10 +487,14 @@ Ginseng.Actuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnim
 };
 
 Ginseng.Actuator.prototype.getTileSrcPath = function(tile) {
-	var srcValue = "images/";
-	var gameImgDir = "Ginseng/" + localStorage.getItem(Ginseng.Options.tileDesignTypeKey);
-	srcValue = srcValue + gameImgDir + "/";
-	return srcValue;
+	if (Ginseng.Controller.isUsingCustomTileDesigns()) {
+		return Ginseng.Controller.getCustomTileDesignsUrl();
+	} else {
+		var srcValue = "images/";
+		var gameImgDir = "Ginseng/" + localStorage.getItem(Ginseng.Options.tileDesignTypeKey);
+		srcValue = srcValue + gameImgDir + "/";
+		return srcValue;
+	}
 };
 
 Ginseng.Actuator.prototype.printBoard = function(board) {

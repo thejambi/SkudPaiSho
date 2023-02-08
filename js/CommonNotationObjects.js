@@ -10,6 +10,7 @@ var ARRANGING = "Arranging";
 
 var DEPLOY = "Deploy";
 var MOVE = "Move";
+var SETUP = "Setup";	// Because it is shorter than the old existing "Initial Setup" string
 
 var TEAM_SELECTION = "Team Selection";
 

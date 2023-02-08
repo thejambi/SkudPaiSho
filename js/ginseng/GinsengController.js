@@ -2,6 +2,13 @@
 
 function Ginseng() {}
 
+Ginseng.Constants = {
+	preferencesKey: "GinsengPreferencesKey"
+};
+Ginseng.Preferences = {
+	customTilesUrl: ""
+};
+
 Ginseng.Controller = function(gameContainer, isMobile) {
 	new Ginseng.Options();	// Initialize
 	this.gameContainer = gameContainer;
@@ -21,6 +28,10 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 	this.isPaiShoGame = true;
 
 	this.showDebugInfo = false;
+
+	if (gameOptionEnabled(GINSENG_1_POINT_0)) {
+		this.isInviteOnly = true;
+	}
 }
 
 Ginseng.Controller.prototype.createActuator = function() {
@@ -86,15 +97,48 @@ Ginseng.Controller.prototype.resetMove = function(skipAnimation) {
 };
 
 Ginseng.Controller.prototype.getDefaultHelpMessageText = function() {
-	return "<h4>Ginseng Pai Sho</h4>"
-		+ "<p>The first player to cross the Border with their White Lotus tile wins. The Border is the midline between Host and Guest tiles.</p><h4>Temple Rules</h4><p>Tiles are protected when inside of the Eastern or Western Temple. Protected tiles cannot be captured, trapped, or pushed. A tile inside of a Temple can still use its abilities.</p><h4>White Lotus Rules</h4><p>When your White Lotus is inside of a Temple:</p><ul><li>You cannot capture tiles by movement</li><li>Your tiles’ abilities are not in effect</li></ul><p>When only your White Lotus is outside of a Temple:</p><ul><li>You cannot capture tiles by movement</li><li>Your tiles’ abilities are in effect</li></ul><p>When both White Lotuses are outside of a Temple:</p><ul><li>You can capture tiles by movement</li><li>Your tiles’ abilities are in effect</li></ul>"
-		+ "<p><a href='https://skudpaisho.com/site/games/ginseng-pai-sho/' target='_blank'>view the full rules</a>.</p>";
+	if (gameOptionEnabled(GINSENG_2_POINT_0) || !gameOptionEnabled(GINSENG_1_POINT_0)) {
+		return '<h4>Ginseng Pai Sho</h4>'
+			+ '<p><strong>Objective</strong></p>'
+			+ '<ul>'
+			+ '<li>Be the first player to move beyond the Border with your White Lotus tile to win the game. The Border is the midline between Host and Guest</li>'
+			+ '</ul>'
+			+ '<p><strong>Taking a turn</strong></p>'
+			+ '<ul>'
+			+ '<li>A turn consists of two phases: Movement Phase and Effect Phase. Hover over the different tiles to learn what they can do in these phases.</li>'
+			+ '</ul>'
+			+ '<p><strong>Important rules</strong></p>'
+			+ '<p>White Lotus</p>'
+			+ '<ul>'
+			+ '<li>Capturing is only allowed when BOTH White Lotus tiles are outside Temples.</li>'
+			+ '</ul>'
+			+ '<p>The Temples</p>'
+			+ '<ul>'
+			+ '<li>Tiles inside Eastern and Western Temples are Ascended. Ascended tiles cannot be captured, trapped or moved by other tiles. A tile inside a Temple can still use its ability.</li>'
+			+ '<li>Captured tiles can be retrieved at the Eastern or Western Temples by exchanging any tile for the retrieved tile.</li>'
+			+ '</ul>'
+			+ '<p>Dynamic or Static Abilities</p>'
+			+ '<ul>'
+			+ '<li>Dynamic Abilities are triggered by movement of the specific tile and only occur during the following Effect Phase.</li>'
+			+ '<li>Static Abilities begin in the Effect Phase and continue until they are interrupted.</li>'
+			+ '</ul>'
+			+ '<p>For additional info, view the rule book <a href="https://skudpaisho.com/site/games/ginseng-pai-sho/" target="_blank">here</a>.</p>';
+	} else {
+		return "<h4>Ginseng Pai Sho</h4>"
+			+ "<p>The first player to cross the Border with their White Lotus tile wins. The Border is the midline between Host and Guest tiles.</p><h4>Temple Rules</h4><p>Tiles are protected when inside of the Eastern or Western Temple. Protected tiles cannot be captured, trapped, or pushed. A tile inside of a Temple can still use its abilities.</p><h4>White Lotus Rules</h4><p>When your White Lotus is inside of a Temple:</p><ul><li>You cannot capture tiles by movement</li><li>Your tiles’ abilities are not in effect</li></ul><p>When only your White Lotus is outside of a Temple:</p><ul><li>You cannot capture tiles by movement</li><li>Your tiles’ abilities are in effect</li></ul><p>When both White Lotuses are outside of a Temple:</p><ul><li>You can capture tiles by movement</li><li>Your tiles’ abilities are in effect</li></ul>"
+			+ "<p><a href='https://skudpaisho.com/site/games/ginseng-pai-sho/' target='_blank'>view the full rules</a>.</p>";
+	}
+};
+
+Ginseng.Controller.prototype.gameNotBegun = function() {
+	return this.gameNotation.moves.length === 0 
+		|| (this.gameNotation.moves.length === 1 && this.gameNotation.moves[0].moveType === SETUP);
 };
 
 Ginseng.Controller.prototype.getAdditionalMessage = function() {
 	var msg = "";
 	
-	if (this.gameNotation.moves.length === 0 && !playingOnlineGame()) {
+	if (this.gameNotBegun() && !playingOnlineGame()) {
 		if (onlinePlayEnabled && gameId < 0 && userIsLoggedIn()) {
 			msg += "Click <em>Join Game</em> above to join another player's game. Or, you can start a game that other players can join by clicking <strong>Start Online Game<strong> below.";
 		} else {
@@ -122,7 +166,7 @@ Ginseng.Controller.prototype.getAdditionalMessage = function() {
 
 	if (!playingOnlineGame()) {
 		// msg += getGameOptionsMessageHtml(GameType.Ginseng.gameOptions);	// For when there are game options
-		if (onlinePlayEnabled && this.gameNotation.moves.length === 0) {
+		if (onlinePlayEnabled && this.gameNotBegun()) {
 			msg += "<br /><span class='skipBonus' onClick='gameController.startOnlineGame()'>Start Online Game</span><br />";
 		}
 	}
@@ -133,6 +177,30 @@ Ginseng.Controller.prototype.getAdditionalMessage = function() {
 Ginseng.Controller.prototype.toggleDebug = function() {
 	this.showDebugInfo = !this.showDebugInfo;
 	clearMessage();
+};
+
+Ginseng.Controller.prototype.completeSetup = function() {
+	// Create initial board setup
+	if (gameOptionEnabled(GINSENG_1_POINT_0)) {
+		this.addSetupMove();
+	}
+
+	// Finish with actuate
+	rerunAll();
+	this.callActuate();
+
+	if (gameOptionEnabled(GINSENG_1_POINT_0)) {
+		setGameTitleText("Ginseng Pai Sho 1.0");
+	}
+};
+
+Ginseng.Controller.prototype.addSetupMove = function() {
+	this.notationBuilder.moveType = SETUP;
+	this.notationBuilder.boardSetupNum = 1;
+	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+	this.theGame.runNotationMove(move);
+	// Move all set. Add it to the notation!
+	this.gameNotation.addMove(move);
 };
 
 Ginseng.Controller.prototype.startOnlineGame = function() {
@@ -477,7 +545,7 @@ Ginseng.Controller.prototype.getAiList = function() {
 }
 
 Ginseng.Controller.prototype.getCurrentPlayer = function() {
-	if (this.gameNotation.moves.length == 0) {
+	if (this.gameNotBegun()) {
 		return GUEST;
 	} /* else if (this.gameNotation.moves.length > 0
 			&& this.gameNotation.moves[0].moveType === PASS_TURN) {
@@ -590,3 +658,21 @@ Ginseng.Controller.prototype.buildNotationString = function(move) {
 
 	return moveNotation;
 };
+
+Ginseng.Controller.prototype.setCustomTileDesignUrl = function(url) {
+	Ginseng.Preferences.customTilesUrl = url;
+	localStorage.setItem(Ginseng.Constants.preferencesKey, JSON.stringify(Ginseng.Preferences));
+	localStorage.setItem(Ginseng.Options.tileDesignTypeKey, 'custom');
+	if (gameController && gameController.callActuate) {
+		gameController.callActuate();
+	}
+};
+
+Ginseng.Controller.isUsingCustomTileDesigns = function() {
+	return localStorage.getItem(Ginseng.Options.tileDesignTypeKey) === "custom";
+};
+
+Ginseng.Controller.getCustomTileDesignsUrl = function() {
+	return Ginseng.Preferences.customTilesUrl;
+};
+
