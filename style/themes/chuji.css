@@ -236,11 +236,15 @@ div.tab button.active {
 .sidenavSection {
     padding:10px;
     border-radius: 12px;
+    margin-bottom: 10px;
 }
 .sidenav .sidenavEntry {color: var(--secondary-text);}
 .sidenavLink {color: var(--secondary-text);}
 .sidenavLink:hover {color: var(--primary-text);}
-.sidenavContent h1 {margin: 0.8em 0;}
+.sidenavContent {margin: 2px 16px;}
+.sidenavContent h1 {margin: 0.8em 0.2em;}
+.sidenavContent .closebtn {top: 10px;}
+.sidenavContent .closebtn:hover {color: var(--highlight);}
 .stretchText {margin-top: 8px;}
 .hexagonNoShow {background-color: var(--primary-text);}
 .hexagonScore {background-color: var(--secondary-text);}

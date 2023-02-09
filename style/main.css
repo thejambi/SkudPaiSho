@@ -1029,11 +1029,11 @@ input[type=submit] {
 
 .sidenav {
     height: 100%;
-    width: 0;
+    width: 307px;
     position: fixed;
     z-index: 104;
     top: 0;
-    left: 0;
+    left: -350px;
     background-color: #222;
     color: #faf8ef;
     overflow-x: hidden;
@@ -1041,7 +1041,7 @@ input[type=submit] {
 }
 
 .sideNavOpen {
-  width: 307px;
+  left: 0;
 }
 
 .sidenavContent {
