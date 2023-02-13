@@ -173,8 +173,6 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 		theImg.elementStyleTransform.setValue("rotate", 315, "deg");
 
-		theImg.style.transform = theImg.rotateTransformStr;
-
 		if (moveToAnimate) {
 			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
 		}
@@ -188,6 +186,8 @@ VagabondActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 		if (this.animationOn && moveToAnimate && moveToAnimate.capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
 			debug("Captured " + moveToAnimate.capturedTile.code);
 			var theImgCaptured = document.createElement("img");
+			theImgCaptured.elementStyleTransform = new ElementStyleTransform(theImgCaptured);
+			theImgCaptured.elementStyleTransform.setValue("rotate", 315, "deg");
 			theImgCaptured.src = srcValue + moveToAnimate.capturedTile.getImageName() + ".png";
 			theImgCaptured.classList.add("underneath");
 			theDiv.appendChild(theImgCaptured);

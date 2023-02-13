@@ -30,6 +30,7 @@ Trifle.BoardPoint.prototype.setRowAndCol = function(row, col) {
 	this.row = row;
 	this.col = col;
 	this.rowAndCol = new RowAndColumn(this.row, this.col);
+	this.rowAndColumn = this.rowAndCol;
 };
 
 Trifle.BoardPoint.prototype.addType = function(type) {
@@ -276,10 +277,7 @@ Trifle.BoardPoint.prototype.getCopy = function() {
 		copy.types.push(this.types[i]);
 	}
 
-	// this.row
-	copy.row = this.row;
-	// this.col
-	copy.col = this.col;
+	copy.setRowAndCol(this.row, this.col);
 
 	// tile
 	if (this.hasTile()) {

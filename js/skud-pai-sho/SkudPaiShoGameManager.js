@@ -110,7 +110,7 @@ SkudPaiShoGameManager.prototype.runNotationMove = function(move, withActuate, mo
 	if (this.board.winners.length === 0) {
 		// If no harmony ring winners, check for player out of basic flower tiles
 		var playerOutOfTiles = this.aPlayerIsOutOfBasicFlowerTiles();
-		if (playerOutOfTiles) {
+		if (playerOutOfTiles && !gameOptionEnabled(NO_ALT_WIN)) {
 			debug("PLAYER OUT OF TILES: " + playerOutOfTiles);
 			// (Previously, on Skud Pai Sho...) If a player has more accent tiles, they win
 			// var playerMoreAccentTiles = this.tileManager.getPlayerWithMoreAccentTiles();

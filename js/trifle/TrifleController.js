@@ -7,6 +7,7 @@ Trifle.Controller = function(gameContainer, isMobile) {
 	this.actuator = new Trifle.Actuator(gameContainer, isMobile);
 
 	Trifle.TileInfo.initializeTrifleData();
+	Trifle.TileInfo.defineTrifleTiles();
 	PaiShoGames.currentTileMetadata = Trifle.TrifleTiles;
 	PaiShoGames.currentTileCodes = Trifle.TileCodes;
 	this.resetGameManager();

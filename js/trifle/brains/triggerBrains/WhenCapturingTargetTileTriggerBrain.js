@@ -16,7 +16,16 @@ Trifle.WhenCapturingTargetTileTriggerBrain = function(triggerContext) {
 	this.thisTile = triggerContext.tile;
 	this.thisTileInfo = triggerContext.tileInfo;
 	this.thisTilePoint = triggerContext.pointWithTile;
+
+	this.setAction();
 }
+
+Trifle.WhenCapturingTargetTileTriggerBrain.prototype.setAction = function() {
+	this.triggeringAction = {
+		actionType: "Capture",	// TODO clean up!
+		tileId: this.possibleTargetTile && this.possibleTargetTile.tileId
+	};
+};
 
 Trifle.WhenCapturingTargetTileTriggerBrain.prototype.isTriggerMet = function() {
 	this.targetTiles = [];

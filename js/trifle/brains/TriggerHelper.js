@@ -70,7 +70,9 @@ Trifle.TriggerHelper.prototype.targetTileIdentifiersCheck = function() {
 
 Trifle.TriggerHelper.prototype.targetTileNamesCheck = function() {
 	if (this.triggerInfo.targetTileCodes) {
-		return arrayIncludesOneOf(this.triggerInfo.targetTileCodes, [this.possibleTargetTile.code]);
+		return arrayIncludesOneOf(this.triggerInfo.targetTileCodes, [this.possibleTargetTile.code])
+			|| (this.triggerInfo.targetTileCodes.includes(Trifle.TileCategory.allButThisTile)
+				&& this.possibleTargetTile.code !== this.triggerContext.tile.code);
 	} else {
 		return true;
 	}

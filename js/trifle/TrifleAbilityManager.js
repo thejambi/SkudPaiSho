@@ -18,6 +18,7 @@ Trifle.AbilityManager.prototype.setAbilitiesWithPromptTargetsNeeded = function(a
 
 Trifle.AbilityManager.prototype.activateReadyAbilitiesOrPromptForTargets = function() {
 	var activateObj = this.activateReadyAbilities();
+	this.ensurePromptsStillNeeded();
 	if (this.abilitiesWithPromptTargetsNeeded && this.abilitiesWithPromptTargetsNeeded.length > 0) {
 		// return this.promptForNextNeededTargets();
 		var promptOjb = this.promptForNextNeededTargets();
@@ -28,12 +29,34 @@ Trifle.AbilityManager.prototype.activateReadyAbilitiesOrPromptForTargets = funct
 	}
 };
 
+Trifle.AbilityManager.prototype.ensurePromptsStillNeeded = function() {
+	if (this.abilitiesWithPromptTargetsNeeded && this.abilitiesWithPromptTargetsNeeded.length > 0) {
+		var index = 0;
+		var removeThese = [];
+		this.abilitiesWithPromptTargetsNeeded.forEach(ability => {
+			if (this.abilityIsCanceled(ability)) {
+				removeThese.push(index);
+			}
+			index++;
+		});
+		if (removeThese.length > 0) {
+			for (var i = removeThese.length - 1; i >= 0; i--) {
+				var indexToRemove = removeThese[i];
+				var abilityRemoved = this.abilitiesWithPromptTargetsNeeded.splice(indexToRemove, 1)[0];
+				debug("No need to prompt for ability: ");
+				debug(abilityRemoved);
+			}
+		}
+	}
+};
+
 Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	var boardHasChanged = false;
 	var tileRecords = {
 		capturedTiles: [],
 		tilesMovedToPiles: []
 	};
+	var abilitiesActivated = [];
 	var self = this;
 
 	/* Mark all existing abilities as do not preserve */
@@ -51,11 +74,12 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	/* Deactivate abilities. New ability list is the ones that are not deactivated. */
 	var newAbilities = [];
 	this.abilities.forEach(function(existingAbility) {
-		// if (existingAbility.preserve && !self.abilityIsCanceled(existingAbility)) {
-		// 	newAbilities.push(existingAbility);	// Commenting this out... ability activation priority should take care of this now
-		// } else {
+		if (existingAbility.preserve && !self.abilityIsCanceled(existingAbility)) {
+			newAbilities.push(existingAbility);	// Commenting this out... ability activation priority should take care of this now
+												// NOOOOOO We need this!
+		} else {
 			existingAbility.deactivate();
-		// }
+		}
 	});
 	this.abilities = newAbilities;
 
@@ -72,7 +96,7 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 				if (ability.isPriority(currentPriority)) {
 					priorityAbilityFound = true;
 					debug("!!!!Priority " + currentPriority + " Ability!!!! " + ability.getTitle());
-					boardHasChanged = self.doTheActivateThing(ability, tileRecords);
+					boardHasChanged = self.doTheActivateThing(ability, tileRecords, abilitiesActivated);
 					return !boardHasChanged;	// Continue if board has not changed
 				}
 			});
@@ -97,7 +121,7 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 			var readyAbilitiesOfType = self.readyAbilities[abilityName];
 			if (readyAbilitiesOfType && readyAbilitiesOfType.length) {
 				readyAbilitiesOfType.every(ability => {
-					boardHasChanged = self.doTheActivateThing(ability, tileRecords);
+					boardHasChanged = self.doTheActivateThing(ability, tileRecords, abilitiesActivated);
 					return !boardHasChanged;	// Continue if board has not changed
 				});
 			}
@@ -107,7 +131,7 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 		if (!boardHasChanged) {
 			Object.values(this.readyAbilities).every(abilityList => {
 				abilityList.every(ability => {
-					boardHasChanged = self.doTheActivateThing(ability, tileRecords);
+					boardHasChanged = self.doTheActivateThing(ability, tileRecords, abilitiesActivated);
 					return !boardHasChanged;	// Continue if board has not changed
 				});
 				return !boardHasChanged;	// Continue if board has not changed
@@ -116,20 +140,27 @@ Trifle.AbilityManager.prototype.activateReadyAbilities = function() {
 	}
 
 	return {
+		abilitiesActivated: abilitiesActivated,
 		boardHasChanged: boardHasChanged,
 		tileRecords: tileRecords
 	};
 };
 
-Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecords) {
+Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecords, abilitiesActivated) {
 	var capturedTiles = tileRecords.capturedTiles;
 	var tilesMovedToPiles = tileRecords.tilesMovedToPiles;
 
+	var abilitiesTriggeredBySameAction = [];
+
 	var boardHasChanged = false;
 	if (!ability.activated
+			// && ability.triggerStillMet()	// I guess not this
 			&& !this.abilitiesWithPromptTargetsNeeded.includes(ability)) {
 		var abilityIsReadyToActivate = this.addNewAbility(ability);
 		if (abilityIsReadyToActivate) {
+			abilitiesTriggeredBySameAction = this.getReadyAbilitiesWithTriggeringActions(ability.getTriggeringActions());
+
+			abilitiesActivated.push(ability);
 			ability.activateAbility();
 
 			if (ability.abilityActivatedResults
@@ -151,8 +182,40 @@ Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecor
 		if (ability.boardChangedAfterActivation()) {
 			boardHasChanged = true;
 		}
+
+		// Now activate abilities triggered by same event
+		if (abilitiesTriggeredBySameAction && abilitiesTriggeredBySameAction.length > 0) {
+			abilitiesTriggeredBySameAction.forEach(otherAbility => {
+				this.doTheActivateThing(otherAbility, tileRecords, abilitiesActivated);
+			});
+		}
 	}
 	return boardHasChanged;
+};
+
+Trifle.AbilityManager.prototype.getReadyAbilitiesWithTriggeringActions = function(triggeringActions) {
+	var matchingReadyAbilities = [];
+
+	if (triggeringActions && triggeringActions.length > 0) {
+		Object.values(this.readyAbilities).forEach(abilityList => {
+			abilityList.forEach(readyAbility => {
+				if (!readyAbility.activated) {
+					var readyAbilityTriggeringActions = readyAbility.getTriggeringActions();
+					if (readyAbilityTriggeringActions && readyAbilityTriggeringActions.length > 0) {
+						readyAbilityTriggeringActions.forEach(triggeringAction => {
+							triggeringActions.forEach(tAction1 => {
+								if (JSON.stringify(tAction1) == JSON.stringify(triggeringAction)) {
+									matchingReadyAbilities.push(readyAbility);
+								}
+							});
+						});
+					}
+				}
+			});
+		});
+	}
+
+	return matchingReadyAbilities;
 };
 
 /**
@@ -234,12 +297,14 @@ Trifle.AbilityManager.prototype.abilityIsCanceled = function(abilityObject) {
 	affectingCancelAbilities.forEach(function(cancelingAbility) {
 		// Does canceling ability affecting tile cancel this kind of ability?
 		if (cancelingAbility.abilityInfo.targetAbilityTypes.includes(Trifle.AbilityType.all)) {
-			isCanceled = true;	// Dat is for sure
+			isCanceled = true;
 		}
 
 		cancelingAbility.abilityInfo.targetAbilityTypes.forEach(function(canceledAbilityType) {
 			var abilitiesForType = Trifle.AbilitiesForType[canceledAbilityType];
 			if (abilitiesForType && abilitiesForType.length && abilitiesForType.includes(abilityObject.abilityInfo.type)) {
+				isCanceled = true;
+			} else if (abilityObject.abilityInfo.type === canceledAbilityType) {
 				isCanceled = true;
 			}
 		});
@@ -262,12 +327,14 @@ Trifle.AbilityManager.prototype.targetingIsCanceled = function(abilitySourceTile
 			if (cancelingAbility.abilityInfo.targetAbilityTypes) {
 				// Does canceling ability affecting tile cancel this kind of ability?
 				if (cancelingAbility.abilityInfo.targetAbilityTypes.includes(Trifle.AbilityType.all)) {
-					isCanceled = true;	// Dat is for sure
+					isCanceled = true;
 				}
 
 				cancelingAbility.abilityInfo.targetAbilityTypes.forEach(function(canceledAbilityType) {
 					var abilitiesForType = Trifle.AbilitiesForType[canceledAbilityType];
 					if (abilitiesForType && abilitiesForType.length && abilitiesForType.includes(abilityType)) {
+						isCanceled = true;
+					} else if (abilityType === canceledAbilityType) {
 						isCanceled = true;
 					}
 				});

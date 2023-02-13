@@ -1,11 +1,11 @@
 
 function AdevarOptions() {
 	// Adevar options
-	if (dateIsBetween("10/01/2021", "11/04/2021")) {
+	if (dateIsBetween("10/01/2023", "11/04/2023")) {
 		AdevarOptions.enableSpoopyTiles();
 	}
 
-	if (dateIsBetween("12/01/2021", "01/04/2022")) {
+	if (dateIsBetween("12/01/2022", "01/04/2023")) {
 		AdevarOptions.enableChristmasTiles();
 	}
 

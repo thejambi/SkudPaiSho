@@ -72,7 +72,9 @@ Trifle.TargetHelper.prototype.targetTileIdentifiersCheck = function() {
 
 Trifle.TargetHelper.prototype.targetTileNamesCheck = function() {
 	if (this.abilityInfo.targetTileCodes) {
-		return arrayIncludesOneOf(this.abilityInfo.targetTileCodes, [this.possibleTargetTile.code]);
+		return arrayIncludesOneOf(this.abilityInfo.targetTileCodes, [this.possibleTargetTile.code])
+			|| (this.abilityInfo.targetTileCodes.includes(Trifle.TileCategory.allButThisTile)
+				&& this.possibleTargetTile.code !== this.abilityObject.sourceTile.code);
 	} else {
 		return true;
 	}

@@ -43,6 +43,7 @@ var QueryString = function () {
   var tileDesignTypeValues = {
 	  // hlowe: "Modern Tiles v1",
 	  tgggyatso: "The Garden Gate Gyatso Tiles",
+	  gaoling: "TGG Gaoling",
 	  tggproject: "TGG Pai Sho Project",
 	  hlowenew: "Modern Tiles",
 	  vescucci: "Vescucci Tiles",
@@ -79,18 +80,20 @@ var customBoardUrlArrayKey = "customBoardUrlArrayKey";
 var defaultBoardDesignKey = "tgg20211007";
 var paiShoBoardDesignTypeValuesDefault = {
 	tgg20211007: "The Garden Gate",
-	nomadic: "Nomadic",
+	tenzin: "Tenzin",
+	gaoling: "Gaoling",
 	classy: "Classy Vescucci",
+	nomadic: "Nomadic",
 	chuji: "Chu Ji",
 	mayfair: "Mayfair Filter",
 	skudShop: "The Garden Gate Shop",
 	// vescucci: "Vescucci Style",
-	xiangqi: "Xiangqi-Style Tile Colors",
-	// pixelsho: "Pixel-Sho",
+	// xiangqi: "Xiangqi-Style Tile Colors",
+	pixelsho: "Pixel-Sho",
 	remix: "Remix",
 	nomadsky: "Nomad's Sky by Morbius",
 	water: "Water by Monk_Gyatso",
-	watertribe: "Northern Water Tribe",
+	// watertribe: "Northern Water Tribe",
 	// earth: "Earth by BoomerangGuy",
 	fire: "Fire by BoomerangGuy",
 	airnomad: "Air Nomads by Monk_Gyatso",
@@ -217,6 +220,8 @@ var showMoveLogsInChatKey = "showMoveLogsInChat";
 var welcomeTutorialDismissedKey = "welcomeTutorialDismissedKey";
 
 var customBgColorKey = "customBgColorKey";
+
+var markGameInactiveWithoutDialogKey = "markGameInactiveWithoutDialogKey";
 
 var url;
 
@@ -432,13 +437,18 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 		  }
 	  }
   
-	//   resetGlobalChats();	"Global Chats" tab is now "Links"
+	  resetGlobalChats();	//"Global Chats" tab is now "Links"
   
 	  initialVerifyLogin();
   
 	  // Open default help/chat tab
 	  document.getElementById("defaultOpenTab").click();
-  
+
+	  if (dateIsBetween("04/01/2022", "04/02/2022")) {
+		Ads.enableAds(true);
+		GameType.SkudPaiSho.gameOptions.push(DIAGONAL_MOVEMENT, EVERYTHING_CAPTURE);
+	  }
+
 	  if (!debugOn && !QueryString.game && (localStorage.getItem(welcomeTutorialDismissedKey) !== 'true' || !userIsLoggedIn())) {
 		  showWelcomeTutorial();
 	  } else {
@@ -934,7 +944,7 @@ function startWatchingGameRealTime() {
 		}
 	}, REAL_TIME_GAME_WATCH_INTERVAL);
 }
-  
+
 /* Pai Sho Board Switches */
 function setPaiShoBoardOption(newPaiShoBoardKey, isTemporary) {
 	if (!paiShoBoardDesignTypeValues[newPaiShoBoardKey]) {
@@ -949,7 +959,9 @@ function setPaiShoBoardOption(newPaiShoBoardKey, isTemporary) {
 	var newClassName = paiShoBoardKey + "Board";
 	gameContainerDiv.classList.add(newClassName);
 
-	applyBoardOptionToBgSvg();
+	if (gameController.isPaiShoGame) {
+		applyBoardOptionToBgSvg();
+	}
 
 	clearMessage(); // Refresh Help tab text
 }
@@ -1129,10 +1141,18 @@ function playNextMove(withActuate, moveAnimationBeginStep, skipAnimation) {
 		if (gameController.getSkipToIndex) {
 			var newMoveIndex = gameController.getSkipToIndex(currentMoveIndex);
 			for (currentMoveIndex; currentMoveIndex < newMoveIndex; currentMoveIndex++) {
-				gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], false);
+				if (gameController.runMove) {
+					gameController.runMove(gameController.gameNotation.moves[currentMoveIndex], false);
+				} else {
+					gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], false);
+				}
 			}
 		}
-		gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep, skipAnimation);
+		if (gameController.runMove) {
+			gameController.runMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep, skipAnimation);
+		} else {
+			gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep, skipAnimation);
+		}
 		currentMoveIndex++;
 		if (currentMoveIndex >= gameController.gameNotation.moves.length) {
 			isInReplay = false;
@@ -1317,9 +1337,43 @@ var finalizeMove = function (moveAnimationBeginStep, ignoreNoEmail, okToUpdateWi
 
   		linkUrl = url + "?" + linkUrl;
 
-  		linkShortenCallback(linkUrl, ignoreNoEmail, okToUpdateWinInfo);
+		if (gameController.runMove && gameController.isStillRunningMove && gameController.isStillRunningMove()) {
+			debug("Move still running");
+			var checkCount = 0;
+			var checkRunningInterval = setInterval(() => {
+				checkCount++;
+				if (!gameController.isStillRunningMove()) {
+					debug("Move done running");
+					linkShortenCallback(linkUrl, ignoreNoEmail, okToUpdateWinInfo);
+					clearInterval(checkRunningInterval);
+				}
+				if (checkCount > 4) {
+					clearInterval(checkRunningInterval);
+					showModal("Error submitting move", "Error finalizing move. Sorry about that :(");
+				}
+			}, replayIntervalLength / 2);
+		} else {
+  			linkShortenCallback(linkUrl, ignoreNoEmail, okToUpdateWinInfo);
+		}
   	} else {
-  		linkShortenCallback('', ignoreNoEmail, okToUpdateWinInfo);
+		if (gameController.runMove && gameController.isStillRunningMove && gameController.isStillRunningMove()) {
+			debug("Move still running");
+			var checkCount = 0;
+			var checkRunningInterval = setInterval(() => {
+				checkCount++;
+				if (!gameController.isStillRunningMove()) {
+					debug("Move done running");
+					linkShortenCallback('', ignoreNoEmail, okToUpdateWinInfo);
+					clearInterval(checkRunningInterval);
+				}
+				if (checkCount > 4) {
+					clearInterval(checkRunningInterval);
+					showModal("Error submitting move", "Error finalizing move. Sorry about that :(");
+				}
+			}, replayIntervalLength / 2);
+		} else {
+			linkShortenCallback('', ignoreNoEmail, okToUpdateWinInfo);
+		}
   	}
 }
   
@@ -1650,7 +1704,7 @@ function askToJoinPrivateGame(privateGameId, hostUserName, rankedGameInd, gameCl
 		if (rankedGameInd === 'y' || rankedGameInd === 'Y') {
 			message += "<br /><br /><strong> This is a ranked game.</strong>";
 		}
-		if (gameClock) {
+		if (gameClock && GameClock.isEnabled()) {
 			message += "<br /><br /><strong>This game has a game clock (beta): " + gameClock.getLabelText() + "</strong><br /><a href='https://forum.skudpaisho.com/showthread.php?tid=158' target='_blank'>Read about the Game Clock feature.</a>";
 		}
 		message += "<br /><br />";
@@ -2040,7 +2094,13 @@ function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, 
   
 function closeModal() {
 	document.getElementById('myMainModal').style.display = "none";
+
+	if (tutorialInProgress || tutorialOpen) {
+		OnboardingFunctions.showOnLoadAnnouncements();
+	}
+
 	tutorialInProgress = false;
+	tutorialOpen = false;
 }
 
 var confirmMoveToSubmit = null;
@@ -2126,7 +2186,7 @@ function sendVerificationCodeClicked() {
 	// Only continue if email and username pass validation
 	if (emailBeingVerified.includes("@") && emailBeingVerified.includes(".")
 		&& usernameBeingVerified.match(/^([A-Za-z0-9_]){3,25}$/g)) {
-		onlinePlayEngine.userInfoExists(usernameBeingVerified, emailBeingVerified, userInfoExistsCallback);
+		onlinePlayEngine.userInfoExists(usernameBeingVerified, encodeURIComponent(emailBeingVerified), userInfoExistsCallback);
 	} else {
 		showModal("Sign In", "Invalid username or email. Your username cannot be too short or too long, and cannot contain spaces. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
 	}
@@ -2264,7 +2324,8 @@ var GameType = {
 			OPTION_ANCIENT_OASIS_EXPANSION,
 			NO_HARMONY_VISUAL_AIDS,
 			NO_WHEELS,
-			SPECIAL_FLOWERS_BOUNCE
+			SPECIAL_FLOWERS_BOUNCE,
+			NO_ALT_WIN
 		],
 		secretGameOptions: [
 			DIAGONAL_MOVEMENT,
@@ -2308,7 +2369,11 @@ var GameType = {
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
 		gameOptions: [
-			LION_TURTLE_ABILITY_ANYWHERE
+		],
+		secretGameOptions: [
+			LION_TURTLE_ABILITY_ANYWHERE,
+			SWAP_BISON_AND_DRAGON,
+			GINSENG_1_POINT_0
 		]
 	},
 	FirePaiSho: {
@@ -2318,21 +2383,36 @@ var GameType = {
 		color: "var(--firecolor)",
 		description: "Like Skud Pai Sho, but with a twist: tiles are chosen randomly.",
 		coverImg: "rose.png",
-		rulesUrl: "https://drive.google.com/file/d/1C3A5Mx0P8vrpKc-X5QbRHuLt27yoMqBj/view?usp=sharing",
+		rulesUrl: "https://skudpaisho.com/site/games/fire-pai-sho/",
 		gameOptions: [
 			NO_HARMONY_VISUAL_AIDS,
 			OPTION_DOUBLE_ACCENT_TILES,
 			HIDE_RESERVE_TILES,
-			MIDLINE_OPENER,
 			ETHEREAL_ACCENT_TILES
 		],
-		noRankedGames: true	// Can take out when testing done, game ready to enable ranked games
+		secretGameOptions: [
+			ORIGINAL_BENDER_EXPANSION,
+			MIDLINE_OPENER
+		]
+	},
+	KeyPaiSho: {
+		id: 19,
+		name: "Key Pai Sho",
+		desc: "Key Pai Sho",
+		color: "var(--keypaishocolor)",
+		description: "Built to replicate the Pai Sho board states seen in ATLA Book 1.",
+		coverImg: "lotus.png",
+		rulesUrl: "https://skudpaisho.com/site/games/key-pai-sho/",
+		gameOptions: [
+			NO_EFFECT_TILES
+		]
 	},
 	SolitairePaiSho: {
 		id: 4,
 		name: "Nature's Grove: Respite",
 		desc: "Respite - Solitaire Pai Sho",
-		color: "var(--solitairecolor)",
+		// color: "var(--solitairecolor)",
+		color: "var(--othercolor)",
 		description: "Arrange random flowers into position to achieve the highest score possible.",
 		coverImg: "rose.png",
 		rulesUrl: "https://skudpaisho.com/site/games/solitaire-pai-sho/",
@@ -2467,6 +2547,20 @@ var GameType = {
 			BOTTOMLESS_RESERVES
 		],
 		noRankedGames: true
+	},
+	BeyondTheMaps: {
+		id: 20,
+		name: "Beyond The Edges of The Maps",
+		desc: "Beyond The Edges of The Maps",
+		// color: "var(--edgescolor)",
+		color: "var(--othercolor)",
+		description: "Explore the land beyond the maps.",
+		coverImg: "boat.png",
+		rulesUrl: "https://skudpaisho.com/site/games/beyond-the-edges-of-the-maps/",
+		gameOptions: [
+			EDGES_12x12_GAME,
+			EDGES_MOVE_4_2
+		]
 	},
 	Blooms: {
 		id: 9,
@@ -2605,6 +2699,12 @@ function getGameControllerForGameType(gameTypeId) {
 		case GameType.Ginseng.id:
 			controller = new Ginseng.Controller(gameContainerDiv, isMobile);
 			break;
+		case GameType.KeyPaiSho.id:
+			controller = new KeyPaiSho.Controller(gameContainerDiv, isMobile);
+			break;
+		case GameType.BeyondTheMaps.id:
+			controller = new BeyondTheMaps.Controller(gameContainerDiv, isMobile);
+			break;
 		default:
 			debug("Game Controller unavailable.");
 	}
@@ -2618,6 +2718,13 @@ function showDefaultGameOpenedMessage(show) {
 	} else {
 		document.getElementById('defaultGameMessage').classList.add('gone');
 	}
+}
+
+function setGameTitleText(gameTitle) {
+	var gameTitleElements = document.getElementsByClassName('game-title-text');
+	for (i = 0; i < gameTitleElements.length; i++) {
+		gameTitleElements[i].innerText = gameTitle;
+	};
 }
 
 function setGameController(gameTypeId, keepGameOptions) {
@@ -2648,19 +2755,18 @@ function setGameController(gameTypeId, keepGameOptions) {
 		showModal("Cannot Load Game", "This game is unavailable. Try Vagabond Pai Sho instead :)<br /><br />To know why the selected game is unavailable, ask in The Garden Gate Discord. Perhaps you have selected a new game that is coming soon!");
 		successResult = false;
 	}
+
+	setGameTitleText(getGameTypeEntryFromId(gameTypeId).desc);
+	
 	if (gameController.completeSetup) {
 		gameController.completeSetup();
 	}
+
 	if (gameController.supportsMoveLogMessages) {
 		document.getElementById("toggleMoveLogDisplayDiv").classList.remove("gone");
 	} else {
 		document.getElementById("toggleMoveLogDisplayDiv").classList.add("gone");
 	}
-
-	var gameTitleElements = document.getElementsByClassName('game-title-text');
-	for (i = 0; i < gameTitleElements.length; i++) {
-		gameTitleElements[i].innerText = getGameTypeEntryFromId(gameTypeId).desc;
-	};
 
 	isInReplay = false;
 
@@ -3361,7 +3467,7 @@ var yesCreateGame = function yesCreateGame(gameTypeId, rankedGame) {
 	onlinePlayEngine.createGame(gameTypeId, encodeURIComponent(gameController.gameNotation.notationTextForUrl()), JSON.stringify(ggOptions), '', getLoginToken(), createGameCallback,
 		rankedInd, gameClockJson);
 };
-  
+
 var yesCreatePrivateGame = function yesCreatePrivateGame(gameTypeId, rankedGame) {
 	var rankedInd = 'n';
 	if (rankedGame && !getGameTypeEntryFromId(gameTypeId).noRankedGames) {
@@ -3398,7 +3504,7 @@ var getCurrentGameSeeksHostedByUserCallback = function getCurrentGameSeeksHosted
 				}
 				// var checkedValue = getBooleanPreference(createNonRankedGamePreferredKey) ? "" : "checked='true'";
 				var checkedValue = false;
-				message += "<br /><div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - coming soon - publicly viewable game)</label></div>";
+				message += "<br /><div><input id='createRankedGameCheckbox' type='checkbox' onclick='toggleBooleanPreference(createNonRankedGamePreferredKey);' " + checkedValue + "'><label for='createRankedGameCheckbox'> Ranked game (Player rankings will be affected and - in the future - publicly viewable game)</label></div>";
 			}
 
 			if (GameClock.userHasGameClockAccess()) {
@@ -3538,13 +3644,14 @@ var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(resul
 function resetGlobalChats() {
 	// Clear all global chats..
 	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>.<hr />";
+	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Welcome! Discord is the best way to chat and get help, but feel free to say hello here in the global chat.<hr />";
 }
 
 function fetchInitialGlobalChats() {
-	//   resetGlobalChats();
+	  resetGlobalChats();
 
 	// Fetch global chats..
-	//   onlinePlayEngine.getInitialGlobalChatMessages(getInitialGlobalChatsCallback);
+	  onlinePlayEngine.getInitialGlobalChatMessages(getInitialGlobalChatsCallback);
 }
 
 // var callLogOnlineStatusPulse = function callLogOnlineStatusPulse() {
@@ -3558,14 +3665,14 @@ function fetchInitialGlobalChats() {
 function logOnlineStatusPulse() {
 	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 	verifyLogin();
-	// fetchGlobalChats();
+	fetchGlobalChats();
 }
 
 var LOG_ONLINE_STATUS_INTERVAL = 5000;
 function startLoggingOnlineStatus() {
 	onlinePlayEngine.logOnlineStatus(getLoginToken(), emptyCallback);
 
-	// fetchInitialGlobalChats();
+	fetchInitialGlobalChats();
 
 	clearLogOnlineStatusInterval();
 
@@ -3593,13 +3700,9 @@ function setSidenavNewGameSection() {
 	document.getElementById("sidenavNewGameSection").innerHTML = message;
 }
 
-function randomIntFromInterval(min, max) {
-	return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
 function closeGame() {
 	if (gameDevOn) {
-		setGameController(GameType.Ginseng.id);
+		setGameController(GameType.Trifle.id);
 		return;
 	}
 	var defaultGameTypeIds = [
@@ -3679,7 +3782,7 @@ function startWatchingNumberOfGamesWhereUserTurn() {
 		}
 	}, USER_TURN_GAME_WATCH_INTERVAL);
 }
-  
+
 var sendChatCallback = function sendChatCallback(result) {
 	document.getElementById('sendChatMessageButton').innerHTML = "Send";
 	var chatMsg = document.getElementById('chatMessageInput').value;
@@ -3689,7 +3792,7 @@ var sendChatCallback = function sendChatCallback(result) {
 		document.getElementById('chatMessageInput').value = "---Message blocked by filter--- " + chatMsg;
 	}
 };
-  
+
 var sendChat = function(chatMessageIfDifferentFromInput) {
 	var chatMessage = htmlEscape(document.getElementById('chatMessageInput').value).trim();
 	if (chatMessageIfDifferentFromInput) {
@@ -3697,14 +3800,36 @@ var sendChat = function(chatMessageIfDifferentFromInput) {
 	}
 	chatMessage = chatMessage.replace(/\n/g, ' ');	// Convert newlines to spaces.
 	if (chatMessage) {
-		document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
-		onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, sendChatCallback);
+		var chatCommandsProcessed = processChatCommands(chatMessage);
+		if (!chatCommandsProcessed) {
+			document.getElementById('sendChatMessageButton').innerHTML = "<i class='fa fa-circle-o-notch fa-spin fa-fw'>";
+			if (playingOnlineGame()) {
+				onlinePlayEngine.sendChat(gameId, getLoginToken(), chatMessage, sendChatCallback);
+			} else {
+				getNewChatMessagesCallback('na||| |||' + chatMessage);
+				sendChatCallback();
+			}
+		} else {
+			sendChatCallback();
+		}
 	}
 
-	processChatCommands(chatMessage);
+	processChatEasterEggCommands(chatMessage);
 }
 
 var processChatCommands = function(chatMessage) {
+	if (chatMessage.toLowerCase().includes('/d6 2')) {
+		document.getElementById("rollD6LinkAboveChat").classList.remove('gone');
+		sendChat((getUsername() !== null ? getUsername() : "Player") 
+			+ " rolled: " + randomIntFromInterval(1,6).toString()
+			+ " & " + randomIntFromInterval(1,6).toString());
+		return true;
+	}
+
+	return false;
+};
+
+var processChatEasterEggCommands = function(chatMessage) {
 	/* Secret easter eggs... */
 	if (chatMessage.toLowerCase().includes('spoopy')) {
 		new AdevarOptions();
@@ -3719,6 +3844,10 @@ var processChatCommands = function(chatMessage) {
 		paiShoBoardDesignTypeValuesDefault['halloween2021'] = 'Halloween';
 		buildBoardDesignsValues();
 		clearMessage();
+	}
+
+	if (chatMessage.toLowerCase().includes("april fools")) {	// April Fools!
+		Ads.enableAds(true);
 	}
 };
 
@@ -3758,12 +3887,12 @@ var sendGlobalChat = function() {
 	}
 }
 
-/* document.getElementById('globalChatMessageInput').onkeypress = function(e){
+document.getElementById('globalChatMessageInput').onkeypress = function(e){
 	 var code = (e.keyCode ? e.keyCode : e.which);
 	  if(code == 13) {
 		sendGlobalChat();
 	  }
-}; */
+};
 
 function htmlEscape(str) {
 	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
@@ -3820,10 +3949,11 @@ function showGameReplayLink() {
 	linkUrl = sandboxUrl + "?" + linkUrl;
 
 	debug("GameReplayLinkUrl: " + linkUrl);
-	var message = "Here is the <a id='gameReplayLink' href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.";
+	var message = "Here is the <a id='gameReplayLink' href=\"" + linkUrl + "\" target='_blank'>game replay link</a> to the current point in the game.<button id='copyGameLinkButton' disabled class='button gone'>Copy Link</button> <br /><br />";
 	if (playingOnlineGame()) {
+		var spectateUrl = buildSpectateUrl();
 		message += "<br /><br />";
-		message += "Here is the <a href=\"" + buildSpectateUrl() + "\" target='_blank'>spectate link</a> others can use to watch the game live and participate in the Game Chat.";
+		message += "Here is the <a href=\"" + spectateUrl + "\" target='_blank'>spectate link</a> others can use to watch the game live and participate in the Game Chat. <button onclick='copyTextToClipboard(\""+spectateUrl+"\", this);' class='button'>Copy Link</button> <br /><br />";
 	}
 	showModal("Game Links", message);
 
@@ -3831,6 +3961,14 @@ function showGameReplayLink() {
 		var linkTag = document.getElementById('gameReplayLink');
 		if (linkTag) {
 			linkTag.setAttribute("href", shortUrl);
+		}
+		var copyLinkButton = document.getElementById('copyGameLinkButton');
+		if (copyLinkButton) {
+			copyLinkButton.disabled = false;
+			copyLinkButton.classList.remove('gone');
+			copyLinkButton.onclick = function () {
+				copyTextToClipboard(shortUrl, copyLinkButton);
+			};
 		}
 	});
 }
@@ -3954,6 +4092,35 @@ function quitOnlineGameClicked() {
 	showModal("Quit Current Online Game", message);
 }
 
+function doNotShowMarkInactiveDialogAgain() {
+	localStorage.setItem(markGameInactiveWithoutDialogKey, 'true');
+}
+
+function markGameInactiveClicked() {
+	// Do they want to have it take immediate action? Or do they want the dialog to show?
+	var message = "";
+	if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame()
+		&& !getGameWinner()
+		&& (currentGameData.hostUsername === currentGameData.guestUsername
+			|| (!myTurn() && onlineGameIsOldEnoughToBeQuit()))
+	) {
+		if (localStorage.getItem(markGameInactiveWithoutDialogKey) === 'true') {
+			quitInactiveOnlineGame();
+		} else {
+			message = "<div>Are you sure you want mark this game inactive? The game will appear as Inactive in your Completed Games list, but will become active again when your opponent plays.</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal(); quitInactiveOnlineGame();'>Yes - mark current game inactive</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal(); doNotShowMarkInactiveDialogAgain(); quitInactiveOnlineGame();'>Yes - mark current game inactive and don't show this again</div>";
+			message += "<br /><div class='clickableText' onclick='closeModal();'>No - cancel</div>";
+		}
+	} else {
+		message = "When playing an unfinished inactive online game, this is where you can mark the game inactive to hide it from your My Games list.";
+	}
+
+	if (message.length > 0) {
+		showModal("Mark Current Game Inactive", message);
+	}
+}
+
 function resignOnlineGame() {
 	if (playingOnlineGame()
 		&& iAmPlayerInCurrentOnlineGame()
@@ -4002,13 +4169,18 @@ function buildDateFromTimestamp(timestampStr) {
 
 function showWelcomeScreensClicked() {
 	OnboardingFunctions.resetOnBoarding();
+
+	localStorage.setItem(markGameInactiveWithoutDialogKey, 'false');
+	
 	showWelcomeTutorial();
 }
   
 var tutorialInProgress = false;
+var tutorialOpen = false;
 
 function showWelcomeTutorial() {
 	tutorialInProgress = true;
+	tutorialOpen = true;
 	showModal("The Garden Gate", "<div id='tutorialContent'></div>");
 	setTimeout(function() { runTutorial(); }, 400);
 }
@@ -4113,6 +4285,10 @@ function openShop() {
 	openLink("https://skudpaisho.com/site/buying-pai-sho/");
 }
 
+function discordLinkClicked() {
+	openLink("https://discord.gg/thegardengate");
+}
+
 /* Options */
 var ggOptions = [];
 
@@ -4130,8 +4306,15 @@ function addOptionFromInput() {
 }
 
 function promptAddOption() {
+	// Ads.enableAds(true);
+	if (Ads.Options.showAds) {
+		Ads.showRandomPopupAd();
+	}
+
 	var message = "";
 	if (usernameIsOneOf(['SkudPaiSho'])) {
+		Ads.enableAds(true);
+
 		message = "<br /><input type='text' id='optionAddInput' name='optionAddInput' />";
 		message += "<br /><div class='clickableText' onclick='addOptionFromInput()'>Add</div>";
 
@@ -4145,15 +4328,21 @@ function promptAddOption() {
 			message += "<br /><div class='clickableText' onclick='clearOptions()'>Clear Options</div>";
 		}
 
+		message += "<br /><div class='clickableText' onclick='Ads.showRandomPopupAd()'>Show Ad</div>";
+
 		showModal("Secrets", message);
 	} else if (usernameIsOneOf(['SkudPaiSho','Adevar'])) {
-		message = "Enter list of names:";
-		message += "<br /><textarea rows = '11' cols = '40' name = 'description' id='giveawayNamesTextbox'></textarea>";
-		message += "<br /><div class='clickableText' onclick='Giveaway.doIt()'>Choose name</div>";
-		message += "<br /><div id='giveawayResults'>:)</div>";
-
-		showModal("Giveaway Winner Chooser!", message);
+		showGiveawayDrawingModal();
 	}
+}
+
+function showGiveawayDrawingModal() {
+	message = "Enter list of names:";
+	message += "<br /><textarea rows = '11' cols = '40' name = 'description' id='giveawayNamesTextbox'></textarea>";
+	message += "<br /><div class='clickableText' onclick='Giveaway.doIt()'>Choose name</div>";
+	message += "<br /><div id='giveawayResults'>:)</div>";
+
+	showModal("Giveaway Winner Chooser!", message);
 }
   
   function addGameOption(option) {
@@ -4208,6 +4397,7 @@ function promptAddOption() {
   }
   
   var showTournamentsCallback = function showTournamentsCallback(results) {
+	var dialogHeading = "Tournaments and Events";
 	  var message = "No current tournaments.";
 	  if (results) {
 		  message = "";
@@ -4223,7 +4413,7 @@ function promptAddOption() {
 		  } catch (error) {
 			  debug("Error parsing tournament data");
 			  closeModal();
-			  showModal("Tournaments", "Error getting tournament data.");
+			  showModal(dialogHeading, "Error getting tournament data.");
 		  }
   
 		  debug(tourneyList);
@@ -4267,12 +4457,12 @@ function promptAddOption() {
   
 	  }
   
-	  showModal("Tournaments", message);
+	  showModal(dialogHeading, message);
   };
   
   function viewTournamentsClicked() {
 	  // showModal("Tournaments", "Tournaments are coming soon! Join the Discord and Forums to get involved!");
-	  showModal("Tournaments", getLoadingModalText());
+	  showModal("Tournaments and Events", getLoadingModalText());
 	  onlinePlayEngine.getCurrentTournaments(getLoginToken(), showTournamentsCallback);
   }
   
@@ -4306,7 +4496,7 @@ function promptAddOption() {
   
 		  modalTitle = tournamentInfo.name;
   
-		  message += "<div class='modalContentHeading'>" + tournamentInfo.status + " Tournament" + "</div>";
+		  message += "<div class='modalContentHeading'>Event status: " + tournamentInfo.status + "</div>";
   
 		  if (tournamentInfo.details) {
 			  message += "<br />";
@@ -4490,6 +4680,7 @@ function promptAddOption() {
 	  var hostUsername = manageTournamentActionData.newMatchData.hostUsername;
 	  var guestUsername = manageTournamentActionData.newMatchData.guestUsername;
 	  var options = JSON.stringify(ggOptions);
+	  var isRanked = currentGameData.isRankedGame;
   
 	  onlinePlayEngine.createTournamentRoundMatch(
 		  getLoginToken(),
@@ -4498,6 +4689,7 @@ function promptAddOption() {
 		  hostUsername,
 		  guestUsername,
 		  options,
+		  isRanked,
 		  goToManageTournamentCallback
 	  );
   }
@@ -4621,6 +4813,7 @@ function promptAddOption() {
 		  var currentGameTypeEntry = getGameTypeEntryFromId(currentGameData.gameTypeId);
 		  message += "<br /><em>Game:</em> " + htmlEscape(currentGameTypeEntry.desc);
 		  message += "<br /><em>Options:</em> " + JSON.stringify(ggOptions);
+		  message += "<br /><em>Is Ranked?:</em> " + currentGameData.isRankedGame === 'Y' ? "Yes" : "No";
 		  message += "<div class='clickableText' onclick='createNewTournamentMatch();'>Create Match</div>";
   
 		  message += "<br /><br />";
@@ -4720,13 +4913,13 @@ function setWebsiteTheme(theme) {
 		// Remove | Dividers
 		var x = document.getElementsByClassName("headerRight");
 		for(var i = 0; i < x.length; i ++) {
-			if (x[i].innerHTML == "&nbsp;|&nbsp;") {
-				x[i].remove();
+			if (x[i].innerHTML.includes("|")) {
+				x[i].classList.add("gone");
 			}
 			if (x[i].innerText == "") {
-				x[i].innerHTML = '<i class="fa fa-shopping-cart" aria-hidden="true"></i> Shop';
+				// x[i].innerHTML = '<i class="fa fa-shopping-cart" aria-hidden="true"></i> Shop';
 				if (window.mobileAndTabletcheck()) {
-					x[i].remove();
+					x[i].classList.add("gone")
 				}
 		  	}
 		}
@@ -4997,6 +5190,13 @@ function showPreferences() {
 	
 	var animationsOnCheckedValue = isAnimationsOn() ? "checked='true'" : "";
 	message += "<div><input id='animationsOnCheckBox' type='checkbox' onclick='toggleAnimationsOn();' " + animationsOnCheckedValue + "'><label for='animationsOnCheckBox'> Move animations enabled?</label></div>";
+
+	var gameClockOnCheckedValue = GameClock.isEnabled() ? "checked='true'" : "";
+	message += "<div><input id='gameClockOnCheckBox' type='checkbox' onclick='GameClock.toggleEnabled();' " + gameClockOnCheckedValue + "'><label for='gameClockOnCheckBox'> (Beta) Game Clock enabled?</label></div>";
+
+	if (Ads.Options.showAds) {
+		message += "<br /><div class='clickableText' onclick='Ads.minimalAdsEnabled()'>Minimal sponsored messages</div>";
+	}
 
 	showModal("Device Preferences", message);
 }
