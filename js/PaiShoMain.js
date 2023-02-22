@@ -267,6 +267,7 @@ var interval = 0;
 
 var emailBeingVerified = "";
 var usernameBeingVerified = "";
+var passwordBeingVerified = "";
 var codeToVerify = 0;
 var tempUserId;
 var myGamesList = [];
@@ -1083,6 +1084,11 @@ function showSignOutModal() {
 	message += "<br /><div class='clickableText' onclick='signOut(false);'>Cancel</div>";
 
 	showModal("Really sign out?", message);
+}
+
+function showChangePasswordModal() {
+	var msg = document.getElementById('changePasswordModalContentContainer').innerHTML;
+	showModal("Update Password", msg);
 }
 
 function signOut(reallySignOut) {
@@ -2179,17 +2185,60 @@ var userInfoExistsCallback = function userInfoExistsCallback(data) {
 	}
 }
 
+var validateSignInCallback = function validateSignInCallback(data) {
+	signInResults = JSON.parse(data);
+
+	if (signInResults.loginResult === "Success") {
+		tempUserId = signInResults.userId;
+		usernameBeingVerified = signInResults.userUsername;
+		emailBeingVerified = signInResults.userEmail;
+
+		createUserCallback(tempUserId);
+	} else {
+		showModal("Sign In", "Sign in failed with provided account info. Please try again.");
+	}
+};
+
+function submitSignInClicked() {
+	var usernameOrEmail = document.getElementById("usernameInput").value.trim();
+	var userPassword = document.getElementById("userPasswordInput").value.trim();
+
+	if ((usernameIsValid(usernameOrEmail) || emailIsValid(usernameOrEmail)) 
+			&& passwordIsValid(userPassword, userPassword)) {
+		onlinePlayEngine.validateSignIn(usernameOrEmail, userPassword, validateSignInCallback);
+	} else {
+		showModal("Sign In", "Invalid username or password. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
+	}
+}
+
 function sendVerificationCodeClicked() {
 	emailBeingVerified = document.getElementById("userEmailInput").value.trim().toLowerCase();
 	usernameBeingVerified = document.getElementById("usernameInput").value.trim();
+	passwordBeingVerified = document.getElementById("userPasswordInput").value.trim();
+	var passwordCheck = document.getElementById("userPasswordCheckInput").value.trim();
 
 	// Only continue if email and username pass validation
-	if (emailBeingVerified.includes("@") && emailBeingVerified.includes(".")
-		&& usernameBeingVerified.match(/^([A-Za-z0-9_]){3,25}$/g)) {
+	if (emailIsValid(emailBeingVerified)
+		&& (passwordIsValid(passwordBeingVerified, passwordCheck) || passwordBeingVerified === '')
+		&& usernameIsValid(usernameBeingVerified)) {
 		onlinePlayEngine.userInfoExists(usernameBeingVerified, encodeURIComponent(emailBeingVerified), userInfoExistsCallback);
 	} else {
-		showModal("Sign In", "Invalid username or email. Your username cannot be too short or too long, and cannot contain spaces. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
+		showModal("Sign Up", "Invalid username, email, or password. Your username cannot be too short or too long, and cannot contain spaces. Your password must be at least 8 characters and can contain commonm special characters. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
+		passwordBeingVerified = "";
 	}
+}
+
+function usernameIsValid(usernameBeingVerified) {
+	return usernameBeingVerified.match(/^([A-Za-z0-9_]){3,25}$/g);
+}
+
+function passwordIsValid(passwordBeingVerified, passwordCheck) {
+	return passwordBeingVerified === passwordCheck
+		&& passwordBeingVerified.match(/^([A-Za-z0-9!@#$%^&*()_]){8,64}$/g);
+}
+
+function emailIsValid(emailBeingVerified) {
+	return emailBeingVerified.includes("@") && emailBeingVerified.includes(".");
 }
 
 function verifyCodeClicked() {
@@ -2231,13 +2280,36 @@ var createDeviceIdCallback = function createDeviceIdCallback(generatedDeviceId) 
 
 	initialVerifyLogin();
 
-	showModal("<i class='fa fa-check' aria-hidden='true'></i> Email Verified", "Hi, " + getUsername() + "! Your email has been successfully verified and you are now signed in.");
+	showModal("<i class='fa fa-check' aria-hidden='true'></i> Successfully Signed In", "Hi, " + getUsername() + "! You are now signed in. The Garden Gate will remember you next time you come, unless you <strong>sign out</strong> from the bottom of the My Games list.");
 }
 
 var createUserCallback = function createUserCallback(generatedUserId) {
 	tempUserId = generatedUserId;
-
 	onlinePlayEngine.createDeviceIdForUser(tempUserId, createDeviceIdCallback);
+}
+
+var updatePasswordCallback = function updatePasswordCallback(data) {
+	var msg = "";
+	if (data === 'Success') {
+		msg = "Password successfully updated.";
+	} else {
+		msg = "Password update failed.";
+	}
+
+	showModal("Update Password", msg);
+};
+
+function updatePasswordClicked() {
+	if (userIsLoggedIn()) {
+		var existingPassword = document.getElementById("userExistingPasswordInput").value.trim();
+		var newPassword = document.getElementById("userPasswordInput").value.trim();
+		var passwordCheck = document.getElementById("userPasswordCheckInput").value.trim();
+		if (passwordIsValid(newPassword, passwordCheck)) {
+			onlinePlayEngine.updateUserPassword(getUserId(), existingPassword, newPassword, updatePasswordCallback);
+		} else {
+			updatePasswordCallback("fail");
+		}
+	}
 }
   
 // TODO actualCode should be result...
@@ -2246,7 +2318,8 @@ var verifyCodeCallback = function verifyCodeCallback(actualCode) {
 		if (tempUserId && tempUserId > 0) {
 			createUserCallback(tempUserId);
 		} else {
-			onlinePlayEngine.createUser(usernameBeingVerified, emailBeingVerified, createUserCallback);
+			onlinePlayEngine.createUser(usernameBeingVerified, emailBeingVerified, passwordBeingVerified, createUserCallback);
+			passwordBeingVerified = "";
 		}
 	} else {
 		closeModal();
@@ -3122,7 +3195,9 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 	message += "<br /><div><span class='skipBonus' onclick='viewGameRankingsClicked();'><i class='fa fa-tachometer' aria-hidden='true'></i> Game Rankings</span></div>";
 	message += "<br /><div><span class='skipBonus' onclick='showPreferences();'>Device Preferences</span></div><br />";
 
-	message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
+	message += "<br /><br /><div>You are currently signed in as " + getUsername() + ".</div>";
+	message += "<div><span class='skipBonus' onclick='showChangePasswordModal();'>Click here to update your password.</span></div>";
+	message += "<div><span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
 	// message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
 	showModal("Active Games", message);
 };
@@ -3187,6 +3262,16 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 	  }
   
 	  showModal("Sign In", msg);
+  }
+
+  function signUpClicked() {
+	var msg = document.getElementById('signUpModalContentContainer').innerHTML;
+  
+	  if (userIsLoggedIn()) {
+		  msg = "<div><br /><br />You are currently signed in as " + getUsername() + "</div>";
+	  }
+  
+	  showModal("Sign Up", msg);
   }
   
   var completeJoinGameSeekCallback = function completeJoinGameSeekCallback(gameJoined) {
