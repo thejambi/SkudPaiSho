@@ -7,7 +7,8 @@ var OnBoardingKeys = {
 	joinDiscord20211028Dismissed: "joinDiscord20211028Dismissed",
 	gameCrafter202210Dissmissed: "gameCrafter202210Dismissed",
 	ginseng2_0Dismissed: "ginseng2_0Dismissed",
-	gameCrafterGiveaway202211Dismissed: "gameCrafterGiveaway202211Dismissed"
+	gameCrafterGiveaway202211Dismissed: "gameCrafterGiveaway202211Dismissed",
+	passwordAnnouncementDismissed: "passwordAnnouncementDismissed"
 };
 
 function OnboardingFunctions() {
@@ -30,6 +31,10 @@ OnboardingFunctions.showOnLoadAnnouncements = function() {
 	// Most priority last:
 	if (dateIsBetween("10/24/2022", "11/21/2022")) {
 		OnboardingFunctions.showTheGameCrafterSet202210Announcement();
+	}
+
+	if (dateIsBetween("02/22/2023", "06/01/2023")) {
+		OnboardingFunctions.showPasswordAnnouncement();
 	}
 };
 
@@ -171,6 +176,25 @@ OnboardingFunctions.showGinseng2_0Announcement = function() {
 			"Ginseng Pai Sho is now Ginseng 2.0! Check out the changes to the rules in the Help tab of a new Ginseng game - remember to hover over the tiles to see their descriptions."
 			+ "<br /><br /><a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a> to join The Garden Gate community and learn more about all things Pai Sho!"
 			+ "<br /><br /><div align='center'><img src='images/Ginseng/gaoling/GG.png' width='30%' style='max-width:450px'></div>",
+			false,
+			yesNoOptions);
+	}
+};
+
+OnboardingFunctions.showPasswordAnnouncement = function() {
+	if (localStorage.getItem(OnBoardingKeys.passwordAnnouncementDismissed) !== "true") {
+		var yesNoOptions = {};
+		yesNoOptions.yesText = "OK - Don't show again";
+		yesNoOptions.yesFunction = function() {
+			localStorage.setItem(OnBoardingKeys.passwordAnnouncementDismissed, "true");
+			OnboardingFunctions.closeCurrentAnnouncement();
+		};
+	yesNoOptions.noText = "Close";
+		showModal(
+			"Password support on The Garden Gate",
+			"The Garden Gate now supports password login in addition to the email verification login system. "
+			+ "<br /><br />Existing users without a password can set a password from the option in your My Games list. "
+			+ "<br /><br /><a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a> to get help or report any issues you encounter with these changes. ",
 			false,
 			yesNoOptions);
 	}

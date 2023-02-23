@@ -2234,7 +2234,7 @@ function usernameIsValid(usernameBeingVerified) {
 
 function passwordIsValid(passwordBeingVerified, passwordCheck) {
 	return passwordBeingVerified === passwordCheck
-		&& passwordBeingVerified.match(/^([A-Za-z0-9!@#$%^&*()_]){8,64}$/g);
+		&& passwordBeingVerified.match(/^([A-Za-z0-9!@#$%^&*()_\-+={}:;<,>.?]){8,64}$/g);
 }
 
 function emailIsValid(emailBeingVerified) {
