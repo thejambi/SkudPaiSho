@@ -2252,6 +2252,23 @@ function verifyCodeClicked() {
 	}
 }
 
+function forgetPasswordClicked() {
+	if (userIsLoggedIn()) {
+		var yesNoOptions = {};
+		yesNoOptions.yesText = "Yes - Remove my password";
+		yesNoOptions.yesFunction = function() {
+			onlinePlayEngine.removeUserPassword();
+		};
+		yesNoOptions.noText = "Close";
+		showModal(
+			"Remove password?",
+			"Really remove ",
+			false,
+			yesNoOptions
+		);
+	}
+}
+
 var createDeviceIdCallback = function createDeviceIdCallback(generatedDeviceId) {
 	closeModal();
 
@@ -2446,6 +2463,7 @@ var GameType = {
 		secretGameOptions: [
 			LION_TURTLE_ABILITY_ANYWHERE,
 			SWAP_BISON_AND_DRAGON,
+			SWAP_BISON_AND_DRAGON_ABILITIES,
 			GINSENG_1_POINT_0
 		]
 	},

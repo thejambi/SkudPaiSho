@@ -179,7 +179,10 @@ var ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE = "OrigBenderAbilitiesTa
 gameOptionDescriptions[ORIGINAL_BENDER_ABILITIES_TARGET_TOUCHING_RED_WHITE] = "Original Bender Abilities only affect tiles touching Central Gardens";
 
 var SWAP_BISON_AND_DRAGON = "SwapBisonDragon";
-gameOptionDescriptions[SWAP_BISON_AND_DRAGON] = "Swap Bison and Dragon";
+gameOptionDescriptions[SWAP_BISON_AND_DRAGON] = "Swap Bison and Dragon Position";
+
+var SWAP_BISON_AND_DRAGON_ABILITIES = "SwapBisonDragonAbilities";
+gameOptionDescriptions[SWAP_BISON_AND_DRAGON_ABILITIES] = "Swap Bison and Dragon Abilities";
 
 var DRAGON_CANCELS_ABILITIES = "DragonCancelsAbilities";
 gameOptionDescriptions[DRAGON_CANCELS_ABILITIES] = "Dragon Cancels Abilities";
