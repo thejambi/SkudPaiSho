@@ -445,7 +445,7 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 	  // Open default help/chat tab
 	  document.getElementById("defaultOpenTab").click();
 
-	  if (dateIsBetween("04/01/2022", "04/02/2022")) {
+	  if (dateIsBetween("04/01/2023", "04/02/2023")) {
 		Ads.enableAds(true);
 		GameType.SkudPaiSho.gameOptions.push(DIAGONAL_MOVEMENT, EVERYTHING_CAPTURE);
 	  }
