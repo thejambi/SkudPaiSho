@@ -5,12 +5,10 @@ function Ginseng() {}
 Ginseng.Constants = {
 	preferencesKey: "GinsengPreferencesKey"
 };
-Ginseng.Preferences = {
-	customTilesUrl: ""
-};
 
 Ginseng.Controller = function(gameContainer, isMobile) {
 	new Ginseng.Options();	// Initialize
+	Ginseng.Controller.loadPreferences();
 	this.gameContainer = gameContainer;
 	this.isMobile = isMobile;
 	this.createActuator();
@@ -33,6 +31,21 @@ Ginseng.Controller = function(gameContainer, isMobile) {
 		this.isInviteOnly = true;
 	}
 }
+
+Ginseng.Controller.loadPreferences = function() {
+	const preferences = localStorage.getItem(Ginseng.Constants.preferencesKey);
+	if (preferences && preferences.length > 0) {
+		try {
+			Ginseng.Preferences = JSON.parse(preferences);
+			return
+		} catch(error) {
+			debug("Error loading Ginseng preferences");
+		}
+	}
+	Ginseng.Preferences = {
+		customTilesUrl: ""
+	};
+};
 
 Ginseng.Controller.prototype.createActuator = function() {
 	this.actuator = new Ginseng.Actuator(this.gameContainer, this.isMobile, isAnimationsOn());
