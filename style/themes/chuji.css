@@ -52,7 +52,9 @@ body {
     color: var(--secondary-text);
 }
 #mainWrapper {
-    margin: 60px auto 0 auto;
+    margin: 0 auto;
+    padding-top: 60px;
+    min-height: calc(100vh - 60px);
 }
 .footer {
 	padding-top: 0.8em;
@@ -95,7 +97,7 @@ div.tab button.active {
     border-radius: 7.5px;
 }
 ::-webkit-scrollbar-track {
-    background: var(--primary-text);
+    background: var(--secondary-text);
     border-radius: 7.5px;
 }
 ::-webkit-scrollbar-thumb {
@@ -229,6 +231,9 @@ div.tab button.active {
     top:4px;
     right:15px;
 }
+.myMainModalClose:hover {
+    color: var(--highlight);
+}
 .sidenav {
     background-color: var(--tertiary);
     color:var(--primary-text);
@@ -236,11 +241,15 @@ div.tab button.active {
 .sidenavSection {
     padding:10px;
     border-radius: 12px;
+    margin-bottom: 10px;
 }
 .sidenav .sidenavEntry {color: var(--secondary-text);}
 .sidenavLink {color: var(--secondary-text);}
 .sidenavLink:hover {color: var(--primary-text);}
-.sidenavContent h1 {margin: 0.8em 0;}
+.sidenavContent {margin: 2px 16px;}
+.sidenavContent h1 {margin: 0.8em 0.2em;}
+.sidenavContent .closebtn {top: 10px;}
+.sidenavContent .closebtn:hover {color: var(--highlight);}
 .stretchText {margin-top: 8px;}
 .hexagonNoShow {background-color: var(--primary-text);}
 .hexagonScore {background-color: var(--secondary-text);}
@@ -290,11 +299,11 @@ input, textarea, select {
 /*body, input, textarea, button {
     font: 12px 'Verdana';
 }*/
-#logo{
+#logo {
     max-height:45px;
     margin:auto;
 }
-table { 
+table {
     border-collapse: separate; 
     width:95%; 
     border-spacing: 0;

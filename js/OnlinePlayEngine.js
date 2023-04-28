@@ -37,6 +37,20 @@ OnlinePlayEngine.prototype.userInfoExists = function(username, emailAddress, cal
     );
 };
 
+OnlinePlayEngine.prototype.validateSignIn = function(usernameOrEmail, password, callback) {
+    $.post("backend/validateSignIn.php", 
+        {
+            usernameOrEmail: usernameOrEmail, 
+            password: password
+        },
+        function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
 OnlinePlayEngine.prototype.verifyLogin = function(userId, username, userEmail, deviceId, callback) {
     $.post("backend/verifyLogin.php", 
         {
@@ -76,13 +90,29 @@ OnlinePlayEngine.prototype.getVerificationCode = function(callback) {
     );
 };
 
-OnlinePlayEngine.prototype.createUser = function(username, emailAddress, callback) {
-    $.post("backend/createUser.php",
+OnlinePlayEngine.prototype.createUser = function(username, emailAddress, password, callback) {
+    $.post("backend/createUserWithPwd.php",
         {
             u: username,
-            e: emailAddress
+            e: emailAddress,
+            p: password
         },
         function(data, status){
+            if (status === 'success') {
+                callback(data.trim());
+            }
+        }
+    );
+};
+
+OnlinePlayEngine.prototype.updateUserPassword = function(userId, existingPassword, newPassword, callback) {
+    $.post("backend/updateUserPassword.php",
+        {
+            userId: userId,
+            existingPassword: existingPassword,
+            newPassword: newPassword
+        },
+        function(data, status) {
             if (status === 'success') {
                 callback(data.trim());
             }

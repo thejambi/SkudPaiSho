@@ -144,51 +144,135 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 		]
 	};
 
-	GinsengTiles[Ginseng.TileCodes.Dragon] = {
-		available: true,
-		types: [Ginseng.TileType.originalBender],
-		movements: [
-			{
-				type: Trifle.MovementType.standard,
-				distance: 5,
-				captureTypes: [
-					{
-						type: Trifle.CaptureType.all
-					}
-				]
-			}
-		],
-		abilities: [
-			{
-				type: Trifle.AbilityName.extendMovement,
-				extendMovementType: Trifle.MovementType.standard,
-				extendDistance: 1,
-				triggers: [
-					{
-						triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
-						targetTeams: [Trifle.TileTeam.friendly],
-						activationRequirements: [
-							{
-								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-								targetTileTypes: [Trifle.TileCategory.thisTile],
-								targetPointTypes: [RED]
-							}
-						]
-					}
-				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles],
-				targetTeams: [Trifle.TileTeam.friendly]
-			}
-		],
-		textLines: [
-			"<strong>Movement Phase</strong>",
-			"- Can move 5 spaces.",
-			"- Can capture.",
-			"",
-			"<strong>Effect Phase (static ability)</strong>",
-			"- All surrounding friendly tiles are boosted with +1 movement when it is touching a Red Garden. <em>(does not affect White Lotus and Wheel)</em>"
-		]
-	};
+	if (!gameOptionEnabled(SWAP_BISON_AND_DRAGON_ABILITIES)) {
+		// Default ability
+		GinsengTiles[Ginseng.TileCodes.Dragon] = {
+			available: true,
+			types: [Ginseng.TileType.originalBender],
+			movements: [
+				{
+					type: Trifle.MovementType.standard,
+					distance: 5,
+					captureTypes: [
+						{
+							type: Trifle.CaptureType.all
+						}
+					]
+				}
+			],
+			abilities: [
+				{
+					title: "Active Dragon Push",
+					type: Trifle.AbilityName.moveTargetTile,
+					// priority: ?,
+					isPassiveMovement: true,
+					optional: true,
+					neededPromptTargetsInfo: [
+						{
+							title: "pushedTile",
+							promptId: Trifle.TargetPromptId.movedTilePoint,
+							targetType: Trifle.PromptTargetType.boardPoint
+						},
+						{
+							title: "pushLanding",
+							promptId: Trifle.TargetPromptId.movedTileDestinationPoint,
+							targetType: Trifle.PromptTargetType.boardPoint
+						}
+					],
+					triggers: [
+						{
+							triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
+							targetTileTypes: [Trifle.TileCategory.allTileTypes],
+							activationRequirements: [
+								{
+									type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+									targetTileTypes: [Trifle.TileCategory.thisTile],
+									targetPointTypes: [RED]
+								}
+							]
+						},
+						{
+							triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
+							targetTileTypes: [Trifle.TileCategory.thisTile]
+						}
+					],
+					targetTypes: [Trifle.TargetType.triggerTargetTiles],
+					triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
+					numberOfTargetTiles: 1,
+					promptTargetTitle: "pushedTile",
+					targetTileMovements: [
+						{
+							type: Trifle.MovementType.awayFromTargetTileOrthogonal,
+							distance: 1,
+							targetTileTypes: [Trifle.TileCategory.tileWithAbility],
+							regardlessOfImmobilization: true
+						},
+						{
+							type: Trifle.MovementType.awayFromTargetTileDiagonal,
+							distance: 1,
+							targetTileTypes: [Trifle.TileCategory.tileWithAbility],
+							regardlessOfImmobilization: true
+						}
+					]
+				}
+			],
+			textLines: [
+				"<strong>Movement Phase</strong>",
+				"- Can move 5 spaces.",
+				"- Can capture.",
+				"",
+				"<strong>Effect Phase (dynamic ability)</strong>",
+				"- May push any one surrounding tile 1 space away from itself when it is touching a Red Garden."
+			]
+		};
+	} else {
+		// Swapped ability
+		GinsengTiles[Ginseng.TileCodes.Dragon] = {
+			available: true,
+			types: [Ginseng.TileType.originalBender],
+			movements: [
+				{
+					type: Trifle.MovementType.standard,
+					distance: 5,
+					captureTypes: [
+						{
+							type: Trifle.CaptureType.all
+						}
+					]
+				}
+			],
+			abilities: [
+				{
+					type: Trifle.AbilityName.extendMovement,
+					extendMovementType: Trifle.MovementType.standard,
+					extendDistance: 1,
+					triggers: [
+						{
+							triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+							targetTeams: [Trifle.TileTeam.friendly],
+							activationRequirements: [
+								{
+									type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+									targetTileTypes: [Trifle.TileCategory.thisTile],
+									targetPointTypes: [RED]
+								}
+							]
+						}
+					],
+					targetTypes: [Trifle.TargetType.triggerTargetTiles],
+					targetTeams: [Trifle.TileTeam.friendly]
+				}
+			],
+			textLines: [
+				"<strong>Movement Phase</strong>",
+				"- Can move 5 spaces.",
+				"- Can capture.",
+				"",
+				"<strong>Effect Phase (static ability)</strong>",
+				"- All surrounding friendly tiles are boosted with +1 movement when it is touching a Red Garden. <em>(does not affect White Lotus and Wheel)</em>"
+			]
+		};
+	}
 
 	GinsengTiles[Ginseng.TileCodes.Badgermole] = {
 		available: true,
@@ -264,85 +348,135 @@ Ginseng.TileInfo.defineGinsengTilesV2 = function() {
 		]
 	};
 
-	GinsengTiles[Ginseng.TileCodes.Bison] = {
-		available: true,
-		types: [Ginseng.TileType.originalBender],
-		movements: [
-			{
-				type: Trifle.MovementType.standard,
-				distance: 5,
-				captureTypes: [
-					{
-						type: Trifle.CaptureType.all
-					}
-				]
-			}
-		],
-		abilities: [
-			{
-				title: "Active Bison Push",
-				type: Trifle.AbilityName.moveTargetTile,
-				// priority: ?,
-				isPassiveMovement: true,
-				optional: true,
-				neededPromptTargetsInfo: [
-					{
-						title: "pushedTile",
-						promptId: Trifle.TargetPromptId.movedTilePoint,
-						targetType: Trifle.PromptTargetType.boardPoint
-					},
-					{
-						title: "pushLanding",
-						promptId: Trifle.TargetPromptId.movedTileDestinationPoint,
-						targetType: Trifle.PromptTargetType.boardPoint
-					}
-				],
-				triggers: [
-					{
-						triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
-						targetTileTypes: [Trifle.TileCategory.allTileTypes],
-						activationRequirements: [
-							{
-								type: Trifle.ActivationRequirement.tileIsOnPointOfType,
-								targetTileTypes: [Trifle.TileCategory.thisTile],
-								targetPointTypes: [RED]
-							}
-						]
-					},
-					{
-						triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
-						targetTileTypes: [Trifle.TileCategory.thisTile]
-					}
-				],
-				targetTypes: [Trifle.TargetType.triggerTargetTiles],
-				triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
-				numberOfTargetTiles: 1,
-				promptTargetTitle: "pushedTile",
-				targetTileMovements: [
-					{
-						type: Trifle.MovementType.awayFromTargetTileOrthogonal,
-						distance: 1,
-						targetTileTypes: [Trifle.TileCategory.tileWithAbility],
-						regardlessOfImmobilization: true
-					},
-					{
-						type: Trifle.MovementType.awayFromTargetTileDiagonal,
-						distance: 1,
-						targetTileTypes: [Trifle.TileCategory.tileWithAbility],
-						regardlessOfImmobilization: true
-					}
-				]
-			}
-		],
-		textLines: [
-			"<strong>Movement Phase</strong>",
-			"- Can move 5 spaces.",
-			"- Can capture.",
-			"",
-			"<strong>Effect Phase (dynamic ability)</strong>",
-			"- May push any one surrounding tile 1 space away from itself when it is touching a Red Garden."
-		]
-	};
+	if (!gameOptionEnabled(SWAP_BISON_AND_DRAGON_ABILITIES)) {
+		// Default ability
+		GinsengTiles[Ginseng.TileCodes.Bison] = {
+			available: true,
+			types: [Ginseng.TileType.originalBender],
+			movements: [
+				{
+					type: Trifle.MovementType.standard,
+					distance: 5,
+					captureTypes: [
+						{
+							type: Trifle.CaptureType.all
+						}
+					]
+				}
+			],
+			abilities: [
+				{
+					type: Trifle.AbilityName.extendMovement,
+					extendMovementType: Trifle.MovementType.standard,
+					extendDistance: 1,
+					triggers: [
+						{
+							triggerType: Trifle.AbilityTriggerType.whileTargetTileIsSurrounding,
+							targetTeams: [Trifle.TileTeam.friendly],
+							activationRequirements: [
+								{
+									type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+									targetTileTypes: [Trifle.TileCategory.thisTile],
+									targetPointTypes: [RED]
+								}
+							]
+						}
+					],
+					targetTypes: [Trifle.TargetType.triggerTargetTiles],
+					targetTeams: [Trifle.TileTeam.friendly]
+				}
+			],
+			textLines: [
+				"<strong>Movement Phase</strong>",
+				"- Can move 5 spaces.",
+				"- Can capture.",
+				"",
+				"<strong>Effect Phase (static ability)</strong>",
+				"- All surrounding friendly tiles are boosted with +1 movement when it is touching a Red Garden. <em>(does not affect White Lotus and Wheel)</em>"
+			]
+		};
+	} else {
+		// Swapped ability
+		GinsengTiles[Ginseng.TileCodes.Bison] = {
+			available: true,
+			types: [Ginseng.TileType.originalBender],
+			movements: [
+				{
+					type: Trifle.MovementType.standard,
+					distance: 5,
+					captureTypes: [
+						{
+							type: Trifle.CaptureType.all
+						}
+					]
+				}
+			],
+			abilities: [
+				{
+					title: "Active Bison Push",
+					type: Trifle.AbilityName.moveTargetTile,
+					// priority: ?,
+					isPassiveMovement: true,
+					optional: true,
+					neededPromptTargetsInfo: [
+						{
+							title: "pushedTile",
+							promptId: Trifle.TargetPromptId.movedTilePoint,
+							targetType: Trifle.PromptTargetType.boardPoint
+						},
+						{
+							title: "pushLanding",
+							promptId: Trifle.TargetPromptId.movedTileDestinationPoint,
+							targetType: Trifle.PromptTargetType.boardPoint
+						}
+					],
+					triggers: [
+						{
+							triggerType: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
+							targetTileTypes: [Trifle.TileCategory.allTileTypes],
+							activationRequirements: [
+								{
+									type: Trifle.ActivationRequirement.tileIsOnPointOfType,
+									targetTileTypes: [Trifle.TileCategory.thisTile],
+									targetPointTypes: [RED]
+								}
+							]
+						},
+						{
+							triggerType: Trifle.AbilityTriggerType.whenActiveMovement,
+							targetTileTypes: [Trifle.TileCategory.thisTile]
+						}
+					],
+					targetTypes: [Trifle.TargetType.triggerTargetTiles],
+					triggerTypeToTarget: Trifle.AbilityTriggerType.whenLandsSurroundingTargetTile,
+					numberOfTargetTiles: 1,
+					promptTargetTitle: "pushedTile",
+					targetTileMovements: [
+						{
+							type: Trifle.MovementType.awayFromTargetTileOrthogonal,
+							distance: 1,
+							targetTileTypes: [Trifle.TileCategory.tileWithAbility],
+							regardlessOfImmobilization: true
+						},
+						{
+							type: Trifle.MovementType.awayFromTargetTileDiagonal,
+							distance: 1,
+							targetTileTypes: [Trifle.TileCategory.tileWithAbility],
+							regardlessOfImmobilization: true
+						}
+					]
+				}
+			],
+			textLines: [
+				"<strong>Movement Phase</strong>",
+				"- Can move 5 spaces.",
+				"- Can capture.",
+				"",
+				"<strong>Effect Phase (dynamic ability)</strong>",
+				"- May push any one surrounding tile 1 space away from itself when it is touching a Red Garden."
+			]
+		};
+	}
 
 	GinsengTiles[Ginseng.TileCodes.LionTurtle] = {
 		available: true,
@@ -538,7 +672,8 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 					targetTileTypes: [Trifle.TileCategory.thisTile]
 				}
 			],
-			targetTypes: [Trifle.TargetType.triggerTargetTiles]
+			targetTypes: [Trifle.TargetType.triggerTargetTiles],
+			inevitable: true
 		};
 		var protectFromAbilitiesWhileInTempleAbility = {
 			title: "Protect From Abilities While In Temple",
@@ -594,8 +729,9 @@ Ginseng.applyCaptureAndAbilityActivationRequirementRulesV2 = function(GinsengTil
 		tileInfo.abilities.push(protectFromCaptureWhileInTempleAbility);
 		tileInfo.abilities.push(protectFromAbilitiesWhileInTempleAbility);
 		// tileInfo.abilities.push(protectFromFriendlyPushAbilitiesWhileInTempleAbility);
-		tileInfo.abilities.push(exchangeForCapturedTileIntempleAbility);
-		// ------
+		if (key !== Ginseng.TileCodes.WhiteLotus) {
+			tileInfo.abilities.push(exchangeForCapturedTileIntempleAbility);
+		}
 
 	});
 };
