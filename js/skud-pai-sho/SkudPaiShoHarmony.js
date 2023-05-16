@@ -708,6 +708,7 @@ SkudPaiShoHarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
 	// They're the same length if we're here
 	// Now, all harmonies must match 
 	var h1Matches = false;
+	var definitelyMatches = true;
 	ring1.forEach(function(h1) {
 		h1Matches = false;
 		ring2.forEach(function(h2) {
@@ -716,11 +717,12 @@ SkudPaiShoHarmonyManager.prototype.ringsMatch = function(ring1, ring2) {
 			}
 		});
 		if (!h1Matches) {
+			definitelyMatches = false;
 			return false;
 		}
 	});
 
-	return h1Matches;
+	return definitelyMatches;
 };
 
 SkudPaiShoHarmonyManager.prototype.lookForRings = function(t1, tx, originalChain) {
