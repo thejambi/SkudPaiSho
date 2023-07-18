@@ -3502,7 +3502,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 	}
 
 	if (!gameSeeksDisplayed) {
-		message = "No games available to join. You can create a new game, or join <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a> to find people to play with!";
+		message = "No games available to join. You can create a new game, or join <a href='https://skudpaisho.com/discord' target='_blank'>Join the Discord</a> to find people to play with!";
 	}
 
 	message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
@@ -3746,7 +3746,7 @@ var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(resul
 /* This is AKA Display Links tab content */
 function resetGlobalChats() {
 	// Clear all global chats..
-	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>.<hr />";
+	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://skudpaisho.com/discord' target='_blank'>Discord server</a>.<hr />";
 	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Welcome! Discord is the best way to chat and get help, but feel free to say hello here in the global chat.<hr />";
 }
 
@@ -3958,7 +3958,7 @@ function promptForAgeToTreeYears() {
 	var message = "<br />Age: <input type='text' id='humanAgeInput' name='humanAgeInput' />";
 	message += "<br /><div class='clickableText' onclick='submitHumanAge()'>Convert to tree years</div>";
 	message += "<br /><div id='treeYearsResult'></div>";
-	message += "<br /><br /><div>Confused? <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a>! :))</div>";
+	message += "<br /><br /><div>Confused? <a href='https://skudpaisho.com/discord' target='_blank'>Join the Discord</a>! :))</div>";
 	showModal("How Old Are You in Tree Years?", message);
 }
 
@@ -4389,7 +4389,7 @@ function openShop() {
 }
 
 function discordLinkClicked() {
-	openLink("https://discord.gg/thegardengate");
+	openLink("https://skudpaisho.com/discord");
 }
 
 /* Options */

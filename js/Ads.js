@@ -168,7 +168,7 @@ Ads.getAdInfo = function(adKey) {
 Ads.getAdDiv = function(adInfo, maxWidthNum, maxHeightNum) {
 	var linkUrl = adInfo.linkUrl;
 	if (!linkUrl) {
-		linkUrl = "https://discord.gg/thegardengate";
+		linkUrl = "https://skudpaisho.com/discord";
 	}
 	var txt = ""
 		+ "<a href='" + linkUrl + "' target='_blank'>"
@@ -186,7 +186,7 @@ Ads.showAdPopup = function(adKey) {
 		showModal(
 			"A Message From Our Sponsors",
 			Ads.getAdDiv(adInfo, 98, 75)
-			+ "<br /><br />Thanks to our sponsors that support The Garden Gate! Be sure to join <a href='https://discord.gg/thegardengate' target='_blank'>The Garden Gate Discord</a> to get more involved in all things Pai Sho. Hide some ads from Device Preferences (My Games list or Side menu).<br /><br />Have a great day ;)"
+			+ "<br /><br />Thanks to our sponsors that support The Garden Gate! Be sure to join <a href='https://skudpaisho.com/discord' target='_blank'>The Garden Gate Discord</a> to get more involved in all things Pai Sho. Hide some ads from Device Preferences (My Games list or Side menu).<br /><br />Have a great day ;)"
 		);
 	}
 };
@@ -266,7 +266,7 @@ Ads.showRandomChatTabAd = function() {
 Ads.showSponsorMessagesTeaserPopup = function() {
 	showModal(
 		"Sponsored Messages",
-		"Would you like to support The Garden Gate and sponsor a message that could show here? <br /><br />Contact @SkudPaiSho on <a href='https://discord.gg/thegardengate' target='_blank'>The Garden Gate Discord</a> and consider supporting The Garden Gate on <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a>."
+		"Would you like to support The Garden Gate and sponsor a message that could show here? <br /><br />Contact @SkudPaiSho on <a href='https://skudpaisho.com/discord' target='_blank'>The Garden Gate Discord</a> and consider supporting The Garden Gate on <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a>."
 	);
 };
 
