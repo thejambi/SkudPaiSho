@@ -2223,7 +2223,7 @@ function sendVerificationCodeClicked() {
 		&& usernameIsValid(usernameBeingVerified)) {
 		onlinePlayEngine.userInfoExists(usernameBeingVerified, encodeURIComponent(emailBeingVerified), userInfoExistsCallback);
 	} else {
-		showModal("Sign Up", "Invalid username, email, or password. Your username cannot be too short or too long, and cannot contain spaces. Your password must be at least 8 characters and can contain commonm special characters. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
+		showModal("Sign Up", "Invalid username, email, or password. Your username cannot be too short or too long, and cannot contain spaces. Your password must be at least 8 characters and can contain common special characters. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
 		passwordBeingVerified = "";
 	}
 }
