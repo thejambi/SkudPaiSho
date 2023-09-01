@@ -5459,3 +5459,20 @@ function promptForCustomTileDesigns(gameType, existingCustomTilesUrl) {
 
 	showModal("Use Custom Tile Designs", message);
 }
+
+
+
+
+
+
+function updateGinsengGameHack() {
+	var notationText = gameController.gameNotation.notationText;
+
+	setGameController(GameType.Ginseng.id);
+
+	addGameOption(SWAP_BISON_AND_DRAGON_ABILITIES);
+
+	setGameController(GameType.Ginseng.id, true);
+
+	gameController.setGameNotation(notationText);
+}
