@@ -189,6 +189,16 @@ Trifle.AbilityManager.prototype.doTheActivateThing = function(ability, tileRecor
 				this.doTheActivateThing(otherAbility, tileRecords, abilitiesActivated);
 			});
 		}
+
+		// If this is a cancelAbilities ability.. should it cancel some ability that's already active?
+		if (ability.abilityType === Trifle.AbilityName.cancelAbilities) {
+			this.abilities.forEach(existingAbility => {
+				if (existingAbility.activated && this.abilityIsCanceled(existingAbility)) {
+					debug("Freshly canceled ability: " + existingAbility.abilityType + " from " + existingAbility.sourceTile.ownerCode + existingAbility.sourceTile.code);
+					existingAbility.deactivate();
+				}
+			});
+		}
 	}
 	return boardHasChanged;
 };
@@ -271,6 +281,7 @@ Trifle.AbilityManager.prototype.getAbilitiesTargetingTile = function(abilityName
 	var abilitiesTargetingTile = [];
 	this.abilities.forEach(function(ability) {
 		if (ability.abilityType === abilityName
+				&& ability.activated
 				&& ability.abilityTargetsTile(tile)) {
 			abilitiesTargetingTile.push(ability);
 		}
