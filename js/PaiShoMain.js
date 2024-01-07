@@ -5339,7 +5339,11 @@ function show2020GameStats(showWins) {
 						var totalWins = stats[i].totalWins ? stats[i].totalWins : 0;
 						var winPercent = Math.round(totalWins / stats[i].totalGamesCompleted * 100);
 						if (showWins) {
-							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " wins, " + winPercent + "%)";
+							var winOrWins = "wins";
+							if (totalWins === 1) {
+								winOrWins = "win";
+							}
+							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " " + winOrWins + ", " + winPercent + "%)";
 						} else {
 							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted;
 						}
@@ -5376,15 +5380,28 @@ function showGameStats(showWins) {
 
 					var stats = resultData.stats;
 
+					var totalGamesTally = 0;
+
 					for (var i = 0; i < stats.length; i++) {
+						if (stats[i].gameType !== 'Pai Sho Playground') {
+							totalGamesTally += stats[i].totalGamesCompleted;
+						}
 						var totalWins = stats[i].totalWins ? stats[i].totalWins : 0;
 						var winPercent = Math.round(totalWins / stats[i].totalGamesCompleted * 100);
 						if (showWins) {
-							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " wins, " + winPercent + "%)";
+							var winOrWins = "wins";
+							if (totalWins === 1) {
+								winOrWins = "win";
+							}
+							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " " + winOrWins + ", " + winPercent + "%)";
 						} else {
 							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted;
 						}
 					}
+
+					message += "<br /><br />Total games (excluding Playground): " + totalGamesTally;
+					message += "<br /><br />" + getHonoraryTitleMessage(stats, totalGamesTally);
+					message += "<br />You can use this honorary title at <a href='https://skudpaisho.com/discord' target='_blank'>The Garden Gate Discord</a>. <a href='https://discord.com/channels/380904760556912641/1160675521496105143/1160675598813896735' target='_blank'>See Honorary Title information here.</a>";
 
 					if (!showWins) {
 						message += "<br /><br /><span class='skipBonus' onclick='showGameStats(true);'>Show number of wins for each game</span>";
@@ -5395,6 +5412,12 @@ function showGameStats(showWins) {
 			}
 		}
 	);
+}
+
+function getHonoraryTitleMessage(gameStats) {
+	var titleChecker = new HonoraryTitleChecker(gameStats);
+	var message = "Honorary Title achieved: <strong>" + titleChecker.getTitleAchieved() + "</strong>";
+	return message;
 }
 
 function getShortUrl(urlToShorten, callback) {
