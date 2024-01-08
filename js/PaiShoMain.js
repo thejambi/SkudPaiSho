@@ -3952,6 +3952,10 @@ var processChatEasterEggCommands = function(chatMessage) {
 	if (chatMessage.toLowerCase().includes("april fools")) {	// April Fools!
 		Ads.enableAds(true);
 	}
+
+	if (chatMessage.toLowerCase().includes("/giveawaydrawing")) {
+		showGiveawayDrawingModal();
+	}
 };
 
 function promptForAgeToTreeYears() {
