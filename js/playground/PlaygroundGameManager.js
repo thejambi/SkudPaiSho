@@ -67,6 +67,10 @@ PlaygroundGameManager.prototype.runNotationMove = function(move, withActuate) {
 		this.tileManager.pilesByName[move.endPileName].push(tile);
 	} else if (move.moveType === PlaygroundMoveType.rotateToFaceDirection) {
 		this.board.rotateTileToFaceDirection(move.startPoint, move.directionToFace);
+	} else if (move.moveType === PlaygroundMoveType.setGameBoard) {
+		if (move.boardType) {
+			setBoardImage(move.boardType);
+		}
 	}
 
 	if (withActuate) {

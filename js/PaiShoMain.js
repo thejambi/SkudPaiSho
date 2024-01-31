@@ -5180,6 +5180,10 @@ document.onkeyup = function(e) {
 	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 78) {
 		/* Ctrl + Alt + N */
 		newGameClicked();
+	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode)) {
+		if (gameController && gameController.shortcutKey) {
+			gameController.shortcutKey(e.which || e.keyCode);
+		}
 	}
 };
   
