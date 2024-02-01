@@ -792,6 +792,11 @@ BeyondTheMaps.Board = class {
 	buildLandAndSeasGroup(landGroup) {
 		var touchingSeaGroupIds = this.getSeaGroupIdsTouchingLandGroup(landGroup);
 
+		/* If no touching sea groups (land is completely surrounded), return landGroup */
+		if (touchingSeaGroupIds.length === 0) {
+			return landGroup;
+		}
+
 		var groupOwner = landGroup[0].tile.ownerName;
 
 		var touchingLandGroupIds = new Set();
