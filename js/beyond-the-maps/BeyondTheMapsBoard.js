@@ -411,19 +411,21 @@ BeyondTheMaps.Board = class {
 
 		var tile = boardPointStart.removeTile();
 
-		if (!tile) {
+		if (tile) {
+
+			var error = boardPointEnd.putTile(tile);
+
+			if (error) {
+				debug("Error moving tile. It probably didn't get moved.");
+				return false;
+			}
+
+			if (landNotationPoint) {
+				this.placeLandPiecesForPlayer(tile.ownerName, [landNotationPoint]);
+			}
+		} else {
 			debug("Error: No tile to move!");
-		}
-
-		var error = boardPointEnd.putTile(tile);
-
-		if (error) {
-			debug("Error moving tile. It probably didn't get moved.");
-			return false;
-		}
-
-		if (landNotationPoint) {
-			this.placeLandPiecesForPlayer(tile.ownerName, [landNotationPoint]);
+			showBadMoveModal();
 		}
 	}
 
