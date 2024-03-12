@@ -169,6 +169,22 @@ PlaygroundController.prototype.hideTileLibraries = function() {
 	}
 };
 
+PlaygroundController.prototype.setGameBoard = function(boardType) {
+	this.notationBuilder.playingPlayer = this.getCurrentPlayingPlayer();
+	this.notationBuilder.moveType = PlaygroundMoveType.setGameBoard;
+	this.notationBuilder.boardType = boardType;
+
+	var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
+	this.gameNotation.addMove(move);
+
+	// Should not be playing online game here, but maybe in future, better support it
+	if (playingOnlineGame()) {
+		callSubmitMove();
+	} else {
+		finalizeMove();
+	}
+};
+
 PlaygroundController.prototype.getAdditionalHelpTabDiv = function() {
 	var settingsDiv = document.createElement("div");
 
@@ -258,11 +274,14 @@ PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
 		return;
 	}
 
+	this.lastSelectedUnplayedTileDiv = tileDiv;
+
 	var divName = tileDiv.getAttribute("name");	// Like: GW5 or HL
 	var tileId = parseInt(tileDiv.getAttribute("id"));
 	var sourcePileName = tileDiv.getAttribute("data-pileName");
 	var playerCode = divName.charAt(0);
-	var tileCode = divName;
+	var tileCode = divName;	// Full tile code
+	var tileName = divName.substring(1);
 
 	var player = GUEST;
 	if (playerCode === 'H') {
@@ -272,6 +291,9 @@ PlaygroundController.prototype.unplayedTileClicked = function(tileDiv) {
 	var tile;
 	if (divName !== "PossibleMove") {
 		tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
+		if (!tile) {
+			tile = this.theGame.tileManager.peekTile(player, tileName);
+		}
 	}
 
 	if (this.notationBuilder.status === BRAND_NEW) {
@@ -522,4 +544,15 @@ PlaygroundController.prototype.selectRandomTile = function(pileName) {
 		randomTileDiv.click();
 	}
 };
+
+PlaygroundController.prototype.shortcutKey = function(keyCode) {
+	debug("Playground will handle this: ");
+	debug(keyCode);
+	
+	if (keyCode == 77) {
+		if (this.lastSelectedUnplayedTileDiv) {
+			this.lastSelectedUnplayedTileDiv.click();
+		}
+	}
+}
 

@@ -28,6 +28,7 @@ Ginseng.Options.tileDesignTypeValues = {
 	spiritworld: "Spirit World",
 	shujing: "Shu Jing",
 	shujingpiandao: "Shu Jing Piandao",
+	xaibausgrove: "Xai Bau's Grove",
 	chuji: "Chu Ji Red",
 	custom: "Use Custom Designs"
 };

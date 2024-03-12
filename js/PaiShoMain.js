@@ -267,6 +267,7 @@ var interval = 0;
 
 var emailBeingVerified = "";
 var usernameBeingVerified = "";
+var passwordBeingVerified = "";
 var codeToVerify = 0;
 var tempUserId;
 var myGamesList = [];
@@ -444,7 +445,7 @@ var createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 	  // Open default help/chat tab
 	  document.getElementById("defaultOpenTab").click();
 
-	  if (dateIsBetween("04/01/2022", "04/02/2022")) {
+	  if (dateIsBetween("04/01/2023", "04/02/2023")) {
 		Ads.enableAds(true);
 		GameType.SkudPaiSho.gameOptions.push(DIAGONAL_MOVEMENT, EVERYTHING_CAPTURE);
 	  }
@@ -1083,6 +1084,11 @@ function showSignOutModal() {
 	message += "<br /><div class='clickableText' onclick='signOut(false);'>Cancel</div>";
 
 	showModal("Really sign out?", message);
+}
+
+function showChangePasswordModal() {
+	var msg = document.getElementById('changePasswordModalContentContainer').innerHTML;
+	showModal("Update Password", msg);
 }
 
 function signOut(reallySignOut) {
@@ -2179,17 +2185,60 @@ var userInfoExistsCallback = function userInfoExistsCallback(data) {
 	}
 }
 
+var validateSignInCallback = function validateSignInCallback(data) {
+	signInResults = JSON.parse(data);
+
+	if (signInResults.loginResult === "Success") {
+		tempUserId = signInResults.userId;
+		usernameBeingVerified = signInResults.userUsername;
+		emailBeingVerified = signInResults.userEmail;
+
+		createUserCallback(tempUserId);
+	} else {
+		showModal("Sign In", "Sign in failed with provided account info. Please try again.");
+	}
+};
+
+function submitSignInClicked() {
+	var usernameOrEmail = document.getElementById("usernameInput").value.trim();
+	var userPassword = document.getElementById("userPasswordInput").value.trim();
+
+	if ((usernameIsValid(usernameOrEmail) || emailIsValid(usernameOrEmail)) 
+			&& passwordIsValid(userPassword, userPassword)) {
+		onlinePlayEngine.validateSignIn(usernameOrEmail, userPassword, validateSignInCallback);
+	} else {
+		showModal("Sign In", "Invalid username or password. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
+	}
+}
+
 function sendVerificationCodeClicked() {
 	emailBeingVerified = document.getElementById("userEmailInput").value.trim().toLowerCase();
 	usernameBeingVerified = document.getElementById("usernameInput").value.trim();
+	passwordBeingVerified = document.getElementById("userPasswordInput").value.trim();
+	var passwordCheck = document.getElementById("userPasswordCheckInput").value.trim();
 
 	// Only continue if email and username pass validation
-	if (emailBeingVerified.includes("@") && emailBeingVerified.includes(".")
-		&& usernameBeingVerified.match(/^([A-Za-z0-9_]){3,25}$/g)) {
+	if (emailIsValid(emailBeingVerified)
+		&& (passwordIsValid(passwordBeingVerified, passwordCheck) || passwordBeingVerified === '')
+		&& usernameIsValid(usernameBeingVerified)) {
 		onlinePlayEngine.userInfoExists(usernameBeingVerified, encodeURIComponent(emailBeingVerified), userInfoExistsCallback);
 	} else {
-		showModal("Sign In", "Invalid username or email. Your username cannot be too short or too long, and cannot contain spaces. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
+		showModal("Sign Up", "Invalid username, email, or password. Your username cannot be too short or too long, and cannot contain spaces. Your password must be at least 8 characters and can contain common special characters. <br /><br /><span class='skipBonus' onclick='loginClicked();'>Back</span>");
+		passwordBeingVerified = "";
 	}
+}
+
+function usernameIsValid(usernameBeingVerified) {
+	return usernameBeingVerified.match(/^([A-Za-z0-9_]){3,25}$/g);
+}
+
+function passwordIsValid(passwordBeingVerified, passwordCheck) {
+	return passwordBeingVerified === passwordCheck
+		&& passwordBeingVerified.match(/^([A-Za-z0-9!@#$%^&*()_\-+={}:;<,>.?]){8,64}$/g);
+}
+
+function emailIsValid(emailBeingVerified) {
+	return emailBeingVerified.includes("@") && emailBeingVerified.includes(".");
 }
 
 function verifyCodeClicked() {
@@ -2200,6 +2249,23 @@ function verifyCodeClicked() {
 		if (codeToVerify && codeToVerify.trim() != "") {
 			onlinePlayEngine.getVerificationCode(verifyCodeCallback);
 		}
+	}
+}
+
+function forgetPasswordClicked() {
+	if (userIsLoggedIn()) {
+		var yesNoOptions = {};
+		yesNoOptions.yesText = "Yes - Remove my password";
+		yesNoOptions.yesFunction = function() {
+			onlinePlayEngine.removeUserPassword();
+		};
+		yesNoOptions.noText = "Close";
+		showModal(
+			"Remove password?",
+			"Really remove ",
+			false,
+			yesNoOptions
+		);
 	}
 }
 
@@ -2231,13 +2297,36 @@ var createDeviceIdCallback = function createDeviceIdCallback(generatedDeviceId) 
 
 	initialVerifyLogin();
 
-	showModal("<i class='fa fa-check' aria-hidden='true'></i> Email Verified", "Hi, " + getUsername() + "! Your email has been successfully verified and you are now signed in.");
+	showModal("<i class='fa fa-check' aria-hidden='true'></i> Successfully Signed In", "Hi, " + getUsername() + "! You are now signed in. The Garden Gate will remember you next time you come, unless you <strong>sign out</strong> from the bottom of the My Games list.");
 }
 
 var createUserCallback = function createUserCallback(generatedUserId) {
 	tempUserId = generatedUserId;
-
 	onlinePlayEngine.createDeviceIdForUser(tempUserId, createDeviceIdCallback);
+}
+
+var updatePasswordCallback = function updatePasswordCallback(data) {
+	var msg = "";
+	if (data === 'Success') {
+		msg = "Password successfully updated.";
+	} else {
+		msg = "Password update failed.";
+	}
+
+	showModal("Update Password", msg);
+};
+
+function updatePasswordClicked() {
+	if (userIsLoggedIn()) {
+		var existingPassword = document.getElementById("userExistingPasswordInput").value.trim();
+		var newPassword = document.getElementById("userPasswordInput").value.trim();
+		var passwordCheck = document.getElementById("userPasswordCheckInput").value.trim();
+		if (passwordIsValid(newPassword, passwordCheck)) {
+			onlinePlayEngine.updateUserPassword(getUserId(), existingPassword, newPassword, updatePasswordCallback);
+		} else {
+			updatePasswordCallback("fail");
+		}
+	}
 }
   
 // TODO actualCode should be result...
@@ -2246,7 +2335,8 @@ var verifyCodeCallback = function verifyCodeCallback(actualCode) {
 		if (tempUserId && tempUserId > 0) {
 			createUserCallback(tempUserId);
 		} else {
-			onlinePlayEngine.createUser(usernameBeingVerified, emailBeingVerified, createUserCallback);
+			onlinePlayEngine.createUser(usernameBeingVerified, emailBeingVerified, passwordBeingVerified, createUserCallback);
+			passwordBeingVerified = "";
 		}
 	} else {
 		closeModal();
@@ -2373,6 +2463,7 @@ var GameType = {
 		secretGameOptions: [
 			LION_TURTLE_ABILITY_ANYWHERE,
 			SWAP_BISON_AND_DRAGON,
+			SWAP_BISON_AND_DRAGON_ABILITIES,
 			GINSENG_1_POINT_0
 		]
 	},
@@ -3122,7 +3213,9 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 	message += "<br /><div><span class='skipBonus' onclick='viewGameRankingsClicked();'><i class='fa fa-tachometer' aria-hidden='true'></i> Game Rankings</span></div>";
 	message += "<br /><div><span class='skipBonus' onclick='showPreferences();'>Device Preferences</span></div><br />";
 
-	message += "<br /><br /><div>You are currently signed in as " + getUsername() + ". <span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
+	message += "<br /><br /><div>You are currently signed in as " + getUsername() + ".</div>";
+	message += "<div><span class='skipBonus' onclick='showChangePasswordModal();'>Click here to update your password.</span></div>";
+	message += "<div><span class='skipBonus' onclick='showSignOutModal();'>Click here to sign out.</span></div>";
 	// message += "<br /><div><span class='skipBonus' onclick='showAccountSettings();'>Account Settings</span></div><br />";
 	showModal("Active Games", message);
 };
@@ -3187,6 +3280,16 @@ var showPastGamesCallback = function showPastGamesCallback(results) {
 	  }
   
 	  showModal("Sign In", msg);
+  }
+
+  function signUpClicked() {
+	var msg = document.getElementById('signUpModalContentContainer').innerHTML;
+  
+	  if (userIsLoggedIn()) {
+		  msg = "<div><br /><br />You are currently signed in as " + getUsername() + "</div>";
+	  }
+  
+	  showModal("Sign Up", msg);
   }
   
   var completeJoinGameSeekCallback = function completeJoinGameSeekCallback(gameJoined) {
@@ -3399,7 +3502,7 @@ var getGameSeeksCallback = function getGameSeeksCallback(results) {
 	}
 
 	if (!gameSeeksDisplayed) {
-		message = "No games available to join. You can create a new game, or join <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a> to find people to play with!";
+		message = "No games available to join. You can create a new game, or join <a href='https://skudpaisho.com/discord' target='_blank'>Join the Discord</a> to find people to play with!";
 	}
 
 	message += "<br /><br /><em><div id='activeGamesCountDisplay' style='font-size:smaller'>&nbsp;</div></em>";
@@ -3643,7 +3746,7 @@ var getInitialGlobalChatsCallback = function getInitialGlobalChatsCallback(resul
 /* This is AKA Display Links tab content */
 function resetGlobalChats() {
 	// Clear all global chats..
-	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://discord.gg/thegardengate' target='_blank'>Discord server</a>.<hr />";
+	//   document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Hi everybody! To chat with everyone, ask questions, or get help, join The Garden Gate <a href='https://skudpaisho.com/discord' target='_blank'>Discord server</a>.<hr />";
 	document.getElementById('globalChatMessagesDisplay').innerHTML = "<strong>SkudPaiSho: </strong> Welcome! Discord is the best way to chat and get help, but feel free to say hello here in the global chat.<hr />";
 }
 
@@ -3849,13 +3952,17 @@ var processChatEasterEggCommands = function(chatMessage) {
 	if (chatMessage.toLowerCase().includes("april fools")) {	// April Fools!
 		Ads.enableAds(true);
 	}
+
+	if (chatMessage.toLowerCase().includes("/giveawaydrawing")) {
+		showGiveawayDrawingModal();
+	}
 };
 
 function promptForAgeToTreeYears() {
 	var message = "<br />Age: <input type='text' id='humanAgeInput' name='humanAgeInput' />";
 	message += "<br /><div class='clickableText' onclick='submitHumanAge()'>Convert to tree years</div>";
 	message += "<br /><div id='treeYearsResult'></div>";
-	message += "<br /><br /><div>Confused? <a href='https://discord.gg/thegardengate' target='_blank'>Join the Discord</a>! :))</div>";
+	message += "<br /><br /><div>Confused? <a href='https://skudpaisho.com/discord' target='_blank'>Join the Discord</a>! :))</div>";
 	showModal("How Old Are You in Tree Years?", message);
 }
 
@@ -4286,7 +4393,7 @@ function openShop() {
 }
 
 function discordLinkClicked() {
-	openLink("https://discord.gg/thegardengate");
+	openLink("https://skudpaisho.com/discord");
 }
 
 /* Options */
@@ -4376,7 +4483,7 @@ function showGiveawayDrawingModal() {
   
   function showBadMoveModal() {
 	  clearGameWatchInterval();
-	  showModal("Uh Oh", "A move went wrong somewhere. If you see this each time you look at this game, then this game may be corrupt due to players not both using latest updates. The app is not be compatible with new features.<br /><br />Please let your opponent know that you saw this message. You may want to quit this game and try again.<br />Live game updates have been paused.");
+	  showModal("Uh Oh", "A move went wrong somewhere. If you see this each time you look at this game, then this game may be corrupt. <br /><br />Please let your opponent know that you saw this message. You may want to quit this game and try again.<br />Live game updates have been paused.");
   }
   
   
@@ -5073,6 +5180,10 @@ document.onkeyup = function(e) {
 	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 78) {
 		/* Ctrl + Alt + N */
 		newGameClicked();
+	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode)) {
+		if (gameController && gameController.shortcutKey) {
+			gameController.shortcutKey(e.which || e.keyCode);
+		}
 	}
 };
   
@@ -5236,7 +5347,11 @@ function show2020GameStats(showWins) {
 						var totalWins = stats[i].totalWins ? stats[i].totalWins : 0;
 						var winPercent = Math.round(totalWins / stats[i].totalGamesCompleted * 100);
 						if (showWins) {
-							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " wins, " + winPercent + "%)";
+							var winOrWins = "wins";
+							if (totalWins === 1) {
+								winOrWins = "win";
+							}
+							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " " + winOrWins + ", " + winPercent + "%)";
 						} else {
 							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted;
 						}
@@ -5273,15 +5388,28 @@ function showGameStats(showWins) {
 
 					var stats = resultData.stats;
 
+					var totalGamesTally = 0;
+
 					for (var i = 0; i < stats.length; i++) {
+						if (stats[i].gameType !== 'Pai Sho Playground') {
+							totalGamesTally += stats[i].totalGamesCompleted;
+						}
 						var totalWins = stats[i].totalWins ? stats[i].totalWins : 0;
 						var winPercent = Math.round(totalWins / stats[i].totalGamesCompleted * 100);
 						if (showWins) {
-							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " wins, " + winPercent + "%)";
+							var winOrWins = "wins";
+							if (totalWins === 1) {
+								winOrWins = "win";
+							}
+							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted + " (" + totalWins + " " + winOrWins + ", " + winPercent + "%)";
 						} else {
 							message += "<br />" + stats[i].gameType + ": " + stats[i].totalGamesCompleted;
 						}
 					}
+
+					message += "<br /><br />Total games (excluding Playground): " + totalGamesTally;
+					message += "<br /><br />" + getHonoraryTitleMessage(stats, totalGamesTally);
+					message += "<br />You can use this honorary title at <a href='https://skudpaisho.com/discord' target='_blank'>The Garden Gate Discord</a>. <a href='https://discord.com/channels/380904760556912641/1160675521496105143/1160675598813896735' target='_blank'>See Honorary Title information here.</a>";
 
 					if (!showWins) {
 						message += "<br /><br /><span class='skipBonus' onclick='showGameStats(true);'>Show number of wins for each game</span>";
@@ -5292,6 +5420,12 @@ function showGameStats(showWins) {
 			}
 		}
 	);
+}
+
+function getHonoraryTitleMessage(gameStats) {
+	var titleChecker = new HonoraryTitleChecker(gameStats);
+	var message = "Honorary Title achieved: <strong>" + titleChecker.getTitleAchieved() + "</strong>";
+	return message;
 }
 
 function getShortUrl(urlToShorten, callback) {
@@ -5356,3 +5490,10 @@ function promptForCustomTileDesigns(gameType, existingCustomTilesUrl) {
 
 	showModal("Use Custom Tile Designs", message);
 }
+
+
+
+
+
+
+

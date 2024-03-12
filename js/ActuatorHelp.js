@@ -51,6 +51,10 @@ function createBoardPointDiv(boardPoint, useSquareSpaces, coordinatesAdjustmentF
 
 	theDiv.classList.add("point");
 
+	if (browserCheck_chrome) {
+		theDiv.classList.add("point_chrome");
+	}
+
 	if (gameOptionEnabled(SQUARE_SPACES) || useSquareSpaces) {
 		theDiv.classList.add("pointSquare");
 	}

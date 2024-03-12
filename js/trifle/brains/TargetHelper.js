@@ -29,6 +29,9 @@ Trifle.TargetHelper.prototype.tileIsTargeted = function() {
 };
 
 Trifle.TargetHelper.prototype.targetingIsNotCanceledCheck = function() {
+	if (this.abilityInfo.inevitable) {
+		return true;
+	}
 	var abilityManager = this.abilityObject.board.abilityManager;
 	var targetingIsCanceled = abilityManager.targetingIsCanceled(this.abilityObject.sourceTile, this.abilityObject.abilityInfo.type, this.possibleTargetTile);
 	return !targetingIsCanceled;

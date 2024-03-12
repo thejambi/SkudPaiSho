@@ -411,19 +411,21 @@ BeyondTheMaps.Board = class {
 
 		var tile = boardPointStart.removeTile();
 
-		if (!tile) {
+		if (tile) {
+
+			var error = boardPointEnd.putTile(tile);
+
+			if (error) {
+				debug("Error moving tile. It probably didn't get moved.");
+				return false;
+			}
+
+			if (landNotationPoint) {
+				this.placeLandPiecesForPlayer(tile.ownerName, [landNotationPoint]);
+			}
+		} else {
 			debug("Error: No tile to move!");
-		}
-
-		var error = boardPointEnd.putTile(tile);
-
-		if (error) {
-			debug("Error moving tile. It probably didn't get moved.");
-			return false;
-		}
-
-		if (landNotationPoint) {
-			this.placeLandPiecesForPlayer(tile.ownerName, [landNotationPoint]);
+			showBadMoveModal();
 		}
 	}
 
@@ -790,14 +792,39 @@ BeyondTheMaps.Board = class {
 	}
 
 	buildLandAndSeasGroup(landGroup) {
-		var landAndSeasGroup = landGroup;
-		
 		var touchingSeaGroupIds = this.getSeaGroupIdsTouchingLandGroup(landGroup);
 
-		touchingSeaGroupIds.forEach(seaGroupId => {
+		/* If no touching sea groups (land is completely surrounded), return landGroup */
+		if (touchingSeaGroupIds.length === 0) {
+			return landGroup;
+		}
+
+		var groupOwner = landGroup[0].tile.ownerName;
+
+		var touchingLandGroupIds = new Set();
+
+		var landAndSeasGroup = [];
+
+		for (var i = 0; i < touchingSeaGroupIds.length; i++) {
+			var seaGroupId = touchingSeaGroupIds[i];
+
 			var seaGroup = this.seaGroups[seaGroupId];
 			landAndSeasGroup = landAndSeasGroup.concat(seaGroup);
-		});
+
+			var newLandGroupIds = this.getLandGroupIdsTouchingSeaGroup(seaGroup, groupOwner);
+			newLandGroupIds.forEach(landGroupId => touchingLandGroupIds.add(landGroupId));
+
+			newLandGroupIds.forEach(landGroupId => {
+				var moreSeaGroupIds = this.getSeaGroupIdsTouchingLandGroup(this.landGroups[landGroupId]);
+				moreSeaGroupIds.forEach(anotherSeaGroupId => {
+					if (!touchingSeaGroupIds.includes(anotherSeaGroupId)) {
+						touchingSeaGroupIds.push(anotherSeaGroupId);
+					}
+				});
+			});
+		};
+
+		touchingLandGroupIds.forEach(landGroupId => landAndSeasGroup = landAndSeasGroup.concat(this.landGroups[landGroupId]));
 
 		return landAndSeasGroup;
 	}
@@ -814,6 +841,20 @@ BeyondTheMaps.Board = class {
 			});
 		});
 		return touchingSeaIds;
+	}
+
+	getLandGroupIdsTouchingSeaGroup(seaGroup, landOwnerName) {
+		var touchingLandIds = [];
+		seaGroup.forEach(seaPoint => {
+			var adjacentPoints = this.getAdjacentPoints(seaPoint);
+			adjacentPoints.forEach(adjacentPoint => {
+				if (this.pointIsLandForPlayer(adjacentPoint, landOwnerName)
+						&& !touchingLandIds.includes(adjacentPoint.landGroupId)) {
+					touchingLandIds.push(adjacentPoint.landGroupId);
+				}
+			});
+		});
+		return touchingLandIds;
 	}
 
 	analyzeSeaAndLandGroups() {
@@ -910,6 +951,12 @@ BeyondTheMaps.Board = class {
 	pointIsEmptyOrShip(point) {
 		return !point.hasTile()
 			|| (point.hasTile() && point.tile.tileType === BeyondTheMaps.TileType.SHIP);
+	}
+
+	pointIsLandForPlayer(point, ownerName) {
+		return point.hasTile() 
+			&& point.tile.tileType === BeyondTheMaps.TileType.LAND
+			&& point.tile.ownerName === ownerName;
 	}
 
 	countPlayerLandPieces(playerName) {

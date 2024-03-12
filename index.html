@@ -2,18 +2,18 @@
 <html>
 
 <head>
-  <meta charset="utf-8">
+	<meta charset="utf-8">
 
-  <title>The Garden Gate</title>
+	<title>The Garden Gate</title>
 
-  <!-- Images of classic tile designs used in Skud Pai Sho are originally from the Lotus Gambit rules community at http://lotusgambit.pbworks.com/w/page/45592429/Home -->
+	<!-- Images of classic tile designs used in Skud Pai Sho are originally from the Lotus Gambit rules community at http://lotusgambit.pbworks.com/w/page/45592429/Home -->
 
-  <link href="style/main.css?v=20230123-200524" rel="stylesheet" type="text/css">
-  <link id="overrideCSS" href="" rel="stylesheet" type="text/css">
+	<link href="style/main.css?v=20230718-071536" rel="stylesheet" type="text/css">
+	<link id="overrideCSS" href="" rel="stylesheet" type="text/css">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
 <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
 <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
 <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
@@ -31,360 +31,443 @@
 <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
 <meta name="theme-color" content="#ffffff">
 
-  <!-- <link href="favicon.ico" rel="shortcut icon"> -->
-  <!-- <link href="meta/apple-touch-icon.png" rel="apple-touch-icon"> -->
-  <link href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
-    rel="apple-touch-startup-image">
-  <!-- iPhone 5+ -->
-  <link href="meta/apple-touch-startup-image-640x920.png" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)"
-    rel="apple-touch-startup-image">
-  <!-- iPhone, retina -->
-  <meta content="yes" name="apple-mobile-web-app-capable">
-  <meta content="black" name="apple-mobile-web-app-status-bar-style">
-  <meta content="True" name="HandheldFriendly">
-  <meta content="320" name="MobileOptimized">
+	<!-- <link href="favicon.ico" rel="shortcut icon"> -->
+	<!-- <link href="meta/apple-touch-icon.png" rel="apple-touch-icon"> -->
+	<link href="meta/apple-touch-startup-image-640x1096.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
+		rel="apple-touch-startup-image">
+	<!-- iPhone 5+ -->
+	<link href="meta/apple-touch-startup-image-640x920.png" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)"
+		rel="apple-touch-startup-image">
+	<!-- iPhone, retina -->
+	<meta content="yes" name="apple-mobile-web-app-capable">
+	<meta content="black" name="apple-mobile-web-app-status-bar-style">
+	<meta content="True" name="HandheldFriendly">
+	<meta content="320" name="MobileOptimized">
 
-  <meta name="apple-itunes-app" content="app-id=1302567785">
+	<meta name="apple-itunes-app" content="app-id=1302567785">
 
-  <script src="https://kit.fontawesome.com/9df52878c1.js" crossorigin="anonymous"></script>
+	<script src="https://kit.fontawesome.com/9df52878c1.js" crossorigin="anonymous"></script>
 
-  <!-- Global site tag (gtag.js) - Google AdWords: 972849224 -->
-  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=AW-972849224"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
+	<!-- Global site tag (gtag.js) - Google AdWords: 972849224 -->
+	<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=AW-972849224"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
 
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-    gtag('js', new Date());
-    gtag('config', 'AW-972849224');
-  </script> -->
+		function gtag() {
+			dataLayer.push(arguments);
+		}
+		gtag('js', new Date());
+		gtag('config', 'AW-972849224');
+	</script> -->
 
 </head>
 
 <body ontouchstart="">
-  <!-- Sidenav -->
-  <div id="mySidenav" class="sidenav">
-    <div class="sidenavContent">
-      <div class="closebtn" onclick="closeNav();">&nbsp;&times;</div>
-      <h1>The Garden Gate</h1>
-      <hr />
-      <div id="sideMenuAvContainer" class="gone"></div>
-      <div class='sidenavSection odd'>
-        <div class='sidenavSectionHeader'>Play</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='accountHeaderClicked();'>
-          <i class="fa fa-user" aria-hidden="true"></i> View my games
-          <span id='myGamesNumberMyTurn'></span>
-        </div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameSeeksClicked();'>
-          <i class="fa fa-plug" aria-hidden="true"></i> Join a game
-        </div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='newGameClicked();'>
-          <i class="fa fa-plus-circle" aria-hidden="true"></i> New game
-        </div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='viewTournamentsClicked();'>
-          <i class="fa fa-trophy" aria-hidden="true"></i> Tournaments
-        </div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameRankingsClicked();'>
-          <i class="fa fa-tachometer" aria-hidden="true"></i> Game Rankings
-        </div>
-        <div class='sidenavEntry'>
-          <a href='https://discord.gg/thegardengate' target='_blank' class='sidenavLink'><i class="fa-brands fa-discord"></i> Join Discord Server</a>
-        </div>
-      </div>
-      <div class='gone'>
-        <hr />
-        <div class='sidenavSectionHeader'>New Game</div>
-        <div id="sidenavNewGameSection"></div>
-      </div>
-      <hr />
-      <div class='sidenavSection even'>
-        <div class='sidenavSectionHeader'>Current Game</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleReplayControls();'>Toggle replay controls</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameReplayLink();'>Get game link</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='showGameNotationModal();'>Show game notation</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='markGameInactiveClicked();'>Mark game inactive</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='resignOnlineGameClicked();'>Resign game</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='closeGame();'>Close this game</div>
-      </div>
-      <hr />
-      <div class='sidenavSection odd'>
-        <div class='sidenavSectionHeader'>About</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='aboutClicked();'>About
-          <em>The Garden Gate</em>
-        </div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='showWelcomeScreensClicked();'>Show welcome screens</div>
-        <div class='sidenavEntry sidenavLink skipBonus' onclick='openShop();'>Buy Pai Sho sets</div>
-        <div class='sidenavEntry'>
-          <a href='https://discord.gg/thegardengate' target='_blank' class='sidenavLink'><i class="fa-brands fa-discord"></i> Join Discord Server</a>
-        </div>
-        <div class='sidenavEntry'>
-          <a href='https://forum.skudpaisho.com/' target='_blank' class='sidenavLink'>The Garden Gate Forum</a>
-        </div>
-      </div>
-      <hr />
-      <div class='sidenavSection even'>
-        <div class='sidenavSectionHeader'>Support The Garden Gate</div>
-        <div class='sidenavEntry'>
-          <a href='https://www.patreon.com/SkudPaiSho' target='_blank' class='sidenavLink'><i class="fa-brands fa-patreon"></i> Support on Patreon</a>
-        </div>
-        <div class='sidenavEntry'>
-          <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank' class='sidenavLink'><i class="fa-solid fa-mug-saucer"></i> Leave a tip</a>
-        </div>
-        <!-- <div class='sidenavEntry sidenavLink skipBonus' onclick='Ads.viewSponsoredMessageClicked();'>View sponsored message</div> -->
-      </div>
-      <hr />
-      <div class='sidenavSection odd'>
-      <div class='sidenavSectionHeader'>
-        <div onClick='promptAddOption()'>Other</div>
-      </div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='showPreferences();'>Device Preferences</div>
-      <!-- <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleSoundOn();'>Toggle Sound On/Off</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleAnimationsOn();'>Toggle Animations On/Off</div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleDarkMode();'>Toggle Dark Mode</div> -->
-      <div class='sidenavEntry skipBonus'>
-        <label>Website Style:</label>
-        <select id='websiteStyleDropdown' onchange='setWebsiteTheme(this.value);'>
-          <option value='dark'>Classic Dark Mode</option>
-          <option value='light'>Classic Light Mode</option>
-          <option value='stotes'>Chu Ji Theme</option>
-        </select>
-      </div>
-      <div class='sidenavEntry sidenavLink skipBonus' onclick='location.reload(true);'>Reload website</div>
-      </div>
+	<!-- Sidenav -->
+	<div id="mySidenav" class="sidenav">
+		<div class="sidenavContent">
+			<div class="closebtn" onclick="closeNav();">&nbsp;&times;</div>
+			<h1>The Garden Gate</h1>
+			<hr />
+			<div id="sideMenuAvContainer" class="gone"></div>
+			<div class='sidenavSection odd'>
+				<div class='sidenavSectionHeader'>Play</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='accountHeaderClicked();'>
+					<i class="fa fa-user" aria-hidden="true"></i> View my games
+					<span id='myGamesNumberMyTurn'></span>
+				</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameSeeksClicked();'>
+					<i class="fa fa-plug" aria-hidden="true"></i> Join a game
+				</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='newGameClicked();'>
+					<i class="fa fa-plus-circle" aria-hidden="true"></i> New game
+				</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='viewTournamentsClicked();'>
+					<i class="fa fa-trophy" aria-hidden="true"></i> Tournaments
+				</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='viewGameRankingsClicked();'>
+					<i class="fa fa-tachometer" aria-hidden="true"></i> Game Rankings
+				</div>
+				<div class='sidenavEntry'>
+					<a href='https://skudpaisho.com/discord' target='_blank' class='sidenavLink'><i class="fa-brands fa-discord"></i> Join Discord Server</a>
+				</div>
+			</div>
+			<div class='gone'>
+				<hr />
+				<div class='sidenavSectionHeader'>New Game</div>
+				<div id="sidenavNewGameSection"></div>
+			</div>
+			<hr />
+			<div class='sidenavSection even'>
+				<div class='sidenavSectionHeader'>Current Game</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='toggleReplayControls();'>Toggle replay controls</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='sandboxFromMove();'>Sandbox this game</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='showGameReplayLink();'>Get game link</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='showGameNotationModal();'>Show game notation</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='markGameInactiveClicked();'>Mark game inactive</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='resignOnlineGameClicked();'>Resign game</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='closeGame();'>Close this game</div>
+			</div>
+			<hr />
+			<div class='sidenavSection odd'>
+				<div class='sidenavSectionHeader'>About</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='aboutClicked();'>About
+					<em>The Garden Gate</em>
+				</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='showWelcomeScreensClicked();'>Show welcome screens</div>
+				<div class='sidenavEntry sidenavLink skipBonus' onclick='openShop();'>Buy Pai Sho sets</div>
+				<div class='sidenavEntry'>
+					<a href='https://skudpaisho.com/discord' target='_blank' class='sidenavLink'><i class="fa-brands fa-discord"></i> Join Discord Server</a>
+				</div>
+				<div class='sidenavEntry'>
+					<a href='https://forum.skudpaisho.com/' target='_blank' class='sidenavLink'>The Garden Gate Forum</a>
+				</div>
+			</div>
+			<hr />
+			<div class='sidenavSection even'>
+				<div class='sidenavSectionHeader'>Support The Garden Gate</div>
+				<div class='sidenavEntry'>
+					<a href='https://www.patreon.com/SkudPaiSho' target='_blank' class='sidenavLink'><i class="fa-brands fa-patreon"></i> Support on Patreon</a>
+				</div>
+				<div class='sidenavEntry'>
+					<a href='https://www.buymeacoffee.com/skudpaisho' target='_blank' class='sidenavLink'><i class="fa-solid fa-mug-saucer"></i> Leave a tip</a>
+				</div>
+				<!-- <div class='sidenavEntry sidenavLink skipBonus' onclick='Ads.viewSponsoredMessageClicked();'>View sponsored message</div> -->
+			</div>
+			<hr />
+			<div class='sidenavSection odd'>
+			<div class='sidenavSectionHeader'>
+				<div onClick='promptAddOption()'>Other</div>
+			</div>
+			<div class='sidenavEntry sidenavLink skipBonus' onclick='showPreferences();'>Device Preferences</div>
+			<!-- <div class='sidenavEntry sidenavLink skipBonus' onclick='toggleSoundOn();'>Toggle Sound On/Off</div>
+			<div class='sidenavEntry sidenavLink skipBonus' onclick='toggleAnimationsOn();'>Toggle Animations On/Off</div>
+			<div class='sidenavEntry sidenavLink skipBonus' onclick='toggleDarkMode();'>Toggle Dark Mode</div> -->
+			<div class='sidenavEntry skipBonus'>
+				<label>Website Style:</label>
+				<select id='websiteStyleDropdown' onchange='setWebsiteTheme(this.value);'>
+					<option value='dark'>Classic Dark Mode</option>
+					<option value='light'>Classic Light Mode</option>
+					<option value='stotes'>Chu Ji Theme</option>
+				</select>
+			</div>
+			<div class='sidenavEntry sidenavLink skipBonus' onclick='location.reload(true);'>Reload website</div>
+			</div>
 
-      <div>&nbsp;</div><div>&nbsp;</div><div>&nbsp;</div>
-      <!--  -->
-      <div id="onlinePlayTest"></div>
-    </div>
-  </div>
-  <!-- End Sidenav -->
+			<div>&nbsp;</div><div>&nbsp;</div><div>&nbsp;</div>
+			<!--  -->
+			<div id="onlinePlayTest"></div>
+		</div>
+	</div>
+	<!-- End Sidenav -->
 
-  <div class="header">
-    <div class="sidenavMenuButton">
-      <span style="cursor:pointer; vertical-align: top;" onclick="openNav();">
-        <h1>
-          <span class="stretchText sidenavMenuButtonText" id='sidenavMenuButton'>&#8801;</span>
-        </h1>
-      </span>
-    </div>
-    <div class="headerLeft">
-      <h1>&nbsp;</h1>
-    </div>
-    <div class="headerLeft" style="cursor:pointer;" onclick="openNav();">
-      <h1 id='siteHeading'>The Garden Gate</h1>
-    </div>
-    <div class="headerRightContainer">
-      <span class="headerRight clickableText" onclick='accountHeaderClicked();'>
-        <i class="fa fa-user" aria-hidden="true"></i><span id="headerRightText4"> <span id='accountHeaderLinkText'>Sign In</span></span>
-      </span>
-      <div class="headerRight">&nbsp;|&nbsp;</div>
-      <span class="headerRight clickableText" onclick='newGameClicked();'>
-        <i class="fa fa-plus-circle" aria-hidden="true"></i> <span id="headerRightText3">New</span></span>
-      <div class="headerRight">&nbsp;|&nbsp;</div>
-      <span class="headerRight clickableText" onclick='viewGameSeeksClicked();'>
-        <i class="fa fa-plug" aria-hidden="true"></i> <span id="headerRightText2">Join</span>
-      </span>
-      <div class="headerRight">&nbsp;|&nbsp;</div>
-      <span class="headerRight clickableText" onclick='openShop();'>
-        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
-      </span>
-      <div class="headerRight">&nbsp;|&nbsp;</div>
-      <span class="headerRight clickableText" onclick='discordLinkClicked();'>
-        <i class="fa-brands fa-discord"></i>
-      </span>
-    </div>
-  </div>
+	<div class="header">
+		<div class="sidenavMenuButton">
+			<span style="cursor:pointer; vertical-align: top;" onclick="openNav();">
+				<h1>
+					<span class="stretchText sidenavMenuButtonText" id='sidenavMenuButton'>&#8801;</span>
+				</h1>
+			</span>
+		</div>
+		<div class="headerLeft">
+			<h1>&nbsp;</h1>
+		</div>
+		<div class="headerLeft" style="cursor:pointer;" onclick="openNav();">
+			<h1 id='siteHeading'>The Garden Gate</h1>
+		</div>
+		<div class="headerRightContainer">
+			<span class="headerRight clickableText" onclick='accountHeaderClicked();'>
+				<i class="fa fa-user" aria-hidden="true"></i><span id="headerRightText4"> <span id='accountHeaderLinkText'>Sign In</span></span>
+			</span>
+			<div class="headerRight">&nbsp;|&nbsp;</div>
+			<span class="headerRight clickableText" onclick='newGameClicked();'>
+				<i class="fa fa-plus-circle" aria-hidden="true"></i> <span id="headerRightText3">New</span></span>
+			<div class="headerRight">&nbsp;|&nbsp;</div>
+			<span class="headerRight clickableText" onclick='viewGameSeeksClicked();'>
+				<i class="fa fa-plug" aria-hidden="true"></i> <span id="headerRightText2">Join</span>
+			</span>
+			<div class="headerRight">&nbsp;|&nbsp;</div>
+			<span class="headerRight clickableText" onclick='openShop();'>
+				<i class="fa fa-shopping-cart" aria-hidden="true"></i>
+			</span>
+			<div class="headerRight">&nbsp;|&nbsp;</div>
+			<span class="headerRight clickableText" onclick='discordLinkClicked();'>
+				<i class="fa-brands fa-discord"></i>
+			</span>
+		</div>
+	</div>
 
-  <div id='mainWrapper'>
-    <div class="game-container-wrapper">
+	<div id='mainWrapper'>
+		<div class="game-container-wrapper">
 
-      <div id="game-title-container">
-        <div id="topAvContainer" class="gone"></div>
-        <h2 id="game-title-heading" class="game-title-text">Loading...</h2>
-        <div id="defaultGameMessage" class="gone">
-          Try <span id="defaultGameMessageGameTitle" class="game-title-text">Game Title</span> by clicking on tiles below. 
-          Click <span style="white-space: nowrap;"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Game</span> from the <span style="white-space: nowrap;"><span class='stretchText'>&nbsp;&#8801&nbsp;</span>side menu</span> 
-          to try one of the many other games here.
-        </div>
-      </div>
+			<div id="game-title-container">
+				<div id="topAvContainer" class="gone"></div>
+				<h2 id="game-title-heading" class="game-title-text">Loading...</h2>
+				<div id="defaultGameMessage" class="gone">
+					Try <span id="defaultGameMessageGameTitle" class="game-title-text">Game Title</span> by clicking on tiles below. 
+					Click <span style="white-space: nowrap;"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Game</span> from the <span style="white-space: nowrap;"><span class='stretchText'>&nbsp;&#8801&nbsp;</span>side menu</span> 
+					to try one of the many other games here.
+				</div>
+			</div>
 
-      <div id="game-container" class="game-container"></div>
+			<div id="game-container" class="game-container"></div>
 
-      <!-- <div class="notation-container" id="notation-container">
-        <div class="notationText gone" id="notationText">
-        </div>
-        <div class="notationInput gone">
-          <input type="text" id="notationInput" />
-          <input type="button" onclick="inputNow()" value="Enter" />
-        </div>
-      </div> -->
+			<!-- <div class="notation-container" id="notation-container">
+				<div class="notationText gone" id="notationText">
+				</div>
+				<div class="notationInput gone">
+					<input type="text" id="notationInput" />
+					<input type="button" onclick="inputNow()" value="Enter" />
+				</div>
+			</div> -->
 
-      <!-- <div id="board-container" class="board-container"> -->
-      <!-- <div class='svgContainerContainer'>
-          <div class="svgContainer">
-            <div class="bg-svg">
-              <div class="pointContainer"></div>
-            </div>
-          </div>
-        </div> -->
-      <!-- </div> -->
-      <!-- <div id="tilePileContainer" class="tilePileContainer">
-        <div id='response'></div>
-        <div class="gameMessage"></div>
-        <div id="hostTilesContainer" class="hostTilesContainer"></div>
-        <div id="guestTilesContainer" class="guestTilesContainer"></div>
-        <div class="gameMessage2"></div>
-      </div> -->
-      <div class="helpContainer" id="help">
-        <div class="tab">
-          <button class="tablinks" onclick="openTab(event, 'helpTextTab')" id="defaultOpenTab">Help</button>
-          <button id='globalChatTabHeader' class="tablinks" onclick="openTab(event, 'globalChatTab');">Links/Chat <i class="fa-brands fa-discord"></i></button>
-          <button id='chatTab' class="tablinks" onclick="openTab(event, 'gameChatTab'); dismissChatAlert();">Game Chat</button>
-        </div>
+			<!-- <div id="board-container" class="board-container"> -->
+			<!-- <div class='svgContainerContainer'>
+					<div class="svgContainer">
+						<div class="bg-svg">
+							<div class="pointContainer"></div>
+						</div>
+					</div>
+				</div> -->
+			<!-- </div> -->
+			<!-- <div id="tilePileContainer" class="tilePileContainer">
+				<div id='response'></div>
+				<div class="gameMessage"></div>
+				<div id="hostTilesContainer" class="hostTilesContainer"></div>
+				<div id="guestTilesContainer" class="guestTilesContainer"></div>
+				<div class="gameMessage2"></div>
+			</div> -->
+			<div class="helpContainer" id="help">
+				<div class="tab">
+					<button class="tablinks" onclick="openTab(event, 'helpTextTab')" id="defaultOpenTab">Help</button>
+					<button id='globalChatTabHeader' class="tablinks" onclick="openTab(event, 'globalChatTab');">Links/Chat <i class="fa-brands fa-discord"></i></button>
+					<button id='chatTab' class="tablinks" onclick="openTab(event, 'gameChatTab'); dismissChatAlert();">Game Chat</button>
+				</div>
 
-        <div id='helpTextTab' class="tabcontent">
-          <div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
-          <div id='helpTextContent'>
-          </div>
-        </div>
-        <div id="globalChatTab" class="tabcontent">
-          <div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
-          <div id="globalChatMessagesDisplayLinks" class="linksTabLinksDiv">
-            <br>
-            <a href='https://discord.gg/thegardengate' target='_blank'><i class="fa-brands fa-discord"></i> Discord server</a>: Join The Garden Gate Community and chat or ask questions.
-            <br><br>
-            <a href='https://skudpaisho.com/site/' target='_blank'>The Rules &amp; More Site</a>: More information about Pai Sho and The Garden Gate.
-            <br><br>
-            <a href='https://skudpaisho.com/site/buying-pai-sho/' target='_blank'>Buying Pai Sho page</a>: Information about buying a Pai Sho set, the free print-and-play set, and all about making your own Pai Sho set.
-            <br><br>
-            <a href='https://www.patreon.com/SkudPaiSho' target='_blank'><i class="fa-brands fa-patreon"></i> Patreon</a>: Support The Garden Gate monthly on <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a> or <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank'>leave a one-time tip</a>.
-          </div>
-          <hr />
-          <div id="globalChatMessagesDisplay" class="chatMessagesDisplay">
-          </div>
-          <div id="globalChatMessageInputContainer" class="chatMessageInputContainer">
-            <textarea id="globalChatMessageInput" class="chatMessageInput"></textarea>
-            <span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span>
-          </div>
-        </div>
-        <div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
-          <div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
-          <div id="chatMessagesHeader" class="chatMessagesHeader"><em>Game Chat messages may be viewed by other players. Abide by the Discord server #rules to be allowed to use Game Chat. Thank you!</em><div class='clickableText' onclick='toggleTimestamps()'>Toggle timestamp display</div><div id='toggleMoveLogDisplayDiv' class='clickableText gone' onclick='toggleMoveLogDisplay()'>Toggle move log messages</div><div id='rollD6LinkAboveChat' class='clickableText gone' onclick='sendChat("/d6 2")'>Roll D6</div><hr /></div>
-          <div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
-          <div id="chatMessageInputContainer" class="chatMessageInputContainer">
-            <textarea id="chatMessageInput" class="chatMessageInput"></textarea>
-            <span id="sendChatMessageButton" class="button" onclick='sendChat();'>Send</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+				<div id='helpTextTab' class="tabcontent">
+					<div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
+					<div id='helpTextContent'>
+					</div>
+				</div>
+				<div id="globalChatTab" class="tabcontent">
+					<div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
+					<div id="globalChatMessagesDisplayLinks" class="linksTabLinksDiv">
+						<br>
+						<a href='https://skudpaisho.com/discord' target='_blank'><i class="fa-brands fa-discord"></i> Discord server</a>: Join The Garden Gate Community and chat or ask questions.
+						<br><br>
+						<a href='https://skudpaisho.com/site/' target='_blank'>The Rules &amp; More Site</a>: More information about Pai Sho and The Garden Gate.
+						<br><br>
+						<a href='https://skudpaisho.com/site/buying-pai-sho/' target='_blank'>Buying Pai Sho page</a>: Information about buying a Pai Sho set, the free print-and-play set, and all about making your own Pai Sho set.
+						<br><br>
+						<a href='https://www.patreon.com/SkudPaiSho' target='_blank'><i class="fa-brands fa-patreon"></i> Patreon</a>: Support The Garden Gate monthly on <a href='https://www.patreon.com/SkudPaiSho' target='_blank'>Patreon</a> or <a href='https://www.buymeacoffee.com/skudpaisho' target='_blank'>leave a one-time tip</a>.
+					</div>
+					<hr />
+					<div id="globalChatMessagesDisplay" class="chatMessagesDisplay">
+					</div>
+					<div id="globalChatMessageInputContainer" class="chatMessageInputContainer">
+						<textarea id="globalChatMessageInput" class="chatMessageInput"></textarea>
+						<span id="sendGlobalChatMessageButton" class="button" onclick='sendGlobalChat();'>Send</span>
+					</div>
+				</div>
+				<div id="gameChatTab" class="tabcontent" onclick='dismissChatAlert();'>
+					<div id="chatTabAvContainer" class="gone chatTabAvContainer"></div>
+					<div id="chatMessagesHeader" class="chatMessagesHeader"><em>Game Chat messages may be viewed by other players. Abide by the Discord server #rules to be allowed to use Game Chat. Thank you!</em><div class='clickableText' onclick='toggleTimestamps()'>Toggle timestamp display</div><div id='toggleMoveLogDisplayDiv' class='clickableText gone' onclick='toggleMoveLogDisplay()'>Toggle move log messages</div><div id='rollD6LinkAboveChat' class='clickableText gone' onclick='sendChat("/d6 2")'>Roll D6</div><hr /></div>
+					<div id="chatMessagesDisplay" class="chatMessagesDisplay"></div>
+					<div id="chatMessageInputContainer" class="chatMessageInputContainer">
+						<textarea id="chatMessageInput" class="chatMessageInput"></textarea>
+						<span id="sendChatMessageButton" class="button" onclick='sendChat();'>Send</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-  <div class="footer"></div>
+	<div class="footer"></div>
 
-  <div id="replayControls" class="gone">
-    <div id="footerAvContainer" class="gone"></div>
-    <div id='confirmMoveButton' class='gone'>
-      <div class="center">
-        <span class='replayButton' onclick="confirmMoveClicked()">
-          Submit Move
-        </span>
-      </div>
-    </div>
-    <div id='gameLogText' class='gameLogText replayControlsAdditionalContent'></div>
-    <div id='gameClockContainer' class='gameClockContainer replayControlsAdditionalContent'></div>
-    <div id='replayButtonContainer' class="center">
-      <span class='replayButton' onclick="rewindAllMoves()">
-        <i class="fa fa-fast-backward" aria-hidden="true"></i>
-      </span>
-      <span class='replayButton' onclick="playPrevMove()">
-        <i class="fa fa-step-backward" aria-hidden="true"></i>
-      </span>
-      <span class='replayButton playPauseButton' onclick="playPause()">
-        <i class="fa fa-play" aria-hidden="true"></i>
-      </span>
-      <span class='replayButton' onclick="playNextMove(true); pauseRun();">
-        <i class="fa fa-step-forward" aria-hidden="true"></i>
-      </span>
-      <span class='replayButton' onclick="playAllMoves()">
-        <i class="fa fa-fast-forward" aria-hidden="true"></i>
-      </span>
-    </div>
-    <span class="replayControlsCloseButton" onClick='toggleReplayControls()'>&nbsp;&times;
-        <!-- <i class="fa fa-times" aria-hidden="true"></i> -->
-      </span>
-  </div>
+	<div id="replayControls" class="gone">
+		<div id="footerAvContainer" class="gone"></div>
+		<div id='confirmMoveButton' class='gone'>
+			<div class="center">
+				<span class='replayButton' onclick="confirmMoveClicked()">
+					Submit Move
+				</span>
+			</div>
+		</div>
+		<div id='gameLogText' class='gameLogText replayControlsAdditionalContent'></div>
+		<div id='gameClockContainer' class='gameClockContainer replayControlsAdditionalContent'></div>
+		<div id='replayButtonContainer' class="center">
+			<span class='replayButton' onclick="rewindAllMoves()">
+				<i class="fa fa-fast-backward" aria-hidden="true"></i>
+			</span>
+			<span class='replayButton' onclick="playPrevMove()">
+				<i class="fa fa-step-backward" aria-hidden="true"></i>
+			</span>
+			<span class='replayButton playPauseButton' onclick="playPause()">
+				<i class="fa fa-play" aria-hidden="true"></i>
+			</span>
+			<span class='replayButton' onclick="playNextMove(true); pauseRun();">
+				<i class="fa fa-step-forward" aria-hidden="true"></i>
+			</span>
+			<span class='replayButton' onclick="playAllMoves()">
+				<i class="fa fa-fast-forward" aria-hidden="true"></i>
+			</span>
+		</div>
+		<span class="replayControlsCloseButton" onClick='toggleReplayControls()'>&nbsp;&times;
+				<!-- <i class="fa fa-times" aria-hidden="true"></i> -->
+			</span>
+	</div>
 
-  <!-- Modal -->
-  <!-- The Modal -->
-  <div id="myMainModal" class="modal">
+	<!-- Modal -->
+	<!-- The Modal -->
+	<div id="myMainModal" class="modal">
 
-    <!-- Modal content -->
-    <div class="modal-content">
-      <span class="myMainModalClose">&nbsp;&times;
-        <!-- <i class="fa fa-times" aria-hidden="true"></i> -->
-      </span>
-      <div id='modalHeading'>&nbsp;</div>
-      <div id='modalMessage'>&nbsp;</div>
-    </div>
+		<!-- Modal content -->
+		<div class="modal-content">
+			<span class="myMainModalClose">&nbsp;&times;
+				<!-- <i class="fa fa-times" aria-hidden="true"></i> -->
+			</span>
+			<div id='modalHeading'>&nbsp;</div>
+			<div id='modalMessage'>&nbsp;</div>
+		</div>
 
-  </div>
-  <!-- End Modal -->
+	</div>
+	<!-- End Modal -->
 
-  <!-- Modal content containers -->
-  <div id='loginModalContentContainer' style='display:none;'>
-    <!-- Login modal -->
-    To sign up or log in, enter your username and email, then enter the 4-digit code sent to you to sign into The
-    Garden Gate.
-    <div style='text-align: center;'>
-      <table style='margin:auto;'>
-        <tr>
-          <td style='text-align:right'>Username:</td>
-          <td>
-            <input id='usernameInput' type='text' name='usernameInput' />
-          </td>
-        </tr>
-        <tr>
-          <td style='text-align:right'>Email:</td>
-          <td>
-            <input id='userEmailInput' type='email' name='userEmailInput' />
-          </td>
-        </tr>
-      </table>
-      <div>
-        <button type='button' class="signupbutton" onclick='sendVerificationCodeClicked();'>Send verification code</button>
-        <br />
-        <div id='verificationCodeSendResponse'>&nbsp;</div>
-      </div>
-      <br />
-      <table style='margin:auto;'>
-        <tr>
-          <td style='text-align:right'>Code:</td>
-          <td>
-            <input id='verificationCodeInput' type='text' name='verificationCodeInput' disabled />
-          </td>
-        </tr>
-      </table>
-      <div>
-        <button id='verifyCodeBtn' class="signupbutton" type='button' onclick='verifyCodeClicked();'>Verify code</button>
-      </div>
-    </div>
-  </div>
-  <!--  -->
+	<!-- Modal content containers -->
+	<div id='loginModalContentContainer' style='display:none;'>
+		<!-- Login modal -->
+		<p>To sign in, enter your username or email and password. <span class='clickableText' onclick='signUpClicked()'>Click here to sign up or sign in with email verification</span>.</p>
+		<div style='text-align: center;'>
+			<table style='margin:auto;'>
+				<tr>
+					<td style='text-align:right'>Username or Email:</td>
+					<td>
+						<input id='usernameInput' type='text' name='usernameInput' />
+					</td>
+				</tr>
+				<!-- <tr>
+					<td style='text-align:right'>Email:</td>
+					<td>
+						<input id='userEmailInput' type='email' name='userEmailInput' />
+					</td>
+				</tr> -->
+				<tr>
+					<td style='text-align:right'>Password:</td>
+					<td>
+						<input id='userPasswordInput' type='password' name='userPasswordInput' />
+					</td>
+				</tr>
+			</table>
+			<div>
+				<button type='button' class="signupbutton" onclick='submitSignInClicked();'>Sign In</button>
+			</div>
+		</div>
+	</div>
 
-  
+	<div id='signUpModalContentContainer' style='display:none;'>
+		<!-- Sign Up modal -->
+		<p>
+			To sign up as a new player, enter your username, email, and password, then enter the 4-digit code sent to you to sign into The
+		Garden Gate.
+		</p>
+		<p>
+			To sign in with email verification, enter your username and email but leave the password fields blank. 
+		</p>
+		<div style='text-align: center;'>
+			<table style='margin:auto;'>
+				<tr>
+					<td style='text-align:right'>Username:</td>
+					<td>
+						<input id='usernameInput' type='text' name='usernameInput' />
+					</td>
+				</tr>
+				<tr>
+					<td style='text-align:right'>Email:</td>
+					<td>
+						<input id='userEmailInput' type='email' name='userEmailInput' />
+					</td>
+				</tr>
+				<tr>
+					<td style='text-align:right'>Password (if signing up):</td>
+					<td>
+						<input id='userPasswordInput' type='password' name='userPasswordInput' />
+					</td>
+				</tr>
+				<tr>
+					<td style='text-align:right'>Verify Password (if signing up):</td>
+					<td>
+						<input id='userPasswordCheckInput' type='password' name='userPasswordCheckInput' />
+					</td>
+				</tr>
+			</table>
+			<div>
+				<button type='button' class="signupbutton" onclick='sendVerificationCodeClicked();'>Send verification code</button>
+				<br />
+				<div id='verificationCodeSendResponse'>&nbsp;</div>
+			</div>
+			<br />
+			<table style='margin:auto;'>
+				<tr>
+					<td style='text-align:right'>Code:</td>
+					<td>
+						<input id='verificationCodeInput' type='text' name='verificationCodeInput' disabled />
+					</td>
+				</tr>
+			</table>
+			<div>
+				<button id='verifyCodeBtn' class="signupbutton" type='button' onclick='verifyCodeClicked();'>Verify code</button>
+			</div>
+		</div>
+	</div>
 
-  <!-- jquery cloud reference -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<div id='changePasswordModalContentContainer' style='display:none;'>
+		<!-- Change password modal -->
+		<p>
+			Set or change your password by entering existing password (leave blank if none) and new password here.
+		</p>
+		<div style='text-align: center;'>
+			<table style='margin:auto;'>
+				<tr>
+					<td style='text-align:right'>Existing Password (if any):</td>
+					<td>
+						<input id='userExistingPasswordInput' type='password' name='userExistingPasswordInput' />
+					</td>
+				</tr>
+				<tr>
+					<td style='text-align:right'>New Password:</td>
+					<td>
+						<input id='userPasswordInput' type='password' name='userPasswordInput' />
+					</td>
+				</tr>
+				<tr>
+					<td style='text-align:right'>Verify New Password:</td>
+					<td>
+						<input id='userPasswordCheckInput' type='password' name='userPasswordCheckInput' />
+					</td>
+				</tr>
+			</table>
+			<div>
+				<button type='button' class="signupbutton" onclick='updatePasswordClicked();'>Change Password</button>
+			</div>
+			<br /><br />
+			<div>
+				Forgot your password? <span class='clickableText' onclick='forgetPasswordClicked()'>Click here to remove the password from your account.</span> You will still be able to log in with email verification and can set a password here later.
+			</div>
+		</div>
+	</div>
+	<!--  -->
 
-  <!-- Util js -->
-  <script src="js_util/0_lz-string.min.js"></script>
-  <script src="js_util/MersenneTwisterRandom.js"></script>
+	
 
-  <!-- Compressed TGG Code -->
-  <script src="psmin_20230123-200524.js"></script>
+	<!-- jquery cloud reference -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+	<!-- Util js -->
+	<script src="js_util/0_lz-string.min.js"></script>
+	<script src="js_util/MersenneTwisterRandom.js"></script>
+
+	<!-- Compressed TGG Code -->
+	<script src="psmin_20230718-071536.js"></script>
 </body>
 
 </html>

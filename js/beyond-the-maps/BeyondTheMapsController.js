@@ -80,6 +80,7 @@ BeyondTheMaps.Controller = class {
 		}
 
 		rerunAll();
+		return true;
 	}
 
 	getDefaultHelpMessageText() {
@@ -423,10 +424,10 @@ BeyondTheMaps.Controller = class {
 					refreshMessage();
 					phaseIndex++;
 					if (phaseIndex >= numPhases) {
-						clearInterval(phaseInterval);
+						clearTimeout(phaseInterval);
 						this.currentlyRunningMove = false;
 					}
-				}, replayIntervalLength / numPhases);
+				}, (replayIntervalLength * 0.9) / numPhases);
 			} else {
 				this.currentlyRunningMove = false;
 			}

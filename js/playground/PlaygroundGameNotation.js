@@ -7,7 +7,8 @@ var PlaygroundMoveType = {
 	hideTileLibraries: "HideTileLibraries",
 	deployToTilePile: "DeployToTilePile",
 	moveToTilePile: "MoveToTilePile",
-	rotateToFaceDirection: "RotateToFaceDirection"
+	rotateToFaceDirection: "RotateToFaceDirection",
+	setGameBoard: "SetGameBoard"
 };
 
 var PlaygroundNotationConstants = {
@@ -79,6 +80,8 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 		this.moveType = PlaygroundMoveType.moveToTilePile;
 	} else if (moveText.includes(PlaygroundNotationConstants.deployToPile)) {
 		this.moveType = PlaygroundMoveType.deployToTilePile;
+	} else if (moveText.includes(PlaygroundMoveType.setGameBoard)) {
+		this.moveType = PlaygroundMoveType.setGameBoard;
 	}
 
 	if (this.moveType === DEPLOY || this.moveType === PlaygroundMoveType.deployToTilePile) {
@@ -127,6 +130,8 @@ PlaygroundNotationMove.prototype.analyzeMove = function() {
 		this.startPoint = new NotationPoint(parts[0]);
 
 		this.directionToFace = parts[1];
+	} else if (this.moveType === PlaygroundMoveType.setGameBoard) {
+		this.boardType = moveText.substring(moveText.indexOf("_") + 1);
 	}
 
 	if (this.tileType) {
@@ -179,6 +184,8 @@ PlaygroundNotationBuilder.prototype.getNotationMove = function(moveNum, player) 
 		notationLine += this.tileType + PlaygroundNotationConstants.deployToPile + this.endPileName + PlaygroundNotationConstants.fromPile + this.sourcePileName;
 	} else if (this.moveType === PlaygroundMoveType.rotateToFaceDirection) {
 		notationLine += "(" + this.startPoint.pointText + ")" + PlaygroundNotationConstants.rotateToFace + this.directionToFace;
+	} else if (this.moveType === PlaygroundMoveType.setGameBoard) {
+		notationLine += PlaygroundMoveType.setGameBoard + "_" + this.boardType;
 	}
 	
 	return new PlaygroundNotationMove(notationLine);

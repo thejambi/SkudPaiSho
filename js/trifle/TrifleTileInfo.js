@@ -374,7 +374,7 @@ Trifle.TileInfo.getReadableDescription = function(tileCode) {
 
 	var tileInfo = PaiShoGames.currentTileMetadata[tileCode];
 
-	if (tileInfo.textLines) {
+	if (tileInfo.textLines && !debugOn) {
 		tileInfo.textLines.forEach(function(textLine) {
 			tileHtml += textLine + "<br />";
 		});
