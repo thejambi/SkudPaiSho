@@ -36,11 +36,16 @@ mkdir -p "$DEPLOY_DIR"
 echo -e "${BLUE}📦 Copying production files...${NC}"
 
 # Use rsync to copy with exclusions
+# >>> SKIP_ASSETS: Comment out the next two lines to include images/ and style/ <<<
+SKIP_IMAGES="--exclude=images"
+SKIP_STYLE="--exclude=style"
 rsync -av \
     --exclude='*.map' \
     --exclude='*.DS_Store' \
     --exclude='.gitkeep' \
     --exclude='sw.js' \
+    $SKIP_IMAGES \
+    $SKIP_STYLE \
     "$DIST_DIR/" "$DEPLOY_DIR/"
 
 # Copy service worker file (Parcel puts it in a directory, we need it as a file)
@@ -53,6 +58,10 @@ else
     # Fallback: copy from source
     cp "sw.js" "$DEPLOY_DIR/sw.js"
 fi
+
+# Create test.html copy of index.html
+echo -e "${BLUE}📋 Creating test.html copy...${NC}"
+cp "$DEPLOY_DIR/index.html" "$DEPLOY_DIR/test.html"
 
 # Count files
 FILE_COUNT=$(find "$DEPLOY_DIR" -type f | wc -l | tr -d ' ')
