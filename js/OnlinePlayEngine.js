@@ -706,55 +706,32 @@ export class OnlinePlayEngine {
 			}
 		);
 	}
+	/* Short Links */
+	createShortLink(linkedInfo, loginToken, callback) {
+		$.post("backend/createShortLink.php",
+			{
+				linkedInfo: linkedInfo,
+				userId: loginToken.userId,
+				username: loginToken.username,
+				userEmail: loginToken.userEmail,
+				deviceId: loginToken.deviceId
+			},
+			function(data, status) {
+				if (status === 'success') {
+					callback(data.trim());
+				} else {
+					callFailed();
+				}
+			}
+		);
+	}
+	getShortLinkInfo(slug, callback) {
+		$.get("backend/getShortLinkInfo.php?slug=" + encodeURIComponent(slug),
+			function(data, status) {
+				if (status === 'success') {
+					callback(data.trim());
+				}
+			}
+		);
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

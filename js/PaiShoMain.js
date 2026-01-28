@@ -131,7 +131,10 @@ export const QueryString = (() => {
 	const query_string = {};
 	let query = window.location.search.substring(1);
 
-	if (query.length > 0 && !(query.includes("appType="))) {
+	// Short link params (sl=) are not compressed, so skip decompression for them
+	const isShortLink = query.startsWith("sl=");
+
+	if (query.length > 0 && !(query.includes("appType=")) && !isShortLink) {
 		// Decompress first
 		query = decompressFromEncodedURIComponent(query);
 	}
@@ -161,6 +164,35 @@ export const QueryString = (() => {
 if (QueryString.tu) {
 	redirectToTinyUrl(QueryString.tu);
 }
+
+// Declared early so it's available for shortLinkDataReady
+export const onlinePlayEngine = new OnlinePlayEngine();
+
+// Promise that resolves when short link data (if any) has been loaded and applied
+export const shortLinkDataReady = QueryString.sl
+	? new Promise((resolve) => {
+		onlinePlayEngine.getShortLinkInfo(QueryString.sl, (linkedInfo) => {
+			if (linkedInfo) {
+				// Decompress and parse the linked info
+				const decompressed = decompressFromEncodedURIComponent(linkedInfo);
+				if (decompressed) {
+					// Parse and merge into QueryString
+					let vars = decompressed.split("&");
+					if (decompressed.includes("&amp;")) {
+						vars = decompressed.split("&amp;");
+					}
+					for (let i = 0; i < vars.length; i++) {
+						const pair = vars[i].split(/=(.+)/);
+						if (pair[0] && pair[1] !== undefined) {
+							QueryString[pair[0]] = decodeURIComponent(pair[1]);
+						}
+					}
+				}
+			}
+			resolve();
+		});
+	})
+	: Promise.resolve();
 
 export let gameController;
 
@@ -381,7 +413,6 @@ export const pieceAnimationLength = 1000; // Note that this must be changed in t
 export const piecePlaceAnimation = 1; // 0 = None, they just appear, 1 =
 
 /* Online Play variables */
-export const onlinePlayEngine = new OnlinePlayEngine();
 let appCaller;
 
 export let onlinePlayEnabled = false;
@@ -450,6 +481,8 @@ export const createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 /* --- */
 
 window.requestAnimationFrame(function() {
+	// Wait for short link data to be loaded (if any) before initializing
+	shortLinkDataReady.then(() => {
 
 	setupUiEvents();
 	setupHtmlEventHandlers();
@@ -652,6 +685,7 @@ window.requestAnimationFrame(function() {
 	if (QueryString.joinPrivateGame) {
 		jumpToGame(QueryString.joinPrivateGame);
 	}
+	}); // end shortLinkDataReady.then()
 });
 export function getGameColor(gameMode) {
 	switch (gameMode) {
@@ -5842,15 +5876,24 @@ export const showGameStats = GameStats.showGameStats;
 export const getHonoraryTitleMessage = GameStats.getHonoraryTitleMessage;
 
 export function getShortUrl(urlToShorten, callback) {
-	return getTinyUrl(urlToShorten, (tinyUrl) => {
-		if (tinyUrl.includes(url)) {
-			callback(tinyUrl);
-		} else {
-			const urlEnd = tinyUrl.substring(tinyUrl.indexOf(".com/") + 5);
-			const encodedEnd = compressToEncodedURIComponent("tu=" + urlEnd);
-			callback(url + "?" + encodedEnd);
-		}
-	});
+	if (onlinePlayEnabled && userIsLoggedIn()) {
+		// Extract just the query string (the compressed params after the ?)
+		const queryStart = urlToShorten.indexOf('?');
+		const linkedInfo = queryStart >= 0 ? urlToShorten.substring(queryStart + 1) : urlToShorten;
+
+		onlinePlayEngine.createShortLink(linkedInfo, getLoginToken(), (slug) => {
+			if (slug && !slug.startsWith("ERROR")) {
+				// Return URL with uncompressed sl= param
+				callback(url + "?sl=" + slug);
+			} else {
+				// Fallback to full URL on error
+				callback(urlToShorten);
+			}
+		});
+	} else {
+		// Not logged in or online play disabled, return full URL
+		callback(urlToShorten);
+	}
 }
 
 export function getTinyUrl(urlToShorten, callback) {
