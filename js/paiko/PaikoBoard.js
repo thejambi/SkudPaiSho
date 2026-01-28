@@ -133,6 +133,24 @@ export class PaikoBoard {
 			}
 		}
 
+		// Mark the black squares (only Lotus can deploy here, no movement allowed)
+		// Notation points: (-1,1), (0,-1), (1,0), (2,-2)
+		// Conversion: row = 8 - y, col = x + 8
+		const blackSquares = [
+			{ x: -1, y: 1 },  // row 7, col 7
+			{ x: 0, y: -1 },  // row 9, col 8
+			{ x: 1, y: 0 },   // row 8, col 9
+			{ x: 2, y: -2 }   // row 10, col 10
+		];
+
+		blackSquares.forEach(({ x, y }) => {
+			const row = 8 - y;
+			const col = x + 8;
+			if (cells[row] && cells[row][col]) {
+				cells[row][col].zone = PaikoZone.BLACKED_OUT;
+			}
+		});
+
 		return cells;
 	}
 

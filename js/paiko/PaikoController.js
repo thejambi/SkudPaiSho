@@ -32,6 +32,7 @@ export class PaikoController {
 		this.resetGameNotation();
 
 		this.isPaiShoGame = false;
+		this.selectedDrawTiles = [];
 	}
 
 	getGameTypeId() {
@@ -279,6 +280,55 @@ export class PaikoController {
 			container.appendChild(rotateContainer);
 		}
 
+		// Show draw selection UI when selecting tiles to draw
+		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.SELECTING_DRAW_TILES) {
+			const drawContainer = document.createElement('div');
+
+			const drawHeader = document.createElement('p');
+			const remaining = 3 - (this.selectedDrawTiles?.length || 0);
+			drawHeader.innerHTML = `<strong>Select tiles to draw (${remaining} remaining):</strong> Click tiles in your reserve`;
+			drawContainer.appendChild(drawHeader);
+
+			// Show selected tiles
+			if (this.selectedDrawTiles && this.selectedDrawTiles.length > 0) {
+				const selectedP = document.createElement('p');
+				selectedP.innerHTML = '<strong>Selected:</strong> ';
+
+				this.selectedDrawTiles.forEach((tileCode, index) => {
+					if (index > 0) selectedP.appendChild(document.createTextNode(', '));
+					const tileSpan = document.createElement('span');
+					tileSpan.className = 'skipBonus';
+					tileSpan.textContent = tileCode + ' ✕';
+					tileSpan.onclick = () => this.deselectTileForDraw(index);
+					selectedP.appendChild(tileSpan);
+				});
+
+				drawContainer.appendChild(selectedP);
+			}
+
+			// Show confirm/cancel buttons
+			const buttonsP = document.createElement('p');
+
+			if (this.selectedDrawTiles && this.selectedDrawTiles.length > 0) {
+				const confirmSpan = document.createElement('span');
+				confirmSpan.className = 'skipBonus';
+				confirmSpan.textContent = 'Confirm Draw';
+				confirmSpan.onclick = () => this.confirmDraw();
+				buttonsP.appendChild(confirmSpan);
+
+				buttonsP.appendChild(document.createTextNode(' | '));
+			}
+
+			const cancelSpan = document.createElement('span');
+			cancelSpan.className = 'skipBonus';
+			cancelSpan.textContent = 'Cancel';
+			cancelSpan.onclick = () => this.cancelDraw();
+			buttonsP.appendChild(cancelSpan);
+
+			drawContainer.appendChild(buttonsP);
+			container.appendChild(drawContainer);
+		}
+
 		// Setup phase messages
 		if (gameInfo.phase === PaikoGamePhase.HOST_SELECT_7) {
 			const msg = document.createElement('p');
@@ -298,10 +348,20 @@ export class PaikoController {
 			scores.innerHTML = `<strong>Scores:</strong> Host: ${gameInfo.scores.host} | Guest: ${gameInfo.scores.guest}`;
 			container.appendChild(scores);
 
-			// Show action options if not selecting rotation
-			if (this.moveBuilder.getStatus() !== PaikoBuilderStatus.SELECTING_ROTATION && myTurn() && !gameInfo.winner) {
-				const actions = document.createElement('span');
-				actions.innerHTML = '<p><strong>Your turn:</strong> Click a tile in your hand to deploy, click a tile on the board to shift, or click here to <span id="drawAction" class="skipBonus">Draw 3 tiles</span></p>';
+			// Show action options if not in special selection modes
+			const status = this.moveBuilder.getStatus();
+			if (status !== PaikoBuilderStatus.SELECTING_ROTATION &&
+				status !== PaikoBuilderStatus.SELECTING_DRAW_TILES &&
+				myTurn() && !gameInfo.winner) {
+				const actions = document.createElement('p');
+				actions.innerHTML = '<strong>Your turn:</strong> Click a tile in your hand to deploy, click a tile on the board to shift, or click here to ';
+
+				const drawSpan = document.createElement('span');
+				drawSpan.className = 'skipBonus';
+				drawSpan.textContent = 'Draw 3 tiles';
+				drawSpan.onclick = () => this.drawTiles();
+				actions.appendChild(drawSpan);
+
 				container.appendChild(actions);
 			}
 		}
@@ -332,6 +392,19 @@ export class PaikoController {
 		const tileCode = tileDiv.getAttribute('data-tileCode');
 		const currentPlayer = this.getCurrentPlayer();
 
+		// Handle draw selection mode - clicking on reserve to select tiles to draw
+		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.SELECTING_DRAW_TILES) {
+			const isOwnReserve = (currentPlayer === HOST && pileName === 'hostReserve') ||
+				(currentPlayer === GUEST && pileName === 'guestReserve');
+
+			if (isOwnReserve) {
+				this.selectTileForDraw(tileCode);
+			} else {
+				debug("Select tiles from your own reserve");
+			}
+			return;
+		}
+
 		// Setup phase - selecting tiles for hand
 		if (this.theGame.isSetupPhase()) {
 			const isHostReserve = pileName === 'hostReserve';
@@ -360,7 +433,10 @@ export class PaikoController {
 
 			this.resetNotationBuilder();
 
-			if (playingOnlineGame()) {
+			// Start online game after HOST finishes selecting 7 tiles (phase transitions to GUEST_SELECT_9)
+			if (onlinePlayEnabled && this.theGame.gamePhase === PaikoGamePhase.GUEST_SELECT_9 && this.gameNotation.moves.length === 7) {
+				this.startOnlineGame();
+			} else if (playingOnlineGame()) {
 				callSubmitMove();
 			} else {
 				finalizeMove();
@@ -537,9 +613,7 @@ export class PaikoController {
 
 		this.resetNotationBuilder();
 
-		if (onlinePlayEnabled && this.gameNotation.moves.length === 4) {
-			createGameIfThatIsOk(GameType.Paiko.id);
-		} else if (playingOnlineGame()) {
+		if (playingOnlineGame()) {
 			callSubmitMove();
 		} else {
 			finalizeMove();
@@ -571,7 +645,7 @@ export class PaikoController {
 		}
 	}
 
-	// Draw action (draw 3 tiles from reserve)
+	// Draw action (draw up to 3 tiles from reserve)
 	drawTiles() {
 		if (!myTurn()) {
 			return;
@@ -585,16 +659,77 @@ export class PaikoController {
 			return;
 		}
 
-		// For simplicity, auto-select first 3 available types
-		// In a full implementation, this would open a selector UI
-		const tilesToDraw = availableTiles.slice(0, Math.min(3, availableTiles.length));
+		// Enter draw selection mode
+		this.moveBuilder.setStatus(PaikoBuilderStatus.SELECTING_DRAW_TILES);
+		this.moveBuilder.setPlayer(currentPlayer);
+		this.moveBuilder.setMoveType(PaikoMoveType.DRAW);
+		this.selectedDrawTiles = [];
 
-		this.moveBuilder.buildDrawMove(currentPlayer, tilesToDraw);
+		// Refresh message to show draw selection UI
+		refreshMessage();
+	}
+
+	// Select a tile to draw from reserve
+	selectTileForDraw(tileCode) {
+		if (this.moveBuilder.getStatus() !== PaikoBuilderStatus.SELECTING_DRAW_TILES) {
+			return;
+		}
+
+		// Check if already at max
+		if (this.selectedDrawTiles.length >= 3) {
+			debug("Already selected 3 tiles");
+			return;
+		}
+
+		// Check if tile is available in reserve
+		const currentPlayer = this.getCurrentPlayer();
+		const availableTiles = this.theGame.tileManager.getAvailableTileTypes(currentPlayer);
+		if (!availableTiles.includes(tileCode)) {
+			debug("Tile not available in reserve");
+			return;
+		}
+
+		// Add to selection
+		this.selectedDrawTiles.push(tileCode);
+
+		// Auto-confirm if we've selected 3
+		if (this.selectedDrawTiles.length >= 3) {
+			this.confirmDraw();
+		} else {
+			// Refresh to show updated selection
+			refreshMessage();
+		}
+	}
+
+	// Remove a tile from draw selection
+	deselectTileForDraw(index) {
+		if (this.moveBuilder.getStatus() !== PaikoBuilderStatus.SELECTING_DRAW_TILES) {
+			return;
+		}
+
+		this.selectedDrawTiles.splice(index, 1);
+		refreshMessage();
+	}
+
+	// Confirm the draw action
+	confirmDraw() {
+		if (this.moveBuilder.getStatus() !== PaikoBuilderStatus.SELECTING_DRAW_TILES) {
+			return;
+		}
+
+		if (this.selectedDrawTiles.length === 0) {
+			debug("Must select at least 1 tile to draw");
+			return;
+		}
+
+		const currentPlayer = this.getCurrentPlayer();
+		this.moveBuilder.buildDrawMove(currentPlayer, this.selectedDrawTiles);
 
 		const move = this.moveBuilder.getNotationMove(this.gameNotation);
 		this.theGame.runNotationMove(move);
 		this.gameNotation.addMove(move);
 
+		this.selectedDrawTiles = [];
 		this.resetNotationBuilder();
 
 		if (playingOnlineGame()) {
@@ -602,6 +737,13 @@ export class PaikoController {
 		} else {
 			finalizeMove();
 		}
+	}
+
+	// Cancel the draw action
+	cancelDraw() {
+		this.selectedDrawTiles = [];
+		this.resetNotationBuilder();
+		refreshMessage();
 	}
 
 	getCurrentPlayer() {
@@ -707,6 +849,10 @@ export class PaikoController {
 
 	isSolitaire() {
 		return false;
+	}
+
+	startOnlineGame() {
+		createGameIfThatIsOk(this.getGameTypeId());
 	}
 
 	setGameNotation(newGameNotation) {
