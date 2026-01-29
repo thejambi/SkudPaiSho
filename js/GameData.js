@@ -11,7 +11,14 @@ export function setCustomBoardUrl(newValue) {
 }
 
 export var debugOn = false;
+export function setDebugOn(value) {
+	debugOn = value;
+}
+
 export var gameDevOn = false;
+export function setGameDevOn(value) {
+	gameDevOn = value;
+}
 
 /* Set to true if building for iOS, else set to false */
 export var ios = false;

@@ -113,7 +113,9 @@ import {
 	dateIsBetween,
 	debug,
 	debugOn,
+	setDebugOn,
 	gameDevOn,
+	setGameDevOn,
 	humanYearsToTreeYears,
 	ios,
 	randomIntFromInterval,
@@ -5477,9 +5479,76 @@ export function promptAddOption() {
 
 	if (usernameIsOneOf(['SkudPaiSho']) || gameDevOn) {
 		const container = document.createElement('div');
+
+		// --- Current Game Info Section ---
+		const gameInfoHeader = document.createElement('div');
+		gameInfoHeader.style.fontWeight = 'bold';
+		gameInfoHeader.textContent = 'Current Game Info:';
+		container.appendChild(gameInfoHeader);
 		container.appendChild(document.createElement('br'));
 
+		const gameIdDiv = document.createElement('div');
+		gameIdDiv.textContent = 'Game ID: ' + (gameId > 0 ? gameId : 'N/A (local game)');
+		container.appendChild(gameIdDiv);
+
+		const gameTypeDiv = document.createElement('div');
+		gameTypeDiv.textContent = 'Game Type: ' + (gameController ? gameController.getGameTypeId() : 'N/A');
+		container.appendChild(gameTypeDiv);
+
+		const moveCountDiv = document.createElement('div');
+		moveCountDiv.textContent = 'Move Count: ' + (gameController && gameController.gameNotation ? gameController.gameNotation.moves.length : 0);
+		container.appendChild(moveCountDiv);
+
+		const onlineStatusDiv = document.createElement('div');
+		onlineStatusDiv.textContent = 'Online Game: ' + (playingOnlineGame() ? 'Yes' : 'No');
+		container.appendChild(onlineStatusDiv);
+
+		const usernameDiv = document.createElement('div');
+		usernameDiv.textContent = 'Username: ' + (getUsername() || 'Not logged in');
+		container.appendChild(usernameDiv);
+
+		// --- Separator ---
+		container.appendChild(document.createElement('br'));
+		const separator1 = document.createElement('hr');
+		separator1.style.border = '1px solid #ccc';
+		separator1.style.margin = '10px 0';
+		container.appendChild(separator1);
+
+		// --- Debug Settings Section ---
+		const debugHeader = document.createElement('div');
+		debugHeader.style.fontWeight = 'bold';
+		debugHeader.textContent = 'Debug Settings:';
+		container.appendChild(debugHeader);
+		container.appendChild(document.createElement('br'));
+
+		const debugToggleDiv = document.createElement('div');
+		debugToggleDiv.classList.add('clickableText');
+		debugToggleDiv.textContent = 'Debug Mode: ' + (debugOn ? 'ON' : 'OFF') + ' (click to toggle)';
+		debugToggleDiv.onclick = () => {
+			setDebugOn(!debugOn);
+			debugToggleDiv.textContent = 'Debug Mode: ' + (debugOn ? 'ON' : 'OFF') + ' (click to toggle)';
+		};
+		container.appendChild(debugToggleDiv);
+
+		const gameDevToggleDiv = document.createElement('div');
+		gameDevToggleDiv.classList.add('clickableText');
+		gameDevToggleDiv.textContent = 'Game Dev Mode: ' + (gameDevOn ? 'ON' : 'OFF') + ' (click to toggle)';
+		gameDevToggleDiv.onclick = () => {
+			setGameDevOn(!gameDevOn);
+			gameDevToggleDiv.textContent = 'Game Dev Mode: ' + (gameDevOn ? 'ON' : 'OFF') + ' (click to toggle)';
+		};
+		container.appendChild(gameDevToggleDiv);
+
+		// --- Separator ---
+		container.appendChild(document.createElement('br'));
+		const separator2 = document.createElement('hr');
+		separator2.style.border = '1px solid #ccc';
+		separator2.style.margin = '10px 0';
+		container.appendChild(separator2);
+
+		// --- Game Options Section ---
 		const gameOptionsHeader = document.createElement('div');
+		gameOptionsHeader.style.fontWeight = 'bold';
 		gameOptionsHeader.textContent = 'Game Options:';
 		container.appendChild(gameOptionsHeader);
 
@@ -5511,14 +5580,26 @@ export function promptAddOption() {
 			container.appendChild(clearDiv);
 		}
 
+		// --- Separator ---
 		container.appendChild(document.createElement('br'));
+		const separator3 = document.createElement('hr');
+		separator3.style.border = '1px solid #ccc';
+		separator3.style.margin = '10px 0';
+		container.appendChild(separator3);
+
+		// --- Ads Section ---
+		const adsHeader = document.createElement('div');
+		adsHeader.style.fontWeight = 'bold';
+		adsHeader.textContent = 'Ads:';
+		container.appendChild(adsHeader);
+		container.appendChild(document.createElement('br'));
+
 		const enableAdsDiv = document.createElement('div');
 		enableAdsDiv.classList.add('clickableText');
 		enableAdsDiv.textContent = 'Enable Ads';
 		enableAdsDiv.onclick = () => Ads.enableAds(true);
 		container.appendChild(enableAdsDiv);
 
-		container.appendChild(document.createElement('br'));
 		const adDiv = document.createElement('div');
 		adDiv.classList.add('clickableText');
 		adDiv.textContent = 'Show Ad';
