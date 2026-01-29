@@ -5550,7 +5550,7 @@ export function promptAddOption() {
 		const winnerInput = document.createElement('input');
 		winnerInput.type = 'text';
 		winnerInput.id = 'winnerUsernameInput';
-		winnerInput.placeholder = currentGameData.hostUsername || 'username';
+		winnerInput.placeholder = '(blank for ties)';
 		container.appendChild(winnerInput);
 		container.appendChild(document.createElement('br'));
 
@@ -5592,10 +5592,6 @@ export function promptAddOption() {
 			const resultCode = parseInt(document.getElementById('resultCodeInput').value, 10);
 			const statusDiv = document.getElementById('winInfoStatus');
 
-			if (!winnerUsername) {
-				statusDiv.textContent = 'Error: Enter a winner username';
-				return;
-			}
 			if (gameId <= 0) {
 				statusDiv.textContent = 'Error: No online game active';
 				return;
