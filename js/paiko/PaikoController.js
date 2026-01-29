@@ -21,6 +21,7 @@ import { PaikoMoveBuilder, PaikoBuilderStatus } from './PaikoMoveBuilder';
 import { TrifleGameNotation } from '../trifle/TrifleGameNotation';
 import { PaikoPointState } from './PaikoBoardPoint';
 import { PaikoTile, PaikoTileFacing, PaikoTileDefinitions, PaikoTileCode, getAllTileCodes } from './PaikoTile';
+import { PaikoAI } from './PaikoAI';
 import { debug } from '../GameData';
 
 export class PaikoController {
@@ -1252,15 +1253,64 @@ export class PaikoController {
 	}
 
 	playAiTurn(finalizeMoveCallback) {
-		// AI not implemented yet
+		const currentPlayer = this.getCurrentPlayer();
+		const ai = new PaikoAI(this.theGame, currentPlayer);
+
+		// Handle capture reward first if pending
+		if (this.theGame.hasPendingCaptureReward()) {
+			const pendingReward = this.theGame.getPendingCaptureReward();
+			const capturingPlayer = pendingReward.capturingPlayer;
+			const availableTiles = this.theGame.tileManager.getAvailableTileTypes(capturingPlayer);
+
+			// AI chooses tiles for opponent (pick random/first available)
+			const tilesToGive = [];
+			for (let i = 0; i < pendingReward.rewardCount && i < availableTiles.length; i++) {
+				tilesToGive.push(availableTiles[i % availableTiles.length]);
+			}
+
+			if (tilesToGive.length > 0) {
+				this.moveBuilder.buildCaptureRewardMove(currentPlayer, tilesToGive);
+				const move = this.moveBuilder.getNotationMove(this.gameNotation);
+				this.theGame.runNotationMove(move);
+				this.gameNotation.addMove(move);
+				this.resetNotationBuilder();
+			}
+
+			if (finalizeMoveCallback) {
+				finalizeMoveCallback();
+			}
+			return;
+		}
+
+		const move = ai.getBestMove();
+
+		if (!move) {
+			debug("AI has no valid moves!");
+			if (finalizeMoveCallback) {
+				finalizeMoveCallback();
+			}
+			return;
+		}
+
+		// Execute the move
+		this.theGame.runNotationMove(move);
+		this.gameNotation.addMove(move);
+		this.resetNotationBuilder();
+
+		if (finalizeMoveCallback) {
+			finalizeMoveCallback();
+		}
 	}
 
 	startAiGame(finalizeMoveCallback) {
-		// AI not implemented yet
+		// AI plays as Guest, start with Host's setup
+		this.playAiTurn(finalizeMoveCallback);
 	}
 
 	getAiList() {
-		return [];
+		return [
+			{ name: 'Paiko Strategic AI', shortName: 'Strategic' }
+		];
 	}
 
 	cleanup() {
