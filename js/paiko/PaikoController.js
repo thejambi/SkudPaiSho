@@ -269,26 +269,54 @@ export class PaikoController {
 
 		// Show rotation options at the very top when selecting facing direction
 		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.SELECTING_ROTATION) {
-			const rotateContainer = document.createElement('p');
-			rotateContainer.innerHTML = '<strong>Select facing direction:</strong> ';
+			const rotateContainer = document.createElement('span');
 
-			const directions = [
-				{ name: 'Up', facing: PaikoTileFacing.UP },
-				{ name: 'Right', facing: PaikoTileFacing.RIGHT },
-				{ name: 'Down', facing: PaikoTileFacing.DOWN },
-				{ name: 'Left', facing: PaikoTileFacing.LEFT }
-			];
+			const headerP = document.createElement('p');
+			headerP.innerHTML = '<strong>Select facing direction:</strong>';
+			rotateContainer.appendChild(headerP);
+
+			// Create joystick-like grid layout
+			const gridDiv = document.createElement('span');
+			gridDiv.style.display = 'grid';
+			gridDiv.style.gridTemplateColumns = 'auto auto auto';
+			gridDiv.style.gap = '4px';
+			gridDiv.style.justifyContent = 'start';
+			gridDiv.style.textAlign = 'center';
+			gridDiv.style.marginLeft = '20px';
 
 			const self = this;
-			directions.forEach((d, i) => {
-				if (i > 0) rotateContainer.appendChild(document.createTextNode(' | '));
-				const dirSpan = document.createElement('span');
-				dirSpan.className = 'skipBonus';
-				dirSpan.textContent = d.name;
-				dirSpan.onclick = () => self.selectFacing(d.facing);
-				rotateContainer.appendChild(dirSpan);
-			});
+			const createButton = (name, facing) => {
+				const btn = document.createElement('span');
+				btn.className = 'skipBonus';
+				btn.textContent = name;
+				btn.style.minWidth = '50px';
+				btn.style.display = 'inline-block';
+				btn.onclick = () => self.selectFacing(facing);
+				return btn;
+			};
 
+			const createEmpty = () => {
+				const empty = document.createElement('span');
+				empty.style.minWidth = '50px';
+				return empty;
+			};
+
+			// Row 1: empty, Up, empty
+			gridDiv.appendChild(createEmpty());
+			gridDiv.appendChild(createButton('Up', PaikoTileFacing.UP));
+			gridDiv.appendChild(createEmpty());
+
+			// Row 2: Left, empty, Right
+			gridDiv.appendChild(createButton('Left', PaikoTileFacing.LEFT));
+			gridDiv.appendChild(createEmpty());
+			gridDiv.appendChild(createButton('Right', PaikoTileFacing.RIGHT));
+
+			// Row 3: empty, Down, empty
+			gridDiv.appendChild(createEmpty());
+			gridDiv.appendChild(createButton('Down', PaikoTileFacing.DOWN));
+			gridDiv.appendChild(createEmpty());
+
+			rotateContainer.appendChild(gridDiv);
 			container.appendChild(rotateContainer);
 		}
 
