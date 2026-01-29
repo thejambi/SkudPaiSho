@@ -51,6 +51,7 @@ import {
 } from './VagabondGameNotation';
 import { VagabondMctsGame, VagabondNotationBgIoGame } from './VagabondNotationBgIoGame';
 import { VagabondRandomAIv1 } from './ai/VagabondRandomAIv1';
+import { VagabondStrategicAI } from './ai/VagabondStrategicAI';
 import { VagabondTile, VagabondTileCodes } from './VagabondTile';
 import { dateIsAprilFools, debug } from "../GameData";
 import { MCTS } from '../ai/MCTS';
@@ -643,7 +644,7 @@ export class VagabondController {
 		this.playAiTurn(finalizeMove);
 	}
 	getAiList() {
-		return [new VagabondRandomAIv1()];
+		return [new VagabondRandomAIv1(), new VagabondStrategicAI()];
 	}
 	getCurrentPlayer() {
 		// if (this.gameNotation.moves.length % 2 === 0) {
