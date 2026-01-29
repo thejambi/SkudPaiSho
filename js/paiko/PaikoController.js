@@ -751,7 +751,7 @@ export class PaikoController {
 		return this.theGame.currentPlayer;
 	}
 
-	getTheMessage(tile, ownerName) {
+	getTheMessage(tile, ownerName, boardPoint = null) {
 		const def = tile.getDefinition();
 		const message = [];
 
@@ -782,6 +782,24 @@ export class PaikoController {
 			}
 		}
 
+		// Show threat/cover status for tiles on the board
+		if (boardPoint) {
+			const player = ownerName;
+			const opponent = player === HOST ? GUEST : HOST;
+			const opponentThreat = boardPoint.getThreat(opponent);
+			const isCovered = boardPoint.isTileCovered(player);
+			const threatNeeded = tile.getThreatToCapture(isCovered);
+
+			message.push('<hr>');
+			message.push(`<p><strong>Status on board:</strong></p>`);
+			message.push(`<p>Opponent threat: ${opponentThreat} (needs ${threatNeeded} to capture)</p>`);
+			message.push(`<p>Covered: ${isCovered ? 'Yes' : 'No'}</p>`);
+
+			if (opponentThreat >= threatNeeded) {
+				message.push(`<p style="color: red;"><strong>⚠ In danger of capture!</strong></p>`);
+			}
+		}
+
 		return {
 			heading: `${ownerName}'s ${def.name}`,
 			message: message
@@ -805,7 +823,7 @@ export class PaikoController {
 		const boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
 		if (boardPoint.hasTile()) {
-			return this.getTheMessage(boardPoint.tile, boardPoint.tile.ownerName);
+			return this.getTheMessage(boardPoint.tile, boardPoint.tile.ownerName, boardPoint);
 		}
 
 		// Show zone info
@@ -821,13 +839,52 @@ export class PaikoController {
 			case 'middleground':
 				zoneInfo = 'Middleground (White Garden) - 1 point';
 				break;
+			case 'blacked_out':
+				zoneInfo = 'Black Square - Only Lotus can deploy here';
+				break;
 			default:
 				zoneInfo = 'Neutral - 0 points';
 		}
 
+		const message = [`<p>${zoneInfo}</p>`];
+
+		// Show threat information
+		const hostThreat = boardPoint.hostThreat || 0;
+		const guestThreat = boardPoint.guestThreat || 0;
+
+		if (hostThreat > 0 || guestThreat > 0) {
+			let threatInfo = '<p><strong>Threats:</strong> ';
+			const threats = [];
+			if (hostThreat > 0) {
+				threats.push(`Host: ${hostThreat}`);
+			}
+			if (guestThreat > 0) {
+				threats.push(`Guest: ${guestThreat}`);
+			}
+			threatInfo += threats.join(', ') + '</p>';
+			message.push(threatInfo);
+		}
+
+		// Show cover information
+		const hostCover = boardPoint.hostCover;
+		const guestCover = boardPoint.guestCover;
+
+		if (hostCover || guestCover) {
+			let coverInfo = '<p><strong>Cover:</strong> ';
+			const covers = [];
+			if (hostCover) {
+				covers.push('Host tiles covered here');
+			}
+			if (guestCover) {
+				covers.push('Guest tiles covered here');
+			}
+			coverInfo += covers.join(', ') + '</p>';
+			message.push(coverInfo);
+		}
+
 		return {
 			heading: 'Board Space',
-			message: [`<p>${zoneInfo}</p>`]
+			message: message
 		};
 	}
 
