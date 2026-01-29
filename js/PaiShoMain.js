@@ -5477,7 +5477,7 @@ export function promptAddOption() {
 		Ads.showRandomPopupAd();
 	}
 
-	if (usernameIsOneOf(['SkudPaiSho']) || gameDevOn) {
+	if (usernameIsOneOf(['SkudPaiSho'])) {
 		const container = document.createElement('div');
 
 		// --- Current Game Info Section ---
@@ -5507,12 +5507,112 @@ export function promptAddOption() {
 		usernameDiv.textContent = 'Username: ' + (getUsername() || 'Not logged in');
 		container.appendChild(usernameDiv);
 
+		const hostDiv = document.createElement('div');
+		hostDiv.classList.add('clickableText');
+		hostDiv.textContent = 'Host: ' + (currentGameData.hostUsername || 'N/A');
+		hostDiv.onclick = () => {
+			const input = document.getElementById('winnerUsernameInput');
+			if (input && currentGameData.hostUsername) {
+				input.value = currentGameData.hostUsername;
+			}
+		};
+		container.appendChild(hostDiv);
+
+		const guestDiv = document.createElement('div');
+		guestDiv.classList.add('clickableText');
+		guestDiv.textContent = 'Guest: ' + (currentGameData.guestUsername || 'N/A');
+		guestDiv.onclick = () => {
+			const input = document.getElementById('winnerUsernameInput');
+			if (input && currentGameData.guestUsername) {
+				input.value = currentGameData.guestUsername;
+			}
+		};
+		container.appendChild(guestDiv);
+
 		// --- Separator ---
 		container.appendChild(document.createElement('br'));
 		const separator1 = document.createElement('hr');
 		separator1.style.border = '1px solid #ccc';
 		separator1.style.margin = '10px 0';
 		container.appendChild(separator1);
+
+		// --- Set Win Info Section ---
+		const winInfoHeader = document.createElement('div');
+		winInfoHeader.style.fontWeight = 'bold';
+		winInfoHeader.textContent = 'Set Win Info:';
+		container.appendChild(winInfoHeader);
+		container.appendChild(document.createElement('br'));
+
+		const winnerLabel = document.createElement('label');
+		winnerLabel.textContent = 'Winner Username: ';
+		container.appendChild(winnerLabel);
+
+		const winnerInput = document.createElement('input');
+		winnerInput.type = 'text';
+		winnerInput.id = 'winnerUsernameInput';
+		winnerInput.placeholder = currentGameData.hostUsername || 'username';
+		container.appendChild(winnerInput);
+		container.appendChild(document.createElement('br'));
+
+		const resultCodeLabel = document.createElement('label');
+		resultCodeLabel.textContent = 'Result Code: ';
+		container.appendChild(resultCodeLabel);
+
+		const resultCodeInput = document.createElement('input');
+		resultCodeInput.type = 'number';
+		resultCodeInput.id = 'resultCodeInput';
+		resultCodeInput.value = '11';
+		resultCodeInput.style.width = '50px';
+		container.appendChild(resultCodeInput);
+		container.appendChild(document.createElement('br'));
+
+		const winInfoStatusDiv = document.createElement('div');
+		winInfoStatusDiv.id = 'winInfoStatus';
+		winInfoStatusDiv.style.fontStyle = 'italic';
+		container.appendChild(winInfoStatusDiv);
+
+		const submitWinInfoDiv = document.createElement('div');
+		submitWinInfoDiv.classList.add('clickableText');
+		submitWinInfoDiv.textContent = 'Submit Win Info';
+		submitWinInfoDiv.onclick = () => {
+			const winnerUsername = document.getElementById('winnerUsernameInput').value;
+			const resultCode = parseInt(document.getElementById('resultCodeInput').value, 10);
+			const statusDiv = document.getElementById('winInfoStatus');
+
+			if (!winnerUsername) {
+				statusDiv.textContent = 'Error: Enter a winner username';
+				return;
+			}
+			if (gameId <= 0) {
+				statusDiv.textContent = 'Error: No online game active';
+				return;
+			}
+
+			statusDiv.textContent = 'Submitting...';
+			onlinePlayEngine.updateGameWinInfo(
+				gameId,
+				winnerUsername,
+				resultCode,
+				getLoginToken(),
+				(result) => {
+					statusDiv.textContent = 'Result: ' + JSON.stringify(result);
+				},
+				false, // updateRatings
+				currentGameData.hostRating,
+				currentGameData.guestRating,
+				gameController.getGameTypeId(),
+				currentGameData.hostUsername,
+				currentGameData.guestUsername
+			);
+		};
+		container.appendChild(submitWinInfoDiv);
+
+		// --- Separator ---
+		container.appendChild(document.createElement('br'));
+		const separatorWin = document.createElement('hr');
+		separatorWin.style.border = '1px solid #ccc';
+		separatorWin.style.margin = '10px 0';
+		container.appendChild(separatorWin);
 
 		// --- Debug Settings Section ---
 		const debugHeader = document.createElement('div');
