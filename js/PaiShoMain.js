@@ -1846,6 +1846,7 @@ export function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) 
 				})(i);
                 span.innerText = "Play " + aiList[i].getName();
                 messageText.appendChild(span);
+				messageText.appendChild(document.createElement("br"));
             }
             if (aiList.length > 1) {
                 const aiVsAiSpan = document.createElement("span");
