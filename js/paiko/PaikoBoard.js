@@ -367,6 +367,44 @@ export class PaikoBoard {
 		return false;
 	}
 
+	// Check if a player can redeploy a tile at a specific point
+	// Used for Water's special ability - can redeploy in its own threat
+	canRedeployAt(point, player, tile, fromPoint) {
+		// Basic playability check
+		if (!point.canDeployTile(tile, player)) {
+			return false;
+		}
+
+		// Can't redeploy on blacked out squares (Water is not Lotus)
+		if (point.isBlackedOut()) {
+			return false;
+		}
+
+		// Can't redeploy where already occupied (except the tile's current position)
+		if (point.hasTile() && point !== fromPoint) {
+			return false;
+		}
+
+		// Check if point is in player's homeground
+		if (point.isHomeground(player)) {
+			return true;
+		}
+
+		// Check if point is threatened by player (they control it)
+		if (point.getThreat(player) > 0) {
+			// Can't deploy in Fire's threat
+			if (this.isThreatenedByFire(point)) {
+				return false;
+			}
+
+			// Water CAN redeploy in its own threat (special rule)
+			// The rule says "You can redeploy Water in its own threat"
+			return true;
+		}
+
+		return false;
+	}
+
 	// Check if a point is threatened by any Fire tile
 	isThreatenedByFire(point) {
 		let threatenedByFire = false;
@@ -462,6 +500,20 @@ export class PaikoBoard {
 		// Also include rotation in place (distance 0) if tile has facing
 		if (tile.hasFacing()) {
 			possibleDestinations.push(point);
+		}
+
+		// If tile can redeploy (Water), add all valid redeploy destinations
+		if (tile.hasSpecialRule('canRedeploy')) {
+			this.forEachPoint((redeployPoint) => {
+				// Skip points already in shift destinations
+				if (possibleDestinations.includes(redeployPoint)) {
+					return;
+				}
+
+				if (this.canRedeployAt(redeployPoint, player, tile, point)) {
+					possibleDestinations.push(redeployPoint);
+				}
+			});
 		}
 
 		return possibleDestinations;
