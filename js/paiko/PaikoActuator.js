@@ -316,8 +316,8 @@ export class PaikoActuator {
 
 		// Get move data from TrifleGameNotation format
 		const moveData = moveToAnimate.moveData || {};
-		const endPointText = moveData.endPoint;
-		const startPointText = moveData.startPoint;
+		const endPointText = moveData.endPoint ? moveData.endPoint.pointText : null;
+		const startPointText = moveData.startPoint ? moveData.startPoint.pointText : null;
 
 		if (moveToAnimate.moveType === MOVE && boardPoint.tile && startPointText) {
 			if (this.isSamePointText(endPointText, x, y)) {

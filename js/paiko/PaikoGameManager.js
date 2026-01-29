@@ -371,40 +371,51 @@ export class PaikoGameManager {
 	}
 
 	// Process capture phase after action
-	// Returns the number of tiles captured
+	// Returns the total number of tiles captured (including cascading captures)
 	processCapturePhase(activePlayer) {
 		const opponent = activePlayer === HOST ? GUEST : HOST;
+		let totalCaptured = 0;
 
-		// Get tiles that would be captured
-		const capturedTiles = this.board.getTilesToCapture(opponent);
+		// Loop to handle cascading captures
+		// When a tile is captured, it may have been providing cover for another tile
+		// that now becomes capturable
+		let capturesThisRound;
+		do {
+			// Get tiles that would be captured
+			const capturedTiles = this.board.getTilesToCapture(opponent);
+			capturesThisRound = capturedTiles.length;
 
-		capturedTiles.forEach(({ tile, point }) => {
-			// Remove from board (skip recalculate during loop)
-			const removedTile = this.board.removeTile(
-				this.board.getNotationPointFromRowCol(point.row, point.col),
-				true
-			);
+			capturedTiles.forEach(({ tile, point }) => {
+				// Remove from board (skip recalculate during loop)
+				const removedTile = this.board.removeTile(
+					this.board.getNotationPointFromRowCol(point.row, point.col),
+					true
+				);
 
-			// Add to discard pile
-			this.tileManager.addToDiscard(opponent, removedTile);
-		});
+				// Add to discard pile
+				this.tileManager.addToDiscard(opponent, removedTile);
+			});
 
-		// Recalculate threat/cover once after all captures
-		if (capturedTiles.length > 0) {
-			this.board.recalculateThreatAndCover();
+			// Recalculate threat/cover after this round of captures
+			if (capturesThisRound > 0) {
+				this.board.recalculateThreatAndCover();
+				totalCaptured += capturesThisRound;
+			}
+		} while (capturesThisRound > 0);
 
-			// Set up pending capture reward
+		// Set up pending capture reward if any tiles were captured
+		if (totalCaptured > 0) {
 			// The opponent (whose turn is next) will choose tiles for the capturing player
 			const availableTypes = this.tileManager.getAvailableTileTypes(activePlayer);
 			if (availableTypes.length > 0) {
 				this.pendingCaptureReward = {
-					rewardCount: capturedTiles.length,
+					rewardCount: totalCaptured,
 					capturingPlayer: activePlayer
 				};
 			}
 		}
 
-		return capturedTiles.length;
+		return totalCaptured;
 	}
 
 	// Execute capture reward move (opponent chose tiles for capturing player)
