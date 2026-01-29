@@ -890,10 +890,19 @@ AdevarBoard.prototype.tileCanMoveOntoPoint = function(tile, movementInfo, target
 		&& targetIsNotProtectedHiddenTile;
 };
 
+import { gameOptionEnabled, ADEVAR_ONE_VANGUARD } from '../GameOptions';
+
 AdevarBoard.prototype.targetPointHasProtectedHiddenTile = function(targetPoint) {
-	return targetPoint && targetPoint.tile 
-		&& targetPoint.tile.type === AdevarTileType.hiddenTile
-		&& this.pointIsAdjacentToVanguard(targetPoint);
+	if (!(targetPoint && targetPoint.tile && targetPoint.tile.type === AdevarTileType.hiddenTile)) {
+		return false;
+	}
+	const adjacentCount = this.countAdjacentVanguards(targetPoint);
+	if (gameOptionEnabled && gameOptionEnabled(ADEVAR_ONE_VANGUARD)) {
+		// With option enabled, Hidden Tile remains protected only if both vanguards are adjacent
+		return adjacentCount >= 2;
+	}
+	// Default rule: protected if any vanguard is adjacent
+	return adjacentCount >= 1;
 };
 
 AdevarBoard.prototype.pointIsAdjacentToVanguard = function(boardPoint) {
@@ -905,6 +914,17 @@ AdevarBoard.prototype.pointIsAdjacentToVanguard = function(boardPoint) {
 		}
 	});
 	return vanguardFound;
+};
+
+AdevarBoard.prototype.countAdjacentVanguards = function(boardPoint) {
+	var adjacentPoints = this.getDirectlyAdjacentPoints(boardPoint);
+	var count = 0;
+	adjacentPoints.forEach(function(adjacentPoint) {
+		if (adjacentPoint.hasTile() && adjacentPoint.tile.type === AdevarTileType.vanguard) {
+			count++;
+		}
+	});
+	return count;
 };
 
 AdevarBoard.prototype.targetPointHasTileThatCanBeCaptured = function(tile, movementInfo, fromPoint, targetPoint, isDeploy) {

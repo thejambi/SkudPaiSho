@@ -53,6 +53,7 @@ export var ADEVAR_GUEST_ROTATE = "AdevarBoardGuestRotation";
 
 /* Adevar */
 export var ADEVAR_LITE = "LiteGame";
+export var ADEVAR_ONE_VANGUARD = "AdevarOneVanguard";
 
 /* Game Option Legacy Map - These were stored as full names in database before current setup, must support */
 export var legacyGameOptionsMap = {};
@@ -86,6 +87,7 @@ legacyGameOptionsMap[ADEVAR_ROTATE] = "Adevar Board Rotation";
 legacyGameOptionsMap[ADEVAR_GUEST_ROTATE] = "Adevar Board Guest Rotation";
 
 legacyGameOptionsMap[ADEVAR_LITE] = "Lite - Beginner Game";
+// No legacy mapping needed for ADEVAR_ONE_VANGUARD (new option)
 
 /* New Game Options Setup */
 
@@ -144,6 +146,7 @@ export var SPECIAL_FLOWERS_BOUNCE = "SpecialFlowersBounce";
 gameOptionDescriptions[SPECIAL_FLOWERS_BOUNCE] = "Special Flower Reincarnation";
 export var VARIABLE_ACCENT_TILES = "VariableAccentTiles";
 gameOptionDescriptions[VARIABLE_ACCENT_TILES] = "Variable Accent Tiles";
+gameOptionDescriptions[ADEVAR_ONE_VANGUARD] = "Vanguard - Only need to capture one";
 export var NO_ALT_WIN = "NoAltWin";
 gameOptionDescriptions[NO_ALT_WIN] = "No Alt Win Condition";
 

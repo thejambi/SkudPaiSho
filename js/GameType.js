@@ -1,5 +1,6 @@
 import {
 	ADEVAR_LITE,
+	ADEVAR_ONE_VANGUARD,
 	ADEVAR_ROTATE,
 	BISON_GRANTS_FLYING,
 	BONUS_MOVEMENT_5,
@@ -120,7 +121,8 @@ export const GameType = {
 		coverImg: "adevar.png",
 		rulesUrl: "https://skudpaisho.com/site/games/adevar-pai-sho/",
 		gameOptions: [
-			ADEVAR_LITE
+			ADEVAR_LITE,
+			ADEVAR_ONE_VANGUARD
 		],
 		noRankedGames: true
 	},
@@ -181,7 +183,7 @@ export const GameType = {
 		desc: "Nick Pai Sho",
 		color: "var(--nickcolor)",
 		description: "Advance your lotus to the center of the board and protect it using the four elements and the Avatar.",
-		coverImg: "lotus.png",
+		coverImg: "nick.png",
 		rulesUrl: "https://skudpaisho.com/site/games/nick-pai-sho/",
 		gameOptions: [],
 		noRankedGames: true
