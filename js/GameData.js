@@ -11,11 +11,11 @@ export function setCustomBoardUrl(newValue) {
 }
 
 export var debugOn = false;
+export var gameDevOn = false;
+
 export function setDebugOn(value) {
 	debugOn = value;
 }
-
-export var gameDevOn = false;
 export function setGameDevOn(value) {
 	gameDevOn = value;
 }
