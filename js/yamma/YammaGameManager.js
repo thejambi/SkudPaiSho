@@ -71,6 +71,13 @@ export class YammaGameManager {
 		return " achieved 4-in-a-row from the " + angleName + " perspective";
 	}
 
+	getWinResultTypeCode() {
+		if (!this.winner) {
+			return null;
+		}
+		return 1;
+	}
+
 	hasEnded() {
 		return this.winner !== null || this.board.isBoardFull();
 	}
