@@ -330,7 +330,7 @@ export class YammaBoard {
 	checkFourInARowInView(view) {
 		// Direction vectors for triangular grid lines
 		const directions = [
-			{ dRow: 0, dCol: 1 },   // Horizontal (along row)
+			// { dRow: 0, dCol: 1 },   // Horizontal (along row)
 			{ dRow: 1, dCol: 0 },   // Down-left diagonal
 			{ dRow: 1, dCol: 1 },   // Down-right diagonal
 		];
