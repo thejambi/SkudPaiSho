@@ -5558,12 +5558,25 @@ export function promptAddOption() {
 		resultCodeLabel.textContent = 'Result Code: ';
 		container.appendChild(resultCodeLabel);
 
-		const resultCodeInput = document.createElement('input');
-		resultCodeInput.type = 'number';
-		resultCodeInput.id = 'resultCodeInput';
-		resultCodeInput.value = '11';
-		resultCodeInput.style.width = '50px';
-		container.appendChild(resultCodeInput);
+		const resultCodeSelect = document.createElement('select');
+		resultCodeSelect.id = 'resultCodeInput';
+		const resultCodeOptions = [
+			{ value: 1, text: '1 - Standard Win' },
+			{ value: 2, text: '2 - Alt Win (More Accents)' },
+			{ value: 3, text: '3 - Alt Win (More Harmonies)' },
+			{ value: 4, text: '4 - Tie' },
+			{ value: 5, text: '5 - Error' },
+			{ value: 8, text: '8 - Player Quit' },
+			{ value: 11, text: '11 - Other' }
+		];
+		resultCodeOptions.forEach(opt => {
+			const option = document.createElement('option');
+			option.value = opt.value;
+			option.textContent = opt.text;
+			if (opt.value === 1) option.selected = true;
+			resultCodeSelect.appendChild(option);
+		});
+		container.appendChild(resultCodeSelect);
 		container.appendChild(document.createElement('br'));
 
 		const winInfoStatusDiv = document.createElement('div');
