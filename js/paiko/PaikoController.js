@@ -282,7 +282,7 @@ export class PaikoController {
 
 		// Show draw selection UI when selecting tiles to draw
 		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.SELECTING_DRAW_TILES) {
-			const drawContainer = document.createElement('div');
+			const drawContainer = document.createElement('span');
 
 			const drawHeader = document.createElement('p');
 			const remaining = 3 - (this.selectedDrawTiles?.length || 0);
