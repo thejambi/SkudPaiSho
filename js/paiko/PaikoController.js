@@ -34,6 +34,7 @@ export class PaikoController {
 		this.isPaiShoGame = false;
 		this.selectedDrawTiles = [];
 		this.selectedCaptureRewardTiles = [];
+		this.pendingDeployMove = null; // For Sai deploy + shift combined move
 	}
 
 	getGameTypeId() {
@@ -699,10 +700,11 @@ export class PaikoController {
 	selectFacing(facing) {
 		this.moveBuilder.setFacing(facing);
 
-		if (this.moveBuilder.getMoveType() === DEPLOY) {
-			this.finalizeDeploy();
-		} else if (this.moveBuilder.getMoveType() === PaikoMoveType.SAI_SHIFT) {
+		// Check if this is facing selection for Sai shift (pending deploy exists)
+		if (this.pendingDeployMove) {
 			this.finalizeSaiShift();
+		} else if (this.moveBuilder.getMoveType() === DEPLOY) {
+			this.finalizeDeploy();
 		} else if (this.moveBuilder.getMoveType() === MOVE) {
 			// If rotating in place, change move type to ROTATE
 			const startPoint = this.moveBuilder.getMoveData('startPoint');
@@ -718,6 +720,11 @@ export class PaikoController {
 		const move = this.moveBuilder.getNotationMove(this.gameNotation);
 		const tileCode = this.moveBuilder.getMoveData('tileCode');
 		const endPointText = this.moveBuilder.getMoveData('endPoint');
+		const currentPlayer = this.getCurrentPlayer();
+
+		// Check if this is Sai with shift ability
+		const tempTile = new PaikoTile(tileCode, currentPlayer === HOST ? 'H' : 'G');
+		const isSaiWithShift = tempTile.hasSpecialRule('shiftAfterDeploy');
 
 		// Validate move doesn't capture own tile
 		const gameCopy = this.theGame.getCopy();
@@ -729,19 +736,18 @@ export class PaikoController {
 			return;
 		}
 
+		// Execute the deploy visually
 		this.theGame.runNotationMove(move);
-		this.gameNotation.addMove(move);
 
-		// Check if Sai was deployed and can shift
-		if (this.theGame.pendingSaiShift) {
+		if (isSaiWithShift) {
+			// Store the pending deploy move - we'll add shift data before recording
+			this.pendingDeployMove = move;
+
 			// Enter Sai shift mode
 			this.moveBuilder.setStatus(PaikoBuilderStatus.WAITING_FOR_SAI_SHIFT);
-			this.moveBuilder.setMoveType(PaikoMoveType.SAI_SHIFT);
-			this.moveBuilder.setMoveData('saiStartPoint', endPointText);
 
 			// Show possible shift destinations for Sai
-			const saiPoint = this.theGame.pendingSaiShift.point;
-			const currentPlayer = this.getCurrentPlayer();
+			const saiPoint = this.theGame.board.getPointFromNotation(endPointText);
 			const shiftDestinations = this.theGame.board.getPossibleShiftDestinations(saiPoint, currentPlayer);
 			this.theGame.board.markPossibleMoves(shiftDestinations);
 
@@ -750,6 +756,8 @@ export class PaikoController {
 			return;
 		}
 
+		// Normal deploy - record the move
+		this.gameNotation.addMove(move);
 		this.resetNotationBuilder();
 
 		if (playingOnlineGame()) {
@@ -790,9 +798,17 @@ export class PaikoController {
 			return;
 		}
 
-		// Clear pending Sai shift
-		this.theGame.pendingSaiShift.tile.justDeployed = false;
-		this.theGame.pendingSaiShift = null;
+		// Record the deploy move without shift data
+		if (this.pendingDeployMove) {
+			this.gameNotation.addMove(this.pendingDeployMove);
+			this.pendingDeployMove = null;
+		}
+
+		// Clear pending Sai shift state
+		if (this.theGame.pendingSaiShift) {
+			this.theGame.pendingSaiShift.tile.justDeployed = false;
+			this.theGame.pendingSaiShift = null;
+		}
 
 		this.theGame.board.clearAllPointStates();
 		this.resetNotationBuilder();
@@ -807,21 +823,31 @@ export class PaikoController {
 	// Finalize the Sai shift after deploy
 	finalizeSaiShift() {
 		const currentPlayer = this.getCurrentPlayer();
-		const startPoint = this.moveBuilder.getMoveData('startPoint');
-		const endPoint = this.moveBuilder.getMoveData('endPoint');
+		const endPointText = this.moveBuilder.getMoveData('endPoint');
 		const facing = this.moveBuilder.getMoveData('facing');
 
-		this.moveBuilder.buildSaiShiftMove(currentPlayer, new NotationPoint(startPoint), new NotationPoint(endPoint), facing);
+		if (!this.pendingDeployMove) {
+			debug("No pending deploy move for Sai shift!");
+			return;
+		}
 
-		const move = this.moveBuilder.getNotationMove(this.gameNotation);
+		// Get Sai's current position (where it was deployed)
+		const deployEndPoint = this.pendingDeployMove.moveData.endPoint;
 
-		// Validate move doesn't capture own tile
+		// Validate the shift doesn't capture own tile
+		// Create a copy and simulate the shift
 		const gameCopy = this.theGame.getCopy();
-		gameCopy.runNotationMove(move, false);
+		gameCopy.board.moveTile(deployEndPoint, endPointText, true);
+		const shiftedPoint = gameCopy.board.getPointFromNotation(endPointText);
+		if (shiftedPoint && shiftedPoint.tile && shiftedPoint.tile.hasFacing() && facing !== undefined) {
+			shiftedPoint.tile.setFacing(facing);
+		}
+		gameCopy.board.recalculateThreatAndCover();
+
 		if (!gameCopy.validateMoveDoesntCaptureOwn(currentPlayer)) {
 			debug("Move would result in your own tile being captured!");
 			// Re-show shift destinations
-			const saiPoint = this.theGame.pendingSaiShift.point;
+			const saiPoint = this.theGame.board.getPointFromNotation(deployEndPoint);
 			const shiftDestinations = this.theGame.board.getPossibleShiftDestinations(saiPoint, currentPlayer);
 			this.theGame.board.markPossibleMoves(shiftDestinations);
 			this.moveBuilder.setStatus(PaikoBuilderStatus.WAITING_FOR_SAI_SHIFT);
@@ -830,8 +856,27 @@ export class PaikoController {
 			return;
 		}
 
-		this.theGame.runNotationMove(move);
-		this.gameNotation.addMove(move);
+		// Execute the shift visually on the actual game
+		this.theGame.board.moveTile(deployEndPoint, endPointText, true);
+		const actualShiftedPoint = this.theGame.board.getPointFromNotation(endPointText);
+		if (actualShiftedPoint && actualShiftedPoint.tile) {
+			if (actualShiftedPoint.tile.hasFacing() && facing !== undefined) {
+				actualShiftedPoint.tile.setFacing(facing);
+			}
+			actualShiftedPoint.tile.justDeployed = false;
+		}
+		this.theGame.board.recalculateThreatAndCover();
+
+		// Add shift data to the pending deploy move
+		this.pendingDeployMove.moveData.shiftEndPoint = endPointText;
+		this.pendingDeployMove.moveData.shiftFacing = facing;
+
+		// Record the complete combined move
+		this.gameNotation.addMove(this.pendingDeployMove);
+		this.pendingDeployMove = null;
+
+		// Clear pending Sai shift state
+		this.theGame.pendingSaiShift = null;
 
 		this.resetNotationBuilder();
 

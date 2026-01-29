@@ -1,12 +1,12 @@
 // Paiko Game Manager
 // Handles game state, rules, and move execution
 
-import { DEPLOY, MOVE, GUEST, HOST, NotationPoint } from '../CommonNotationObjects';
-import { PaikoBoard } from './PaikoBoard';
-import { PaikoTileManager } from './PaikoTileManager';
-import { PaikoMoveType, PaikoGamePhase } from './PaikoGameNotation';
-import { PaikoTile, PaikoTileFacing, PaikoTileCode } from './PaikoTile';
+import { DEPLOY, GUEST, HOST, MOVE } from '../CommonNotationObjects';
 import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
+import { PaikoBoard } from './PaikoBoard';
+import { PaikoGamePhase, PaikoMoveType } from './PaikoGameNotation';
+import { PaikoTile, PaikoTileCode } from './PaikoTile';
+import { PaikoTileManager } from './PaikoTileManager';
 
 const WINNING_SCORE = 10;
 
@@ -62,7 +62,7 @@ export class PaikoGameManager {
 	}
 
 	// Execute a move from notation (TrifleGameNotation format)
-	runNotationMove(move, withActuate = true) {
+	runNotationMove(move, withActuate = false) {
 		if (!move) {
 			return false;
 		}
@@ -71,6 +71,12 @@ export class PaikoGameManager {
 		const moveData = move.moveData || {};
 		const moveType = move.moveType;
 		const player = move.player;
+
+		// Clear any pending Sai shift from previous turn (unless this IS the Sai shift)
+		// This handles the case where player skipped their Sai shift (no move recorded)
+		if (moveType !== PaikoMoveType.SAI_SHIFT && this.pendingSaiShift) {
+			this.pendingSaiShift = null;
+		}
 
 		let moveSuccess = false;
 
@@ -177,6 +183,8 @@ export class PaikoGameManager {
 		const tileCode = moveData.tileCode;
 		const endPoint = moveData.endPoint;
 		const facing = moveData.facing;
+		const shiftEndPoint = moveData.shiftEndPoint;
+		const shiftFacing = moveData.shiftFacing;
 
 		// Get tile from hand
 		const tile = this.tileManager.getTileFromHand(player, tileCode);
@@ -189,14 +197,26 @@ export class PaikoGameManager {
 			tile.setFacing(facing);
 		}
 
-		// Place on board
-		this.board.placeTile(tile, endPoint);
+		// Place on board (skip recalculate, we'll do it once at the end)
+		this.board.placeTile(tile, endPoint, true);
 
-		// Check for Sai shift ability
-		if (tile.hasSpecialRule('shiftAfterDeploy')) {
+		// Handle optional Sai shift (combined with deploy move)
+		if (shiftEndPoint) {
+			// Shift is part of this move - execute it
+			this.board.moveTile(endPoint, shiftEndPoint, true);
+			if (shiftFacing !== undefined && tile.hasFacing()) {
+				tile.setFacing(shiftFacing);
+			}
+			tile.justDeployed = false;
+		} else if (tile.hasSpecialRule('shiftAfterDeploy')) {
+			// No shift data - set pending for interactive play
+			// (This gets cleared at start of next move if skipped)
 			tile.justDeployed = true;
 			this.pendingSaiShift = { tile, point: this.board.getPointFromNotation(endPoint) };
 		}
+
+		// Recalculate threat/cover once after all changes
+		this.board.recalculateThreatAndCover();
 
 		return true;
 	}
@@ -212,7 +232,8 @@ export class PaikoGameManager {
 			return false;
 		}
 
-		const tile = this.board.moveTile(startPointText, endPointText);
+		// Skip recalculate in moveTile, we'll do it once at the end
+		const tile = this.board.moveTile(startPointText, endPointText, true);
 		if (!tile) {
 			return false;
 		}
@@ -220,13 +241,14 @@ export class PaikoGameManager {
 		// Update facing if provided
 		if (facing !== undefined && tile.hasFacing()) {
 			tile.setFacing(facing);
-			// Recalculate threat/cover since facing pattern changed
-			this.board.recalculateThreatAndCover();
 		}
 
 		// Clear any pending Sai shift
 		this.pendingSaiShift = null;
 		tile.justDeployed = false;
+
+		// Recalculate threat/cover once after all changes
+		this.board.recalculateThreatAndCover();
 
 		return true;
 	}
@@ -283,19 +305,21 @@ export class PaikoGameManager {
 		const endPointText = moveData.endPoint;
 		const facing = moveData.facing;
 
-		const tile = this.board.moveTile(startPointText, endPointText);
+		// Skip recalculate in moveTile, we'll do it once at the end
+		const tile = this.board.moveTile(startPointText, endPointText, true);
 		if (!tile) {
 			return false;
 		}
 
 		if (facing !== undefined && tile.hasFacing()) {
 			tile.setFacing(facing);
-			// Recalculate threat/cover since facing pattern changed
-			this.board.recalculateThreatAndCover();
 		}
 
 		tile.justDeployed = false;
 		this.pendingSaiShift = null;
+
+		// Recalculate threat/cover once after all changes
+		this.board.recalculateThreatAndCover();
 
 		return true;
 	}
@@ -315,8 +339,11 @@ export class PaikoGameManager {
 			return false;
 		}
 
-		// Move water to new position
-		this.board.moveTile(startPointText, endPointText);
+		// Move water to new position (skip recalculate, we'll do it at the end)
+		this.board.moveTile(startPointText, endPointText, true);
+
+		// Recalculate threat/cover once after move
+		this.board.recalculateThreatAndCover();
 
 		return true;
 	}
@@ -330,18 +357,22 @@ export class PaikoGameManager {
 		const capturedTiles = this.board.getTilesToCapture(opponent);
 
 		capturedTiles.forEach(({ tile, point }) => {
-			// Remove from board
+			// Remove from board (skip recalculate during loop)
 			const removedTile = this.board.removeTile(
-				this.board.getNotationPointFromRowCol(point.row, point.col)
+				this.board.getNotationPointFromRowCol(point.row, point.col),
+				true
 			);
 
 			// Add to discard pile
 			this.tileManager.addToDiscard(opponent, removedTile);
 		});
 
-		// If any tiles were captured, set up pending capture reward
-		// The opponent (whose turn is next) will choose tiles for the capturing player
+		// Recalculate threat/cover once after all captures
 		if (capturedTiles.length > 0) {
+			this.board.recalculateThreatAndCover();
+
+			// Set up pending capture reward
+			// The opponent (whose turn is next) will choose tiles for the capturing player
 			const availableTypes = this.tileManager.getAvailableTileTypes(activePlayer);
 			if (availableTypes.length > 0) {
 				this.pendingCaptureReward = {

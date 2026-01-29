@@ -3,7 +3,7 @@
 // Uses 18x18 grid like Adevar for space-based play
 
 import { GUEST, HOST, NotationPoint, RowAndColumn } from '../CommonNotationObjects';
-import { PaikoBoardPoint, PaikoZone, PaikoPointState } from './PaikoBoardPoint';
+import { PaikoBoardPoint, PaikoPointState, PaikoZone } from './PaikoBoardPoint';
 import { PaikoTileCode } from './PaikoTile';
 
 export class PaikoBoard {
@@ -188,36 +188,42 @@ export class PaikoBoard {
 	}
 
 	// Place a tile on the board
-	placeTile(tile, notationPoint) {
+	placeTile(tile, notationPoint, skipRecalculate = false) {
 		const point = this.getPointFromNotation(notationPoint);
 		if (point) {
 			point.putTile(tile);
-			this.recalculateThreatAndCover();
+			if (!skipRecalculate) {
+				this.recalculateThreatAndCover();
+			}
 			return true;
 		}
 		return false;
 	}
 
 	// Move a tile from one point to another
-	moveTile(startNotationPoint, endNotationPoint) {
+	moveTile(startNotationPoint, endNotationPoint, skipRecalculate = false) {
 		const startPoint = this.getPointFromNotation(startNotationPoint);
 		const endPoint = this.getPointFromNotation(endNotationPoint);
 
 		if (startPoint && endPoint && startPoint.hasTile()) {
 			const tile = startPoint.removeTile();
 			endPoint.putTile(tile);
-			this.recalculateThreatAndCover();
+			if (!skipRecalculate) {
+				this.recalculateThreatAndCover();
+			}
 			return tile;
 		}
 		return null;
 	}
 
 	// Remove a tile from the board
-	removeTile(notationPoint) {
+	removeTile(notationPoint, skipRecalculate = false) {
 		const point = this.getPointFromNotation(notationPoint);
 		if (point && point.hasTile()) {
 			const tile = point.removeTile();
-			this.recalculateThreatAndCover();
+			if (!skipRecalculate) {
+				this.recalculateThreatAndCover();
+			}
 			return tile;
 		}
 		return null;
