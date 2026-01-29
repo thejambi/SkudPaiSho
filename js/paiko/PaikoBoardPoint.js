@@ -79,6 +79,10 @@ export class PaikoBoardPoint {
 		return this.zone !== PaikoZone.NON_PLAYABLE && this.zone !== PaikoZone.BLACKED_OUT;
 	}
 
+	isPlayableOrBlack() {
+		return this.zone !== PaikoZone.NON_PLAYABLE;
+	}
+
 	isBlackedOut() {
 		return this.zone === PaikoZone.BLACKED_OUT;
 	}

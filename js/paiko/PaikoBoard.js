@@ -257,7 +257,7 @@ export class PaikoBoard {
 			const targetCol = tilePoint.col + colOffset;
 			const targetPoint = this.getPoint(targetRow, targetCol);
 
-			if (targetPoint && targetPoint.isPlayable()) {
+			if (targetPoint && targetPoint.isPlayableOrBlack()) {
 				// Fire threatens all tiles (including own)
 				if (tile.hasSpecialRule('threatensAll')) {
 					targetPoint.addThreat(HOST, 1);
