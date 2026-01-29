@@ -26,11 +26,11 @@ SpiritGameManager.prototype.setup = function(ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-SpiritGameManager.prototype.actuate = function() {
+SpiritGameManager.prototype.actuate = function(moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager);
+	this.actuator.actuate(this.board, this.tileManager, moveToAnimate);
 };
 
 SpiritGameManager.prototype.drawRandomTile = function() {
@@ -43,6 +43,7 @@ SpiritGameManager.prototype.runNotationMove = function(move, withActuate) {
 	if (move.moveType === MOVE) {
 		var capturedTile = this.board.moveTile(move.player, move.startPoint, move.endPoint);
 		if (capturedTile) {
+			move.capturedTile = capturedTile; // Store for animation
 			this.tileManager.putTileBack(capturedTile);
 
 			// Analyze board for end of game conditions
@@ -56,7 +57,7 @@ SpiritGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	if (withActuate) {
-		this.actuate();
+		this.actuate(move); // Pass move for animation
 	}
 };
 

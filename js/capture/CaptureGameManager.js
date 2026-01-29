@@ -28,11 +28,11 @@ CaptureGameManager.prototype.setup = function(ignoreActuate) {
 };
 
 // Sends the updated board to the actuator
-CaptureGameManager.prototype.actuate = function() {
+CaptureGameManager.prototype.actuate = function(moveToAnimate) {
 	if (this.isCopy) {
 		return;
 	}
-	this.actuator.actuate(this.board, this.tileManager, this.markingManager);
+	this.actuator.actuate(this.board, this.tileManager, this.markingManager, moveToAnimate);
 };
 
 CaptureGameManager.prototype.drawRandomTile = function() {
@@ -45,6 +45,7 @@ CaptureGameManager.prototype.runNotationMove = function(move, withActuate) {
 	if (move.moveType === MOVE) {
 		var capturedTile = this.board.moveTile(move.player, move.startPoint, move.endPoint);
 		if (capturedTile) {
+			move.capturedTile = capturedTile; // Store for animation
 			this.tileManager.putTileBack(capturedTile);
 
 			// Analyze board for end of game conditions
@@ -64,7 +65,7 @@ CaptureGameManager.prototype.runNotationMove = function(move, withActuate) {
 	}
 
 	if (withActuate) {
-		this.actuate();
+		this.actuate(move); // Pass move for animation
 	}
 };
 

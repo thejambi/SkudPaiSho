@@ -6,6 +6,7 @@ import {
   WAITING_FOR_ENDPOINT,
   buildPreferenceDropdownDiv,
   callSubmitMove,
+  clearMessage,
   createGameIfThatIsOk,
   currentMoveIndex,
   finalizeMove,
@@ -45,8 +46,8 @@ export var CapturePreferences = {
 };
 
 export function CaptureController(gameContainer, isMobile) {
-	this.actuator = new CaptureActuator(gameContainer, isMobile);
-	
+	this.actuator = new CaptureActuator(gameContainer, isMobile, this.isAnimationsEnabled());
+
 	this.resetGameManager();
 	this.resetNotationBuilder();
 	this.resetGameNotation();
@@ -361,8 +362,47 @@ CaptureController.prototype.getAdditionalHelpTabDiv = function() {
 	settingsDiv.appendChild(buildPreferenceDropdownDiv("Tile Designs", "capturePaiShoDesignsDropdown", CapturePreferences.tileDesignTypeValues, CapturePreferences.tileDesignKey));
 
 	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(this.buildToggleAnimationsDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
 };
+
+CaptureController.prototype.buildToggleAnimationsDiv = function() {
+	var self = this;
+	var div = document.createElement("div");
+	var onOrOff = this.isAnimationsEnabled() ? "on" : "off";
+
+	var textSpan = document.createElement("span");
+	textSpan.textContent = "Move animations are " + onOrOff + ": ";
+	div.appendChild(textSpan);
+
+	var toggleSpan = document.createElement("span");
+	toggleSpan.className = "skipBonus";
+	toggleSpan.textContent = "toggle";
+	toggleSpan.onclick = function() { self.toggleAnimations(); };
+	div.appendChild(toggleSpan);
+
+	return div;
+};
+
+CaptureController.prototype.toggleAnimations = function() {
+	if (this.isAnimationsEnabled()) {
+		setUserGamePreference(CaptureController.animationsEnabledKey, "false");
+		this.actuator.setAnimationOn(false);
+	} else {
+		setUserGamePreference(CaptureController.animationsEnabledKey, "true");
+		this.actuator.setAnimationOn(true);
+	}
+	clearMessage();
+};
+
+CaptureController.prototype.isAnimationsEnabled = function() {
+	// Check !== "false" to default to on
+	return getUserGamePreference(CaptureController.animationsEnabledKey) !== "false";
+};
+
+CaptureController.animationsEnabledKey = "CaptureAnimationsEnabled";
 
 /* Capture Pai Sho specific methods */
 CaptureController.prototype.flagCaptureHelp = function(boardPoint) {

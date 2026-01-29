@@ -6,6 +6,7 @@ import {
   WAITING_FOR_ENDPOINT,
   buildPreferenceDropdownDiv,
   callSubmitMove,
+  clearMessage,
   createGameIfThatIsOk,
   currentMoveIndex,
   finalizeMove,
@@ -46,8 +47,8 @@ export var SpiritPreferences = {
 };
 
 export function SpiritController(gameContainer, isMobile) {
-	this.actuator = new SpiritActuator(gameContainer, isMobile);
-	
+	this.actuator = new SpiritActuator(gameContainer, isMobile, this.isAnimationsEnabled());
+
 	this.resetGameManager();
 	this.resetNotationBuilder();
 	this.resetGameNotation();
@@ -323,8 +324,47 @@ SpiritController.prototype.getAdditionalHelpTabDiv = function() {
 	settingsDiv.appendChild(buildPreferenceDropdownDiv("Tile Designs", "spiritPaiShoDesignsDropdown", SpiritPreferences.tileDesignTypeValues, SpiritPreferences.tileDesignKey));
 
 	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(this.buildToggleAnimationsDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
 };
+
+SpiritController.prototype.buildToggleAnimationsDiv = function() {
+	var self = this;
+	var div = document.createElement("div");
+	var onOrOff = this.isAnimationsEnabled() ? "on" : "off";
+
+	var textSpan = document.createElement("span");
+	textSpan.textContent = "Move animations are " + onOrOff + ": ";
+	div.appendChild(textSpan);
+
+	var toggleSpan = document.createElement("span");
+	toggleSpan.className = "skipBonus";
+	toggleSpan.textContent = "toggle";
+	toggleSpan.onclick = function() { self.toggleAnimations(); };
+	div.appendChild(toggleSpan);
+
+	return div;
+};
+
+SpiritController.prototype.toggleAnimations = function() {
+	if (this.isAnimationsEnabled()) {
+		setUserGamePreference(SpiritController.animationsEnabledKey, "false");
+		this.actuator.setAnimationOn(false);
+	} else {
+		setUserGamePreference(SpiritController.animationsEnabledKey, "true");
+		this.actuator.setAnimationOn(true);
+	}
+	clearMessage();
+};
+
+SpiritController.prototype.isAnimationsEnabled = function() {
+	// Check !== "false" to default to on
+	return getUserGamePreference(SpiritController.animationsEnabledKey) !== "false";
+};
+
+SpiritController.animationsEnabledKey = "SpiritAnimationsEnabled";
 
 /* Spirit Pai Sho specific methods */
 SpiritController.prototype.flagCaptureHelp = function(boardPoint) {

@@ -21,36 +21,45 @@ import {
 import {
   createBoardArrow,
   createBoardPointDiv,
+  isSamePoint,
   setupPaiShoBoard,
 } from '../ActuatorHelp';
+import { MOVE } from '../CommonNotationObjects';
+import { pieceAnimationLength } from '../PaiShoMain';
 import { debug } from '../GameData';
 
-export function CaptureActuator(gameContainer, isMobile) {
+export function CaptureActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
 	this.mobile = isMobile;
+	this.animationOn = enableAnimations;
 
 	var containers = setupPaiShoBoard(
-		this.gameContainer, 
+		this.gameContainer,
 		CaptureController.getHostTilesContainerDivs(),
-		CaptureController.getGuestTilesContainerDivs(), 
+		CaptureController.getGuestTilesContainerDivs(),
 		false
 	);
 
 	this.boardContainer = containers.boardContainer;
+	this.boardContainer.style.position = "relative";
 	this.arrowContainer = containers.arrowContainer;
 	this.hostTilesContainer = containers.hostTilesContainer;
 	this.guestTilesContainer = containers.guestTilesContainer;
 }
 
-CaptureActuator.prototype.actuate = function(board, tileManager, markingManager) {
+CaptureActuator.prototype.setAnimationOn = function(isOn) {
+	this.animationOn = isOn;
+};
+
+CaptureActuator.prototype.actuate = function(board, tileManager, markingManager, moveToAnimate) {
 	var self = this;
 
 	window.requestAnimationFrame(function () {
-		self.htmlify(board, tileManager, markingManager);
+		self.htmlify(board, tileManager, markingManager, moveToAnimate);
 	});
 };
 
-CaptureActuator.prototype.htmlify = function(board, tileManager, markingManager) {
+CaptureActuator.prototype.htmlify = function(board, tileManager, markingManager, moveToAnimate) {
 	this.clearContainer(this.boardContainer);
 	this.clearContainer(this.arrowContainer);
 
@@ -65,7 +74,7 @@ CaptureActuator.prototype.htmlify = function(board, tileManager, markingManager)
 				cell.removeType(MARKED);
 			}
 			if (cell) {
-				self.addBoardPoint(cell);
+				self.addBoardPoint(cell, moveToAnimate);
 			}
 		});
 	});
@@ -144,7 +153,7 @@ CaptureActuator.prototype.addTile = function(tile, mainContainer) {
 	container.appendChild(theDiv);
 };
 
-CaptureActuator.prototype.addBoardPoint = function(boardPoint) {
+CaptureActuator.prototype.addBoardPoint = function(boardPoint, moveToAnimate) {
 	var self = this;
 
 	var theDiv = createBoardPointDiv(boardPoint);
@@ -153,11 +162,11 @@ CaptureActuator.prototype.addBoardPoint = function(boardPoint) {
 		theDiv.classList.add("activePoint");
 		if (boardPoint.isType(MARKED)) {
 			theDiv.classList.add("markedPoint");
-		}	
+		}
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			theDiv.classList.add("possibleMove");
 		}
-		
+
 		if (this.mobile) {
 			// Using touchstart instead of click, to try it out
 			theDiv.addEventListener('touchstart', function() {
@@ -191,22 +200,39 @@ CaptureActuator.prototype.addBoardPoint = function(boardPoint) {
 
 	if (boardPoint.hasTile()) {
 		theDiv.classList.add("hasTile");
-		
+
 		var theImg = document.createElement("img");
+
+		if (moveToAnimate) {
+			this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
+		}
+
 		var srcValue = this.getTileImageSourceDir();
 		theImg.src = srcValue + boardPoint.tile.getImageName() + ".png";
-		
+
 		if (boardPoint.tile.captureHelpFlag) {
 			theDiv.classList.add("GUESTharmony");
 		}
 		if (boardPoint.tile.capturedByHelpFlag) {
 			theDiv.classList.add("HOSTharmony");
 		}
-		// if (boardPoint.tile.drained || boardPoint.tile.trapped) {
-		// 	theDiv.classList.add("drained");
-		// }
-		
+
 		theDiv.appendChild(theImg);
+
+		// Handle captured tile animation (fade out effect)
+		if (this.animationOn && moveToAnimate && moveToAnimate.capturedTile &&
+			isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
+			var theImgCaptured = document.createElement("img");
+			theImgCaptured.src = srcValue + moveToAnimate.capturedTile.getImageName() + ".png";
+			theImgCaptured.classList.add("underneath");
+			theDiv.appendChild(theImgCaptured);
+
+			setTimeout(function() {
+				requestAnimationFrame(function() {
+					theImgCaptured.style.visibility = "hidden";
+				});
+			}, pieceAnimationLength);
+		}
 	}
 
 	this.boardContainer.appendChild(theDiv);
@@ -220,6 +246,42 @@ CaptureActuator.prototype.addBoardPoint = function(boardPoint) {
 
 CaptureActuator.prototype.getTileImageSourceDir = function() {
 	return "images/Capture/" + getUserGamePreference(CapturePreferences.tileDesignKey) + "/";
+};
+
+CaptureActuator.prototype.doAnimateBoardPoint = function(boardPoint, moveToAnimate, theImg, theDiv) {
+	if (!this.animationOn) return;
+
+	var x = boardPoint.col, y = boardPoint.row, ox = x, oy = y;
+
+	if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
+		if (isSamePoint(moveToAnimate.endPoint, x, y)) {
+			// This is the piece that moved - calculate offset from start position
+			x = moveToAnimate.startPoint.rowAndColumn.col;
+			y = moveToAnimate.startPoint.rowAndColumn.row;
+			theDiv.style.zIndex = 99; // Show above other pieces
+		}
+	}
+
+	var pointSizeMultiplierX = 34;
+	var pointSizeMultiplierY = 34;
+	var unitString = "px";
+
+	// Responsive sizing for mobile
+	if (window.innerWidth <= 612) {
+		pointSizeMultiplierX = 5.5555;
+		pointSizeMultiplierY = 5.611;
+		unitString = "vw";
+	}
+
+	// Set initial position (offset from final position)
+	theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+	theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+
+	// Animate to final position (CSS transition handles the animation)
+	requestAnimationFrame(function() {
+		theImg.style.left = "0px";
+		theImg.style.top = "0px";
+	});
 };
 
 CaptureActuator.prototype.printBoard = function(board) {
