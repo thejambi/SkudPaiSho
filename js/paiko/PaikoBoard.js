@@ -3,6 +3,7 @@
 // Uses 18x18 grid like Adevar for space-based play
 
 import { GUEST, HOST, NotationPoint, RowAndColumn } from '../CommonNotationObjects';
+import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
 import { PaikoBoardPoint, PaikoPointState, PaikoZone } from './PaikoBoardPoint';
 import { PaikoTileCode } from './PaikoTile';
 
@@ -350,9 +351,9 @@ export class PaikoBoard {
 			return false;
 		}
 
-		// Check if point is in player's homeground
-		if (point.isHomeground(player)) {
-			return true;
+		// Check if point is threatened by opponent - if so, cannot deploy
+		if (point.getThreat(getOpponentName(player)) > 0) {
+			return false;
 		}
 
 		// Check if point is threatened by player (they control it)
@@ -367,6 +368,11 @@ export class PaikoBoard {
 				return false;
 			}
 
+			return true;
+		}
+
+		// Check if point is in player's homeground
+		if (point.isHomeground(player)) {
 			return true;
 		}
 
@@ -391,9 +397,9 @@ export class PaikoBoard {
 			return false;
 		}
 
-		// Check if point is in player's homeground
-		if (point.isHomeground(player)) {
-			return true;
+		// Check if point is threatened by opponent - if so, cannot deploy
+		if (point.getThreat(getOpponentName(player)) > 0) {
+			return false;
 		}
 
 		// Check if point is threatened by player (they control it)
@@ -405,6 +411,11 @@ export class PaikoBoard {
 
 			// Water CAN redeploy in its own threat (special rule)
 			// The rule says "You can redeploy Water in its own threat"
+			return true;
+		}
+
+		// Check if point is in player's homeground
+		if (point.isHomeground(player)) {
 			return true;
 		}
 

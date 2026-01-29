@@ -5471,16 +5471,17 @@ export function addOptionFromInput() {
 }
 
 export function promptAddOption() {
-	// Ads.enableAds(true);
 	if (Ads.Options.showAds) {
 		Ads.showRandomPopupAd();
 	}
 
-	if (usernameIsOneOf(['SkudPaiSho'])) {
-		Ads.enableAds(true);
-
+	if (usernameIsOneOf(['SkudPaiSho']) || gameDevOn) {
 		const container = document.createElement('div');
 		container.appendChild(document.createElement('br'));
+
+		const gameOptionsHeader = document.createElement('div');
+		gameOptionsHeader.textContent = 'Game Options:';
+		container.appendChild(gameOptionsHeader);
 
 		const optionInput = document.createElement('input');
 		optionInput.type = 'text';
@@ -5509,6 +5510,13 @@ export function promptAddOption() {
 			clearDiv.onclick = () => clearOptions();
 			container.appendChild(clearDiv);
 		}
+
+		container.appendChild(document.createElement('br'));
+		const enableAdsDiv = document.createElement('div');
+		enableAdsDiv.classList.add('clickableText');
+		enableAdsDiv.textContent = 'Enable Ads';
+		enableAdsDiv.onclick = () => Ads.enableAds(true);
+		container.appendChild(enableAdsDiv);
 
 		container.appendChild(document.createElement('br'));
 		const adDiv = document.createElement('div');

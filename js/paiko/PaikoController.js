@@ -3,10 +3,13 @@
 
 import {
 	GameType,
+	activeAi,
+	activeAi2,
 	callSubmitMove,
 	createGameIfThatIsOk,
 	currentMoveIndex,
 	finalizeMove,
+	getCurrentPlayer,
 	myTurn,
 	onlinePlayEnabled,
 	playingOnlineGame,
@@ -36,6 +39,13 @@ export class PaikoController {
 		this.selectedDrawTiles = [];
 		this.selectedCaptureRewardTiles = [];
 		this.pendingDeployMove = null; // For Sai deploy + shift combined move
+
+		// For accumulating setup tiles into single moves
+		this.pendingSetupTiles = [];
+		// For HOST_SELECT_1 - stores the selected tile until action move is made
+		this.pendingHostSetupTile = null;
+		// For capture reward - stores selected tiles to bundle with the next move
+		this.pendingCaptureRewardData = null;
 	}
 
 	getGameTypeId() {
@@ -545,22 +555,58 @@ export class PaikoController {
 				}
 			}
 
-			// Build selection move
-			this.moveBuilder.buildSelectMove(currentPlayer, [tileCode]);
+			// Handle HOST_SELECT_1 specially - store tile and wait for action move
+			if (this.theGame.gamePhase === PaikoGamePhase.HOST_SELECT_1) {
+				this.pendingHostSetupTile = tileCode;
+				// Draw the tile to hand immediately for UI purposes
+				this.theGame.tileManager.drawTileFromReserve(HOST, tileCode);
+				this.theGame.gamePhase = PaikoGamePhase.PLAYING;
+				this.callActuate();
+				refreshMessage();
+				return;
+			}
 
-			const move = this.moveBuilder.getNotationMove(this.gameNotation);
-			this.theGame.runNotationMove(move);
-			this.gameNotation.addMove(move);
+			// Accumulate selected tiles
+			this.pendingSetupTiles.push(tileCode);
+			// Draw the tile to hand immediately for UI purposes
+			this.theGame.tileManager.drawTileFromReserve(currentPlayer, tileCode);
 
-			this.resetNotationBuilder();
+			// Determine target count for this phase
+			const targetCount = this.theGame.gamePhase === PaikoGamePhase.HOST_SELECT_7 ? 7 : 9;
 
-			// Start online game after HOST finishes selecting 7 tiles (phase transitions to GUEST_SELECT_9)
-			if (onlinePlayEnabled && this.theGame.gamePhase === PaikoGamePhase.GUEST_SELECT_9 && this.gameNotation.moves.length === 7) {
-				this.startOnlineGame();
-			} else if (playingOnlineGame()) {
-				callSubmitMove();
+			// Check if we've reached the target
+			if (this.pendingSetupTiles.length >= targetCount) {
+				// Create the move with all selected tiles
+				this.moveBuilder.buildSelectMove(currentPlayer, [...this.pendingSetupTiles]);
+				const move = this.moveBuilder.getNotationMove(this.gameNotation);
+				// Don't run the move - tiles are already in hand. Just add to notation.
+				this.gameNotation.addMove(move);
+
+				// Advance game phase
+				if (this.theGame.gamePhase === PaikoGamePhase.HOST_SELECT_7) {
+					this.theGame.gamePhase = PaikoGamePhase.GUEST_SELECT_9;
+				} else if (this.theGame.gamePhase === PaikoGamePhase.GUEST_SELECT_9) {
+					this.theGame.gamePhase = PaikoGamePhase.HOST_SELECT_1;
+				}
+
+				// Reset accumulated tiles
+				this.pendingSetupTiles = [];
+				this.resetNotationBuilder();
+
+				this.callActuate();
+
+				// Start online game after HOST finishes selecting 7 tiles
+				if (onlinePlayEnabled && this.theGame.gamePhase === PaikoGamePhase.GUEST_SELECT_9 && this.gameNotation.moves.length === 1) {
+					this.startOnlineGame();
+				} else if (playingOnlineGame()) {
+					callSubmitMove();
+				} else {
+					finalizeMove();
+				}
 			} else {
-				finalizeMove();
+				// Just update UI to show selected tile in hand
+				this.callActuate();
+				refreshMessage();
 			}
 			return;
 		}
@@ -751,6 +797,18 @@ export class PaikoController {
 		const endPointText = this.moveBuilder.getMoveData('endPoint');
 		const currentPlayer = this.getCurrentPlayer();
 
+		// Bundle pending setup tile if this is HOST's first action
+		if (this.pendingHostSetupTile && currentPlayer === HOST) {
+			move.moveData.setupTile = this.pendingHostSetupTile;
+			this.pendingHostSetupTile = null;
+		}
+
+		// Bundle pending capture reward if opponent selected tiles for us
+		if (this.pendingCaptureRewardData) {
+			move.moveData.captureReward = this.pendingCaptureRewardData;
+			this.pendingCaptureRewardData = null;
+		}
+
 		// Check if this is Sai with shift ability
 		const tempTile = new PaikoTile(tileCode, currentPlayer === HOST ? 'H' : 'G');
 		const isSaiWithShift = tempTile.hasSpecialRule('shiftAfterDeploy');
@@ -798,6 +856,19 @@ export class PaikoController {
 
 	finalizeShift() {
 		const move = this.moveBuilder.getNotationMove(this.gameNotation);
+		const currentPlayer = this.getCurrentPlayer();
+
+		// Bundle pending setup tile if this is HOST's first action
+		if (this.pendingHostSetupTile && currentPlayer === HOST) {
+			move.moveData.setupTile = this.pendingHostSetupTile;
+			this.pendingHostSetupTile = null;
+		}
+
+		// Bundle pending capture reward if opponent selected tiles for us
+		if (this.pendingCaptureRewardData) {
+			move.moveData.captureReward = this.pendingCaptureRewardData;
+			this.pendingCaptureRewardData = null;
+		}
 
 		// Validate move doesn't capture own tile
 		const gameCopy = this.theGame.getCopy();
@@ -997,6 +1068,19 @@ export class PaikoController {
 		this.moveBuilder.buildDrawMove(currentPlayer, this.selectedDrawTiles);
 
 		const move = this.moveBuilder.getNotationMove(this.gameNotation);
+
+		// Bundle pending setup tile if this is HOST's first action
+		if (this.pendingHostSetupTile && currentPlayer === HOST) {
+			move.moveData.setupTile = this.pendingHostSetupTile;
+			this.pendingHostSetupTile = null;
+		}
+
+		// Bundle pending capture reward if opponent selected tiles for us
+		if (this.pendingCaptureRewardData) {
+			move.moveData.captureReward = this.pendingCaptureRewardData;
+			this.pendingCaptureRewardData = null;
+		}
+
 		this.theGame.runNotationMove(move);
 		this.gameNotation.addMove(move);
 
@@ -1078,6 +1162,7 @@ export class PaikoController {
 	}
 
 	// Confirm the capture reward selection
+	// Instead of creating a separate move, store the data to bundle with the next action move
 	confirmCaptureReward() {
 		if (this.moveBuilder.getStatus() !== PaikoBuilderStatus.SELECTING_CAPTURE_REWARD) {
 			return;
@@ -1093,21 +1178,26 @@ export class PaikoController {
 			return;
 		}
 
-		const currentPlayer = this.getCurrentPlayer();
-		this.moveBuilder.buildCaptureRewardMove(currentPlayer, this.selectedCaptureRewardTiles);
+		// Store the capture reward data to bundle with the next move
+		this.pendingCaptureRewardData = {
+			forPlayer: pendingReward.capturingPlayer,
+			tiles: [...this.selectedCaptureRewardTiles]
+		};
 
-		const move = this.moveBuilder.getNotationMove(this.gameNotation);
-		this.theGame.runNotationMove(move);
-		this.gameNotation.addMove(move);
+		// Execute the reward immediately so tiles go to the capturing player
+		this.selectedCaptureRewardTiles.forEach(tileCode => {
+			this.theGame.tileManager.drawTileFromReserve(pendingReward.capturingPlayer, tileCode);
+		});
+
+		// Clear the pending reward in game state
+		this.theGame.clearPendingCaptureReward();
 
 		this.selectedCaptureRewardTiles = [];
 		this.resetNotationBuilder();
 
-		if (playingOnlineGame()) {
-			callSubmitMove();
-		} else {
-			finalizeMove();
-		}
+		// Now the player can make their regular move
+		this.callActuate();
+		refreshMessage();
 	}
 
 	getCurrentPlayer() {
@@ -1253,53 +1343,68 @@ export class PaikoController {
 	}
 
 	playAiTurn(finalizeMoveCallback) {
-		const currentPlayer = this.getCurrentPlayer();
-		const ai = new PaikoAI(this.theGame, currentPlayer);
+		if (this.theGame.getWinner && this.theGame.getWinner()) {
+			return;
+		}
 
-		// Handle capture reward first if pending
+		var theAi = activeAi;
+		if (activeAi2) {
+			if (activeAi2.player === getCurrentPlayer()) {
+				theAi = activeAi2;
+			}
+		}
+
+		// Handle capture reward first if pending - select tiles and bundle with the action move
+		let captureRewardData = null;
 		if (this.theGame.hasPendingCaptureReward()) {
 			const pendingReward = this.theGame.getPendingCaptureReward();
 			const capturingPlayer = pendingReward.capturingPlayer;
 			const availableTiles = this.theGame.tileManager.getAvailableTileTypes(capturingPlayer);
 
-			// AI chooses tiles for opponent (pick random/first available)
+			// AI chooses tiles for opponent (pick from priority list)
 			const tilesToGive = [];
 			for (let i = 0; i < pendingReward.rewardCount && i < availableTiles.length; i++) {
 				tilesToGive.push(availableTiles[i % availableTiles.length]);
 			}
 
 			if (tilesToGive.length > 0) {
-				this.moveBuilder.buildCaptureRewardMove(currentPlayer, tilesToGive);
-				const move = this.moveBuilder.getNotationMove(this.gameNotation);
-				this.theGame.runNotationMove(move);
-				this.gameNotation.addMove(move);
-				this.resetNotationBuilder();
+				captureRewardData = {
+					forPlayer: capturingPlayer,
+					tiles: tilesToGive
+				};
+
+				// Execute the reward immediately
+				tilesToGive.forEach(tileCode => {
+					this.theGame.tileManager.drawTileFromReserve(capturingPlayer, tileCode);
+				});
+
+				// Clear pending reward
+				this.theGame.clearPendingCaptureReward();
 			}
+		}
+
+		var playerMoveNum = this.gameNotation.getPlayerMoveNum();
+
+		var self = this;
+		setTimeout(function() {
+			var move = theAi.getMove(self.theGame.getCopy(), playerMoveNum);
+
+			if (!move) {
+				debug("AI has no valid moves!");
+				return;
+			}
+
+			// Bundle capture reward data with the move if we selected tiles
+			if (captureRewardData) {
+				move.moveData.captureReward = captureRewardData;
+			}
+
+			self.gameNotation.addMove(move);
 
 			if (finalizeMoveCallback) {
 				finalizeMoveCallback();
 			}
-			return;
-		}
-
-		const move = ai.getBestMove();
-
-		if (!move) {
-			debug("AI has no valid moves!");
-			if (finalizeMoveCallback) {
-				finalizeMoveCallback();
-			}
-			return;
-		}
-
-		// Execute the move
-		this.theGame.runNotationMove(move);
-		this.gameNotation.addMove(move);
-		this.resetNotationBuilder();
-
-		if (finalizeMoveCallback) {
-			finalizeMoveCallback();
-		}
+		}, 10);
 	}
 
 	startAiGame(finalizeMoveCallback) {
@@ -1308,9 +1413,7 @@ export class PaikoController {
 	}
 
 	getAiList() {
-		return [
-			{ name: 'Paiko Strategic AI', shortName: 'Strategic' }
-		];
+		return [ new PaikoAI() ];
 	}
 
 	cleanup() {

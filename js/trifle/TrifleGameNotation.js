@@ -3,7 +3,7 @@
 // --------------------------------------------- // 
 
 import { BRAND_NEW, gameController } from '../PaiShoMain';
-import { DEPLOY, MOVE, SETUP, TEAM_SELECTION } from '../CommonNotationObjects';
+import { DEPLOY, GUEST, MOVE, SETUP, TEAM_SELECTION } from '../CommonNotationObjects';
 import { debug } from '../GameData';
 import {
   getOpponentName,
@@ -128,9 +128,9 @@ export class TrifleGameNotation {
 		debug(removedMove);
 	}
 
-	/* TrifleGameNotation.prototype.getPlayerMoveNum = function() {
+	getPlayerMoveNum() {
 		var moveNum = 0;
-		var lastMove = this.moves[this.moves.length-1];
+		var lastMove = this.moves[this.moves.length - 1];
 
 		if (lastMove) {
 			moveNum = lastMove.moveNum;
@@ -139,7 +139,7 @@ export class TrifleGameNotation {
 			}
 		}
 		return moveNum;
-	}; */	// Can get rid of this?
+	}
 
 	getNotationMoveFromBuilder(builder) {
 		let moveNum = 0;

@@ -72,6 +72,28 @@ export class PaikoGameManager {
 		const moveType = move.moveType;
 		const player = move.player;
 
+		// Handle bundled setup tile (HOST_SELECT_1 combined with first action)
+		if (moveData.setupTile) {
+			this.tileManager.drawTileFromReserve(player, moveData.setupTile);
+			// Advance phase if needed
+			if (this.gamePhase === PaikoGamePhase.HOST_SELECT_1) {
+				this.gamePhase = PaikoGamePhase.PLAYING;
+			}
+		}
+
+		// Handle bundled capture reward (opponent selected tiles for the capturing player)
+		if (moveData.captureReward) {
+			const reward = moveData.captureReward;
+			const capturingPlayer = reward.forPlayer;
+			if (reward.tiles && reward.tiles.length > 0) {
+				reward.tiles.forEach(tileCode => {
+					this.tileManager.drawTileFromReserve(capturingPlayer, tileCode);
+				});
+			}
+			// Clear any pending reward since we just processed it
+			this.pendingCaptureReward = null;
+		}
+
 		// Clear any pending Sai shift from previous turn (unless this IS the Sai shift)
 		// This handles the case where player skipped their Sai shift (no move recorded)
 		if (moveType !== PaikoMoveType.SAI_SHIFT && this.pendingSaiShift) {
@@ -413,6 +435,11 @@ export class PaikoGameManager {
 	// Get pending capture reward info
 	getPendingCaptureReward() {
 		return this.pendingCaptureReward;
+	}
+
+	// Clear pending capture reward (after opponent has selected tiles)
+	clearPendingCaptureReward() {
+		this.pendingCaptureReward = null;
 	}
 
 	// Update current player after move

@@ -6,27 +6,103 @@ import { PaikoMoveType, PaikoGamePhase } from './PaikoGameNotation';
 import { PaikoTile, PaikoTileFacing, PaikoTileCode } from './PaikoTile';
 
 export class PaikoAI {
-	constructor(gameManager, player) {
-		this.gameManager = gameManager;
-		this.player = player;
-		this.opponent = player === HOST ? GUEST : HOST;
+	constructor() {
+		this.player = null;
+		this.opponent = null;
+		this.moveNum = 0;
+	}
+
+	getName() {
+		return "Paiko Strategic AI";
+	}
+
+	getMessage() {
+		return "A strategic AI that evaluates positions based on score potential, capture threats, tile safety, and board control.";
+	}
+
+	setPlayer(playerName) {
+		this.player = playerName;
+		this.opponent = playerName === HOST ? GUEST : HOST;
 	}
 
 	// Main entry point - get the best move for current game state
-	getBestMove() {
-		if (this.gameManager.isSetupPhase()) {
-			return this.getSetupMove();
+	getMove(gameManager, moveNum) {
+		this.moveNum = moveNum;
+
+		// Handle HOST_SELECT_1 specially - need to bundle tile selection with first action
+		if (gameManager.gamePhase === PaikoGamePhase.HOST_SELECT_1) {
+			return this.getHostSelect1WithAction(gameManager);
 		}
-		return this.getPlayingPhaseMove();
+
+		if (gameManager.isSetupPhase()) {
+			return this.getSetupMove(gameManager);
+		}
+		return this.getPlayingPhaseMove(gameManager);
+	}
+
+	// HOST_SELECT_1: Select a tile AND make the first action in one move
+	getHostSelect1WithAction(gameManager) {
+		// First, select a tile from priority list
+		const availableTiles = gameManager.tileManager.getAvailableTileTypes(this.player);
+		if (availableTiles.length === 0) {
+			return null;
+		}
+
+		const tilePriority = [
+			PaikoTileCode.SAI, PaikoTileCode.BOW, PaikoTileCode.SWORD,
+			PaikoTileCode.EARTH, PaikoTileCode.WATER, PaikoTileCode.AIR,
+			PaikoTileCode.FIRE, PaikoTileCode.LOTUS
+		];
+
+		let setupTile = null;
+		for (const code of tilePriority) {
+			if (availableTiles.includes(code)) {
+				setupTile = code;
+				break;
+			}
+		}
+
+		if (!setupTile) {
+			setupTile = availableTiles[0];
+		}
+
+		// Create a copy of game state with the tile drawn to hand
+		const gameCopy = gameManager.getCopy();
+		gameCopy.tileManager.drawTileFromReserve(this.player, setupTile);
+		gameCopy.gamePhase = PaikoGamePhase.PLAYING;
+
+		// Now generate an action move using the updated state
+		const actionMove = this.getPlayingPhaseMove(gameCopy);
+		if (!actionMove) {
+			return null;
+		}
+
+		// Bundle the setup tile with the action move
+		actionMove.moveData.setupTile = setupTile;
+		return actionMove;
 	}
 
 	// ============ SETUP PHASE ============
 
-	getSetupMove() {
-		// During setup, select tiles strategically
-		// Prioritize a balanced mix of tiles
-		const availableTiles = this.gameManager.tileManager.getAvailableTileTypes(this.player);
+	getSetupMove(gameManager) {
+		// During setup, select all tiles at once for a single move
+		// Determine how many tiles to select based on game phase
+		const phase = gameManager.gamePhase;
+		let targetCount;
 
+		if (phase === PaikoGamePhase.HOST_SELECT_7) {
+			targetCount = 7;
+		} else if (phase === PaikoGamePhase.GUEST_SELECT_9) {
+			targetCount = 9;
+		} else if (phase === PaikoGamePhase.HOST_SELECT_1) {
+			// HOST_SELECT_1 is bundled with the first action move
+			// Return null and let getPlayingPhaseMove handle it
+			return null;
+		} else {
+			return null;
+		}
+
+		const availableTiles = gameManager.tileManager.getAvailableTileTypes(this.player);
 		if (availableTiles.length === 0) {
 			return null;
 		}
@@ -43,40 +119,61 @@ export class PaikoAI {
 			PaikoTileCode.LOTUS     // Deploy anywhere but no points
 		];
 
-		// Get current hand to avoid too many duplicates
-		const handCounts = {};
-		const hand = this.gameManager.tileManager.getHand(this.player);
-		hand.forEach(tile => {
-			handCounts[tile.code] = (handCounts[tile.code] || 0) + 1;
-		});
+		// Select tiles strategically up to target count
+		const selectedTiles = [];
+		const selectedCounts = {};
 
-		// Find best available tile we don't have too many of
+		// First pass: select from priority list, avoiding too many duplicates
 		for (const code of tilePriority) {
-			if (availableTiles.includes(code) && (handCounts[code] || 0) < 2) {
-				return {
-					moveType: PaikoMoveType.SELECT_TILE,
-					player: this.player,
-					moveData: { selectedTiles: [code] }
-				};
+			if (selectedTiles.length >= targetCount) break;
+
+			// Count how many of this tile we've already selected
+			const alreadySelected = selectedCounts[code] || 0;
+
+			// Count available of this type
+			const availableCount = availableTiles.filter(t => t === code).length;
+
+			// Select up to 2 of each type
+			while (selectedTiles.length < targetCount &&
+				   alreadySelected + (selectedCounts[code] || 0) < 2 &&
+				   (selectedCounts[code] || 0) < availableCount) {
+				selectedTiles.push(code);
+				selectedCounts[code] = (selectedCounts[code] || 0) + 1;
 			}
 		}
 
-		// Fall back to any available tile
+		// Second pass: fill remaining slots with any available tiles
+		for (const code of tilePriority) {
+			if (selectedTiles.length >= targetCount) break;
+
+			const availableCount = availableTiles.filter(t => t === code).length;
+			while (selectedTiles.length < targetCount &&
+				   (selectedCounts[code] || 0) < availableCount) {
+				selectedTiles.push(code);
+				selectedCounts[code] = (selectedCounts[code] || 0) + 1;
+			}
+		}
+
+		if (selectedTiles.length === 0) {
+			return null;
+		}
+
 		return {
+			moveNum: this.moveNum,
 			moveType: PaikoMoveType.SELECT_TILE,
 			player: this.player,
-			moveData: { selectedTiles: [availableTiles[0]] }
+			moveData: { selectedTiles: selectedTiles }
 		};
 	}
 
 	// ============ PLAYING PHASE ============
 
-	getPlayingPhaseMove() {
-		const possibleMoves = this.generateAllMoves();
+	getPlayingPhaseMove(gameManager) {
+		const possibleMoves = this.generateAllMoves(gameManager);
 
 		if (possibleMoves.length === 0) {
 			// No moves available - draw tiles
-			return this.getDrawMove();
+			return this.getDrawMove(gameManager);
 		}
 
 		// Evaluate each move and pick the best
@@ -84,7 +181,7 @@ export class PaikoAI {
 		let bestScore = -Infinity;
 
 		for (const move of possibleMoves) {
-			const score = this.evaluateMove(move);
+			const score = this.evaluateMove(gameManager, move);
 			if (score > bestScore) {
 				bestScore = score;
 				bestMove = move;
@@ -93,7 +190,7 @@ export class PaikoAI {
 
 		// If no good moves found, consider drawing
 		if (bestScore < -50) {
-			const drawMove = this.getDrawMove();
+			const drawMove = this.getDrawMove(gameManager);
 			if (drawMove) {
 				return drawMove;
 			}
@@ -102,34 +199,35 @@ export class PaikoAI {
 		return bestMove;
 	}
 
-	generateAllMoves() {
+	generateAllMoves(gameManager) {
 		const moves = [];
 
 		// Generate deploy moves
-		const deployMoves = this.generateDeployMoves();
+		const deployMoves = this.generateDeployMoves(gameManager);
 		moves.push(...deployMoves);
 
 		// Generate shift moves
-		const shiftMoves = this.generateShiftMoves();
+		const shiftMoves = this.generateShiftMoves(gameManager);
 		moves.push(...shiftMoves);
 
 		return moves;
 	}
 
-	generateDeployMoves() {
+	generateDeployMoves(gameManager) {
 		const moves = [];
-		const hand = this.gameManager.tileManager.getHand(this.player);
+		const hand = gameManager.tileManager.getHand(this.player);
 
 		for (const tile of hand) {
-			const deployPoints = this.gameManager.board.getPossibleDeploymentPoints(this.player, tile);
+			const deployPoints = gameManager.board.getPossibleDeploymentPoints(this.player, tile);
 
 			for (const point of deployPoints) {
-				const notationPoint = this.gameManager.board.getNotationPointFromRowCol(point.row, point.col);
+				const notationPoint = gameManager.board.getNotationPointFromRowCol(point.row, point.col);
 
 				// For tiles with facing, try all directions
 				if (tile.hasFacing()) {
 					for (const facing of [PaikoTileFacing.UP, PaikoTileFacing.RIGHT, PaikoTileFacing.DOWN, PaikoTileFacing.LEFT]) {
 						const move = {
+							moveNum: this.moveNum,
 							moveType: DEPLOY,
 							player: this.player,
 							moveData: {
@@ -145,7 +243,7 @@ export class PaikoAI {
 							moves.push(move);
 
 							// Add moves with shift
-							const shiftMoves = this.generateSaiShiftVariants(move, point, tile);
+							const shiftMoves = this.generateSaiShiftVariants(gameManager, move, point, tile);
 							moves.push(...shiftMoves);
 						} else {
 							moves.push(move);
@@ -153,6 +251,7 @@ export class PaikoAI {
 					}
 				} else {
 					moves.push({
+						moveNum: this.moveNum,
 						moveType: DEPLOY,
 						player: this.player,
 						moveData: {
@@ -168,11 +267,11 @@ export class PaikoAI {
 		return moves;
 	}
 
-	generateSaiShiftVariants(deployMove, deployPoint, tile) {
+	generateSaiShiftVariants(gameManager, deployMove, deployPoint, tile) {
 		const moves = [];
 
 		// Simulate placing Sai at deploy point to get shift destinations
-		const gameCopy = this.gameManager.getCopy();
+		const gameCopy = gameManager.getCopy();
 		const tempTile = new PaikoTile(tile.code, this.player === HOST ? 'H' : 'G');
 		gameCopy.board.placeTile(tempTile, deployMove.moveData.endPoint, true);
 
@@ -186,6 +285,7 @@ export class PaikoAI {
 
 			for (const shiftFacing of [PaikoTileFacing.UP, PaikoTileFacing.RIGHT, PaikoTileFacing.DOWN, PaikoTileFacing.LEFT]) {
 				moves.push({
+					moveNum: this.moveNum,
 					moveType: DEPLOY,
 					player: this.player,
 					moveData: {
@@ -202,24 +302,25 @@ export class PaikoAI {
 		return moves;
 	}
 
-	generateShiftMoves() {
+	generateShiftMoves(gameManager) {
 		const moves = [];
-		const playerTiles = this.gameManager.board.getPlayerTiles(this.player);
+		const playerTiles = gameManager.board.getPlayerTiles(this.player);
 
 		for (const { tile, point } of playerTiles) {
 			if (!tile.canShift()) {
 				continue;
 			}
 
-			const shiftDestinations = this.gameManager.board.getPossibleShiftDestinations(point, this.player);
+			const shiftDestinations = gameManager.board.getPossibleShiftDestinations(point, this.player);
 
 			for (const destPoint of shiftDestinations) {
-				const startNotation = this.gameManager.board.getNotationPointFromRowCol(point.row, point.col);
-				const endNotation = this.gameManager.board.getNotationPointFromRowCol(destPoint.row, destPoint.col);
+				const startNotation = gameManager.board.getNotationPointFromRowCol(point.row, point.col);
+				const endNotation = gameManager.board.getNotationPointFromRowCol(destPoint.row, destPoint.col);
 
 				if (tile.hasFacing()) {
 					for (const facing of [PaikoTileFacing.UP, PaikoTileFacing.RIGHT, PaikoTileFacing.DOWN, PaikoTileFacing.LEFT]) {
 						moves.push({
+							moveNum: this.moveNum,
 							moveType: MOVE,
 							player: this.player,
 							moveData: {
@@ -231,6 +332,7 @@ export class PaikoAI {
 					}
 				} else {
 					moves.push({
+						moveNum: this.moveNum,
 						moveType: MOVE,
 						player: this.player,
 						moveData: {
@@ -246,8 +348,8 @@ export class PaikoAI {
 		return moves;
 	}
 
-	getDrawMove() {
-		const availableTiles = this.gameManager.tileManager.getAvailableTileTypes(this.player);
+	getDrawMove(gameManager) {
+		const availableTiles = gameManager.tileManager.getAvailableTileTypes(this.player);
 
 		if (availableTiles.length === 0) {
 			return null;
@@ -286,6 +388,7 @@ export class PaikoAI {
 		}
 
 		return {
+			moveNum: this.moveNum,
 			moveType: PaikoMoveType.DRAW,
 			player: this.player,
 			moveData: { drawnTiles: tilesToDraw }
@@ -294,9 +397,9 @@ export class PaikoAI {
 
 	// ============ MOVE EVALUATION ============
 
-	evaluateMove(move) {
+	evaluateMove(gameManager, move) {
 		// Create a copy of the game and apply the move
-		const gameCopy = this.gameManager.getCopy();
+		const gameCopy = gameManager.getCopy();
 
 		try {
 			gameCopy.runNotationMove(move, false);
