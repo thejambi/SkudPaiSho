@@ -17,113 +17,100 @@ export class PaikoBoard {
 		const cells = [];
 
 		// Helper aliases for cleaner board definition
-		const N = () => PaikoBoardPoint.neutral();
+		const N = () => PaikoBoardPoint.nonPlayable();
 		const M = () => PaikoBoardPoint.middleground();
 		const HH = () => PaikoBoardPoint.hostHomeground();
 		const GH = () => PaikoBoardPoint.guestHomeground();
-		const X = () => PaikoBoardPoint.nonPlayable();
 
 		// Row 0 - Top row (6 spaces) - mirrors row 17
-		cells[0] = this.createRow(6, [N(), N(), N(), N(), N(), N()]);
+		cells[0] = this.createRow(6, [
+			N(), N(), N(), N(), N(), N()
+		]);
 
 		// Row 1 (10 spaces)
 		cells[1] = this.createRow(10, [
-			N(), N(), N(), N(), M(),
-			M(), N(), N(), N(), N()
+			N(), N(), N(), N(), N(), N(), N(), N(), N(), N()
 		]);
 
 		// Row 2 (12 spaces)
 		cells[2] = this.createRow(12, [
-			N(), N(), N(), N(), N(), M(),
-			GH(), N(), N(), N(), N(), N()
+			N(), N(), N(), N(), N(), M(), GH(), N(), N(), N(), N(), N()
 		]);
 
 		// Row 3 (14 spaces)
 		cells[3] = this.createRow(14, [
-			N(), N(), N(), N(), N(), M(), M(),
-			GH(), GH(), N(), N(), N(), N(), N()
+			N(), N(), N(), N(), N(), M(), M(), GH(), GH(), N(), N(), N(), N(), N()
 		]);
 
 		// Row 4 (16 spaces)
 		cells[4] = this.createRow(16, [
-			N(), N(), N(), N(), N(), M(), M(), M(),
-			GH(), GH(), GH(), N(), N(), N(), N(), N()
+			N(), N(), N(), N(), N(), M(), M(), M(), GH(), GH(), GH(), N(), N(), N(), N(), N()
 		]);
 
 		// Row 5 (16 spaces)
 		cells[5] = this.createRow(16, [
-			N(), N(), N(), N(), M(), M(), M(), M(),
-			GH(), GH(), GH(), GH(), N(), N(), N(), N()
+			N(), N(), N(), N(), M(), M(), M(), M(), GH(), GH(), GH(), GH(), N(), N(), N(), N()
 		]);
 
 		// Row 6 (18 spaces)
 		cells[6] = this.createRow(18, [
-			N(), N(), N(), N(), M(), M(), M(), M(), M(),
-			GH(), GH(), GH(), GH(), GH(), N(), N(), N(), N()
+			N(), N(), N(), N(), M(), M(), M(), M(), M(), GH(), GH(), GH(), GH(), GH(), N(), N(), N(), N()
 		]);
 
 		// Row 7 (18 spaces)
 		cells[7] = this.createRow(18, [
-			N(), N(), N(), M(), M(), M(), M(), M(), M(),
-			GH(), GH(), GH(), GH(), GH(), GH(), N(), N(), N()
+			N(), N(), N(), M(), M(), M(), M(), M(), M(), GH(), GH(), GH(), GH(), GH(), GH(), N(), N(), N()
 		]);
 
 		// Row 8 (18 spaces) - Center top
 		cells[8] = this.createRow(18, [
-			N(), N(), M(), M(), M(), M(), M(), M(), M(),
-			GH(), GH(), GH(), GH(), GH(), GH(), GH(), N(), N()
+			N(), N(), M(), M(), M(), M(), M(), M(), M(), GH(), GH(), GH(), GH(), GH(), GH(), GH(), N(), N()
 		]);
 
 		// Row 9 (18 spaces) - Center bottom
 		cells[9] = this.createRow(18, [
-			N(), N(), HH(), HH(), HH(), HH(), HH(), HH(), HH(),
-			M(), M(), M(), M(), M(), M(), M(), N(), N()
+			N(), N(), HH(), HH(), HH(), HH(), HH(), HH(), HH(), M(), M(), M(), M(), M(), M(), M(), N(), N()
 		]);
 
 		// Row 10 (18 spaces)
 		cells[10] = this.createRow(18, [
-			N(), N(), N(), HH(), HH(), HH(), HH(), HH(), HH(),
-			M(), M(), M(), M(), M(), M(), N(), N(), N()
+			N(), N(), N(), HH(), HH(), HH(), HH(), HH(), HH(), M(), M(), M(), M(), M(), M(), N(), N(), N()
 		]);
 
 		// Row 11 (18 spaces)
 		cells[11] = this.createRow(18, [
-			N(), N(), N(), N(), HH(), HH(), HH(), HH(), HH(),
-			M(), M(), M(), M(), M(), N(), N(), N(), N()
+			N(), N(), N(), N(), HH(), HH(), HH(), HH(), HH(), M(), M(), M(), M(), M(), N(), N(), N(), N()
 		]);
 
 		// Row 12 (16 spaces)
 		cells[12] = this.createRow(16, [
-			N(), N(), N(), N(), HH(), HH(), HH(), HH(),
-			M(), M(), M(), M(), N(), N(), N(), N()
+			N(), N(), N(), N(), HH(), HH(), HH(), HH(), M(), M(), M(), M(), N(), N(), N(), N()
 		]);
 
 		// Row 13 (16 spaces)
 		cells[13] = this.createRow(16, [
-			N(), N(), N(), N(), N(), HH(), HH(), HH(),
-			M(), M(), M(), N(), N(), N(), N(), N()
+			N(), N(), N(), N(), N(), HH(), HH(), HH(), M(), M(), M(), N(), N(), N(), N(), N()
 		]);
 
 		// Row 14 (14 spaces)
 		cells[14] = this.createRow(14, [
-			N(), N(), N(), N(), N(), HH(), HH(),
-			M(), M(), N(), N(), N(), N(), N()
+			N(), N(), N(), N(), N(), HH(), HH(), M(), M(), N(), N(), N(), N(), N()
 		]);
 
 		// Row 15 (12 spaces)
 		cells[15] = this.createRow(12, [
-			N(), N(), N(), N(), N(), HH(),
-			M(), N(), N(), N(), N(), N()
+			N(), N(), N(), N(), N(), HH(), M(), N(), N(), N(), N(), N()
 		]);
 
 		// Row 16 (10 spaces)
 		cells[16] = this.createRow(10, [
-			N(), N(), N(), N(), M(),
-			M(), N(), N(), N(), N()
+			N(), N(), N(), N(), N(), N(), N(), N(), N(), N()
 		]);
 
 		// Row 17 - Bottom row (6 spaces)
-		cells[17] = this.createRow(6, [N(), N(), N(), N(), N(), N()]);
+		cells[17] = this.createRow(6, [
+			N(), N(), N(), N(), N(), N()
+		]);
 
 		// Set row/col for each cell
 		for (let row = 0; row < cells.length; row++) {
