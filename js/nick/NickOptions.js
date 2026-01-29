@@ -4,7 +4,7 @@ export class NickOptions {
 	constructor() {
 		if (!localStorage.getItem(NickOptions.tileDesignTypeKey)
 			|| !NickOptions.tileDesignTypeValues[localStorage.getItem(NickOptions.tileDesignTypeKey)]) {
-			NickOptions.setTileDesignsPreference("siyuan", true);
+			NickOptions.setTileDesignsPreference("fournationsgaoling", true);
 		}
 
 		NickOptions.viewAsGuest = false || NickOptions.viewAsGuest;
@@ -20,10 +20,10 @@ export class NickOptions {
 NickOptions.tileDesignTypeKey = "nickTileDesignTypeKey";
 
 NickOptions.tileDesignTypeValues = {
-	siyuan: "Sì Yuán",
-	fournations: "Four Nations",
-	siyuangaoling: "Sì Yuán Gāolíng",
 	fournationsgaoling: "Four Nations Gāolíng",
+	siyuangaoling: "Sì Yuán Gāolíng",
+	fournations: "Four Nations",
+	siyuan: "Sì Yuán",
 	custom: "Custom"
 };
 
