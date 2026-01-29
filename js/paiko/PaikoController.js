@@ -20,7 +20,7 @@ import { PaikoMoveType, PaikoGamePhase } from './PaikoGameNotation';
 import { PaikoMoveBuilder, PaikoBuilderStatus } from './PaikoMoveBuilder';
 import { TrifleGameNotation } from '../trifle/TrifleGameNotation';
 import { PaikoPointState } from './PaikoBoardPoint';
-import { PaikoTile, PaikoTileFacing, PaikoTileDefinitions, getAllTileCodes } from './PaikoTile';
+import { PaikoTile, PaikoTileFacing, PaikoTileDefinitions, PaikoTileCode, getAllTileCodes } from './PaikoTile';
 import { debug } from '../GameData';
 
 export class PaikoController {
@@ -33,6 +33,7 @@ export class PaikoController {
 
 		this.isPaiShoGame = false;
 		this.selectedDrawTiles = [];
+		this.selectedCaptureRewardTiles = [];
 	}
 
 	getGameTypeId() {
@@ -255,6 +256,16 @@ export class PaikoController {
 		const container = document.createElement('span');
 		const gameInfo = this.theGame.getGameInfo();
 
+		// Check if we need to enter capture reward mode
+		// This happens when there's a pending capture reward and it's the player's turn
+		if (this.theGame.hasPendingCaptureReward() &&
+			myTurn() &&
+			this.moveBuilder.getStatus() === PaikoBuilderStatus.BRAND_NEW) {
+			this.moveBuilder.setStatus(PaikoBuilderStatus.SELECTING_CAPTURE_REWARD);
+			this.moveBuilder.setPlayer(this.getCurrentPlayer());
+			this.selectedCaptureRewardTiles = [];
+		}
+
 		// Show rotation options at the very top when selecting facing direction
 		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.SELECTING_ROTATION) {
 			const rotateContainer = document.createElement('p');
@@ -329,6 +340,67 @@ export class PaikoController {
 			container.appendChild(drawContainer);
 		}
 
+		// Show Sai shift UI after deploying Sai
+		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.WAITING_FOR_SAI_SHIFT) {
+			const saiContainer = document.createElement('span');
+
+			const saiHeader = document.createElement('p');
+			saiHeader.innerHTML = '<strong>Sai Deployed!</strong> Sai can shift up to 2 spaces immediately. Click a destination on the board or:';
+			saiContainer.appendChild(saiHeader);
+
+			const buttonsP = document.createElement('p');
+			const skipSpan = document.createElement('span');
+			skipSpan.className = 'skipBonus';
+			skipSpan.textContent = 'Skip Sai Shift';
+			skipSpan.onclick = () => this.skipSaiShift();
+			buttonsP.appendChild(skipSpan);
+
+			saiContainer.appendChild(buttonsP);
+			container.appendChild(saiContainer);
+		}
+
+		// Show capture reward UI when opponent must choose tiles for capturing player
+		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.SELECTING_CAPTURE_REWARD) {
+			const rewardContainer = document.createElement('span');
+			const pendingReward = this.theGame.getPendingCaptureReward();
+			const capturingPlayer = pendingReward.capturingPlayer;
+			const remaining = pendingReward.rewardCount - (this.selectedCaptureRewardTiles?.length || 0);
+
+			const rewardHeader = document.createElement('p');
+			rewardHeader.innerHTML = `<strong>Capture Reward:</strong> Your opponent captured your tiles! Choose ${remaining} tile(s) from their reserve to give them.`;
+			rewardContainer.appendChild(rewardHeader);
+
+			// Show selected tiles
+			if (this.selectedCaptureRewardTiles && this.selectedCaptureRewardTiles.length > 0) {
+				const selectedP = document.createElement('p');
+				selectedP.innerHTML = '<strong>Selected:</strong> ';
+
+				this.selectedCaptureRewardTiles.forEach((tileCode, index) => {
+					if (index > 0) selectedP.appendChild(document.createTextNode(', '));
+					const tileSpan = document.createElement('span');
+					tileSpan.className = 'skipBonus';
+					tileSpan.textContent = tileCode + ' ✕';
+					tileSpan.onclick = () => this.deselectCaptureRewardTile(index);
+					selectedP.appendChild(tileSpan);
+				});
+
+				rewardContainer.appendChild(selectedP);
+			}
+
+			// Show confirm button when all tiles are selected
+			if (this.selectedCaptureRewardTiles && this.selectedCaptureRewardTiles.length >= pendingReward.rewardCount) {
+				const confirmP = document.createElement('p');
+				const confirmSpan = document.createElement('span');
+				confirmSpan.className = 'skipBonus';
+				confirmSpan.textContent = 'Confirm Reward';
+				confirmSpan.onclick = () => this.confirmCaptureReward();
+				confirmP.appendChild(confirmSpan);
+				rewardContainer.appendChild(confirmP);
+			}
+
+			container.appendChild(rewardContainer);
+		}
+
 		// Setup phase messages
 		if (gameInfo.phase === PaikoGamePhase.HOST_SELECT_7) {
 			const msg = document.createElement('p');
@@ -352,6 +424,8 @@ export class PaikoController {
 			const status = this.moveBuilder.getStatus();
 			if (status !== PaikoBuilderStatus.SELECTING_ROTATION &&
 				status !== PaikoBuilderStatus.SELECTING_DRAW_TILES &&
+				status !== PaikoBuilderStatus.SELECTING_CAPTURE_REWARD &&
+				status !== PaikoBuilderStatus.WAITING_FOR_SAI_SHIFT &&
 				myTurn() && !gameInfo.winner) {
 				const actions = document.createElement('p');
 				actions.innerHTML = '<strong>Your turn:</strong> Click a tile in your hand to deploy, click a tile on the board to shift, or click here to ';
@@ -401,6 +475,23 @@ export class PaikoController {
 				this.selectTileForDraw(tileCode);
 			} else {
 				debug("Select tiles from your own reserve");
+			}
+			return;
+		}
+
+		// Handle capture reward selection mode - clicking on opponent's (capturing player's) reserve
+		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.SELECTING_CAPTURE_REWARD) {
+			const pendingReward = this.theGame.getPendingCaptureReward();
+			if (pendingReward) {
+				const capturingPlayer = pendingReward.capturingPlayer;
+				const isCapturingPlayerReserve = (capturingPlayer === HOST && pileName === 'hostReserve') ||
+					(capturingPlayer === GUEST && pileName === 'guestReserve');
+
+				if (isCapturingPlayerReserve) {
+					this.selectCaptureRewardTile(tileCode);
+				} else {
+					debug("Select tiles from your opponent's reserve");
+				}
 			}
 			return;
 		}
@@ -473,7 +564,9 @@ export class PaikoController {
 			return;
 		}
 
-		if (currentMoveIndex !== this.gameNotation.moves.length) {
+		// Allow interaction during Sai shift even though move index doesn't match yet
+		const inSaiShiftMode = this.moveBuilder.getStatus() === PaikoBuilderStatus.WAITING_FOR_SAI_SHIFT;
+		if (currentMoveIndex !== this.gameNotation.moves.length && !inSaiShiftMode) {
 			debug("Can only interact if all moves are played.");
 			return;
 		}
@@ -570,6 +663,30 @@ export class PaikoController {
 				this.resetNotationBuilder();
 				this.callActuate();
 			}
+		} else if (this.moveBuilder.getStatus() === PaikoBuilderStatus.WAITING_FOR_SAI_SHIFT) {
+			// Handle Sai shift after deploy
+			if (boardPoint.hasState(PaikoPointState.POSSIBLE_MOVE)) {
+				this.theGame.board.clearAllPointStates();
+
+				// Get Sai's current position from pending shift
+				const saiPoint = this.theGame.pendingSaiShift.point;
+				const saiTile = this.theGame.pendingSaiShift.tile;
+				const startNotationPoint = this.theGame.board.getNotationPointFromRowCol(saiPoint.row, saiPoint.col);
+
+				this.moveBuilder.setStartPoint(startNotationPoint);
+				this.moveBuilder.setEndPoint(notationPoint);
+
+				// Sai has facing, so need to select rotation
+				if (saiTile.hasFacing()) {
+					this.moveBuilder.setStatus(PaikoBuilderStatus.SELECTING_ROTATION);
+					this.showRotationSelector();
+				} else {
+					this.moveBuilder.setFacing(PaikoTileFacing.UP);
+					this.finalizeSaiShift();
+				}
+			} else {
+				// Clicking elsewhere doesn't cancel - user must click Skip or a valid destination
+			}
 		}
 	}
 
@@ -584,6 +701,8 @@ export class PaikoController {
 
 		if (this.moveBuilder.getMoveType() === DEPLOY) {
 			this.finalizeDeploy();
+		} else if (this.moveBuilder.getMoveType() === PaikoMoveType.SAI_SHIFT) {
+			this.finalizeSaiShift();
 		} else if (this.moveBuilder.getMoveType() === MOVE) {
 			// If rotating in place, change move type to ROTATE
 			const startPoint = this.moveBuilder.getMoveData('startPoint');
@@ -596,6 +715,51 @@ export class PaikoController {
 	}
 
 	finalizeDeploy() {
+		const move = this.moveBuilder.getNotationMove(this.gameNotation);
+		const tileCode = this.moveBuilder.getMoveData('tileCode');
+		const endPointText = this.moveBuilder.getMoveData('endPoint');
+
+		// Validate move doesn't capture own tile
+		const gameCopy = this.theGame.getCopy();
+		gameCopy.runNotationMove(move, false);
+		if (!gameCopy.validateMoveDoesntCaptureOwn(this.moveBuilder.getPlayer())) {
+			debug("Move would result in your own tile being captured!");
+			this.resetNotationBuilder();
+			this.callActuate();
+			return;
+		}
+
+		this.theGame.runNotationMove(move);
+		this.gameNotation.addMove(move);
+
+		// Check if Sai was deployed and can shift
+		if (this.theGame.pendingSaiShift) {
+			// Enter Sai shift mode
+			this.moveBuilder.setStatus(PaikoBuilderStatus.WAITING_FOR_SAI_SHIFT);
+			this.moveBuilder.setMoveType(PaikoMoveType.SAI_SHIFT);
+			this.moveBuilder.setMoveData('saiStartPoint', endPointText);
+
+			// Show possible shift destinations for Sai
+			const saiPoint = this.theGame.pendingSaiShift.point;
+			const currentPlayer = this.getCurrentPlayer();
+			const shiftDestinations = this.theGame.board.getPossibleShiftDestinations(saiPoint, currentPlayer);
+			this.theGame.board.markPossibleMoves(shiftDestinations);
+
+			this.callActuate();
+			refreshMessage();
+			return;
+		}
+
+		this.resetNotationBuilder();
+
+		if (playingOnlineGame()) {
+			callSubmitMove();
+		} else {
+			finalizeMove();
+		}
+	}
+
+	finalizeShift() {
 		const move = this.moveBuilder.getNotationMove(this.gameNotation);
 
 		// Validate move doesn't capture own tile
@@ -620,16 +784,49 @@ export class PaikoController {
 		}
 	}
 
-	finalizeShift() {
+	// Skip the optional Sai shift after deploy
+	skipSaiShift() {
+		if (this.moveBuilder.getStatus() !== PaikoBuilderStatus.WAITING_FOR_SAI_SHIFT) {
+			return;
+		}
+
+		// Clear pending Sai shift
+		this.theGame.pendingSaiShift.tile.justDeployed = false;
+		this.theGame.pendingSaiShift = null;
+
+		this.theGame.board.clearAllPointStates();
+		this.resetNotationBuilder();
+
+		if (playingOnlineGame()) {
+			callSubmitMove();
+		} else {
+			finalizeMove();
+		}
+	}
+
+	// Finalize the Sai shift after deploy
+	finalizeSaiShift() {
+		const currentPlayer = this.getCurrentPlayer();
+		const startPoint = this.moveBuilder.getMoveData('startPoint');
+		const endPoint = this.moveBuilder.getMoveData('endPoint');
+		const facing = this.moveBuilder.getMoveData('facing');
+
+		this.moveBuilder.buildSaiShiftMove(currentPlayer, new NotationPoint(startPoint), new NotationPoint(endPoint), facing);
+
 		const move = this.moveBuilder.getNotationMove(this.gameNotation);
 
 		// Validate move doesn't capture own tile
 		const gameCopy = this.theGame.getCopy();
 		gameCopy.runNotationMove(move, false);
-		if (!gameCopy.validateMoveDoesntCaptureOwn(this.moveBuilder.getPlayer())) {
+		if (!gameCopy.validateMoveDoesntCaptureOwn(currentPlayer)) {
 			debug("Move would result in your own tile being captured!");
-			this.resetNotationBuilder();
+			// Re-show shift destinations
+			const saiPoint = this.theGame.pendingSaiShift.point;
+			const shiftDestinations = this.theGame.board.getPossibleShiftDestinations(saiPoint, currentPlayer);
+			this.theGame.board.markPossibleMoves(shiftDestinations);
+			this.moveBuilder.setStatus(PaikoBuilderStatus.WAITING_FOR_SAI_SHIFT);
 			this.callActuate();
+			refreshMessage();
 			return;
 		}
 
@@ -746,6 +943,99 @@ export class PaikoController {
 		refreshMessage();
 	}
 
+	// Enter capture reward selection mode
+	enterCaptureRewardMode() {
+		if (!this.theGame.hasPendingCaptureReward()) {
+			return;
+		}
+
+		const currentPlayer = this.getCurrentPlayer();
+		this.moveBuilder.setStatus(PaikoBuilderStatus.SELECTING_CAPTURE_REWARD);
+		this.moveBuilder.setPlayer(currentPlayer);
+		this.selectedCaptureRewardTiles = [];
+
+		refreshMessage();
+	}
+
+	// Select a tile for capture reward (from opponent's reserve)
+	selectCaptureRewardTile(tileCode) {
+		if (this.moveBuilder.getStatus() !== PaikoBuilderStatus.SELECTING_CAPTURE_REWARD) {
+			return;
+		}
+
+		const pendingReward = this.theGame.getPendingCaptureReward();
+		if (!pendingReward) {
+			return;
+		}
+
+		// Check if already at max
+		if (this.selectedCaptureRewardTiles.length >= pendingReward.rewardCount) {
+			debug("Already selected enough tiles");
+			return;
+		}
+
+		// Check if tile is available in the capturing player's reserve
+		const capturingPlayer = pendingReward.capturingPlayer;
+		const availableTiles = this.theGame.tileManager.getAvailableTileTypes(capturingPlayer);
+		if (!availableTiles.includes(tileCode)) {
+			debug("Tile not available in reserve");
+			return;
+		}
+
+		// Add to selection
+		this.selectedCaptureRewardTiles.push(tileCode);
+
+		// Auto-confirm if we've selected enough
+		if (this.selectedCaptureRewardTiles.length >= pendingReward.rewardCount) {
+			this.confirmCaptureReward();
+		} else {
+			refreshMessage();
+		}
+	}
+
+	// Remove a tile from capture reward selection
+	deselectCaptureRewardTile(index) {
+		if (this.moveBuilder.getStatus() !== PaikoBuilderStatus.SELECTING_CAPTURE_REWARD) {
+			return;
+		}
+
+		this.selectedCaptureRewardTiles.splice(index, 1);
+		refreshMessage();
+	}
+
+	// Confirm the capture reward selection
+	confirmCaptureReward() {
+		if (this.moveBuilder.getStatus() !== PaikoBuilderStatus.SELECTING_CAPTURE_REWARD) {
+			return;
+		}
+
+		const pendingReward = this.theGame.getPendingCaptureReward();
+		if (!pendingReward) {
+			return;
+		}
+
+		if (this.selectedCaptureRewardTiles.length === 0) {
+			debug("Must select tiles for capture reward");
+			return;
+		}
+
+		const currentPlayer = this.getCurrentPlayer();
+		this.moveBuilder.buildCaptureRewardMove(currentPlayer, this.selectedCaptureRewardTiles);
+
+		const move = this.moveBuilder.getNotationMove(this.gameNotation);
+		this.theGame.runNotationMove(move);
+		this.gameNotation.addMove(move);
+
+		this.selectedCaptureRewardTiles = [];
+		this.resetNotationBuilder();
+
+		if (playingOnlineGame()) {
+			callSubmitMove();
+		} else {
+			finalizeMove();
+		}
+	}
+
 	getCurrentPlayer() {
 		// Use the game manager's tracked current player
 		return this.theGame.currentPlayer;
@@ -792,7 +1082,7 @@ export class PaikoController {
 
 			message.push('<hr>');
 			message.push(`<p><strong>Status on board:</strong></p>`);
-			message.push(`<p>Opponent threat: ${opponentThreat} (needs ${threatNeeded} to capture)</p>`);
+			message.push(`<p>Threatened: ${opponentThreat} (needs ${threatNeeded} to capture)</p>`);
 			message.push(`<p>Covered: ${isCovered ? 'Yes' : 'No'}</p>`);
 
 			if (opponentThreat >= threatNeeded) {

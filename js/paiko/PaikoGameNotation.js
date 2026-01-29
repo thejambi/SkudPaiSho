@@ -20,6 +20,9 @@ export const PaikoMoveType = {
 	SAI_SHIFT: 'SaiShift',
 	WATER_REDEPLOY: 'WaterRedeploy',
 
+	// Capture reward - opponent chooses tiles for capturing player
+	CAPTURE_REWARD: 'CaptureReward',
+
 	// Game state
 	PASS: 'Pass'
 };

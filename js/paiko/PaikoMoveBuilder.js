@@ -16,6 +16,7 @@ export const PaikoBuilderStatus = {
 	SELECTING_SHIFT_DESTINATION: 'selecting_shift_destination',
 	SELECTING_ROTATION: 'selecting_rotation',
 	SELECTING_DRAW_TILES: 'selecting_draw_tiles',
+	SELECTING_CAPTURE_REWARD: 'selecting_capture_reward',
 	WAITING_FOR_SAI_SHIFT: 'waiting_for_sai_shift'
 };
 
@@ -156,6 +157,13 @@ export class PaikoMoveBuilder {
 		this.setPlayer(player);
 		this.setMoveType(PaikoMoveType.DRAW);
 		this.setDrawnTiles(drawnTiles);
+	}
+
+	buildCaptureRewardMove(player, tileCodes) {
+		this.reset();
+		this.setPlayer(player);
+		this.setMoveType(PaikoMoveType.CAPTURE_REWARD);
+		this.notationBuilder.moveData.tileCodes = tileCodes;
 	}
 
 	buildSaiShiftMove(player, startPoint, endPoint, facing) {

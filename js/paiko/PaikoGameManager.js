@@ -28,6 +28,11 @@ export class PaikoGameManager {
 		// Track pending Sai shift (Sai can shift after deploy)
 		this.pendingSaiShift = null;
 
+		// Track pending capture rewards
+		// When tiles are captured, the opponent chooses tiles for the capturer to draw
+		// { rewardCount: number, capturingPlayer: HOST/GUEST }
+		this.pendingCaptureReward = null;
+
 		// Winners
 		this.winners = [];
 
@@ -100,6 +105,10 @@ export class PaikoGameManager {
 
 			case PaikoMoveType.PASS:
 				moveSuccess = true;
+				break;
+
+			case PaikoMoveType.CAPTURE_REWARD:
+				moveSuccess = this.executeCaptureReward(player, moveData);
 				break;
 
 			case PaikoMoveType.END_GAME:
@@ -211,6 +220,8 @@ export class PaikoGameManager {
 		// Update facing if provided
 		if (facing !== undefined && tile.hasFacing()) {
 			tile.setFacing(facing);
+			// Recalculate threat/cover since facing pattern changed
+			this.board.recalculateThreatAndCover();
 		}
 
 		// Clear any pending Sai shift
@@ -279,6 +290,8 @@ export class PaikoGameManager {
 
 		if (facing !== undefined && tile.hasFacing()) {
 			tile.setFacing(facing);
+			// Recalculate threat/cover since facing pattern changed
+			this.board.recalculateThreatAndCover();
 		}
 
 		tile.justDeployed = false;
@@ -309,6 +322,7 @@ export class PaikoGameManager {
 	}
 
 	// Process capture phase after action
+	// Returns the number of tiles captured
 	processCapturePhase(activePlayer) {
 		const opponent = activePlayer === HOST ? GUEST : HOST;
 
@@ -323,20 +337,60 @@ export class PaikoGameManager {
 
 			// Add to discard pile
 			this.tileManager.addToDiscard(opponent, removedTile);
+		});
 
-			// For each captured tile, opponent chooses a tile for active player to draw
-			// (This is handled in the controller/UI - automatically draw if only one choice)
-			// For now, auto-draw if reserve is not empty
+		// If any tiles were captured, set up pending capture reward
+		// The opponent (whose turn is next) will choose tiles for the capturing player
+		if (capturedTiles.length > 0) {
 			const availableTypes = this.tileManager.getAvailableTileTypes(activePlayer);
 			if (availableTypes.length > 0) {
-				// Auto-draw the first available type (controller can override)
-				this.tileManager.drawTileFromReserve(activePlayer, availableTypes[0]);
+				this.pendingCaptureReward = {
+					rewardCount: capturedTiles.length,
+					capturingPlayer: activePlayer
+				};
 			}
+		}
+
+		return capturedTiles.length;
+	}
+
+	// Execute capture reward move (opponent chose tiles for capturing player)
+	executeCaptureReward(player, moveData) {
+		if (!this.pendingCaptureReward) {
+			return false;
+		}
+
+		const tileCodes = moveData.tileCodes || [];
+		const capturingPlayer = this.pendingCaptureReward.capturingPlayer;
+
+		// Draw the selected tiles into the capturing player's hand
+		tileCodes.forEach(tileCode => {
+			this.tileManager.drawTileFromReserve(capturingPlayer, tileCode);
 		});
+
+		// Clear pending reward
+		this.pendingCaptureReward = null;
+
+		return true;
+	}
+
+	// Check if there's a pending capture reward
+	hasPendingCaptureReward() {
+		return this.pendingCaptureReward !== null;
+	}
+
+	// Get pending capture reward info
+	getPendingCaptureReward() {
+		return this.pendingCaptureReward;
 	}
 
 	// Update current player after move
 	updateCurrentPlayer(move) {
+		// Capture reward doesn't change the current player - it's part of the opponent's turn
+		if (move.moveType === PaikoMoveType.CAPTURE_REWARD) {
+			return;
+		}
+
 		if (this.gamePhase === PaikoGamePhase.HOST_SELECT_7) {
 			this.currentPlayer = HOST;
 		} else if (this.gamePhase === PaikoGamePhase.GUEST_SELECT_9) {
@@ -491,6 +545,10 @@ export class PaikoGameManager {
 			const originalPoint = this.pendingSaiShift.point;
 			const copyPoint = copy.board.getPoint(originalPoint.row, originalPoint.col);
 			copy.pendingSaiShift = { tile: copyPoint.tile, point: copyPoint };
+		}
+
+		if (this.pendingCaptureReward) {
+			copy.pendingCaptureReward = { ...this.pendingCaptureReward };
 		}
 
 		return copy;

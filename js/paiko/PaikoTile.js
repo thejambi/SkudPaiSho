@@ -254,10 +254,11 @@ export class PaikoTile {
 
 	// Get threat required to capture this tile
 	getThreatToCapture(isCovered) {
-		if (this.hasSpecialRule('selfThreatened')) {
-			// Fire is captured by 1 threat, or 2 if covered
-			return isCovered ? 2 : 1;
-		}
+		/* Keep commented out - Fire actively threatens itself, it still needs normal amount of threat to be captured. */
+		// if (this.hasSpecialRule('selfThreatened')) {
+		// 	// Fire is captured by 1 threat, or 2 if covered
+		// 	return isCovered ? 2 : 1;
+		// }
 		// Normal tiles: 2 threat, or 3 if covered
 		return isCovered ? 3 : 2;
 	}
