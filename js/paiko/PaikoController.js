@@ -1205,19 +1205,130 @@ export class PaikoController {
 		return this.theGame.currentPlayer;
 	}
 
+	// Generate an HTML grid showing the tile's threat and cover patterns
+	generatePatternGrid(tile, ownerName) {
+		const threatPattern = tile.getThreatPattern();
+		const coverPattern = tile.getCoverPattern();
+
+		// Use 5x5 grid
+		const gridSize = 5;
+
+		// Default center position
+		let centerRow = 2;
+		let centerCol = 2;
+
+		// Bow needs special positioning - offset back from facing direction
+		// so its long-range threat pattern (extends 4 spaces) is visible
+		if (tile.code === 'Bow') {
+			const facing = tile.getFacing ? tile.getFacing() : PaikoTileFacing.UP;
+			switch (facing) {
+				case PaikoTileFacing.UP:
+					centerRow = 4; // Move to bottom so upward threats are visible
+					break;
+				case PaikoTileFacing.DOWN:
+					centerRow = 0; // Move to top so downward threats are visible
+					break;
+				case PaikoTileFacing.RIGHT:
+					centerCol = 0; // Move to left so rightward threats are visible
+					break;
+				case PaikoTileFacing.LEFT:
+					centerCol = 4; // Move to right so leftward threats are visible
+					break;
+			}
+		}
+
+		// Build grid data
+		const grid = [];
+		for (let r = 0; r < gridSize; r++) {
+			grid[r] = [];
+			for (let c = 0; c < gridSize; c++) {
+				grid[r][c] = { threat: false, cover: false, tile: false };
+			}
+		}
+
+		// Mark tile position
+		grid[centerRow][centerCol].tile = true;
+
+		// Mark threat positions
+		threatPattern.forEach(([row, col]) => {
+			const gridRow = centerRow + row;
+			const gridCol = centerCol + col;
+			if (gridRow >= 0 && gridRow < gridSize && gridCol >= 0 && gridCol < gridSize) {
+				grid[gridRow][gridCol].threat = true;
+			}
+		});
+
+		// Mark cover positions
+		coverPattern.forEach(([row, col]) => {
+			const gridRow = centerRow + row;
+			const gridCol = centerCol + col;
+			if (gridRow >= 0 && gridRow < gridSize && gridCol >= 0 && gridCol < gridSize) {
+				grid[gridRow][gridCol].cover = true;
+			}
+		});
+
+		// Generate HTML table
+		const cellSize = '24px';
+		const ownerColor = ownerName === HOST ? '#d44' : '#48d';
+		const tileImgSrc = `images/Paiko/${ownerName === HOST ? 'H' : 'G'}${tile.code}.png`;
+
+		// Calculate rotation for tile image based on facing
+		// UP=0, RIGHT=1, DOWN=2, LEFT=3 -> 0, 90, 180, 270 degrees
+		const facing = tile.getFacing ? tile.getFacing() : PaikoTileFacing.UP;
+		const rotationDeg = facing * 90;
+
+		let html = '<table style="border-collapse: collapse; margin: 8px auto;">';
+		for (let r = 0; r < gridSize; r++) {
+			html += '<tr>';
+			for (let c = 0; c < gridSize; c++) {
+				const cell = grid[r][c];
+				let bgColor = '#f5f5f5';
+				let content = '';
+				let borderColor = '#ddd';
+
+				if (cell.tile) {
+					// Tile position - show small tile image, rotated to match facing
+					bgColor = ownerColor;
+					const rotateStyle = rotationDeg !== 0 ? `transform: rotate(${rotationDeg}deg);` : '';
+					content = `<img src="${tileImgSrc}" style="width: 24px; height: 24px; ${rotateStyle}">`;
+				} else if (cell.threat && cell.cover) {
+					// Both threat and cover
+					bgColor = '#b8a';
+					content = '<span style="font-size: 10px; font-weight: bold; color: #fff;">T+C</span>';
+				} else if (cell.threat) {
+					// Threat only
+					bgColor = '#e66';
+					content = '<span style="font-size: 12px; font-weight: bold; color: #fff;">&nbsp</span>';
+				} else if (cell.cover) {
+					// Cover only
+					bgColor = '#6a6';
+					content = '<span style="font-size: 12px; font-weight: bold; color: #fff;">&nbsp</span>';
+				}
+
+				html += `<td style="width: ${cellSize}; height: ${cellSize}; text-align: center; vertical-align: middle; background: ${bgColor}; border: 1px solid ${borderColor};">${content}</td>`;
+			}
+			html += '</tr>';
+		}
+		html += '</table>';
+
+		// Add legend
+		html += '<div style="font-size: 11px; text-align: center; margin-top: 4px;">';
+		html += '<span style="background: #e66; color: #fff; padding: 1px 4px; margin-right: 4px;">&nbsp;</span> Threat ';
+		html += '<span style="background: #6a6; color: #fff; padding: 1px 4px; margin-left: 8px; margin-right: 4px;">&nbsp;</span> Cover';
+		html += '</div>';
+
+		return html;
+	}
+
 	getTheMessage(tile, ownerName, boardPoint = null) {
 		const def = tile.getDefinition();
 		const message = [];
 
+		// Show pattern grid
+		const patternGrid = this.generatePatternGrid(tile, ownerName);
+		message.push(patternGrid);
+
 		message.push(`<p><strong>Move Distance:</strong> ${def.moveDistance}</p>`);
-
-		if (def.threatPattern.length > 0) {
-			message.push(`<p><strong>Threatens:</strong> ${def.threatPattern.length} spaces</p>`);
-		}
-
-		if (def.coverPattern.length > 0) {
-			message.push(`<p><strong>Provides cover:</strong> ${def.coverPattern.length} spaces</p>`);
-		}
 
 		if (Object.keys(def.specialRules).length > 0) {
 			const rules = [];
