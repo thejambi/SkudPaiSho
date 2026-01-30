@@ -231,20 +231,18 @@ describe('Yamma Game - Board State', () => {
 });
 
 describe('Yamma Game - Win Checking', () => {
-	it('should detect 4-in-a-row horizontally on the base row', () => {
+	it('should detect 4-in-a-row down-left diagonal', () => {
 		const board = new YammaBoard();
 
-		// Place 4 white cubes in a row on row 5 (base row) with rotation 0
-		// With rotation 0, front face shows owner's color, but from Front view
-		// we see the rightFace which shows opponent's color (Blue for White cubes)
-		// So we need to check that 4 Blue appear in a row from Front view
+		// Place 4 Blue cubes in a down-left diagonal: (2,0), (3,0), (4,0), (5,0)
+		// Down-left diagonal goes (row, col) -> (row+1, col)
+		// With rotation 0, Blue cubes show White on rightFace (Front view)
+		board.placeCube(2, 0, 0, PLAYER.BLUE, 0);
+		board.placeCube(3, 0, 0, PLAYER.BLUE, 0);
+		board.placeCube(4, 0, 0, PLAYER.BLUE, 0);
 		board.placeCube(5, 0, 0, PLAYER.BLUE, 0);
-		board.placeCube(5, 1, 0, PLAYER.BLUE, 0);
-		board.placeCube(5, 2, 0, PLAYER.BLUE, 0);
-		board.placeCube(5, 3, 0, PLAYER.BLUE, 0);
 
 		// Check for winner - Blue cubes show White on Front view (rightFace)
-		// So from Front view, positions (5,0), (5,1), (5,2), (5,3) all show White
 		const result = board.checkWinner();
 		expect(result).not.toBeNull();
 		expect(result.winner).toBe(PLAYER.WHITE); // rightFace of Blue cubes = White
