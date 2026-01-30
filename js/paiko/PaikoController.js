@@ -252,16 +252,19 @@ export class PaikoController {
 			<p>Paiko is a tactical tile game. Win by reaching 10 points!</p>
 			<p><strong>Scoring:</strong></p>
 			<ul>
-				<li>2 points for each tile on opponent's homeground (Red Garden)</li>
-				<li>1 point for each tile on middleground (White Garden)</li>
+				<li>2 points for each tile in opponent's homeground</li>
+				<li>1 point for each tile in middleground</li>
 			</ul>
+			<p>To begin the game, HOST draws 7 tiles from their reserve. Then, GUEST draws 9. Then, HOST draws 1 more tile and takes the first turn.</p>
 			<p><strong>On your turn:</strong></p>
 			<ul>
 				<li><strong>Deploy</strong> - Place a tile from your hand</li>
-				<li><strong>Shift</strong> - Move a tile up to 2 spaces (non-diagonal)</li>
+				<li><strong>Shift</strong> - Move a tile up to 2 spaces</li>
 				<li><strong>Draw</strong> - Take 3 tiles from your reserve</li>
 			</ul>
-			<p>After your action, capture opponent tiles that are threatened by 2 of your tiles (3 if covered).</p>`;
+			<p>After your action, capture opponent tiles that are threatened by 2 of your tiles (3 if covered).</p>
+			<p>If you capture tiles, your opponent must reward you by giving you a tile from your reserve!</p>
+			<p>Select tiles to learn more about them.</p>`;
 	}
 
 	getAdditionalMessage() {
@@ -1290,7 +1293,7 @@ export class PaikoController {
 					// Tile position - show small tile image, rotated to match facing
 					bgColor = ownerColor;
 					const rotateStyle = rotationDeg !== 0 ? `transform: rotate(${rotationDeg}deg);` : '';
-					content = `<img src="${tileImgSrc}" style="width: 24px; height: 24px; ${rotateStyle}">`;
+					content = `<img src="${tileImgSrc}" style="width: 24px; height: 24px; display: block; ${rotateStyle}">`;
 				} else if (cell.threat && cell.cover) {
 					// Both threat and cover
 					bgColor = '#b8a';
@@ -1328,14 +1331,14 @@ export class PaikoController {
 		const patternGrid = this.generatePatternGrid(tile, ownerName);
 		message.push(patternGrid);
 
-		message.push(`<p><strong>Move Distance:</strong> ${def.moveDistance}</p>`);
+		// message.push(`<p><strong>Move Distance:</strong> ${def.moveDistance}</p>`);	// Can remove
 
 		if (Object.keys(def.specialRules).length > 0) {
 			const rules = [];
 			if (def.specialRules.reducedMovement) rules.push('Only shifts 1 space');
 			if (def.specialRules.cannotShift) rules.push('Cannot shift');
-			if (def.specialRules.threatensAll) rules.push('Threatens all tiles including own');
-			if (def.specialRules.selfThreatened) rules.push('Captured by 1 threat (2 if covered)');
+			if (def.specialRules.threatensAll) rules.push('Threatens itself and tiles of both players');
+			// if (def.specialRules.selfThreatened) rules.push('Captured by 1 threat (2 if covered)');	// Can remove
 			if (def.specialRules.canRedeploy) rules.push('Can redeploy instead of shift');
 			if (def.specialRules.shiftAfterDeploy) rules.push('Can shift after deploy');
 			if (def.specialRules.deployAnywhere) rules.push('Can deploy anywhere');
@@ -1358,7 +1361,7 @@ export class PaikoController {
 			message.push('<hr>');
 			message.push(`<p><strong>Status on board:</strong></p>`);
 			message.push(`<p>Threatened: ${opponentThreat} (needs ${threatNeeded} to capture)</p>`);
-			message.push(`<p>Covered: ${isCovered ? 'Yes' : 'No'}</p>`);
+			message.push(`<p>In Cover: ${isCovered ? 'Yes' : 'No'}</p>`);
 
 			if (opponentThreat >= threatNeeded) {
 				message.push(`<p style="color: red;"><strong>⚠ In danger of capture!</strong></p>`);
@@ -1546,22 +1549,23 @@ export class PaikoController {
 	getAdditionalHelpTabDiv() {
 		const settingsDiv = document.createElement('div');
 
-		const heading = document.createElement('h4');
-		heading.innerText = 'Paiko Tiles:';
-		settingsDiv.appendChild(heading);
+		// To remove
+		// const heading = document.createElement('h4');
+		// heading.innerText = 'Paiko Tiles:';
+		// settingsDiv.appendChild(heading);
 
-		// Add tile info
-		const tileInfo = document.createElement('div');
-		getAllTileCodes().forEach(code => {
-			const def = PaikoTileDefinitions[code];
-			const tileDiv = document.createElement('p');
-			tileDiv.innerHTML = `<strong>${def.name}:</strong> Move ${def.moveDistance}, Threatens ${def.threatPattern.length} spaces`;
-			if (def.coverPattern.length > 0) {
-				tileDiv.innerHTML += `, Covers ${def.coverPattern.length} spaces`;
-			}
-			tileInfo.appendChild(tileDiv);
-		});
-		settingsDiv.appendChild(tileInfo);
+		// // Add tile info
+		// const tileInfo = document.createElement('div');
+		// getAllTileCodes().forEach(code => {
+		// 	const def = PaikoTileDefinitions[code];
+		// 	const tileDiv = document.createElement('p');
+		// 	tileDiv.innerHTML = `<strong>${def.name}:</strong> Move ${def.moveDistance}, Threatens ${def.threatPattern.length} spaces`;
+		// 	if (def.coverPattern.length > 0) {
+		// 		tileDiv.innerHTML += `, Covers ${def.coverPattern.length} spaces`;
+		// 	}
+		// 	tileInfo.appendChild(tileDiv);
+		// });
+		// settingsDiv.appendChild(tileInfo);
 
 		return settingsDiv;
 	}

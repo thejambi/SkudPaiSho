@@ -230,6 +230,9 @@ export function setupPaiShoBoard(gameContainer,
 	
 	var tilePileContainer = createDivWithClass("tilePileContainer");
 	tilePileContainer.classList.add("PaiSho");
+	if (overrideBoardName) {
+		tilePileContainer.classList.add(overrideBoardName);
+	}
 	var gameMessage2 = createDivWithClass("gameMessage2");
 
 	hostTilesContainer.innerHTML = hostTilesContainerDivs;
