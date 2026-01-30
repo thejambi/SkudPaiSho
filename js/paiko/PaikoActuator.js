@@ -80,14 +80,14 @@ export class PaikoActuator {
 			this.clearTileContainer('H' + code + '-hand');
 			this.clearTileContainer('H' + code + '-reserve');
 		});
-		this.clearTileContainer('H-captured');
+		// this.clearTileContainer('H-captured');
 
 		// Clear guest tile containers
 		allTileCodes.forEach(code => {
 			this.clearTileContainer('G' + code + '-hand');
 			this.clearTileContainer('G' + code + '-reserve');
 		});
-		this.clearTileContainer('G-captured');
+		// this.clearTileContainer('G-captured');
 
 		// Add tiles to their appropriate containers
 		tileManager.hostHand.forEach(tile => {
@@ -104,12 +104,12 @@ export class PaikoActuator {
 			this.addTile(tile, 'reserve');
 		});
 
-		tileManager.hostDiscard.forEach(tile => {
-			this.addTileToCaptured(tile);
-		});
-		tileManager.guestDiscard.forEach(tile => {
-			this.addTileToCaptured(tile);
-		});
+		// tileManager.hostDiscard.forEach(tile => {
+		// 	this.addTileToCaptured(tile);
+		// });
+		// tileManager.guestDiscard.forEach(tile => {
+		// 	this.addTileToCaptured(tile);
+		// });
 	}
 
 	clearTileContainer(className) {
@@ -164,40 +164,40 @@ export class PaikoActuator {
 		container.appendChild(theDiv);
 	}
 
-	addTileToCaptured(tile) {
-		const containerClass = tile.ownerCode + '-captured';
-		const container = document.querySelector('.' + containerClass);
-		if (!container) {
-			return;
-		}
+	// addTileToCaptured(tile) {
+	// 	const containerClass = tile.ownerCode + '-captured';
+	// 	const container = document.querySelector('.' + containerClass);
+	// 	if (!container) {
+	// 		return;
+	// 	}
 
-		const theDiv = document.createElement('div');
-		theDiv.classList.add('point');
-		theDiv.classList.add('hasTile');
-		theDiv.classList.add('captured');
+	// 	const theDiv = document.createElement('div');
+	// 	theDiv.classList.add('point');
+	// 	theDiv.classList.add('hasTile');
+	// 	theDiv.classList.add('captured');
 
-		const theImg = document.createElement('img');
-		theImg.src = this.getTileSrcPath(tile);
-		theDiv.appendChild(theImg);
+	// 	const theImg = document.createElement('img');
+	// 	theImg.src = this.getTileSrcPath(tile);
+	// 	theDiv.appendChild(theImg);
 
-		theDiv.setAttribute('name', tile.getImageName());
-		theDiv.setAttribute('id', tile.id);
-		theDiv.setAttribute('data-pileName', 'captured');
-		theDiv.setAttribute('data-tileCode', tile.code);
+	// 	theDiv.setAttribute('name', tile.getImageName());
+	// 	theDiv.setAttribute('id', tile.id);
+	// 	theDiv.setAttribute('data-pileName', 'captured');
+	// 	theDiv.setAttribute('data-tileCode', tile.code);
 
-		if (this.mobile) {
-			theDiv.addEventListener('click', () => {
-				unplayedTileClicked(theDiv);
-				showTileMessage(theDiv);
-			});
-		} else {
-			theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
-			theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
-			theDiv.addEventListener('mouseout', clearMessage);
-		}
+	// 	if (this.mobile) {
+	// 		theDiv.addEventListener('click', () => {
+	// 			unplayedTileClicked(theDiv);
+	// 			showTileMessage(theDiv);
+	// 		});
+	// 	} else {
+	// 		theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
+	// 		theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
+	// 		theDiv.addEventListener('mouseout', clearMessage);
+	// 	}
 
-		container.appendChild(theDiv);
-	}
+	// 	container.appendChild(theDiv);
+	// }
 
 	getTileSrcPath(tile) {
 		// For now, use placeholder path - will need actual tile images

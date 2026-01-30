@@ -143,16 +143,16 @@ export class PaikoController {
 		container.appendChild(clearBr4);
 		container.appendChild(document.createElement('br'));
 
-		// Host Captured Section
-		const capturedLabel = document.createElement('span');
-		capturedLabel.className = 'tileLibraryLabel';
-		capturedLabel.innerHTML = '<strong>Host Captured</strong>';
-		container.appendChild(capturedLabel);
-		container.appendChild(document.createElement('br'));
+		// // Host Captured Section
+		// const capturedLabel = document.createElement('span');
+		// capturedLabel.className = 'tileLibraryLabel';
+		// capturedLabel.innerHTML = '<strong>Host Captured</strong>';
+		// container.appendChild(capturedLabel);
+		// container.appendChild(document.createElement('br'));
 
-		const capturedDiv = document.createElement('div');
-		capturedDiv.className = 'H-captured';
-		container.appendChild(capturedDiv);
+		// const capturedDiv = document.createElement('div');
+		// capturedDiv.className = 'H-captured';
+		// container.appendChild(capturedDiv);
 
 		return container.innerHTML;
 	}
@@ -223,15 +223,15 @@ export class PaikoController {
 		container.appendChild(document.createElement('br'));
 
 		// Guest Captured Section
-		const capturedLabel = document.createElement('span');
-		capturedLabel.className = 'tileLibraryLabel';
-		capturedLabel.innerHTML = '<strong>Guest Captured</strong>';
-		container.appendChild(capturedLabel);
-		container.appendChild(document.createElement('br'));
+		// const capturedLabel = document.createElement('span');
+		// capturedLabel.className = 'tileLibraryLabel';
+		// capturedLabel.innerHTML = '<strong>Guest Captured</strong>';
+		// container.appendChild(capturedLabel);
+		// container.appendChild(document.createElement('br'));
 
-		const capturedDiv = document.createElement('div');
-		capturedDiv.className = 'G-captured';
-		container.appendChild(capturedDiv);
+		// const capturedDiv = document.createElement('div');
+		// capturedDiv.className = 'G-captured';
+		// container.appendChild(capturedDiv);
 
 		return container.innerHTML;
 	}
