@@ -5485,7 +5485,8 @@ export function promptAddOption() {
 		Ads.showRandomPopupAd();
 	}
 
-	if (usernameIsOneOf(['SkudPaiSho'])) {
+	const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+	if (usernameIsOneOf(['SkudPaiSho']) || isLocalDev) {
 		const container = document.createElement('div');
 
 		// --- Current Game Info Section ---
@@ -5730,12 +5731,16 @@ export function promptAddOption() {
 		separator4.style.margin = '10px 0';
 		container.appendChild(separator4);
 
-		// --- QueryString Section ---
+		// --- QueryString Section (collapsible) ---
 		const queryStringHeader = document.createElement('div');
 		queryStringHeader.style.fontWeight = 'bold';
-		queryStringHeader.textContent = 'QueryString:';
+		queryStringHeader.classList.add('clickableText');
+		queryStringHeader.textContent = '▶ QueryString';
 		container.appendChild(queryStringHeader);
-		container.appendChild(document.createElement('br'));
+
+		const queryStringContent = document.createElement('div');
+		queryStringContent.style.display = 'none';
+		queryStringContent.style.marginLeft = '10px';
 
 		const rawQueryString = window.location.search.substring(1);
 		if (rawQueryString) {
@@ -5743,7 +5748,7 @@ export function promptAddOption() {
 			rawLabel.style.fontSize = '0.85em';
 			rawLabel.style.fontWeight = 'bold';
 			rawLabel.textContent = 'Raw (compressed):';
-			container.appendChild(rawLabel);
+			queryStringContent.appendChild(rawLabel);
 
 			const rawDiv = document.createElement('div');
 			rawDiv.style.fontSize = '0.8em';
@@ -5751,13 +5756,13 @@ export function promptAddOption() {
 			rawDiv.style.marginBottom = '8px';
 			rawDiv.style.fontFamily = 'monospace';
 			rawDiv.textContent = rawQueryString;
-			container.appendChild(rawDiv);
+			queryStringContent.appendChild(rawDiv);
 
 			const decompressedLabel = document.createElement('div');
 			decompressedLabel.style.fontSize = '0.85em';
 			decompressedLabel.style.fontWeight = 'bold';
 			decompressedLabel.textContent = 'Decompressed:';
-			container.appendChild(decompressedLabel);
+			queryStringContent.appendChild(decompressedLabel);
 		}
 
 		if (rawShortLinkInfo) {
@@ -5766,7 +5771,7 @@ export function promptAddOption() {
 			shortLinkLabel.style.fontWeight = 'bold';
 			shortLinkLabel.style.marginTop = '8px';
 			shortLinkLabel.textContent = 'Short Link Info (raw):';
-			container.appendChild(shortLinkLabel);
+			queryStringContent.appendChild(shortLinkLabel);
 
 			const shortLinkDiv = document.createElement('div');
 			shortLinkDiv.style.fontSize = '0.8em';
@@ -5774,7 +5779,7 @@ export function promptAddOption() {
 			shortLinkDiv.style.marginBottom = '8px';
 			shortLinkDiv.style.fontFamily = 'monospace';
 			shortLinkDiv.textContent = rawShortLinkInfo;
-			container.appendChild(shortLinkDiv);
+			queryStringContent.appendChild(shortLinkDiv);
 		}
 
 		const queryStringProps = Object.keys(QueryString).filter(key => QueryString[key] !== undefined && QueryString[key] !== '');
@@ -5783,14 +5788,22 @@ export function promptAddOption() {
 				const propDiv = document.createElement('div');
 				propDiv.style.fontSize = '0.9em';
 				propDiv.textContent = key + ': ' + QueryString[key];
-				container.appendChild(propDiv);
+				queryStringContent.appendChild(propDiv);
 			});
 		} else {
 			const noneDiv = document.createElement('div');
 			noneDiv.style.fontStyle = 'italic';
 			noneDiv.textContent = '(no query parameters)';
-			container.appendChild(noneDiv);
+			queryStringContent.appendChild(noneDiv);
 		}
+
+		queryStringHeader.onclick = () => {
+			const isCollapsed = queryStringContent.style.display === 'none';
+			queryStringContent.style.display = isCollapsed ? 'block' : 'none';
+			queryStringHeader.textContent = (isCollapsed ? '▼' : '▶') + ' QueryString';
+		};
+
+		container.appendChild(queryStringContent);
 
 		showModalElem("Secrets", container);
 	} else if (usernameIsOneOf(['SkudPaiSho', 'Adevar'])) {
