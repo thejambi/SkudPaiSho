@@ -231,7 +231,8 @@ export class PaikoActuator {
 
 		// Add zone-specific styling
 		if (boardPoint.zone === PaikoZone.NON_PLAYABLE) {
-			// Non-playable, don't add any active styling
+			// Non-playable, don't add any active styling, but make clicks reset Help tab
+			theDiv.addEventListener('click', clearMessage);
 		} else {
 			theDiv.classList.add('activePoint');
 
