@@ -222,6 +222,7 @@ export class PaikoAI {
 
 			for (const point of deployPoints) {
 				const notationPoint = gameManager.board.getNotationPointFromRowCol(point.row, point.col);
+				const endPointText = notationPoint.pointText;
 
 				// For tiles with facing, try all directions
 				if (tile.hasFacing()) {
@@ -232,7 +233,7 @@ export class PaikoAI {
 							player: this.player,
 							moveData: {
 								tileCode: tile.code,
-								endPoint: notationPoint,
+								endPoint: endPointText,
 								facing: facing
 							}
 						};
@@ -256,7 +257,7 @@ export class PaikoAI {
 						player: this.player,
 						moveData: {
 							tileCode: tile.code,
-							endPoint: notationPoint,
+							endPoint: endPointText,
 							facing: PaikoTileFacing.UP
 						}
 					});
@@ -282,6 +283,7 @@ export class PaikoAI {
 
 		for (const shiftPoint of shiftDestinations) {
 			const shiftNotation = gameCopy.board.getNotationPointFromRowCol(shiftPoint.row, shiftPoint.col);
+			const shiftEndPointText = shiftNotation.pointText;
 
 			for (const shiftFacing of [PaikoTileFacing.UP, PaikoTileFacing.RIGHT, PaikoTileFacing.DOWN, PaikoTileFacing.LEFT]) {
 				moves.push({
@@ -292,7 +294,7 @@ export class PaikoAI {
 						tileCode: tile.code,
 						endPoint: deployMove.moveData.endPoint,
 						facing: deployMove.moveData.facing,
-						shiftEndPoint: shiftNotation,
+						shiftEndPoint: shiftEndPointText,
 						shiftFacing: shiftFacing
 					}
 				});
@@ -316,6 +318,8 @@ export class PaikoAI {
 			for (const destPoint of shiftDestinations) {
 				const startNotation = gameManager.board.getNotationPointFromRowCol(point.row, point.col);
 				const endNotation = gameManager.board.getNotationPointFromRowCol(destPoint.row, destPoint.col);
+				const startPointText = startNotation.pointText;
+				const endPointText = endNotation.pointText;
 
 				if (tile.hasFacing()) {
 					for (const facing of [PaikoTileFacing.UP, PaikoTileFacing.RIGHT, PaikoTileFacing.DOWN, PaikoTileFacing.LEFT]) {
@@ -324,8 +328,8 @@ export class PaikoAI {
 							moveType: MOVE,
 							player: this.player,
 							moveData: {
-								startPoint: startNotation,
-								endPoint: endNotation,
+								startPoint: startPointText,
+								endPoint: endPointText,
 								facing: facing
 							}
 						});
@@ -336,8 +340,8 @@ export class PaikoAI {
 						moveType: MOVE,
 						player: this.player,
 						moveData: {
-							startPoint: startNotation,
-							endPoint: endNotation,
+							startPoint: startPointText,
+							endPoint: endPointText,
 							facing: PaikoTileFacing.UP
 						}
 					});

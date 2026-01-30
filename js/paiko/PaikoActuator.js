@@ -316,6 +316,41 @@ export class PaikoActuator {
 			theDiv.classList.add(tile.ownerName === HOST ? 'hostTile' : 'guestTile');
 		}
 
+		// Captured tile animation - show captured tiles fading out at their positions
+		if (this.animationOn && moveToAnimate && moveToAnimate.capturedTiles) {
+			for (const captured of moveToAnimate.capturedTiles) {
+				if (captured.row === boardPoint.row && captured.col === boardPoint.col) {
+					const capturedImg = document.createElement('img');
+					capturedImg.elementStyleTransform = new ElementStyleTransform(capturedImg);
+					capturedImg.src = this.getTileSrcPath(captured.tile);
+					capturedImg.classList.add('capturedTileAnim');
+
+					// Apply rotation if tile has facing
+					if (captured.tile.hasFacing && captured.tile.hasFacing() &&
+						captured.tile.getFacing() !== PaikoTileFacing.UP) {
+						const rotationDegrees = 90 * captured.tile.getFacing();
+						capturedImg.elementStyleTransform.setValue('rotate', rotationDegrees, 'deg');
+					}
+
+					theDiv.appendChild(capturedImg);
+
+					// Fade out and hide after animation
+					setTimeout(() => {
+						requestAnimationFrame(() => {
+							capturedImg.style.opacity = '0';
+							capturedImg.style.transform = 'scale(0.5)';
+						});
+					}, pieceAnimationLength / 2);
+
+					setTimeout(() => {
+						requestAnimationFrame(() => {
+							capturedImg.style.visibility = 'hidden';
+						});
+					}, pieceAnimationLength);
+				}
+			}
+		}
+
 		this.boardContainer.appendChild(theDiv);
 
 		// Add line break at end of row (18 columns, 0-17)
@@ -336,10 +371,60 @@ export class PaikoActuator {
 
 		// Get move data from TrifleGameNotation format
 		const moveData = moveToAnimate.moveData || {};
-		const endPointText = moveData.endPoint ? moveData.endPoint.pointText : null;
-		const startPointText = moveData.startPoint ? moveData.startPoint.pointText : null;
+		const endPointText = moveData.endPoint;
+		const startPointText = moveData.startPoint;
+		const shiftEndPointText = moveData.shiftEndPoint;
 
-		if (moveToAnimate.moveType === MOVE && boardPoint.tile && startPointText) {
+		let pointSizeMultiplierX = 34;
+		let pointSizeMultiplierY = pointSizeMultiplierX;
+		let unitString = 'px';
+
+		if (window.innerWidth <= 612) {
+			pointSizeMultiplierX = 5.5555;
+			pointSizeMultiplierY = 5.611;
+			unitString = 'vw';
+		}
+
+		// Check if this is a Sai deploy+shift (tile ends at shiftEndPoint)
+		if (moveToAnimate.moveType === DEPLOY && shiftEndPointText) {
+			// Sai deploy+shift animation - two stages: pop at deploy, then slide to shift
+			if (this.isSamePointText(shiftEndPointText, ox, oy)) {
+				const deployPoint = this.getRowColFromPointText(startPointText);
+				if (deployPoint) {
+					// Stage 1: Start at deploy position with pop effect
+					x = deployPoint.col;
+					y = deployPoint.row;
+					theDiv.style.zIndex = 99;
+
+					// Position at deploy location
+					theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+					theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+
+					// Pop effect at deploy location
+					theImg.elementStyleTransform.setValue('scale', 2);
+					requestAnimationFrame(() => {
+						theImg.elementStyleTransform.setValue('scale', 1.2);
+					});
+
+					// Stage 2: After pop completes, slide to final position
+					setTimeout(() => {
+						requestAnimationFrame(() => {
+							theImg.style.left = '0px';
+							theImg.style.top = '0px';
+						});
+					}, pieceAnimationLength / 2);
+
+					// Final scale reset
+					setTimeout(() => {
+						requestAnimationFrame(() => {
+							theImg.elementStyleTransform.setValue('scale', 1);
+						});
+					}, pieceAnimationLength);
+
+					return; // Early return - we've handled all animation
+				}
+			}
+		} else if (moveToAnimate.moveType === MOVE && boardPoint.tile && startPointText) {
 			if (this.isSamePointText(endPointText, x, y)) {
 				const startPoint = this.getRowColFromPointText(startPointText);
 				if (startPoint) {
@@ -359,16 +444,6 @@ export class PaikoActuator {
 					});
 				}
 			}
-		}
-
-		let pointSizeMultiplierX = 34;
-		let pointSizeMultiplierY = pointSizeMultiplierX;
-		let unitString = 'px';
-
-		if (window.innerWidth <= 612) {
-			pointSizeMultiplierX = 5.5555;
-			pointSizeMultiplierY = 5.611;
-			unitString = 'vw';
 		}
 
 		theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;

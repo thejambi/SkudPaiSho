@@ -12,6 +12,7 @@ import {
 	getCurrentPlayer,
 	myTurn,
 	onlinePlayEnabled,
+	pieceAnimationLength,
 	playingOnlineGame,
 	refreshMessage,
 	rerunAll,
@@ -46,6 +47,10 @@ export class PaikoController {
 		this.pendingHostSetupTile = null;
 		// For capture reward - stores selected tiles to bundle with the next move
 		this.pendingCaptureRewardData = null;
+
+		// Threat/cover visualization state
+		this.showingHostThreat = false;
+		this.showingGuestThreat = false;
 	}
 
 	getGameTypeId() {
@@ -246,6 +251,11 @@ export class PaikoController {
 
 	callActuate() {
 		this.theGame.actuate();
+		// Reapply threat visualization after board update
+		// Use setTimeout to ensure DOM has updated
+		if (this.showingHostThreat || this.showingGuestThreat) {
+			setTimeout(() => this.applyThreatVisualization(), pieceAnimationLength + 50);
+		}
 	}
 
 	resetMove() {
@@ -256,23 +266,83 @@ export class PaikoController {
 	}
 
 	getDefaultHelpMessageText() {
-		return `<h4>Paiko</h4>
-			<p>Paiko is a tactical tile game. Win by reaching 10 points!</p>
-			<p><strong>Scoring:</strong></p>
-			<ul>
-				<li>2 points for each tile in opponent's homeground</li>
-				<li>1 point for each tile in middleground</li>
-			</ul>
-			<p>To begin the game, HOST draws 7 tiles from their reserve. Then, GUEST draws 9. Then, HOST draws 1 more tile and takes the first turn.</p>
-			<p><strong>On your turn:</strong></p>
-			<ul>
-				<li><strong>Deploy</strong> - Place a tile from your hand</li>
-				<li><strong>Shift</strong> - Move a tile up to 2 spaces</li>
-				<li><strong>Draw</strong> - Take 3 tiles from your reserve</li>
-			</ul>
-			<p>After your action, capture opponent tiles that are in 2 threat (3 if in cover).</p>
-			<p>If you capture a tile, your opponent must reward you by giving you a tile from your reserve!</p>
-			<p>Select tiles to learn more about them.</p>`;
+		const container = document.createElement('div');
+
+		// Threat/cover visualization links - show during playing phase
+		const gameInfo = this.theGame.getGameInfo();
+		if (gameInfo.phase === PaikoGamePhase.PLAYING) {
+			const vizContainer = document.createElement('p');
+			const hostVizLink = document.createElement('span');
+			hostVizLink.className = 'skipBonus';
+			hostVizLink.textContent = this.showingHostThreat ? 'Hide Host Threat' : 'Show Host Threat';
+			hostVizLink.onclick = () => this.toggleHostThreatVisualization();
+			vizContainer.appendChild(hostVizLink);
+
+			vizContainer.appendChild(document.createTextNode(' | '));
+
+			const guestVizLink = document.createElement('span');
+			guestVizLink.className = 'skipBonus';
+			guestVizLink.textContent = this.showingGuestThreat ? 'Hide Guest Threat' : 'Show Guest Threat';
+			guestVizLink.onclick = () => this.toggleGuestThreatVisualization();
+			vizContainer.appendChild(guestVizLink);
+
+			container.appendChild(vizContainer);
+		}
+
+		const heading = document.createElement('h4');
+		heading.textContent = 'Paiko';
+		container.appendChild(heading);
+
+		const intro = document.createElement('p');
+		intro.textContent = 'Paiko is a tactical tile game. Win by reaching 10 points!';
+		container.appendChild(intro);
+
+		const scoringHeader = document.createElement('p');
+		scoringHeader.innerHTML = '<strong>Scoring:</strong>';
+		container.appendChild(scoringHeader);
+
+		const scoringList = document.createElement('ul');
+		const scoring1 = document.createElement('li');
+		scoring1.textContent = '2 points for each tile in opponent\'s homeground';
+		scoringList.appendChild(scoring1);
+		const scoring2 = document.createElement('li');
+		scoring2.textContent = '1 point for each tile in middleground';
+		scoringList.appendChild(scoring2);
+		container.appendChild(scoringList);
+
+		const setupInfo = document.createElement('p');
+		setupInfo.textContent = 'To begin the game, HOST draws 7 tiles from their reserve. Then, GUEST draws 9. Then, HOST draws 1 more tile and takes the first turn.';
+		container.appendChild(setupInfo);
+
+		const turnHeader = document.createElement('p');
+		turnHeader.innerHTML = '<strong>On your turn:</strong>';
+		container.appendChild(turnHeader);
+
+		const turnList = document.createElement('ul');
+		const turn1 = document.createElement('li');
+		turn1.innerHTML = '<strong>Deploy</strong> - Place a tile from your hand';
+		turnList.appendChild(turn1);
+		const turn2 = document.createElement('li');
+		turn2.innerHTML = '<strong>Shift</strong> - Move a tile up to 2 spaces';
+		turnList.appendChild(turn2);
+		const turn3 = document.createElement('li');
+		turn3.innerHTML = '<strong>Draw</strong> - Take 3 tiles from your reserve';
+		turnList.appendChild(turn3);
+		container.appendChild(turnList);
+
+		const captureInfo = document.createElement('p');
+		captureInfo.textContent = 'After your action, capture opponent tiles that are in 2 threat (3 if in cover).';
+		container.appendChild(captureInfo);
+
+		const rewardInfo = document.createElement('p');
+		rewardInfo.textContent = 'If you capture a tile, your opponent must reward you by giving you a tile from your reserve!';
+		container.appendChild(rewardInfo);
+
+		const selectInfo = document.createElement('p');
+		selectInfo.textContent = 'Select tiles to learn more about them.';
+		container.appendChild(selectInfo);
+
+		return container;
 	}
 
 	getAdditionalMessage() {
@@ -1214,6 +1284,76 @@ export class PaikoController {
 	getCurrentPlayer() {
 		// Use the game manager's tracked current player
 		return this.theGame.currentPlayer;
+	}
+
+	// Toggle threat/cover visualization
+	toggleHostThreatVisualization() {
+		this.showingHostThreat = !this.showingHostThreat;
+		this.applyThreatVisualization();
+		refreshMessage();
+	}
+
+	toggleGuestThreatVisualization() {
+		this.showingGuestThreat = !this.showingGuestThreat;
+		this.applyThreatVisualization();
+		refreshMessage();
+	}
+
+	applyThreatVisualization() {
+		// Remove all existing visualization classes from board points
+		const allPoints = document.querySelectorAll('.point');
+		allPoints.forEach(pointDiv => {
+			pointDiv.classList.remove(
+				'threatViz1', 'threatViz2', 'threatViz3',
+				'coverVizHost', 'coverVizGuest'
+			);
+		});
+
+		if (!this.showingHostThreat && !this.showingGuestThreat) {
+			return;
+		}
+
+		// Apply visualization classes based on threat/cover levels
+		this.theGame.board.forEachPoint((boardPoint) => {
+			if (!boardPoint.isPlayableOrBlack()) return;
+
+			const notationPoint = this.theGame.board.getNotationPointFromRowCol(boardPoint.row, boardPoint.col);
+			const npText = notationPoint.pointText;
+			const pointDiv = document.querySelector(`.point[name="${npText}"]`);
+			if (!pointDiv) return;
+
+			// Apply host threat visualization
+			if (this.showingHostThreat) {
+				const hostThreat = boardPoint.hostThreat;
+				if (hostThreat >= 3) {
+					pointDiv.classList.add('threatViz3');
+				} else if (hostThreat === 2) {
+					pointDiv.classList.add('threatViz2');
+				} else if (hostThreat === 1) {
+					pointDiv.classList.add('threatViz1');
+				}
+
+				if (boardPoint.hostCover) {
+					pointDiv.classList.add('coverVizHost');
+				}
+			}
+
+			// Apply guest threat visualization
+			if (this.showingGuestThreat) {
+				const guestThreat = boardPoint.guestThreat;
+				if (guestThreat >= 3) {
+					pointDiv.classList.add('threatViz3');
+				} else if (guestThreat === 2) {
+					pointDiv.classList.add('threatViz2');
+				} else if (guestThreat === 1) {
+					pointDiv.classList.add('threatViz1');
+				}
+
+				if (boardPoint.guestCover) {
+					pointDiv.classList.add('coverVizGuest');
+				}
+			}
+		});
 	}
 
 	// Generate an HTML grid showing the tile's threat and cover patterns

@@ -157,6 +157,10 @@ export class PaikoGameManager {
 			this.checkForWinners();
 
 			if (withActuate) {
+				// Add captured tiles info to move for animation
+				if (this.lastCapturedTiles && this.lastCapturedTiles.length > 0) {
+					move.capturedTiles = this.lastCapturedTiles;
+				}
 				this.actuate(move);
 			}
 		}
@@ -376,6 +380,9 @@ export class PaikoGameManager {
 		const opponent = activePlayer === HOST ? GUEST : HOST;
 		let totalCaptured = 0;
 
+		// Store captured tiles info for animation
+		this.lastCapturedTiles = [];
+
 		// Loop to handle cascading captures
 		// When a tile is captured, it may have been providing cover for another tile
 		// that now becomes capturable
@@ -386,11 +393,17 @@ export class PaikoGameManager {
 			capturesThisRound = capturedTiles.length;
 
 			capturedTiles.forEach(({ tile, point }) => {
+				// Store capture info for animation before removing
+				const notationPoint = this.board.getNotationPointFromRowCol(point.row, point.col);
+				this.lastCapturedTiles.push({
+					tile: tile.getCopy(),
+					row: point.row,
+					col: point.col,
+					pointText: notationPoint.pointText
+				});
+
 				// Remove from board (skip recalculate during loop)
-				const removedTile = this.board.removeTile(
-					this.board.getNotationPointFromRowCol(point.row, point.col),
-					true
-				);
+				const removedTile = this.board.removeTile(notationPoint, true);
 
 				// Add to discard pile
 				this.tileManager.addToDiscard(opponent, removedTile);

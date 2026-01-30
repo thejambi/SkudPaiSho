@@ -751,6 +751,55 @@ figure > div {
   border: 1px solid rgba(55, 55, 200, 0.1);
 }
 
+/* Paiko threat/cover visualization - uses ::after overlay to show on top of tiles */
+.threatViz1::after, .threatViz2::after, .threatViz3::after,
+.coverVizHost::after, .coverVizGuest::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  z-index: 10;
+  pointer-events: none;
+}
+.threatViz1::after {
+  box-shadow: inset 0px 0px 10px 4px rgba(255, 100, 140, 0.8);
+}
+.threatViz2::after {
+  box-shadow: inset 0px 0px 10px 4px rgba(220, 50, 100, 0.9);
+}
+.threatViz3::after {
+  box-shadow: inset 0px 0px 10px 4px rgba(180, 20, 80, 1);
+}
+.coverVizHost::after, .coverVizGuest::after {
+  box-shadow: inset 0px 0px 10px 4px rgba(100, 100, 220, 0.8);
+}
+/* Combined threat and cover - show threat with blue inner border */
+.threatViz1.coverVizHost::after, .threatViz1.coverVizGuest::after {
+  box-shadow: inset 0px 0px 10px 4px rgba(255, 100, 140, 0.8), inset 0px 0px 3px 2px rgba(100, 100, 220, 1);
+}
+.threatViz2.coverVizHost::after, .threatViz2.coverVizGuest::after {
+  box-shadow: inset 0px 0px 10px 4px rgba(220, 50, 100, 0.9), inset 0px 0px 3px 2px rgba(100, 100, 220, 1);
+}
+.threatViz3.coverVizHost::after, .threatViz3.coverVizGuest::after {
+  box-shadow: inset 0px 0px 10px 4px rgba(180, 20, 80, 1), inset 0px 0px 3px 2px rgba(100, 100, 220, 1);
+}
+
+/* Paiko captured tile fade-out animation */
+.capturedTileAnim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+  pointer-events: none;
+  z-index: 5;
+}
+
 .selectedFromPile {
   /*box-shadow: 0px 0px 32px #054;*/
   /*box-shadow: 0px 0px 34px #054;*/
