@@ -484,42 +484,44 @@ export class PaikoController {
 		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.SELECTING_CAPTURE_REWARD) {
 			const rewardContainer = document.createElement('span');
 			const pendingReward = this.theGame.getPendingCaptureReward();
-			const capturingPlayer = pendingReward.capturingPlayer;
-			const remaining = pendingReward.rewardCount - (this.selectedCaptureRewardTiles?.length || 0);
+			if (pendingReward && !gameInfo.winner) {
+				const capturingPlayer = pendingReward.capturingPlayer;
+				const remaining = pendingReward.rewardCount - (this.selectedCaptureRewardTiles?.length || 0);
 
-			const rewardHeader = document.createElement('p');
-			rewardHeader.innerHTML = `<strong>Capture Reward:</strong> Your opponent captured your tiles! Choose ${remaining} tile(s) from their reserve to give them.`;
-			rewardContainer.appendChild(rewardHeader);
+				const rewardHeader = document.createElement('p');
+				rewardHeader.innerHTML = `<strong>Capture Reward:</strong> Your opponent captured your tiles! Choose ${remaining} tile(s) from their reserve to give them.`;
+				rewardContainer.appendChild(rewardHeader);
 
-			// Show selected tiles
-			if (this.selectedCaptureRewardTiles && this.selectedCaptureRewardTiles.length > 0) {
-				const selectedP = document.createElement('p');
-				selectedP.innerHTML = '<strong>Selected:</strong> ';
+				// Show selected tiles
+				if (this.selectedCaptureRewardTiles && this.selectedCaptureRewardTiles.length > 0) {
+					const selectedP = document.createElement('p');
+					selectedP.innerHTML = '<strong>Selected:</strong> ';
 
-				this.selectedCaptureRewardTiles.forEach((tileCode, index) => {
-					if (index > 0) selectedP.appendChild(document.createTextNode(', '));
-					const tileSpan = document.createElement('span');
-					tileSpan.className = 'skipBonus';
-					tileSpan.textContent = tileCode + ' ✕';
-					tileSpan.onclick = () => this.deselectCaptureRewardTile(index);
-					selectedP.appendChild(tileSpan);
-				});
+					this.selectedCaptureRewardTiles.forEach((tileCode, index) => {
+						if (index > 0) selectedP.appendChild(document.createTextNode(', '));
+						const tileSpan = document.createElement('span');
+						tileSpan.className = 'skipBonus';
+						tileSpan.textContent = tileCode + ' ✕';
+						tileSpan.onclick = () => this.deselectCaptureRewardTile(index);
+						selectedP.appendChild(tileSpan);
+					});
 
-				rewardContainer.appendChild(selectedP);
+					rewardContainer.appendChild(selectedP);
+				}
+
+				// Show confirm button when all tiles are selected
+				if (this.selectedCaptureRewardTiles && this.selectedCaptureRewardTiles.length >= pendingReward.rewardCount) {
+					const confirmP = document.createElement('p');
+					const confirmSpan = document.createElement('span');
+					confirmSpan.className = 'skipBonus';
+					confirmSpan.textContent = 'Confirm Reward';
+					confirmSpan.onclick = () => this.confirmCaptureReward();
+					confirmP.appendChild(confirmSpan);
+					rewardContainer.appendChild(confirmP);
+				}
+
+				container.appendChild(rewardContainer);
 			}
-
-			// Show confirm button when all tiles are selected
-			if (this.selectedCaptureRewardTiles && this.selectedCaptureRewardTiles.length >= pendingReward.rewardCount) {
-				const confirmP = document.createElement('p');
-				const confirmSpan = document.createElement('span');
-				confirmSpan.className = 'skipBonus';
-				confirmSpan.textContent = 'Confirm Reward';
-				confirmSpan.onclick = () => this.confirmCaptureReward();
-				confirmP.appendChild(confirmSpan);
-				rewardContainer.appendChild(confirmP);
-			}
-
-			container.appendChild(rewardContainer);
 		}
 
 		// Setup phase messages
