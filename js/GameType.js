@@ -334,7 +334,7 @@ export const GameType = {
 		desc: "Paiko",
 		color: "var(--paikocolor)",
 		description: "A tactical tile game where you deploy and shift tiles to reach 10 points by controlling territory.",
-		coverImg: "lotus.png",
+		coverImg: "paiko-water.png",
 		rulesUrl: "https://skudpaisho.com/site/games/paiko/",
 		gameOptions: [],
 		usersWithAccess: [
