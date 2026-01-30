@@ -737,20 +737,6 @@ figure > div {
   line-height: 0.5;
 }
 
-/* Paiko captured tiles - display horizontally */
-.tilePileContainer.Paiko .H-captured,
-.tilePileContainer.Paiko .G-captured {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-}
-.tilePileContainer.Paiko .H-captured .point,
-.tilePileContainer.Paiko .G-captured .point {
-  display: inline-block;
-  float: none;
-  margin-top: 0;
-}
-
 .possibleDeploy {
   box-shadow: inset 0px 0px 8px 3px #823;
 }
