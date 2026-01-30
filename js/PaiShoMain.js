@@ -5719,6 +5719,35 @@ export function promptAddOption() {
 		adDiv.onclick = () => Ads.showRandomPopupAd();
 		container.appendChild(adDiv);
 
+		// --- Separator ---
+		container.appendChild(document.createElement('br'));
+		const separator4 = document.createElement('hr');
+		separator4.style.border = '1px solid #ccc';
+		separator4.style.margin = '10px 0';
+		container.appendChild(separator4);
+
+		// --- QueryString Section ---
+		const queryStringHeader = document.createElement('div');
+		queryStringHeader.style.fontWeight = 'bold';
+		queryStringHeader.textContent = 'QueryString:';
+		container.appendChild(queryStringHeader);
+		container.appendChild(document.createElement('br'));
+
+		const queryStringProps = Object.keys(QueryString).filter(key => QueryString[key] !== undefined && QueryString[key] !== '');
+		if (queryStringProps.length > 0) {
+			queryStringProps.forEach(key => {
+				const propDiv = document.createElement('div');
+				propDiv.style.fontSize = '0.9em';
+				propDiv.textContent = key + ': ' + QueryString[key];
+				container.appendChild(propDiv);
+			});
+		} else {
+			const noneDiv = document.createElement('div');
+			noneDiv.style.fontStyle = 'italic';
+			noneDiv.textContent = '(no query parameters)';
+			container.appendChild(noneDiv);
+		}
+
 		showModalElem("Secrets", container);
 	} else if (usernameIsOneOf(['SkudPaiSho', 'Adevar'])) {
 		showGiveawayDrawingModal();
