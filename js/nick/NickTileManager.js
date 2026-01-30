@@ -195,7 +195,21 @@ export class NickTileManager {
 	getCopy() {
 		const copy = new NickTileManager();
 
-		// copy this.hostTiles and this.guestTiles
+		// Copy tile arrays (tiles not on board)
+		copy.hostTiles = [];
+		for (let i = 0; i < this.hostTiles.length; i++) {
+			copy.hostTiles.push(this.hostTiles[i].getCopy());
+		}
+
+		copy.guestTiles = [];
+		for (let i = 0; i < this.guestTiles.length; i++) {
+			copy.guestTiles.push(this.guestTiles[i].getCopy());
+		}
+
+		copy.capturedTiles = [];
+		for (let i = 0; i < this.capturedTiles.length; i++) {
+			copy.capturedTiles.push(this.capturedTiles[i].getCopy());
+		}
 
 		return copy;
 	}

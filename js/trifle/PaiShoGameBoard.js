@@ -2879,4 +2879,25 @@ export class PaiShoGameBoard {
 	getBoardPointFromRowAndCol(rowAndCol) {
 		return this.cells[rowAndCol.row][rowAndCol.col];
 	}
+
+	getCopy() {
+		const copy = new PaiShoGameBoard(this.tileManager);
+
+		// Copy cells
+		copy.cells = [];
+		for (let row = 0; row < this.cells.length; row++) {
+			copy.cells[row] = [];
+			for (let col = 0; col < this.cells[row].length; col++) {
+				copy.cells[row][col] = this.cells[row][col].getCopy();
+			}
+		}
+
+		// Copy state flags
+		copy.hostBannerPlayed = this.hostBannerPlayed;
+		copy.guestBannerPlayed = this.guestBannerPlayed;
+		copy.useBannerCaptureSystem = this.useBannerCaptureSystem;
+		copy.winners = this.winners ? [...this.winners] : [];
+
+		return copy;
+	}
 }

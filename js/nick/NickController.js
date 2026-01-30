@@ -1,6 +1,8 @@
 /* Nick specific UI interaction logic */
 
 import {
+	activeAi,
+	activeAi2,
 	BRAND_NEW,
 	callSubmitMove,
 	clearMessage,
@@ -23,6 +25,7 @@ import {
 	READY_FOR_BONUS,
 	refreshMessage,
 	rerunAll,
+	setAiIndex,
 	setGameTitleText,
 	showResetMoveMessage,
 	showSkipButtonMessage,
@@ -55,6 +58,7 @@ import { NickActuator } from './NickActuator';
 import { NickGameManager } from './NickGameManager';
 import { NickOptions } from './NickOptions';
 import { initializeTrifleData, NickTileCodes, TileInfo, getNickTiles } from './NickTiles';
+import { NickStrategicAI } from './ai/NickStrategicAI';
 
 export var NickConstants = {
 	preferencesKey: "NickPreferencesKey"
@@ -199,8 +203,14 @@ export class NickController {
 	}
 
 	gameNotBegun() {
-		return this.gameNotation.moves.length === 0 
+		return this.gameNotation.moves.length === 0
 			|| (this.gameNotation.moves.length === 1 && this.gameNotation.moves[0].moveType === SETUP);
+	}
+
+	readyToShowPlayAgainstAiOption() {
+		// Nick Pai Sho starts with all tiles on the board, so show AI option right away after setup
+		return this.gameNotation.moves.length >= 1
+			&& this.gameNotation.moves[0].moveType === SETUP;
 	}
 
 	getAdditionalMessage() {
@@ -290,6 +300,23 @@ export class NickController {
 				container.appendChild(startSpan);
 
 				container.appendChild(document.createElement('br'));
+			}
+
+			// Show AI options when game is ready but no AI is active
+			if (this.readyToShowPlayAgainstAiOption() && !activeAi) {
+				container.appendChild(document.createElement('br'));
+
+				const aiList = this.getAiList();
+				for (let i = 0; i < aiList.length; i++) {
+					const span = document.createElement('span');
+					span.className = 'skipBonus';
+					span.onclick = ((index) => {
+						return () => setAiIndex(index);
+					})(i);
+					span.textContent = 'Play ' + aiList[i].getName();
+					container.appendChild(span);
+					container.appendChild(document.createElement('br'));
+				}
 			}
 		}
 
@@ -652,16 +679,41 @@ export class NickController {
 		}
 	}
 
-	playAiTurn(finalizeMove) {
-		// 
+	playAiTurn(gameFinalize) {
+		if (this.theGame.getWinner()) {
+			return;
+		}
+
+		let theAi = activeAi;
+		if (activeAi2) {
+			if (activeAi2.player === getCurrentPlayer()) {
+				theAi = activeAi2;
+			}
+		}
+
+		const playerMoveNum = this.gameNotation.getPlayerMoveNum();
+
+		const self = this;
+		setTimeout(function() {
+			const move = theAi.getMove(self.theGame.getCopy(), playerMoveNum);
+
+			if (move) {
+				self.gameNotation.addMove(move);
+				self.theGame.runNotationMove(move);
+
+				if (gameFinalize) {
+					gameFinalize();
+				}
+			}
+		}, 10);
 	}
 
-	startAiGame(finalizeMove) {
-		// 
+	startAiGame(gameFinalize) {
+		this.playAiTurn(gameFinalize);
 	}
 
 	getAiList() {
-		return [];
+		return [new NickStrategicAI()];
 	}
 
 	getCurrentPlayer() {

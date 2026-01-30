@@ -407,6 +407,7 @@ export class NickGameManager {
 		const copyGame = new NickGameManager(this.actuator, true, true);
 		copyGame.board = this.board.getCopy();
 		copyGame.tileManager = this.tileManager.getCopy();
+		copyGame.winners = this.winners ? [...this.winners] : [];
 		return copyGame;
 	}
 }
