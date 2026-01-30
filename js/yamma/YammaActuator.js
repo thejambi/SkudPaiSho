@@ -93,6 +93,9 @@ export class YammaActuator {
 
 		this.viewCanvases = [];
 		const viewLabels = ['Front View', 'Left View', 'Right View'];
+		// Use smaller canvas size on mobile
+		this.viewCanvasWidth = this.isMobile ? 90 : 150;
+		this.viewCanvasHeight = this.isMobile ? 57 : 95;
 		for (let i = 0; i < 3; i++) {
 			const viewWrapper = document.createElement('div');
 			viewWrapper.style.textAlign = 'center';
@@ -101,12 +104,12 @@ export class YammaActuator {
 			label.textContent = viewLabels[i];
 			label.style.color = '#ddd';
 			label.style.marginBottom = '5px';
-			label.style.fontSize = '12px';
+			label.style.fontSize = this.isMobile ? '10px' : '12px';
 			viewWrapper.appendChild(label);
 
 			const canvas = document.createElement('canvas');
-			canvas.width = 150;
-			canvas.height = 95;
+			canvas.width = this.viewCanvasWidth;
+			canvas.height = this.viewCanvasHeight;
 			canvas.style.backgroundColor = '#4a5568';
 			canvas.style.borderRadius = '5px';
 			this.viewCanvases.push(canvas);
@@ -1050,9 +1053,10 @@ export class YammaActuator {
 		// For a triangular pyramid, each view shows a triangular projection
 		// The projection has the same structure as the base: 6 rows
 
-		const diamondSize = 10; // Half-diagonal of each diamond
+		// Scale diamond size based on canvas width
+		const diamondSize = this.isMobile ? 6 : 10; // Half-diagonal of each diamond
 		const startX = width / 2;
-		const startY = diamondSize + 5;
+		const startY = diamondSize + (this.isMobile ? 3 : 5);
 
 		// Draw the triangular grid for this view
 		// Spacing set so diamond edges touch (no gaps)
@@ -1095,10 +1099,10 @@ export class YammaActuator {
 
 		// Draw view angle indicator
 		ctx.fillStyle = '#d1d5db';
-		ctx.font = '10px sans-serif';
+		ctx.font = this.isMobile ? '8px sans-serif' : '10px sans-serif';
 		ctx.textAlign = 'center';
 		const angleLabels = ['Front', 'Left', 'Right'];
-		ctx.fillText(`Angle: ${angleLabels[viewAngle]}`, width / 2, height - 5);
+		ctx.fillText(`Angle: ${angleLabels[viewAngle]}`, width / 2, height - (this.isMobile ? 3 : 5));
 	}
 
 	/**
