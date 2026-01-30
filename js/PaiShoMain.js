@@ -2346,11 +2346,15 @@ export function pointClicked(htmlPoint) {
 }
 
 export function RmbDown(htmlPoint) {
-	gameController.RmbDown(htmlPoint);
+	if (gameController.RmbDown) {
+		gameController.RmbDown(htmlPoint);
+	}
 }
 
 export function RmbUp(htmlPoint) {
-	gameController.RmbUp(htmlPoint);
+	if (gameController.RmbUp) {
+		gameController.RmbUp(htmlPoint);
+	}
 }
 
 export function displayReturnedMessage(messageReturned) {

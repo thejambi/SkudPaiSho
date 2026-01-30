@@ -728,7 +728,7 @@ figure > div {
   /* background-color: rgba(0, 0, 0, 0.5); */
 }
 .possibleDeploy {
-  box-shadow: 0px 0px 2px 2px #823;
+  box-shadow: inset 0px 0px 8px 3px #823;
 }
 .selectedPoint {
   box-shadow: 0px 0px 24px 4px #c6c;

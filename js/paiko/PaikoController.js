@@ -468,11 +468,11 @@ export class PaikoController {
 				status !== PaikoBuilderStatus.WAITING_FOR_SAI_SHIFT &&
 				myTurn() && !gameInfo.winner) {
 				const actions = document.createElement('p');
-				actions.innerHTML = '<strong>Your turn:</strong> Click a tile in your hand to deploy, click a tile on the board to shift, or click here to ';
+				actions.innerHTML = '<strong>Your turn:</strong> Deploy a tile from your hand, shift a tile on the board, or ';
 
 				const drawSpan = document.createElement('span');
 				drawSpan.className = 'skipBonus';
-				drawSpan.textContent = 'Draw 3 tiles';
+				drawSpan.textContent = 'draw 3 tiles';
 				drawSpan.onclick = () => this.drawTiles();
 				actions.appendChild(drawSpan);
 
