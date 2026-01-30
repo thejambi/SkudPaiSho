@@ -89,23 +89,27 @@ export class PaikoController {
 		container.appendChild(document.createElement('br'));
 
 		// Hand tile containers
-		['HSword', 'HBow', 'HEarth', 'HFire'].forEach(className => {
-			const div = document.createElement('div');
-			div.className = className + '-hand';
-			container.appendChild(div);
-			container.appendChild(document.createTextNode(' '));
-		});
+		// ['HSword', 'HBow', 'HEarth', 'HFire'].forEach(className => {
+		// 	const div = document.createElement('div');
+		// 	div.className = className + '-hand';
+		// 	container.appendChild(div);
+		// 	container.appendChild(document.createTextNode(' '));
+		// });
+		const div = document.createElement('span');
+		div.className = 'H-hand';
+		container.appendChild(div);
+		container.appendChild(document.createTextNode(' '));
 
-		const clearBr1 = document.createElement('br');
-		clearBr1.className = 'clear';
-		container.appendChild(clearBr1);
+		// const clearBr1 = document.createElement('br');
+		// clearBr1.className = 'clear';
+		// container.appendChild(clearBr1);
 
-		['HWater', 'HSai', 'HLotus', 'HAir'].forEach(className => {
-			const div = document.createElement('div');
-			div.className = className + '-hand';
-			container.appendChild(div);
-			container.appendChild(document.createTextNode(' '));
-		});
+		// ['HWater', 'HSai', 'HLotus', 'HAir'].forEach(className => {
+		// 	const div = document.createElement('div');
+		// 	div.className = className + '-hand';
+		// 	container.appendChild(div);
+		// 	container.appendChild(document.createTextNode(' '));
+		// });
 
 		const clearBr2 = document.createElement('br');
 		clearBr2.className = 'clear';
@@ -120,7 +124,7 @@ export class PaikoController {
 		container.appendChild(document.createElement('br'));
 
 		// Reserve tile containers
-		['HSword', 'HBow', 'HEarth', 'HFire'].forEach(className => {
+		['HWater', 'HEarth', 'HFire', 'HAir'].forEach(className => {
 			const div = document.createElement('div');
 			div.className = className + '-reserve';
 			container.appendChild(div);
@@ -131,7 +135,7 @@ export class PaikoController {
 		clearBr3.className = 'clear';
 		container.appendChild(clearBr3);
 
-		['HWater', 'HSai', 'HLotus', 'HAir'].forEach(className => {
+		['HSword', 'HBow', 'HSai', 'HLotus'].forEach(className => {
 			const div = document.createElement('div');
 			div.className = className + '-reserve';
 			container.appendChild(div);
@@ -168,23 +172,27 @@ export class PaikoController {
 		container.appendChild(document.createElement('br'));
 
 		// Hand tile containers
-		['GSword', 'GBow', 'GEarth', 'GFire'].forEach(className => {
-			const div = document.createElement('div');
-			div.className = className + '-hand';
-			container.appendChild(div);
-			container.appendChild(document.createTextNode(' '));
-		});
+		// ['GSword', 'GBow', 'GEarth', 'GFire'].forEach(className => {
+		// 	const div = document.createElement('div');
+		// 	div.className = className + '-hand';
+		// 	container.appendChild(div);
+		// 	container.appendChild(document.createTextNode(' '));
+		// });
+		const div = document.createElement('span');
+		div.className = 'G-hand';
+		container.appendChild(div);
+		container.appendChild(document.createTextNode(' '));
 
-		const clearBr1 = document.createElement('br');
-		clearBr1.className = 'clear';
-		container.appendChild(clearBr1);
+		// const clearBr1 = document.createElement('br');
+		// clearBr1.className = 'clear';
+		// container.appendChild(clearBr1);
 
-		['GWater', 'GSai', 'GLotus', 'GAir'].forEach(className => {
-			const div = document.createElement('div');
-			div.className = className + '-hand';
-			container.appendChild(div);
-			container.appendChild(document.createTextNode(' '));
-		});
+		// ['GWater', 'GSai', 'GLotus', 'GAir'].forEach(className => {
+		// 	const div = document.createElement('div');
+		// 	div.className = className + '-hand';
+		// 	container.appendChild(div);
+		// 	container.appendChild(document.createTextNode(' '));
+		// });
 
 		const clearBr2 = document.createElement('br');
 		clearBr2.className = 'clear';
@@ -199,7 +207,7 @@ export class PaikoController {
 		container.appendChild(document.createElement('br'));
 
 		// Reserve tile containers
-		['GSword', 'GBow', 'GEarth', 'GFire'].forEach(className => {
+		['GWater', 'GEarth', 'GFire', 'GAir'].forEach(className => {
 			const div = document.createElement('div');
 			div.className = className + '-reserve';
 			container.appendChild(div);
@@ -210,7 +218,7 @@ export class PaikoController {
 		clearBr3.className = 'clear';
 		container.appendChild(clearBr3);
 
-		['GWater', 'GSai', 'GLotus', 'GAir'].forEach(className => {
+		['GSword', 'GBow', 'GSai', 'GLotus'].forEach(className => {
 			const div = document.createElement('div');
 			div.className = className + '-reserve';
 			container.appendChild(div);
@@ -262,8 +270,8 @@ export class PaikoController {
 				<li><strong>Shift</strong> - Move a tile up to 2 spaces</li>
 				<li><strong>Draw</strong> - Take 3 tiles from your reserve</li>
 			</ul>
-			<p>After your action, capture opponent tiles that are threatened by 2 of your tiles (3 if covered).</p>
-			<p>If you capture tiles, your opponent must reward you by giving you a tile from your reserve!</p>
+			<p>After your action, capture opponent tiles that are in 2 threat (3 if in cover).</p>
+			<p>If you capture a tile, your opponent must reward you by giving you a tile from your reserve!</p>
 			<p>Select tiles to learn more about them.</p>`;
 	}
 
@@ -1331,7 +1339,7 @@ export class PaikoController {
 		const patternGrid = this.generatePatternGrid(tile, ownerName);
 		message.push(patternGrid);
 
-		// message.push(`<p><strong>Move Distance:</strong> ${def.moveDistance}</p>`);	// Can remove
+		message.push(`<p><strong>Move Distance:</strong> ${def.moveDistance}</p>`);
 
 		if (Object.keys(def.specialRules).length > 0) {
 			const rules = [];

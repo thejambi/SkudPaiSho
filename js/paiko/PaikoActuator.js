@@ -8,7 +8,7 @@ import { clearMessage, gameController, pieceAnimationLength, piecePlaceAnimation
 import { ElementStyleTransform } from '../util/ElementStyleTransform';
 import { PaikoController } from './PaikoController';
 import { PaikoPointState, PaikoZone } from './PaikoBoardPoint';
-import { PaikoTileFacing, getAllTileCodes } from './PaikoTile';
+import { PaikoTileFacing, PaikoTileCode, getAllTileCodes } from './PaikoTile';
 
 export class PaikoActuator {
 	constructor(gameContainer, isMobile, enableAnimations) {
@@ -76,24 +76,40 @@ export class PaikoActuator {
 		const allTileCodes = getAllTileCodes();
 
 		// Clear host tile containers
+		this.clearTileContainer('H-hand');
 		allTileCodes.forEach(code => {
-			this.clearTileContainer('H' + code + '-hand');
+			// this.clearTileContainer('H' + code + '-hand');
 			this.clearTileContainer('H' + code + '-reserve');
 		});
 		// this.clearTileContainer('H-captured');
 
 		// Clear guest tile containers
+		this.clearTileContainer('G-hand');
 		allTileCodes.forEach(code => {
-			this.clearTileContainer('G' + code + '-hand');
+			// this.clearTileContainer('G' + code + '-hand');
 			this.clearTileContainer('G' + code + '-reserve');
 		});
 		// this.clearTileContainer('G-captured');
 
-		// Add tiles to their appropriate containers
-		tileManager.hostHand.forEach(tile => {
+		// Sort order for hand display: Elements first, then weapons/special
+		const tileOrder = [
+			PaikoTileCode.WATER, PaikoTileCode.EARTH, PaikoTileCode.FIRE, PaikoTileCode.AIR,
+			PaikoTileCode.SWORD, PaikoTileCode.BOW, PaikoTileCode.SAI, PaikoTileCode.LOTUS
+		];
+
+		const sortTiles = (tiles) => {
+			return [...tiles].sort((a, b) => {
+				const aIndex = tileOrder.indexOf(a.code);
+				const bIndex = tileOrder.indexOf(b.code);
+				return aIndex - bIndex;
+			});
+		};
+
+		// Add tiles to their appropriate containers (sorted for hand)
+		sortTiles(tileManager.hostHand).forEach(tile => {
 			this.addTile(tile, 'hand');
 		});
-		tileManager.guestHand.forEach(tile => {
+		sortTiles(tileManager.guestHand).forEach(tile => {
 			this.addTile(tile, 'hand');
 		});
 
@@ -122,7 +138,10 @@ export class PaikoActuator {
 	}
 
 	addTile(tile, pileType) {
-		const containerClass = tile.getImageName() + '-' + pileType;
+		let containerClass = tile.getImageName() + '-' + pileType;
+		if (pileType === 'hand') {
+			containerClass = tile.ownerCode + '-hand';
+		}
 		const container = document.querySelector('.' + containerClass);
 		if (!container) {
 			return;

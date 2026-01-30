@@ -730,7 +730,8 @@ figure > div {
 
 /* Paiko tile container spacing */
 .tilePileContainer.Paiko div div {
-  margin-top: 2px;
+  margin-top: 3px;
+  margin-right: 3px;
 }
 .tilePileContainer.Paiko .hostTilesContainer br,
 .tilePileContainer.Paiko .guestTilesContainer br {
