@@ -51,6 +51,37 @@ export class PaikoController {
 		// Threat/cover visualization state
 		this.showingHostThreat = false;
 		this.showingGuestThreat = false;
+
+		// Error/warning message display
+		this.displayTempMessage = null;
+		this.displayTempMessageTimeout = null;
+	}
+
+	// Show a temporary message in the game UI
+	showTemporaryAlertMessage(message, durationMs = 5000) {
+		this.displayTempMessage = message;
+
+		// Clear any existing timeout
+		if (this.displayTempMessageTimeout) {
+			clearTimeout(this.displayTempMessageTimeout);
+		}
+
+		// Auto-clear after duration
+		this.displayTempMessageTimeout = setTimeout(() => {
+			this.displayTempMessage = null;
+			this.displayTempMessageTimeout = null;
+			refreshMessage();
+		}, durationMs);
+
+		refreshMessage();
+	}
+
+	clearMessage() {
+		this.displayTempMessage = null;
+		if (this.displayTempMessageTimeout) {
+			clearTimeout(this.displayTempMessageTimeout);
+			this.displayTempMessageTimeout = null;
+		}
 	}
 
 	getGameTypeId() {
@@ -538,6 +569,20 @@ export class PaikoController {
 			msg.innerHTML = `<strong>Setup Phase:</strong> Host, select ${gameInfo.remainingSelection} more tile from your reserve.`;
 			container.appendChild(msg);
 		} else {
+			// Display message (errors/warnings) if present
+			if (this.displayTempMessage) {
+				const msgDiv = document.createElement('p');
+				msgDiv.style.backgroundColor = '#ffcccc';
+				msgDiv.style.border = '1px solid #cc0000';
+				msgDiv.style.borderRadius = '4px';
+				msgDiv.style.padding = '8px';
+				msgDiv.style.marginBottom = '8px';
+				msgDiv.style.color = '#990000';
+				msgDiv.style.fontWeight = 'bold';
+				msgDiv.textContent = this.displayTempMessage;
+				container.appendChild(msgDiv);
+			}
+
 			// Main game - show scores
 			const scores = document.createElement('p');
 			scores.innerHTML = `<strong>Scores:</strong> Host: ${gameInfo.scores.host} | Guest: ${gameInfo.scores.guest}`;
@@ -901,8 +946,11 @@ export class PaikoController {
 		gameCopy.runNotationMove(move, false);
 		if (!gameCopy.validateMoveDoesntCaptureOwn(this.moveBuilder.getPlayer())) {
 			debug("Move would result in your own tile being captured!");
+			this.showTemporaryAlertMessage("Move would result in your own tile being captured!");
+			this.theGame.board.clearAllPointStates();
 			this.resetNotationBuilder();
 			this.callActuate();
+			refreshMessage();
 			return;
 		}
 
@@ -958,8 +1006,11 @@ export class PaikoController {
 		gameCopy.runNotationMove(move, false);
 		if (!gameCopy.validateMoveDoesntCaptureOwn(this.moveBuilder.getPlayer())) {
 			debug("Move would result in your own tile being captured!");
+			this.showTemporaryAlertMessage("Move would result in your own tile being captured!");
+			this.theGame.board.clearAllPointStates();
 			this.resetNotationBuilder();
 			this.callActuate();
+			refreshMessage();
 			return;
 		}
 
@@ -1029,6 +1080,7 @@ export class PaikoController {
 
 		if (!gameCopy.validateMoveDoesntCaptureOwn(currentPlayer)) {
 			debug("Move would result in your own tile being captured!");
+			this.showTemporaryAlertMessage("Move would result in your own tile being captured!");
 			// Re-show shift destinations
 			const saiPoint = this.theGame.board.getPointFromNotation(deployEndPoint);
 			const shiftDestinations = this.theGame.board.getPossibleShiftDestinations(saiPoint, currentPlayer);
