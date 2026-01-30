@@ -877,7 +877,7 @@ export function defineTrifleTiles() {
 	TrifleTiles[TrifleTileCodes.FireBanner] = {	/* todo */
 		available: true,
 		types: [TrifleTileType.banner],
-		identifiers: [TrifleTileIdentifier.earth],
+		identifiers: [TrifleTileIdentifier.fire],
 		deployTypes: [TrifleDeployType.anywhere],
 		abilities: [
 			{
