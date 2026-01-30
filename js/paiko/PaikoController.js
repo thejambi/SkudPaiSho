@@ -6,6 +6,7 @@ import {
 	activeAi,
 	activeAi2,
 	callSubmitMove,
+	clearMessage,
 	createGameIfThatIsOk,
 	currentMoveIndex,
 	finalizeMove,
@@ -76,7 +77,7 @@ export class PaikoController {
 		refreshMessage();
 	}
 
-	clearMessage() {
+	clerTemporaryAlertMessage() {
 		this.displayTempMessage = null;
 		if (this.displayTempMessageTimeout) {
 			clearTimeout(this.displayTempMessageTimeout);
@@ -1344,13 +1345,13 @@ export class PaikoController {
 	toggleHostThreatVisualization() {
 		this.showingHostThreat = !this.showingHostThreat;
 		this.applyThreatVisualization();
-		refreshMessage();
+		clearMessage();
 	}
 
 	toggleGuestThreatVisualization() {
 		this.showingGuestThreat = !this.showingGuestThreat;
 		this.applyThreatVisualization();
-		refreshMessage();
+		clearMessage();
 	}
 
 	applyThreatVisualization() {
