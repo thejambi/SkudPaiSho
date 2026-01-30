@@ -309,22 +309,28 @@ export class GodaiController {
             messageInfo.heading = "Neutral Space"
             messageInfo.message.push(this._getNeutralPointMessage())
         }
+
         if (boardPoint.isType(GATE)) {
-            messageInfo.heading = "Gate"
-            messageInfo.message.push(this._getGateMessage(boardPoint))
+            let info = this._getGateMessage(boardPoint)
+            messageInfo.heading = info.header
+            messageInfo.message.push(info.message)
         }
+
         if (boardPoint.isType(MOUNTAIN_ENTRANCE)) {
-            messageInfo.heading = "Mountain Entrance"
+            messageInfo.heading = "Mountain Entry Point"
             messageInfo.message.push(this._getMountainEntranceMessage())
         }
         else if (boardPoint.isType(MOUNTAIN_TILE)) {
-            messageInfo.heading = "Mountain Space"
+            messageInfo.heading = "Mountain Point"
             messageInfo.message.push(...this._getMountainMessage())
         }
         else if (boardPoint.isType(RIVER_TILE)) {
             messageInfo.heading = "River Space"
             messageInfo.message.push(...this._getRiverMessage(boardPoint))
         }
+
+        // TODO: Add a special message for the river mouth at the Red Gate
+        // TODO: Rename the neutral spaces to their Skud Pai Sho names
 
         return messageInfo
     }
@@ -336,30 +342,45 @@ export class GodaiController {
     /** @param {GodaiBoardPoint} point */
     _getGateMessage(point) {
         let msg = "Gate."
+        let header = "Gate.";
         if (point.isType(WHITE_GATE)) {
-            msg = "White or Western Gate. Metal tiles are deployed here."
+            header = "Western/White Gate"
+            msg = "The Metal Tile is deployed in this Gate"
         } else if (point.isType(RED_GATE)) {
-            msg = "Red or South Gate. Fire tiles are deployed here."
+            header = "South/Red Gate"
+            msg = "The Fire Tile is deployed in this Gate"
         } else if (point.isType(BLACK_GATE)) {
-            msg = "Black or North Gate. Water tiles are deployed here."
+            header = "North/Black Gate."
+            msg = "The Water Tile is deployed in this Gate"
         } else if (point.isType(GREEN_GATE)) {
-            msg = "Green or Eastern Gate. Wood tiles are deployed here."
+            header = "Eastern/Green Gate"
+            msg = "The Wood Tile is deployed in this Gate"
         } else if (point.isType(YELLOW_GATE)) {
-            msg = "Yellow or Center Gate. Earth tiles are deployed here."
+            header = "Central/Yellow Gate"
+            msg = "The Earth Tile is deployed in this Gate"
         }
-        return msg
+
+        let message = "<ul>"
+            + "<li>" + msg + "</li>"
+            + "<li>Tiles already on the board can not move onto any Gate but can move through unoccupied Gates</li>"
+            + "<li>Each player may only have up to 1 tile in all the total Gates at a time</li>"
+            + "<li>Tiles in Gates are unaffected by cycles and can not be captured</li>"
+            + "</ul>"
+
+        return { message, header }
     }
 
     _getMountainMessage() {
         let msg = []
-        msg.push("Can only be entered from the mountain entrances located at the corners")
-        msg.push("Tiles located at a mountain space can go to a neutral space, as normal movement applies")
-        msg.push("If a tile located in a mountain space moves to a river, it will not be moved at the end of the turn")
+        msg.push("<ul>")
+        msg.push("<li>Tiles can only enter Mountains through the Mountain Entry Points</li>")
+        msg.push("<li>If tiles wish to move off the Mountains not through the Mountain Entry Points, they have to spend a turn moving onto the River point first, after which they are off the Mountains</li>")
+        msg.push("</ul>")
         return msg
     }
 
     _getMountainEntranceMessage() {
-        return "Entrance to mountain zones"
+        return "The point through which tiles can enter Mountains, either from on gates or not"
     }
 
     /**
@@ -373,16 +394,18 @@ export class GodaiController {
     /** @param {GodaiBoardPoint} point */
     _getRiverMessage(point) {
         let msg = []
-        msg.push("Rivers start from the Blue Gate to the Red Gate")
-        msg.push("At the end of the turn they move tiles one space downstream in direction of the Red Gate")
-        msg.push("Earth tiles located in rivers will not be moved. Instead, they block the stream of river tiles downstream")
-        msg.push("Tiles are not moved by rivers on the turn they enter")
+        msg.push("<ul>")
+        msg.push("<li>", "Rivers start from the Blue Gate to the Red Gate", "</li>")
+        msg.push("<li>", "All Water, Wood and Fire Tiles on the River float one space down the River at the end of each players' turn", "</li>")
+        msg.push("<li>", "Earth tiles located in rivers will not be moved. Instead, they block the stream of river tiles downstream", "</li>")
+        msg.push("<li>", "Tiles are not moved by rivers on the turn they enter", "</li>")
         if (point.isType(RIVER_DL_TILE)) {
-            msg.push("This river space moves tiles to the South-West")
+            msg.push("<li>", "This river space moves tiles to the South-West", "</li>")
         }
         if (point.isType(RIVER_DR_TILE)) {
-            msg.push("This river space moves tiles to the South-East")
+            msg.push("<li>", "This river space moves tiles to the South-East", "</li>")
         }
+        msg.push("</ul>")
         return msg
     }
 
