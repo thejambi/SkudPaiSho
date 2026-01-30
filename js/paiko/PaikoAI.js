@@ -102,17 +102,17 @@ export class PaikoAI {
 			return null;
 		}
 
-		const availableTiles = gameManager.tileManager.getAvailableTileTypes(this.player);
-		if (availableTiles.length === 0) {
+		const availableTileTypes = gameManager.tileManager.getAvailableTileTypes(this.player);
+		if (availableTileTypes.length === 0) {
 			return null;
 		}
 
-		// Priority order for tile selection
+		// Priority order for tile selection - balanced for opening
 		const tilePriority = [
-			PaikoTileCode.SAI,      // Sai is very versatile with shift after deploy
+			PaikoTileCode.EARTH,    // Provides cover - good for defense
 			PaikoTileCode.BOW,      // Long range threat
 			PaikoTileCode.SWORD,    // Good threat pattern
-			PaikoTileCode.EARTH,    // Provides cover
+			PaikoTileCode.SAI,      // Versatile with shift after deploy
 			PaikoTileCode.WATER,    // Can redeploy
 			PaikoTileCode.AIR,      // Mobile
 			PaikoTileCode.FIRE,     // Threatens all but self-threatened
@@ -123,30 +123,28 @@ export class PaikoAI {
 		const selectedTiles = [];
 		const selectedCounts = {};
 
-		// First pass: select from priority list, avoiding too many duplicates
+		// First pass: select up to 2 of each type from priority list
 		for (const code of tilePriority) {
 			if (selectedTiles.length >= targetCount) break;
 
-			// Count how many of this tile we've already selected
+			// Get actual count available in reserve
+			const availableCount = gameManager.tileManager.getReserveTileCount(this.player, code);
 			const alreadySelected = selectedCounts[code] || 0;
-
-			// Count available of this type
-			const availableCount = availableTiles.filter(t => t === code).length;
 
 			// Select up to 2 of each type
 			while (selectedTiles.length < targetCount &&
-				   alreadySelected + (selectedCounts[code] || 0) < 2 &&
+				   alreadySelected < 2 &&
 				   (selectedCounts[code] || 0) < availableCount) {
 				selectedTiles.push(code);
 				selectedCounts[code] = (selectedCounts[code] || 0) + 1;
 			}
 		}
 
-		// Second pass: fill remaining slots with any available tiles
+		// Second pass: fill remaining slots if needed (allow 3rd copy)
 		for (const code of tilePriority) {
 			if (selectedTiles.length >= targetCount) break;
 
-			const availableCount = availableTiles.filter(t => t === code).length;
+			const availableCount = gameManager.tileManager.getReserveTileCount(this.player, code);
 			while (selectedTiles.length < targetCount &&
 				   (selectedCounts[code] || 0) < availableCount) {
 				selectedTiles.push(code);
@@ -244,7 +242,7 @@ export class PaikoAI {
 							moves.push(move);
 
 							// Add moves with shift
-							const shiftMoves = this.generateSaiShiftVariants(gameManager, move, point, tile);
+							const shiftMoves = this.generateSaiShiftVariants(gameManager, move, tile);
 							moves.push(...shiftMoves);
 						} else {
 							moves.push(move);
@@ -268,7 +266,7 @@ export class PaikoAI {
 		return moves;
 	}
 
-	generateSaiShiftVariants(gameManager, deployMove, deployPoint, tile) {
+	generateSaiShiftVariants(gameManager, deployMove, tile) {
 		const moves = [];
 
 		// Simulate placing Sai at deploy point to get shift destinations
@@ -427,14 +425,18 @@ export class PaikoAI {
 	evaluatePosition(gameState) {
 		let score = 0;
 
-		// 1. Score differential (most important)
+		// Determine game phase - early game is first 4 moves
+		const isEarlyGame = this.moveNum <= 4;
+
+		// 1. Score differential (less important in early game)
 		const scores = {
 			host: gameState.board.calculateScore(HOST),
 			guest: gameState.board.calculateScore(GUEST)
 		};
 		const myScore = this.player === HOST ? scores.host : scores.guest;
 		const oppScore = this.player === HOST ? scores.guest : scores.host;
-		score += (myScore - oppScore) * 100;
+		const scoreDiffWeight = isEarlyGame ? 30 : 100; // Reduce score focus early
+		score += (myScore - oppScore) * scoreDiffWeight;
 
 		// 2. Check for win
 		if (myScore >= 10) {
@@ -450,15 +452,17 @@ export class PaikoAI {
 
 		// 4. Safety - are our tiles safe from capture?
 		const safetyScore = this.evaluateSafety(gameState);
-		score += safetyScore * 40;
+		const safetyWeight = isEarlyGame ? 60 : 40; // Safety more important early
+		score += safetyScore * safetyWeight;
 
 		// 5. Positional advantage - tiles closer to opponent's side
-		const positionScore = this.evaluatePosition_Positional(gameState);
+		const positionScore = this.evaluatePosition_Positional(gameState, isEarlyGame);
 		score += positionScore * 20;
 
 		// 6. Control - threatening important spaces
-		const controlScore = this.evaluateControl(gameState);
-		score += controlScore * 10;
+		const controlScore = this.evaluateControl(gameState, isEarlyGame);
+		const controlWeight = isEarlyGame ? 25 : 10; // Control more important early
+		score += controlScore * controlWeight;
 
 		return score;
 	}
@@ -506,7 +510,7 @@ export class PaikoAI {
 		return score;
 	}
 
-	evaluatePosition_Positional(gameState) {
+	evaluatePosition_Positional(gameState, isEarlyGame = false) {
 		let score = 0;
 		const myTiles = gameState.board.getPlayerTiles(this.player);
 
@@ -517,18 +521,51 @@ export class PaikoAI {
 			}
 
 			const pointValue = point.getPointsValue(this.player);
-			score += pointValue;
 
-			// Bonus for being in opponent's territory
-			if (pointValue === 2) {
-				score += 1; // Extra bonus for homeground
+			if (isEarlyGame) {
+				// Early game: prioritize centrality and homeground defense over pushing for points
+				const centrality = this.getCentrality(point);
+
+				// Bonus for central positions (where you can project threat in multiple directions)
+				score += centrality * 2;
+
+				// Bonus for defending your own territory (homeground = 0 points for you)
+				if (pointValue === 0) {
+					score += 2; // Good to have presence on your side early
+				} else if (pointValue === 1) {
+					score += 1; // Middleground is ok
+				}
+				// No bonus for opponent's homeground early - too risky
+
+			} else {
+				// Later game: normal scoring - value opponent territory
+				score += pointValue;
+
+				// Bonus for being in opponent's territory
+				if (pointValue === 2) {
+					score += 1; // Extra bonus for homeground
+				}
 			}
 		}
 
 		return score;
 	}
 
-	evaluateControl(gameState) {
+	// Calculate how central a point is (0-1 scale, 1 = center)
+	getCentrality(point) {
+		// Board is 18x18, center is around row 8-9, col 8-9
+		const centerRow = 8.5;
+		const centerCol = 8.5;
+		const maxDist = 8.5; // Max distance from center to edge
+
+		const rowDist = Math.abs(point.row - centerRow);
+		const colDist = Math.abs(point.col - centerCol);
+		const dist = Math.max(rowDist, colDist);
+
+		return 1 - (dist / maxDist);
+	}
+
+	evaluateControl(gameState, isEarlyGame = false) {
 		let score = 0;
 
 		// Count spaces we threaten vs opponent threatens
@@ -538,10 +575,17 @@ export class PaikoAI {
 			const myThreat = point.getThreat(this.player);
 			const oppThreat = point.getThreat(this.opponent);
 
+			let controlValue = 0.1;
+			if (isEarlyGame) {
+				// Early game: value central control more
+				const centrality = this.getCentrality(point);
+				controlValue = 0.1 + (centrality * 0.2); // Up to 0.3 for center
+			}
+
 			if (myThreat > oppThreat) {
-				score += 0.1;
+				score += controlValue;
 			} else if (oppThreat > myThreat) {
-				score -= 0.1;
+				score -= controlValue;
 			}
 		});
 
