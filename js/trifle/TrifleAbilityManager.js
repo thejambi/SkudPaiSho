@@ -8,6 +8,8 @@ import { debug } from '../GameData';
 import { TrifleBrainFactory } from './brains/BrainFactory';
 
 export class TrifleAbilityManager {
+	static MAX_CASCADE_DEPTH = 10;
+
 	constructor(board, customAbilityActivationOrder) {
 		this.board = board;
 		this.tileManager = board.tileManager;
@@ -154,11 +156,34 @@ export class TrifleAbilityManager {
 		};
 	}
 
-	doTheActivateThing(ability, tileRecords, abilitiesActivated) {
+	doTheActivateThing(ability, tileRecords, abilitiesActivated, cascadeDepth = 0, visitedAbilityKeys = null) {
 		const capturedTiles = tileRecords.capturedTiles;
 		const tilesMovedToPiles = tileRecords.tilesMovedToPiles;
 
 		let abilitiesTriggeredBySameAction = [];
+
+		// Initialize visited set on first call
+		if (visitedAbilityKeys === null) {
+			visitedAbilityKeys = new Set();
+		}
+
+		// Build unique key for this ability
+		const abilityKey = this.buildAbilityKey(ability);
+
+		// Check for cycle
+		if (visitedAbilityKeys.has(abilityKey)) {
+			debug("RECURSION BLOCKED: Cycle detected for " + ability.abilityType + " from " + ability.sourceTile.code);
+			return false;
+		}
+
+		// Check depth limit
+		if (cascadeDepth >= TrifleAbilityManager.MAX_CASCADE_DEPTH) {
+			debug("RECURSION BLOCKED: Max depth reached for " + ability.abilityType);
+			return false;
+		}
+
+		// Add to visited set
+		visitedAbilityKeys.add(abilityKey);
 
 		let boardHasChanged = false;
 		if (!ability.activated
@@ -194,7 +219,7 @@ export class TrifleAbilityManager {
 			// Now activate abilities triggered by same event
 			if (abilitiesTriggeredBySameAction && abilitiesTriggeredBySameAction.length > 0) {
 				abilitiesTriggeredBySameAction.forEach(otherAbility => {
-					this.doTheActivateThing(otherAbility, tileRecords, abilitiesActivated);
+					this.doTheActivateThing(otherAbility, tileRecords, abilitiesActivated, cascadeDepth + 1, visitedAbilityKeys);
 				});
 			}
 
@@ -234,6 +259,14 @@ export class TrifleAbilityManager {
 		}
 
 		return matchingReadyAbilities;
+	}
+
+	buildAbilityKey(ability) {
+		const triggerTargetIds = ability.triggerTargetTiles
+			.map(tile => tile.id)
+			.sort()
+			.join(',');
+		return `${ability.abilityType}|${ability.sourceTile.id}|${triggerTargetIds}`;
 	}
 
 	/**
