@@ -170,10 +170,14 @@ if (QueryString.tu) {
 // Declared early so it's available for shortLinkDataReady
 export const onlinePlayEngine = new OnlinePlayEngine();
 
+// Store raw short link info for debugging
+export let rawShortLinkInfo = null;
+
 // Promise that resolves when short link data (if any) has been loaded and applied
 export const shortLinkDataReady = QueryString.sl
 	? new Promise((resolve) => {
 		onlinePlayEngine.getShortLinkInfo(QueryString.sl, (linkedInfo) => {
+			rawShortLinkInfo = linkedInfo;
 			if (linkedInfo) {
 				// Decompress and parse the linked info
 				const decompressed = decompressFromEncodedURIComponent(linkedInfo);
@@ -5732,6 +5736,46 @@ export function promptAddOption() {
 		queryStringHeader.textContent = 'QueryString:';
 		container.appendChild(queryStringHeader);
 		container.appendChild(document.createElement('br'));
+
+		const rawQueryString = window.location.search.substring(1);
+		if (rawQueryString) {
+			const rawLabel = document.createElement('div');
+			rawLabel.style.fontSize = '0.85em';
+			rawLabel.style.fontWeight = 'bold';
+			rawLabel.textContent = 'Raw (compressed):';
+			container.appendChild(rawLabel);
+
+			const rawDiv = document.createElement('div');
+			rawDiv.style.fontSize = '0.8em';
+			rawDiv.style.wordBreak = 'break-all';
+			rawDiv.style.marginBottom = '8px';
+			rawDiv.style.fontFamily = 'monospace';
+			rawDiv.textContent = rawQueryString;
+			container.appendChild(rawDiv);
+
+			const decompressedLabel = document.createElement('div');
+			decompressedLabel.style.fontSize = '0.85em';
+			decompressedLabel.style.fontWeight = 'bold';
+			decompressedLabel.textContent = 'Decompressed:';
+			container.appendChild(decompressedLabel);
+		}
+
+		if (rawShortLinkInfo) {
+			const shortLinkLabel = document.createElement('div');
+			shortLinkLabel.style.fontSize = '0.85em';
+			shortLinkLabel.style.fontWeight = 'bold';
+			shortLinkLabel.style.marginTop = '8px';
+			shortLinkLabel.textContent = 'Short Link Info (raw):';
+			container.appendChild(shortLinkLabel);
+
+			const shortLinkDiv = document.createElement('div');
+			shortLinkDiv.style.fontSize = '0.8em';
+			shortLinkDiv.style.wordBreak = 'break-all';
+			shortLinkDiv.style.marginBottom = '8px';
+			shortLinkDiv.style.fontFamily = 'monospace';
+			shortLinkDiv.textContent = rawShortLinkInfo;
+			container.appendChild(shortLinkDiv);
+		}
 
 		const queryStringProps = Object.keys(QueryString).filter(key => QueryString[key] !== undefined && QueryString[key] !== '');
 		if (queryStringProps.length > 0) {
