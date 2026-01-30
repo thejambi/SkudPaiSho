@@ -425,8 +425,8 @@ export class PaikoAI {
 	evaluatePosition(gameState) {
 		let score = 0;
 
-		// Determine game phase - early game is first 4 moves
-		const isEarlyGame = this.moveNum <= 4;
+		// Determine game phase - early game is first 2 moves
+		const isEarlyGame = this.moveNum <= 2;
 
 		// 1. Score differential (less important in early game)
 		const scores = {
