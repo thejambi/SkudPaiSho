@@ -7,7 +7,7 @@ import { GATE, NEUTRAL, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoi
 import { GodaiActuator } from "./GodaiActuator.js";
 import { GodaiGameManager } from "./GodaiGameManager.js";
 import { GodaiGameNotation, GodaiNotationBuilder } from "./GodaiNotation.js";
-import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WHITE_GATE, GodaiBoardPoint, YELLOW_GATE } from "./GodaiBoardPoint.js";
+import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WHITE_GATE, GodaiBoardPoint, YELLOW_GATE, RIVER_MOUTH } from "./GodaiBoardPoint.js";
 import { GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD, GodaiTile } from "./GodaiTile.js";
 
 export var GodaiPreferences = {
@@ -320,16 +320,21 @@ export class GodaiController {
             messageInfo.heading = "Mountain Entry Point"
             messageInfo.message.push(this._getMountainEntranceMessage())
         }
+        
+        if (boardPoint.isType(RIVER_TILE)) {
+            messageInfo.heading = "River Space"
+            messageInfo.message.push(...this._getRiverMessage(boardPoint))
+        }
         else if (boardPoint.isType(MOUNTAIN_TILE)) {
             messageInfo.heading = "Mountain Point"
             messageInfo.message.push(...this._getMountainMessage())
         }
-        else if (boardPoint.isType(RIVER_TILE)) {
-            messageInfo.heading = "River Space"
-            messageInfo.message.push(...this._getRiverMessage(boardPoint))
+        else if (boardPoint.isType(RIVER_MOUTH)) {
+            messageInfo.heading = "River Mouth/Mountain Entry Point"
+            messageInfo.message.push(this._getMountainEntranceMessage())
+            messageInfo.message.push(...this._getRiverMouthMessage())
         }
 
-        // TODO: Add a special message for the river mouth at the Red Gate
         // TODO: Rename the neutral spaces to their Skud Pai Sho names
 
         return messageInfo
@@ -405,6 +410,19 @@ export class GodaiController {
         if (point.isType(RIVER_DR_TILE)) {
             msg.push("<li>", "This river space moves tiles to the South-East", "</li>")
         }
+        msg.push("</ul>")
+        return msg
+    }
+
+    _getRiverMouthMessage() {
+        let msg = []
+        msg.push("<ul>")
+        msg.push("<li>", "Rivers start from the Blue Gate to the Red Gate", "</li>")
+        msg.push("<li>", "All Water, Wood and Fire Tiles on the River float one space down the River at the end of each players' turn", "</li>")
+        msg.push("<li>", "Earth tiles located in rivers will not be moved. Instead, they block the stream of river tiles downstream", "</li>")
+        msg.push("<li>", "Tiles are not moved by rivers on the turn they enter", "</li>")
+        msg.push("<li>", "Tiles on this point are at the end of the River and cannot flow down any more", "</li>")
+        msg.push("<li>", "If two tiles simultaneously reach this point, then both tiles drown, resulting in both tiles getting captured regardless of the capture cycle. This is called 'The River Crash'" ,"</li>")
         msg.push("</ul>")
         return msg
     }

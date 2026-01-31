@@ -421,7 +421,7 @@ export class GodaiBoard {
             GodaiBoardPoint.mountain(),
             GodaiBoardPoint.mountain(),
             GodaiBoardPoint.mountain(),
-            GodaiBoardPoint.western(GodaiBoardPoint.eastern(GodaiBoardPoint.mountainEntranceWithRiver())),
+            GodaiBoardPoint.western(GodaiBoardPoint.eastern(GodaiBoardPoint.riverMouth(GodaiBoardPoint.mountainEntranceWithRiver()))),
             GodaiBoardPoint.neutral(),
             GodaiBoardPoint.neutral(),
             GodaiBoardPoint.neutral(),

@@ -9,6 +9,7 @@ export let YELLOW_GATE = "Yellow Gate"
 export let RIVER_TILE = "River Tile"
 export let RIVER_DL_TILE = "River (Down-Left) Tile"
 export let RIVER_DR_TILE = "River (Down-Right) Tile"
+export let RIVER_MOUTH = "River Mouth"
 export let MOUNTAIN_TILE = "Mountain Tile"
 export let MOUNTAIN_ENTRANCE = "Mountain Entrance"
 export let WESTERN_RIVER = "Western River"
@@ -171,6 +172,16 @@ export class GodaiBoardPoint {
     static mountainEntranceWithRiverDR() {
         let p = GodaiBoardPoint.mountainEntranceWithRiver()
         p.addType(RIVER_DR_TILE)
+        return p
+    }
+
+    /**
+     * Adds the `RIVER_MOUTH` type to `p`
+     * @param {GodaiBoardPoint} p 
+     * @returns {GodaiBoardPoint}
+     */
+    static riverMouth(p) {
+        p.addType(RIVER_MOUTH)
         return p
     }
 
