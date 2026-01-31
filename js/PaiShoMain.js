@@ -5653,27 +5653,31 @@ export function promptAddOption() {
 		separator1.style.margin = '10px 0';
 		container.appendChild(separator1);
 
-		// --- Set Win Info Section ---
+		// --- Set Win Info Section (collapsible) ---
 		const winInfoHeader = document.createElement('div');
 		winInfoHeader.style.fontWeight = 'bold';
-		winInfoHeader.textContent = 'Set Win Info:';
+		winInfoHeader.classList.add('clickableText');
+		winInfoHeader.textContent = '▶ Set Win Info';
 		container.appendChild(winInfoHeader);
-		container.appendChild(document.createElement('br'));
+
+		const winInfoContent = document.createElement('div');
+		winInfoContent.style.display = 'none';
+		winInfoContent.style.marginLeft = '10px';
 
 		const winnerLabel = document.createElement('label');
 		winnerLabel.textContent = 'Winner Username: ';
-		container.appendChild(winnerLabel);
+		winInfoContent.appendChild(winnerLabel);
 
 		const winnerInput = document.createElement('input');
 		winnerInput.type = 'text';
 		winnerInput.id = 'winnerUsernameInput';
 		winnerInput.placeholder = '(blank for ties)';
-		container.appendChild(winnerInput);
-		container.appendChild(document.createElement('br'));
+		winInfoContent.appendChild(winnerInput);
+		winInfoContent.appendChild(document.createElement('br'));
 
 		const resultCodeLabel = document.createElement('label');
 		resultCodeLabel.textContent = 'Result Code: ';
-		container.appendChild(resultCodeLabel);
+		winInfoContent.appendChild(resultCodeLabel);
 
 		const resultCodeSelect = document.createElement('select');
 		resultCodeSelect.id = 'resultCodeInput';
@@ -5693,13 +5697,13 @@ export function promptAddOption() {
 			if (opt.value === 1) option.selected = true;
 			resultCodeSelect.appendChild(option);
 		});
-		container.appendChild(resultCodeSelect);
-		container.appendChild(document.createElement('br'));
+		winInfoContent.appendChild(resultCodeSelect);
+		winInfoContent.appendChild(document.createElement('br'));
 
 		const winInfoStatusDiv = document.createElement('div');
 		winInfoStatusDiv.id = 'winInfoStatus';
 		winInfoStatusDiv.style.fontStyle = 'italic';
-		container.appendChild(winInfoStatusDiv);
+		winInfoContent.appendChild(winInfoStatusDiv);
 
 		const submitWinInfoDiv = document.createElement('div');
 		submitWinInfoDiv.classList.add('clickableText');
@@ -5731,7 +5735,15 @@ export function promptAddOption() {
 				currentGameData.guestUsername
 			);
 		};
-		container.appendChild(submitWinInfoDiv);
+		winInfoContent.appendChild(submitWinInfoDiv);
+
+		winInfoHeader.onclick = () => {
+			const isCollapsed = winInfoContent.style.display === 'none';
+			winInfoContent.style.display = isCollapsed ? 'block' : 'none';
+			winInfoHeader.textContent = (isCollapsed ? '▼' : '▶') + ' Set Win Info';
+		};
+
+		container.appendChild(winInfoContent);
 
 		// --- Separator ---
 		container.appendChild(document.createElement('br'));
@@ -5861,10 +5873,18 @@ export function promptAddOption() {
 			const rawDiv = document.createElement('div');
 			rawDiv.style.fontSize = '0.8em';
 			rawDiv.style.wordBreak = 'break-all';
-			rawDiv.style.marginBottom = '8px';
+			rawDiv.style.marginBottom = '4px';
 			rawDiv.style.fontFamily = 'monospace';
 			rawDiv.textContent = rawQueryString;
 			queryStringContent.appendChild(rawDiv);
+
+			const copyRawBtn = document.createElement('span');
+			copyRawBtn.classList.add('clickableText');
+			copyRawBtn.style.fontSize = '0.8em';
+			copyRawBtn.textContent = 'Copy to Clipboard';
+			copyRawBtn.onclick = () => copyTextToClipboard(rawQueryString, copyRawBtn);
+			queryStringContent.appendChild(copyRawBtn);
+			queryStringContent.appendChild(document.createElement('br'));
 
 			const decompressedLabel = document.createElement('div');
 			decompressedLabel.style.fontSize = '0.85em';
@@ -5884,10 +5904,18 @@ export function promptAddOption() {
 			const shortLinkDiv = document.createElement('div');
 			shortLinkDiv.style.fontSize = '0.8em';
 			shortLinkDiv.style.wordBreak = 'break-all';
-			shortLinkDiv.style.marginBottom = '8px';
+			shortLinkDiv.style.marginBottom = '4px';
 			shortLinkDiv.style.fontFamily = 'monospace';
 			shortLinkDiv.textContent = rawShortLinkInfo;
 			queryStringContent.appendChild(shortLinkDiv);
+
+			const copyShortLinkBtn = document.createElement('span');
+			copyShortLinkBtn.classList.add('clickableText');
+			copyShortLinkBtn.style.fontSize = '0.8em';
+			copyShortLinkBtn.textContent = 'Copy to Clipboard';
+			copyShortLinkBtn.onclick = () => copyTextToClipboard(rawShortLinkInfo, copyShortLinkBtn);
+			queryStringContent.appendChild(copyShortLinkBtn);
+			queryStringContent.appendChild(document.createElement('br'));
 		}
 
 		const queryStringProps = Object.keys(QueryString).filter(key => QueryString[key] !== undefined && QueryString[key] !== '');
