@@ -376,6 +376,7 @@ export class PaikoGameManager {
 
 	// Process capture phase after action
 	// Returns the total number of tiles captured (including cascading captures)
+	// Fire tiles are captured last, after all other tiles (and their cascades) are resolved
 	processCapturePhase(activePlayer) {
 		const opponent = activePlayer === HOST ? GUEST : HOST;
 		let totalCaptured = 0;
@@ -383,30 +384,18 @@ export class PaikoGameManager {
 		// Store captured tiles info for animation
 		this.lastCapturedTiles = [];
 
-		// Loop to handle cascading captures
+		// Step 1 & 2: Capture non-Fire tiles first (with cascade loop)
 		// When a tile is captured, it may have been providing cover for another tile
-		// that now becomes capturable
+		// that now becomes capturable - keep looping until no more non-Fire captures
 		let capturesThisRound;
 		do {
-			// Get tiles that would be captured
-			const capturedTiles = this.board.getTilesToCapture(opponent);
-			capturesThisRound = capturedTiles.length;
+			// Get non-Fire tiles that would be captured
+			const allCapturable = this.board.getTilesToCapture(opponent);
+			const nonFireCapturable = allCapturable.filter(({ tile }) => tile.code !== PaikoTileCode.FIRE);
+			capturesThisRound = nonFireCapturable.length;
 
-			capturedTiles.forEach(({ tile, point }) => {
-				// Store capture info for animation before removing
-				const notationPoint = this.board.getNotationPointFromRowCol(point.row, point.col);
-				this.lastCapturedTiles.push({
-					tile: tile.getCopy(),
-					row: point.row,
-					col: point.col,
-					pointText: notationPoint.pointText
-				});
-
-				// Remove from board (skip recalculate during loop)
-				const removedTile = this.board.removeTile(notationPoint, true);
-
-				// Add to discard pile
-				this.tileManager.addToDiscard(opponent, removedTile);
+			nonFireCapturable.forEach(({ tile, point }) => {
+				this.captureTileAt(point, tile, opponent);
 			});
 
 			// Recalculate threat/cover after this round of captures
@@ -415,6 +404,19 @@ export class PaikoGameManager {
 				totalCaptured += capturesThisRound;
 			}
 		} while (capturesThisRound > 0);
+
+		// Step 3: Capture Fire tiles last (after all non-Fire cascades are resolved)
+		const remainingCapturable = this.board.getTilesToCapture(opponent);
+		const fireCapturable = remainingCapturable.filter(({ tile }) => tile.code === PaikoTileCode.FIRE);
+
+		fireCapturable.forEach(({ tile, point }) => {
+			this.captureTileAt(point, tile, opponent);
+		});
+
+		if (fireCapturable.length > 0) {
+			this.board.recalculateThreatAndCover();
+			totalCaptured += fireCapturable.length;
+		}
 
 		// Set up pending capture reward if any tiles were captured
 		if (totalCaptured > 0) {
@@ -429,6 +431,24 @@ export class PaikoGameManager {
 		}
 
 		return totalCaptured;
+	}
+
+	// Helper to capture a tile at a point
+	captureTileAt(point, tile, owner) {
+		// Store capture info for animation before removing
+		const notationPoint = this.board.getNotationPointFromRowCol(point.row, point.col);
+		this.lastCapturedTiles.push({
+			tile: tile.getCopy(),
+			row: point.row,
+			col: point.col,
+			pointText: notationPoint.pointText
+		});
+
+		// Remove from board (skip recalculate - caller will do it)
+		const removedTile = this.board.removeTile(notationPoint, true);
+
+		// Add to discard pile
+		this.tileManager.addToDiscard(owner, removedTile);
 	}
 
 	// Execute capture reward move (opponent chose tiles for capturing player)
