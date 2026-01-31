@@ -159,7 +159,8 @@ export function setupPaiShoBoard(gameContainer,
 	rotateBoard,
 	rotateType,
 	playInSpaces,
-	overrideBoardName) {
+	overrideBoardName,
+	overrideScale) {
 
 	var addVagabondBoardRotate = false;
 	var addAdevarBoardRotate = false;
@@ -190,6 +191,10 @@ export function setupPaiShoBoard(gameContainer,
 	boardContainer.setAttribute("oncontextmenu", "return false;");
 
 	var bcontainer = createDivWithClass("board-container");
+	if (overrideScale) {
+		bcontainer.style.scale = overrideScale;
+	}
+
 	var svgContainer = createDivWithClass("svgContainer");
 	var svgContainerContainer = createDivWithClass("svgContainerContainer");
 	var bgSvg = createDivWithClass("bg-svg");
