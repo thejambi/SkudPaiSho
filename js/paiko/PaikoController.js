@@ -407,16 +407,9 @@ export class PaikoController {
 			gridDiv.style.gap = '4px';
 			gridDiv.style.justifyContent = 'start';
 			gridDiv.style.textAlign = 'center';
-			// gridDiv.style.marginLeft = '20px';	// Trying without margin
-			
-			gridDiv.style.border = '2px solid #28a745';
-			gridDiv.style.borderRadius = '4px';
-			gridDiv.style.padding = '8px';
-			gridDiv.style.marginBottom = '8px';
-			gridDiv.style.paddingTop = '8px';
-			gridDiv.style.paddingBottom = '8px';
 			gridDiv.style.fontWeight = 'bold';
 			gridDiv.style.maxWidth = '165px';
+			this.applyMessageAttentionStyle(gridDiv);
 
 			const self = this;
 			const createButton = (name, facing) => {
@@ -532,6 +525,7 @@ export class PaikoController {
 
 				const rewardHeader = document.createElement('p');
 				rewardHeader.innerHTML = `<strong>Capture Reward:</strong> Your opponent captured your tiles! Choose ${remaining} tile(s) from their reserve to give them.`;
+				this.applyMessageAttentionStyle(rewardHeader);
 				rewardContainer.appendChild(rewardHeader);
 
 				// Show selected tiles
@@ -627,6 +621,15 @@ export class PaikoController {
 		}
 
 		return container;
+	}
+
+	applyMessageAttentionStyle(element) {
+		element.style.border = '2px solid #28a745';
+		element.style.borderRadius = '4px';
+		element.style.padding = '8px';
+		element.style.marginBottom = '8px';
+		element.style.paddingTop = '8px';
+		element.style.paddingBottom = '8px';
 	}
 
 	// Handle clicking on an unplayed tile (from hand or reserve)
