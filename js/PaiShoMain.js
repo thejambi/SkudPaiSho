@@ -3,6 +3,20 @@
 import $ from 'jquery';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
+import { AdevarController } from "./adevar/AdevarController";
+import { AdevarOptions } from './adevar/AdevarOptions';
+import { Ads } from "./Ads";
+import { DummyAppCaller, IOSCaller } from "./AppCaller";
+import {
+	BeyondTheMapsController,
+} from './beyond-the-maps/BeyondTheMapsController';
+import { BloomsController } from './blooms/BloomsController';
+import { CaptureController } from './capture/CaptureController';
+import { GUEST, HOST } from "./CommonNotationObjects";
+import {
+	CoopSolitaireController,
+} from './cooperative-solitaire/CoopSolitaireController';
+import { FirePaiShoController } from './fire-pai-sho/FirePaiShoController';
 import {
 	DIAGONAL_MOVEMENT,
 	EVERYTHING_CAPTURE,
@@ -10,97 +24,16 @@ import {
 	gameOptionEnabled,
 	getGameOptionDescription,
 } from './GameOptions';
-import { GameType, getGameTypeEntryFromId, gameTypeIdSupported } from './GameType';
-// Re-export for backward compatibility
-export { GameType, getGameTypeEntryFromId, gameTypeIdSupported };
-import { AdevarController } from "./adevar/AdevarController";
-import { AdevarOptions } from './adevar/AdevarOptions';
-import { Ads } from "./Ads";
-import {
-	BeyondTheMapsController,
-} from './beyond-the-maps/BeyondTheMapsController';
-import { BloomsController } from './blooms/BloomsController';
-import { CaptureController } from './capture/CaptureController';
-import {
-	CoopSolitaireController,
-} from './cooperative-solitaire/CoopSolitaireController';
-import { DummyAppCaller, IOSCaller } from "./AppCaller";
-import { Elo } from "./util/elo";
-import { FirePaiShoController } from './fire-pai-sho/FirePaiShoController';
-import { GUEST, HOST } from "./CommonNotationObjects";
-import { GameClock } from "./util/GameClock";
-import { Giveaway } from "./util/Giveaway";
+import { GameType, gameTypeIdSupported, getGameTypeEntryFromId } from './GameType';
 import { GinsengController } from './ginseng/GinsengController';
 import { GodaiController } from './godai/GodaiController';
 import { HexentaflController } from './hexentafl/HexentaflController';
+import { Elo } from "./util/elo";
+import { GameClock } from "./util/GameClock";
+import { Giveaway } from "./util/Giveaway";
+// Re-export for backward compatibility
+export { GameType, gameTypeIdSupported, getGameTypeEntryFromId };
 // HonoraryTitleChecker moved to GameStats module
-import { KeyPaiShoController } from './key-pai-sho/KeyPaiShoController';
-import { LocalStorage } from "./LocalStorage";
-import { MeadowController } from './meadow/MeadowController';
-import { OnboardingFunctions } from "./OnBoardingVars";
-import { OnlinePlayEngine } from "./OnlinePlayEngine";
-import { OvergrowthController } from './overgrowth/OvergrowthController';
-import { PlaygroundController } from './playground/PlaygroundController';
-import { SkudPaiShoController, SkudPreferences } from "./skud-pai-sho/SkudPaiShoController";
-import { SolitaireController } from './solitaire/SolitaireController';
-import { SoundManager } from "./SoundManager";
-import { SpiritController } from './spirit/SpiritController';
-import { StreetController } from './street/StreetController';
-import { TrifleController } from './trifle/TrifleController';
-import { TumbleweedController } from './tumbleweed/TumbleweedController';
-import { UndergrowthController } from './undergrowth/UndergrowthController';
-import { YammaController } from './yamma/YammaController';
-import { TicTacToeController } from './tictactoe/TicTacToeController';
-import { HexController } from './hex/HexController';
-import { PaikoController } from './paiko/PaikoController';
-import { VagabondController } from "./vagabond/VagabondController";
-import * as WelcomeTutorial from './WelcomeTutorial';
-import * as TournamentManager from './TournamentManager';
-import {
-	toggleSoundOn,
-	toggleAnimationsOn,
-	isAnimationsOn,
-	isTimestampsOn,
-	toggleTimestamps,
-	isMoveLogDisplayOn,
-	toggleMoveLogDisplay,
-	isMoveConfirmationRequired,
-	toggleConfirmMovePreference,
-	showConfirmMoveButton,
-	hideConfirmMoveButton,
-	confirmMoveClicked,
-	setBackgroundColor,
-	setCustomBgColorFromInput,
-	showPreferences,
-	getBooleanPreference,
-	toggleBooleanPreference
-} from './UserPreferences';
-import {
-	handleNewGlobalChatMessages,
-	fetchGlobalChats,
-	resetGlobalChats,
-	fetchInitialGlobalChats,
-	sendGlobalChat
-} from './GlobalChat';
-import {
-	requestNotificationPermission,
-	notifyMe,
-	notifyThisMessage
-} from './Notifications';
-import {
-	initWebPush,
-	isPushSupported,
-	isWebPushEnabled,
-	subscribeToPush,
-	unsubscribeFromPush,
-	saveWebPushSubscriptionIfNeeded,
-	isChatNotificationsEnabled,
-	enableChatNotifications,
-	disableChatNotifications
-} from './WebPush';
-import { PREF_IOS_DEVICE_TOKEN } from './preferenceTypes';
-import { addEventToElement, setupUiEvents } from './ui/UiSetup';
-import { setupHtmlEventHandlers } from './ui/HtmlEventHandlers';
 import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
 import {
 	arrayIncludesAll,
@@ -113,20 +46,68 @@ import {
 	dateIsBetween,
 	debug,
 	debugOn,
-	setDebugOn,
 	gameDevOn,
-	setGameDevOn,
 	humanYearsToTreeYears,
 	ios,
 	randomIntFromInterval,
 	runningOnAndroid,
-	setCustomBoardUrl
+	setCustomBoardUrl,
+	setDebugOn,
+	setGameDevOn
 } from './GameData';
-import { buildLoginModalContentElement } from './ui/LoginModal';
-import NickController from './nick/NickController';
-import { viewGameRankingsClicked } from './PaiShoMain';
 import * as GameStats from './GameStats';
+import {
+	fetchGlobalChats,
+	fetchInitialGlobalChats,
+	resetGlobalChats
+} from './GlobalChat';
+import { HexController } from './hex/HexController';
+import { KeyPaiShoController } from './key-pai-sho/KeyPaiShoController';
+import { LocalStorage } from "./LocalStorage";
+import { MeadowController } from './meadow/MeadowController';
+import NickController from './nick/NickController';
+import {
+	notifyThisMessage,
+	requestNotificationPermission
+} from './Notifications';
+import { OnboardingFunctions } from "./OnBoardingVars";
+import { OnlinePlayEngine } from "./OnlinePlayEngine";
+import { OvergrowthController } from './overgrowth/OvergrowthController';
+import { PaikoController } from './paiko/PaikoController';
+import { viewGameRankingsClicked } from './PaiShoMain';
+import { PlaygroundController } from './playground/PlaygroundController';
+import { PREF_IOS_DEVICE_TOKEN } from './preferenceTypes';
+import { SkudPaiShoController, SkudPreferences } from "./skud-pai-sho/SkudPaiShoController";
+import { SolitaireController } from './solitaire/SolitaireController';
+import { SoundManager } from "./SoundManager";
+import { SpiritController } from './spirit/SpiritController';
+import { StreetController } from './street/StreetController';
+import { TicTacToeController } from './tictactoe/TicTacToeController';
+import { TrifleController } from './trifle/TrifleController';
+import { TumbleweedController } from './tumbleweed/TumbleweedController';
+import { setupHtmlEventHandlers } from './ui/HtmlEventHandlers';
+import { buildLoginModalContentElement } from './ui/LoginModal';
 import { buildSignUpModalContentElement } from './ui/SignUpModal';
+import { addEventToElement, setupUiEvents } from './ui/UiSetup';
+import { UndergrowthController } from './undergrowth/UndergrowthController';
+import {
+	getBooleanPreference,
+	hideConfirmMoveButton,
+	isMoveConfirmationRequired,
+	isMoveLogDisplayOn,
+	isTimestampsOn,
+	setBackgroundColor,
+	showConfirmMoveButton,
+	showPreferences,
+	toggleBooleanPreference
+} from './UserPreferences';
+import { VagabondController } from "./vagabond/VagabondController";
+import {
+	initWebPush,
+	saveWebPushSubscriptionIfNeeded
+} from './WebPush';
+import * as WelcomeTutorial from './WelcomeTutorial';
+import { YammaController } from './yamma/YammaController';
 
 
 export const QueryString = (() => {
@@ -4671,11 +4652,7 @@ export function createGameIfThatIsOk(gameTypeId) {
 /* Global Chat - delegated to GlobalChat module */
 // Re-exported from GlobalChat module
 export {
-	handleNewGlobalChatMessages,
-	fetchGlobalChats,
-	resetGlobalChats,
-	fetchInitialGlobalChats,
-	sendGlobalChat
+	fetchGlobalChats, fetchInitialGlobalChats, handleNewGlobalChatMessages, resetGlobalChats, sendGlobalChat
 } from './GlobalChat';
 
 // var callLogOnlineStatusPulse = function callLogOnlineStatusPulse() {
@@ -6032,22 +6009,8 @@ export function getLoadingModalElement() {
 
 /* Tournament functions - Re-exported from TournamentManager module */
 export {
-	showPastTournamentsClicked,
-	viewTournamentsClicked,
-	signUpForTournament,
-	viewTournamentInfo,
-	submitCreateTournament,
-	createNewTournamentClicked,
-	createNewRound,
-	changeTournamentPlayerStatus,
-	roundClicked,
-	playerNameClicked,
-	createNewTournamentMatch,
-	matchGameClicked,
-	changeTournamentStatus,
-	manageTournamentClicked,
-	manageTournamentsClicked,
-	submitTournamentSignup
+	changeTournamentPlayerStatus, changeTournamentStatus, createNewRound, createNewTournamentClicked, createNewTournamentMatch, manageTournamentClicked,
+	manageTournamentsClicked, matchGameClicked, playerNameClicked, roundClicked, showPastTournamentsClicked, signUpForTournament, submitCreateTournament, submitTournamentSignup, viewTournamentInfo, viewTournamentsClicked
 } from './TournamentManager';
 
 /* Game Rankings - Re-exported from GameRankings module */
@@ -6182,20 +6145,16 @@ export function setGameLogText(text) {
 /* Notifications - delegated to Notifications module */
 // Re-exported from Notifications module
 export {
-	requestNotificationPermission,
 	notifyMe,
-	notifyThisMessage
+	notifyThisMessage, requestNotificationPermission
 } from './Notifications';
 
 // Re-exported from WebPush module
 export {
-	isPushSupported,
+	disableChatNotifications, enableChatNotifications, isChatNotificationsEnabled, isPushSupported,
 	isWebPushEnabled,
 	subscribeToPush,
-	unsubscribeFromPush,
-	isChatNotificationsEnabled,
-	enableChatNotifications,
-	disableChatNotifications
+	unsubscribeFromPush
 } from './WebPush';
 
 /* Keyboard shortcuts */
@@ -6252,23 +6211,8 @@ export function clearGameChats() {
 
 // Re-export preference functions from UserPreferences module
 export {
-	toggleSoundOn,
-	toggleAnimationsOn,
-	isAnimationsOn,
-	isTimestampsOn,
-	toggleTimestamps,
-	isMoveLogDisplayOn,
-	toggleMoveLogDisplay,
-	isMoveConfirmationRequired,
-	toggleConfirmMovePreference,
-	showConfirmMoveButton,
-	hideConfirmMoveButton,
-	confirmMoveClicked,
-	setBackgroundColor,
-	setCustomBgColorFromInput,
-	showPreferences,
-	getBooleanPreference,
-	toggleBooleanPreference
+	confirmMoveClicked, getBooleanPreference, hideConfirmMoveButton, isAnimationsOn, isMoveConfirmationRequired, isMoveLogDisplayOn, isTimestampsOn, setBackgroundColor,
+	setCustomBgColorFromInput, showConfirmMoveButton, showPreferences, toggleAnimationsOn, toggleBooleanPreference, toggleConfirmMovePreference, toggleMoveLogDisplay, toggleSoundOn, toggleTimestamps
 } from './UserPreferences';
 
 // Re-export game stats functions from GameStats module
