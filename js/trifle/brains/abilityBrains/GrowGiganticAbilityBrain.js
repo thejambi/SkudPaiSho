@@ -22,15 +22,15 @@ TrifleGrowGiganticAbilityBrain.prototype.activateAbility = function() {
 		targetTilePoints.forEach(function(targetTilePoint) {
 			if (targetTilePoint === self.abilityObject.sourceTile.seatedPoint) {
 				var occupiedPoints = self.board.getGrowGiantOccupiedPoints(targetTilePoint);
-				occupiedPoints.forEach(function(occupyPoint) {
-					occupyPoint.putTile(self.abilityObject.sourceTile);
-					occupyPoint.occupiedByAbility = true;
-					occupyPoint.pointOccupiedBy = self.abilityObject.sourceTilePoint;
-					// occupyPoint.isGigantic = true;
-				});
+				if (occupiedPoints && occupiedPoints.length > 0) {
+					occupiedPoints.forEach(function(occupyPoint) {
+						occupyPoint.putTile(self.abilityObject.sourceTile);
+						occupyPoint.occupiedByAbility = true;
+						occupyPoint.pointOccupiedBy = self.abilityObject.sourceTilePoint;
+					});
 
-				self.abilityObject.sourceTilePoint.otherPointsOccupied = occupiedPoints;
-				// self.abilityObject.sourceTilePoint.isGigantic = true;
+					self.abilityObject.sourceTilePoint.otherPointsOccupied = occupiedPoints;
+				}
 			}
 		});
 	}

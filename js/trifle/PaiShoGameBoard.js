@@ -451,8 +451,6 @@ export class PaiShoGameBoard {
 
 	getGrowGiantOccupiedPoints(boardPointToGrowGigantic) {
 		/* Gigantic points to occupy - to grow to 2x2 size */
-		var tileToGrow = boardPointToGrowGigantic.tile;
-
 		var row = boardPointToGrowGigantic.row;
 		var col = boardPointToGrowGigantic.col;
 
