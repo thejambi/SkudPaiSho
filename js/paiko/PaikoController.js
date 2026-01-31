@@ -291,7 +291,8 @@ export class PaikoController {
 	}
 
 	resetMove() {
-		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.BRAND_NEW) {
+		if (this.moveBuilder.getStatus() === PaikoBuilderStatus.BRAND_NEW
+			|| this.moveBuilder.getStatus() === PaikoBuilderStatus.SELECTING_CAPTURE_REWARD) {
 			this.gameNotation.removeLastMove();
 		}
 		rerunAll();
