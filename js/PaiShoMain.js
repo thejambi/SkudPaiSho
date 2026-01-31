@@ -524,6 +524,15 @@ window.requestAnimationFrame(function() {
 	// Initialize service worker for push notifications
 	initWebPush();
 
+	// Listen for messages from service worker (e.g., notification clicks)
+	if ('serviceWorker' in navigator) {
+		navigator.serviceWorker.addEventListener('message', (event) => {
+			if (event.data?.type === 'NAVIGATE_TO_GAME' && event.data?.gameId) {
+				jumpToGameIfPlayerIsInGame(event.data.gameId);
+			}
+		});
+	}
+
 	/* Online play is enabled! */
 	onlinePlayEnabled = true;
 	/* ----------------------- */

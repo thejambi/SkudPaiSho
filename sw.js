@@ -114,12 +114,15 @@ self.addEventListener('notificationclick', (event) => {
                 // Try to find an existing window
                 for (const client of clientList) {
                     if (client.url.includes(self.location.origin) && 'focus' in client) {
-                        // If we have a gameId, navigate to it (this will reload the page)
-                        if (event.notification.data?.gameId) {
-                            return client.navigate(urlToOpen);
-                        }
-                        // Otherwise just focus the existing window
-                        return client.focus();
+                        return client.focus().then(() => {
+                            // Send message to app to navigate to the game
+                            if (event.notification.data?.gameId) {
+                                client.postMessage({
+                                    type: 'NAVIGATE_TO_GAME',
+                                    gameId: event.notification.data.gameId
+                                });
+                            }
+                        });
                     }
                 }
                 // No existing window, open a new one
