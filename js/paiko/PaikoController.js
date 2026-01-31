@@ -407,7 +407,16 @@ export class PaikoController {
 			gridDiv.style.gap = '4px';
 			gridDiv.style.justifyContent = 'start';
 			gridDiv.style.textAlign = 'center';
-			gridDiv.style.marginLeft = '20px';
+			// gridDiv.style.marginLeft = '20px';	// Trying without margin
+			
+			gridDiv.style.border = '2px solid #28a745';
+			gridDiv.style.borderRadius = '4px';
+			gridDiv.style.padding = '8px';
+			gridDiv.style.marginBottom = '8px';
+			gridDiv.style.paddingTop = '8px';
+			gridDiv.style.paddingBottom = '8px';
+			gridDiv.style.fontWeight = 'bold';
+			gridDiv.style.maxWidth = '165px';
 
 			const self = this;
 			const createButton = (name, facing) => {
