@@ -203,6 +203,11 @@ export async function initWebPush() {
         return;
     }
 
+    // Clear app badge when app opens (Android PWA)
+    if (navigator.clearAppBadge) {
+        navigator.clearAppBadge();
+    }
+
     await registerServiceWorker();
 }
 

@@ -41,7 +41,7 @@ self.addEventListener('push', (event) => {
         vibrate: [100, 50, 100],
         data: {
             gameId: data.gameId,
-            url: data.gameId ? `/?game=${data.gameId}` : '/'
+            url: data.gameId ? `/?gameInApp=${data.gameId}` : '/'
         },
         actions: [
             { action: 'open', title: 'Open Game' },
@@ -63,6 +63,10 @@ self.addEventListener('push', (event) => {
                     );
 
                     if (!appIsFocused) {
+                        // Set app badge for Android PWA
+                        if (navigator.setAppBadge) {
+                            navigator.setAppBadge();
+                        }
                         return self.registration.showNotification(data.title, options);
                     }
                 })
@@ -77,6 +81,10 @@ self.addEventListener('push', (event) => {
                     );
 
                     if (!appIsFocused) {
+                        // Set app badge for Android PWA
+                        if (navigator.setAppBadge) {
+                            navigator.setAppBadge();
+                        }
                         return self.registration.showNotification(data.title, options);
                     }
                 })
@@ -88,6 +96,11 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
 
+    // Clear app badge for Android PWA
+    if (navigator.clearAppBadge) {
+        navigator.clearAppBadge();
+    }
+
     // If user clicked dismiss, do nothing
     if (event.action === 'dismiss') {
         return;
@@ -98,15 +111,15 @@ self.addEventListener('notificationclick', (event) => {
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true })
             .then((clientList) => {
-                // Try to find an existing window and focus it
+                // Try to find an existing window
                 for (const client of clientList) {
                     if (client.url.includes(self.location.origin) && 'focus' in client) {
-                        return client.focus().then(() => {
-                            // Navigate to the game if gameId provided
-                            if (event.notification.data?.gameId) {
-                                return client.navigate(urlToOpen);
-                            }
-                        });
+                        // If we have a gameId, navigate to it (this will reload the page)
+                        if (event.notification.data?.gameId) {
+                            return client.navigate(urlToOpen);
+                        }
+                        // Otherwise just focus the existing window
+                        return client.focus();
                     }
                 }
                 // No existing window, open a new one

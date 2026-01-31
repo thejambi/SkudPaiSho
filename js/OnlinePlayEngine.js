@@ -734,4 +734,20 @@ export class OnlinePlayEngine {
 			}
 		);
 	}
+	checkIfUserIsGameParticipant(gameId, loginToken, callback) {
+		$.post("backend/userIsGameParticipant.php",
+			{
+				gameId: gameId,
+				userId: loginToken.userId,
+				username: loginToken.username,
+				userEmail: loginToken.userEmail,
+				deviceId: loginToken.deviceId
+			},
+			function(data, status) {
+				if (status === 'success') {
+					callback(data.trim());
+				}
+			}
+		);
+	}
 }

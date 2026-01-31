@@ -117,7 +117,7 @@ export const QueryString = (() => {
 	// Short link params (sl=) are not compressed, so skip decompression for them
 	const isShortLink = query.startsWith("sl=");
 
-	if (query.length > 0 && !(query.includes("appType=")) && !isShortLink) {
+	if (query.length > 0 && !(query.includes("appType=") || query.includes("gameInApp=")) && !isShortLink) {
 		// Decompress first
 		query = decompressFromEncodedURIComponent(query);
 	}
@@ -521,6 +521,9 @@ window.requestAnimationFrame(function() {
 	setupUiEvents();
 	setupHtmlEventHandlers();
 
+	// Initialize service worker for push notifications
+	initWebPush();
+
 	/* Online play is enabled! */
 	onlinePlayEnabled = true;
 	/* ----------------------- */
@@ -708,6 +711,10 @@ window.requestAnimationFrame(function() {
 	}
 	if (QueryString.watchGame) {
 		jumpToGame(QueryString.watchGame);
+	}
+
+	if (QueryString.gameInApp) {	/* `gameInApp` for game id to open from app notification */
+		jumpToGameIfPlayerIsInGame(QueryString.gameInApp);
 	}
 
 	/* If a link to a private game, jump to the game. */
@@ -3402,6 +3409,19 @@ export function jumpToGame(gameIdChosen) {
 	}
 }
 
+function jumpToGameIfPlayerIsInGame(gameId) {
+	if (!onlinePlayEnabled) {
+		return;
+	}
+	if (userIsLoggedIn()) {
+		onlinePlayEngine.checkIfUserIsGameParticipant(gameId, getLoginToken(), (results) => {
+			if (results && results.trim() === 'yes') {
+				jumpToGame(gameId);
+			}
+		});
+	}
+}
+
 export function populateMyGamesList(results) {
 	const resultRows = results.split('\n');
 	myGamesList = [];
@@ -4024,7 +4044,6 @@ export function accountHeaderClicked() {
 		loginClicked();
 	}
 	requestNotificationPermission();
-	initWebPush();
 }
 
 export function loginClicked() {
