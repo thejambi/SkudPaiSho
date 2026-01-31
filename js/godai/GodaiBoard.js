@@ -297,7 +297,7 @@ export class GodaiBoard {
             GodaiBoardPoint.neutralRedWhite(),
             GodaiBoardPoint.neutralRedWhite(),
             GodaiBoardPoint.neutralRedWhite(),
-            GodaiBoardPoint.eastern(GodaiBoardPoint.mountainEntranceWithRiverDL()),
+            GodaiBoardPoint.eastern(GodaiBoardPoint.riverDownLeft()),
             GodaiBoardPoint.greenGate(),
         ])
 

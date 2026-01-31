@@ -10,6 +10,7 @@ import { GodaiGameNotation, GodaiNotationBuilder } from "./GodaiNotation.js";
 import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WHITE_GATE, GodaiBoardPoint, YELLOW_GATE, RIVER_MOUTH } from "./GodaiBoardPoint.js";
 import { GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD, GodaiTile } from "./GodaiTile.js";
 import { RED, WHITE } from "../skud-pai-sho/SkudPaiShoTile.js";
+import { gameOptionEnabled, GODAI_BOARD_ZONES } from "../GameOptions.js";
 
 export var GodaiPreferences = {
     tileDesignKey: "TileDesigns",
@@ -305,50 +306,58 @@ export class GodaiController {
             messageInfo.message.push(...tileInfo.message)
         }
 
-        // Add point data
-        if (boardPoint.isType(RED) && boardPoint.isType(WHITE)) {
-            messageInfo.heading = "Red/White Point"
-            messageInfo.message.push(this._getNeutralPointMessage())
-        }
-        else if (boardPoint.isType(RED)) {
-            messageInfo.heading = "Red Point"
-            messageInfo.message.push(this._getNeutralPointMessage())
-        }
-        else if (boardPoint.isType(WHITE)) {
-            messageInfo.heading = "White Point"
-            messageInfo.message.push(this._getNeutralPointMessage())
-        }
-        else if (boardPoint.isType(NEUTRAL)) {
-            messageInfo.heading = "Neutral Point"
-            messageInfo.message.push(this._getNeutralPointMessage())
-        }
-
         if (boardPoint.isType(GATE)) {
             let info = this._getGateMessage(boardPoint)
             messageInfo.heading = info.header
             messageInfo.message.push(info.message)
+
+            return messageInfo
         }
 
-        if (boardPoint.isType(MOUNTAIN_ENTRANCE)) {
-            messageInfo.heading = "Mountain Entry Point"
-            messageInfo.message.push(this._getMountainEntranceMessage())
+        // Apply the board zone descriptions only when the option is enabled
+        if (gameOptionEnabled(GODAI_BOARD_ZONES)) {
+            if (boardPoint.isType(MOUNTAIN_ENTRANCE)) {
+                messageInfo.heading = "Mountain Entry Point"
+                messageInfo.message.push(this._getMountainEntranceMessage())
+            }
+            
+            if (boardPoint.isType(RIVER_MOUTH)) {
+                messageInfo.heading = "River Mouth/Mountain Entry Point"
+                messageInfo.message.push(this._getRiverMouthMessage())
+            }
+            else if (boardPoint.isType(MOUNTAIN_ENTRANCE) && boardPoint.isType(RIVER_TILE)) {
+                
+            }
+            else if (boardPoint.isType(RIVER_TILE)) {
+                messageInfo.heading = "River Space"
+                messageInfo.message.push(this._getRiverMessage(boardPoint))
+            }
+            else if (boardPoint.isType(MOUNTAIN_TILE)) {
+                messageInfo.heading = "Mountain Point"
+                messageInfo.message.push(this._getMountainMessage())
+            }
+        
+            if (boardPoint.isType(MOUNTAIN_ENTRANCE) && boardPoint.isType(RIVER_TILE) && !boardPoint.isType(RIVER_MOUTH)) {
+                messageInfo.heading = "River Space/Mountain Entry Point"
+            }
         }
 
-        if (boardPoint.isType(RIVER_MOUTH)) {
-            messageInfo.heading = "River Mouth/Mountain Entry Point"
-            messageInfo.message.push(...this._getRiverMouthMessage())
+        // Add point data to neutral spaces
+        if (boardPoint.isType(RED) && boardPoint.isType(WHITE)) {
+            messageInfo.heading = "Red/White Point"
+            // messageInfo.message.push(this._getNeutralPointMessage())
         }
-        else if (boardPoint.isType(RIVER_TILE)) {
-            messageInfo.heading = "River Space"
-            messageInfo.message.push(...this._getRiverMessage(boardPoint))
+        else if (boardPoint.isType(RED)) {
+            messageInfo.heading = "Red Point"
+            // messageInfo.message.push(this._getNeutralPointMessage())
         }
-        else if (boardPoint.isType(MOUNTAIN_TILE)) {
-            messageInfo.heading = "Mountain Point"
-            messageInfo.message.push(...this._getMountainMessage())
+        else if (boardPoint.isType(WHITE)) {
+            messageInfo.heading = "White Point"
+            // messageInfo.message.push(this._getNeutralPointMessage())
         }
-
-        if (boardPoint.isType(MOUNTAIN_ENTRANCE) && boardPoint.isType(RIVER_TILE)) {
-            messageInfo.heading = "River Space/Mountain Entry Point"
+        else if (boardPoint.isType(NEUTRAL) || ( !boardPoint.isType(NEUTRAL) && !gameOptionEnabled(GODAI_BOARD_ZONES) ) ) {
+            messageInfo.heading = "Neutral Point"
+            // messageInfo.message.push(this._getNeutralPointMessage())
         }
 
         return messageInfo
@@ -391,13 +400,16 @@ export class GodaiController {
 
     _getMountainMessage() {
         let msg = []
-        msg.push("<li>Tiles can only enter Mountains through the Mountain Entry Points</li>")
-        msg.push("<li>If tiles wish to move off the Mountains not through the Mountain Entry Points, they have to spend a turn moving onto the River point first, after which they are off the Mountains</li>")
-        return msg
+        msg.push("Tiles can only enter Mountains through the Mountain Entry Points")
+        msg.push("If tiles wish to move off the Mountains not through the Mountain Entry Points, they have to spend a turn moving onto the River point first, after which they are off the Mountains")
+        return "Mountain: " + toBullets(msg).outerHTML
     }
 
     _getMountainEntranceMessage() {
-        return "The point through which tiles can enter Mountains, either from on gates or not"
+        let bullets = toBullets([
+            "The point through which tiles can enter Mountains, either from on gates or not"
+        ])
+        return "Mountain Entry Point: " + bullets.outerHTML
     }
 
     /**
@@ -421,7 +433,7 @@ export class GodaiController {
         if (point.isType(RIVER_DR_TILE)) {
             msg.push("This river space moves tiles to the <b>South-East</b>")
         }
-        return msg
+        return "River Space: " + toBullets(msg).outerHTML
     }
 
     _getRiverMouthMessage() {
@@ -431,8 +443,8 @@ export class GodaiController {
         msg.push("Earth tiles located in rivers will not be moved. Instead, they block the stream of river tiles downstream")
         msg.push("Tiles are not moved by rivers on the turn they enter")
         msg.push("Tiles on this point are at the end of the River and cannot flow down any more")
-        msg.push("If two tiles simultaneously reach this point, then both tiles drown, resulting in both tiles getting captured regardless of the capture cycle. This is called 'The River Crash'")
-        return msg
+        msg.push("If two tiles simultaneously reach this point, then both tiles drown, resulting in both tiles getting captured regardless of the capture cycle. This is called <b>'The River Crash'</b>")
+        return "River Mouth: " + toBullets(msg).outerHTML
     }
 
     /**
