@@ -389,6 +389,8 @@ export const customBgColorKey = "customBgColorKey";
 
 export const markGameInactiveWithoutDialogKey = "markGameInactiveWithoutDialogKey";
 
+export const favoriteGameTypesKey = "favoriteGameTypesKey";
+
 let url;
 
 let defaultHelpMessageText;
@@ -484,6 +486,51 @@ export const confirmMoveKey = "confirmMove";
 export const createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 
 // var sendJoinGameChatMessage = false;
+/* --- */
+
+/* Favorite Game Types Functions */
+export function getFavoriteGameTypeIds() {
+	return JSON.parse(localStorage.getItem(favoriteGameTypesKey)) || [];
+}
+
+export function isGameTypeFavorite(gameTypeId) {
+	const favorites = getFavoriteGameTypeIds();
+	return favorites.includes(gameTypeId);
+}
+
+export function toggleFavoriteGameType(gameTypeId) {
+	let favorites = getFavoriteGameTypeIds();
+	const index = favorites.indexOf(gameTypeId);
+	if (index > -1) {
+		favorites.splice(index, 1);
+	} else {
+		favorites.push(gameTypeId);
+	}
+	localStorage.setItem(favoriteGameTypesKey, JSON.stringify(favorites));
+	return favorites.includes(gameTypeId);
+}
+
+export function sortGameTypesWithFavoritesFirst(gameTypeKeys) {
+	const favorites = getFavoriteGameTypeIds();
+	return [...gameTypeKeys].sort((a, b) => {
+		const aIsFavorite = favorites.includes(GameType[a].id);
+		const bIsFavorite = favorites.includes(GameType[b].id);
+		if (aIsFavorite && !bIsFavorite) return -1;
+		if (!aIsFavorite && bIsFavorite) return 1;
+		return 0;
+	});
+}
+
+export function sortGameListWithFavoritesFirst(gameList) {
+	const favorites = getFavoriteGameTypeIds();
+	return [...gameList].sort((a, b) => {
+		const aIsFavorite = favorites.includes(a.gameTypeId);
+		const bIsFavorite = favorites.includes(b.gameTypeId);
+		if (aIsFavorite && !bIsFavorite) return -1;
+		if (!aIsFavorite && bIsFavorite) return 1;
+		return 0;
+	});
+}
 /* --- */
 
 window.requestAnimationFrame(function() {
@@ -3774,6 +3821,9 @@ const showMyGamesCallback = (results) => {
 	} else {
 		populateMyGamesList(results);
 
+		// Sort with favorites first
+		myGamesList = sortGameListWithFavoritesFirst(myGamesList);
+
 		if (localStorage.getItem("data-theme") == "stotes") {
 			// Build table for stotes theme
 			const table = document.createElement('table');
@@ -3857,6 +3907,14 @@ const showMyGamesCallback = (results) => {
 					const headingText = document.createElement('span');
 					headingText.textContent = gameTypeHeading;
 					headingDiv.appendChild(headingText);
+
+					// Add favorite star indicator to heading
+					if (gameTypeEntry && isGameTypeFavorite(gameTypeEntry.id)) {
+						const starIndicator = document.createElement('span');
+						starIndicator.className = 'favoriteStar';
+						starIndicator.innerHTML = "<i class='fa-solid fa-star' aria-hidden='true'></i>";
+						headingDiv.appendChild(starIndicator);
+					}
 
 					currentSection.appendChild(headingDiv);
 					container.appendChild(currentSection);
@@ -4125,6 +4183,10 @@ const getGameSeeksCallback = (results) => {
 			}
 			gameSeekList.push(gameSeek);
 		}
+
+		// Sort with favorites first
+		gameSeekList = sortGameListWithFavoritesFirst(gameSeekList);
+
 		let gameTypeHeading = "";
 
 		if (localStorage.getItem("data-theme") == "stotes") {
@@ -4248,6 +4310,14 @@ const getGameSeeksCallback = (results) => {
 						const headingText = document.createElement('span');
 						headingText.textContent = gameTypeHeading;
 						headingDiv.appendChild(headingText);
+
+						// Add favorite star indicator to heading
+						if (isGameTypeFavorite(gameTypeEntry.id)) {
+							const starIndicator = document.createElement('span');
+							starIndicator.className = 'favoriteStar';
+							starIndicator.innerHTML = "<i class='fa-solid fa-star' aria-hidden='true'></i>";
+							headingDiv.appendChild(starIndicator);
+						}
 
 						currentSection.appendChild(headingDiv);
 						container.appendChild(currentSection);
@@ -4737,6 +4807,32 @@ function getNewGameEntryForGameType(gameType) {
 
 			newGameElem.appendChild(hiddenDiv);
 
+			// Create favorite star toggle for stotes theme
+			const starButtonStotes = document.createElement('span');
+			starButtonStotes.className = 'favoriteToggle';
+			starButtonStotes.style.position = 'absolute';
+			starButtonStotes.style.top = '5px';
+			starButtonStotes.style.right = '5px';
+			const isFavoriteStotes = isGameTypeFavorite(gameType.id);
+			starButtonStotes.innerHTML = isFavoriteStotes
+				? "<i class='fa-solid fa-star' aria-hidden='true'></i>"
+				: "<i class='fa-regular fa-star' aria-hidden='true'></i>";
+			if (isFavoriteStotes) {
+				starButtonStotes.classList.add('favorited');
+			}
+			starButtonStotes.title = isFavoriteStotes ? 'Remove from favorites' : 'Add to favorites';
+			starButtonStotes.onclick = function(e) {
+				e.stopPropagation();
+				const nowFavorite = toggleFavoriteGameType(gameType.id);
+				this.innerHTML = nowFavorite
+					? "<i class='fa-solid fa-star' aria-hidden='true'></i>"
+					: "<i class='fa-regular fa-star' aria-hidden='true'></i>";
+				this.classList.toggle('favorited', nowFavorite);
+				this.title = nowFavorite ? 'Remove from favorites' : 'Add to favorites';
+			};
+			newGameElem.style.position = 'relative';
+			newGameElem.appendChild(starButtonStotes);
+
 			return newGameElem;
 		} else {
 			// Create the card div element
@@ -4778,8 +4874,30 @@ function getNewGameEntryForGameType(gameType) {
 				e.stopPropagation();
 			};
 
-			// Append text and rules to content
+			// Create favorite star toggle
+			const starButton = document.createElement('span');
+			starButton.className = 'favoriteToggle';
+			const isFavorite = isGameTypeFavorite(gameType.id);
+			starButton.innerHTML = isFavorite
+				? "<i class='fa-solid fa-star' aria-hidden='true'></i>"
+				: "<i class='fa-regular fa-star' aria-hidden='true'></i>";
+			if (isFavorite) {
+				starButton.classList.add('favorited');
+			}
+			starButton.title = isFavorite ? 'Remove from favorites' : 'Add to favorites';
+			starButton.onclick = function(e) {
+				e.stopPropagation();
+				const nowFavorite = toggleFavoriteGameType(gameType.id);
+				this.innerHTML = nowFavorite
+					? "<i class='fa-solid fa-star' aria-hidden='true'></i>"
+					: "<i class='fa-regular fa-star' aria-hidden='true'></i>";
+				this.classList.toggle('favorited', nowFavorite);
+				this.title = nowFavorite ? 'Remove from favorites' : 'Add to favorites';
+			};
+
+			// Append text, star, and rules to content
 			contentDiv.appendChild(spanClickableText);
+			contentDiv.appendChild(starButton);
 			contentDiv.appendChild(anchorRules);
 
 			// Append thumbnail and content to card
@@ -4802,7 +4920,10 @@ export function newGameClicked() {
 	const messageElem = document.createElement('div');
 	messageElem.className = 'gameDivContainer';
 
-	Object.keys(GameType).forEach((key, index) => {
+	// Sort game types with favorites first
+	const sortedKeys = sortGameTypesWithFavoritesFirst(Object.keys(GameType));
+
+	sortedKeys.forEach((key, index) => {
 		const newGameEntryElem = getNewGameEntryForGameType(GameType[key]);
 		messageElem.appendChild(newGameEntryElem);
 	});
