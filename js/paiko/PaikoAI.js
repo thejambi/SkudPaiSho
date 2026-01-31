@@ -107,49 +107,40 @@ export class PaikoAI {
 			return null;
 		}
 
-		// Priority order for tile selection - balanced for opening
-		const tilePriority = [
-			PaikoTileCode.EARTH,    // Provides cover - good for defense
-			PaikoTileCode.BOW,      // Long range threat
-			PaikoTileCode.SWORD,    // Good threat pattern
-			PaikoTileCode.SAI,      // Versatile with shift after deploy
-			PaikoTileCode.WATER,    // Can redeploy
-			PaikoTileCode.AIR,      // Mobile
-			PaikoTileCode.FIRE,     // Threatens all but self-threatened
-			PaikoTileCode.LOTUS     // Deploy anywhere but no points
-		];
+		// Weights for tile selection - higher = more likely to be picked
+		const tileWeights = {
+			[PaikoTileCode.EARTH]: 10,   // Provides cover - very useful
+			[PaikoTileCode.BOW]: 9,      // Long range threat
+			[PaikoTileCode.SWORD]: 8,    // Good threat pattern
+			[PaikoTileCode.SAI]: 8,      // Versatile with shift after deploy
+			[PaikoTileCode.WATER]: 6,    // Can redeploy
+			[PaikoTileCode.AIR]: 5,      // Mobile
+			[PaikoTileCode.FIRE]: 4,     // Threatens all but self-threatened
+			[PaikoTileCode.LOTUS]: 2     // Deploy anywhere but no points
+		};
 
-		// Select tiles strategically up to target count
+		// Select tiles using weighted random selection
 		const selectedTiles = [];
 		const selectedCounts = {};
 
-		// First pass: select up to 2 of each type from priority list
-		for (const code of tilePriority) {
-			if (selectedTiles.length >= targetCount) break;
-
-			// Get actual count available in reserve
-			const availableCount = gameManager.tileManager.getReserveTileCount(this.player, code);
-			const alreadySelected = selectedCounts[code] || 0;
-
-			// Select up to 2 of each type
-			while (selectedTiles.length < targetCount &&
-				   alreadySelected < 2 &&
-				   (selectedCounts[code] || 0) < availableCount) {
-				selectedTiles.push(code);
-				selectedCounts[code] = (selectedCounts[code] || 0) + 1;
-			}
+		// First pass: select up to 2 of each type using weighted random
+		while (selectedTiles.length < targetCount) {
+			const tile = this.selectWeightedRandomTile(
+				gameManager, availableTileTypes, tileWeights, selectedCounts, 2
+			);
+			if (!tile) break; // No more tiles available within limits
+			selectedTiles.push(tile);
+			selectedCounts[tile] = (selectedCounts[tile] || 0) + 1;
 		}
 
-		// Second pass: fill remaining slots if needed (allow 3rd copy)
-		for (const code of tilePriority) {
-			if (selectedTiles.length >= targetCount) break;
-
-			const availableCount = gameManager.tileManager.getReserveTileCount(this.player, code);
-			while (selectedTiles.length < targetCount &&
-				   (selectedCounts[code] || 0) < availableCount) {
-				selectedTiles.push(code);
-				selectedCounts[code] = (selectedCounts[code] || 0) + 1;
-			}
+		// Second pass: if we still need more, allow 3rd copies
+		while (selectedTiles.length < targetCount) {
+			const tile = this.selectWeightedRandomTile(
+				gameManager, availableTileTypes, tileWeights, selectedCounts, 3
+			);
+			if (!tile) break; // No more tiles available
+			selectedTiles.push(tile);
+			selectedCounts[tile] = (selectedCounts[tile] || 0) + 1;
 		}
 
 		if (selectedTiles.length === 0) {
@@ -162,6 +153,41 @@ export class PaikoAI {
 			player: this.player,
 			moveData: { selectedTiles: selectedTiles }
 		};
+	}
+
+	// Select a tile using weighted random selection
+	selectWeightedRandomTile(gameManager, availableTypes, weights, selectedCounts, maxPerType) {
+		// Build list of eligible tiles with their weights
+		const eligible = [];
+		let totalWeight = 0;
+
+		for (const code of availableTypes) {
+			const alreadySelected = selectedCounts[code] || 0;
+			const availableInReserve = gameManager.tileManager.getReserveTileCount(this.player, code);
+
+			// Check if we can still select this tile type
+			if (alreadySelected < maxPerType && alreadySelected < availableInReserve) {
+				const weight = weights[code] || 1;
+				eligible.push({ code, weight });
+				totalWeight += weight;
+			}
+		}
+
+		if (eligible.length === 0 || totalWeight === 0) {
+			return null;
+		}
+
+		// Weighted random selection
+		let random = Math.random() * totalWeight;
+		for (const { code, weight } of eligible) {
+			random -= weight;
+			if (random <= 0) {
+				return code;
+			}
+		}
+
+		// Fallback (shouldn't happen)
+		return eligible[eligible.length - 1].code;
 	}
 
 	// ============ PLAYING PHASE ============
