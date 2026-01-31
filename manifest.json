@@ -2,9 +2,12 @@
   "name": "The Garden Gate",
   "short_name": "The Garden Gate",
   "description": "The home of Pai Sho - play online against friends",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "categories": ["games", "entertainment"],
   "background_color": "#1a1a1a",
   "theme_color": "#4a7c59",
   "orientation": "any",
@@ -38,7 +41,7 @@
       "src": "/android-icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
