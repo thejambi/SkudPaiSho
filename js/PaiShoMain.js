@@ -4816,7 +4816,7 @@ function getNewGameEntryForGameType(gameType) {
 			const isFavoriteStotes = isGameTypeFavorite(gameType.id);
 			starButtonStotes.innerHTML = isFavoriteStotes
 				? "<i class='fa-solid fa-star' aria-hidden='true'></i>"
-				: "<i class='fa-regular fa-star' aria-hidden='true'></i>";
+				: "<i class='fa-solid fa-star' aria-hidden='true'></i>";
 			if (isFavoriteStotes) {
 				starButtonStotes.classList.add('favorited');
 			}
@@ -4826,7 +4826,7 @@ function getNewGameEntryForGameType(gameType) {
 				const nowFavorite = toggleFavoriteGameType(gameType.id);
 				this.innerHTML = nowFavorite
 					? "<i class='fa-solid fa-star' aria-hidden='true'></i>"
-					: "<i class='fa-regular fa-star' aria-hidden='true'></i>";
+					: "<i class='fa-solid fa-star' aria-hidden='true'></i>";
 				this.classList.toggle('favorited', nowFavorite);
 				this.title = nowFavorite ? 'Remove from favorites' : 'Add to favorites';
 			};
@@ -4880,7 +4880,7 @@ function getNewGameEntryForGameType(gameType) {
 			const isFavorite = isGameTypeFavorite(gameType.id);
 			starButton.innerHTML = isFavorite
 				? "<i class='fa-solid fa-star' aria-hidden='true'></i>"
-				: "<i class='fa-regular fa-star' aria-hidden='true'></i>";
+				: "<i class='fa-solid fa-star' aria-hidden='true'></i>";
 			if (isFavorite) {
 				starButton.classList.add('favorited');
 			}
@@ -4890,7 +4890,7 @@ function getNewGameEntryForGameType(gameType) {
 				const nowFavorite = toggleFavoriteGameType(gameType.id);
 				this.innerHTML = nowFavorite
 					? "<i class='fa-solid fa-star' aria-hidden='true'></i>"
-					: "<i class='fa-regular fa-star' aria-hidden='true'></i>";
+					: "<i class='fa-solid fa-star' aria-hidden='true'></i>";
 				this.classList.toggle('favorited', nowFavorite);
 				this.title = nowFavorite ? 'Remove from favorites' : 'Add to favorites';
 			};
