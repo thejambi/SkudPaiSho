@@ -768,7 +768,10 @@ export class PaikoController {
 		this.moveBuilder.setTileCode(tileCode);
 		this.moveBuilder.setPlayer(currentPlayer);
 
-		// Show possible deployment points
+		// Clear any existing point states (e.g., from previously selected tile)
+		this.theGame.board.clearAllPointStates();
+
+		// Show possible deployment points for the selected tile
 		const tempTile = new PaikoTile(tileCode, currentPlayer === HOST ? 'H' : 'G');
 		const deployPoints = this.theGame.board.getPossibleDeploymentPoints(currentPlayer, tempTile);
 		this.theGame.board.markPossibleDeploys(deployPoints);
