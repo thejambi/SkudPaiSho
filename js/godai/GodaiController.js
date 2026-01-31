@@ -9,6 +9,7 @@ import { GodaiGameManager } from "./GodaiGameManager.js";
 import { GodaiGameNotation, GodaiNotationBuilder } from "./GodaiNotation.js";
 import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WHITE_GATE, GodaiBoardPoint, YELLOW_GATE, RIVER_MOUTH } from "./GodaiBoardPoint.js";
 import { GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD, GodaiTile } from "./GodaiTile.js";
+import { RED, WHITE } from "../skud-pai-sho/SkudPaiShoTile.js";
 
 export var GodaiPreferences = {
     tileDesignKey: "TileDesigns",
@@ -306,7 +307,19 @@ export class GodaiController {
 
         // Add point data
         if (boardPoint.isType(NEUTRAL)) {
-            messageInfo.heading = "Neutral Space"
+            messageInfo.heading = "Neutral Point"
+            messageInfo.message.push(this._getNeutralPointMessage())
+        }
+        else if (boardPoint.isType(RED) && boardPoint.isType(WHITE)) {
+            messageInfo.heading = "Red/White Point"
+            messageInfo.message.push(this._getNeutralPointMessage())
+        }
+        else if (boardPoint.isType(RED)) {
+            messageInfo.heading = "Red Point"
+            messageInfo.message.push(this._getNeutralPointMessage())
+        }
+        else if (boardPoint.isType(WHITE)) {
+            messageInfo.heading = "White Point"
             messageInfo.message.push(this._getNeutralPointMessage())
         }
 
@@ -320,7 +333,7 @@ export class GodaiController {
             messageInfo.heading = "Mountain Entry Point"
             messageInfo.message.push(this._getMountainEntranceMessage())
         }
-        
+
         if (boardPoint.isType(RIVER_TILE)) {
             messageInfo.heading = "River Space"
             messageInfo.message.push(...this._getRiverMessage(boardPoint))
@@ -334,8 +347,6 @@ export class GodaiController {
             messageInfo.message.push(this._getMountainEntranceMessage())
             messageInfo.message.push(...this._getRiverMouthMessage())
         }
-
-        // TODO: Rename the neutral spaces to their Skud Pai Sho names
 
         return messageInfo
     }
@@ -479,57 +490,64 @@ export class GodaiController {
         let heading = ownerName + "'s " + GodaiTile.getTileName(tileCode) + ' Tile'
         switch (tileCode) {
             case GO_WOOD:
+                message.push("Basic Tile")
                 message.push("Deployed on East or Green Gate")
                 message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Earth Tiles")
-                message.push("If it's <b>Shēng</b> with Water it can move up to " + GodaiTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Fire it can move up to " + GodaiTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Metal it can move up to " + GodaiTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Wood it can move up to " + GodaiTile.wuMovement + " spaces")
+                message.push("Encounters a <b>Shēng</b> cycle when next to a Water tile; it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("Encounters a <b>Xiè</b> cycle when next to a Fire tile; it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("Encounters a <b>Kè</b> cycle when next to a Metal tile; it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("Encounters a <b>Wǔ</b> cycle when next to a Wood tile; it can move up to " + GodaiTile.wuMovement + " spaces")
                 break
             case GO_EARTH:
+                message.push("Basic Tile")
                 message.push("Deployed on Center or Yellow Gate")
                 message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Water Tiles")
-                message.push("If it's <b>Shēng</b> with Fire it can move up to " + GodaiTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Metal it can move up to " + GodaiTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Wood it can move up to " + GodaiTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Earth it can move up to " + GodaiTile.wuMovement + " spaces")
+                message.push("Encounters a <b>Shēng</b> cycle when next to a Fire tile; it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("Encounters a <b>Xiè</b> cycle when next to a Metal tile; it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("Encounters a <b>Kè</b> cycle when next to a Wood tile; it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("Encounters a <b>Wǔ</b> cycle when next to a Earth tile; it can move up to " + GodaiTile.wuMovement + " spaces")
+                message.push("Does not float on the River. 'Dams' the River, not allowing any tile downstream of it to continue flowing down the River")
                 break
             case GO_WATER:
+                message.push("Basic Tile")
                 message.push("Deployed on North or Black Gate")
                 message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Fire Tiles")
-                message.push("If it's <b>Shēng</b> with Metal it can move up to " + GodaiTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Wood it can move up to " + GodaiTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Earth it can move up to " + GodaiTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Water it can move up to " + GodaiTile.wuMovement + " spaces")
+                message.push("Encounters a <b>Shēng</b> when next to a Metal tile; it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("Encounters a <b>Xiè</b> when next to a Wood tile; it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("Encounters a <b>Kè</b> when next to a Earth tile; it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("Encounters a <b>Wǔ</b> when next to a Water tile; it can move up to " + GodaiTile.wuMovement + " spaces")
                 break
             case GO_FIRE:
+                message.push("Basic Tile")
                 message.push("Deployed on South or Red Gate")
                 message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Metal Tiles")
-                message.push("If it's <b>Shēng</b> with Wood it can move up to " + GodaiTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Earth it can move up to " + GodaiTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Water it can move up to " + GodaiTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Fire it can move up to " + GodaiTile.wuMovement + " spaces")
+                message.push("Encounters a <b>Shēng</b> when next to a Wood tile; it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("Encounters a <b>Xiè</b> when next to a Earth tile; it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("Encounters a <b>Kè</b> when next to a Water tile; it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("Encounters a <b>Wǔ</b> when next to a Fire tile; it can move up to " + GodaiTile.wuMovement + " spaces")
                 break
             case GO_METAL:
+                message.push("Basic Tile")
                 message.push("Deployed on West or White Gate")
                 message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Wood Tiles")
-                message.push("If it's <b>Shēng</b> with Earth it can move up to " + GodaiTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Water it can move up to " + GodaiTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Fire it can move up to " + GodaiTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Metal it can move up to " + GodaiTile.wuMovement + " spaces")
+                message.push("Encounters a <b>Shēng</b> when next to a Earth tile; it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("Encounters a <b>Xiè</b> when next to a Water tile; it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("Encounters a <b>Kè</b> when next to a Fire tile; it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("Encounters a <b>Wǔ</b> when next to a Metal tile; it can move up to " + GodaiTile.wuMovement + " spaces")
                 break
             case GO_EMPTY:
+                message.push("Special Tile")
                 message.push("Deployed on any Gate")
                 message.push("Moves up to " + GodaiTile.emptyTileMovement + " spaces")
                 message.push("Can capture and be captured by any tile")
-                message.push("Transforms into the first tile it captures")
-                message.push("When the Empty Tile is transformed, it acts as the tile it captured")
-                message.push("If it is captured before it transforms, it counts towards the objective as if it were any tile")
+                message.push("Not affected by any cycle")
+                message.push("When it captures a Basic Tile, it 'transforms' into that tile, after which it only does what that Tile does")
+                message.push("If captured before transformation, it acts as a substitute for any of the required tiles still needed for the opponent to win")
                 break
         }
 

@@ -1,4 +1,5 @@
 import { GATE, NEUTRAL } from "../skud-pai-sho/SkudPaiShoBoardPoint"
+import { RED, WHITE } from "../skud-pai-sho/SkudPaiShoTile"
 import { GodaiTile } from "./GodaiTile"
 
 export let BLACK_GATE = "Black Gate"
@@ -88,6 +89,28 @@ export class GodaiBoardPoint {
     static neutral() {
         let point = new GodaiBoardPoint()
         point.addType(NEUTRAL)
+        return point
+    }
+
+    static neutralRed() {
+        let point = new GodaiBoardPoint()
+        point.addType(NEUTRAL)
+        point.addType(RED)
+        return point
+    }
+
+    static neutralWhite() {
+        let point = new GodaiBoardPoint()
+        point.addType(NEUTRAL)
+        point.addType(WHITE)
+        return point
+    }
+
+    static neutralRedWhite() {
+        let point = new GodaiBoardPoint()
+        point.addType(NEUTRAL)
+        point.addType(RED)
+        point.addType(WHITE)
         return point
     }
 
