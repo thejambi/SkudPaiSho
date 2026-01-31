@@ -190,10 +190,14 @@ export function setupPaiShoBoard(gameContainer,
 	var boardContainer = createDivWithClass(ptContainerClass);
 	boardContainer.setAttribute("oncontextmenu", "return false;");
 
-	var bcontainer = createDivWithClass("board-container");
+	// Scale just the point container (not the whole board) so the board image
+	// stays full size while the interactive squares are zoomed in
 	if (overrideScale) {
-		bcontainer.style.scale = overrideScale;
+		boardContainer.style.scale = overrideScale;
+		boardContainer.classList.add("points-scaled");
 	}
+
+	var bcontainer = createDivWithClass("board-container");
 
 	var svgContainer = createDivWithClass("svgContainer");
 	var svgContainerContainer = createDivWithClass("svgContainerContainer");

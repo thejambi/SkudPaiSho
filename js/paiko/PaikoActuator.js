@@ -24,7 +24,7 @@ export class PaikoActuator {
 			false, // No board rotation
 			false, // No rotation type
 			true,   // Play in spaces (not on points)
-			"Paiko_new",
+			"Paiko_zoom",
 			"1.2"	// Paiko zooms in
 		);
 

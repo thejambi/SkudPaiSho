@@ -755,6 +755,12 @@ figure > div {
   opacity: 0.6;
 }
 
+/* Scaled points - used when a game has overrideScale (e.g., Paiko at 1.2x) */
+/* Only the point container is scaled, not the board image, so no overflow issues */
+.points-scaled {
+  transform-origin: center;
+}
+
 /* Paiko board zones */
 .paikoHostHomeground {
   /* background-color: rgba(200, 55, 55, 0.15); */
