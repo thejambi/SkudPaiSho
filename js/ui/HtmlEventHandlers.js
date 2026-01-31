@@ -79,7 +79,7 @@ export function setupHtmlEventHandlers() {
 	addEventToElementId('sendGlobalChatMessageButton', 'click', sendGlobalChat);
 
 	// Chat - Game chat
-	addEventToElementId('sendChatMessageButton', 'click', sendChat);
+	addEventToElementId('sendChatMessageButton', 'click', () => sendChat());
 
 	const gameChatTab = document.getElementById('gameChatTab');
 	if (gameChatTab) {
