@@ -267,7 +267,8 @@ export const GameType = {
 			'TheRealMomo',
 			'MrsSkud',
 			'markdwagner',
-			'The_IceL0rd'
+			'The_IceL0rd',
+			'GreenCompass'
 		],
 		noRankedGames: true
 	},
