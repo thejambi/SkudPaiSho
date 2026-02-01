@@ -190,21 +190,25 @@ export class BeyondTheMapsGameManager {
 	}
 
 	getWinReason() {
-		var msg;
-
-		if (this.endGameWinners.length > 0) {
-			if (this.endGameWinners.length === 1) {
-				msg = " discovered more land to win!";
-			} else if (this.endGameWinners.length > 1) {
-				msg = " discovered much land together!";
-			}
-			msg += "<br /><br />";
-			msg += "Host land: " + this.calculatePlayerScore(HOST);
-			msg += "<br />";
-			msg += "Guest land: " + this.calculatePlayerScore(GUEST);
+		if (this.endGameWinners.length === 0) {
+			return;
 		}
 
-		return msg;
+		var span = document.createElement("span");
+
+		if (this.endGameWinners.length === 1) {
+			span.appendChild(document.createTextNode(" discovered more land to win!"));
+		} else {
+			span.appendChild(document.createTextNode(" discovered much land together!"));
+		}
+
+		span.appendChild(document.createElement("br"));
+		span.appendChild(document.createElement("br"));
+		span.appendChild(document.createTextNode("Host land: " + this.calculatePlayerScore(HOST)));
+		span.appendChild(document.createElement("br"));
+		span.appendChild(document.createTextNode("Guest land: " + this.calculatePlayerScore(GUEST)));
+
+		return span;
 	}
 
 	getWinResultTypeCode() {
