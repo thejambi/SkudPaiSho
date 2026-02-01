@@ -1513,7 +1513,7 @@ export class PaikoController {
 
 		// Generate HTML table
 		const cellSize = '24px';
-		const ownerColor = ownerName === HOST ? '#d44' : '#48d';
+		// const ownerColor = ownerName === HOST ? '#d44' : '#48d';	/* Removing tile background */
 		const tileImgSrc = `images/Paiko/${ownerName === HOST ? 'H' : 'G'}${tile.code}.png`;
 
 		// Calculate rotation for tile image based on facing
@@ -1532,7 +1532,7 @@ export class PaikoController {
 
 				if (cell.tile) {
 					// Tile position - show small tile image, rotated to match facing
-					bgColor = ownerColor;
+					// bgColor = ownerColor;	/* Removing tile background */
 					const rotateStyle = rotationDeg !== 0 ? `transform: rotate(${rotationDeg}deg);` : '';
 					content = `<img src="${tileImgSrc}" style="width: 24px; height: 24px; display: block; ${rotateStyle}">`;
 				} else if (cell.threat && cell.cover) {
