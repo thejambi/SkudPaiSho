@@ -1,4 +1,5 @@
 import { debug } from '../../../GameData';
+import { NON_PLAYABLE } from '../../../skud-pai-sho/SkudPaiShoBoardPoint';
 
 export function TrifleMoveTileToRecordedPointAbilityBrain(abilityObject) {
 	this.abilityObject = abilityObject;

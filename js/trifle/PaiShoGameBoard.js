@@ -3207,6 +3207,17 @@ export class PaiShoGameBoard {
 		copy.useBannerCaptureSystem = this.useBannerCaptureSystem;
 		copy.winners = this.winners ? [...this.winners] : [];
 
+		// Copy recordedTilePoints (deep copy needed for nested structure)
+		copy.recordedTilePoints = {};
+		if (this.recordedTilePoints) {
+			for (const pointType of Object.keys(this.recordedTilePoints)) {
+				copy.recordedTilePoints[pointType] = {};
+				for (const tileKey of Object.keys(this.recordedTilePoints[pointType])) {
+					copy.recordedTilePoints[pointType][tileKey] = this.recordedTilePoints[pointType][tileKey];
+				}
+			}
+		}
+
 		return copy;
 	}
 }

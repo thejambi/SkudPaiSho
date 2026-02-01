@@ -1,6 +1,8 @@
 /* Ginseng specific UI interaction logic */
 
 import {
+  activeAi,
+  activeAi2,
   BRAND_NEW,
   GameType,
   READY_FOR_BONUS,
@@ -30,6 +32,7 @@ import {
   userIsLoggedIn,
   usernameIsOneOf,
 } from '../PaiShoMain';
+import { GinsengStrategicAI } from './ai/GinsengStrategicAI';
 import {
   DEPLOY,
   DRAW_ACCEPT,
@@ -681,15 +684,41 @@ GinsengController.prototype.getPointMessage = function(htmlPoint) {
 	}
 }
 
-GinsengController.prototype.playAiTurn = function(finalizeMove) {
-	// 
+GinsengController.prototype.playAiTurn = function(gameFinalize) {
+	if (this.theGame.getWinner()) {
+		return;
+	}
+
+	let theAi = activeAi;
+	if (activeAi2) {
+		if (activeAi2.player === getCurrentPlayer()) {
+			theAi = activeAi2;
+		}
+	}
+
+	const playerMoveNum = this.gameNotation.getPlayerMoveNum();
+
+	const self = this;
+	setTimeout(function() {
+		const move = theAi.getMove(self.theGame.getCopy(), playerMoveNum);
+
+		if (move) {
+			self.gameNotation.addMove(move);
+			self.theGame.runNotationMove(move);
+
+			if (gameFinalize) {
+				gameFinalize();
+			}
+		}
+	}, 10);
 };
 
-GinsengController.prototype.startAiGame = function(finalizeMove) {
-	// 
+GinsengController.prototype.startAiGame = function(gameFinalize) {
+	this.playAiTurn(gameFinalize);
 };
 
 GinsengController.prototype.getAiList = function() {
+	// return [new GinsengStrategicAI()];
 	return [];
 }
 
