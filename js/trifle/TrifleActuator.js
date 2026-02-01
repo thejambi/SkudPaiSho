@@ -1,7 +1,7 @@
 // Trifle Actuator
 
 import { ElementStyleTransform } from '../util/ElementStyleTransform';
-import { GUEST, HOST } from '../CommonNotationObjects';
+import { GUEST, HOST, MOVE } from '../CommonNotationObjects';
 import {
 	MARKED,
 	NON_PLAYABLE,
@@ -57,13 +57,13 @@ export class TrifleActuator {
 		this.guestTilesContainer = containers.guestTilesContainer;
 	}
 
-	actuate(board, tileManager, markingManager) {
+	actuate(board, tileManager, markingManager, moveToAnimate) {
 		window.requestAnimationFrame(() => {
-			this.htmlify(board, tileManager, markingManager);
+			this.htmlify(board, tileManager, markingManager, moveToAnimate);
 		});
 	}
 
-	htmlify(board, tileManager, markingManager) {
+	htmlify(board, tileManager, markingManager, moveToAnimate) {
 		this.clearContainer(this.boardContainer);
 		this.clearContainer(this.arrowContainer);
 
@@ -75,7 +75,7 @@ export class TrifleActuator {
 					cell.removeType(MARKED);
 				}
 				if (cell) {
-					this.addBoardPoint(cell, board);
+					this.addBoardPoint(cell, board, moveToAnimate);
 				}
 			});
 		});
@@ -189,7 +189,7 @@ export class TrifleActuator {
 		container.appendChild(theDiv);
 	}
 
-	addBoardPoint(boardPoint, board) {
+	addBoardPoint(boardPoint, board, moveToAnimate) {
 		const theDiv = createBoardPointDiv(boardPoint);
 
 		if (!boardPoint.isType(NON_PLAYABLE)) {
@@ -243,7 +243,6 @@ export class TrifleActuator {
 			theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 			theImg.elementStyleTransform.setValue("rotate", 315, "deg");
 
-			const moveToAnimate = null;
 			if (moveToAnimate || boardPoint.tile.isGigantic) {
 				this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv);
 			}
@@ -299,8 +298,8 @@ export class TrifleActuator {
 	}
 
 	doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv) {
-		const x = boardPoint.col;
-		const y = boardPoint.row;
+		let x = boardPoint.col;
+		let y = boardPoint.row;
 		const ox = x;
 		const oy = y;
 
@@ -316,36 +315,59 @@ export class TrifleActuator {
 		}
 
 		let scaleValue = 1;
+		let animatingMovement = false;
 
-		if (boardPoint.tile.isGigantic) {
+		// Handle gigantic tiles
+		if (boardPoint.tile && boardPoint.tile.isGigantic) {
 			scaleValue = 2;
+			theDiv.style.zIndex = 90;
 		}
 
+		// Handle movement animation
+		if (moveToAnimate && moveToAnimate.animationInfo && moveToAnimate.moveType === MOVE) {
+			const endRow = moveToAnimate.endPoint.rowAndColumn.row;
+			const endCol = moveToAnimate.endPoint.rowAndColumn.col;
+
+			// Check if this is the destination point of the moved tile
+			if (boardPoint.row === endRow && boardPoint.col === endCol) {
+				// Start position: where the tile came from
+				x = moveToAnimate.startPoint.rowAndColumn.col;
+				y = moveToAnimate.startPoint.rowAndColumn.row;
+				animatingMovement = true;
+				theDiv.style.zIndex = 99;
+			}
+		}
+
+		// Calculate offset from final position
+		let left = (x - ox);
+		let top = (y - oy);
 		let finalLeft = 0;
 		let finalTop = 0;
 
-		let left = (x - ox);
-		const top = (y - oy);
-		if (boardPoint.tile.isGigantic) {
+		if (boardPoint.tile && boardPoint.tile.isGigantic) {
 			left += 0.7;
 			finalLeft += 0.7;
-
-			theDiv.style.zIndex = 90;
 		}
+
+		// Set initial position
 		theDiv.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
 		theDiv.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
-
 		theDiv.style.transform = "scale(" + scaleValue + ")";
 
+		// Animate to final position
 		requestAnimationFrame(() => {
 			theDiv.style.left = ((finalLeft * cos45 - finalTop * sin45) * pointSizeMultiplierX) + unitString;
 			theDiv.style.top = ((finalTop * cos45 + finalLeft * sin45) * pointSizeMultiplierY) + unitString;
 		});
-		setTimeout(() => {
-			requestAnimationFrame(() => {
-				theDiv.style.transform = "scale(" + scaleValue + ")";	// This will size back to normal after moving
-			});
-		}, pieceAnimationLength);
+
+		// Reset z-index after animation
+		if (animatingMovement) {
+			setTimeout(() => {
+				requestAnimationFrame(() => {
+					theDiv.style.zIndex = "";
+				});
+			}, pieceAnimationLength);
+		}
 	}
 
 	printBoard(board) {

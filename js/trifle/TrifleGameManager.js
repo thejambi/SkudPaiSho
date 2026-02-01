@@ -40,11 +40,11 @@ export class TrifleGameManager {
 	}
 
 	// Sends the updated board to the actuator
-	actuate() {
+	actuate(moveToAnimate) {
 		if (this.isCopy) {
 			return;
 		}
-		this.actuator.actuate(this.board, this.tileManager, this.markingManager);
+		this.actuator.actuate(this.board, this.tileManager, this.markingManager, moveToAnimate);
 		setGameLogText(this.gameLogText);
 	}
 
@@ -76,6 +76,14 @@ export class TrifleGameManager {
 			const moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint);
 			this.buildMoveGameLogText(move, moveDetails);
 
+			// Attach animation info for actuator
+			move.animationInfo = {
+				startPoint: move.startPoint,
+				endPoint: move.endPoint,
+				movedTile: moveDetails.movedTile,
+				capturedTiles: moveDetails.capturedTiles || []
+			};
+
 			// If tile is capturing a Banner tile, there's a winner
 			if (moveDetails.capturedTiles && moveDetails.capturedTiles.length) {
 				moveDetails.capturedTiles.forEach((capturedTile) => {
@@ -89,7 +97,7 @@ export class TrifleGameManager {
 		}
 
 		if (withActuate) {
-			this.actuate();
+			this.actuate(move);
 		}
 	}
 

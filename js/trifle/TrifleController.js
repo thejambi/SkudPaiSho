@@ -11,7 +11,7 @@ import {
 } from '../CommonNotationObjects';
 import { TrifleAggressiveAI } from './ai/TrifleAggressiveAI';
 import { TrifleDefensiveAI } from './ai/TrifleDefensiveAI';
-import { debug } from '../GameData';
+import { debug, gameDevOn } from '../GameData';
 import {
 	activeAi,
 	activeAi2,
@@ -470,7 +470,10 @@ export class TrifleController {
 	}
 
 	getAiList() {
-		return [new TrifleAggressiveAI(), new TrifleDefensiveAI()];
+		if (gameDevOn) {
+			return [new TrifleAggressiveAI(), new TrifleDefensiveAI()];
+		}
+		return [];
 	}
 
 	readyToShowPlayAgainstAiOption() {
