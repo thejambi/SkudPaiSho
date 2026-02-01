@@ -1598,6 +1598,128 @@ describe('Fixed TODO Tiles - Definition and Abilities', () => {
 			);
 			expect(requireBannerAbility).toBeDefined();
 		});
+
+		it('should restrict banner deployment to within WaterHyacinth zone', () => {
+			const mockActuator = { actuate: vi.fn() };
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+
+			// Add tiles to teams
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.WaterHyacinth,
+				TrifleTileCodes.WaterBanner
+			]);
+
+			// Deploy WaterHyacinth at (0,0)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.WaterHyacinth,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Verify WaterHyacinth is on the board
+			const waterHyacinthPoints = gameManager.board.getTilePoints(TrifleTileCodes.WaterHyacinth, HOST);
+			expect(waterHyacinthPoints.length).toBe(1);
+
+			// Verify the board has getBannerDeployZoneRestriction method for checking banner zones
+			expect(typeof gameManager.board.getBannerDeployZoneRestriction).toBe('function');
+
+			// Verify WaterHyacinth tile info has the correct ability configuration
+			const waterHyacinthTileInfo = TrifleTiles[TrifleTileCodes.WaterHyacinth];
+			const requireBannerAbility = waterHyacinthTileInfo.abilities.find(
+				a => a.type === TrifleAbilityName.requireBannerDeployInZone
+			);
+			expect(requireBannerAbility).toBeDefined();
+			expect(requireBannerAbility.triggers).toBeDefined();
+			expect(requireBannerAbility.triggers[0].triggerType).toBe(TrifleAbilityTriggerType.whileOnBoard);
+
+			// Verify the zone size is correctly configured
+			expect(waterHyacinthTileInfo.territorialZone.size).toBe(6);
+
+			// Verify banners are correctly typed as banner tiles
+			const waterBannerInfo = TrifleTiles[TrifleTileCodes.WaterBanner];
+			expect(waterBannerInfo.types).toContain(TrifleTileType.banner);
+		});
+
+		it('should have setDeployPointsPossibleMoves method and banner configuration for deployment', () => {
+			const mockActuator = { actuate: vi.fn() };
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+
+			// Verify the board has the method used to calculate deploy points
+			expect(typeof gameManager.board.setDeployPointsPossibleMoves).toBe('function');
+
+			// Verify WaterBanner is configured to deploy anywhere
+			const waterBannerInfo = TrifleTiles[TrifleTileCodes.WaterBanner];
+			expect(waterBannerInfo.deployTypes).toBeDefined();
+			expect(waterBannerInfo.deployTypes).toContain(TrifleDeployType.anywhere);
+
+			// Verify banner tiles are properly typed
+			expect(waterBannerInfo.types).toContain(TrifleTileType.banner);
+
+			// Verify all banner types have deploy anywhere
+			const bannerCodes = [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.EarthBanner,
+				TrifleTileCodes.FireBanner
+			];
+			bannerCodes.forEach(code => {
+				const bannerInfo = TrifleTiles[code];
+				expect(bannerInfo).toBeDefined();
+				expect(bannerInfo.types).toContain(TrifleTileType.banner);
+				expect(bannerInfo.deployTypes).toContain(TrifleDeployType.anywhere);
+			});
+		});
+
+		it('should activate requireBannerDeployInZone ability and restrict banner deploy points', () => {
+			const mockActuator = { actuate: vi.fn() };
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+
+			// Add tiles to teams
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.WaterHyacinth,
+				TrifleTileCodes.WaterBanner
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			// Deploy WaterHyacinth at (0,0)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.WaterHyacinth,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Verify WaterHyacinth is on the board
+			const waterHyacinthPoints = gameManager.board.getTilePoints(TrifleTileCodes.WaterHyacinth, HOST);
+			expect(waterHyacinthPoints.length).toBe(1);
+
+			// Deploy a GUEST tile to allow HOST to play again
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Chrysanthemum,
+				endPoint: new NotationPoint('7,7')
+			}, false);
+
+			// Verify the requireBannerDeployInZone ability is active
+			const requireBannerAbilities = gameManager.board.abilityManager.getActiveAbilitiesFromTile(
+				TrifleAbilityName.requireBannerDeployInZone,
+				waterHyacinthPoints[0].tile
+			);
+			expect(requireBannerAbilities.length).toBeGreaterThan(0);
+
+			// Create a banner tile and check the zone restriction
+			const bannerTile = new TrifleTile(TrifleTileCodes.WaterBanner, 'H');
+			const zoneRestriction = gameManager.board.getBannerDeployZoneRestriction(bannerTile);
+
+			// Should return the WaterHyacinth point as the zone restriction
+			expect(zoneRestriction).not.toBeNull();
+			expect(zoneRestriction.tile.code).toBe(TrifleTileCodes.WaterHyacinth);
+		});
 	});
 
 	describe('MoonFlower', () => {

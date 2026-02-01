@@ -23,6 +23,7 @@ import { TrifleWhenDeployedTriggerBrain } from './triggerBrains/WhenDeployedTrig
 import { TrifleWhenActiveMovementTriggerBrain } from './triggerBrains/WhenActiveMovementTriggerBrain';
 import { TrifleWhenTargetTileLandsInTempleTriggerBrain } from './triggerBrains/WhenTargetTileLandsInTempleTriggerBrain';
 import { TrifleWhenAdjacentFriendlyTileIsCapturedTriggerBrain } from './triggerBrains/WhenAdjacentFriendlyTileIsCapturedTriggerBrain';
+import { TrifleWhileOnBoardTriggerBrain } from './triggerBrains/WhileOnBoardTriggerBrain';
 import { TrifleTriggerTargetTilesTargetBrain } from './targetBrains/TriggerTargetTilesTargetBrain';
 import { TrifleAllTilesTargetBrain } from './targetBrains/AllTilesTargetBrain';
 import { TrifleSurroundingTilesTargetBrain } from './targetBrains/SurroundingTilesTargetBrain';
@@ -81,6 +82,8 @@ TrifleBrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, t
 			return new TrifleWhenTargetTileLandsInTempleTriggerBrain(triggerContext);
 		case TrifleAbilityTriggerType.whenAdjacentFriendlyTileIsCaptured:
 			return new TrifleWhenAdjacentFriendlyTileIsCapturedTriggerBrain(triggerContext);
+		case TrifleAbilityTriggerType.whileOnBoard:
+			return new TrifleWhileOnBoardTriggerBrain(triggerContext);
 		default:
 			debug("No Trigger Brain created for trigger: " + abilityTriggerInfo.triggerType);
 	}

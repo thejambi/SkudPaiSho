@@ -351,6 +351,18 @@ export class TrifleAbilityManager {
 		return abilitiesTargetingTile;
 	}
 
+	getActiveAbilitiesFromTile(abilityName, sourceTile) {
+		const abilitiesFromTile = [];
+		this.abilities.forEach((ability) => {
+			if (ability.abilityType === abilityName
+					&& ability.activated
+					&& ability.sourceTile === sourceTile) {
+				abilitiesFromTile.push(ability);
+			}
+		});
+		return abilitiesFromTile;
+	}
+
 	abilityIsCanceled(abilityObject) {
 		let isCanceled = false;
 

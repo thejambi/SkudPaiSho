@@ -693,7 +693,12 @@ export function defineTrifleTiles() {
 		abilities: [
 			{
 				type: TrifleAbilityName.requireBannerDeployInZone,
-				triggerType: TrifleAbilityTriggerType.whileOnBoard
+				targetTypes: [TrifleTargetType.thisTile],
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileOnBoard
+					}
+				]
 			}
 		],
 		textLines: [
