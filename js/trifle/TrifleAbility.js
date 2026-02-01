@@ -112,7 +112,32 @@ export class TrifleAbility {
 		if (this.abilityTargetTiles.length > 0) {	// Ability must have target tile?
 			this.abilityActivatedResults = this.abilityBrain.activateAbility();
 			this.activated = true;
+
+			// Initialize duration tracking if ability has duration
+			if (this.abilityInfo.duration && this.abilityInfo.duration > 0) {
+				this.remainingDuration = this.abilityInfo.duration;
+				debug("Ability has duration: " + this.remainingDuration);
+			}
 		}
+	}
+
+	hasDuration() {
+		return this.abilityInfo.duration && this.abilityInfo.duration > 0;
+	}
+
+	tickDuration() {
+		if (this.remainingDuration !== undefined) {
+			// Decrement by 0.5 because each player's move is a "half turn"
+			// duration: 1 means "opponent's next turn" = 2 ticks (your move end + opponent move end)
+			this.remainingDuration -= 0.5;
+			debug("Ability duration ticked, remaining: " + this.remainingDuration);
+			return this.remainingDuration <= 0;
+		}
+		return false;
+	}
+
+	isDurationExpired() {
+		return this.remainingDuration !== undefined && this.remainingDuration <= 0;
 	}
 
 	deactivate() {

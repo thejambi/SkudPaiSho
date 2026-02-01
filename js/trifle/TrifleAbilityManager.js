@@ -84,9 +84,15 @@ export class TrifleAbilityManager {
 		/* Deactivate abilities. New ability list is the ones that are not deactivated. */
 		const newAbilities = [];
 		this.abilities.forEach((existingAbility) => {
-			if (existingAbility.preserve && !this.abilityIsCanceled(existingAbility)) {
-				newAbilities.push(existingAbility);	// Commenting this out... ability activation priority should take care of this now
-											// NOOOOOO We need this!
+			// Preserve if:
+			// 1. Marked as preserve (re-triggered this turn) and not canceled, OR
+			// 2. Has remaining duration (duration abilities should persist until expired)
+			const hasDurationRemaining = existingAbility.remainingDuration !== undefined
+				&& existingAbility.remainingDuration > 0;
+
+			if ((existingAbility.preserve && !this.abilityIsCanceled(existingAbility))
+					|| hasDurationRemaining) {
+				newAbilities.push(existingAbility);
 			} else {
 				existingAbility.deactivate();
 			}
@@ -308,11 +314,14 @@ export class TrifleAbilityManager {
 
 	abilityTargetingTileExists(abilityName, tile) {
 		let targetsTile = false;
+		const self = this;
 		this.abilities.forEach((ability) => {
 			if (ability.abilityType === abilityName
 					&& ability.abilityTargetsTile(tile)) {
-				targetsTile = true;
-				return;
+				// Check if targeting is canceled (e.g., by Elderberry's Antidote Aura)
+				if (!self.targetingIsCanceled(ability.sourceTile, abilityName, tile)) {
+					targetsTile = true;
+				}
 			}
 		});
 		return targetsTile;
@@ -344,6 +353,12 @@ export class TrifleAbilityManager {
 
 	abilityIsCanceled(abilityObject) {
 		let isCanceled = false;
+
+		// Check if source tile is in a zone that removes its abilities (e.g., Buffalo Yak)
+		if (this.board.tileAbilitiesRemovedByZone(abilityObject.sourceTile, abilityObject.sourceTilePoint)) {
+			return true;
+		}
+
 		const affectingCancelAbilities = this.getAbilitiesTargetingTile(TrifleAbilityName.cancelAbilities, abilityObject.sourceTile);
 
 		affectingCancelAbilities.forEach((cancelingAbility) => {
@@ -396,6 +411,12 @@ export class TrifleAbilityManager {
 						&& cancelingAbility.abilityInfo.cancelAbilitiesFromTileCodes.includes(abilitySourceTile.code)) {
 					isCanceled = true;
 				}
+
+				// Check abilityTypesToCancel - direct ability name matching (e.g., immobilizeTiles)
+				if (cancelingAbility.abilityInfo.abilityTypesToCancel
+						&& cancelingAbility.abilityInfo.abilityTypesToCancel.includes(abilityType)) {
+					isCanceled = true;
+				}
 			}
 		});
 
@@ -403,18 +424,18 @@ export class TrifleAbilityManager {
 	}
 
 	tickDurationAbilities() {
-		// TODO: Something like this old tick code did:
-		/* for (var i = this.activeDurationAbilities.length - 1; i >= 0; i--) {
-			var durationAbilityDetails = this.activeDurationAbilities[i];
-			var durationAbilityInfo = durationAbilityDetails.ability;
-			durationAbilityInfo.remainingDuration -= 0.5;
-			if (durationAbilityInfo.remainingDuration <= 0) {
-				durationAbilityInfo.active = false;
-				this.activeDurationAbilities.splice(i, 1);
-				debug("Ability deactivated!");
-				debug(durationAbilityInfo);
+		// Tick duration for all abilities that have duration, remove expired ones
+		for (let i = this.abilities.length - 1; i >= 0; i--) {
+			const ability = this.abilities[i];
+			if (ability.hasDuration() && ability.activated) {
+				const expired = ability.tickDuration();
+				if (expired) {
+					debug("Duration ability expired: " + ability.abilityType + " from " + ability.sourceTile.ownerCode + ability.sourceTile.code);
+					ability.deactivate();
+					this.abilities.splice(i, 1);
+				}
 			}
-		} */
+		}
 	}
 
 	promptForNextNeededTargets() {

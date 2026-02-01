@@ -54,6 +54,7 @@ export class PaiShoGameBoard {
 
 		this.activeDurationAbilities = [];
 		this.recordedTilePoints = {};
+		this.capturedTilesForResurrection = []; // Track tiles that may be resurrected
 
 		this.tileManager = tileManager;
 
@@ -423,8 +424,12 @@ export class PaiShoGameBoard {
 
 		this.processAbilities(tile, tileInfo, null, boardPoint, capturedTiles, {});
 
+		// Check for tile resurrections after abilities are processed
+		var resurrectedTiles = this.checkAndPerformResurrections();
+
 		return {
-			capturedTiles: capturedTiles
+			capturedTiles: capturedTiles,
+			resurrectedTiles: resurrectedTiles
 		}
 	}
 
@@ -437,6 +442,19 @@ export class PaiShoGameBoard {
 
 		point.putTile(tile);
 		tile.seatedPoint = point;
+
+		// Store deploy position for tiles with resurrection ability
+		if (!tile.deployPoint) {
+			const tileInfo = this.tileMetadata[tile.code];
+			if (tileInfo && tileInfo.abilities) {
+				const hasResurrectionAbility = tileInfo.abilities.some(
+					ability => ability.type === TrifleAbilityName.resurrectAtDeployPosition
+				);
+				if (hasResurrectionAbility) {
+					tile.deployPoint = point;
+				}
+			}
+		}
 
 		/* // Check if gigantic...
 		const tileInfo = this.tileMetadata[tile.code];
@@ -1153,8 +1171,30 @@ export class PaiShoGameBoard {
 		} */
 
 		if (boardPointEnd.hasTile() && !capturedTiles.includes(boardPointEnd.tile)) {
-			// capturedTiles.push(boardPointEnd.tile);
-			capturedTiles.push(this.captureTileOnPoint(boardPointEnd));
+			// Check for capture substitution (like Saffron's ability)
+			const substitutePoint = this.getCaptureSubstitutePoint(boardPointEnd);
+			if (substitutePoint) {
+				// Swap positions: substitute tile goes to capture location, original tile goes to substitute's location
+				const originalTile = boardPointEnd.tile;
+				const substituteTile = substitutePoint.tile;
+
+				// Remove both tiles from their positions
+				boardPointEnd.removeTile();
+				substitutePoint.removeTile();
+
+				// Move original tile to substitute's position (safe)
+				substitutePoint.putTile(originalTile);
+				originalTile.seatedPoint = substitutePoint;
+
+				// Place substitute tile at capture location and capture it
+				boardPointEnd.putTile(substituteTile);
+				substituteTile.seatedPoint = boardPointEnd;
+				capturedTiles.push(this.captureTileOnPoint(boardPointEnd));
+				debug("Capture substitution: " + substituteTile.code + " was captured instead of " + originalTile.code);
+			} else {
+				// Normal capture
+				capturedTiles.push(this.captureTileOnPoint(boardPointEnd));
+			}
 		}
 
 		capturedTiles.forEach((capturedTile) => {
@@ -1172,11 +1212,15 @@ export class PaiShoGameBoard {
 
 		var abilityActivationFlags = this.processAbilities(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo);
 
+		// Check for tile resurrections after abilities are processed
+		var resurrectedTiles = this.checkAndPerformResurrections();
+
 		return {
 			movedTile: tile,
 			startPoint: boardPointStart,
 			endPoint: boardPointEnd,
 			capturedTiles: capturedTiles,
+			resurrectedTiles: resurrectedTiles,
 			abilityActivationFlags: abilityActivationFlags
 		}
 	}
@@ -1711,6 +1755,37 @@ export class PaiShoGameBoard {
 		return extendDistance;
 	}
 
+	getMovementDistanceFactor(tile) {
+		// Get all changeMovementDistanceByFactor abilities targeting this tile
+		const factorAbilities = this.abilityManager.getAbilitiesTargetingTile(
+			TrifleAbilityName.changeMovementDistanceByFactor,
+			tile
+		);
+
+		// Multiply all factors together (default is 1.0)
+		let factor = 1.0;
+		factorAbilities.forEach(ability => {
+			if (ability.abilityInfo.distanceAdjustmentFactor) {
+				factor *= ability.abilityInfo.distanceAdjustmentFactor;
+			}
+		});
+		return factor;
+	}
+
+	getOverriddenMovementDistance(tile) {
+		// Get all setMovementDistance abilities targeting this tile
+		const overrideAbilities = this.abilityManager.getAbilitiesTargetingTile(
+			TrifleAbilityName.setMovementDistance,
+			tile
+		);
+
+		// If any override exists, return the set distance (use the first one found)
+		if (overrideAbilities.length > 0 && overrideAbilities[0].abilityInfo.movementDistance !== undefined) {
+			return overrideAbilities[0].abilityInfo.movementDistance;
+		}
+		return null; // No override
+	}
+
 	getManipulatedMovementInfo(boardPointStart, movementInfo) {
 		movementInfo = { ...movementInfo };	// Copy object
 		var manipulateMovementAbilities = this.abilityManager.getAbilitiesTargetingTile(TrifleAbilityName.manipulateExistingMovement, boardPointStart.tile);
@@ -1748,7 +1823,19 @@ export class PaiShoGameBoard {
 
 	setPossibleMovesForMovement(movementInfo, boardPointStart) {
 		this.movementPointChecks = 0;
-		var movementDistance = movementInfo.distance + this.getMovementExtendedDistance(boardPointStart, movementInfo);
+
+		// Check for movement distance override first
+		var overriddenDistance = this.getOverriddenMovementDistance(boardPointStart.tile);
+		var movementDistance;
+		if (overriddenDistance !== null) {
+			// Override takes precedence, ignores other movement effects
+			movementDistance = overriddenDistance;
+		} else {
+			// Normal calculation with extensions and factors
+			var baseDistance = movementInfo.distance + this.getMovementExtendedDistance(boardPointStart, movementInfo);
+			var distanceFactor = this.getMovementDistanceFactor(boardPointStart.tile);
+			movementDistance = Math.floor(baseDistance * distanceFactor);
+		}
 
 		var isImmobilized = this.tileMovementIsImmobilized(boardPointStart.tile, movementInfo, boardPointStart);
 		if (!isImmobilized) {
@@ -2518,7 +2605,79 @@ export class PaiShoGameBoard {
 			capturedTile = boardPoint.removeTile();
 		}
 
+		// Track tiles with resurrection ability for later resurrection
+		if (capturedTile && capturedTile.deployPoint) {
+			this.capturedTilesForResurrection.push(capturedTile);
+		}
+
 		return capturedTile;
+	}
+
+	/**
+	 * Check if a tile being captured has a substitute (like Saffron's ability)
+	 * Returns the point of the substituting tile if found, null otherwise
+	 */
+	getCaptureSubstitutePoint(targetTilePoint) {
+		if (!targetTilePoint.hasTile()) {
+			return null;
+		}
+
+		const targetTile = targetTilePoint.tile;
+		let substitutePoint = null;
+
+		// Look for tiles with substituteForCapture ability
+		this.forEachBoardPointWithTile((checkPoint) => {
+			if (substitutePoint) return; // Already found one
+
+			const checkTile = checkPoint.tile;
+			const checkTileInfo = this.tileMetadata[checkTile.code];
+
+			// Must be friendly
+			if (checkTile.ownerName !== targetTile.ownerName) return;
+			// Don't substitute for yourself
+			if (checkPoint === targetTilePoint) return;
+
+			if (checkTileInfo && checkTileInfo.abilities) {
+				const hasSubstituteAbility = checkTileInfo.abilities.some(
+					ability => ability.type === TrifleAbilityName.substituteForCapture
+				);
+
+				if (hasSubstituteAbility && checkTileInfo.territorialZone) {
+					// Check if target is within the substitute tile's zone
+					const distance = this.getDistanceBetweenPoints(checkPoint, targetTilePoint);
+					if (distance <= checkTileInfo.territorialZone.size) {
+						substitutePoint = checkPoint;
+					}
+				}
+			}
+		});
+
+		return substitutePoint;
+	}
+
+	/**
+	 * Check if any captured tiles with resurrection ability should be resurrected.
+	 * Resurrection happens when the tile's deploy position is empty.
+	 */
+	checkAndPerformResurrections() {
+		const resurrectedTiles = [];
+		const remainingCaptured = [];
+
+		this.capturedTilesForResurrection.forEach((capturedTile) => {
+			if (capturedTile.deployPoint && !capturedTile.deployPoint.hasTile()) {
+				// Deploy position is empty - resurrect the tile!
+				capturedTile.deployPoint.putTile(capturedTile);
+				capturedTile.seatedPoint = capturedTile.deployPoint;
+				resurrectedTiles.push(capturedTile);
+				debug("Resurrected " + capturedTile.code + " at its deploy position");
+			} else {
+				// Keep tracking for future resurrection
+				remainingCaptured.push(capturedTile);
+			}
+		});
+
+		this.capturedTilesForResurrection = remainingCaptured;
+		return resurrectedTiles;
 	}
 
 	getFireLilyPoint(player) {
@@ -2558,6 +2717,15 @@ export class PaiShoGameBoard {
 		this.currentlyDeployingTile = tile;
 		this.currentlyDeployingTileInfo = tileInfo;
 
+		// Check if tile has deploy order restrictions (e.g., must deploy before banners)
+		if (!this.tileCanBeDeployed(tile)) {
+			debug("Tile " + tile.code + " cannot be deployed due to deploy order restrictions");
+			return; // No possible deploy points
+		}
+
+		// Check if banner must be deployed within a specific zone -- TODO: Should this be more flexible and not just banner but dynamically work for other types as well?
+		const bannerZoneRestriction = this.getBannerDeployZoneRestriction(tile);
+
 		if (tileInfo && tileInfo.specialDeployTypes) {
 			tileInfo.specialDeployTypes.forEach((specialDeployInfo) => {
 				this.setDeployPointsPossibleForSpecialDeploy(tile, tileInfo, specialDeployInfo);
@@ -2570,7 +2738,8 @@ export class PaiShoGameBoard {
 					if (!boardPoint.hasTile()
 						&& !boardPoint.isType(GATE)
 						&& !this.tileZonedOutOfSpaceByAbility(tile, boardPoint)
-						&& this.tileCanOccupyPoint(tile, boardPoint)) {
+						&& this.tileCanOccupyPoint(tile, boardPoint)
+						&& (!bannerZoneRestriction || this.pointTileZoneContainsPoint(bannerZoneRestriction, boardPoint))) {
 						boardPoint.addType(POSSIBLE_MOVE);
 					}
 				});
@@ -2581,7 +2750,8 @@ export class PaiShoGameBoard {
 					if (!boardPoint.hasTile()
 						&& boardPoint.isType(GATE)
 						&& !this.tileZonedOutOfSpaceByAbility(tile, boardPoint)
-						&& this.tileCanOccupyPoint(tile, boardPoint)) {
+						&& this.tileCanOccupyPoint(tile, boardPoint)
+						&& (!bannerZoneRestriction || this.pointTileZoneContainsPoint(bannerZoneRestriction, boardPoint))) {
 						boardPoint.addType(POSSIBLE_MOVE);
 					}
 				});
@@ -2594,7 +2764,8 @@ export class PaiShoGameBoard {
 						adjacentToTemplePoints.forEach((pointAdjacentToTemple) => {
 							if (!pointAdjacentToTemple.hasTile()
 								&& !this.tileZonedOutOfSpaceByAbility(tile, pointAdjacentToTemple)
-								&& this.tileCanOccupyPoint(tile, pointAdjacentToTemple)) {
+								&& this.tileCanOccupyPoint(tile, pointAdjacentToTemple)
+								&& (!bannerZoneRestriction || this.pointTileZoneContainsPoint(bannerZoneRestriction, pointAdjacentToTemple))) {
 								pointAdjacentToTemple.addType(POSSIBLE_MOVE);
 							}
 						});
@@ -2622,6 +2793,65 @@ export class PaiShoGameBoard {
 		} else {
 			return true;	// Default to true
 		}
+	}
+
+	/**
+	 * Check if tile can be deployed based on deploy order restrictions
+	 * (e.g., WaterHyacinth must be deployed before any banner)
+	 */
+	tileCanBeDeployed(tile) {
+		var tileInfo = this.tileMetadata[tile.code];
+
+		// Check if tile has cannotDeployAfterTileTypes restriction
+		if (tileInfo && tileInfo.cannotDeployAfterTileTypes && tileInfo.cannotDeployAfterTileTypes.length > 0) {
+			// Check if any of those tile types are already on the board for this player
+			let blockedByTileOnBoard = false;
+			this.forEachBoardPointWithTile((boardPoint) => {
+				if (boardPoint.tile.ownerName === tile.ownerName) {
+					const boardTileInfo = this.tileMetadata[boardPoint.tile.code];
+					if (boardTileInfo && boardTileInfo.types) {
+						tileInfo.cannotDeployAfterTileTypes.forEach((restrictedType) => {
+							if (boardTileInfo.types.includes(restrictedType)) {
+								blockedByTileOnBoard = true;
+							}
+						});
+					}
+				}
+			});
+			if (blockedByTileOnBoard) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Check if a banner must be deployed within a specific zone
+	 * Returns the zone points if restricted, null otherwise
+	 */
+	getBannerDeployZoneRestriction(tile) {
+		var tileInfo = this.tileMetadata[tile.code];
+
+		// Only applies to banners
+		if (!tileInfo || !tileInfo.types || !tileInfo.types.includes(TrifleTileType.banner)) {
+			return null;
+		}
+
+		// Check if there's a tile with requireBannerDeployInZone ability on the board for this player
+		let zoneSourcePoint = null;
+		this.forEachBoardPointWithTile((boardPoint) => {
+			if (boardPoint.tile.ownerName === tile.ownerName) {
+				const requireBannerAbilities = this.abilityManager.getActiveAbilitiesFromTile(
+					TrifleAbilityName.requireBannerDeployInZone,
+					boardPoint.tile
+				);
+				if (requireBannerAbilities.length > 0) {
+					zoneSourcePoint = boardPoint;
+				}
+			}
+		});
+
+		return zoneSourcePoint;
 	}
 
 	setDeployPointsPossibleForSpecialDeploy(tile, tileInfo, specialDeployInfo) {
@@ -2776,10 +3006,38 @@ export class PaiShoGameBoard {
 		var tile = pointWithZone.tile;
 		var zone = TrifleTileInfo.getTerritorialZone(tileInfo);
 
-		return pointWithZone.hasTile()
-			&& zone
-			&& this.tileZoneIsActive(tile)
-			&& this.getDistanceBetweenPoints(pointWithZone, targetPoint) <= zone.size;
+		if (!pointWithZone.hasTile() || !zone || !this.tileZoneIsActive(tile)) {
+			return false;
+		}
+
+		// Calculate effective zone size including any enlargement bonuses
+		const effectiveZoneSize = this.getEffectiveZoneSize(tile, zone.size);
+
+		return this.getDistanceBetweenPoints(pointWithZone, targetPoint) <= effectiveZoneSize;
+	}
+
+	/**
+	 * Calculate the effective zone size for a tile, including bonuses from enlargeZone abilities
+	 * @param {Object} tile - The tile with the zone
+	 * @param {number} baseZoneSize - The base zone size from tile definition
+	 * @returns {number} - The effective zone size after applying enlargement bonuses
+	 */
+	getEffectiveZoneSize(tile, baseZoneSize) {
+		let bonusZoneSize = 0;
+
+		// Check for enlargeZone abilities targeting this tile
+		const enlargeAbilities = this.abilityManager.getAbilitiesTargetingTile(
+			TrifleAbilityName.enlargeZone,
+			tile
+		);
+
+		enlargeAbilities.forEach((ability) => {
+			if (ability.abilityInfo.bonusZoneSize) {
+				bonusZoneSize += ability.abilityInfo.bonusZoneSize;
+			}
+		});
+
+		return baseZoneSize + bonusZoneSize;
 	}
 
 	pointIsWithinZoneOfOneOfTheseTiles(targetPoint, tileCodes, zoneOwner) {
@@ -2793,6 +3051,59 @@ export class PaiShoGameBoard {
 			});
 		}
 		return isInTheZone;
+	}
+
+	/**
+	 * Check if a tile's abilities are removed by a zone ability (e.g., Buffalo Yak's removesTileAbilities)
+	 * @param {Object} tile - The tile whose abilities may be removed
+	 * @param {Object} tilePoint - The board point where the tile is located
+	 * @returns {boolean} - True if the tile's abilities are removed by a zone
+	 */
+	tileAbilitiesRemovedByZone(tile, tilePoint) {
+		if (!tile || !tilePoint) {
+			return false;
+		}
+
+		const tileInfo = this.tileMetadata[tile.code];
+		let isRemoved = false;
+		const self = this;
+
+		this.forEachBoardPointWithTile(function(checkBoardPoint) {
+			if (isRemoved) return; // Already found a removing zone
+
+			const checkTileInfo = self.tileMetadata[checkBoardPoint.tile.code];
+			const zoneInfo = TrifleTileInfo.getTerritorialZone(checkTileInfo);
+
+			if (zoneInfo && zoneInfo.abilities) {
+				zoneInfo.abilities.forEach(function(zoneAbilityInfo) {
+					if (zoneAbilityInfo.type === TrifleZoneAbility.removesTileAbilities
+						&& self.tileZoneIsActive(checkBoardPoint.tile)
+						&& self.pointTileZoneContainsPoint(checkBoardPoint, tilePoint)
+					) {
+						// Check target teams
+						const teamMatches = !zoneAbilityInfo.targetTeams || (
+							(zoneAbilityInfo.targetTeams.includes(TrifleTileTeam.friendly)
+								&& checkBoardPoint.tile.ownerName === tile.ownerName)
+							|| (zoneAbilityInfo.targetTeams.includes(TrifleTileTeam.enemy)
+								&& checkBoardPoint.tile.ownerName !== tile.ownerName)
+						);
+
+						// Check target tile types
+						const typeMatches = !zoneAbilityInfo.targetTileTypes || (
+							tileInfo && tileInfo.types
+							&& arrayIncludesOneOf(zoneAbilityInfo.targetTileTypes, tileInfo.types)
+						);
+
+						if (teamMatches && typeMatches) {
+							debug("Tile abilities removed by zone: " + tile.code + " by " + checkBoardPoint.tile.code);
+							isRemoved = true;
+						}
+					}
+				});
+			}
+		});
+
+		return isRemoved;
 	}
 
 	forEachBoardPoint(forEachFunc) {

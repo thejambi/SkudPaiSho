@@ -41,6 +41,7 @@ export const TrifleTileCodes = {
 	Edelweiss: 'Edelweiss',
 	NobleRhubarb: 'NobleRhubarb',
 	Lavender: 'Lavender',
+	Wisteria: 'Wisteria',
 	/* Water */
 	WaterBanner: 'WaterBanner',
 	SnowLeopard: "SnowLeopard",
@@ -51,6 +52,7 @@ export const TrifleTileCodes = {
 	LilyPad: 'LilyPad',
 	Cattail: "Cattail",
 	WaterHyacinth: "WaterHyacinth",
+	Duckweed: "Duckweed",
 	/* Earth */
 	EarthBanner: 'EarthBanner',
 	Badgermole: 'Badgermole',
@@ -61,6 +63,7 @@ export const TrifleTileCodes = {
 	Sunflower: "Sunflower",
 	MoonFlower: "MoonFlower",
 	Chamomile: "Chamomile",
+	Elderberry: "Elderberry",
 	/* Fire */
 	FireBanner: "FireBanner",
 	Dragon: 'Dragon',
@@ -70,7 +73,8 @@ export const TrifleTileCodes = {
 	FireLily: 'FireLily',
 	GrassWeed: "GrassWeed",
 	GrippingGrass: "GrippingGrass",
-	Saffron: "Saffron"
+	Saffron: "Saffron",
+	Marigold: "Marigold"
 };
 
 export const TrifleTileType = {
@@ -391,6 +395,54 @@ export function defineTrifleTiles() {
 		]
 	};
 
+	TrifleTiles[TrifleTileCodes.Wisteria] = {	/* Done */
+		available: true,
+		types: [TrifleTileType.flower],
+		identifiers: [TrifleTileIdentifier.air],
+		deployTypes: [TrifleDeployType.anywhere],
+		territorialZone: {
+			size: 4
+		},
+		abilities: [
+			{
+				// Ascending Winds: Friendly animals in zone gain jump movement
+				type: TrifleAbilityName.grantBonusMovement,
+				bonusMovement: {
+					type: TrifleMovementType.standard,
+					distance: 1,
+					abilities: [TrifleMovementAbility.jumpOver]
+				},
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInZone,
+						targetTeams: [TrifleTileTeam.friendly],
+						targetTileTypes: [TrifleTileType.animal]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles]
+			},
+			{
+				// Sheltering Veil: Friendly tiles in zone cannot be drawn by enemy abilities
+				type: TrifleAbilityName.cancelAbilitiesTargetingTiles,
+				abilityTypesToCancel: [TrifleAbilityName.drawTilesAlongLineOfSight],
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInZone,
+						targetTeams: [TrifleTileTeam.friendly]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles]
+			}
+		],
+		textLines: [
+			"Flower | Air",
+			"Deploys anywhere",
+			"Territorial Zone: 4",
+			"Ascending Winds: Friendly animals in zone gain +1 jump movement",
+			"Sheltering Veil: Friendly tiles in zone cannot be drawn by enemy abilities"
+		]
+	};
+
 	/* Water */
 
 	TrifleTiles[TrifleTileCodes.WaterBanner] = {	/* Done */
@@ -455,7 +507,7 @@ export function defineTrifleTiles() {
 		]
 	};
 
-	TrifleTiles[TrifleTileCodes.PolarBearDog] = {	// todo
+	TrifleTiles[TrifleTileCodes.PolarBearDog] = {	/* Done - Needs manual testing */
 		available: true,
 		types: [TrifleTileType.animal],
 		identifiers: [TrifleTileIdentifier.water],
@@ -486,7 +538,7 @@ export function defineTrifleTiles() {
 		]
 	};
 
-	TrifleTiles[TrifleTileCodes.BuffaloYak] = {	// todo
+	TrifleTiles[TrifleTileCodes.BuffaloYak] = {	/* Done - Needs manual testing */
 		available: true,
 		types: [TrifleTileType.animal],
 		identifiers: [TrifleTileIdentifier.water],
@@ -509,13 +561,12 @@ export function defineTrifleTiles() {
 			]
 		},
 		textLines: [
-			"TODO",
 			"Animal | Water",
 			"Flower tiles within 2 spaces have their effects nullified. Can move two spaces, and can capture."
 		]
 	};
 
-	TrifleTiles[TrifleTileCodes.SnowWolf] = {	// todo
+	TrifleTiles[TrifleTileCodes.SnowWolf] = {	/* Done */
 		available: true,
 		types: [TrifleTileType.animal],
 		identifiers: [TrifleTileIdentifier.water],
@@ -527,10 +578,22 @@ export function defineTrifleTiles() {
 				captureTypes: [TrifleCaptureType.all]
 			}
 		],
+		abilities: [
+			{
+				type: TrifleAbilityName.captureTargetTiles,
+				moveSourceToTargetPosition: true,
+				triggerType: TrifleAbilityTriggerType.whenAdjacentFriendlyTileIsCaptured,
+				regardlessOfCaptureProtection: true,
+				targetTriggerInfo: {
+					targetType: TrifleTargetType.triggerTargetTiles
+				}
+			}
+		],
 		textLines: [
-			"TODO",
 			"Animal | Water",
-			"Enemy tiles that capture an ally tile adjacent to this tile are captured as well then this tile moves into that space. Moves 3 spaces. Can capture other tiles."
+			"Deploys anywhere",
+			"Moves 3 spaces, can capture",
+			"When enemy captures adjacent friendly tile, capture that enemy and move to its space"
 		]
 	};
 
@@ -617,19 +680,69 @@ export function defineTrifleTiles() {
 		]
 	};
 
-	TrifleTiles[TrifleTileCodes.WaterHyacinth] = {
+	TrifleTiles[TrifleTileCodes.WaterHyacinth] = {	/* Done */
 		available: true,
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.water],
 		deployTypes: [TrifleDeployType.anywhere],
+		territorialZone: {
+			size: 6
+		},
+		cannotDeployAfterTileTypes: [TrifleTileType.banner],
 		abilities: [
-
+			{
+				type: TrifleAbilityName.requireBannerDeployInZone,
+				triggerType: TrifleAbilityTriggerType.whileOnBoard
+			}
 		],
 		textLines: [
-			"TODO",
 			"Flower | Water",
 			"Deploys anywhere",
-			"must be played before any banner is played. All banners must be played within 6 spaces of this tile."
+			"Territorial Zone: 6",
+			"Must be played before any banner",
+			"Banners must be deployed within this tile's zone"
+		]
+	};
+
+	TrifleTiles[TrifleTileCodes.Duckweed] = {	/* Done */
+		available: true,
+		types: [TrifleTileType.flower],
+		identifiers: [TrifleTileIdentifier.water],
+		deployTypes: [TrifleDeployType.anywhere],
+		territorialZone: {
+			size: 2
+		},
+		abilities: [
+			{
+				// Surface Calm: Enemy tiles in zone cannot capture
+				type: TrifleAbilityName.prohibitTileFromCapturing,
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInZone,
+						targetTeams: [TrifleTileTeam.enemy]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles]
+			},
+			{
+				// Floating Refuge: Friendly tiles in zone are protected from capture
+				type: TrifleAbilityName.protectFromCapture,
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInZone,
+						targetTeams: [TrifleTileTeam.friendly]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				excludeTileCodes: [TrifleTileCodes.Duckweed]
+			}
+		],
+		textLines: [
+			"Flower | Water",
+			"Deploys anywhere",
+			"Territorial Zone: 2",
+			"Surface Calm: Enemy tiles in zone cannot capture",
+			"Floating Refuge: Friendly tiles in zone (except Duckweed) are protected from capture"
 		]
 	};
 
@@ -796,19 +909,36 @@ export function defineTrifleTiles() {
 		]
 	};
 
-	TrifleTiles[TrifleTileCodes.CherryBlossom] = {
+	TrifleTiles[TrifleTileCodes.CherryBlossom] = {	/* Done */
 		available: true,
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.earth],
 		deployTypes: [TrifleDeployType.anywhere],
+		territorialZone: {
+			size: 2
+		},
+		attributes: [
+			TrifleAttributeType.canBeCapturedByFriendlyTiles
+		],
 		abilities: [
-
+			{
+				type: TrifleAbilityName.protectFromCapture,
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInZone,
+						targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				excludeTileCodes: [TrifleTileCodes.CherryBlossom]
+			}
 		],
 		textLines: [
-			"TODO",
 			"Flower | Earth",
 			"Deploys anywhere",
-			"Tiles within 2 spaces may not be captured. (Any cherry blossom can be captured by either player, including any in zone)"
+			"Territorial Zone: 2",
+			"Tiles within zone cannot be captured (except Cherry Blossoms)",
+			"Can be captured by friendly or enemy tiles"
 		]
 	};
 
@@ -840,63 +970,140 @@ export function defineTrifleTiles() {
 		]
 	};
 
-	TrifleTiles[TrifleTileCodes.MoonFlower] = {
+	TrifleTiles[TrifleTileCodes.MoonFlower] = {	/* Done */
 		available: true,
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.earth],
-		deployTypes: [TrifleDeployType.anywhere],
-		abilities: [
-
-		],
-		textLines: [
-			"TODO",
-			"Flower | Earth",
-			"Deploys anywhere",
-			"After capture, returns to the field in original position when it's next open."
-		]
-	};
-
-	TrifleTiles[TrifleTileCodes.Chamomile] = {
-		available: true,
-		types: [TrifleTileType.flower],
-		identifiers: [TrifleTileIdentifier.earth],
-		deployTypes: [TrifleDeployType.anywhere],
-		abilities: [
-
-		],
-		textLines: [
-			"TODO",
-			"Flower | Earth",
-			"Deploys anywhere",
-			"All tiles within 7 spaces have a movement of 2. Affects all types, ignores other movement effects. Chamomile may not move."
-		]
-	};
-
-	/* Fire */
-
-	TrifleTiles[TrifleTileCodes.FireBanner] = {	/* todo */
-		available: true,
-		types: [TrifleTileType.banner],
-		identifiers: [TrifleTileIdentifier.fire],
 		deployTypes: [TrifleDeployType.anywhere],
 		abilities: [
 			{
-				type: TrifleAbilityName.protectFromCapture,
+				type: TrifleAbilityName.resurrectAtDeployPosition
+			}
+		],
+		textLines: [
+			"Flower | Earth",
+			"Deploys anywhere",
+			"After capture, returns to original position when it becomes open"
+		]
+	};
+
+	TrifleTiles[TrifleTileCodes.Chamomile] = {	/* Done */
+		available: true,
+		types: [TrifleTileType.flower],
+		identifiers: [TrifleTileIdentifier.earth],
+		deployTypes: [TrifleDeployType.anywhere],
+		territorialZone: {
+			size: 7
+		},
+		abilities: [
+			{
+				type: TrifleAbilityName.immobilizeTiles,
 				triggers: [
 					{
-						triggerType: TrifleAbilityTriggerType.whileTargetTileIsAdjacent,
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsOnBoard,
+						targetTileTypes: [TrifleTileCategory.thisTile]
+					}
+				],
+				targetTypes: [TrifleTargetType.thisTile]
+			},
+			{
+				type: TrifleAbilityName.setMovementDistance,
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInZone,
+						targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				movementDistance: 2
+			}
+		],
+		textLines: [
+			"Flower | Earth",
+			"Deploys anywhere",
+			"Territorial Zone: 7",
+			"Chamomile cannot move",
+			"All tiles in zone have movement of 2 (ignores other effects)"
+		]
+	};
+
+	/* Claude-created Tile */
+	TrifleTiles[TrifleTileCodes.Elderberry] = {	/* Done */
+		available: true,
+		types: [TrifleTileType.flower],
+		identifiers: [TrifleTileIdentifier.earth],
+		deployTypes: [TrifleDeployType.anywhere],
+		territorialZone: {
+			size: 3
+		},
+		abilities: [
+			{
+				// Antidote Aura: Friendly tiles in zone are cured of immobilization
+				type: TrifleAbilityName.cancelAbilitiesTargetingTiles,
+				abilityTypesToCancel: [TrifleAbilityName.immobilizeTiles],
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInZone,
+						targetTeams: [TrifleTileTeam.friendly]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles]
+			},
+			{
+				// Invigorating Essence: Friendly animals in zone get +1 movement
+				type: TrifleAbilityName.grantBonusMovement,
+				bonusMovement: {
+					distance: 1
+				},
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInZone,
 						targetTeams: [TrifleTileTeam.friendly],
-						targetTileTypes: [TrifleTileType.flower]
+						targetTileTypes: [TrifleTileType.animal]
 					}
 				],
 				targetTypes: [TrifleTargetType.triggerTargetTiles]
 			}
 		],
 		textLines: [
-			"TODO",
+			"Flower | Earth",
+			"Deploys anywhere",
+			"Territorial Zone: 3",
+			"Antidote Aura: Friendly tiles in zone cannot be immobilized",
+			"Invigorating Essence: Friendly animals in zone get +1 movement"
+		]
+	};
+
+	/* Fire */
+
+	TrifleTiles[TrifleTileCodes.FireBanner] = {	/* Done - Needs manual testing */
+		available: true,
+		types: [TrifleTileType.banner],
+		identifiers: [TrifleTileIdentifier.fire],
+		deployTypes: [TrifleDeployType.anywhere],
+		movements: [
+			{
+				type: TrifleMovementType.standard,
+				distance: 1
+			}
+		],
+		abilities: [
+			{
+				type: TrifleAbilityName.enlargeZone,
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsAdjacent,
+						targetTeams: [TrifleTileTeam.friendly]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				bonusZoneSize: 1
+			}
+		],
+		textLines: [
 			"Banner | Fire",
 			"Deploys anywhere",
-			"+1 to adjacent tile's territory range"
+			"Adjacent friendly tiles have their Territorial Zone enlarged by 1"
 		]
 	};
 
@@ -930,14 +1137,16 @@ export function defineTrifleTiles() {
 		]
 	};
 
-	TrifleTiles[TrifleTileCodes.KomodoRhino] = {	/* TODO */
+	TrifleTiles[TrifleTileCodes.KomodoRhino] = {	/* Done */
 		available: true,
 		types: [TrifleTileType.animal],
 		identifiers: [TrifleTileIdentifier.fire],
-		deployTypes: [TrifleDeployType.anywhere, TrifleDeployType.temple],
+		deployTypes: [TrifleDeployType.anywhere],
 		movements: [
 			{
-				type: TrifleMovementType.anywhere,
+				type: TrifleMovementType.standard,
+				distance: 2,
+				captureTypes: [TrifleCaptureType.all]
 			}
 		],
 		abilities: [
@@ -950,30 +1159,48 @@ export function defineTrifleTiles() {
 					}
 				],
 				targetTypes: [TrifleTargetType.triggerTargetTiles],
-				distanceAdjustmentFactor: 1/2
+				distanceAdjustmentFactor: 0.5
 			}
 		],
 		textLines: [
-			"TODO",
 			"Animal | Fire",
-			"Enemy tiles in this tiles line of sight have their movement speed halved (rounded down). This tile can move 2 spaces and can capture tiles."
+			"Deploys anywhere",
+			"Moves 2 spaces, can capture",
+			"Enemy tiles in line of sight have their movement halved (rounded down)"
 		]
 	};
 
-	TrifleTiles[TrifleTileCodes.ArmadilloBear] = {	/* TODO */
+	TrifleTiles[TrifleTileCodes.ArmadilloBear] = {	/* Done - Needs manual testing */
 		available: true,
 		types: [TrifleTileType.animal],
 		identifiers: [TrifleTileIdentifier.fire],
-		deployTypes: [TrifleDeployType.anywhere, TrifleDeployType.temple],
+		deployTypes: [TrifleDeployType.anywhere],
 		movements: [
 			{
-				type: TrifleMovementType.anywhere,
+				type: TrifleMovementType.standard,
+				distance: 2,
+				captureTypes: [TrifleCaptureType.all]
+			}
+		],
+		abilities: [
+			{
+				type: TrifleAbilityName.protectFromCapture,
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsSurrounding,
+						targetTileCodes: [TrifleTileCodes.FireLily],
+						targetTeams: [TrifleTileTeam.friendly],
+						distance: 2
+					}
+				],
+				targetTypes: [TrifleTargetType.thisTile]
 			}
 		],
 		textLines: [
-			"TODO",
 			"Animal | Fire",
-			"This tile can't be captured if it is within 2 spaces of any friendly Fire Lily tile. This tile can move 2 spaces. Can capture other tiles"
+			"Deploys anywhere",
+			"Moves 2 spaces, can capture",
+			"Protected from capture when within 2 spaces of a friendly Fire Lily"
 		]
 	};
 
@@ -1010,39 +1237,136 @@ export function defineTrifleTiles() {
 		]
 	};
 
-	TrifleTiles[TrifleTileCodes.GrassWeed] = {	/* TODO */
+	TrifleTiles[TrifleTileCodes.GrassWeed] = {	/* Done */
 		available: true,
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.fire],
-		deployTypes: [TrifleDeployType.anywhere, TrifleDeployType.temple],
+		deployTypes: [TrifleDeployType.anywhere],
+		territorialZone: {
+			size: 1
+		},
+		abilities: [
+			{
+				type: TrifleAbilityName.captureTargetTiles,
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whenDeployed,
+						targetTileTypes: [TrifleTileType.flower],
+						targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy]
+					}
+				],
+				targetTypes: [TrifleTargetType.surroundingTiles]
+			},
+			{
+				type: TrifleAbilityName.restrictMovementWithinZone,
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsOnBoard,
+						targetTileTypes: [TrifleTileCategory.thisTile]
+					}
+				],
+				targetTypes: [TrifleTargetType.allTiles],
+				targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy],
+				targetTileTypes: [TrifleTileType.flower]
+			}
+		],
 		textLines: [
-			"TODO",
 			"Flower | Fire",
-			"When this Plant tile is deployed it captures all flower tiles adjacent to it. Flower tiles can't be deployed or moved to a space adjacent to this tile"
+			"Deploys anywhere",
+			"Territorial Zone: 1",
+			"When deployed, captures all adjacent flowers",
+			"Flowers cannot deploy or move adjacent to this tile"
 		]
 	};
 
-	TrifleTiles[TrifleTileCodes.GrippingGrass] = {	/* TODO */
+	TrifleTiles[TrifleTileCodes.GrippingGrass] = {	/* Done */
 		available: true,
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.fire],
-		deployTypes: [TrifleDeployType.anywhere, TrifleDeployType.temple],
+		deployTypes: [TrifleDeployType.anywhere],
+		abilities: [
+			{
+				type: TrifleAbilityName.immobilizeTiles,
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsAdjacent,
+						targetTileTypes: [TrifleTileType.animal]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles]
+			}
+		],
 		textLines: [
-			"TODO",
 			"Flower | Fire",
-			"Animals may not move if beginning their movement adjacent to this tile."
+			"Deploys anywhere",
+			"Animals adjacent to Gripping Grass are immobilized"
 		]
 	};
 
-	TrifleTiles[TrifleTileCodes.Saffron] = {	/* TODO */
+	TrifleTiles[TrifleTileCodes.Saffron] = {	/* Done */
 		available: true,
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.fire],
-		deployTypes: [TrifleDeployType.anywhere, TrifleDeployType.temple],
+		deployTypes: [TrifleDeployType.anywhere],
+		territorialZone: {
+			size: 4
+		},
+		abilities: [
+			{
+				type: TrifleAbilityName.substituteForCapture
+			}
+		],
 		textLines: [
-			"TODO",
 			"Flower | Fire",
-			"When a tile is captured within 4 spaces, capture this tile instead and move that piece to saffron's position"
+			"Deploys anywhere",
+			"Territorial Zone: 4",
+			"When friendly tile is captured in zone, Saffron is captured instead"
+		]
+	};
+
+	TrifleTiles[TrifleTileCodes.Marigold] = {	/* Done */
+		available: true,
+		types: [TrifleTileType.flower],
+		identifiers: [TrifleTileIdentifier.fire],
+		deployTypes: [TrifleDeployType.anywhere],
+		territorialZone: {
+			size: 3
+		},
+		abilities: [
+			{
+				// Scorching Presence: Enemy flowers in zone have abilities canceled
+				type: TrifleAbilityName.cancelAbilities,
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInZone,
+						targetTeams: [TrifleTileTeam.enemy],
+						targetTileTypes: [TrifleTileType.flower]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles]
+			},
+			{
+				// Flame's Vigor: Friendly banners in zone get +1 movement
+				type: TrifleAbilityName.grantBonusMovement,
+				bonusMovement: {
+					distance: 1
+				},
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInZone,
+						targetTeams: [TrifleTileTeam.friendly],
+						targetTileTypes: [TrifleTileType.banner]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles]
+			}
+		],
+		textLines: [
+			"Flower | Fire",
+			"Deploys anywhere",
+			"Territorial Zone: 3",
+			"Scorching Presence: Enemy flowers in zone have their abilities canceled",
+			"Flame's Vigor: Friendly banners in zone get +1 movement"
 		]
 	};
 

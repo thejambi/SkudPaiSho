@@ -94,7 +94,7 @@ export const TrifleZoneAbility = {
 	protectFriendlyTilesFromCapture: "protectFriendlyTilesFromCapture", // Too specific, can be ProtectTilesFromCapture and have a target tiles metadata
 	// immobilizesOpponentTiles: "immobilizesOpponentTiles", // Outdated, replaced by ImmobilizesTiles
 	immobilizesTiles: "immobilizesTiles",
-	removesTileAbilities: "removesTileAbilities",	// TODO // TODO testing, etc
+	removesTileAbilities: "removesTileAbilities",
 	restrictMovementWithinZone: "restrictMovementWithinZone",
 	captureLandingTiles: "captureLandingTiles" // unused?
 }
@@ -137,7 +137,12 @@ export const TrifleAbilityName = {
 	recordTilePoint: "recordTilePoint",
 	moveTileToRecordedPoint: "moveTileToRecordedPoint",
 	moveTargetTileToPile: "moveTargetTileToPile",
-	exchangeWithCapturedTile: "exchangeWithCapturedTile"
+	exchangeWithCapturedTile: "exchangeWithCapturedTile",
+	enlargeZone: "enlargeZone",
+	setMovementDistance: "setMovementDistance",
+	requireBannerDeployInZone: "requireBannerDeployInZone",
+	resurrectAtDeployPosition: "resurrectAtDeployPosition",
+	substituteForCapture: "substituteForCapture"
 };
 
 export const TrifleAbilityType = {
@@ -183,7 +188,8 @@ export const TrifleAbilityTriggerType = {
 	whileTargetTileIsInZone: "whileTargetTileIsInZone",
 	whenDeployed: "whenDeployed",
 	whenActiveMovement: "whenActiveMovement",
-	whenTargetTileLandsInTemple: "whenTargetTileLandsInTemple"
+	whenTargetTileLandsInTemple: "whenTargetTileLandsInTemple",
+	whenAdjacentFriendlyTileIsCaptured: "whenAdjacentFriendlyTileIsCaptured"
 };
 
 export const TriflePromptTargetType = {
