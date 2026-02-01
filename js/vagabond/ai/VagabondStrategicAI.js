@@ -3,6 +3,7 @@
 import { DEPLOY, GUEST, HOST, MOVE } from '../../CommonNotationObjects';
 import { getOpponentName } from '../../pai-sho-common/PaiShoPlayerHelp';
 import { VagabondTileCodes } from '../VagabondTile';
+import { VagabondTrifleTileCodes } from '../VagabondTrifleTiles';
 import { VagabondAiHelp } from './VagabondAiHelp';
 import { NON_PLAYABLE } from '../../skud-pai-sho/SkudPaiShoBoardPoint';
 
@@ -123,7 +124,9 @@ export class VagabondStrategicAI {
 		var oppLotusPoint = this.findTileOnBoard(board, opponent, VagabondTileCodes.Lotus);
 
 		if (myLotusPoint) {
-			if (myLotusPoint.tile.protected) {
+			// In Trifle, protection is handled by the ability manager
+			// Check if tile has protected flag (set by ability activation)
+			if (this.isTileProtected(myLotusPoint.tile)) {
 				score += this.weights.lotusProtection;
 			}
 			if (this.canBeCapturedByOpponent(board, myLotusPoint, player, opponent)) {
@@ -132,7 +135,7 @@ export class VagabondStrategicAI {
 		}
 
 		if (oppLotusPoint) {
-			if (!oppLotusPoint.tile.protected && this.canCaptureOpponentLotus(board, oppLotusPoint, player)) {
+			if (!this.isTileProtected(oppLotusPoint.tile) && this.canCaptureOpponentLotus(board, oppLotusPoint, player)) {
 				score += this.weights.lotusThreat;
 			}
 		}
@@ -150,13 +153,14 @@ export class VagabondStrategicAI {
 		var oppBisons = this.findAllTilesOnBoard(board, opponent, [VagabondTileCodes.SkyBison, VagabondTileCodes.FlyingLemur]);
 
 		for (var i = 0; i < myBisons.length; i++) {
-			if (myBisons[i].tile.blocked) {
+			// In Trifle, blocking is handled by the ability manager
+			if (this.isTileBlocked(myBisons[i].tile)) {
 				score += this.weights.bisonBlocked;
 			}
 		}
 
 		for (var i = 0; i < oppBisons.length; i++) {
-			if (oppBisons[i].tile.blocked) {
+			if (this.isTileBlocked(oppBisons[i].tile)) {
 				score += this.weights.opponentBisonBlocked;
 			}
 		}
@@ -286,7 +290,18 @@ export class VagabondStrategicAI {
 		// Check if capturing opponent's Lotus
 		return endBp.tile.code === VagabondTileCodes.Lotus &&
 			   endBp.tile.ownerName !== this.player &&
-			   startBp.tile.hasCaptureAbility();
+			   this.tileHasCaptureAbility(startBp.tile);
+	}
+
+	// Helper: Check if tile has capture ability
+	tileHasCaptureAbility(tile) {
+		// Check using tile method if available, otherwise check by code
+		if (typeof tile.hasCaptureAbility === 'function') {
+			return tile.hasCaptureAbility();
+		}
+		// Capture tiles in Vagabond: D, W, S, Y
+		return [VagabondTileCodes.Dragon, VagabondTileCodes.Wheel,
+				VagabondTileCodes.SkyBison, VagabondTileCodes.FlyingLemur].includes(tile.code);
 	}
 
 	// Helper methods
@@ -346,10 +361,12 @@ export class VagabondStrategicAI {
 
 		for (var i = 0; i < oppCaptureTiles.length; i++) {
 			var bp = oppCaptureTiles[i];
-			if (bp.tile.blocked) {
+			if (this.isTileBlocked(bp.tile)) {
 				continue;
 			}
-			if (board.canMoveTileToPoint(opponent, bp, targetPoint)) {
+			// Note: canMoveTileToPoint may not exist in PaiShoGameBoard
+			// For Trifle compatibility, we use a simplified distance check
+			if (this.canReachTarget(board, bp, targetPoint)) {
 				return true;
 			}
 		}
@@ -362,14 +379,60 @@ export class VagabondStrategicAI {
 
 		for (var i = 0; i < myCaptureTiles.length; i++) {
 			var bp = myCaptureTiles[i];
-			if (bp.tile.blocked) {
+			if (this.isTileBlocked(bp.tile)) {
 				continue;
 			}
-			if (board.canMoveTileToPoint(player, bp, lotusPoint)) {
+			// Note: canMoveTileToPoint may not exist in PaiShoGameBoard
+			// For Trifle compatibility, we use a simplified distance check
+			if (this.canReachTarget(board, bp, lotusPoint)) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	// Helper: Check if tile has protected status (from ability manager or flag)
+	isTileProtected(tile) {
+		// Check for protected flag set by ability activation
+		if (tile.protected) {
+			return true;
+		}
+		// TODO: Could also query the ability manager for active protection abilities
+		return false;
+	}
+
+	// Helper: Check if tile is blocked/immobilized (from ability manager or flag)
+	isTileBlocked(tile) {
+		// Check for blocked flag set by ability activation
+		if (tile.blocked) {
+			return true;
+		}
+		// TODO: Could also query the ability manager for active immobilization abilities
+		return false;
+	}
+
+	// Helper: Simplified reachability check for Trifle compatibility
+	canReachTarget(board, fromPoint, toPoint) {
+		if (!fromPoint.hasTile()) {
+			return false;
+		}
+		var tile = fromPoint.tile;
+		var distance = Math.abs(fromPoint.row - toPoint.row) + Math.abs(fromPoint.col - toPoint.col);
+
+		// Get movement distance based on tile type
+		var moveRange = 0;
+		if (tile.code === VagabondTileCodes.SkyBison) {
+			moveRange = 6;
+		} else if (tile.code === VagabondTileCodes.FlyingLemur) {
+			moveRange = 5;
+		} else if (tile.code === VagabondTileCodes.Dragon) {
+			moveRange = 5;
+		} else if (tile.code === VagabondTileCodes.Wheel) {
+			// Wheel has unlimited range but only diagonal
+			moveRange = 99;
+		}
+
+		return distance <= moveRange;
 	}
 
 	countProtectedFlowers(board, player) {
@@ -377,12 +440,23 @@ export class VagabondStrategicAI {
 		for (var row = 0; row < board.cells.length; row++) {
 			for (var col = 0; col < board.cells[row].length; col++) {
 				var bp = board.cells[row][col];
-				if (bp.hasTile() && bp.tile.ownerName === player && bp.tile.isFlowerTile() && bp.tile.protected) {
+				if (bp.hasTile() && bp.tile.ownerName === player &&
+					this.isTileFlower(bp.tile) && this.isTileProtected(bp.tile)) {
 					count++;
 				}
 			}
 		}
 		return count;
+	}
+
+	// Helper: Check if tile is a flower tile
+	isTileFlower(tile) {
+		// Check using tile method if available, otherwise check by code
+		if (typeof tile.isFlowerTile === 'function') {
+			return tile.isFlowerTile();
+		}
+		// Flower tiles in Vagabond: L, C, F
+		return [VagabondTileCodes.Lotus, VagabondTileCodes.Chrysanthemum, VagabondTileCodes.FireLily].includes(tile.code);
 	}
 
 	calculateCenterBonus(boardPoint) {

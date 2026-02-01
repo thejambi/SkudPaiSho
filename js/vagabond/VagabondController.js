@@ -45,6 +45,7 @@ import { POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint";
 import { SWAP_BISON_WITH_LEMUR, gameOptionEnabled } from '../GameOptions';
 import { VagabondActuator } from './VagabondActuator';
 import { VagabondGameManager } from './VagabondGameManager';
+import { VagabondTrifleGameManager } from './VagabondTrifleGameManager';
 import {
   VagabondGameNotation,
   VagabondNotationBuilder,
@@ -53,7 +54,17 @@ import { VagabondMctsGame, VagabondNotationBgIoGame } from './VagabondNotationBg
 import { VagabondRandomAIv1 } from './ai/VagabondRandomAIv1';
 import { VagabondStrategicAI } from './ai/VagabondStrategicAI';
 import { VagabondTile, VagabondTileCodes } from './VagabondTile';
-import { dateIsAprilFools, debug } from "../GameData";
+import {
+  VagabondTileInfo,
+  VagabondTrifleTiles,
+  VagabondTrifleTileCodes,
+} from './VagabondTrifleTiles';
+import {
+  setCurrentTileMetadata,
+  setCurrentTileCodes,
+} from '../trifle/PaiShoGamesTileMetadata';
+import { TrifleTile } from '../trifle/TrifleTile';
+import { dateIsAprilFools, debug, gameDevOn } from "../GameData";
 import { MCTS } from '../ai/MCTS';
 
 export var VagabondConstants = {
@@ -69,6 +80,11 @@ export class VagabondController {
 		if (!localStorage.getItem(vagabondTileDesignTypeKey)
 			|| !VagabondController.tileDesignTypeValues[localStorage.getItem(vagabondTileDesignTypeKey)]) {
 			localStorage.setItem(vagabondTileDesignTypeKey, "tggvagabond");
+		}
+
+		this.useTrifleConversion = false;
+		if (gameDevOn) {
+			this.useTrifleConversion = true;
 		}
 
 		VagabondController.loadPreferences();
@@ -164,7 +180,16 @@ export class VagabondController {
 		}
 	}
 	resetGameManager() {
-		this.theGame = new VagabondGameManager(this.actuator);
+		if (this.useTrifleConversion) {
+			// Use Trifle engine for Vagabond (experimental)
+			VagabondTileInfo.initializeTrifleData();
+			setCurrentTileMetadata(VagabondTrifleTiles);
+			setCurrentTileCodes(VagabondTrifleTileCodes);
+			this.theGame = new VagabondTrifleGameManager(this.actuator);
+		} else {
+			// Use original Vagabond game manager
+			this.theGame = new VagabondGameManager(this.actuator);
+		}
 
 		var vgame = new VagabondMctsGame(GUEST);
 		let iterations = 500; //more iterations -> stronger AI, more computation
@@ -414,8 +439,13 @@ export class VagabondController {
 			this.notationBuilder.tileType = tileCode;
 			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
-			// this.theGame.revealDeployPoints(getCurrentPlayer(), tileCode); // Old
-			this.theGame.revealDeployPoints(tile.ownerName, tileCode); // New
+			if (this.useTrifleConversion) {
+				// Trifle engine expects tile object
+				this.theGame.revealDeployPoints(tile);
+			} else {
+				// Original expects (player, tileCode, ignoreActuate)
+				this.theGame.revealDeployPoints(player, tileCode);
+			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
 			this.resetNotationBuilder(this.notationBuilder.offerDraw);
@@ -534,7 +564,7 @@ export class VagabondController {
 
 		var tileCode = tile.code;
 
-		var heading = VagabondTile.getTileName(tileCode);
+		var heading = this.useTrifleConversion ? TrifleTile.getTileName(tileCode) : VagabondTile.getTileName(tileCode);
 
 		if (tileCode === 'L') {
 			heading = "White Lotus";

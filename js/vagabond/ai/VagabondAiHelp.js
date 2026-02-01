@@ -10,6 +10,7 @@ import {
 import { NON_PLAYABLE, POSSIBLE_MOVE } from '../../skud-pai-sho/SkudPaiShoBoardPoint';
 import { VagabondNotationBuilder } from '../VagabondGameNotation';
 import { WAITING_FOR_ENDPOINT } from '../../PaiShoMain';
+import { gameDevOn } from '../../GameData';
 
 export function VagabondAiHelp() {
 	this.moveNum = 0;
@@ -30,7 +31,13 @@ VagabondAiHelp.prototype.getPossibleDeploymentMoves = function(game, player) {
 
 	for (var i = 0; i < tilePile.length; i++) {
 		var tile = tilePile[i];
-		game.revealDeployPoints(player, tile.code, true);
+		if (gameDevOn) {
+			// Trifle engine expects tile object
+			game.revealDeployPoints(tile, true);
+		} else {
+			// Original expects (player, tileCode, ignoreActuate)
+			game.revealDeployPoints(player, tile.code, true);
+		}
 		var endPoints = this.getPossibleMovePoints(game);
 
 		for (var j = 0; j < endPoints.length; j++) {
