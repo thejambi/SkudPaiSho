@@ -395,8 +395,9 @@ export function defineTrifleTiles() {
 		]
 	};
 
+	/* Claude-created Tile */
 	TrifleTiles[TrifleTileCodes.Wisteria] = {	/* Done */
-		available: true,
+		available: false,
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.air],
 		deployTypes: [TrifleDeployType.anywhere],
@@ -704,8 +705,9 @@ export function defineTrifleTiles() {
 		]
 	};
 
+	/* Claude-created Tile */
 	TrifleTiles[TrifleTileCodes.Duckweed] = {	/* Done */
-		available: true,
+		available: false,
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.water],
 		deployTypes: [TrifleDeployType.anywhere],
@@ -1029,7 +1031,7 @@ export function defineTrifleTiles() {
 
 	/* Claude-created Tile */
 	TrifleTiles[TrifleTileCodes.Elderberry] = {	/* Done */
-		available: true,
+		available: false,
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.earth],
 		deployTypes: [TrifleDeployType.anywhere],
@@ -1324,8 +1326,9 @@ export function defineTrifleTiles() {
 		]
 	};
 
+	/* Claude-created Tile */
 	TrifleTiles[TrifleTileCodes.Marigold] = {	/* Done */
-		available: true,
+		available: false,
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.fire],
 		deployTypes: [TrifleDeployType.anywhere],
