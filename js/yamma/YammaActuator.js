@@ -63,6 +63,10 @@ export class YammaActuator {
 		this.currentPlayerColor = PLAYER.WHITE; // Updated when showing rotation selection
 		this.rotationArrowsGroup = null; // 3D arrows for rotation control
 
+		// Turn indicator
+		this.turnIndicatorSprite = null;
+		this.boardContainerDiv = null; // Reference for colored border
+
 		this.initialized = false;
 
 		this.initialize();
@@ -74,6 +78,8 @@ export class YammaActuator {
 
 		// Create board container wrapper
 		const bcontainer = createDivWithClass('board-container');
+		bcontainer.classList.add('yamma-board-container');
+		this.boardContainerDiv = bcontainer;
 
 		// Create 3D container div
 		const container = document.createElement('div');
@@ -189,6 +195,9 @@ export class YammaActuator {
 
 		// Create the triangular board base
 		this.createBoardBase();
+
+		// Create turn indicator sprite
+		this.createTurnIndicator();
 
 		// Event listeners
 		this.setupEventListeners(container);
@@ -449,6 +458,116 @@ export class YammaActuator {
 		sprite.scale.set(1.5, 0.75, 1);
 
 		return sprite;
+	}
+
+	/**
+	 * Create the turn indicator sprite that shows whose turn it is.
+	 * Positioned above the board, always facing the camera.
+	 */
+	createTurnIndicator() {
+		this.turnIndicatorSprite = this.createTurnIndicatorSprite(PLAYER.WHITE);
+		this.turnIndicatorSprite.position.set(0, 6, 0);
+		this.scene.add(this.turnIndicatorSprite);
+	}
+
+	/**
+	 * Create a turn indicator sprite with the player's color.
+	 */
+	createTurnIndicatorSprite(playerColor) {
+		const canvas = document.createElement('canvas');
+		const context = canvas.getContext('2d');
+		canvas.width = 256;
+		canvas.height = 64;
+
+		// Clear canvas
+		context.clearRect(0, 0, canvas.width, canvas.height);
+
+		// Draw rounded background
+		const bgColor = playerColor === PLAYER.WHITE ? '#f0f0f0' : '#1e40af';
+		const textColor = playerColor === PLAYER.WHITE ? '#333333' : '#ffffff';
+		const borderColor = playerColor === PLAYER.WHITE ? '#cccccc' : '#3b82f6';
+
+		context.fillStyle = bgColor;
+		context.strokeStyle = borderColor;
+		context.lineWidth = 3;
+		this.roundRect(context, 4, 4, canvas.width - 8, canvas.height - 8, 12);
+		context.fill();
+		context.stroke();
+
+		// Draw text
+		const colorName = playerColor === PLAYER.WHITE ? 'White' : 'Blue';
+		context.font = 'bold 28px Arial';
+		context.textAlign = 'center';
+		context.textBaseline = 'middle';
+		context.fillStyle = textColor;
+		context.fillText(`${colorName}'s Turn`, canvas.width / 2, canvas.height / 2);
+
+		const texture = new THREE.CanvasTexture(canvas);
+		const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+		const sprite = new THREE.Sprite(spriteMaterial);
+		sprite.scale.set(4, 1, 1);
+
+		return sprite;
+	}
+
+	/**
+	 * Helper to draw a rounded rectangle.
+	 */
+	roundRect(ctx, x, y, width, height, radius) {
+		ctx.beginPath();
+		ctx.moveTo(x + radius, y);
+		ctx.lineTo(x + width - radius, y);
+		ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+		ctx.lineTo(x + width, y + height - radius);
+		ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+		ctx.lineTo(x + radius, y + height);
+		ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+		ctx.lineTo(x, y + radius);
+		ctx.quadraticCurveTo(x, y, x + radius, y);
+		ctx.closePath();
+	}
+
+	/**
+	 * Update the turn indicator to show the current player.
+	 */
+	updateTurnIndicator(currentPlayer, gameEnded) {
+		if (!this.turnIndicatorSprite) return;
+
+		// Remove old sprite
+		this.scene.remove(this.turnIndicatorSprite);
+		if (this.turnIndicatorSprite.material.map) {
+			this.turnIndicatorSprite.material.map.dispose();
+		}
+		this.turnIndicatorSprite.material.dispose();
+
+		// Create new sprite with updated player (unless game ended)
+		if (!gameEnded) {
+			const playerColor = currentPlayer === PLAYER.WHITE ? PLAYER.WHITE : PLAYER.BLUE;
+			this.turnIndicatorSprite = this.createTurnIndicatorSprite(playerColor);
+			this.turnIndicatorSprite.position.set(0, 6, 0);
+			this.scene.add(this.turnIndicatorSprite);
+		}
+
+		// Update the board container border color
+		this.updateBoardBorder(currentPlayer, gameEnded);
+	}
+
+	/**
+	 * Update the colored border around the board container.
+	 */
+	updateBoardBorder(currentPlayer, gameEnded) {
+		if (!this.boardContainerDiv) return;
+
+		// Remove existing border classes
+		this.boardContainerDiv.classList.remove('yamma-turn-white', 'yamma-turn-blue', 'yamma-game-ended');
+
+		if (gameEnded) {
+			this.boardContainerDiv.classList.add('yamma-game-ended');
+		} else if (currentPlayer === PLAYER.WHITE) {
+			this.boardContainerDiv.classList.add('yamma-turn-white');
+		} else {
+			this.boardContainerDiv.classList.add('yamma-turn-blue');
+		}
 	}
 
 	createTriangularGrid() {
@@ -964,10 +1083,14 @@ export class YammaActuator {
 		}
 	}
 
-	actuate(board, winner, winningAngle, lastMove) {
+	actuate(board, winner, winningAngle, lastMove, currentPlayer) {
 		if (!this.initialized) return;
 
 		this.currentBoard = board;
+
+		// Update the turn indicator and border
+		const playerColor = currentPlayer === PLAYER.WHITE ? PLAYER.WHITE : PLAYER.BLUE;
+		this.updateTurnIndicator(playerColor, winner !== null);
 
 		// Clear existing cubes
 		while (this.cubesGroup.children.length > 0) {

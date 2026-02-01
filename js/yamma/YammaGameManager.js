@@ -22,7 +22,10 @@ export class YammaGameManager {
 			return;
 		}
 		if (this.actuator) {
-			this.actuator.actuate(this.board, this.winner, this.winningAngle, this.lastMove);
+			// Determine current player color based on move count
+			// HOST (White) plays on even moves, GUEST (Blue) plays on odd moves
+			const currentPlayerColor = this.moveCount % 2 === 0 ? PLAYER.WHITE : PLAYER.BLUE;
+			this.actuator.actuate(this.board, this.winner, this.winningAngle, this.lastMove, currentPlayerColor);
 		}
 	}
 
