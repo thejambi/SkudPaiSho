@@ -47,6 +47,10 @@ export class PaikoGameManager {
 		}
 	}
 
+	updateActuator(actuator) {
+		this.actuator = actuator;
+	}
+
 	setup(gameNotation) {
 		// Reset board and tiles
 		this.board = new PaikoBoard();

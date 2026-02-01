@@ -14,10 +14,10 @@ export function GinsengOptions() {
 	}
 
 	GinsengOptions.viewAsGuest = false || GinsengOptions.viewAsGuest;
-	if (currentGameData && currentGameData.gameTypeId === GameType.Ginsengid && usernameEquals(currentGameData.guestUsername)) {
+	if (currentGameData && currentGameData.gameTypeId === GameType.Ginseng.id && usernameEquals(currentGameData.guestUsername)) {
 		GinsengOptions.viewAsGuest = true;
 	}
-	if (currentGameData && currentGameData.gameTypeId === GameType.Ginsengid && usernameEquals(currentGameData.hostUsername)) {
+	if (currentGameData && currentGameData.gameTypeId === GameType.Ginseng.id && usernameEquals(currentGameData.hostUsername)) {
 		GinsengOptions.viewAsGuest = false;
 	}
 }

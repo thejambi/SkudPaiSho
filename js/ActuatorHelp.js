@@ -1,22 +1,23 @@
 /* Used in Vagabond Board Rotate: */
-import {
-  ADEVAR_GUEST_ROTATE,
-  ADEVAR_ROTATE,
-  GINSENG_GUEST_ROTATE,
-  GINSENG_ROTATE,
-  SQUARE_SPACES,
-  gameOptionEnabled,
-} from './GameOptions';
 import { NotationPoint, RowAndColumn } from './CommonNotationObjects';
-import { SkudPaiShoController } from './skud-pai-sho/SkudPaiShoController';
 import { browserCheck_chrome, debugOn } from './GameData';
 import {
-  customBoardUrlArrayKey,
-  customBoardUrlKey,
-  paiShoBoardKey,
-  skudTilesKey,
-  svgBoardDesigns
+	ADEVAR_GUEST_ROTATE,
+	ADEVAR_ROTATE,
+	GINSENG_GUEST_ROTATE,
+	GINSENG_ROTATE,
+	PAIKO_GUEST_ROTATE,
+	SQUARE_SPACES,
+	gameOptionEnabled
+} from './GameOptions';
+import {
+	customBoardUrlArrayKey,
+	customBoardUrlKey,
+	paiShoBoardKey,
+	skudTilesKey,
+	svgBoardDesigns
 } from './PaiShoMain';
+import { SkudPaiShoController } from './skud-pai-sho/SkudPaiShoController';
 
 export var cos45 = Math.sin(Math.PI / 4);
 export var sin45 = cos45;
@@ -167,6 +168,7 @@ export function setupPaiShoBoard(gameContainer,
 	var addAdevarGuestBoardRotate = false;
 	var addGinsengBoardRotate = false;
 	var addGinsengGuestBoardRotate = false;
+	var addPaikoGuestBoardRotate = false;
 
 	// Check for existing class on board...
 	if (document.querySelector(".vagabondBoardRotate")) {
@@ -179,6 +181,8 @@ export function setupPaiShoBoard(gameContainer,
 		addGinsengBoardRotate = true;
 	} else if (document.querySelector(".ginsengGuestBoardRotate")) {
 		addGinsengGuestBoardRotate = true;
+	} else if (document.querySelector(".paikoGuestBoardRotate")) {
+		addPaikoGuestBoardRotate = true;
 	}
 
 	removeChildren(gameContainer);
@@ -217,6 +221,8 @@ export function setupPaiShoBoard(gameContainer,
 		svgContainer.classList.add("ginsengBoardRotate");
 	} else if (addGinsengGuestBoardRotate) {
 		svgContainer.classList.add("ginsengGuestBoardRotate");
+	} else if (addPaikoGuestBoardRotate) {
+		svgContainer.classList.add("paikoGuestBoardRotate");
 	}
 
 	arrowSvg.appendChild(arrowContainer);
@@ -267,6 +273,8 @@ export function setupPaiShoBoard(gameContainer,
 			rotateClass = "ginsengBoardRotate";
 		} else if (rotateType === GINSENG_GUEST_ROTATE) {
 			rotateClass = "ginsengGuestBoardRotate";
+		} else if (rotateType === PAIKO_GUEST_ROTATE) {
+			rotateClass = "paikoGuestBoardRotate";
 		}
 
 		// Set Timeout to get animated board rotation
@@ -276,6 +284,7 @@ export function setupPaiShoBoard(gameContainer,
 			svgContainer.classList.remove("adevarGuestBoardRotate");
 			svgContainer.classList.remove("ginsengBoardRotate");
 			svgContainer.classList.remove("ginsengGuestBoardRotate");
+			svgContainer.classList.remove("paikoGuestBoardRotate");
 			svgContainer.classList.add(rotateClass);
 		}, addClassAfterThisManyMs);
 	} else {
@@ -286,6 +295,7 @@ export function setupPaiShoBoard(gameContainer,
 			svgContainer.classList.remove("adevarGuestBoardRotate");
 			svgContainer.classList.remove("ginsengBoardRotate");
 			svgContainer.classList.remove("ginsengGuestBoardRotate");
+			svgContainer.classList.remove("paikoGuestBoardRotate");
 		}, addClassAfterThisManyMs);
 	}
 

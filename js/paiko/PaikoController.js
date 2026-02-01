@@ -11,6 +11,10 @@ import {
 	currentMoveIndex,
 	finalizeMove,
 	getCurrentPlayer,
+	getOnlineGameOpponentUsername,
+	getUsername,
+	iAmPlayerInCurrentOnlineGame,
+	isAnimationsOn,
 	myTurn,
 	onlinePlayEnabled,
 	pieceAnimationLength,
@@ -23,6 +27,7 @@ import { PaikoActuator } from './PaikoActuator';
 import { PaikoGameManager } from './PaikoGameManager';
 import { PaikoMoveType, PaikoGamePhase } from './PaikoGameNotation';
 import { PaikoMoveBuilder, PaikoBuilderStatus } from './PaikoMoveBuilder';
+import { PaikoOptions } from './PaikoOptions';
 import { TrifleGameNotation } from '../trifle/TrifleGameNotation';
 import { PaikoPointState } from './PaikoBoardPoint';
 import { PaikoTile, PaikoTileFacing, PaikoTileDefinitions, PaikoTileCode, getAllTileCodes } from './PaikoTile';
@@ -31,7 +36,10 @@ import { debug } from '../GameData';
 
 export class PaikoController {
 	constructor(gameContainer, isMobile) {
-		this.actuator = new PaikoActuator(gameContainer, isMobile, true);
+		new PaikoOptions();	// Initialize
+		this.gameContainer = gameContainer;
+		this.isMobile = isMobile;
+		this.createActuator();
 
 		this.resetGameManager();
 		this.resetNotationBuilder();
@@ -83,6 +91,20 @@ export class PaikoController {
 			clearTimeout(this.displayTempMessageTimeout);
 			this.displayTempMessageTimeout = null;
 		}
+	}
+
+	createActuator() {
+		this.actuator = new PaikoActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+		if (this.theGame) {
+			this.theGame.updateActuator(this.actuator);
+		}
+	}
+
+	toggleViewAsGuest() {
+		PaikoOptions.viewAsGuest = !PaikoOptions.viewAsGuest;
+		this.createActuator();
+		this.callActuate();
+		clearMessage();
 	}
 
 	getGameTypeId() {
@@ -1763,28 +1785,24 @@ export class PaikoController {
 
 	setGameNotation(newGameNotation) {
 		this.gameNotation.setNotationText(newGameNotation);
+		if (playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && getOnlineGameOpponentUsername() != getUsername()) {
+			new PaikoOptions();	// To set perspective...
+			this.createActuator();
+			clearMessage();
+		}
 	}
 
 	getAdditionalHelpTabDiv() {
 		const settingsDiv = document.createElement('div');
 
-		// To remove
-		// const heading = document.createElement('h4');
-		// heading.innerText = 'Paiko Tiles:';
-		// settingsDiv.appendChild(heading);
+		const heading = document.createElement('h4');
+		heading.innerText = 'Paiko Preferences:';
+		settingsDiv.appendChild(heading);
 
-		// // Add tile info
-		// const tileInfo = document.createElement('div');
-		// getAllTileCodes().forEach(code => {
-		// 	const def = PaikoTileDefinitions[code];
-		// 	const tileDiv = document.createElement('p');
-		// 	tileDiv.innerHTML = `<strong>${def.name}:</strong> Move ${def.moveDistance}, Threatens ${def.threatPattern.length} spaces`;
-		// 	if (def.coverPattern.length > 0) {
-		// 		tileDiv.innerHTML += `, Covers ${def.coverPattern.length} spaces`;
-		// 	}
-		// 	tileInfo.appendChild(tileDiv);
-		// });
-		// settingsDiv.appendChild(tileInfo);
+		if (!playingOnlineGame() || !iAmPlayerInCurrentOnlineGame() || getOnlineGameOpponentUsername() === getUsername()) {
+			settingsDiv.appendChild(PaikoOptions.buildToggleViewAsGuestDiv());
+			settingsDiv.appendChild(document.createElement('br'));
+		}
 
 		return settingsDiv;
 	}

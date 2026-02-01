@@ -592,6 +592,24 @@ figure > div {
   transform: rotate(90deg);
 }
 
+.paikoGuestBoardRotate {
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
+
+  z-index:0;
+}
+.paikoGuestPointRotate {
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+/* TODO remove nick board rotate and replace references with Adevar rotate */
 .nickBoardRotate {
   -webkit-transform: rotate(135deg);
   -moz-transform: rotate(135deg);

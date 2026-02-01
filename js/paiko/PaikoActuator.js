@@ -2,13 +2,14 @@
 // Handles rendering the board and tiles
 
 import { createBoardArrow, createBoardPointDiv, setupPaiShoBoard } from '../ActuatorHelp';
-import { NotationPoint } from '../CommonNotationObjects';
-import { DEPLOY, MOVE, HOST, GUEST } from '../CommonNotationObjects';
-import { clearMessage, gameController, pieceAnimationLength, piecePlaceAnimation, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from '../PaiShoMain';
+import { DEPLOY, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
+import { PAIKO_GUEST_ROTATE } from '../GameOptions';
+import { clearMessage, pieceAnimationLength, piecePlaceAnimation, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from '../PaiShoMain';
 import { ElementStyleTransform } from '../util/ElementStyleTransform';
-import { PaikoController } from './PaikoController';
 import { PaikoPointState, PaikoZone } from './PaikoBoardPoint';
-import { PaikoTileFacing, PaikoTileCode, getAllTileCodes } from './PaikoTile';
+import { PaikoController } from './PaikoController';
+import { PaikoOptions } from './PaikoOptions';
+import { getAllTileCodes, PaikoTileCode, PaikoTileFacing } from './PaikoTile';
 
 export class PaikoActuator {
 	constructor(gameContainer, isMobile, enableAnimations) {
@@ -21,8 +22,8 @@ export class PaikoActuator {
 			this.gameContainer,
 			PaikoController.getHostTilesContainerDivs(),
 			PaikoController.getGuestTilesContainerDivs(),
-			false, // No board rotation
-			false, // No rotation type
+			PaikoOptions.viewAsGuest, // Board default rotation if not viewing as Guest
+			PaikoOptions.viewAsGuest ? PAIKO_GUEST_ROTATE : null,
 			true,   // Play in spaces (not on points)
 			"Paiko_zoom",
 			"1.2"	// Paiko zooms in
@@ -237,6 +238,10 @@ export class PaikoActuator {
 		} else {
 			theDiv.classList.add('activePoint');
 
+			if (PaikoOptions.viewAsGuest) {
+				theDiv.classList.add("paikoGuestPointRotate");
+			}
+
 			// Zone styling
 			if (boardPoint.zone === PaikoZone.HOST_HOMEGROUND) {
 				theDiv.classList.add('paikoHostHomeground');
@@ -300,8 +305,15 @@ export class PaikoActuator {
 
 			// Apply tile rotation based on facing
 			const tile = boardPoint.tile;
+			let rotationDegrees = 0;
 			if (tile.hasFacing() && tile.getFacing() !== PaikoTileFacing.UP) {
-				const rotationDegrees = 90 * tile.getFacing();
+				rotationDegrees = 90 * tile.getFacing();
+			}
+			// Add 180 degrees when viewing as Guest to keep tiles oriented correctly
+			if (PaikoOptions.viewAsGuest && !tile.hasFacing()) {
+				rotationDegrees += 180;
+			}
+			if (rotationDegrees !== 0) {
 				theImg.elementStyleTransform.setValue('rotate', rotationDegrees, 'deg');
 			}
 
@@ -326,11 +338,17 @@ export class PaikoActuator {
 					capturedImg.src = this.getTileSrcPath(captured.tile);
 					capturedImg.classList.add('capturedTileAnim');
 
-					// Apply rotation if tile has facing
+					// Apply rotation if tile has facing or viewing as Guest
+					let capturedRotation = 0;
 					if (captured.tile.hasFacing && captured.tile.hasFacing() &&
 						captured.tile.getFacing() !== PaikoTileFacing.UP) {
-						const rotationDegrees = 90 * captured.tile.getFacing();
-						capturedImg.elementStyleTransform.setValue('rotate', rotationDegrees, 'deg');
+						capturedRotation = 90 * captured.tile.getFacing();
+					}
+					if (PaikoOptions.viewAsGuest) {
+						capturedRotation += 180;
+					}
+					if (capturedRotation !== 0) {
+						capturedImg.elementStyleTransform.setValue('rotate', capturedRotation, 'deg');
 					}
 
 					theDiv.appendChild(capturedImg);

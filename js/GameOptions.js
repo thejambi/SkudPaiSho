@@ -155,6 +155,9 @@ gameOptionDescriptions[GINSENG_ROTATE] = "Ginseng Board Rotation";
 export var GINSENG_GUEST_ROTATE = "GinsengGuestRotation";
 gameOptionDescriptions[GINSENG_GUEST_ROTATE] = "Ginseng Guest Rotation";
 
+export var PAIKO_GUEST_ROTATE = "PaikoGuestRotation";
+gameOptionDescriptions[PAIKO_GUEST_ROTATE] = "Paiko Guest Rotation";
+
 export var FULL_GRID = "FullGrid";
 gameOptionDescriptions[FULL_GRID] = "Full Grid";
 
