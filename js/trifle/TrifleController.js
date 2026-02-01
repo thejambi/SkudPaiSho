@@ -9,8 +9,12 @@ import {
 	NotationPoint,
 	TEAM_SELECTION,
 } from '../CommonNotationObjects';
+import { TrifleAggressiveAI } from './ai/TrifleAggressiveAI';
+import { TrifleDefensiveAI } from './ai/TrifleDefensiveAI';
 import { debug } from '../GameData';
 import {
+	activeAi,
+	activeAi2,
 	BRAND_NEW,
 	GameType,
 	READY_FOR_BONUS,
@@ -435,16 +439,43 @@ export class TrifleController {
 		}
 	}
 
-	playAiTurn(finalizeMove) {
-		//
+	playAiTurn(theFinalizeMove) {
+		if (this.theGame.getWinner()) {
+			return;
+		}
+
+		var theAi = activeAi;
+		if (activeAi2) {
+			if (activeAi2.player === getCurrentPlayer()) {
+				theAi = activeAi2;
+			}
+		}
+
+		var playerMoveNum = this.gameNotation.getPlayerMoveNum();
+		var selfRef = this;
+
+		setTimeout(function() {
+			var move = theAi.getMove(selfRef.theGame.getCopy(), playerMoveNum);
+			if (!move) {
+				return;
+			}
+			selfRef.theGame.runNotationMove(move);
+			selfRef.gameNotation.addMove(move);
+			theFinalizeMove();
+		}, 10);
 	}
 
-	startAiGame(finalizeMove) {
-		//
+	startAiGame(theFinalizeMove) {
+		this.playAiTurn(theFinalizeMove);
 	}
 
 	getAiList() {
-		return [];
+		return [new TrifleAggressiveAI(), new TrifleDefensiveAI()];
+	}
+
+	readyToShowPlayAgainstAiOption() {
+		// Show AI option from the very start, even before team selection
+		return this.gameNotation.moves.length <= 1;
 	}
 
 	getCurrentPlayer() {

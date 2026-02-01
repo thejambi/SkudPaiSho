@@ -206,8 +206,22 @@ export class TrifleTileManager {
 	getCopy() {
 		const copy = new TrifleTileManager();
 
-		// copy this.hostTiles and this.guestTiles
-		
+		// Copy teams
+		this.hostTeam.forEach(tile => {
+			copy.hostTeam.push(tile.getCopy());
+		});
+		this.guestTeam.forEach(tile => {
+			copy.guestTeam.push(tile.getCopy());
+		});
+
+		// Copy tile piles
+		this.hostTiles.forEach(tile => {
+			copy.hostTiles.push(tile.getCopy());
+		});
+		this.guestTiles.forEach(tile => {
+			copy.guestTiles.push(tile.getCopy());
+		});
+
 		return copy;
 	}
 }

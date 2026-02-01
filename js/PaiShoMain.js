@@ -3331,6 +3331,12 @@ export function setGameController(gameTypeId, keepGameOptions) {
 	defaultHelpMessageText = null;
 	clearMessage();
 	refreshMessage();
+
+	// Show AI options on game load if controller supports it
+	if (gameController.readyToShowPlayAgainstAiOption && gameController.readyToShowPlayAgainstAiOption()) {
+		linkShortenCallback('');
+	}
+
 	return successResult;
 }
 

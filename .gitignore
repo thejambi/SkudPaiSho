@@ -376,7 +376,6 @@ other/rules
 
 images/Adevar/frumos_z/
 style/board_adevar_orig.png
-trifle/
 
 assets/fontawesome/
 
@@ -385,7 +384,7 @@ node_modules
 dist
 parcel-update
 images/Adevar/frumos_z
-trifle/
+/trifle/
 assets/fontawesome
 
 js/PaiShoMain.js.bak
