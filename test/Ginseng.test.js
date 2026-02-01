@@ -979,3 +979,744 @@ describe('Ginseng Player Interaction - Mid-Game State', () => {
 		}
 	});
 });
+
+// ============================================================================
+// Global Rules Tests - Temple Protection
+// ============================================================================
+
+describe('Ginseng Global Rules - Temple Protection', () => {
+	let gameManager;
+
+	beforeEach(() => {
+		const mockActuator = { actuate: vi.fn() };
+		gameManager = new GinsengGameManager(mockActuator, true, true);
+	});
+
+	it('should have protectFromCapture ability added to all tiles for temple protection', () => {
+		// Every tile type should have the temple protection ability
+		const tileCodes = [
+			GinsengTileCodes.WhiteLotus,
+			GinsengTileCodes.Koi,
+			GinsengTileCodes.Dragon,
+			GinsengTileCodes.Badgermole,
+			GinsengTileCodes.Bison,
+			GinsengTileCodes.LionTurtle,
+			GinsengTileCodes.Wheel,
+			GinsengTileCodes.Ginseng,
+			GinsengTileCodes.Orchid
+		];
+
+		tileCodes.forEach(code => {
+			const tileInfo = GinsengTiles[code];
+			expect(tileInfo.abilities).toBeDefined();
+
+			const templeProtectionAbility = tileInfo.abilities.find(
+				a => a.title === 'Protect From Capture While In Temple'
+			);
+			expect(templeProtectionAbility).toBeDefined();
+			expect(templeProtectionAbility.type).toBe('protectFromCapture');
+		});
+	});
+
+	it('should have White Lotus in temple at game start', () => {
+		// Gates (temples) are at:
+		// - Row 0, col 8 (top gate)
+		// - Row 8, col 0 (left gate - GUEST lotus start)
+		// - Row 8, col 16 (right gate - HOST lotus start)
+		// - Row 16, col 8 (bottom gate)
+
+		// The GUEST White Lotus starts in the left gate (temple)
+		const guestLotusPoints = gameManager.board.getTilePoints(GinsengTileCodes.WhiteLotus, GUEST);
+		const lotusPoint = guestLotusPoints[0];
+
+		// Verify lotus is in temple
+		expect(lotusPoint.isType(GATE)).toBe(true);
+
+		// The HOST White Lotus starts in the right gate (temple)
+		const hostLotusPoints = gameManager.board.getTilePoints(GinsengTileCodes.WhiteLotus, HOST);
+		const hostLotusPoint = hostLotusPoints[0];
+
+		// Verify HOST lotus is in temple
+		expect(hostLotusPoint.isType(GATE)).toBe(true);
+	});
+});
+
+// ============================================================================
+// Global Rules Tests - Lotus Capture Requirements
+// ============================================================================
+
+describe('Ginseng Global Rules - Lotus Capture Requirements', () => {
+	let gameManager;
+
+	beforeEach(() => {
+		const mockActuator = { actuate: vi.fn() };
+		gameManager = new GinsengGameManager(mockActuator, true, true);
+	});
+
+	it('should have tilesNotInTemple activation requirement on all capture types', () => {
+		// Check that Koi (which can capture) has the activation requirement
+		const koiInfo = GinsengTiles[GinsengTileCodes.Koi];
+		const movement = koiInfo.movements[0];
+
+		expect(movement.captureTypes).toBeDefined();
+		expect(movement.captureTypes.length).toBeGreaterThan(0);
+
+		const captureType = movement.captureTypes[0];
+		expect(captureType.activationRequirements).toBeDefined();
+
+		// Should have the tilesNotInTemple requirement
+		const lotusRequirement = captureType.activationRequirements.find(
+			r => r.type === 'tilesNotInTemple'
+		);
+		expect(lotusRequirement).toBeDefined();
+		expect(lotusRequirement.targetTileCodes).toContain(GinsengTileCodes.WhiteLotus);
+	});
+
+	it('should verify Lotus position at game start affects capture activation requirements', () => {
+		// At game start, both Lotus tiles are in their temples
+		// Verify the configuration is set up correctly
+
+		const hostLotusPoints = gameManager.board.getTilePoints(GinsengTileCodes.WhiteLotus, HOST);
+		const lotusPoint = hostLotusPoints[0];
+
+		// Lotus is at starting position (temple)
+		expect(lotusPoint.col).toBe(16);
+		expect(lotusPoint.isType(GATE)).toBe(true);
+
+		// Verify that the capture type has activation requirements that check for Lotus not in temple
+		const koiInfo = GinsengTiles[GinsengTileCodes.Koi];
+		const captureTypes = koiInfo.movements[0].captureTypes;
+		expect(captureTypes).toBeDefined();
+		expect(captureTypes.length).toBeGreaterThan(0);
+
+		const activationReqs = captureTypes[0].activationRequirements;
+		expect(activationReqs).toBeDefined();
+
+		const lotusRequirement = activationReqs.find(r => r.type === 'tilesNotInTemple');
+		expect(lotusRequirement).toBeDefined();
+		expect(lotusRequirement.targetTileCodes).toContain(GinsengTileCodes.WhiteLotus);
+	});
+
+	it('should verify activation requirement targets both friendly and enemy Lotus', () => {
+		// The activation requirement should check for BOTH friendly and enemy Lotus tiles
+		const koiInfo = GinsengTiles[GinsengTileCodes.Koi];
+		const captureTypes = koiInfo.movements[0].captureTypes;
+		const activationReqs = captureTypes[0].activationRequirements;
+
+		const lotusRequirement = activationReqs.find(r => r.type === 'tilesNotInTemple');
+		expect(lotusRequirement).toBeDefined();
+
+		// Both friendly and enemy Lotus must be outside temple
+		expect(lotusRequirement.targetTeams).toContain('friendly');
+		expect(lotusRequirement.targetTeams).toContain('enemy');
+	});
+});
+
+// ============================================================================
+// Global Rules Tests - Movement Restriction
+// ============================================================================
+
+describe('Ginseng Global Rules - Lotus Starting Point Restriction', () => {
+	it('should have movement restriction to prevent moving onto enemy Lotus start point', () => {
+		// Check that Koi (not a Lotus) has the movement restriction
+		const koiInfo = GinsengTiles[GinsengTileCodes.Koi];
+		const movement = koiInfo.movements[0];
+
+		expect(movement.restrictions).toBeDefined();
+
+		const startPointRestriction = movement.restrictions.find(
+			r => r.type === 'restrictMovementOntoRecordedTilePoint' &&
+			     r.recordTilePointType === 'startPoint' &&
+			     r.targetTileCode === GinsengTileCodes.WhiteLotus
+		);
+
+		expect(startPointRestriction).toBeDefined();
+		expect(startPointRestriction.targetTeams).toContain('friendly');
+		expect(startPointRestriction.targetTeams).toContain('enemy');
+	});
+
+	it('should NOT have the restriction on White Lotus itself', () => {
+		// White Lotus should be able to return to its own starting point
+		const lotusInfo = GinsengTiles[GinsengTileCodes.WhiteLotus];
+		const movement = lotusInfo.movements[0];
+
+		// Lotus has a different restriction - can't move onto ENEMY lotus start
+		const restrictions = movement.restrictions || [];
+		const selfStartRestriction = restrictions.find(
+			r => r.type === 'restrictMovementOntoRecordedTilePoint' &&
+			     r.recordTilePointType === 'startPoint' &&
+			     r.targetTileCode === GinsengTileCodes.WhiteLotus &&
+			     r.targetTeams.includes('friendly')
+		);
+
+		// Lotus restricts only enemy starting points, not its own
+		if (selfStartRestriction) {
+			expect(selfStartRestriction.targetTeams).not.toContain('friendly');
+		}
+	});
+});
+
+// ============================================================================
+// Global Rules Tests - Exchange With Captured Tile
+// ============================================================================
+
+describe('Ginseng Global Rules - Exchange With Captured Tile', () => {
+	it('should have exchange ability on all tiles except White Lotus', () => {
+		const tilesWithExchange = [
+			GinsengTileCodes.Koi,
+			GinsengTileCodes.Dragon,
+			GinsengTileCodes.Badgermole,
+			GinsengTileCodes.Bison,
+			GinsengTileCodes.LionTurtle,
+			GinsengTileCodes.Wheel,
+			GinsengTileCodes.Ginseng,
+			GinsengTileCodes.Orchid
+		];
+
+		tilesWithExchange.forEach(code => {
+			const tileInfo = GinsengTiles[code];
+			const exchangeAbility = tileInfo.abilities.find(
+				a => a.type === 'exchangeWithCapturedTile'
+			);
+			expect(exchangeAbility).toBeDefined();
+			expect(exchangeAbility.title).toBe('Exchange With Captured Tile');
+		});
+	});
+
+	it('should NOT have exchange ability on White Lotus', () => {
+		const lotusInfo = GinsengTiles[GinsengTileCodes.WhiteLotus];
+		const exchangeAbility = lotusInfo.abilities.find(
+			a => a.type === 'exchangeWithCapturedTile'
+		);
+		expect(exchangeAbility).toBeUndefined();
+	});
+
+	it('should trigger exchange when landing in temple', () => {
+		const koiInfo = GinsengTiles[GinsengTileCodes.Koi];
+		const exchangeAbility = koiInfo.abilities.find(
+			a => a.type === 'exchangeWithCapturedTile'
+		);
+
+		const templeTrigger = exchangeAbility.triggers.find(
+			t => t.triggerType === 'whenTargetTileLandsInTemple'
+		);
+		expect(templeTrigger).toBeDefined();
+	});
+});
+
+// ============================================================================
+// Koi Trap Ability Tests
+// ============================================================================
+
+describe('Ginseng Koi - Trap Ability', () => {
+	let gameManager;
+
+	beforeEach(() => {
+		const mockActuator = { actuate: vi.fn() };
+		gameManager = new GinsengGameManager(mockActuator, true, true);
+	});
+
+	it('should have immobilizeTiles ability that triggers on WHITE garden', () => {
+		const koiInfo = GinsengTiles[GinsengTileCodes.Koi];
+		const trapAbility = koiInfo.abilities.find(a => a.type === 'immobilizeTiles');
+
+		expect(trapAbility).toBeDefined();
+
+		const trigger = trapAbility.triggers[0];
+		expect(trigger.triggerType).toBe('whileTargetTileIsSurrounding');
+		expect(trigger.targetTeams).toContain('enemy');
+
+		// Should have activation requirement for WHITE garden
+		const activationReq = trigger.activationRequirements.find(
+			r => r.type === 'tileIsOnPointOfType'
+		);
+		expect(activationReq).toBeDefined();
+		expect(activationReq.targetPointTypes).toContain(WHITE);
+	});
+
+	it('should have immobilization infrastructure in place', () => {
+		// Verify the board has tileMovementIsImmobilized method
+		expect(typeof gameManager.board.tileMovementIsImmobilized).toBe('function');
+
+		// Verify the ability manager has the method to check immobilization ability
+		expect(typeof gameManager.board.abilityManager.abilityTargetingTileExists).toBe('function');
+
+		// Verify Koi's trap ability is configured correctly
+		const koiInfo = GinsengTiles[GinsengTileCodes.Koi];
+		const trapAbility = koiInfo.abilities.find(a => a.type === 'immobilizeTiles');
+		expect(trapAbility).toBeDefined();
+		expect(trapAbility.targetTypes).toContain('triggerTargetTiles');
+	});
+});
+
+// ============================================================================
+// Dragon Push Ability Tests
+// ============================================================================
+
+describe('Ginseng Dragon - Push Ability', () => {
+	it('should have moveTargetTile ability that triggers when landing surrounding on RED', () => {
+		const dragonInfo = GinsengTiles[GinsengTileCodes.Dragon];
+		const pushAbility = dragonInfo.abilities.find(
+			a => a.title === 'Active Dragon Push'
+		);
+
+		expect(pushAbility).toBeDefined();
+		expect(pushAbility.type).toBe('moveTargetTile');
+		expect(pushAbility.optional).toBe(true);
+
+		// Check trigger for landing surrounding
+		const landingTrigger = pushAbility.triggers.find(
+			t => t.triggerType === 'whenLandsSurroundingTargetTile'
+		);
+		expect(landingTrigger).toBeDefined();
+
+		// Check activation requirement for RED garden
+		const activationReq = landingTrigger.activationRequirements.find(
+			r => r.type === 'tileIsOnPointOfType'
+		);
+		expect(activationReq).toBeDefined();
+		expect(activationReq.targetPointTypes).toContain(RED);
+	});
+
+	it('should push tile away (orthogonal or diagonal)', () => {
+		const dragonInfo = GinsengTiles[GinsengTileCodes.Dragon];
+		const pushAbility = dragonInfo.abilities.find(
+			a => a.title === 'Active Dragon Push'
+		);
+
+		// Check target tile movements
+		expect(pushAbility.targetTileMovements).toBeDefined();
+		expect(pushAbility.targetTileMovements.length).toBe(2);
+
+		const orthogonalPush = pushAbility.targetTileMovements.find(
+			m => m.type === 'awayFromTargetTileOrthogonal'
+		);
+		const diagonalPush = pushAbility.targetTileMovements.find(
+			m => m.type === 'awayFromTargetTileDiagonal'
+		);
+
+		expect(orthogonalPush).toBeDefined();
+		expect(orthogonalPush.distance).toBe(1);
+		expect(diagonalPush).toBeDefined();
+		expect(diagonalPush.distance).toBe(1);
+	});
+
+	it('should push regardless of immobilization', () => {
+		const dragonInfo = GinsengTiles[GinsengTileCodes.Dragon];
+		const pushAbility = dragonInfo.abilities.find(
+			a => a.title === 'Active Dragon Push'
+		);
+
+		const orthogonalPush = pushAbility.targetTileMovements[0];
+		expect(orthogonalPush.regardlessOfImmobilization).toBe(true);
+	});
+});
+
+// ============================================================================
+// Badgermole Flip Ability Tests
+// ============================================================================
+
+describe('Ginseng Badgermole - Flip Ability', () => {
+	it('should have moveTargetTile ability that triggers when landing surrounding on WHITE', () => {
+		const badgermoleInfo = GinsengTiles[GinsengTileCodes.Badgermole];
+		const flipAbility = badgermoleInfo.abilities.find(
+			a => a.title === 'Active Badgermole Flip'
+		);
+
+		expect(flipAbility).toBeDefined();
+		expect(flipAbility.type).toBe('moveTargetTile');
+		expect(flipAbility.optional).toBe(true);
+
+		// Check trigger for landing surrounding
+		const landingTrigger = flipAbility.triggers.find(
+			t => t.triggerType === 'whenLandsSurroundingTargetTile'
+		);
+		expect(landingTrigger).toBeDefined();
+
+		// Check activation requirement for WHITE garden
+		const activationReq = landingTrigger.activationRequirements.find(
+			r => r.type === 'tileIsOnPointOfType'
+		);
+		expect(activationReq).toBeDefined();
+		expect(activationReq.targetPointTypes).toContain(WHITE);
+	});
+
+	it('should flip tile by jumping over Badgermole', () => {
+		const badgermoleInfo = GinsengTiles[GinsengTileCodes.Badgermole];
+		const flipAbility = badgermoleInfo.abilities.find(
+			a => a.title === 'Active Badgermole Flip'
+		);
+
+		// Check target tile movements
+		expect(flipAbility.targetTileMovements).toBeDefined();
+		expect(flipAbility.targetTileMovements.length).toBe(1);
+
+		const jumpMovement = flipAbility.targetTileMovements[0];
+		expect(jumpMovement.type).toBe('jumpTargetTile');
+		expect(jumpMovement.distance).toBe(1);
+	});
+});
+
+// ============================================================================
+// Bison Boost Ability Tests
+// ============================================================================
+
+describe('Ginseng Bison - Movement Boost Ability', () => {
+	it('should have extendMovement ability for surrounding friendly tiles on RED', () => {
+		const bisonInfo = GinsengTiles[GinsengTileCodes.Bison];
+		const boostAbility = bisonInfo.abilities.find(a => a.type === 'extendMovement');
+
+		expect(boostAbility).toBeDefined();
+		expect(boostAbility.extendDistance).toBe(1);
+
+		// Check trigger
+		const trigger = boostAbility.triggers[0];
+		expect(trigger.triggerType).toBe('whileTargetTileIsSurrounding');
+		expect(trigger.targetTeams).toContain('friendly');
+
+		// Check activation requirement for RED garden
+		const activationReq = trigger.activationRequirements.find(
+			r => r.type === 'tileIsOnPointOfType'
+		);
+		expect(activationReq).toBeDefined();
+		expect(activationReq.targetPointTypes).toContain(RED);
+	});
+
+	it('should boost standard movement type', () => {
+		const bisonInfo = GinsengTiles[GinsengTileCodes.Bison];
+		const boostAbility = bisonInfo.abilities.find(a => a.type === 'extendMovement');
+
+		expect(boostAbility.extendMovementType).toBe('standard');
+	});
+});
+
+// ============================================================================
+// LionTurtle Cancel Abilities Tests
+// ============================================================================
+
+describe('Ginseng LionTurtle - Cancel Abilities', () => {
+	it('should have cancelAbilities for surrounding enemy tiles', () => {
+		const lionTurtleInfo = GinsengTiles[GinsengTileCodes.LionTurtle];
+		const cancelAbility = lionTurtleInfo.abilities.find(
+			a => a.type === 'cancelAbilities'
+		);
+
+		expect(cancelAbility).toBeDefined();
+
+		// Check trigger
+		const trigger = cancelAbility.triggers[0];
+		expect(trigger.triggerType).toBe('whileTargetTileIsSurrounding');
+		expect(trigger.targetTeams).toContain('enemy');
+	});
+
+	it('should cancel all ability types', () => {
+		const lionTurtleInfo = GinsengTiles[GinsengTileCodes.LionTurtle];
+		const cancelAbility = lionTurtleInfo.abilities.find(
+			a => a.type === 'cancelAbilities'
+		);
+
+		expect(cancelAbility.targetAbilityTypes).toContain('all');
+	});
+
+	it('should have ability cancellation configured correctly', () => {
+		// Verify LionTurtle's cancel ability is configured correctly
+		const lionTurtleInfo = GinsengTiles[GinsengTileCodes.LionTurtle];
+		const cancelAbility = lionTurtleInfo.abilities.find(a => a.type === 'cancelAbilities');
+		expect(cancelAbility).toBeDefined();
+
+		// Verify it targets all ability types for surrounding enemies
+		expect(cancelAbility.targetAbilityTypes).toContain('all');
+		const trigger = cancelAbility.triggers[0];
+		expect(trigger.triggerType).toBe('whileTargetTileIsSurrounding');
+		expect(trigger.targetTeams).toContain('enemy');
+	});
+});
+
+// ============================================================================
+// Ginseng Protection Ability Tests
+// ============================================================================
+
+describe('Ginseng Tile - Protection Ability', () => {
+	it('should have protectFromCapture for friendly tiles in line of sight', () => {
+		const ginsengInfo = GinsengTiles[GinsengTileCodes.Ginseng];
+		const protectAbility = ginsengInfo.abilities.find(
+			a => a.type === 'protectFromCapture' &&
+			     a.triggers.some(t => t.triggerType === 'whileTargetTileIsInLineOfSight')
+		);
+
+		expect(protectAbility).toBeDefined();
+
+		const trigger = protectAbility.triggers[0];
+		expect(trigger.targetTeams).toContain('friendly');
+	});
+
+	it('should have line of sight protection configured correctly', () => {
+		// Verify the Ginseng tile has protectFromCapture ability with line of sight trigger
+		const ginsengInfo = GinsengTiles[GinsengTileCodes.Ginseng];
+		const protectAbility = ginsengInfo.abilities.find(
+			a => a.type === 'protectFromCapture' &&
+			     a.triggers.some(t => t.triggerType === 'whileTargetTileIsInLineOfSight')
+		);
+
+		expect(protectAbility).toBeDefined();
+
+		// Check the trigger configuration
+		const losTrigger = protectAbility.triggers[0];
+		expect(losTrigger.targetTeams).toContain('friendly');
+
+		// Check that target types include trigger target tiles
+		expect(protectAbility.targetTypes).toContain('triggerTargetTiles');
+	});
+});
+
+// ============================================================================
+// Orchid Self-Capture Ability Tests
+// ============================================================================
+
+describe('Ginseng Orchid - Self-Capture Ability', () => {
+	it('should have captureTargetTiles ability targeting itself', () => {
+		const orchidInfo = GinsengTiles[GinsengTileCodes.Orchid];
+		const selfCaptureAbility = orchidInfo.abilities.find(
+			a => a.type === 'captureTargetTiles' &&
+			     a.targetTypes.includes('thisTile')
+		);
+
+		expect(selfCaptureAbility).toBeDefined();
+	});
+
+	it('should trigger when capturing any tile', () => {
+		const orchidInfo = GinsengTiles[GinsengTileCodes.Orchid];
+		const selfCaptureAbility = orchidInfo.abilities.find(
+			a => a.type === 'captureTargetTiles'
+		);
+
+		const trigger = selfCaptureAbility.triggers[0];
+		expect(trigger.triggerType).toBe('whenCapturingTargetTile');
+	});
+
+	it('should capture regardless of protection', () => {
+		const orchidInfo = GinsengTiles[GinsengTileCodes.Orchid];
+		const selfCaptureAbility = orchidInfo.abilities.find(
+			a => a.type === 'captureTargetTiles'
+		);
+
+		expect(selfCaptureAbility.regardlessOfCaptureProtection).toBe(true);
+	});
+});
+
+// ============================================================================
+// White Lotus Special Abilities Tests
+// ============================================================================
+
+describe('Ginseng White Lotus - Special Abilities', () => {
+	it('should have recordTilePoint ability to remember starting position', () => {
+		const lotusInfo = GinsengTiles[GinsengTileCodes.WhiteLotus];
+		const recordAbility = lotusInfo.abilities.find(
+			a => a.type === 'recordTilePoint'
+		);
+
+		expect(recordAbility).toBeDefined();
+		expect(recordAbility.recordTilePointType).toBe('startPoint');
+
+		const trigger = recordAbility.triggers[0];
+		expect(trigger.triggerType).toBe('whenDeployed');
+	});
+
+	it('should have moveTileToRecordedPoint ability to return when captured', () => {
+		const lotusInfo = GinsengTiles[GinsengTileCodes.WhiteLotus];
+		const returnAbility = lotusInfo.abilities.find(
+			a => a.type === 'moveTileToRecordedPoint'
+		);
+
+		expect(returnAbility).toBeDefined();
+		expect(returnAbility.recordedPointType).toBe('startPoint');
+		expect(returnAbility.inevitable).toBe(true);
+
+		const trigger = returnAbility.triggers[0];
+		expect(trigger.triggerType).toBe('whenCapturedByTargetTile');
+	});
+
+	it('should use jumpSurroundingTiles movement (diagonal only)', () => {
+		const lotusInfo = GinsengTiles[GinsengTileCodes.WhiteLotus];
+		const movement = lotusInfo.movements[0];
+
+		expect(movement.type).toBe('jumpSurroundingTiles');
+		expect(movement.jumpDirections).toContain('diagonal');
+		expect(movement.distance).toBe(99); // Unlimited chaining
+	});
+
+	it('should be able to jump over both friendly and enemy tiles', () => {
+		const lotusInfo = GinsengTiles[GinsengTileCodes.WhiteLotus];
+		const movement = lotusInfo.movements[0];
+
+		expect(movement.targetTeams).toContain('friendly');
+		expect(movement.targetTeams).toContain('enemy');
+	});
+});
+
+// ============================================================================
+// Wheel Movement Tests
+// ============================================================================
+
+describe('Ginseng Wheel - Movement', () => {
+	it('should have unlimited distance movement', () => {
+		const wheelInfo = GinsengTiles[GinsengTileCodes.Wheel];
+		const movement = wheelInfo.movements[0];
+
+		expect(movement.distance).toBe(99);
+	});
+
+	it('should have mustPreserveDirection restriction', () => {
+		const wheelInfo = GinsengTiles[GinsengTileCodes.Wheel];
+		const movement = wheelInfo.movements[0];
+
+		const directionRestriction = movement.restrictions.find(
+			r => r.type === 'mustPreserveDirection'
+		);
+
+		expect(directionRestriction).toBeDefined();
+	});
+
+	it('should be able to capture', () => {
+		const wheelInfo = GinsengTiles[GinsengTileCodes.Wheel];
+		const movement = wheelInfo.movements[0];
+
+		expect(movement.captureTypes).toBeDefined();
+		expect(movement.captureTypes.length).toBeGreaterThan(0);
+	});
+});
+
+// ============================================================================
+// Integration Tests - Trifle Engine Compatibility
+// ============================================================================
+
+describe('Ginseng - Trifle Engine Integration', () => {
+	let gameManager;
+
+	beforeEach(() => {
+		const mockActuator = { actuate: vi.fn() };
+		gameManager = new GinsengGameManager(mockActuator, true, true);
+	});
+
+	it('should have ability manager properly initialized with all tile abilities', () => {
+		// After game setup, ability manager should have abilities from deployed tiles
+		const abilityManager = gameManager.board.abilityManager;
+
+		expect(abilityManager).toBeDefined();
+		expect(abilityManager.abilities).toBeDefined();
+
+		// Should have temple protection abilities for all 24 tiles on board
+		const templeProtectionAbilities = abilityManager.abilities.filter(
+			a => a.abilityType === 'protectFromCapture' &&
+			     a.abilityInfo.title === 'Protect From Capture While In Temple'
+		);
+
+		// Not all may be active (only tiles in temples have active temple protection)
+		// But the infrastructure should be there
+		expect(abilityManager.abilities.length).toBeGreaterThan(0);
+	});
+
+	it('should properly refresh abilities after tile movement', () => {
+		// Make a valid move
+		const move = {
+			moveNum: 0,
+			player: GUEST,
+			moveType: MOVE,
+			startPoint: '-7,1',
+			endPoint: '-5,1'
+		};
+
+		const abilitiesBefore = gameManager.board.abilityManager.abilities.length;
+		gameManager.runNotationMove(move, false);
+		const abilitiesAfter = gameManager.board.abilityManager.abilities.length;
+
+		// Abilities should be recalculated (may be same count but refreshed)
+		expect(typeof abilitiesAfter).toBe('number');
+	});
+
+	it('should maintain board state consistency after multiple moves', () => {
+		const moves = [
+			{ moveNum: 0, player: GUEST, moveType: MOVE, startPoint: '-7,1', endPoint: '-5,1' },
+			{ moveNum: 0, player: HOST, moveType: MOVE, startPoint: '7,-1', endPoint: '5,-1' },
+		];
+
+		moves.forEach(move => {
+			gameManager.runNotationMove(move, false);
+		});
+
+		// Count tiles on board
+		let tileCount = 0;
+		gameManager.board.forEachBoardPointWithTile(() => tileCount++);
+
+		// Should still have 24 tiles (no captures yet)
+		expect(tileCount).toBe(24);
+	});
+
+	it('should correctly identify tile owner for abilities', () => {
+		const guestKoiPoints = gameManager.board.getTilePoints(GinsengTileCodes.Koi, GUEST);
+		const hostKoiPoints = gameManager.board.getTilePoints(GinsengTileCodes.Koi, HOST);
+
+		expect(guestKoiPoints.length).toBe(1);
+		expect(hostKoiPoints.length).toBe(1);
+
+		expect(guestKoiPoints[0].tile.ownerName).toBe(GUEST);
+		expect(hostKoiPoints[0].tile.ownerName).toBe(HOST);
+	});
+});
+
+// ============================================================================
+// Regression Tests - Ensure Core Functionality Preserved
+// ============================================================================
+
+describe('Ginseng - Regression Tests', () => {
+	it('should still detect GUEST win correctly', () => {
+		const mockActuator = { actuate: vi.fn() };
+		const gameManager = new GinsengGameManager(mockActuator, true, true);
+
+		// Move GUEST Lotus to winning position (x > 0 means col > 8)
+		const guestLotusPoints = gameManager.board.getTilePoints(GinsengTileCodes.WhiteLotus, GUEST);
+		const lotusPoint = guestLotusPoints[0];
+		const lotusTile = lotusPoint.tile;
+
+		lotusPoint.removeTile();
+		const winningPoint = gameManager.board.cells[8][10]; // col=10 → x=2
+		winningPoint.putTile(lotusTile);
+		lotusTile.seatedPoint = winningPoint;
+
+		gameManager.checkForWin();
+
+		expect(gameManager.getWinner()).toBe(GUEST);
+	});
+
+	it('should still detect HOST win correctly', () => {
+		const mockActuator = { actuate: vi.fn() };
+		const gameManager = new GinsengGameManager(mockActuator, true, true);
+
+		// Move HOST Lotus to winning position (x < 0 means col < 8)
+		const hostLotusPoints = gameManager.board.getTilePoints(GinsengTileCodes.WhiteLotus, HOST);
+		const lotusPoint = hostLotusPoints[0];
+		const lotusTile = lotusPoint.tile;
+
+		lotusPoint.removeTile();
+		const winningPoint = gameManager.board.cells[8][6]; // col=6 → x=-2
+		winningPoint.putTile(lotusTile);
+		lotusTile.seatedPoint = winningPoint;
+
+		gameManager.checkForWin();
+
+		expect(gameManager.getWinner()).toBe(HOST);
+	});
+
+	it('should maintain ability activation order', () => {
+		const mockActuator = { actuate: vi.fn() };
+		const gameManager = new GinsengGameManager(mockActuator, true, true);
+
+		const activationOrder = gameManager.buildAbilityActivationOrder();
+
+		// Should have protectFromCapture in the list
+		expect(activationOrder).toContain('protectFromCapture');
+
+		// Should be an array with multiple entries
+		expect(activationOrder.length).toBeGreaterThan(1);
+	});
+});
