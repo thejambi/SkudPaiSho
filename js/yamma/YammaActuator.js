@@ -63,8 +63,8 @@ export class YammaActuator {
 		this.currentPlayerColor = PLAYER.WHITE; // Updated when showing rotation selection
 		this.rotationArrowsGroup = null; // 3D arrows for rotation control
 
-		// Turn indicator
-		this.turnIndicatorSprite = null;
+		// Turn indicator (HTML overlay)
+		this.turnIndicatorDiv = null;
 		this.boardContainerDiv = null; // Reference for colored border
 
 		this.initialized = false;
@@ -196,8 +196,8 @@ export class YammaActuator {
 		// Create the triangular board base
 		this.createBoardBase();
 
-		// Create turn indicator sprite
-		this.createTurnIndicator();
+		// Create turn indicator overlay (pinned to top left of 3D container)
+		this.createTurnIndicator(container);
 
 		// Event listeners
 		this.setupEventListeners(container);
@@ -353,7 +353,7 @@ export class YammaActuator {
 
 		// Calculate triangle dimensions for equilateral triangle
 		// The slots span (baseRows - 1) gaps horizontally at the base
-		const padding = 0.5;
+		const padding = 1.2; // Increased for more visible border around spaces
 		const baseWidth = (this.baseRows - 1) * this.slotSpacing + padding * 2;
 		// For equilateral triangle: height = base * sqrt(3) / 2
 		const height = baseWidth * Math.sqrt(3) / 2;
@@ -379,7 +379,9 @@ export class YammaActuator {
 			metalness: 0.1
 		});
 		const baseMesh = new THREE.Mesh(baseGeometry, baseMaterial);
-		baseMesh.position.y = -0.3;
+		// Shift board forward (negative z) to better center slots within the board
+		const zOffset = -height / 19;	// -height/19 Seems to be the right value!
+		baseMesh.position.set(0, -0.3, zOffset);
 		baseMesh.receiveShadow = true;
 		this.boardGroup.add(baseMesh);
 
@@ -461,91 +463,34 @@ export class YammaActuator {
 	}
 
 	/**
-	 * Create the turn indicator sprite that shows whose turn it is.
-	 * Positioned above the board, always facing the camera.
+	 * Create the turn indicator as an HTML overlay pinned to the top left.
+	 * @param {HTMLElement} container - The 3D container to attach the overlay to
 	 */
-	createTurnIndicator() {
-		this.turnIndicatorSprite = this.createTurnIndicatorSprite(PLAYER.WHITE);
-		this.turnIndicatorSprite.position.set(0, 6, 0);
-		this.scene.add(this.turnIndicatorSprite);
-	}
-
-	/**
-	 * Create a turn indicator sprite with the player's color.
-	 */
-	createTurnIndicatorSprite(playerColor) {
-		const canvas = document.createElement('canvas');
-		const context = canvas.getContext('2d');
-		canvas.width = 256;
-		canvas.height = 64;
-
-		// Clear canvas
-		context.clearRect(0, 0, canvas.width, canvas.height);
-
-		// Draw rounded background
-		const bgColor = playerColor === PLAYER.WHITE ? '#f0f0f0' : '#1e40af';
-		const textColor = playerColor === PLAYER.WHITE ? '#333333' : '#ffffff';
-		const borderColor = playerColor === PLAYER.WHITE ? '#cccccc' : '#3b82f6';
-
-		context.fillStyle = bgColor;
-		context.strokeStyle = borderColor;
-		context.lineWidth = 3;
-		this.roundRect(context, 4, 4, canvas.width - 8, canvas.height - 8, 12);
-		context.fill();
-		context.stroke();
-
-		// Draw text
-		const colorName = playerColor === PLAYER.WHITE ? 'White' : 'Blue';
-		context.font = 'bold 28px Arial';
-		context.textAlign = 'center';
-		context.textBaseline = 'middle';
-		context.fillStyle = textColor;
-		context.fillText(`${colorName}'s Turn`, canvas.width / 2, canvas.height / 2);
-
-		const texture = new THREE.CanvasTexture(canvas);
-		const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
-		const sprite = new THREE.Sprite(spriteMaterial);
-		sprite.scale.set(4, 1, 1);
-
-		return sprite;
-	}
-
-	/**
-	 * Helper to draw a rounded rectangle.
-	 */
-	roundRect(ctx, x, y, width, height, radius) {
-		ctx.beginPath();
-		ctx.moveTo(x + radius, y);
-		ctx.lineTo(x + width - radius, y);
-		ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-		ctx.lineTo(x + width, y + height - radius);
-		ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-		ctx.lineTo(x + radius, y + height);
-		ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-		ctx.lineTo(x, y + radius);
-		ctx.quadraticCurveTo(x, y, x + radius, y);
-		ctx.closePath();
+	createTurnIndicator(container) {
+		this.turnIndicatorDiv = document.createElement('div');
+		this.turnIndicatorDiv.className = 'yamma-turn-indicator yamma-turn-indicator-white';
+		this.turnIndicatorDiv.textContent = "White's Turn";
+		container.appendChild(this.turnIndicatorDiv);
 	}
 
 	/**
 	 * Update the turn indicator to show the current player.
 	 */
 	updateTurnIndicator(currentPlayer, gameEnded) {
-		if (!this.turnIndicatorSprite) return;
+		if (!this.turnIndicatorDiv) return;
 
-		// Remove old sprite
-		this.scene.remove(this.turnIndicatorSprite);
-		if (this.turnIndicatorSprite.material.map) {
-			this.turnIndicatorSprite.material.map.dispose();
-		}
-		this.turnIndicatorSprite.material.dispose();
+		// Update classes and text
+		this.turnIndicatorDiv.classList.remove('yamma-turn-indicator-white', 'yamma-turn-indicator-blue', 'yamma-turn-indicator-ended');
 
-		// Create new sprite with updated player (unless game ended)
-		if (!gameEnded) {
-			const playerColor = currentPlayer === PLAYER.WHITE ? PLAYER.WHITE : PLAYER.BLUE;
-			this.turnIndicatorSprite = this.createTurnIndicatorSprite(playerColor);
-			this.turnIndicatorSprite.position.set(0, 6, 0);
-			this.scene.add(this.turnIndicatorSprite);
+		if (gameEnded) {
+			this.turnIndicatorDiv.classList.add('yamma-turn-indicator-ended');
+			this.turnIndicatorDiv.textContent = 'Game Over';
+		} else if (currentPlayer === PLAYER.WHITE) {
+			this.turnIndicatorDiv.classList.add('yamma-turn-indicator-white');
+			this.turnIndicatorDiv.textContent = "White's Turn";
+		} else {
+			this.turnIndicatorDiv.classList.add('yamma-turn-indicator-blue');
+			this.turnIndicatorDiv.textContent = "Blue's Turn";
 		}
 
 		// Update the board container border color
@@ -674,8 +619,6 @@ export class YammaActuator {
 	}
 
 	createSlotMesh(row, col, level) {
-		// Use hexagon shape for triangular grid slots - larger for easier clicking
-		const slotGeometry = new THREE.CylinderGeometry(0.25, 0.25, 0.08, 6);
 		// Brighter golden/tan colors for each level
 		const levelColors = [0xd4a574, 0xdeb887, 0xe8c89a, 0xf2d8ad, 0xfce8c0];
 		const slotMaterial = new THREE.MeshStandardMaterial({
@@ -685,14 +628,66 @@ export class YammaActuator {
 			opacity: 0.7
 		});
 
-		const slot = new THREE.Mesh(slotGeometry, slotMaterial);
+		let slotGeometry;
+		let slot;
+
+		if (level === 0) {
+			// Bottom level: use equilateral triangles all pointing toward the back (apex)
+			slotGeometry = this.createTriangleGeometry(0.45, true);
+			slot = new THREE.Mesh(slotGeometry, slotMaterial);
+		} else {
+			// Upper levels: use larger hexagons for easier clicking
+			const slotSize = 0.4; // Larger than before (was 0.25)
+			slotGeometry = new THREE.CylinderGeometry(slotSize, slotSize, 0.1, 6);
+			slot = new THREE.Mesh(slotGeometry, slotMaterial);
+		}
+
 		const pos = this.getWorldPosition(row, col, level);
 
 		// Position at the bottom corner where the cube would balance
-		slot.position.set(pos.x, pos.y - this.cubeHalfHeight + 0.1, pos.z);
+		// Upper levels get extra height to float above the cubes below
+		const yOffset = level === 0 ? 0.05 : 0.3;
+		slot.position.set(pos.x, pos.y - this.cubeHalfHeight + yOffset, pos.z);
 		slot.userData = { row, col, level, type: 'slot' };
 
 		return slot;
+	}
+
+	/**
+	 * Create an equilateral triangle geometry for base level slots.
+	 * @param {number} size - The "radius" (center to vertex distance)
+	 * @param {boolean} pointsUp - If true, one vertex points toward back (negative z); if false, toward front
+	 */
+	createTriangleGeometry(size, pointsUp) {
+		const shape = new THREE.Shape();
+
+		// Equilateral triangle vertices
+		// For pointsUp: one vertex at top (back), two at bottom (front)
+		// For pointsDown: one vertex at bottom (front), two at top (back)
+		const angle = pointsUp ? -Math.PI / 2 : Math.PI / 2;
+
+		const v1x = size * Math.cos(angle);
+		const v1y = size * Math.sin(angle);
+		const v2x = size * Math.cos(angle + (2 * Math.PI / 3));
+		const v2y = size * Math.sin(angle + (2 * Math.PI / 3));
+		const v3x = size * Math.cos(angle + (4 * Math.PI / 3));
+		const v3y = size * Math.sin(angle + (4 * Math.PI / 3));
+
+		shape.moveTo(v1x, v1y);
+		shape.lineTo(v2x, v2y);
+		shape.lineTo(v3x, v3y);
+		shape.closePath();
+
+		const extrudeSettings = {
+			depth: 0.1,
+			bevelEnabled: false
+		};
+
+		const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+		// Rotate to lie flat (shape is in XY plane, we want XZ plane)
+		geometry.rotateX(-Math.PI / 2);
+
+		return geometry;
 	}
 
 	createCubeMesh(cube) {
@@ -735,20 +730,34 @@ export class YammaActuator {
 
 		const mesh = new THREE.Mesh(geometry, materials);
 
+		// Add subtle dark edges to the cube
+		const edgesGeometry = new THREE.EdgesGeometry(geometry);
+		const edgesMaterial = new THREE.LineBasicMaterial({
+			color: 0x333333,
+			transparent: true,
+			opacity: 0.3
+		});
+		const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
+
+		// Group the mesh and edges together
+		const group = new THREE.Group();
+		group.add(mesh);
+		group.add(edges);
+
 		// To balance a cube on its corner with point straight up:
 		// With 'YXZ' order, transforms apply as: Rz first, then Rx, then Ry
 		// 1. Rz(45°) - align cube diagonal with view
 		// 2. Rx(-35.26°) - tilt backward to balance on corner, point up
 		// 3. Ry(rotation * 120°) - spin around vertical for player's choice
-		mesh.rotation.order = 'YXZ';
-		mesh.rotation.z = Math.PI / 4;  // 45° - align diagonal
-		mesh.rotation.x = -Math.atan(1 / Math.sqrt(2));  // -35.26° - tilt onto corner
-		mesh.rotation.y = (cube.rotation || 0) * (Math.PI * 2 / 3);  // Player's spin
+		group.rotation.order = 'YXZ';
+		group.rotation.z = Math.PI / 4;  // 45° - align diagonal
+		group.rotation.x = -Math.atan(1 / Math.sqrt(2));  // -35.26° - tilt onto corner
+		group.rotation.y = (cube.rotation || 0) * (Math.PI * 2 / 3);  // Player's spin
 
 		mesh.castShadow = true;
 		mesh.receiveShadow = true;
 
-		return mesh;
+		return group;
 	}
 
 	/**
