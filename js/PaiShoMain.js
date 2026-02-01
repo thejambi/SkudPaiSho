@@ -2110,7 +2110,7 @@ export function getSkipButtonElement(overrideText) {
         text = overrideText;
     }
 
-    const container = document.createElement("div");
+    const container = document.createElement("span");
     container.appendChild(document.createElement("br"));
 
     const button = document.createElement("button");
