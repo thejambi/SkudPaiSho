@@ -61,6 +61,7 @@ import {
 	fetchInitialGlobalChats,
 	resetGlobalChats
 } from './GlobalChat';
+import { FanoronaController } from './fanorona/FanoronaController';
 import { HexController } from './hex/HexController';
 import { KeyPaiShoController } from './key-pai-sho/KeyPaiShoController';
 import { LocalStorage } from "./LocalStorage";
@@ -3255,6 +3256,9 @@ export function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Paiko.id:
 			controller = new PaikoController(gameContainerDiv, isMobile);
+			break;
+		case GameType.Fanorona.id:
+			controller = new FanoronaController(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
