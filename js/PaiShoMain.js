@@ -398,6 +398,7 @@ export let activeAi;
 export let activeAi2;
 let sandboxUrl;
 let metadata = {};
+export let superSandboxMode = false;
 export const replayIntervalLength = 2100;
 export const pieceAnimationLength = 1000; // Note that this must be changed in the `.point img` `transition` property as well(main.css)
 export const piecePlaceAnimation = 1; // 0 = None, they just appear, 1 =
@@ -2147,6 +2148,10 @@ export function resetMove() {
 window.resetMove = resetMove
 
 export function myTurn() {
+	if (superSandboxMode) {
+		return true;
+	}
+
 	const userEmail = localStorage.getItem(localEmailKey);
 	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
 		if (getCurrentPlayer() === HOST) {
@@ -2386,11 +2391,36 @@ export function haveUserEmail() {
 	return userEmail && userEmail.includes("@") && userEmail.includes(".");
 }
 
+function truncateMovesForSuperSandboxMode() {
+	if (superSandboxMode && gameController.notationBuilder.status === BRAND_NEW) {
+		isInReplay = false;
+		const moves = gameController.gameNotation.moves;
+		if (moves.length > 0) {
+			/* Reset moves to current replay position to auto-sandbox */
+			if (currentMoveIndex < moves.length) {
+				const newMoves = moves.slice(0, currentMoveIndex);
+				gameController.resetGameNotation();
+				newMoves.forEach(m => { gameController.gameNotation.addMove(m); });
+			}
+		}
+	}
+}
+
 export function unplayedTileClicked(tileDiv) {
+	/* If super sandbox mode, sandbox game immediately */
+	if (superSandboxMode) {
+		truncateMovesForSuperSandboxMode();
+	}
+
 	gameController.unplayedTileClicked(tileDiv);
 }
 
 export function pointClicked(htmlPoint) {
+	/* If super sandbox mode, sandbox game immediately */
+	if (superSandboxMode) {
+		truncateMovesForSuperSandboxMode();
+	}
+
 	gameController.pointClicked(htmlPoint);
 }
 
@@ -2569,7 +2599,49 @@ export function userHasGameAccess() {
 			|| usernameIsOneOf(getGameTypeEntryFromId(gameTypeId).usersWithAccess));
 }
 
-export function sandboxitize() {
+function enterSuperSandboxMode() {
+	superSandboxMode = true;
+	showSuperSandboxIndicator();
+}
+function exitSuperSandboxMode() {
+	superSandboxMode = false;
+	hideSuperSandboxIndicator();
+}
+
+function showSuperSandboxIndicator() {
+	const indicator = document.getElementById('superSandboxIndicator');
+	if (indicator) {
+		indicator.classList.remove('gone');
+	}
+	const container = document.getElementById('replayButtonContainer');
+	if (container) {
+		container.classList.add('superSandboxActive');
+	}
+}
+
+function hideSuperSandboxIndicator() {
+	const indicator = document.getElementById('superSandboxIndicator');
+	if (indicator) {
+		indicator.classList.add('gone');
+	}
+	const container = document.getElementById('replayButtonContainer');
+	if (container) {
+		container.classList.remove('superSandboxActive');
+	}
+}
+
+export function showSuperSandboxInfoModal() {
+	const message = "Super Sandbox mode allows you to explore game variations freely. " +
+		"When you rewind to a previous move and then interact with the board, " +
+		"the game is automatically sandboxed from that point, discarding any moves that came after.<br /><br />" +
+		"This lets you quickly try different move sequences without manually sandboxing each time.";
+	showModal("Super Sandbox Mode", message);
+}
+export function isSuperSandboxMode() {
+	return superSandboxMode && !playingOnlineGame();
+}
+
+export function sandboxitize(isSuperSandbox) {
 	/* Verify game access if it would start a new game at move 0 */
 	if (currentMoveIndex === 0 && !userHasGameAccess()) {
 		return;
@@ -2585,6 +2657,10 @@ export function sandboxitize() {
 	}
 
 	setGameController(currentGameData.gameTypeId, true);
+
+	if (isSuperSandbox) {
+		enterSuperSandboxMode();
+	}
 
 	if (userIsLoggedIn()) {
 		currentGameData.hostUsername = getUsername();
@@ -2658,7 +2734,11 @@ export function playAiTurn() {
 export function sandboxFromMove() {
 	// var link = getLink(true);
 	// openLink(link);
-	sandboxitize();
+	sandboxitize(false);
+}
+
+export function superSandboxFromMove() {
+	sandboxitize(true);
 }
 
 export function openLink(linkUrl) {
@@ -3139,6 +3219,9 @@ export function userIsLoggedIn() {
 
 export function forgetCurrentGameInfo() {
 	clearAiPlayers();
+
+	// Exit sandbox mode. Any other places we need to do this?
+	exitSuperSandboxMode();
 
 	lockedInNotationTextForUrlData = null;
 

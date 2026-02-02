@@ -390,6 +390,10 @@ div.tab .alertTab, div.tab .alertTab.active {
   padding: 4px;
 }
 
+#replayControls .center.superSandboxActive {
+  width: 330px;
+}
+
 #replayControls .gameLogText, #replayControls .replayControlsAdditionalContent {
   width: 38%;
   float: left;
@@ -435,6 +439,13 @@ div.tab .alertTab, div.tab .alertTab.active {
 }
 .replayButton:active {
   background-color: #bbb;
+}
+
+.superSandboxIndicator {
+  color: #ab6bff;
+  border-color: #ab6bff;
+  margin-right: 20px;
+  margin-left: -20px;
 }
 
 #confirmMoveButton .replayButton {
