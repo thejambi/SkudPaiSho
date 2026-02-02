@@ -73,9 +73,10 @@ export function jumpToBranch(branchId) {
 	const branch = superSandboxBranches.find(b => b.id === branchId);
 	if (!branch) return false;
 
-	// Save current state before jumping (if different from target)
+	// Save current state before jumping (if different from target and not already saved)
 	const currentNotation = gameController.gameNotation.notationTextForUrl();
-	if (currentNotation !== branch.notationText) {
+	const alreadySaved = superSandboxBranches.some(b => b.notationText === currentNotation);
+	if (!alreadySaved && currentNotation !== branch.notationText) {
 		const moves = gameController.gameNotation.moves;
 		if (moves.length > 0) {
 			// Save current state as a branch
