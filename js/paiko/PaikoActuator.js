@@ -9,7 +9,7 @@ import { ElementStyleTransform } from '../util/ElementStyleTransform';
 import { PaikoPointState, PaikoZone } from './PaikoBoardPoint';
 import { PaikoController } from './PaikoController';
 import { PaikoOptions } from './PaikoOptions';
-import { getAllTileCodes, PaikoTileCode, PaikoTileFacing } from './PaikoTile';
+import { getAllTileCodes, getTileName, PaikoTileCode, PaikoTileFacing } from './PaikoTile';
 
 export class PaikoActuator {
 	constructor(gameContainer, isMobile, enableAnimations) {
@@ -80,18 +80,14 @@ export class PaikoActuator {
 		// Clear host tile containers
 		this.clearTileContainer('H-hand');
 		allTileCodes.forEach(code => {
-			// this.clearTileContainer('H' + code + '-hand');
-			this.clearTileContainer('H' + code + '-reserve');
+			this.clearTileContainer('H' + getTileName(code) + '-reserve');
 		});
-		// this.clearTileContainer('H-captured');
 
 		// Clear guest tile containers
 		this.clearTileContainer('G-hand');
 		allTileCodes.forEach(code => {
-			// this.clearTileContainer('G' + code + '-hand');
-			this.clearTileContainer('G' + code + '-reserve');
+			this.clearTileContainer('G' + getTileName(code) + '-reserve');
 		});
-		// this.clearTileContainer('G-captured');
 
 		// Sort order for hand display: Elements first, then weapons/special
 		const tileOrder = [

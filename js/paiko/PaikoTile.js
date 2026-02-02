@@ -15,17 +15,56 @@ export const PaikoTileFacing = {
 	LEFT: 3
 };
 
-// Tile type codes - match image file names (e.g., HSword.png, GBow.png)
+// Tile type codes - short abbreviations for notation
 export const PaikoTileCode = {
-	SWORD: 'Sword',
-	BOW: 'Bow',
-	EARTH: 'Earth',
-	FIRE: 'Fire',
-	WATER: 'Water',
-	SAI: 'Sai',
-	LOTUS: 'Lotus',
-	AIR: 'Air'
+	SWORD: 'Sw',
+	BOW: 'Bw',
+	EARTH: 'Er',
+	FIRE: 'Fi',
+	WATER: 'Wa',
+	SAI: 'Sa',
+	LOTUS: 'Lo',
+	AIR: 'Ai'
 };
+
+// Tile names - used for images and display (maps code to name)
+export const PaikoTileName = {
+	[PaikoTileCode.SWORD]: 'Sword',
+	[PaikoTileCode.BOW]: 'Bow',
+	[PaikoTileCode.EARTH]: 'Earth',
+	[PaikoTileCode.FIRE]: 'Fire',
+	[PaikoTileCode.WATER]: 'Water',
+	[PaikoTileCode.SAI]: 'Sai',
+	[PaikoTileCode.LOTUS]: 'Lotus',
+	[PaikoTileCode.AIR]: 'Air'
+};
+
+// Reverse lookup - name to code (for parsing notation that uses names)
+export const PaikoNameToCode = {
+	'Sword': PaikoTileCode.SWORD,
+	'Bow': PaikoTileCode.BOW,
+	'Earth': PaikoTileCode.EARTH,
+	'Fire': PaikoTileCode.FIRE,
+	'Water': PaikoTileCode.WATER,
+	'Sai': PaikoTileCode.SAI,
+	'Lotus': PaikoTileCode.LOTUS,
+	'Air': PaikoTileCode.AIR
+};
+
+// Helper to get code from either code or name
+export function getTileCode(codeOrName) {
+	// If it's already a valid code, return it
+	if (Object.values(PaikoTileCode).includes(codeOrName)) {
+		return codeOrName;
+	}
+	// Try to look up as a name
+	return PaikoNameToCode[codeOrName] || codeOrName;
+}
+
+// Helper to get name from code
+export function getTileName(code) {
+	return PaikoTileName[code] || code;
+}
 
 // Tile metadata definitions
 // Threat patterns are defined as offsets from tile position [row, col]
@@ -183,7 +222,7 @@ export function rotatePattern(pattern, facing) {
 
 export class PaikoTile {
 	constructor(code, ownerCode) {
-		this.code = code;
+		this.code = getTileCode(code); // Normalize code (handles both names and short codes)
 		this.ownerCode = ownerCode;
 		if (this.ownerCode === 'G') {
 			this.ownerName = GUEST;
@@ -264,7 +303,8 @@ export class PaikoTile {
 	}
 
 	getImageName() {
-		return this.ownerCode + this.code;
+		// Use full name for image files (e.g., HSword.png)
+		return this.ownerCode + PaikoTileName[this.code];
 	}
 
 	getConsoleDisplay() {

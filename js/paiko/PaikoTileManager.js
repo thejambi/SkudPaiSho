@@ -2,7 +2,7 @@
 // Manages tile reserves, hands, and discard piles
 
 import { GUEST, HOST } from '../CommonNotationObjects';
-import { PaikoTile, getAllTileCodes } from './PaikoTile';
+import { PaikoTile, getAllTileCodes, getTileCode } from './PaikoTile';
 
 export class PaikoTileManager {
 	constructor() {
@@ -47,8 +47,9 @@ export class PaikoTileManager {
 
 	// Get tiles of a specific type from reserve
 	getTilesOfTypeFromReserve(player, tileCode) {
+		const code = getTileCode(tileCode); // Normalize code (handles both names and codes)
 		const reserve = this.getReserve(player);
-		return reserve.filter(tile => tile.code === tileCode);
+		return reserve.filter(tile => tile.code === code);
 	}
 
 	// Get count of specific tile type in reserve
@@ -58,10 +59,11 @@ export class PaikoTileManager {
 
 	// Draw a specific tile from reserve into hand
 	drawTileFromReserve(player, tileCode) {
+		const code = getTileCode(tileCode); // Normalize code (handles both names and codes)
 		const reserve = this.getReserve(player);
 		const hand = this.getHand(player);
 
-		const index = reserve.findIndex(tile => tile.code === tileCode);
+		const index = reserve.findIndex(tile => tile.code === code);
 		if (index !== -1) {
 			const tile = reserve.splice(index, 1)[0];
 			hand.push(tile);
@@ -72,8 +74,9 @@ export class PaikoTileManager {
 
 	// Get a tile from hand for deployment
 	getTileFromHand(player, tileCode) {
+		const code = getTileCode(tileCode); // Normalize code (handles both names and codes)
 		const hand = this.getHand(player);
-		const index = hand.findIndex(tile => tile.code === tileCode);
+		const index = hand.findIndex(tile => tile.code === code);
 		if (index !== -1) {
 			return hand.splice(index, 1)[0];
 		}
@@ -82,14 +85,16 @@ export class PaikoTileManager {
 
 	// Check if player has tile in hand
 	hasTileInHand(player, tileCode) {
+		const code = getTileCode(tileCode); // Normalize code (handles both names and codes)
 		const hand = this.getHand(player);
-		return hand.some(tile => tile.code === tileCode);
+		return hand.some(tile => tile.code === code);
 	}
 
 	// Get count of specific tile type in hand
 	getHandTileCount(player, tileCode) {
+		const code = getTileCode(tileCode); // Normalize code (handles both names and codes)
 		const hand = this.getHand(player);
-		return hand.filter(tile => tile.code === tileCode).length;
+		return hand.filter(tile => tile.code === code).length;
 	}
 
 	// Add captured tile to discard

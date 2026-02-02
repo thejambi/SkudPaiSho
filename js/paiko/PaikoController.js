@@ -1,6 +1,9 @@
 // Paiko Controller
 // Handles UI interaction for Paiko game
 
+import { DEPLOY, GUEST, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { getPlayerCodeFromName } from '../pai-sho-common/PaiShoPlayerHelp';
 import {
 	GameType,
 	activeAi,
@@ -22,17 +25,15 @@ import {
 	refreshMessage,
 	rerunAll,
 } from '../PaiShoMain';
-import { DEPLOY, MOVE, GUEST, HOST, NotationPoint } from '../CommonNotationObjects';
-import { PaikoActuator } from './PaikoActuator';
-import { PaikoGameManager } from './PaikoGameManager';
-import { PaikoMoveType, PaikoGamePhase } from './PaikoGameNotation';
-import { PaikoMoveBuilder, PaikoBuilderStatus } from './PaikoMoveBuilder';
-import { PaikoOptions } from './PaikoOptions';
 import { TrifleGameNotation } from '../trifle/TrifleGameNotation';
-import { PaikoPointState } from './PaikoBoardPoint';
-import { PaikoTile, PaikoTileFacing, PaikoTileDefinitions, PaikoTileCode, getAllTileCodes } from './PaikoTile';
+import { PaikoActuator } from './PaikoActuator';
 import { PaikoAI } from './PaikoAI';
-import { debug } from '../GameData';
+import { PaikoPointState } from './PaikoBoardPoint';
+import { PaikoGameManager } from './PaikoGameManager';
+import { PaikoGamePhase, PaikoMoveType } from './PaikoGameNotation';
+import { PaikoBuilderStatus, PaikoMoveBuilder } from './PaikoMoveBuilder';
+import { PaikoOptions } from './PaikoOptions';
+import { PaikoTile, PaikoTileCode, PaikoTileFacing } from './PaikoTile';
 
 export class PaikoController {
 	constructor(gameContainer, isMobile) {
@@ -109,6 +110,53 @@ export class PaikoController {
 
 	getGameTypeId() {
 		return GameType.Paiko.id;
+	}
+
+	buildNotationString(move) {
+		const playerCode = getPlayerCodeFromName(move.player);
+		const moveNum = move.moveNum;
+		let notation = moveNum + playerCode + ".";
+
+		switch (move.moveType) {
+			case DEPLOY:
+				notation += move.moveData.tileCode;
+				notation += "(" + move.moveData.endPoint + ")";
+				if (move.moveData.facing) {
+					notation += move.moveData.facing;
+				}
+				break;
+			case MOVE:
+				notation += "(" + move.moveData.startPoint + ")-(" + move.moveData.endPoint + ")";
+				if (move.moveData.facing) {
+					notation += move.moveData.facing;
+				}
+				break;
+			case PaikoMoveType.SELECT_TILE:
+				notation += "Select:" + (move.moveData.selectedTiles || []).join(",");
+				break;
+			case PaikoMoveType.DRAW:
+				notation += "Draw:" + (move.moveData.drawnTiles || []).join(",");
+				break;
+			case PaikoMoveType.ROTATE:
+				notation += "Rotate(" + move.moveData.startPoint + ")" + move.moveData.facing;
+				break;
+			case PaikoMoveType.SAI_SHIFT:
+				notation += "Sai(" + move.moveData.startPoint + ")-(" + move.moveData.endPoint + ")";
+				break;
+			case PaikoMoveType.WATER_REDEPLOY:
+				notation += "Water(" + move.moveData.startPoint + ")-(" + move.moveData.endPoint + ")";
+				break;
+			case PaikoMoveType.CAPTURE_REWARD:
+				notation += "Reward:" + (move.moveData.tileCodes || []).join(",");
+				break;
+			case PaikoMoveType.PASS:
+				notation += "Pass";
+				break;
+			default:
+				notation += move.moveType || "?";
+		}
+
+		return notation;
 	}
 
 	completeSetup() {
@@ -1457,7 +1505,7 @@ export class PaikoController {
 	}
 
 	// Generate an HTML grid showing the tile's threat and cover patterns
-	generatePatternGrid(tile, ownerName) {
+	generatePatternGrid(tile) {
 		const threatPattern = tile.getThreatPattern();
 		const coverPattern = tile.getCoverPattern();
 
@@ -1470,7 +1518,7 @@ export class PaikoController {
 
 		// Bow needs special positioning - offset back from facing direction
 		// so its long-range threat pattern (extends 4 spaces) is visible
-		if (tile.code === 'Bow') {
+		if (tile.code === PaikoTileCode.BOW) {
 			const facing = tile.getFacing ? tile.getFacing() : PaikoTileFacing.UP;
 			switch (facing) {
 				case PaikoTileFacing.UP:
@@ -1521,7 +1569,7 @@ export class PaikoController {
 		// Generate HTML table
 		const cellSize = '24px';
 		// const ownerColor = ownerName === HOST ? '#d44' : '#48d';	/* Removing tile background */
-		const tileImgSrc = `images/Paiko/${ownerName === HOST ? 'H' : 'G'}${tile.code}.png`;
+		const tileImgSrc = `images/Paiko/${tile.getImageName()}.png`;
 
 		// Calculate rotation for tile image based on facing
 		// UP=0, RIGHT=1, DOWN=2, LEFT=3 -> 0, 90, 180, 270 degrees
@@ -1573,12 +1621,12 @@ export class PaikoController {
 		return html;
 	}
 
-	getTheMessage(tile, ownerName, boardPoint = null) {
+	getTheMessage(tile, boardPoint = null) {
 		const def = tile.getDefinition();
 		const message = [];
 
 		// Show pattern grid
-		const patternGrid = this.generatePatternGrid(tile, ownerName);
+		const patternGrid = this.generatePatternGrid(tile);
 		message.push(patternGrid);
 
 		message.push(`<p><strong>Move Distance:</strong> ${def.moveDistance}</p>`);
@@ -1602,7 +1650,7 @@ export class PaikoController {
 
 		// Show threat/cover status for tiles on the board
 		if (boardPoint) {
-			const player = ownerName;
+			const player = tile.ownerName;
 			const opponent = player === HOST ? GUEST : HOST;
 			const opponentThreat = boardPoint.getThreat(opponent);
 			const isCovered = boardPoint.isTileCovered(player);
@@ -1619,7 +1667,7 @@ export class PaikoController {
 		}
 
 		return {
-			heading: `${ownerName}'s ${def.name}`,
+			heading: `${tile.ownerName}'s ${def.name}`,
 			message: message
 		};
 	}
@@ -1629,9 +1677,8 @@ export class PaikoController {
 		const ownerCode = tileDiv.getAttribute('name').charAt(0);
 
 		const tile = new PaikoTile(tileCode, ownerCode);
-		const ownerName = ownerCode === 'H' ? HOST : GUEST;
 
-		return this.getTheMessage(tile, ownerName);
+		return this.getTheMessage(tile);
 	}
 
 	getPointMessage(htmlPoint) {
@@ -1641,7 +1688,7 @@ export class PaikoController {
 		const boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
 		if (boardPoint.hasTile()) {
-			return this.getTheMessage(boardPoint.tile, boardPoint.tile.ownerName, boardPoint);
+			return this.getTheMessage(boardPoint.tile, boardPoint);
 		}
 
 		// Show zone info
