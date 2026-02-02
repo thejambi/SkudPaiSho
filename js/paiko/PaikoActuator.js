@@ -26,7 +26,8 @@ export class PaikoActuator {
 			PaikoOptions.viewAsGuest ? PAIKO_GUEST_ROTATE : null,
 			true,   // Play in spaces (not on points)
 			"Paiko_zoom",
-			"1.2"	// Paiko zooms in
+			"1.2",	// Paiko zooms in
+			"Paiko",	// Custom CSS class name
 		);
 
 		this.boardContainer = containers.boardContainer;
@@ -89,10 +90,12 @@ export class PaikoActuator {
 			this.clearTileContainer('G' + getTileName(code) + '-reserve');
 		});
 
-		// Sort order for hand display: Elements first, then weapons/special
+		// Sort order for hand display
 		const tileOrder = [
-			PaikoTileCode.WATER, PaikoTileCode.EARTH, PaikoTileCode.FIRE, PaikoTileCode.AIR,
-			PaikoTileCode.SWORD, PaikoTileCode.BOW, PaikoTileCode.SAI, PaikoTileCode.LOTUS
+			// PaikoTileCode.WATER, PaikoTileCode.EARTH, PaikoTileCode.FIRE, PaikoTileCode.AIR,
+			// PaikoTileCode.SWORD, PaikoTileCode.BOW, PaikoTileCode.SAI, PaikoTileCode.LOTUS
+			PaikoTileCode.SWORD, PaikoTileCode.EARTH, PaikoTileCode.BOW, PaikoTileCode.FIRE,
+			PaikoTileCode.AIR, PaikoTileCode.WATER, PaikoTileCode.SAI, PaikoTileCode.LOTUS
 		];
 
 		const sortTiles = (tiles) => {

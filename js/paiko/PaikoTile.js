@@ -323,3 +323,10 @@ export class PaikoTile {
 export function getAllTileCodes() {
 	return Object.values(PaikoTileCode);
 }
+
+// Display order for reserve tiles (two rows)
+// Each row is an array of tile codes in the order they should appear
+export const PaikoReserveDisplayOrder = [
+	[PaikoTileCode.SWORD, PaikoTileCode.EARTH, PaikoTileCode.BOW, PaikoTileCode.FIRE],
+	[PaikoTileCode.WATER, PaikoTileCode.SAI, PaikoTileCode.AIR, PaikoTileCode.LOTUS]
+];

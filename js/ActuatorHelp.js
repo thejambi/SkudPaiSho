@@ -161,7 +161,8 @@ export function setupPaiShoBoard(gameContainer,
 	rotateType,
 	playInSpaces,
 	overrideBoardName,
-	overrideScale) {
+	overrideScale,
+	customCssClassName) {
 
 	var addVagabondBoardRotate = false;
 	var addAdevarBoardRotate = false;
@@ -247,6 +248,9 @@ export function setupPaiShoBoard(gameContainer,
 	tilePileContainer.classList.add("PaiSho");
 	if (overrideBoardName) {
 		tilePileContainer.classList.add(overrideBoardName);
+	}
+	if (customCssClassName) {
+		tilePileContainer.classList.add(customCssClassName);
 	}
 	var gameMessage2 = createDivWithClass("gameMessage2");
 

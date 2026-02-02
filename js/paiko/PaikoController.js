@@ -33,7 +33,7 @@ import { PaikoGameManager } from './PaikoGameManager';
 import { PaikoGamePhase, PaikoMoveType } from './PaikoGameNotation';
 import { PaikoBuilderStatus, PaikoMoveBuilder } from './PaikoMoveBuilder';
 import { PaikoOptions } from './PaikoOptions';
-import { PaikoTile, PaikoTileCode, PaikoTileFacing } from './PaikoTile';
+import { PaikoTile, PaikoTileCode, PaikoTileFacing, PaikoTileName, PaikoReserveDisplayOrder } from './PaikoTile';
 
 export class PaikoController {
 	constructor(gameContainer, isMobile) {
@@ -195,28 +195,10 @@ export class PaikoController {
 		container.appendChild(handLabel);
 		container.appendChild(document.createElement('br'));
 
-		// Hand tile containers
-		// ['HSword', 'HBow', 'HEarth', 'HFire'].forEach(className => {
-		// 	const div = document.createElement('div');
-		// 	div.className = className + '-hand';
-		// 	container.appendChild(div);
-		// 	container.appendChild(document.createTextNode(' '));
-		// });
 		const div = document.createElement('span');
 		div.className = 'H-hand';
 		container.appendChild(div);
 		container.appendChild(document.createTextNode(' '));
-
-		// const clearBr1 = document.createElement('br');
-		// clearBr1.className = 'clear';
-		// container.appendChild(clearBr1);
-
-		// ['HWater', 'HSai', 'HLotus', 'HAir'].forEach(className => {
-		// 	const div = document.createElement('div');
-		// 	div.className = className + '-hand';
-		// 	container.appendChild(div);
-		// 	container.appendChild(document.createTextNode(' '));
-		// });
 
 		const clearBr2 = document.createElement('br');
 		clearBr2.className = 'clear';
@@ -231,39 +213,23 @@ export class PaikoController {
 		container.appendChild(document.createElement('br'));
 
 		// Reserve tile containers
-		['HWater', 'HEarth', 'HFire', 'HAir'].forEach(className => {
-			const div = document.createElement('div');
-			div.className = className + '-reserve';
-			container.appendChild(div);
-			container.appendChild(document.createTextNode(' '));
+		PaikoReserveDisplayOrder.forEach((row, rowIndex) => {
+			row.forEach(tileCode => {
+				const className = 'H' + PaikoTileName[tileCode];
+				const div = document.createElement('div');
+				div.className = className + '-reserve';
+				container.appendChild(div);
+				container.appendChild(document.createTextNode(' '));
+			});
+
+			const clearBr = document.createElement('br');
+			clearBr.className = 'clear';
+			container.appendChild(clearBr);
+
+			if (rowIndex === PaikoReserveDisplayOrder.length - 1) {
+				container.appendChild(document.createElement('br'));
+			}
 		});
-
-		const clearBr3 = document.createElement('br');
-		clearBr3.className = 'clear';
-		container.appendChild(clearBr3);
-
-		['HSword', 'HBow', 'HSai', 'HLotus'].forEach(className => {
-			const div = document.createElement('div');
-			div.className = className + '-reserve';
-			container.appendChild(div);
-			container.appendChild(document.createTextNode(' '));
-		});
-
-		const clearBr4 = document.createElement('br');
-		clearBr4.className = 'clear';
-		container.appendChild(clearBr4);
-		container.appendChild(document.createElement('br'));
-
-		// // Host Captured Section
-		// const capturedLabel = document.createElement('span');
-		// capturedLabel.className = 'tileLibraryLabel';
-		// capturedLabel.innerHTML = '<strong>Host Captured</strong>';
-		// container.appendChild(capturedLabel);
-		// container.appendChild(document.createElement('br'));
-
-		// const capturedDiv = document.createElement('div');
-		// capturedDiv.className = 'H-captured';
-		// container.appendChild(capturedDiv);
 
 		return container.innerHTML;
 	}
@@ -278,28 +244,10 @@ export class PaikoController {
 		container.appendChild(handLabel);
 		container.appendChild(document.createElement('br'));
 
-		// Hand tile containers
-		// ['GSword', 'GBow', 'GEarth', 'GFire'].forEach(className => {
-		// 	const div = document.createElement('div');
-		// 	div.className = className + '-hand';
-		// 	container.appendChild(div);
-		// 	container.appendChild(document.createTextNode(' '));
-		// });
 		const div = document.createElement('span');
 		div.className = 'G-hand';
 		container.appendChild(div);
 		container.appendChild(document.createTextNode(' '));
-
-		// const clearBr1 = document.createElement('br');
-		// clearBr1.className = 'clear';
-		// container.appendChild(clearBr1);
-
-		// ['GWater', 'GSai', 'GLotus', 'GAir'].forEach(className => {
-		// 	const div = document.createElement('div');
-		// 	div.className = className + '-hand';
-		// 	container.appendChild(div);
-		// 	container.appendChild(document.createTextNode(' '));
-		// });
 
 		const clearBr2 = document.createElement('br');
 		clearBr2.className = 'clear';
@@ -314,39 +262,23 @@ export class PaikoController {
 		container.appendChild(document.createElement('br'));
 
 		// Reserve tile containers
-		['GWater', 'GEarth', 'GFire', 'GAir'].forEach(className => {
-			const div = document.createElement('div');
-			div.className = className + '-reserve';
-			container.appendChild(div);
-			container.appendChild(document.createTextNode(' '));
+		PaikoReserveDisplayOrder.forEach((row, rowIndex) => {
+			row.forEach(tileCode => {
+				const className = 'G' + PaikoTileName[tileCode];
+				const div = document.createElement('div');
+				div.className = className + '-reserve';
+				container.appendChild(div);
+				container.appendChild(document.createTextNode(' '));
+			});
+
+			const clearBr = document.createElement('br');
+			clearBr.className = 'clear';
+			container.appendChild(clearBr);
+
+			if (rowIndex === PaikoReserveDisplayOrder.length - 1) {
+				container.appendChild(document.createElement('br'));
+			}
 		});
-
-		const clearBr3 = document.createElement('br');
-		clearBr3.className = 'clear';
-		container.appendChild(clearBr3);
-
-		['GSword', 'GBow', 'GSai', 'GLotus'].forEach(className => {
-			const div = document.createElement('div');
-			div.className = className + '-reserve';
-			container.appendChild(div);
-			container.appendChild(document.createTextNode(' '));
-		});
-
-		const clearBr4 = document.createElement('br');
-		clearBr4.className = 'clear';
-		container.appendChild(clearBr4);
-		container.appendChild(document.createElement('br'));
-
-		// Guest Captured Section
-		// const capturedLabel = document.createElement('span');
-		// capturedLabel.className = 'tileLibraryLabel';
-		// capturedLabel.innerHTML = '<strong>Guest Captured</strong>';
-		// container.appendChild(capturedLabel);
-		// container.appendChild(document.createElement('br'));
-
-		// const capturedDiv = document.createElement('div');
-		// capturedDiv.className = 'G-captured';
-		// container.appendChild(capturedDiv);
 
 		return container.innerHTML;
 	}
