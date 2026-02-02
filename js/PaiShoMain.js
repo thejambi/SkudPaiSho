@@ -6041,6 +6041,7 @@ export function getGameOptionsMessageElement(options) {
     let optionsListed = false;
 
     if (options && options.length > 0) {
+		container.appendChild(document.createElement('br'));
         // Create a strong element for the title
         const strong = document.createElement('strong');
         strong.textContent = 'Add Game Option:';
