@@ -8,8 +8,7 @@ import {
 	playingOnlineGame,
 	showModalElem,
 	closeModal,
-	setIsInReplay,
-	BRAND_NEW
+	setIsInReplay
 } from './PaiShoMain.js';
 
 // State
@@ -22,13 +21,22 @@ function generateBranchId() {
 	return ++branchIdCounter;
 }
 
+function getMovePreviewString(move) {
+	// Use game-specific notation builder if available
+	if (gameController.buildNotationString) {
+		return gameController.buildNotationString(move);
+	}
+	// Fallback for simpler notation formats
+	return move.fullMoveText || move.text || String(move);
+}
+
 function saveBranch(branchPointMoveIndex, truncatedMoves) {
 	// Store the full notation text for reliable restoration
 	const fullNotationText = gameController.gameNotation.notationTextForUrl();
 
 	// Get first move preview for display
 	const firstMovePreview = truncatedMoves.length > 0
-		? (truncatedMoves[0].fullMoveText || truncatedMoves[0].text || String(truncatedMoves[0]))
+		? getMovePreviewString(truncatedMoves[0])
 		: '';
 
 	const branch = {
@@ -133,7 +141,7 @@ function hideSuperSandboxIndicator() {
 
 // Truncation with branch saving
 export function truncateMovesForSuperSandboxMode() {
-	if (superSandboxMode && gameController.notationBuilder.status === BRAND_NEW) {
+	if (superSandboxMode) {
 		setIsInReplay(false);
 		const moves = gameController.gameNotation.moves;
 		if (moves.length > 0 && currentMoveIndex < moves.length) {
@@ -155,10 +163,9 @@ export function showSuperSandboxInfoModal() {
 
 	// Description
 	const description = document.createElement('p');
-	description.innerHTML = "Super Sandbox mode allows you to explore game variations freely. " +
+	description.innerHTML = "Super Sandbox mode allows you to explore game variations. " +
 		"When you rewind to a previous move and then interact with the board, " +
-		"the game is automatically sandboxed from that point, discarding any moves that came after.<br /><br />" +
-		"This lets you quickly try different move sequences without manually sandboxing each time.";
+		"the game is automatically sandboxed from that point, saving the previous line of moves as a branch you can jump back to from the list below!";
 	container.appendChild(description);
 
 	// Branches section
