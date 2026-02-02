@@ -477,6 +477,19 @@ export const GameType = {
 		usersWithAccess: [
 			'SkudPaiSho',
 		]
+	},
+	Fanorona: {
+		id: 26,
+		name: "Fanorona",
+		desc: "Fanorona",
+		color: "var(--fanoronacolor)",
+		description: "A traditional strategy game from Madagascar. Capture all opponent pieces through approach or withdrawal moves.",
+		coverImg: "hexagon.png",
+		rulesUrl: "https://en.wikipedia.org/wiki/Fanorona",
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho',
+		]
 	}
 };
 
