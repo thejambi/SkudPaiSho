@@ -1,7 +1,10 @@
 // Coop Solitaire Notation
 
-import { GUEST, HOST, PLANTING, ARRANGING } from '../CommonNotationObjects';
-import { simpleCanonRules, sameStart } from '../skud-pai-sho/SkudPaiShoRules';
+import { ARRANGING, GUEST, HOST, NotationPoint, PLANTING } from '../CommonNotationObjects';
+import { debug } from '../GameData';
+import { BRAND_NEW } from '../PaiShoMain';
+import { sameStart, simpleCanonRules } from '../skud-pai-sho/SkudPaiShoRules';
+import { CoopSolitaireTile } from './CoopSolitaireTile';
 
 export function CoopSolitaireNotationMove(text) {
 	this.fullMoveText = text;
@@ -138,7 +141,7 @@ export function CoopSolitaireNotationBuilder() {
 CoopSolitaireNotationBuilder.prototype.getFirstMoveForHost = function(tileCode) {
 	var builder = new CoopSolitaireNotationBuilder();
 	builder.moveType = PLANTING;
-	builder.plantedFlowerType = Tile.getClashTileCode(tileCode);
+	builder.plantedFlowerType = CoopSolitaireTile.getClashTileCode(tileCode);
 
 	if (simpleCanonRules || sameStart) {
 		builder.plantedFlowerType = tileCode;
@@ -201,6 +204,7 @@ CoopSolitaireGameNotation.prototype.removeLastMove = function() {
 CoopSolitaireGameNotation.prototype.getPlayerMoveNum = function() {
 	var moveNum = 0;
 	var lastMove = this.moves[this.moves.length-1];
+	var player;
 
 	if (lastMove) {
 		moveNum = lastMove.moveNum;

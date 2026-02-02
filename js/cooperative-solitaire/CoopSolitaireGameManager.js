@@ -1,5 +1,13 @@
 // Solitaire Game Manager
 
+import { ARRANGING, HOST, PLANTING } from '../CommonNotationObjects';
+import { ACCENT_TILE, debug } from '../GameData';
+import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
+import { gameController, getCurrentPlayer, isInReplay } from '../PaiShoMain';
+import { lessBonus, newGatesRule, newSpecialFlowerRules } from '../skud-pai-sho/SkudPaiShoRules';
+import { CoopSolitaireBoard } from './CoopSolitaireBoard';
+import { CoopSolitaireTileManager } from './CoopSolitaireTileManager';
+
 export function CoopSolitaireGameManager(actuator, ignoreActuate, isCopy, existingDrawnTile, existingLastDrawnTile) {
 	this.isCopy = isCopy;
 

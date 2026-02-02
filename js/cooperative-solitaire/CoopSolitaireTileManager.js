@@ -1,5 +1,15 @@
 // Tile Manager
 
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { ACCENT_TILE, SPECIAL_FLOWER, debug } from '../GameData';
+import {
+	gameOptionEnabled,
+	LESS_TILES,
+	OPTION_DOUBLE_TILES,
+	OPTION_INSANE_TILES,
+} from '../GameOptions';
+import { SolitaireTile } from '../solitaire/SolitaireTile';
+
 export function CoopSolitaireTileManager(forActuating) {
 	this.playerCode = 'H'
 	
@@ -163,7 +173,7 @@ CoopSolitaireTileManager.prototype.grabTile = function(player, tileCode) {
 	var tile;
 	for (var i = 0; i < tilePile.length; i++) {
 		if (tilePile[i].code === tileCode) {
-			newTileArr = tilePile.splice(i, 1);
+			var newTileArr = tilePile.splice(i, 1);
 			tile = newTileArr[0];
 			break;
 		}

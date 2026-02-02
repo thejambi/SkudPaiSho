@@ -1,5 +1,19 @@
 // Board Point
 
+import { GUEST, HOST } from '../CommonNotationObjects';
+import { ACCENT_TILE, BASIC_FLOWER, SPECIAL_FLOWER } from '../GameData';
+import {
+	GATE,
+	gateDot,
+	NEUTRAL,
+	NON_PLAYABLE,
+	POSSIBLE_MOVE,
+	thickDot,
+	thinDot,
+	whiteDot,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+
 export function CoopSolitaireBoardPoint() {
 	this.types = [];
 	this.row = -1;

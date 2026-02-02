@@ -1,9 +1,40 @@
 // Board
 
+import { GUEST, HOST, NotationPoint, RowAndColumn } from '../CommonNotationObjects';
 import {
+  ACCENT_TILE,
+  BASIC_FLOWER,
+  BOAT,
+  KNOTWEED,
+  ORCHID,
+  ROCK,
+  SPECIAL_FLOWER,
+  WHEEL,
+  WHITE_LOTUS,
+  debug,
+} from '../GameData';
+import { showBadMoveModal } from '../PaiShoMain';
+import {
+  GATE,
+  NON_PLAYABLE,
+  POSSIBLE_MOVE,
+} from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import {
+  boatOnlyMoves,
+  lotusNoCapture,
+  newKnotweedRules,
+  newOrchidVulnerableRule,
+  newWheelRule,
+  rocksUnwheelable,
   simpleRocks,
+  simpleSpecialFlowerRule,
   simplest,
+  superRocks,
 } from '../skud-pai-sho/SkudPaiShoRules';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import { CoopSolitaireBoardPoint } from './CoopSolitaireBoardPoint';
+import { CoopSolitaireHarmony, CoopSolitaireHarmonyManager } from './CoopSolitaireHarmony';
+import { CoopSolitaireTile } from './CoopSolitaireTile';
 
 export function CoopSolitaireBoard() {
 	this.size = new RowAndColumn(17, 17);
@@ -475,7 +506,7 @@ CoopSolitaireBoard.prototype.canPlaceWheel = function(boardPoint) {
 	// Does it create Disharmony?
 	var newBoard = this.getCopy();
 	var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
-	newBoard.placeWheel(new SolitaireTile('W', 'G'), notationPoint, true);
+	newBoard.placeWheel(new CoopSolitaireTile('W', 'G'), notationPoint, true);
 	if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
 		return false;
 	}
@@ -590,7 +621,7 @@ CoopSolitaireBoard.prototype.canPlaceBoat = function(boardPoint, tile) {
 			// Ensure no Disharmony
 			var newBoard = this.getCopy();
 			var notationPoint = new NotationPoint(new RowAndColumn(boardPoint.row, boardPoint.col).notationPointString);
-			newBoard.placeBoat(new SolitaireTile('B', 'G'), notationPoint, boardPoint, true);
+			newBoard.placeBoat(new CoopSolitaireTile('B', 'G'), notationPoint, boardPoint, true);
 			if (newBoard.moveCreatesDisharmony(boardPoint, boardPoint)) {
 				return false;
 			}
@@ -1347,7 +1378,7 @@ CoopSolitaireBoard.prototype.getHarmonyLeft = function(tile, endRowCol) {
 	if (colToCheck >= 0) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
 		if (tile.formsHarmonyWith(checkPoint.tile)) {
-			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+			var harmony = new CoopSolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
 	}
@@ -1363,7 +1394,7 @@ CoopSolitaireBoard.prototype.getHarmonyRight = function(tile, endRowCol) {
 	if (colToCheck <= 16) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
 		if (tile.formsHarmonyWith(checkPoint.tile)) {
-			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+			var harmony = new CoopSolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
 	}
@@ -1379,7 +1410,7 @@ CoopSolitaireBoard.prototype.getHarmonyUp = function(tile, endRowCol) {
 	if (rowToCheck >= 0) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
 		if (tile.formsHarmonyWith(checkPoint.tile)) {
-			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+			var harmony = new CoopSolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
 	}
@@ -1395,7 +1426,7 @@ CoopSolitaireBoard.prototype.getHarmonyDown = function(tile, endRowCol) {
 	if (rowToCheck <= 16) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
 		if (tile.formsHarmonyWith(checkPoint.tile)) {
-			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+			var harmony = new CoopSolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
 	}
@@ -1442,7 +1473,7 @@ CoopSolitaireBoard.prototype.getClashLeft = function(tile, endRowCol) {
 	if (colToCheck >= 0) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
 		if (tile.clashesWith(checkPoint.tile)) {
-			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+			var harmony = new CoopSolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
 	}
@@ -1458,7 +1489,7 @@ CoopSolitaireBoard.prototype.getClashRight = function(tile, endRowCol) {
 	if (colToCheck <= 16) {
 		var checkPoint = this.cells[endRowCol.row][colToCheck];
 		if (tile.clashesWith(checkPoint.tile)) {
-			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
+			var harmony = new CoopSolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(endRowCol.row, colToCheck));
 			return harmony;
 		}
 	}
@@ -1474,7 +1505,7 @@ CoopSolitaireBoard.prototype.getClashUp = function(tile, endRowCol) {
 	if (rowToCheck >= 0) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
 		if (tile.clashesWith(checkPoint.tile)) {
-			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+			var harmony = new CoopSolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
 	}
@@ -1490,7 +1521,7 @@ CoopSolitaireBoard.prototype.getClashDown = function(tile, endRowCol) {
 	if (rowToCheck <= 16) {
 		var checkPoint = this.cells[rowToCheck][endRowCol.col];
 		if (tile.clashesWith(checkPoint.tile)) {
-			var harmony = new SolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
+			var harmony = new CoopSolitaireHarmony(tile, endRowCol, checkPoint.tile, new RowAndColumn(rowToCheck, endRowCol.col));
 			return harmony;
 		}
 	}

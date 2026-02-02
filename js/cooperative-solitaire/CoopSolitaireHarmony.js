@@ -1,5 +1,9 @@
 // Coop Solitaire Harmony
 
+import { GUEST, HOST, NotationPoint } from '../CommonNotationObjects';
+import { ACCENT_TILE, debug } from '../GameData';
+import { completeHarmony } from '../skud-pai-sho/SkudPaiShoRules';
+
 export function CoopSolitaireHarmony(tile1, tile1RowAndColumn, tile2, tile2RowAndColumn) {
 	this.tile1 = tile1;
 	this.tile1Pos = tile1RowAndColumn;
