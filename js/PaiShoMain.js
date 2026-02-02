@@ -109,6 +109,12 @@ import {
 } from './WebPush';
 import * as WelcomeTutorial from './WelcomeTutorial';
 import { YammaController } from './yamma/YammaController';
+import {
+	enterSuperSandboxMode,
+	exitSuperSandboxMode,
+	isSuperSandboxMode,
+	truncateMovesForSuperSandboxMode
+} from './SuperSandbox.js';
 
 
 export const QueryString = (() => {
@@ -398,7 +404,6 @@ export let activeAi;
 export let activeAi2;
 let sandboxUrl;
 let metadata = {};
-export let superSandboxMode = false;
 export const replayIntervalLength = 2100;
 export const pieceAnimationLength = 1000; // Note that this must be changed in the `.point img` `transition` property as well(main.css)
 export const piecePlaceAnimation = 1; // 0 = None, they just appear, 1 =
@@ -414,6 +419,9 @@ export let currentGameOpponentUsername;
 export let currentGameData = {};
 export let currentMoveIndex = 0;
 export let isInReplay = false;
+export function setIsInReplay(value) {
+	isInReplay = value;
+}
 export let interval = 0;
 
 export let emailBeingVerified = "";
@@ -2148,7 +2156,7 @@ export function resetMove() {
 window.resetMove = resetMove
 
 export function myTurn() {
-	if (superSandboxMode) {
+	if (isSuperSandboxMode()) {
 		return true;
 	}
 
@@ -2391,24 +2399,9 @@ export function haveUserEmail() {
 	return userEmail && userEmail.includes("@") && userEmail.includes(".");
 }
 
-function truncateMovesForSuperSandboxMode() {
-	if (superSandboxMode && gameController.notationBuilder.status === BRAND_NEW) {
-		isInReplay = false;
-		const moves = gameController.gameNotation.moves;
-		if (moves.length > 0) {
-			/* Reset moves to current replay position to auto-sandbox */
-			if (currentMoveIndex < moves.length) {
-				const newMoves = moves.slice(0, currentMoveIndex);
-				gameController.resetGameNotation();
-				newMoves.forEach(m => { gameController.gameNotation.addMove(m); });
-			}
-		}
-	}
-}
-
 export function unplayedTileClicked(tileDiv) {
 	/* If super sandbox mode, sandbox game immediately */
-	if (superSandboxMode) {
+	if (isSuperSandboxMode()) {
 		truncateMovesForSuperSandboxMode();
 	}
 
@@ -2417,7 +2410,7 @@ export function unplayedTileClicked(tileDiv) {
 
 export function pointClicked(htmlPoint) {
 	/* If super sandbox mode, sandbox game immediately */
-	if (superSandboxMode) {
+	if (isSuperSandboxMode()) {
 		truncateMovesForSuperSandboxMode();
 	}
 
@@ -2597,48 +2590,6 @@ export function userHasGameAccess() {
 		&& (gameDevOn
 			|| !getGameTypeEntryFromId(gameTypeId).usersWithAccess
 			|| usernameIsOneOf(getGameTypeEntryFromId(gameTypeId).usersWithAccess));
-}
-
-function enterSuperSandboxMode() {
-	superSandboxMode = true;
-	showSuperSandboxIndicator();
-}
-function exitSuperSandboxMode() {
-	superSandboxMode = false;
-	hideSuperSandboxIndicator();
-}
-
-function showSuperSandboxIndicator() {
-	const indicator = document.getElementById('superSandboxIndicator');
-	if (indicator) {
-		indicator.classList.remove('gone');
-	}
-	const container = document.getElementById('replayButtonContainer');
-	if (container) {
-		container.classList.add('superSandboxActive');
-	}
-}
-
-function hideSuperSandboxIndicator() {
-	const indicator = document.getElementById('superSandboxIndicator');
-	if (indicator) {
-		indicator.classList.add('gone');
-	}
-	const container = document.getElementById('replayButtonContainer');
-	if (container) {
-		container.classList.remove('superSandboxActive');
-	}
-}
-
-export function showSuperSandboxInfoModal() {
-	const message = "Super Sandbox mode allows you to explore game variations freely. " +
-		"When you rewind to a previous move and then interact with the board, " +
-		"the game is automatically sandboxed from that point, discarding any moves that came after.<br /><br />" +
-		"This lets you quickly try different move sequences without manually sandboxing each time.";
-	showModal("Super Sandbox Mode", message);
-}
-export function isSuperSandboxMode() {
-	return superSandboxMode && !playingOnlineGame();
 }
 
 export function sandboxitize(isSuperSandbox) {

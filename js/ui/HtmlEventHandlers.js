@@ -32,9 +32,9 @@ import {
 	dismissChatAlert,
 	toggleTimestamps,
 	toggleMoveLogDisplay,
-	superSandboxFromMove,
-	showSuperSandboxInfoModal
+	superSandboxFromMove
 } from '../PaiShoMain';
+import { showSuperSandboxInfoModal } from '../SuperSandbox.js';
 import { addEventToElementId } from './UiSetup';
 
 export function setupHtmlEventHandlers() {
