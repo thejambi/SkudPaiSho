@@ -31,7 +31,9 @@ import {
 	sendChat,
 	dismissChatAlert,
 	toggleTimestamps,
-	toggleMoveLogDisplay
+	toggleMoveLogDisplay,
+	superSandboxFromMove,
+	showSuperSandboxInfoModal
 } from '../PaiShoMain';
 import { addEventToElementId } from './UiSetup';
 
@@ -44,6 +46,7 @@ export function setupHtmlEventHandlers() {
 	// Sidenav Menu - Current Game section
 	addEventToElementId('sidenavToggleReplay', 'click', toggleReplayControls);
 	addEventToElementId('sidenavSandbox', 'click', sandboxFromMove);
+	addEventToElementId('sidenavSuperSandbox', 'click', superSandboxFromMove);
 	addEventToElementId('sidenavGameLink', 'click', showGameReplayLink);
 	addEventToElementId('sidenavShowNotation', 'click', showGameNotationModal);
 	addEventToElementId('sidenavMarkInactive', 'click', markGameInactiveClicked);
@@ -99,6 +102,7 @@ export function setupHtmlEventHandlers() {
 	}
 
 	// Replay Controls
+	addEventToElementId('superSandboxIndicator', 'click', showSuperSandboxInfoModal);
 	addEventToElementId('confirmMoveBtn', 'click', confirmMoveClicked);
 	addEventToElementId('rewindAllBtn', 'click', rewindAllMoves);
 	addEventToElementId('playPrevBtn', 'click', playPrevMove);
