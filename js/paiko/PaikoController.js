@@ -1,6 +1,7 @@
 // Paiko Controller
 // Handles UI interaction for Paiko game
 
+import { createClearBr } from '../ActuatorHelp';
 import { DEPLOY, GUEST, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
 import { debug } from '../GameData';
 import { getPlayerCodeFromName } from '../pai-sho-common/PaiShoPlayerHelp';
@@ -33,7 +34,7 @@ import { PaikoGameManager } from './PaikoGameManager';
 import { PaikoGamePhase, PaikoMoveType } from './PaikoGameNotation';
 import { PaikoBuilderStatus, PaikoMoveBuilder } from './PaikoMoveBuilder';
 import { PaikoOptions } from './PaikoOptions';
-import { PaikoTile, PaikoTileCode, PaikoTileFacing, PaikoTileName, PaikoReserveDisplayOrder } from './PaikoTile';
+import { PaikoReserveDisplayOrder, PaikoTile, PaikoTileCode, PaikoTileFacing, PaikoTileName } from './PaikoTile';
 
 export class PaikoController {
 	constructor(gameContainer, isMobile) {
@@ -186,99 +187,59 @@ export class PaikoController {
 	}
 
 	static getHostTilesContainerDivs() {
-		const container = document.createElement('div');
-
-		// Host Hand Section
-		const handLabel = document.createElement('span');
-		handLabel.className = 'tileLibraryLabel';
-		handLabel.innerHTML = '<strong>Host Hand</strong>';
-		container.appendChild(handLabel);
-		container.appendChild(document.createElement('br'));
-
-		const div = document.createElement('span');
-		div.className = 'H-hand';
-		container.appendChild(div);
-		container.appendChild(document.createTextNode(' '));
-
-		const clearBr2 = document.createElement('br');
-		clearBr2.className = 'clear';
-		container.appendChild(clearBr2);
-		container.appendChild(document.createElement('br'));
-
-		// Host Reserve Section
-		const reserveLabel = document.createElement('span');
-		reserveLabel.className = 'tileLibraryLabel';
-		reserveLabel.innerHTML = '<strong>Host Reserve</strong>';
-		container.appendChild(reserveLabel);
-		container.appendChild(document.createElement('br'));
-
-		// Reserve tile containers
-		PaikoReserveDisplayOrder.forEach((row, rowIndex) => {
-			row.forEach(tileCode => {
-				const className = 'H' + PaikoTileName[tileCode];
-				const div = document.createElement('div');
-				div.className = className + '-reserve';
-				container.appendChild(div);
-				container.appendChild(document.createTextNode(' '));
-			});
-
-			const clearBr = document.createElement('br');
-			clearBr.className = 'clear';
-			container.appendChild(clearBr);
-
-			if (rowIndex === PaikoReserveDisplayOrder.length - 1) {
-				container.appendChild(document.createElement('br'));
-			}
-		});
-
-		return container.innerHTML;
+		return PaikoController.buildTilesContainerDivs(HOST);
 	}
 
 	static getGuestTilesContainerDivs() {
+		return PaikoController.buildTilesContainerDivs(GUEST);
+	}
+
+	static buildTilesContainerDivs(player) {
+		const playerName = player === HOST ? 'Host' : 'Guest';
+		const playerCode = player === HOST ? 'H' : 'G';
+
 		const container = document.createElement('div');
 
-		// Guest Hand Section
+		// Hand Section
+		const handSection = document.createElement('span');
+		handSection.className = 'tileLibrary';
+
 		const handLabel = document.createElement('span');
 		handLabel.className = 'tileLibraryLabel';
-		handLabel.innerHTML = '<strong>Guest Hand</strong>';
-		container.appendChild(handLabel);
-		container.appendChild(document.createElement('br'));
+		handLabel.innerHTML = `<strong>${playerName} Hand</strong>`;
+		handSection.appendChild(handLabel);
+		handSection.appendChild(document.createElement('br'));
 
-		const div = document.createElement('span');
-		div.className = 'G-hand';
-		container.appendChild(div);
-		container.appendChild(document.createTextNode(' '));
+		const handDiv = document.createElement('span');
+		handDiv.className = `${playerCode}-hand`;
+		handSection.appendChild(handDiv);
 
-		const clearBr2 = document.createElement('br');
-		clearBr2.className = 'clear';
-		container.appendChild(clearBr2);
-		container.appendChild(document.createElement('br'));
+		container.appendChild(handSection);
 
-		// Guest Reserve Section
+		// Reserve Section
+		const reserveSection = document.createElement('span');
+		reserveSection.className = 'tileLibrary';
+
 		const reserveLabel = document.createElement('span');
 		reserveLabel.className = 'tileLibraryLabel';
-		reserveLabel.innerHTML = '<strong>Guest Reserve</strong>';
-		container.appendChild(reserveLabel);
-		container.appendChild(document.createElement('br'));
+		reserveLabel.innerHTML = `<strong>${playerName} Reserve</strong>`;
+		reserveSection.appendChild(reserveLabel);
+		reserveSection.appendChild(document.createElement('br'));
 
 		// Reserve tile containers
-		PaikoReserveDisplayOrder.forEach((row, rowIndex) => {
+		PaikoReserveDisplayOrder.forEach((row) => {
 			row.forEach(tileCode => {
-				const className = 'G' + PaikoTileName[tileCode];
+				const className = playerCode + PaikoTileName[tileCode];
 				const div = document.createElement('div');
 				div.className = className + '-reserve';
-				container.appendChild(div);
-				container.appendChild(document.createTextNode(' '));
+				reserveSection.appendChild(div);
+				reserveSection.appendChild(document.createTextNode(' '));
 			});
 
-			const clearBr = document.createElement('br');
-			clearBr.className = 'clear';
-			container.appendChild(clearBr);
-
-			if (rowIndex === PaikoReserveDisplayOrder.length - 1) {
-				container.appendChild(document.createElement('br'));
-			}
+			reserveSection.appendChild(createClearBr());
 		});
+
+		container.appendChild(reserveSection);
 
 		return container.innerHTML;
 	}
@@ -610,7 +571,7 @@ export class PaikoController {
 				status !== PaikoBuilderStatus.WAITING_FOR_SAI_SHIFT &&
 				myTurn() && !gameInfo.winner) {
 				const actions = document.createElement('p');
-				actions.innerHTML = '<strong>Your turn:</strong> Deploy a tile from your hand, shift a tile on the board, or ';
+				actions.innerHTML = '<strong>Your turn:</strong> Deploy from your hand, shift a tile on the board, or ';
 
 				const drawSpan = document.createElement('span');
 				drawSpan.className = 'skipBonus';

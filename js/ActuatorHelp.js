@@ -46,6 +46,12 @@ export function createDivWithId(idName) {
 	return div;
 }
 
+export function createClearBr() {
+	var br = document.createElement("br");
+	br.className = "clear";
+	return br;
+}
+
 // export function mobilecheck() {
 // 	var check = false;
 // 	(function (a) {

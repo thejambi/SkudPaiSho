@@ -807,12 +807,8 @@ figure > div {
 
 /* Paiko tile container spacing */
 .tilePileContainer.Paiko div div {
-  margin-top: 6px;
-  margin-right: 6px;
-}
-.tilePileContainer.Paiko .hostTilesContainer br,
-.tilePileContainer.Paiko .guestTilesContainer br {
-  line-height: 0.5;
+  margin-top: 4px;
+  margin-right: 4px;
 }
 
 .possibleDeploy {
@@ -985,6 +981,10 @@ figure > div {
   display: inline-block;
   float: left;
   margin-top: 12px;
+}
+
+.Paiko .hostTilesContainer, .Paiko .guestTilesContainer {
+  margin-top: 2px;
 }
 
 .tileLibraryNoMargin {
