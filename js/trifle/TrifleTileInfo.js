@@ -181,6 +181,7 @@ export const TrifleAbilityTriggerType = {
 	whileOnBoard: "whileOnBoard",	// Remove?
 	whileTargetTileIsAdjacent: "whileTargetTileIsAdjacent",
 	whileTargetTileIsSurrounding: "whileTargetTileIsSurrounding",
+	whileTargetTileIsWithinDistance: "whileTargetTileIsWithinDistance",
 	whenLandsAdjacentToTargetTile: "whenLandsAdjacentToTargetTile",
 	whenLandsSurroundingTargetTile: "whenLandsSurroundingTargetTile",
 	whenTargetTileLandsAdjacent: "whenTargetTileLandsAdjacent",

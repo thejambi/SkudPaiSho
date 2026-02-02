@@ -9,6 +9,7 @@ import { TrifleWhileOutsideTempleTriggerBrain } from './triggerBrains/WhileOutsi
 import { TrifleWhileTargetTileIsOnBoardTriggerBrain } from './triggerBrains/WhileTargetTileIsOnBoardTriggerBrain';
 import { TrifleWhileTargetTileIsAdjacentTriggerBrain } from './triggerBrains/WhileTargetTileIsAdjacentTriggerBrain';
 import { TrifleWhileTargetTileIsSurroundingTriggerBrain } from './triggerBrains/WhileTargetTileIsSurroundingTriggerBrain';
+import { TrifleWhileTargetTileIsWithinDistanceTriggerBrain } from './triggerBrains/WhileTargetTileIsWithinDistanceTriggerBrain';
 import { TrifleWhileTargetTileIsInZoneTriggerBrain } from './triggerBrains/WhileTargetTileIsInZoneTriggerBrain';
 import { TrifleWhileTargetTileIsInLineOfSightTriggerBrain } from './triggerBrains/WhileTargetTileIsInLineOfSightTriggerBrain';
 import { TrifleWhenTargetTileLandsInZoneTriggerBrain } from './triggerBrains/WhenTargetTileLandsInZoneTriggerBrain';
@@ -54,6 +55,8 @@ TrifleBrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, t
 			return new TrifleWhileTargetTileIsAdjacentTriggerBrain(triggerContext);
 		case TrifleAbilityTriggerType.whileTargetTileIsSurrounding:
 			return new TrifleWhileTargetTileIsSurroundingTriggerBrain(triggerContext);
+		case TrifleAbilityTriggerType.whileTargetTileIsWithinDistance:
+			return new TrifleWhileTargetTileIsWithinDistanceTriggerBrain(triggerContext);
 		case TrifleAbilityTriggerType.whileTargetTileIsInZone:
 			return new TrifleWhileTargetTileIsInZoneTriggerBrain(triggerContext);
 		case TrifleAbilityTriggerType.whileTargetTileIsInLineOfSight:

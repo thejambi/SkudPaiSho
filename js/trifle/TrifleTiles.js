@@ -1194,7 +1194,7 @@ export function defineTrifleTiles() {
 				type: TrifleAbilityName.protectFromCapture,
 				triggers: [
 					{
-						triggerType: TrifleAbilityTriggerType.whileTargetTileIsSurrounding,
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsWithinDistance,
 						targetTileCodes: [TrifleTileCodes.FireLily],
 						targetTeams: [TrifleTileTeam.friendly],
 						distance: 2
