@@ -8,28 +8,21 @@ export function TrifleWhileTargetTileIsSurroundingTriggerBrain(triggerContext) {
 }
 
 TrifleWhileTargetTileIsSurroundingTriggerBrain.prototype.isTriggerMet = function() {
-	/* Get surrounding tiles within specified distance (default 1) */
-	const abilityTriggerInfo = this.triggerContext.abilityTriggerInfo || {};
-	const distance = abilityTriggerInfo.distance || 1;
-	const centerPoint = this.triggerContext.pointWithTile;
+	/* Get surrounding tiles...  */
+	var surroundingPoints = this.board.getSurroundingBoardPoints(this.triggerContext.pointWithTile);
 
 	var self = this;
 
-	// Check all points within the specified distance
-	this.board.forEachBoardPoint(function(boardPoint) {
-		if (boardPoint.hasTile() && boardPoint !== centerPoint) {
-			const pointDistance = self.board.getDistanceBetweenPoints(centerPoint, boardPoint);
-			if (pointDistance <= distance) {
-				var triggerHelper = new TrifleTriggerHelper(self.triggerContext, boardPoint);
-				if (triggerHelper.tileIsTargeted()) {
-					self.targetTiles.push(boardPoint.tile);
-					self.targetTilePoints.push(boardPoint);
-				}
+	surroundingPoints.forEach(function(surroundingPoint) {
+		if (surroundingPoint.hasTile()) {
+			var triggerHelper = new TrifleTriggerHelper(self.triggerContext, surroundingPoint);
+			if (triggerHelper.tileIsTargeted()) {
+				self.targetTiles.push(surroundingPoint.tile);
+				self.targetTilePoints.push(surroundingPoint);
 			}
 		}
 	});
 
 	return this.targetTiles.length > 0;
 };
-
 
