@@ -38,6 +38,11 @@ export class BeyondTheMapsActuator {
 	static hostTeamTilesDivId = "hostTilesContainer";
 	static guestTeamTilesDivId = "guestTilesContainer";
 
+	// Convert row/col to chess-like notation for tooltip display
+	static NotationAdjustmentFunction = (row, col) => {
+		return BeyondTheMapsController.rowColToChessNotation(row, col);
+	};
+
 	constructor(gameContainer, isMobile, enableAnimations) {
 		this.gameContainer = gameContainer;
 		this.mobile = isMobile;
@@ -205,7 +210,7 @@ export class BeyondTheMapsActuator {
 	addBoardPoint(boardPoint) {
 		var self = this;
 
-		var theDiv = createBoardPointDiv(boardPoint);
+		var theDiv = createBoardPointDiv(boardPoint, false, BeyondTheMapsActuator.NotationAdjustmentFunction);
 
 		if (!boardPoint.isType(NON_PLAYABLE)) {
 			theDiv.classList.add("activePoint");

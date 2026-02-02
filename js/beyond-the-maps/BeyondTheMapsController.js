@@ -33,7 +33,7 @@ import {
 } from './BeyondTheMapsGameManager';
 import { BeyondTheMapsMctsGame, BtmAction, BtmGame } from './ai/BeyondTheMapsMctsGame';
 import { BtmMoveBuilder } from './BtmMoveBuilder';
-import { EDGES_DICE_FOR_MOVEMENT, EDGES_MOVE_4_2, gameOptionEnabled } from '../GameOptions';
+import { EDGES_12x12_GAME, EDGES_DICE_FOR_MOVEMENT, EDGES_MOVE_4_2, gameOptionEnabled } from '../GameOptions';
 import { GUEST, HOST, NotationPoint } from '../CommonNotationObjects';
 import { MCTS } from '../ai/MCTS';
 import { MCTSPlayer } from '../ai/jsmcts';
@@ -542,6 +542,56 @@ export class BeyondTheMapsController {
 
 	isSolitaire() {
 		return false;
+	}
+
+	// Convert row/col to chess-like notation (e.g., "c6")
+	// Shared logic used by both controller and actuator
+	static rowColToChessNotation(row, col) {
+		const is12x12 = gameOptionEnabled(EDGES_12x12_GAME);
+		const offset = is12x12 ? 3 : 0;
+		const boardSize = is12x12 ? 12 : 18;
+		const adjustedCol = col - offset;
+		const adjustedRow = row - offset;
+		const letter = String.fromCharCode('a'.charCodeAt(0) + adjustedCol);
+		const number = boardSize - adjustedRow;
+		return letter + number;
+	}
+
+	// Convert notation point string (e.g., "-5,3") to chess-like format (e.g., "c6")
+	toChessNotation(pointStr) {
+		const parts = pointStr.split(',');
+		const x = parseInt(parts[0]);
+		const y = parseInt(parts[1]);
+		// Convert back to row/col (standard Pai Sho coordinate system)
+		const col = x + 8;
+		const row = 8 - y;
+		return BeyondTheMapsController.rowColToChessNotation(row, col);
+	}
+
+	buildNotationString(move) {
+		const playerCode = move.player === HOST ? 'H' : 'G';
+		let notation = move.moveNum + playerCode + '.';
+
+		if (move.moveData && move.moveData.phases) {
+			const phaseParts = [];
+			move.moveData.phases.forEach(phase => {
+				if (phase.moveType === BeyondTheMapsMoveType.EXPLORE_SEA) {
+					let seaPart = this.toChessNotation(phase.startPoint) + '-' + this.toChessNotation(phase.endPoint);
+					if (phase.landPoint) {
+						seaPart += '+' + this.toChessNotation(phase.landPoint);
+					}
+					phaseParts.push(seaPart);
+				} else if (phase.moveType === BeyondTheMapsMoveType.EXPLORE_LAND) {
+					if (phase.landPoints && phase.landPoints.length > 0) {
+						const chessPoints = phase.landPoints.map(p => this.toChessNotation(p));
+						phaseParts.push('+' + chessPoints.join(','));
+					}
+				}
+			});
+			notation += phaseParts.join(';');
+		}
+
+		return notation;
 	}
 
 	setGameNotation(newGameNotation) {
