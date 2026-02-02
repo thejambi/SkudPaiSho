@@ -450,19 +450,26 @@ export class PaikoController {
 				return empty;
 			};
 
+			// When viewing as Guest, board is rotated 180°, so visual directions are reversed
+			const isGuestView = PaikoOptions.viewAsGuest;
+			const upFacing = isGuestView ? PaikoTileFacing.DOWN : PaikoTileFacing.UP;
+			const downFacing = isGuestView ? PaikoTileFacing.UP : PaikoTileFacing.DOWN;
+			const leftFacing = isGuestView ? PaikoTileFacing.RIGHT : PaikoTileFacing.LEFT;
+			const rightFacing = isGuestView ? PaikoTileFacing.LEFT : PaikoTileFacing.RIGHT;
+
 			// Row 1: empty, Up, empty
 			gridDiv.appendChild(createEmpty());
-			gridDiv.appendChild(createButton('Up', PaikoTileFacing.UP));
+			gridDiv.appendChild(createButton('Up', upFacing));
 			gridDiv.appendChild(createEmpty());
 
 			// Row 2: Left, empty, Right
-			gridDiv.appendChild(createButton('Left', PaikoTileFacing.LEFT));
+			gridDiv.appendChild(createButton('Left', leftFacing));
 			gridDiv.appendChild(createEmpty());
-			gridDiv.appendChild(createButton('Right', PaikoTileFacing.RIGHT));
+			gridDiv.appendChild(createButton('Right', rightFacing));
 
 			// Row 3: empty, Down, empty
 			gridDiv.appendChild(createEmpty());
-			gridDiv.appendChild(createButton('Down', PaikoTileFacing.DOWN));
+			gridDiv.appendChild(createButton('Down', downFacing));
 			gridDiv.appendChild(createEmpty());
 
 			rotateContainer.appendChild(gridDiv);
@@ -1521,7 +1528,9 @@ export class PaikoController {
 		const facing = tile.getFacing ? tile.getFacing() : PaikoTileFacing.UP;
 		const rotationDeg = facing * 90;
 
-		let html = '<table style="border-collapse: collapse; margin: 8px auto;">';
+		// Rotate the grid 180° when viewing as Guest to match board orientation
+		const gridRotateStyle = PaikoOptions.viewAsGuest ? ' transform: rotate(180deg);' : '';
+		let html = `<table style="border-collapse: collapse; margin: 8px auto;${gridRotateStyle}">`;
 		for (let r = 0; r < gridSize; r++) {
 			html += '<tr>';
 			for (let c = 0; c < gridSize; c++) {
