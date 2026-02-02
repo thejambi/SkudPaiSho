@@ -164,9 +164,9 @@ export function showSuperSandboxInfoModal() {
 
 	// Description
 	const description = document.createElement('p');
-	description.innerHTML = "Super Sandbox mode allows you to explore game variations. " +
+	description.innerHTML = "Sandbox mode jumps into a local copy of a game you're looking at, letting you play both sides of the board and explore game variations. " +
 		"When you rewind to a previous move and then interact with the board, " +
-		"the game is automatically sandboxed from that point, saving the previous line of moves as a branch you can jump back to from the list below!";
+		"sandbox mode saves the previous line of moves as a branch you can jump back to from the list below!";
 	container.appendChild(description);
 
 	// Branches section
@@ -241,5 +241,5 @@ export function showSuperSandboxInfoModal() {
 		container.appendChild(noBranches);
 	}
 
-	showModalElem("Super Sandbox Mode", container);
+	showModalElem("Sandbox Mode", container);
 }

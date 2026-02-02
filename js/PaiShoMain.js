@@ -2683,9 +2683,7 @@ export function playAiTurn() {
 }
 
 export function sandboxFromMove() {
-	// var link = getLink(true);
-	// openLink(link);
-	sandboxitize(false);
+	superSandboxFromMove();
 }
 
 export function superSandboxFromMove() {
