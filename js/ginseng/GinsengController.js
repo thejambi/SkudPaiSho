@@ -95,6 +95,8 @@ export function GinsengController(gameContainer, isMobile) {
 	this.isPaiShoGame = true;
 
 	this.showDebugInfo = false;
+	this.clickToShowPointMessage = false;
+	this.lastClickedPointForMessage = null;
 
 	this.supportsMoveLogMessages = true;
 
@@ -331,6 +333,13 @@ GinsengController.prototype.toggleDebug = function() {
 	clearMessage();
 };
 
+GinsengController.prototype.toggleClickToShowPointMessage = function() {
+	this.clickToShowPointMessage = !this.clickToShowPointMessage;
+	this.createActuator();
+	this.callActuate();
+	clearMessage();
+};
+
 GinsengController.prototype.completeSetup = function() {
 	// Create initial board setup
 	if (gameOptionEnabled(GINSENG_1_POINT_0)) {
@@ -383,6 +392,19 @@ GinsengController.prototype.getAdditionalHelpTabDiv = function() {
 	}
 
 	settingsDiv.appendChild(document.createElement("br"));
+
+	if (debugOn) {
+		var clickToShowText = this.clickToShowPointMessage
+			? "Switch to show tile info on hover"
+			: "Switch to show tile info on click";
+		var clickToShowSpan = document.createElement("span");
+		clickToShowSpan.classList.add("skipBonus");
+		clickToShowSpan.onclick = function() { gameController.toggleClickToShowPointMessage(); };
+		clickToShowSpan.innerText = clickToShowText;
+		settingsDiv.appendChild(clickToShowSpan);
+
+		settingsDiv.appendChild(document.createElement("br"));
+	}
 
 	if (usernameIsOneOf(["SkudPaiSho"]) || debugOn) {
 		var toggleDebugText = "Enable debug Help display";

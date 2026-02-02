@@ -14,6 +14,7 @@ import {
   RmbDown,
   RmbUp,
   clearMessage,
+  gameController,
   pieceAnimationLength,
   pointClicked,
   showPointMessage,
@@ -265,6 +266,33 @@ addBoardPoint(boardPoint, board, moveToAnimate, moveDetails) {
 				theDiv.addEventListener("click", () => {
 					pointClicked(theDiv);
 					showPointMessage(theDiv);
+				});
+			} else if (gameController && gameController.clickToShowPointMessage) {
+				theDiv.addEventListener("click", () => {
+					pointClicked(theDiv);
+					const pointName = theDiv.getAttribute("name");
+					if (gameController.lastClickedPointForMessage === pointName) {
+						gameController.lastClickedPointForMessage = null;
+						clearMessage();
+					} else {
+						gameController.lastClickedPointForMessage = pointName;
+						showPointMessage(theDiv);
+					}
+				});
+				theDiv.addEventListener('mousedown', e => {
+					 // Right Mouse Button
+					if (e.button == 2) {
+						RmbDown(theDiv);
+					}
+				});
+				theDiv.addEventListener('mouseup', e => {
+					 // Right Mouse Button
+					if (e.button == 2) {
+						RmbUp(theDiv);
+					}
+				});
+				theDiv.addEventListener('contextmenu', e => {
+						e.preventDefault();
 				});
 			} else {
 				theDiv.addEventListener("click", () => pointClicked(theDiv));
