@@ -2450,3 +2450,188 @@ textarea {
     }
 
 }
+
+/* ============================================ */
+/* Fanorona Styles */
+/* ============================================ */
+
+.fanoronaBoardContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.fanoronaBoard {
+  position: relative;
+  width: 800px;
+  height: 400px;
+  background-color: #c4a574;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.fanoronaBoardLines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.fanoronaLine {
+  stroke: #5a4a3a;
+  stroke-width: 2px;
+}
+
+.fanoronaGrid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.fanoronaRow {
+  display: flex;
+  flex: 1;
+}
+
+.fanoronaPoint {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.fanoronaPoint::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: #5a4a3a;
+  border-radius: 50%;
+}
+
+.fanoronaPoint.fanoronaSelected::before {
+  background-color: #f0c040;
+  box-shadow: 0 0 10px 4px rgba(240, 192, 64, 0.6);
+}
+
+.fanoronaPoint.fanoronaPossibleMove::before {
+  background-color: #40c040;
+  box-shadow: 0 0 8px 3px rgba(64, 192, 64, 0.5);
+}
+
+.fanoronaPoint:hover::before {
+  background-color: #7a6a5a;
+}
+
+.fanoronaPiece {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  z-index: 10;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  transition: transform 0.1s ease;
+}
+
+.fanoronaPiece:hover {
+  transform: scale(1.05);
+}
+
+.fanoronaWhite {
+  background: radial-gradient(circle at 30% 30%, #fff, #ddd);
+  border: 2px solid #aaa;
+}
+
+.fanoronaBlack {
+  background: radial-gradient(circle at 30% 30%, #444, #111);
+  border: 2px solid #333;
+}
+
+/* Capture type selection modal styling */
+.fanoronaCaptureChoice {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.fanoronaCaptureButton {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: 2px solid var(--fanoronacolor);
+  border-radius: 5px;
+  background-color: var(--body-background-color);
+  color: var(--color);
+  transition: background-color 0.2s;
+}
+
+.fanoronaCaptureButton:hover {
+  background-color: var(--fanoronacolor);
+  color: white;
+}
+
+/* Score display */
+.fanoronaScore {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+.fanoronaScoreHost,
+.fanoronaScoreGuest {
+  padding: 5px 15px;
+  border-radius: 5px;
+}
+
+.fanoronaScoreHost {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.fanoronaScoreGuest {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive scaling for mobile */
+@media screen and (max-width: 850px) {
+  .fanoronaBoard {
+    width: 100%;
+    max-width: 400px;
+    height: 200px;
+  }
+
+  .fanoronaPiece {
+    width: 25px;
+    height: 25px;
+  }
+
+  .fanoronaPoint::before {
+    width: 10px;
+    height: 10px;
+  }
+}
+
+/* Fanorona Animation Classes */
+.fanoronaAnimating {
+  z-index: 100;
+  position: relative;
+}
+
+.fanoronaCaptured {
+  opacity: 1;
+}
+
+.fanoronaFadeOut {
+  opacity: 0;
+  transform: scale(0.5);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
