@@ -317,9 +317,12 @@ export class TrifleAbilityManager {
 		const self = this;
 		this.abilities.forEach((ability) => {
 			if (ability.abilityType === abilityName
+					&& ability.activated
 					&& ability.abilityTargetsTile(tile)) {
 				// Check if targeting is canceled (e.g., by Elderberry's Antidote Aura)
-				if (!self.targetingIsCanceled(ability.sourceTile, abilityName, tile)) {
+				// Also check if the ability itself is canceled (e.g., source tile in Edelweiss zone)
+				if (!self.targetingIsCanceled(ability.sourceTile, abilityName, tile)
+						&& !self.abilityIsCanceled(ability)) {
 					targetsTile = true;
 				}
 			}
@@ -343,6 +346,7 @@ export class TrifleAbilityManager {
 		const abilitiesTargetingTile = [];
 		this.abilities.forEach((ability) => {
 			if (ability.abilityType === abilityName
+					&& ability.activated
 					&& ability.sourceTile === sourceTile
 					&& ability.abilityTargetsTile(tile)) {
 				abilitiesTargetingTile.push(ability);
