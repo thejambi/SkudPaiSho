@@ -9,6 +9,8 @@ import { PaikoTile, PaikoTileCode } from './PaikoTile';
 import { PaikoTileManager } from './PaikoTileManager';
 
 const WINNING_SCORE = 10;
+const TIE_TILES_LOST = 13;
+const TIE_MAX_SCORE = 5;
 
 export class PaikoGameManager {
 	constructor(actuator, ignoreActuate, isCopy) {
@@ -35,6 +37,7 @@ export class PaikoGameManager {
 
 		// Winners
 		this.winners = [];
+		this.endedInTie = false;
 
 		if (!ignoreActuate) {
 			this.actuate();
@@ -531,9 +534,23 @@ export class PaikoGameManager {
 				this.winners.push(GUEST);
 			}
 		}
+
+		// Check for tie condition: both players lost 13+ tiles and have 5 or fewer points
+		if (this.winners.length === 0) {
+			const hostTilesLost = this.tileManager.getDiscard(HOST).length;
+			const guestTilesLost = this.tileManager.getDiscard(GUEST).length;
+
+			if (hostTilesLost >= TIE_TILES_LOST && guestTilesLost >= TIE_TILES_LOST &&
+				hostScore <= TIE_MAX_SCORE && guestScore <= TIE_MAX_SCORE) {
+				this.endedInTie = true;
+			}
+		}
 	}
 
 	getWinner() {
+		if (this.endedInTie) {
+			return 'tie';
+		}
 		if (this.winners.length === 0) {
 			return null;
 		}
@@ -543,6 +560,9 @@ export class PaikoGameManager {
 	}
 
 	getWinReason() {
+		if (this.endedInTie) {
+			return 'Game ended in a tie! Both players lost 13+ tiles with 5 or fewer points.';
+		}
 		const winner = this.getWinner();
 		if (!winner) {
 			return null;
@@ -552,6 +572,9 @@ export class PaikoGameManager {
 	}
 
 	getWinResultTypeCode() {
+		if (this.endedInTie) {
+			return 4; // Tie
+		}
 		return this.getWinner() ? 1 : 0;
 	}
 
@@ -645,6 +668,7 @@ export class PaikoGameManager {
 		copy.gamePhase = this.gamePhase;
 		copy.actionPhaseComplete = this.actionPhaseComplete;
 		copy.winners = [...this.winners];
+		copy.endedInTie = this.endedInTie;
 
 		if (this.pendingSaiShift) {
 			// Find the corresponding tile and point in the copy
