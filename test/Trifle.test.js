@@ -42,7 +42,7 @@ import { TrifleGameManager } from '../js/trifle/TrifleGameManager';
 import { NotationPoint, DEPLOY, MOVE, TEAM_SELECTION, HOST, GUEST } from '../js/CommonNotationObjects';
 import { TrifleTileCodes, defineTrifleTiles, TrifleTileType, TrifleTileIdentifier } from '../js/trifle/TrifleTiles';
 import { TrifleMovementType, TrifleDeployType, TrifleCaptureType, TrifleMovementAbility } from '../js/trifle/TrifleTileInfo';
-import { TrifleAbilityName, TrifleZoneAbility, TrifleAbilityTriggerType, TrifleAttributeType } from '../js/trifle/TrifleTileInfo';
+import { TrifleAbilityName, TrifleAbilityTriggerType, TrifleAttributeType } from '../js/trifle/TrifleTileInfo';
 import { setCurrentTileMetadata, setCurrentTileCodes } from '../js/trifle/PaiShoGamesTileMetadata';
 import { TrifleTiles } from '../js/trifle/TrifleTileInfo';
 import { TrifleTile } from '../js/trifle/TrifleTile';
@@ -300,24 +300,20 @@ describe('Buffalo Yak - Zone Ability to Remove Tile Abilities', () => {
 			expect(buffaloYakInfo.territorialZone.size).toBe(2);
 		});
 
-		it('should have removesTileAbilities zone ability targeting flowers', () => {
+		it('should have cancelAbilities ability targeting flowers in zone', () => {
 			const buffaloYakInfo = TrifleTiles[TrifleTileCodes.BuffaloYak];
-			expect(buffaloYakInfo.territorialZone.abilities).toBeDefined();
+			expect(buffaloYakInfo.abilities).toBeDefined();
 
-			const removeAbility = buffaloYakInfo.territorialZone.abilities.find(
-				a => a.type === TrifleZoneAbility.removesTileAbilities
+			const cancelAbility = buffaloYakInfo.abilities.find(
+				a => a.type === TrifleAbilityName.cancelAbilities
 			);
-			expect(removeAbility).toBeDefined();
-			expect(removeAbility.targetTileTypes).toContain(TrifleTileType.flower);
+			expect(cancelAbility).toBeDefined();
+			expect(cancelAbility.triggers[0].targetTileTypes).toContain(TrifleTileType.flower);
 		});
 	});
 
-	describe('Zone Ability Functionality', () => {
-		it('should have tileAbilitiesRemovedByZone method on board', () => {
-			expect(typeof gameManager.board.tileAbilitiesRemovedByZone).toBe('function');
-		});
-
-		it('should return false when no zone affects the tile', () => {
+	describe('Cancel Abilities Functionality', () => {
+		it('should not cancel flower abilities when no Buffalo Yak on board', () => {
 			// Add tiles to teams
 			addTilesToTeam(gameManager, HOST, [
 				TrifleTileCodes.WaterBanner,
@@ -335,15 +331,15 @@ describe('Buffalo Yak - Zone Ability to Remove Tile Abilities', () => {
 			const flowerPoints = gameManager.board.getTilePoints(TrifleTileCodes.Lavender, HOST);
 			expect(flowerPoints.length).toBe(1);
 
-			// No Buffalo Yak on the board, so abilities should NOT be removed
-			const isRemoved = gameManager.board.tileAbilitiesRemovedByZone(
-				flowerPoints[0].tile,
-				flowerPoints[0]
+			// No Buffalo Yak on the board, so cancelAbilities should NOT target the flower
+			const isCanceled = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.cancelAbilities,
+				flowerPoints[0].tile
 			);
-			expect(isRemoved).toBe(false);
+			expect(isCanceled).toBe(false);
 		});
 
-		it('should remove flower abilities when within Buffalo Yak zone', () => {
+		it('should cancel flower abilities when within Buffalo Yak zone', () => {
 			// Add tiles to teams
 			addTilesToTeam(gameManager, HOST, [
 				TrifleTileCodes.WaterBanner,
@@ -373,15 +369,15 @@ describe('Buffalo Yak - Zone Ability to Remove Tile Abilities', () => {
 			const flowerPoints = gameManager.board.getTilePoints(TrifleTileCodes.Lavender, GUEST);
 			expect(flowerPoints.length).toBe(1);
 
-			// Flower is within Buffalo Yak's zone, so abilities should be removed
-			const isRemoved = gameManager.board.tileAbilitiesRemovedByZone(
-				flowerPoints[0].tile,
-				flowerPoints[0]
+			// Flower is within Buffalo Yak's zone, so cancelAbilities should target the flower
+			const isCanceled = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.cancelAbilities,
+				flowerPoints[0].tile
 			);
-			expect(isRemoved).toBe(true);
+			expect(isCanceled).toBe(true);
 		});
 
-		it('should not affect flower outside Buffalo Yak zone', () => {
+		it('should not cancel flower abilities outside Buffalo Yak zone', () => {
 			// Add tiles to teams
 			addTilesToTeam(gameManager, HOST, [
 				TrifleTileCodes.WaterBanner,
@@ -411,15 +407,15 @@ describe('Buffalo Yak - Zone Ability to Remove Tile Abilities', () => {
 			const flowerPoints = gameManager.board.getTilePoints(TrifleTileCodes.Lavender, GUEST);
 			expect(flowerPoints.length).toBe(1);
 
-			// Flower is outside Buffalo Yak's zone, abilities should NOT be removed
-			const isRemoved = gameManager.board.tileAbilitiesRemovedByZone(
-				flowerPoints[0].tile,
-				flowerPoints[0]
+			// Flower is outside Buffalo Yak's zone, so cancelAbilities should NOT target it
+			const isCanceled = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.cancelAbilities,
+				flowerPoints[0].tile
 			);
-			expect(isRemoved).toBe(false);
+			expect(isCanceled).toBe(false);
 		});
 
-		it('should not affect non-flower tiles within zone', () => {
+		it('should not cancel abilities of non-flower tiles within zone', () => {
 			// Add tiles to teams
 			addTilesToTeam(gameManager, HOST, [
 				TrifleTileCodes.WaterBanner,
@@ -449,15 +445,15 @@ describe('Buffalo Yak - Zone Ability to Remove Tile Abilities', () => {
 			const animalPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, GUEST);
 			expect(animalPoints.length).toBe(1);
 
-			// Animal is within zone but not a flower, so abilities should NOT be removed
-			const isRemoved = gameManager.board.tileAbilitiesRemovedByZone(
-				animalPoints[0].tile,
-				animalPoints[0]
+			// Animal is within zone but not a flower, so cancelAbilities should NOT target it
+			const isCanceled = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.cancelAbilities,
+				animalPoints[0].tile
 			);
-			expect(isRemoved).toBe(false);
+			expect(isCanceled).toBe(false);
 		});
 
-		it('should affect friendly flower tiles within zone', () => {
+		it('should cancel friendly flower abilities within zone', () => {
 			// Add tiles to teams (flower on same team as Buffalo Yak)
 			addTilesToTeam(gameManager, HOST, [
 				TrifleTileCodes.WaterBanner,
@@ -497,11 +493,11 @@ describe('Buffalo Yak - Zone Ability to Remove Tile Abilities', () => {
 			expect(flowerPoints.length).toBe(1);
 
 			// Buffalo Yak affects both friendly and enemy flowers
-			const isRemoved = gameManager.board.tileAbilitiesRemovedByZone(
-				flowerPoints[0].tile,
-				flowerPoints[0]
+			const isCanceled = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.cancelAbilities,
+				flowerPoints[0].tile
 			);
-			expect(isRemoved).toBe(true);
+			expect(isCanceled).toBe(true);
 		});
 	});
 });
@@ -1411,7 +1407,7 @@ describe('Fixed TODO Tiles - Definition and Abilities', () => {
 			);
 			expect(protectAbility).toBeDefined();
 			expect(protectAbility.triggers[0].triggerType).toBe(
-				TrifleAbilityTriggerType.whileTargetTileIsSurrounding
+				TrifleAbilityTriggerType.whileTargetTileIsWithinDistance
 			);
 			expect(protectAbility.triggers[0].targetTileCodes).toContain(TrifleTileCodes.FireLily);
 			expect(protectAbility.triggers[0].distance).toBe(2);

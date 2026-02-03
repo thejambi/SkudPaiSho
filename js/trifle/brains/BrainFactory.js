@@ -38,6 +38,7 @@ import { TrifleMoveTargetTileAbilityBrain } from './abilityBrains/MoveTargetTile
 import { TrifleMoveTargetTileToPileAbilityBrain } from './abilityBrains/MoveTargetTileToPileAbilityBrain';
 import { TrifleExchangeWithCapturedTileAbilityBrain } from './abilityBrains/ExchangeWithCapturedTileAbilityBrain';
 import { TrifleSimpleOngoingAbilityBrain } from './abilityBrains/SimpleOngoingAbilityBrain';
+import { TrifleDrawTilesAlongLineOfSightConstraintBrain } from './constraintBrains/DrawTilesAlongLineOfSightConstraintBrain';
 
 export function TrifleBrainFactory() {
 
@@ -127,6 +128,22 @@ TrifleBrainFactory.createTargetBrain = function(targetType, abilityObject) {
 			return new TrifleThisTileTargetBrain(abilityObject);
 		case TrifleTargetType.chosenCapturedTile:
 			return new TrifleChosenCapturedTileTargetBrain(abilityObject);
+	}
+};
+
+/**
+ * Create a constraint brain for movement constraints
+ * @param {string} abilityName - The ability type that creates this constraint
+ * @param {Object} board - The game board
+ * @param {Object} ability - The ability object
+ * @returns {Object|null} The constraint brain or null if not applicable
+ */
+TrifleBrainFactory.createConstraintBrain = function(abilityName, board, ability) {
+	switch(abilityName) {
+		case TrifleAbilityName.drawTilesAlongLineOfSight:
+			return new TrifleDrawTilesAlongLineOfSightConstraintBrain(board, ability);
+		default:
+			return null;
 	}
 };
 
