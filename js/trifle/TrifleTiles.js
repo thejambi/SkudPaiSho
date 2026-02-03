@@ -14,7 +14,6 @@ import {
   TrifleTileCategory,
   TrifleTileTeam,
   TrifleTiles,
-  TrifleZoneAbility,
 } from './TrifleTileInfo';
 import { clearObject } from '../GameData';
 
@@ -552,15 +551,22 @@ export function defineTrifleTiles() {
 			}
 		],
 		territorialZone: {
-			size: 2,
-			abilities: [
-				{
-					type: TrifleZoneAbility.removesTileAbilities,
-					targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy],
-					targetTileTypes: [TrifleTileType.flower]
-				}
-			]
+			size: 2
 		},
+		abilities: [
+			{
+				type: TrifleAbilityName.cancelAbilities,
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInZone,
+						targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy],
+						targetTileTypes: [TrifleTileType.flower]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				targetAbilityTypes: [TrifleAbilityType.all]
+			}
+		],
 		textLines: [
 			"Animal | Water",
 			"Flower tiles within 2 spaces have their effects nullified. Can move two spaces, and can capture."
