@@ -358,7 +358,7 @@ export function defineTrifleTiles() {
 					{
 						triggerType: TrifleAbilityTriggerType.whileTargetTileIsAdjacent,
 						targetTeams: [TrifleTileTeam.friendly],
-						targetTypes: [TrifleTileType.animal]
+						targetTileTypes: [TrifleTileType.animal]
 					}
 				],
 				targetTypes: [TrifleTargetType.triggerTargetTiles]
@@ -782,6 +782,7 @@ export function defineTrifleTiles() {
 		textLines: [
 			"Banner | Earth",
 			"Deploys anywhere",
+			"Cannot move",
 			"Friendly Flowers adjacent to Earth Banner are protected from capture"
 		]
 	};
