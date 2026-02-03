@@ -2886,15 +2886,9 @@ export class PaiShoGameBoard {
 	}
 
 	setPointAsPossibleMovement(targetPoint, tileBeingMoved, originPoint, currentMovementPath) {
-		// Enforce the drawing-towards abilities, etc
+		// Enforce movement constraints from abilities (drawing-towards, etc)
 
-		var movementOk = false;
-
-		/* Enforce Trifle.BoardPresenceAbility.drawOpponentTilesInLineOfSight */
-		var movementOk = this.movementPassesLineOfSightTest(targetPoint, tileBeingMoved, originPoint);
-		/* var movementOk = this.movementAllowedByAffectingAbilities(targetPoint, tileBeingMoved, originPoint, currentMovementPath); */
-
-		// Future... movementOk = movementOk && this.movementcheckmethod(...)
+		var movementOk = this.movementPassesConstraintChecks(targetPoint, tileBeingMoved, originPoint);
 
 		if (movementOk) {
 			targetPoint.addType(POSSIBLE_MOVE);
@@ -2905,6 +2899,34 @@ export class PaiShoGameBoard {
 		}
 
 		return movementOk;
+	}
+
+	/**
+	 * Check if movement passes all constraint checks from affecting abilities.
+	 * Uses constraint brains from the AbilityManager.
+	 * @param {Object} targetPoint - The point the tile is moving to
+	 * @param {Object} tileBeingMoved - The tile being moved
+	 * @param {Object} originPoint - The point the tile is moving from
+	 * @returns {boolean} True if movement passes all constraints
+	 */
+	movementPassesConstraintChecks(targetPoint, tileBeingMoved, originPoint) {
+		const constraints = this.abilityManager.getMovementConstraintsForTile(tileBeingMoved);
+
+		// If multiple conflicting draw abilities affect this tile, no movement is allowed
+		if (constraints.length > 1) {
+			return false;
+		}
+
+		// Check each constraint
+		for (let i = 0; i < constraints.length; i++) {
+			const constraint = constraints[i];
+			const result = constraint.isMovementAllowed(tileBeingMoved, originPoint, targetPoint);
+			if (!result.allowed) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/* movementAllowedByAffectingAbilities(targetPoint, tileBeingMoved, originPoint, currentMovementPath) {
@@ -3051,59 +3073,6 @@ export class PaiShoGameBoard {
 			});
 		}
 		return isInTheZone;
-	}
-
-	/**
-	 * Check if a tile's abilities are removed by a zone ability (e.g., Buffalo Yak's removesTileAbilities)
-	 * @param {Object} tile - The tile whose abilities may be removed
-	 * @param {Object} tilePoint - The board point where the tile is located
-	 * @returns {boolean} - True if the tile's abilities are removed by a zone
-	 */
-	tileAbilitiesRemovedByZone(tile, tilePoint) {
-		if (!tile || !tilePoint) {
-			return false;
-		}
-
-		const tileInfo = this.tileMetadata[tile.code];
-		let isRemoved = false;
-		const self = this;
-
-		this.forEachBoardPointWithTile(function(checkBoardPoint) {
-			if (isRemoved) return; // Already found a removing zone
-
-			const checkTileInfo = self.tileMetadata[checkBoardPoint.tile.code];
-			const zoneInfo = TrifleTileInfo.getTerritorialZone(checkTileInfo);
-
-			if (zoneInfo && zoneInfo.abilities) {
-				zoneInfo.abilities.forEach(function(zoneAbilityInfo) {
-					if (zoneAbilityInfo.type === TrifleZoneAbility.removesTileAbilities
-						&& self.tileZoneIsActive(checkBoardPoint.tile)
-						&& self.pointTileZoneContainsPoint(checkBoardPoint, tilePoint)
-					) {
-						// Check target teams
-						const teamMatches = !zoneAbilityInfo.targetTeams || (
-							(zoneAbilityInfo.targetTeams.includes(TrifleTileTeam.friendly)
-								&& checkBoardPoint.tile.ownerName === tile.ownerName)
-							|| (zoneAbilityInfo.targetTeams.includes(TrifleTileTeam.enemy)
-								&& checkBoardPoint.tile.ownerName !== tile.ownerName)
-						);
-
-						// Check target tile types
-						const typeMatches = !zoneAbilityInfo.targetTileTypes || (
-							tileInfo && tileInfo.types
-							&& arrayIncludesOneOf(zoneAbilityInfo.targetTileTypes, tileInfo.types)
-						);
-
-						if (teamMatches && typeMatches) {
-							debug("Tile abilities removed by zone: " + tile.code + " by " + checkBoardPoint.tile.code);
-							isRemoved = true;
-						}
-					}
-				});
-			}
-		});
-
-		return isRemoved;
 	}
 
 	forEachBoardPoint(forEachFunc) {
