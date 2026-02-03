@@ -51,7 +51,7 @@ import { TrifleTiles } from '../js/trifle/TrifleTileInfo';
 import { TrifleTile } from '../js/trifle/TrifleTile';
 import { POSSIBLE_MOVE } from '../js/trifle/TrifleBoardPoint';
 import { PaiShoGameBoard } from '../js/trifle/PaiShoGameBoard';
-import { TrifleBrainFactory } from '../js/trifle/brains/BrainFactory';
+import { TrifleBrainFactory, ConstraintCategory, getAbilityNamesForConstraintCategory } from '../js/trifle/brains/BrainFactory';
 import { TrifleDrawTilesAlongLineOfSightConstraintBrain } from '../js/trifle/brains/constraintBrains/DrawTilesAlongLineOfSightConstraintBrain';
 
 // Initialize tile metadata
@@ -996,6 +996,125 @@ describe('DrawTilesAlongLineOfSight Constraint', () => {
 				guestPerpPoint, guestFirefly, guestOrigin
 			);
 			expect(guestPerpAllowed).toBe(false);
+		});
+
+		it('should STOP targeting when a tile is placed between two Fireflies', () => {
+			// This is the bug scenario reported by user:
+			// - Host Firefly starts in temple
+			// - Guest Firefly starts in another temple
+			// - They move toward each other (drawing each other)
+			// - A tile is placed between them
+			// - The draw ability should NO LONGER target
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Firefly,
+				TrifleTileCodes.Lavender // Will be placed to block
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.EarthBanner,
+				TrifleTileCodes.Firefly
+			]);
+
+			// Deploy Host Firefly in left temple (-8,0)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Firefly,
+				endPoint: new NotationPoint('-8,0')
+			}, false);
+
+			// Deploy Guest Firefly in right temple (8,0)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Firefly,
+				endPoint: new NotationPoint('8,0')
+			}, false);
+
+			// Neither should have draw ability active yet (both in temples)
+			let hostFireflyPoints = gameManager.board.getTilePoints(TrifleTileCodes.Firefly, HOST);
+			let guestFireflyPoints = gameManager.board.getTilePoints(TrifleTileCodes.Firefly, GUEST);
+			let hostFirefly = hostFireflyPoints[0].tile;
+			let guestFirefly = guestFireflyPoints[0].tile;
+
+			// Move Host Firefly out of temple toward Guest: (-8,0) -> (-6,0)
+			gameManager.runNotationMove({
+				moveType: MOVE,
+				player: HOST,
+				startPoint: new NotationPoint('-8,0'),
+				endPoint: new NotationPoint('-6,0')
+			}, false);
+
+			// Move Guest Firefly out of temple toward Host: (8,0) -> (6,0)
+			gameManager.runNotationMove({
+				moveType: MOVE,
+				player: GUEST,
+				startPoint: new NotationPoint('8,0'),
+				endPoint: new NotationPoint('6,0')
+			}, false);
+
+			// Update tile references after moves
+			hostFireflyPoints = gameManager.board.getTilePoints(TrifleTileCodes.Firefly, HOST);
+			guestFireflyPoints = gameManager.board.getTilePoints(TrifleTileCodes.Firefly, GUEST);
+			hostFirefly = hostFireflyPoints[0].tile;
+			guestFirefly = guestFireflyPoints[0].tile;
+
+			// VERIFY: Both Fireflies should now be drawing each other
+			let hostHasDrawOnIt = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.drawTilesAlongLineOfSight,
+				hostFirefly
+			);
+			let guestHasDrawOnIt = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.drawTilesAlongLineOfSight,
+				guestFirefly
+			);
+			expect(hostHasDrawOnIt).toBe(true);
+			expect(guestHasDrawOnIt).toBe(true);
+
+			// Get all draw abilities BEFORE placing Lavender
+			const abilitiesBefore = gameManager.board.abilityManager.abilities.filter(
+				a => a.abilityType === TrifleAbilityName.drawTilesAlongLineOfSight
+			);
+			// Should have exactly 2 abilities before (each Firefly draws the other)
+			expect(abilitiesBefore.length).toBe(2);
+
+			// Now deploy Lavender between them at (0,0) to block line of sight
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Lavender,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Get all draw abilities AFTER placing Lavender
+			const abilitiesAfter = gameManager.board.abilityManager.abilities.filter(
+				a => a.abilityType === TrifleAbilityName.drawTilesAlongLineOfSight
+			);
+
+			// Check what abilities remain and what they target
+			const abilitiesTargetingHostFirefly = abilitiesAfter.filter(
+				a => a.abilityTargetTiles.includes(hostFirefly)
+			);
+			const abilitiesTargetingGuestFirefly = abilitiesAfter.filter(
+				a => a.abilityTargetTiles.includes(guestFirefly)
+			);
+
+			// Debug: If any abilities target Host Firefly, examine them
+			if (abilitiesTargetingHostFirefly.length > 0) {
+				const badAbility = abilitiesTargetingHostFirefly[0];
+				// This assertion will fail with useful debug info
+				expect({
+					sourceTile: badAbility.sourceTile.ownerCode + badAbility.sourceTile.code,
+					abilityTargets: badAbility.abilityTargetTiles.map(t => t.ownerCode + t.code),
+					triggerTargets: badAbility.triggerTargetTiles.map(t => t.ownerCode + t.code),
+					activated: badAbility.activated,
+					preserve: badAbility.preserve
+				}).toEqual({ shouldNotExist: true });
+			}
+
+			// AFTER BLOCKING: Neither Firefly should be targeted by draw ability
+			expect(abilitiesTargetingHostFirefly.length).toBe(0);
+			expect(abilitiesTargetingGuestFirefly.length).toBe(0);
 		});
 	});
 
@@ -3400,6 +3519,110 @@ describe('Capture Constraint Brains', () => {
 			);
 
 			expect(brain).toBeNull();
+		});
+	});
+
+	// --------------------------------------------------------------------------
+	// Dynamic Constraint Registry Tests
+	// --------------------------------------------------------------------------
+	describe('Constraint Registry and Dynamic Lookup', () => {
+		it('should have ConstraintCategory enum with expected categories', () => {
+			expect(ConstraintCategory.MOVEMENT).toBe('movement');
+			expect(ConstraintCategory.CAPTURE_PROHIBITION).toBe('captureProhibition');
+			expect(ConstraintCategory.CAPTURE_PROTECTION).toBe('captureProtection');
+		});
+
+		it('should return movement constraint ability names', () => {
+			const movementAbilities = getAbilityNamesForConstraintCategory(ConstraintCategory.MOVEMENT);
+			expect(movementAbilities).toContain(TrifleAbilityName.drawTilesAlongLineOfSight);
+			expect(movementAbilities).toContain(TrifleAbilityName.immobilizeTiles);
+			expect(movementAbilities).toContain(TrifleAbilityName.restrictMovementWithinZone);
+			expect(movementAbilities).toContain(TrifleAbilityName.restrictMovementWithinZoneUnlessCapturing);
+		});
+
+		it('should return capture prohibition ability names', () => {
+			const prohibitionAbilities = getAbilityNamesForConstraintCategory(ConstraintCategory.CAPTURE_PROHIBITION);
+			expect(prohibitionAbilities).toContain(TrifleAbilityName.prohibitTileFromCapturing);
+		});
+
+		it('should return capture protection ability names', () => {
+			const protectionAbilities = getAbilityNamesForConstraintCategory(ConstraintCategory.CAPTURE_PROTECTION);
+			expect(protectionAbilities).toContain(TrifleAbilityName.protectFromCapture);
+		});
+
+		it('should return empty array for unknown category', () => {
+			const unknownAbilities = getAbilityNamesForConstraintCategory('unknownCategory');
+			expect(unknownAbilities).toEqual([]);
+		});
+
+		it('unified createConstraintBrain should create movement constraint brains', () => {
+			const mockAbility = {
+				abilityType: TrifleAbilityName.immobilizeTiles,
+				sourceTile: { code: 'TEST' }
+			};
+
+			const brain = TrifleBrainFactory.createConstraintBrain(
+				TrifleAbilityName.immobilizeTiles,
+				gameManager.board,
+				mockAbility
+			);
+
+			expect(brain).not.toBeNull();
+			expect(typeof brain.isMovementAllowed).toBe('function');
+		});
+
+		it('unified createConstraintBrain should create capture constraint brains', () => {
+			const mockAbility = {
+				abilityType: TrifleAbilityName.protectFromCapture,
+				sourceTile: { code: 'TEST' }
+			};
+
+			const brain = TrifleBrainFactory.createConstraintBrain(
+				TrifleAbilityName.protectFromCapture,
+				gameManager.board,
+				mockAbility
+			);
+
+			expect(brain).not.toBeNull();
+			expect(typeof brain.isCaptureAllowed).toBe('function');
+		});
+
+		it('AbilityManager getConstraintsForTile should work with category parameter', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Cattail
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Shirshu
+			]);
+
+			// Deploy Cattail
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Cattail,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy Shirshu adjacent to Cattail
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Shirshu,
+				endPoint: new NotationPoint('1,0')
+			}, false);
+
+			// Get the Shirshu tile
+			const shirshuPoints = gameManager.board.getTilePoints(TrifleTileCodes.Shirshu, GUEST);
+			const shirshuTile = shirshuPoints[0].tile;
+
+			// Use the new dynamic method directly
+			const constraints = gameManager.board.abilityManager.getConstraintsForTile(
+				shirshuTile,
+				ConstraintCategory.CAPTURE_PROHIBITION
+			);
+			expect(constraints.length).toBeGreaterThan(0);
 		});
 	});
 

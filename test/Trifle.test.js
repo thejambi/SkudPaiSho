@@ -641,6 +641,297 @@ describe('Air Tiles - Definition and Abilities', () => {
 		});
 	});
 
+	describe('Firefly Line of Sight Trigger', () => {
+		// Tests for WhileTargetTileIsInLineOfSightTriggerBrain behavior
+		// Firefly has drawTilesAlongLineOfSight triggered by whileTargetTileIsInLineOfSight
+		// Line of sight is orthogonal only (not diagonal), blocked by tiles in between
+
+		it('should target adjacent tile (1 space away) - in line of sight', () => {
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Firefly
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.PolarBearDog
+			]);
+
+			// Deploy Firefly outside temple (so ability is active)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Firefly,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy enemy PolarBearDog adjacent (1 space away, same row)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.PolarBearDog,
+				endPoint: new NotationPoint('0,1')
+			}, false);
+
+			// Get the enemy tile
+			const pbdPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, GUEST);
+			expect(pbdPoints.length).toBe(1);
+
+			// Adjacent enemy tile should be targeted by drawTilesAlongLineOfSight
+			const isTargeted = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.drawTilesAlongLineOfSight,
+				pbdPoints[0].tile
+			);
+			expect(isTargeted).toBe(true);
+		});
+
+		it('should target tile 2 spaces away on same line with no tile between - in line of sight', () => {
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Firefly
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.PolarBearDog
+			]);
+
+			// Deploy Firefly outside temple
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Firefly,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy enemy PolarBearDog 2 spaces away on same row (no tile between)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.PolarBearDog,
+				endPoint: new NotationPoint('0,2')
+			}, false);
+
+			// Get the enemy tile
+			const pbdPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, GUEST);
+			expect(pbdPoints.length).toBe(1);
+
+			// Enemy tile 2 spaces away with clear line should be in line of sight
+			const isTargeted = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.drawTilesAlongLineOfSight,
+				pbdPoints[0].tile
+			);
+			expect(isTargeted).toBe(true);
+		});
+
+		it('should NOT target tile 2 spaces away when another tile blocks line of sight', () => {
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Firefly,
+				TrifleTileCodes.Lavender // Tile to block line of sight
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.PolarBearDog
+			]);
+
+			// Deploy Firefly outside temple
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Firefly,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy blocking tile between Firefly and target
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Lavender,
+				endPoint: new NotationPoint('0,1')
+			}, false);
+
+			// Deploy enemy PolarBearDog 2 spaces away (blocked by Lavender)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.PolarBearDog,
+				endPoint: new NotationPoint('0,2')
+			}, false);
+
+			// Get the enemy tile
+			const pbdPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, GUEST);
+			expect(pbdPoints.length).toBe(1);
+
+			// Enemy tile should NOT be in line of sight (blocked by Lavender)
+			const isTargeted = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.drawTilesAlongLineOfSight,
+				pbdPoints[0].tile
+			);
+			expect(isTargeted).toBe(false);
+		});
+
+		it('should STOP targeting tile when another tile moves to block line of sight', () => {
+			// This tests the dynamic case: ability is active, then gets blocked
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Firefly,
+				TrifleTileCodes.Lavender // Will move to block line of sight
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.PolarBearDog
+			]);
+
+			// Deploy Firefly outside temple
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Firefly,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy Lavender somewhere else (not blocking yet)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Lavender,
+				endPoint: new NotationPoint('1,0')
+			}, false);
+
+			// Deploy enemy PolarBearDog 2 spaces away - should be in line of sight
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.PolarBearDog,
+				endPoint: new NotationPoint('0,2')
+			}, false);
+
+			// Get the enemy tile
+			const pbdPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, GUEST);
+			expect(pbdPoints.length).toBe(1);
+
+			// FIRST: Verify PolarBearDog IS in line of sight (ability is active)
+			let isTargeted = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.drawTilesAlongLineOfSight,
+				pbdPoints[0].tile
+			);
+			expect(isTargeted).toBe(true);
+
+			// Now move Lavender to block line of sight (from 1,0 to 0,1)
+			gameManager.runNotationMove({
+				moveType: MOVE,
+				player: HOST,
+				startPoint: new NotationPoint('1,0'),
+				endPoint: new NotationPoint('0,1')
+			}, false);
+
+			// AFTER blocking: PolarBearDog should NO LONGER be in line of sight
+			isTargeted = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.drawTilesAlongLineOfSight,
+				pbdPoints[0].tile
+			);
+			expect(isTargeted).toBe(false);
+		});
+
+		it('should STOP targeting tile when another tile is DEPLOYED to block line of sight', () => {
+			// Same as above test but using DEPLOY instead of MOVE to block
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Firefly,
+				TrifleTileCodes.Lavender // Will be deployed to block line of sight
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.PolarBearDog
+			]);
+
+			// Deploy Firefly outside temple
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Firefly,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy enemy PolarBearDog 2 spaces away - should be in line of sight
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.PolarBearDog,
+				endPoint: new NotationPoint('0,2')
+			}, false);
+
+			// Get the enemy tile
+			const pbdPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, GUEST);
+			expect(pbdPoints.length).toBe(1);
+
+			// FIRST: Verify PolarBearDog IS in line of sight (ability is active)
+			let isTargeted = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.drawTilesAlongLineOfSight,
+				pbdPoints[0].tile
+			);
+			expect(isTargeted).toBe(true);
+
+			// Now DEPLOY Lavender to block line of sight at (0,1)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Lavender,
+				endPoint: new NotationPoint('0,1')
+			}, false);
+
+			// AFTER blocking: PolarBearDog should NO LONGER be in line of sight
+			isTargeted = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.drawTilesAlongLineOfSight,
+				pbdPoints[0].tile
+			);
+			expect(isTargeted).toBe(false);
+		});
+
+		it('should NOT target tile that is diagonally adjacent - not in line of sight', () => {
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Firefly
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.PolarBearDog
+			]);
+
+			// Deploy Firefly outside temple
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Firefly,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy enemy PolarBearDog diagonally adjacent (different row AND different col)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.PolarBearDog,
+				endPoint: new NotationPoint('1,1')
+			}, false);
+
+			// Get the enemy tile
+			const pbdPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, GUEST);
+			expect(pbdPoints.length).toBe(1);
+
+			// Diagonally adjacent tile should NOT be in line of sight (line of sight is orthogonal only)
+			const isTargeted = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.drawTilesAlongLineOfSight,
+				pbdPoints[0].tile
+			);
+			expect(isTargeted).toBe(false);
+		});
+	});
+
 	describe('Chrysanthemum', () => {
 		it('should have correct tile properties', () => {
 			const tileInfo = TrifleTiles[TrifleTileCodes.Chrysanthemum];
@@ -694,6 +985,285 @@ describe('Air Tiles - Definition and Abilities', () => {
 			expect(cancelAbility.triggers[0].triggerType).toBe(
 				TrifleAbilityTriggerType.whileTargetTileIsInZone
 			);
+		});
+
+		it('should target tiles in zone with cancelAbilities', () => {
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Edelweiss
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Lavender // Another flower with abilities
+			]);
+
+			// Deploy Edelweiss
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Edelweiss,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy Lavender inside Edelweiss's zone (zone size is 2)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Lavender,
+				endPoint: new NotationPoint('1,0')
+			}, false);
+
+			// Get Lavender tile
+			const lavenderPoints = gameManager.board.getTilePoints(TrifleTileCodes.Lavender, GUEST);
+			expect(lavenderPoints.length).toBe(1);
+
+			// Lavender is in Edelweiss's zone, so cancelAbilities should target it
+			const isCanceled = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.cancelAbilities,
+				lavenderPoints[0].tile
+			);
+			expect(isCanceled).toBe(true);
+		});
+
+		it('should NOT target tiles outside zone with cancelAbilities', () => {
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Edelweiss
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Lavender
+			]);
+
+			// Deploy Edelweiss
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Edelweiss,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy Lavender OUTSIDE Edelweiss's zone (zone size is 2, so 3+ away)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Lavender,
+				endPoint: new NotationPoint('3,0')
+			}, false);
+
+			// Get Lavender tile
+			const lavenderPoints = gameManager.board.getTilePoints(TrifleTileCodes.Lavender, GUEST);
+			expect(lavenderPoints.length).toBe(1);
+
+			// Lavender is outside Edelweiss's zone, so cancelAbilities should NOT target it
+			const isCanceled = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.cancelAbilities,
+				lavenderPoints[0].tile
+			);
+			expect(isCanceled).toBe(false);
+		});
+
+		it('should NOT target itself with cancelAbilities', () => {
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Edelweiss
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner
+			]);
+
+			// Deploy Edelweiss
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Edelweiss,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Get Edelweiss tile
+			const edelweissPoints = gameManager.board.getTilePoints(TrifleTileCodes.Edelweiss, HOST);
+			expect(edelweissPoints.length).toBe(1);
+
+			// Edelweiss should NOT target itself (targetTileTypes: allButThisTile)
+			const isCanceled = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.cancelAbilities,
+				edelweissPoints[0].tile
+			);
+			expect(isCanceled).toBe(false);
+		});
+
+		it('should cancel abilities of both friendly and enemy tiles in zone', () => {
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Edelweiss,
+				TrifleTileCodes.NobleRhubarb // Friendly flower with abilities
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Lavender // Enemy flower with abilities
+			]);
+
+			// Deploy Edelweiss at center
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Edelweiss,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy enemy Lavender in zone
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Lavender,
+				endPoint: new NotationPoint('1,0')
+			}, false);
+
+			// Deploy friendly NobleRhubarb in zone
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.NobleRhubarb,
+				endPoint: new NotationPoint('0,1')
+			}, false);
+
+			// Get tiles
+			const lavenderPoints = gameManager.board.getTilePoints(TrifleTileCodes.Lavender, GUEST);
+			const rhubarbPoints = gameManager.board.getTilePoints(TrifleTileCodes.NobleRhubarb, HOST);
+
+			// Both should have cancelAbilities targeting them
+			const lavenderCanceled = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.cancelAbilities,
+				lavenderPoints[0].tile
+			);
+			const rhubarbCanceled = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.cancelAbilities,
+				rhubarbPoints[0].tile
+			);
+
+			expect(lavenderCanceled).toBe(true);
+			expect(rhubarbCanceled).toBe(true);
+		});
+
+		it('should neutralize immobilizeTiles when source tile is in zone', () => {
+			// This test verifies that cancelAbilities actually prevents abilities from working
+			// Edelweiss cancels abilities of tiles in its zone
+			// Lavender immobilizes adjacent tiles
+			// When Lavender is in Edelweiss's zone, its immobilize should be canceled
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Edelweiss
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Lavender,
+				TrifleTileCodes.Firefly
+			]);
+
+			// Deploy Edelweiss
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Edelweiss,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy Lavender inside Edelweiss's zone (zone size is 2)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Lavender,
+				endPoint: new NotationPoint('1,0')
+			}, false);
+
+			// Deploy Firefly adjacent to Lavender (so normally it would be immobilized)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Firefly,
+				endPoint: new NotationPoint('2,0')
+			}, false);
+
+			// Get tiles
+			const lavenderPoints = gameManager.board.getTilePoints(TrifleTileCodes.Lavender, GUEST);
+			const fireflyPoints = gameManager.board.getTilePoints(TrifleTileCodes.Firefly, GUEST);
+			expect(lavenderPoints.length).toBe(1);
+			expect(fireflyPoints.length).toBe(1);
+
+			// First verify Lavender is being targeted by cancelAbilities
+			const lavenderCanceled = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.cancelAbilities,
+				lavenderPoints[0].tile
+			);
+			expect(lavenderCanceled).toBe(true);
+
+			// Firefly should NOT be immobilized because Lavender's abilities are canceled
+			const fireflyImmobilized = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles,
+				fireflyPoints[0].tile
+			);
+			expect(fireflyImmobilized).toBe(false);
+		});
+
+		it('should allow immobilizeTiles to work when source tile is outside zone', () => {
+			// Contrast test: when Lavender is OUTSIDE Edelweiss's zone, immobilize works
+			const gameManager = new TrifleGameManager(mockActuator, true, true);
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Edelweiss
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Lavender,
+				TrifleTileCodes.Firefly
+			]);
+
+			// Deploy Edelweiss
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Edelweiss,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy Lavender OUTSIDE Edelweiss's zone (zone size is 2, so 3+ away)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Lavender,
+				endPoint: new NotationPoint('3,0')
+			}, false);
+
+			// Deploy Firefly adjacent to Lavender
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Firefly,
+				endPoint: new NotationPoint('4,0')
+			}, false);
+
+			// Get tiles
+			const lavenderPoints = gameManager.board.getTilePoints(TrifleTileCodes.Lavender, GUEST);
+			const fireflyPoints = gameManager.board.getTilePoints(TrifleTileCodes.Firefly, GUEST);
+
+			// Lavender is NOT targeted by cancelAbilities (outside zone)
+			const lavenderCanceled = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.cancelAbilities,
+				lavenderPoints[0].tile
+			);
+			expect(lavenderCanceled).toBe(false);
+
+			// Firefly SHOULD be immobilized because Lavender's abilities are active
+			const fireflyImmobilized = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles,
+				fireflyPoints[0].tile
+			);
+			expect(fireflyImmobilized).toBe(true);
 		});
 	});
 

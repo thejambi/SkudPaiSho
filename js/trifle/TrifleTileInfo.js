@@ -382,7 +382,7 @@ TrifleTileInfo.defineAbilityTypes = function () {
 };
 
 
-TrifleTileInfo.getReadableDescription = function(tileCode) {
+TrifleTileInfo.getReadableDescription = function(tileCode, boardTile, abilityManager) {
 	var tileHtml = "";
 
 	var tileInfo = getCurrentTileMetadata()[tileCode];
@@ -480,7 +480,79 @@ TrifleTileInfo.getReadableDescription = function(tileCode) {
 		tileHtml = tileCode;
 	}
 
+	// Debug: Show active abilities when debugOn is true
+	if (debugOn && boardTile && abilityManager) {
+		tileHtml += TrifleTileInfo.getActiveAbilitiesDebugInfo(boardTile, abilityManager);
+	}
+
 	return tileHtml;
+};
+
+TrifleTileInfo.getActiveAbilitiesDebugInfo = function(boardTile, abilityManager) {
+	var debugHtml = "";
+
+	if (!abilityManager || !abilityManager.abilities || !boardTile) {
+		return debugHtml;
+	}
+
+	// Find abilities where this tile is the source
+	var abilitiesFromTile = [];
+	// Find abilities targeting this tile
+	var abilitiesTargetingTile = [];
+
+	abilityManager.abilities.forEach(function(ability) {
+		if (ability.activated) {
+			// Check if this tile is the source
+			if (ability.sourceTile && ability.sourceTile.id === boardTile.id) {
+				abilitiesFromTile.push(ability);
+			}
+			// Check if this tile is a target
+			if (ability.abilityTargetsTile && ability.abilityTargetsTile(boardTile)) {
+				abilitiesTargetingTile.push(ability);
+			}
+		}
+	});
+
+	// Display abilities from this tile
+	if (abilitiesFromTile.length > 0) {
+		debugHtml += "<br /><b>== Active Abilities FROM This Tile ==</b>";
+		abilitiesFromTile.forEach(function(ability) {
+			debugHtml += "<br />";
+			var abilityTitle = ability.abilityInfo.title || ability.abilityType;
+			debugHtml += "• " + abilityTitle;
+			if (ability.abilityTargetTiles && ability.abilityTargetTiles.length > 0) {
+				debugHtml += "<br />&nbsp;&nbsp;Targeting: ";
+				var targetNames = [];
+				ability.abilityTargetTiles.forEach(function(targetTile) {
+					targetNames.push(targetTile.ownerCode + " " + targetTile.code);
+				});
+				debugHtml += targetNames.join(", ");
+			}
+			if (ability.remainingDuration !== undefined) {
+				debugHtml += "<br />&nbsp;&nbsp;Duration remaining: " + ability.remainingDuration;
+			}
+		});
+	}
+
+	// Display abilities targeting this tile
+	if (abilitiesTargetingTile.length > 0) {
+		debugHtml += "<br /><br /><b>== Active Abilities TARGETING This Tile ==</b>";
+		abilitiesTargetingTile.forEach(function(ability) {
+			debugHtml += "<br />";
+			var abilityTitle = ability.abilityInfo.title || ability.abilityType;
+			debugHtml += "• " + abilityTitle;
+			debugHtml += "<br />&nbsp;&nbsp;From: " + ability.sourceTile.ownerCode + " " + ability.sourceTile.code;
+			if (ability.remainingDuration !== undefined) {
+				debugHtml += "<br />&nbsp;&nbsp;Duration remaining: " + ability.remainingDuration;
+			}
+		});
+	}
+
+	if (abilitiesFromTile.length === 0 && abilitiesTargetingTile.length === 0) {
+		debugHtml += "<br /><i>(No active abilities)</i>";
+	}
+
+	return debugHtml;
 };
 
 TrifleTileInfo.getObjectSummary = function(origKey, theObject, indentDepth) {

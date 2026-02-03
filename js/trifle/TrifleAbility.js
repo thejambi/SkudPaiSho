@@ -188,12 +188,27 @@ export class TrifleAbility {
 	}
 
 	appearsToBeTheSameAs(otherAbility) {
-		return otherAbility
-			&& this.abilityType === otherAbility.abilityType
-			&& this.sourceTile.id === otherAbility.sourceTile.id
-			&& this.triggerTargetTiles.equals(otherAbility.triggerTargetTiles)
-			&& this.triggerTargetTilePoints.equals(otherAbility.triggerTargetTilePoints)
-			&& this.sourceTilePoint === otherAbility.sourceTilePoint;
+		if (!otherAbility
+			|| this.abilityType !== otherAbility.abilityType
+			|| this.sourceTile.id !== otherAbility.sourceTile.id
+			|| this.sourceTilePoint !== otherAbility.sourceTilePoint) {
+			return false;
+		}
+
+		// If ability has triggerTypeToTarget, compare targets from that specific trigger
+		// This is necessary because triggerTargetTiles is the intersection of ALL trigger targets,
+		// which can be empty when triggers have non-overlapping purposes (e.g., one for targeting,
+		// one for conditions like "while outside temple")
+		if (this.abilityInfo.triggerTypeToTarget) {
+			const thisTargets = this.getTriggerTypeTargets(this.abilityInfo.triggerTypeToTarget);
+			const otherTargets = otherAbility.getTriggerTypeTargets(this.abilityInfo.triggerTypeToTarget);
+			return thisTargets.targetTiles.equals(otherTargets.targetTiles)
+				&& thisTargets.targetTilePoints.equals(otherTargets.targetTilePoints);
+		}
+
+		// Otherwise, fall back to comparing the intersection (triggerTargetTiles)
+		return this.triggerTargetTiles.equals(otherAbility.triggerTargetTiles)
+			&& this.triggerTargetTilePoints.equals(otherAbility.triggerTargetTilePoints);
 	}
 
 	abilityTargetsTile(tile) {

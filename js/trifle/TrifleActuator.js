@@ -12,6 +12,7 @@ import {
 	RmbDown,
 	RmbUp,
 	clearMessage,
+	gameController,
 	pieceAnimationLength,
 	pointClicked,
 	showPointMessage,
@@ -180,6 +181,18 @@ export class TrifleActuator {
 				unplayedTileClicked(this);
 				showTileMessage(this);
 			});
+		} else if (gameController && gameController.clickToShowPointMessage) {
+			theDiv.addEventListener('click', () => {
+				unplayedTileClicked(theDiv);
+				const tileName = theDiv.getAttribute("name");
+				if (gameController.lastClickedTileForMessage === tileName) {
+					gameController.lastClickedTileForMessage = null;
+					clearMessage();
+				} else {
+					gameController.lastClickedTileForMessage = tileName;
+					showTileMessage(theDiv);
+				}
+			});
 		} else {
 			theDiv.addEventListener('click', function() { unplayedTileClicked(this); });
 			theDiv.addEventListener('mouseover', function() { showTileMessage(this); });
@@ -213,6 +226,33 @@ export class TrifleActuator {
 				theDiv.addEventListener('click', function() {
 					pointClicked(this);
 					showPointMessage(this);
+				});
+			} else if (gameController && gameController.clickToShowPointMessage) {
+				theDiv.addEventListener('click', () => {
+					pointClicked(theDiv);
+					const pointName = theDiv.getAttribute("name");
+					if (gameController.lastClickedPointForMessage === pointName) {
+						gameController.lastClickedPointForMessage = null;
+						clearMessage();
+					} else {
+						gameController.lastClickedPointForMessage = pointName;
+						showPointMessage(theDiv);
+					}
+				});
+				theDiv.addEventListener('mousedown', (e) => {
+					// Right Mouse Button
+					if (e.button === 2) {
+						RmbDown(theDiv);
+					}
+				});
+				theDiv.addEventListener('mouseup', (e) => {
+					// Right Mouse Button
+					if (e.button === 2) {
+						RmbUp(theDiv);
+					}
+				});
+				theDiv.addEventListener('contextmenu', (e) => {
+					e.preventDefault();
 				});
 			} else {
 				theDiv.addEventListener('click', function() { pointClicked(this); });

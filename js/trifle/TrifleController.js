@@ -11,11 +11,12 @@ import {
 } from '../CommonNotationObjects';
 import { TrifleAggressiveAI } from './ai/TrifleAggressiveAI';
 import { TrifleDefensiveAI } from './ai/TrifleDefensiveAI';
-import { debug, gameDevOn } from '../GameData';
+import { debug, debugOn, gameDevOn } from '../GameData';
 import {
 	activeAi,
 	activeAi2,
 	BRAND_NEW,
+	clearMessage,
 	GameType,
 	READY_FOR_BONUS,
 	WAITING_FOR_ENDPOINT,
@@ -52,6 +53,8 @@ import { TrifleTileCodes, defineTrifleTiles } from './TrifleTiles';
 
 export class TrifleController {
 	constructor(gameContainer, isMobile) {
+		this.gameContainer = gameContainer;
+		this.isMobile = isMobile;
 		this.actuator = new TrifleActuator(gameContainer, isMobile);
 
 		TrifleTileInfo.initializeTrifleData();
@@ -67,6 +70,8 @@ export class TrifleController {
 
 		this.isInviteOnly = true;
 		this.isPaiShoGame = true;
+
+		this.clickToShowPointMessage = false;
 	}
 
 	static getHostTilesContainerDivs() {
@@ -107,6 +112,37 @@ export class TrifleController {
 
 	callActuate() {
 		this.theGame.actuate();
+	}
+
+	toggleClickToShowPointMessage() {
+		this.clickToShowPointMessage = !this.clickToShowPointMessage;
+		this.actuator = new TrifleActuator(this.gameContainer, this.isMobile);
+		this.theGame.actuator = this.actuator;
+		this.callActuate();
+		clearMessage();
+	}
+
+	getAdditionalHelpTabDiv() {
+		if (!debugOn) {
+			return null;
+		}
+
+		const settingsDiv = document.createElement("div");
+
+		const heading = document.createElement("h4");
+		heading.innerText = "Trifle Debug Preferences:";
+		settingsDiv.appendChild(heading);
+
+		const clickToShowText = this.clickToShowPointMessage
+			? "Switch to show tile info on hover"
+			: "Switch to show tile info on click";
+		const clickToShowSpan = document.createElement("span");
+		clickToShowSpan.classList.add("skipBonus");
+		clickToShowSpan.onclick = function() { gameController.toggleClickToShowPointMessage(); };
+		clickToShowSpan.innerText = clickToShowText;
+		settingsDiv.appendChild(clickToShowSpan);
+
+		return settingsDiv;
 	}
 
 	resetMove() {
@@ -396,14 +432,16 @@ export class TrifleController {
 		}
 	}
 
-	getTheMessage(tile, ownerName) {
+	getTheMessage(tile, ownerName, boardTile) {
 		const message = [];
 
 		const tileCode = tile.code;
 
 		const heading = TrifleTile.getTileName(tileCode);
 
-		message.push(TrifleTileInfo.getReadableDescription(tileCode));
+		// Pass boardTile and abilityManager for debug info when tile is on the board
+		const abilityManager = boardTile ? this.theGame.board.abilityManager : null;
+		message.push(TrifleTileInfo.getReadableDescription(tileCode, boardTile, abilityManager));
 
 		return {
 			heading: heading,
@@ -433,7 +471,7 @@ export class TrifleController {
 		const boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
 		if (boardPoint.hasTile()) {
-			return this.getTheMessage(boardPoint.tile, boardPoint.tile.ownerName);
+			return this.getTheMessage(boardPoint.tile, boardPoint.tile.ownerName, boardPoint.tile);
 		} else {
 			return null;
 		}

@@ -2386,7 +2386,9 @@ export function clearMessage() {
 
 	if (gameController.getAdditionalHelpTabDiv) {
 		const additionalDiv = gameController.getAdditionalHelpTabDiv();
-		helpTabContentDiv.appendChild(additionalDiv);
+		if (additionalDiv) {
+			helpTabContentDiv.appendChild(additionalDiv);
+		}
 	}
 
 	if (gameController.isPaiShoGame) {

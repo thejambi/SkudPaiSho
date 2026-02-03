@@ -45,6 +45,57 @@ import { TrifleRestrictMovementWithinZoneUnlessCapturingConstraintBrain } from '
 import { TrifleProtectFromCaptureCaptureConstraintBrain } from './captureConstraintBrains/ProtectFromCaptureCaptureConstraintBrain';
 import { TrifleProhibitTileFromCapturingCaptureConstraintBrain } from './captureConstraintBrains/ProhibitTileFromCapturingCaptureConstraintBrain';
 
+/**
+ * Constraint categories for organizing different types of constraint brains
+ */
+export const ConstraintCategory = {
+	MOVEMENT: 'movement',
+	CAPTURE_PROHIBITION: 'captureProhibition',
+	CAPTURE_PROTECTION: 'captureProtection'
+};
+
+/**
+ * Registry mapping ability names to their constraint category and brain constructor.
+ * This allows dynamic lookup of constraints by category without hard-coding each ability.
+ */
+const CONSTRAINT_REGISTRY = {
+	[TrifleAbilityName.drawTilesAlongLineOfSight]: {
+		category: ConstraintCategory.MOVEMENT,
+		brain: TrifleDrawTilesAlongLineOfSightConstraintBrain
+	},
+	[TrifleAbilityName.immobilizeTiles]: {
+		category: ConstraintCategory.MOVEMENT,
+		brain: TrifleImmobilizeTilesConstraintBrain
+	},
+	[TrifleAbilityName.restrictMovementWithinZone]: {
+		category: ConstraintCategory.MOVEMENT,
+		brain: TrifleRestrictMovementWithinZoneConstraintBrain
+	},
+	[TrifleAbilityName.restrictMovementWithinZoneUnlessCapturing]: {
+		category: ConstraintCategory.MOVEMENT,
+		brain: TrifleRestrictMovementWithinZoneUnlessCapturingConstraintBrain
+	},
+	[TrifleAbilityName.prohibitTileFromCapturing]: {
+		category: ConstraintCategory.CAPTURE_PROHIBITION,
+		brain: TrifleProhibitTileFromCapturingCaptureConstraintBrain
+	},
+	[TrifleAbilityName.protectFromCapture]: {
+		category: ConstraintCategory.CAPTURE_PROTECTION,
+		brain: TrifleProtectFromCaptureCaptureConstraintBrain
+	}
+};
+
+/**
+ * Get all ability names that belong to a specific constraint category
+ * @param {string} category - The constraint category to filter by
+ * @returns {Array<string>} Array of ability names in that category
+ */
+export function getAbilityNamesForConstraintCategory(category) {
+	return Object.entries(CONSTRAINT_REGISTRY)
+		.filter(([_, entry]) => entry.category === category)
+		.map(([abilityName]) => abilityName);
+}
+
 export function TrifleBrainFactory() {
 
 }
@@ -137,42 +188,25 @@ TrifleBrainFactory.createTargetBrain = function(targetType, abilityObject) {
 };
 
 /**
- * Create a constraint brain for movement constraints
+ * Create a constraint brain for any constraint type (movement, capture, etc.)
+ * Uses the CONSTRAINT_REGISTRY to dynamically look up the appropriate brain constructor.
  * @param {string} abilityName - The ability type that creates this constraint
  * @param {Object} board - The game board
  * @param {Object} ability - The ability object
  * @returns {Object|null} The constraint brain or null if not applicable
  */
 TrifleBrainFactory.createConstraintBrain = function(abilityName, board, ability) {
-	switch(abilityName) {
-		case TrifleAbilityName.drawTilesAlongLineOfSight:
-			return new TrifleDrawTilesAlongLineOfSightConstraintBrain(board, ability);
-		case TrifleAbilityName.immobilizeTiles:
-			return new TrifleImmobilizeTilesConstraintBrain(board, ability);
-		case TrifleAbilityName.restrictMovementWithinZone:
-			return new TrifleRestrictMovementWithinZoneConstraintBrain(board, ability);
-		case TrifleAbilityName.restrictMovementWithinZoneUnlessCapturing:
-			return new TrifleRestrictMovementWithinZoneUnlessCapturingConstraintBrain(board, ability);
-		default:
-			return null;
+	const registryEntry = CONSTRAINT_REGISTRY[abilityName];
+	if (registryEntry && registryEntry.brain) {
+		return new registryEntry.brain(board, ability);
 	}
+	return null;
 };
 
 /**
- * Create a capture constraint brain for capture-related constraints
- * @param {string} abilityName - The ability type that creates this constraint
- * @param {Object} board - The game board
- * @param {Object} ability - The ability object
- * @returns {Object|null} The capture constraint brain or null if not applicable
+ * @deprecated Use createConstraintBrain instead - kept for backwards compatibility
  */
 TrifleBrainFactory.createCaptureConstraintBrain = function(abilityName, board, ability) {
-	switch(abilityName) {
-		case TrifleAbilityName.protectFromCapture:
-			return new TrifleProtectFromCaptureCaptureConstraintBrain(board, ability);
-		case TrifleAbilityName.prohibitTileFromCapturing:
-			return new TrifleProhibitTileFromCapturingCaptureConstraintBrain(board, ability);
-		default:
-			return null;
-	}
+	return TrifleBrainFactory.createConstraintBrain(abilityName, board, ability);
 };
 
