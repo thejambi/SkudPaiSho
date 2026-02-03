@@ -45,6 +45,7 @@ import { GinsengGameManager } from '../js/ginseng/GinsengGameManager';
 import { NotationPoint, MOVE, HOST, GUEST } from '../js/CommonNotationObjects';
 import { GinsengTileInfo, GinsengTiles, GinsengTileCodes } from '../js/ginseng/GinsengTiles';
 import { setCurrentTileMetadata, setCurrentTileCodes } from '../js/trifle/PaiShoGamesTileMetadata';
+import { TrifleAbilityName } from '../js/trifle/TrifleTileInfo';
 
 // Initialize tile metadata (normally done by GinsengController)
 GinsengTileInfo.initializeTrifleData();
@@ -1246,6 +1247,87 @@ describe('Ginseng Koi - Trap Ability', () => {
 		const trapAbility = koiInfo.abilities.find(a => a.type === 'immobilizeTiles');
 		expect(trapAbility).toBeDefined();
 		expect(trapAbility.targetTypes).toContain('triggerTargetTiles');
+	});
+
+	it('should immobilize enemy tile when Koi is on WHITE and enemy surrounds it', () => {
+		// The board starts with tiles already placed
+		// HOST Koi starts at "7,-1" which is NOT a WHITE point
+		// We need to move Koi to a WHITE point, then have an enemy surround it
+
+		// First, find a WHITE point on the board that we can move to
+		let whitePoint = null;
+		let whiteNotationStr = null;
+		gameManager.board.forEachBoardPoint(point => {
+			if (!whitePoint && point.isType(WHITE) && !point.hasTile()) {
+				whitePoint = point;
+				whiteNotationStr = point.getNotationPointString();
+			}
+		});
+
+		expect(whitePoint).not.toBeNull();
+
+		// Get the HOST Koi's starting position
+		const hostKoiPoints = gameManager.board.getTilePoints(GinsengTileCodes.Koi, HOST);
+		expect(hostKoiPoints.length).toBe(1);
+		const koiStartPoint = hostKoiPoints[0];
+		const koiStartNotation = koiStartPoint.getNotationPointString();
+
+		// Move Koi to the WHITE point
+		gameManager.runNotationMove({
+			moveType: MOVE,
+			player: HOST,
+			startPoint: koiStartNotation,
+			endPoint: whiteNotationStr
+		}, false);
+
+		// Verify Koi moved to the WHITE point
+		const koiNewPoints = gameManager.board.getTilePoints(GinsengTileCodes.Koi, HOST);
+		expect(koiNewPoints.length).toBe(1);
+		expect(koiNewPoints[0].isType(WHITE)).toBe(true);
+
+		// Find a GUEST tile we can move to surround the Koi
+		const guestTilePoints = [];
+		gameManager.board.forEachBoardPointWithTile(point => {
+			if (point.tile.ownerName === GUEST) {
+				guestTilePoints.push(point);
+			}
+		});
+		expect(guestTilePoints.length).toBeGreaterThan(0);
+
+		// Find an adjacent point to the Koi that we can move a GUEST tile to
+		const adjacentPoints = gameManager.board.getAdjacentPoints(koiNewPoints[0]);
+		const emptyAdjacentPoint = adjacentPoints.find(p => !p.hasTile());
+
+		if (!emptyAdjacentPoint) {
+			// Skip test if no empty adjacent point (unlikely in practice)
+			return;
+		}
+
+		const adjacentNotation = emptyAdjacentPoint.getNotationPointString();
+
+		// Find a GUEST tile that can move
+		const guestTileToMove = guestTilePoints[0];
+		const guestStartNotation = guestTileToMove.getNotationPointString();
+
+		// Move the GUEST tile to surround the Koi
+		gameManager.runNotationMove({
+			moveType: MOVE,
+			player: GUEST,
+			startPoint: guestStartNotation,
+			endPoint: adjacentNotation
+		}, false);
+
+		// Get the moved GUEST tile
+		const movedGuestPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint(adjacentNotation));
+		expect(movedGuestPoint.hasTile()).toBe(true);
+		const movedGuestTile = movedGuestPoint.tile;
+
+		// Verify the GUEST tile is now immobilized by the Koi's trap ability
+		const isImmobilized = gameManager.board.abilityManager.abilityTargetingTileExists(
+			TrifleAbilityName.immobilizeTiles,
+			movedGuestTile
+		);
+		expect(isImmobilized).toBe(true);
 	});
 });
 
