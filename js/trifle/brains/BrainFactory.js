@@ -39,6 +39,11 @@ import { TrifleMoveTargetTileToPileAbilityBrain } from './abilityBrains/MoveTarg
 import { TrifleExchangeWithCapturedTileAbilityBrain } from './abilityBrains/ExchangeWithCapturedTileAbilityBrain';
 import { TrifleSimpleOngoingAbilityBrain } from './abilityBrains/SimpleOngoingAbilityBrain';
 import { TrifleDrawTilesAlongLineOfSightConstraintBrain } from './constraintBrains/DrawTilesAlongLineOfSightConstraintBrain';
+import { TrifleImmobilizeTilesConstraintBrain } from './constraintBrains/ImmobilizeTilesConstraintBrain';
+import { TrifleRestrictMovementWithinZoneConstraintBrain } from './constraintBrains/RestrictMovementWithinZoneConstraintBrain';
+import { TrifleRestrictMovementWithinZoneUnlessCapturingConstraintBrain } from './constraintBrains/RestrictMovementWithinZoneUnlessCapturingConstraintBrain';
+import { TrifleProtectFromCaptureCaptureConstraintBrain } from './captureConstraintBrains/ProtectFromCaptureCaptureConstraintBrain';
+import { TrifleProhibitTileFromCapturingCaptureConstraintBrain } from './captureConstraintBrains/ProhibitTileFromCapturingCaptureConstraintBrain';
 
 export function TrifleBrainFactory() {
 
@@ -142,6 +147,30 @@ TrifleBrainFactory.createConstraintBrain = function(abilityName, board, ability)
 	switch(abilityName) {
 		case TrifleAbilityName.drawTilesAlongLineOfSight:
 			return new TrifleDrawTilesAlongLineOfSightConstraintBrain(board, ability);
+		case TrifleAbilityName.immobilizeTiles:
+			return new TrifleImmobilizeTilesConstraintBrain(board, ability);
+		case TrifleAbilityName.restrictMovementWithinZone:
+			return new TrifleRestrictMovementWithinZoneConstraintBrain(board, ability);
+		case TrifleAbilityName.restrictMovementWithinZoneUnlessCapturing:
+			return new TrifleRestrictMovementWithinZoneUnlessCapturingConstraintBrain(board, ability);
+		default:
+			return null;
+	}
+};
+
+/**
+ * Create a capture constraint brain for capture-related constraints
+ * @param {string} abilityName - The ability type that creates this constraint
+ * @param {Object} board - The game board
+ * @param {Object} ability - The ability object
+ * @returns {Object|null} The capture constraint brain or null if not applicable
+ */
+TrifleBrainFactory.createCaptureConstraintBrain = function(abilityName, board, ability) {
+	switch(abilityName) {
+		case TrifleAbilityName.protectFromCapture:
+			return new TrifleProtectFromCaptureCaptureConstraintBrain(board, ability);
+		case TrifleAbilityName.prohibitTileFromCapturing:
+			return new TrifleProhibitTileFromCapturingCaptureConstraintBrain(board, ability);
 		default:
 			return null;
 	}

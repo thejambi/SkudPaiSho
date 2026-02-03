@@ -471,6 +471,115 @@ export class TrifleAbilityManager {
 			}
 		});
 
+		// Get all immobilizeTiles abilities targeting this tile
+		const immobilizeAbilities = this.getAbilitiesTargetingTile(
+			TrifleAbilityName.immobilizeTiles,
+			tile
+		);
+
+		immobilizeAbilities.forEach((ability) => {
+			const constraintBrain = TrifleBrainFactory.createConstraintBrain(
+				ability.abilityType,
+				this.board,
+				ability
+			);
+			if (constraintBrain) {
+				constraints.push(constraintBrain);
+			}
+		});
+
+		// Get all restrictMovementWithinZone abilities targeting this tile
+		const zoneAbilities = this.getAbilitiesTargetingTile(
+			TrifleAbilityName.restrictMovementWithinZone,
+			tile
+		);
+
+		zoneAbilities.forEach((ability) => {
+			const constraintBrain = TrifleBrainFactory.createConstraintBrain(
+				ability.abilityType,
+				this.board,
+				ability
+			);
+			if (constraintBrain) {
+				constraints.push(constraintBrain);
+			}
+		});
+
+		// Get all restrictMovementWithinZoneUnlessCapturing abilities targeting this tile
+		const zoneUnlessCapturingAbilities = this.getAbilitiesTargetingTile(
+			TrifleAbilityName.restrictMovementWithinZoneUnlessCapturing,
+			tile
+		);
+
+		zoneUnlessCapturingAbilities.forEach((ability) => {
+			const constraintBrain = TrifleBrainFactory.createConstraintBrain(
+				ability.abilityType,
+				this.board,
+				ability
+			);
+			if (constraintBrain) {
+				constraints.push(constraintBrain);
+			}
+		});
+
+		return constraints;
+	}
+
+	/**
+	 * Get capture constraints for a tile that is attempting to capture.
+	 * Returns an array of constraint brain objects that can validate if the tile can capture.
+	 * @param {Object} tile - The tile attempting to capture
+	 * @returns {Array} Array of capture constraint brain objects
+	 */
+	getCaptureConstraintsForTile(tile) {
+		const constraints = [];
+
+		// Get all prohibitTileFromCapturing abilities targeting this tile
+		const prohibitAbilities = this.getAbilitiesTargetingTile(
+			TrifleAbilityName.prohibitTileFromCapturing,
+			tile
+		);
+
+		prohibitAbilities.forEach((ability) => {
+			const constraintBrain = TrifleBrainFactory.createCaptureConstraintBrain(
+				ability.abilityType,
+				this.board,
+				ability
+			);
+			if (constraintBrain) {
+				constraints.push(constraintBrain);
+			}
+		});
+
+		return constraints;
+	}
+
+	/**
+	 * Get capture protection constraints for a tile that might be captured.
+	 * Returns an array of constraint brain objects that protect the tile from capture.
+	 * @param {Object} tile - The tile that might be captured
+	 * @returns {Array} Array of capture constraint brain objects
+	 */
+	getCaptureProtectionForTile(tile) {
+		const constraints = [];
+
+		// Get all protectFromCapture abilities targeting this tile
+		const protectAbilities = this.getAbilitiesTargetingTile(
+			TrifleAbilityName.protectFromCapture,
+			tile
+		);
+
+		protectAbilities.forEach((ability) => {
+			const constraintBrain = TrifleBrainFactory.createCaptureConstraintBrain(
+				ability.abilityType,
+				this.board,
+				ability
+			);
+			if (constraintBrain) {
+				constraints.push(constraintBrain);
+			}
+		});
+
 		return constraints;
 	}
 

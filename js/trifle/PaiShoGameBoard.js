@@ -2944,6 +2944,43 @@ export class PaiShoGameBoard {
 	// Is a LureTiles ability active on the board?
 } */
 
+	/**
+	 * Check if capture passes all constraint checks from affecting abilities.
+	 * Uses capture constraint brains from the AbilityManager.
+	 * @param {Object} capturingTile - The tile attempting to capture
+	 * @param {Object} fromPoint - The point the capturing tile is moving from
+	 * @param {Object} targetPoint - The point with the tile to be captured
+	 * @returns {boolean} True if capture passes all constraints
+	 */
+	capturePassesConstraintChecks(capturingTile, fromPoint, targetPoint) {
+		const targetTile = targetPoint.tile;
+		if (!targetTile) {
+			return true; // No tile to capture
+		}
+
+		// Check if capturing tile has any prohibitions
+		const captureConstraints = this.abilityManager.getCaptureConstraintsForTile(capturingTile);
+		for (let i = 0; i < captureConstraints.length; i++) {
+			const constraint = captureConstraints[i];
+			const result = constraint.isCaptureAllowed(capturingTile, targetTile, fromPoint, targetPoint);
+			if (!result.allowed) {
+				return false;
+			}
+		}
+
+		// Check if target tile has any protection
+		const protectionConstraints = this.abilityManager.getCaptureProtectionForTile(targetTile);
+		for (let i = 0; i < protectionConstraints.length; i++) {
+			const constraint = protectionConstraints[i];
+			const result = constraint.isCaptureAllowed(capturingTile, targetTile, fromPoint, targetPoint);
+			if (!result.allowed) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	movementPassesLineOfSightTest(targetPoint, tileBeingMoved, originPoint) {
 		const pointsToMoveTowards = [];
 		let movementPassesLineOfSightTest = true;
