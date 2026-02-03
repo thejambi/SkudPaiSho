@@ -1,9 +1,9 @@
 /**
  * Skud Pai Sho Game Test
- * Tests game notation replay and board state validation
+ * Tests game notation replay, tile mechanics, harmonies, and board state validation
  */
 
-import { describe, it, expect, vi, beforeAll } from 'vitest';
+import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 
 // Mock PaiShoMain before any imports that depend on it
 vi.mock('../js/PaiShoMain', () => {
@@ -36,8 +36,14 @@ vi.mock('../js/PaiShoMain', () => {
 });
 
 // Import after mocking
+import { HOST, GUEST } from '../js/CommonNotationObjects';
 import { SkudPaiShoNotationMove } from '../js/skud-pai-sho/SkudPaiShoGameNotation';
 import { SkudPaiShoGameManager } from '../js/skud-pai-sho/SkudPaiShoGameManager';
+import { SkudPaiShoTile } from '../js/skud-pai-sho/SkudPaiShoTile';
+import { SkudPaiShoTileManager } from '../js/skud-pai-sho/SkudPaiShoTileManager';
+import { SkudPaiShoBoard } from '../js/skud-pai-sho/SkudPaiShoBoard';
+import { BASIC_FLOWER, SPECIAL_FLOWER, ACCENT_TILE, ROCK, WHEEL, KNOTWEED, BOAT, WHITE_LOTUS, ORCHID } from '../js/GameData';
+import { GATE, NEUTRAL } from '../js/skud-pai-sho/SkudPaiShoBoardPoint';
 
 describe('Skud Pai Sho Game - Notation Parsing', () => {
 	it('should parse move 0 (accent tile selection) correctly', () => {
@@ -209,5 +215,309 @@ describe('Skud Pai Sho Game - Game Logic', () => {
 		// We should have multiple tiles on the board after all those moves
 		expect(tilesOnBoard).toBeGreaterThan(0);
 		console.log(`\nTotal tiles on board: ${tilesOnBoard}`);
+	});
+});
+
+describe('SkudPaiShoTile', () => {
+	describe('Basic Flower Tiles', () => {
+		it('should create Red basic flower tiles correctly', () => {
+			const tile = new SkudPaiShoTile('R4', 'H');
+			expect(tile.type).toBe(BASIC_FLOWER);
+			expect(tile.basicColorCode).toBe('R');
+			expect(tile.basicColorName).toBe('Red');
+			expect(tile.basicValue).toBe('4');
+			expect(tile.ownerCode).toBe('H');
+			expect(tile.ownerName).toBe(HOST);
+		});
+
+		it('should create White basic flower tiles correctly', () => {
+			const tile = new SkudPaiShoTile('W5', 'G');
+			expect(tile.type).toBe(BASIC_FLOWER);
+			expect(tile.basicColorCode).toBe('W');
+			expect(tile.basicColorName).toBe('White');
+			expect(tile.basicValue).toBe('5');
+			expect(tile.ownerCode).toBe('G');
+			expect(tile.ownerName).toBe(GUEST);
+		});
+	});
+
+	describe('Special Flower Tiles', () => {
+		it('should create White Lotus tile correctly', () => {
+			const tile = new SkudPaiShoTile('L', 'H');
+			expect(tile.type).toBe(SPECIAL_FLOWER);
+			expect(tile.specialFlowerType).toBe(WHITE_LOTUS);
+		});
+
+		it('should create Orchid tile correctly', () => {
+			const tile = new SkudPaiShoTile('O', 'G');
+			expect(tile.type).toBe(SPECIAL_FLOWER);
+			expect(tile.specialFlowerType).toBe(ORCHID);
+		});
+	});
+
+	describe('Accent Tiles', () => {
+		it('should create Rock tile correctly', () => {
+			const tile = new SkudPaiShoTile('R', 'H');
+			expect(tile.type).toBe(ACCENT_TILE);
+			expect(tile.accentType).toBe(ROCK);
+		});
+
+		it('should create Wheel tile correctly', () => {
+			const tile = new SkudPaiShoTile('W', 'H');
+			expect(tile.type).toBe(ACCENT_TILE);
+			expect(tile.accentType).toBe(WHEEL);
+		});
+
+		it('should create Knotweed tile correctly', () => {
+			const tile = new SkudPaiShoTile('K', 'G');
+			expect(tile.type).toBe(ACCENT_TILE);
+			expect(tile.accentType).toBe(KNOTWEED);
+		});
+
+		it('should create Boat tile correctly', () => {
+			const tile = new SkudPaiShoTile('B', 'G');
+			expect(tile.type).toBe(ACCENT_TILE);
+			expect(tile.accentType).toBe(BOAT);
+		});
+	});
+
+	describe('Harmony Formation', () => {
+		it('should form harmony between same-color flowers with value difference of 1', () => {
+			const tile1 = new SkudPaiShoTile('R3', 'H');
+			const tile2 = new SkudPaiShoTile('R4', 'H');
+			expect(tile1.formsHarmonyWith(tile2)).toBe(true);
+		});
+
+		it('should form harmony between different-color flowers with value difference of 2', () => {
+			const tile1 = new SkudPaiShoTile('R3', 'H');
+			const tile2 = new SkudPaiShoTile('W5', 'H');
+			expect(tile1.formsHarmonyWith(tile2)).toBe(true);
+		});
+
+		it('should NOT form harmony between flowers with wrong value differences', () => {
+			const tile1 = new SkudPaiShoTile('R3', 'H');
+			const tile2 = new SkudPaiShoTile('R5', 'H'); // Same color, diff of 2
+			expect(tile1.formsHarmonyWith(tile2)).toBeFalsy();
+		});
+
+		it('should NOT form harmony between different owners (without Lion Turtle)', () => {
+			const tile1 = new SkudPaiShoTile('R3', 'H');
+			const tile2 = new SkudPaiShoTile('R4', 'G');
+			expect(tile1.formsHarmonyWith(tile2)).toBeFalsy();
+		});
+
+		it('should form harmony between White Lotus and any basic flower', () => {
+			const lotus = new SkudPaiShoTile('L', 'H');
+			const flower = new SkudPaiShoTile('R3', 'G'); // Different owner
+			expect(lotus.formsHarmonyWith(flower)).toBe(true);
+			expect(flower.formsHarmonyWith(lotus)).toBe(true);
+		});
+
+		it('should NOT form harmony between accent tiles', () => {
+			const rock = new SkudPaiShoTile('R', 'H');
+			const wheel = new SkudPaiShoTile('W', 'H');
+			expect(rock.formsHarmonyWith(wheel)).toBeFalsy();
+		});
+
+		it('should NOT form harmony with drained tiles', () => {
+			const tile1 = new SkudPaiShoTile('R3', 'H');
+			const tile2 = new SkudPaiShoTile('R4', 'H');
+			tile2.drained = true;
+			expect(tile1.formsHarmonyWith(tile2)).toBeFalsy();
+		});
+	});
+
+	describe('Tile Display', () => {
+		it('should return correct image name', () => {
+			const hostTile = new SkudPaiShoTile('R4', 'H');
+			const guestTile = new SkudPaiShoTile('W3', 'G');
+			expect(hostTile.getImageName()).toBe('HR4');
+			expect(guestTile.getImageName()).toBe('GW3');
+		});
+
+		it('should return correct console display', () => {
+			const tile = new SkudPaiShoTile('R4', 'H');
+			expect(tile.getConsoleDisplay()).toBe('HR4');
+
+			tile.drained = true;
+			expect(tile.getConsoleDisplay()).toBe('*R4');
+		});
+	});
+});
+
+describe('SkudPaiShoTileManager', () => {
+	let tileManager;
+
+	beforeEach(() => {
+		tileManager = new SkudPaiShoTileManager();
+	});
+
+	describe('Tile Set Loading', () => {
+		it('should load tiles for both players', () => {
+			expect(tileManager.hostTiles.length).toBeGreaterThan(0);
+			expect(tileManager.guestTiles.length).toBeGreaterThan(0);
+		});
+
+		it('should have basic flowers in tile set', () => {
+			const hostBasicFlowers = tileManager.hostTiles.filter(t => t.type === BASIC_FLOWER);
+			expect(hostBasicFlowers.length).toBeGreaterThan(0);
+		});
+
+		it('should have special flowers in tile set', () => {
+			const hostSpecialFlowers = tileManager.hostTiles.filter(t => t.type === SPECIAL_FLOWER);
+			expect(hostSpecialFlowers.length).toBe(2); // Lotus and Orchid
+		});
+
+		it('should have accent tiles in tile set', () => {
+			const hostAccentTiles = tileManager.hostTiles.filter(t => t.type === ACCENT_TILE);
+			expect(hostAccentTiles.length).toBeGreaterThan(0);
+		});
+	});
+
+	describe('Tile Retrieval', () => {
+		it('should have tiles accessible by player arrays', () => {
+			expect(tileManager.hostTiles).toBeDefined();
+			expect(tileManager.guestTiles).toBeDefined();
+			expect(tileManager.hostTiles.length).toBeGreaterThan(0);
+			expect(tileManager.guestTiles.length).toBeGreaterThan(0);
+		});
+
+		it('should get tile by code using grabTile', () => {
+			const tile = tileManager.grabTile(HOST, 'R4');
+			expect(tile).not.toBeNull();
+			expect(tile.code).toBe('R4');
+			expect(tile.ownerName).toBe(HOST);
+		});
+	});
+
+	describe('Accent Tile Management', () => {
+		it('should have accent tiles in host tiles', () => {
+			const accentTiles = tileManager.hostTiles.filter(t => t.type === ACCENT_TILE);
+			expect(accentTiles.length).toBeGreaterThan(0);
+			accentTiles.forEach(tile => {
+				expect(tile.type).toBe(ACCENT_TILE);
+			});
+		});
+
+		it('should have accent tiles marked as selected from pile initially', () => {
+			// In Skud set, accent tiles start with selectedFromPile = true
+			const selectedAccent = tileManager.hostTiles.filter(t => t.type === ACCENT_TILE && t.selectedFromPile);
+			expect(selectedAccent.length).toBeGreaterThan(0);
+		});
+	});
+});
+
+describe('SkudPaiShoBoard', () => {
+	let board;
+
+	beforeEach(() => {
+		board = new SkudPaiShoBoard();
+	});
+
+	describe('Board Setup', () => {
+		it('should create a 17x17 board', () => {
+			expect(board.cells.length).toBe(17);
+		});
+
+		it('should have gates on the board', () => {
+			let gateCount = 0;
+			for (let row = 0; row < board.cells.length; row++) {
+				if (board.cells[row]) {
+					for (let col = 0; col < board.cells[row].length; col++) {
+						const point = board.cells[row][col];
+						if (point && point.isType(GATE)) {
+							gateCount++;
+						}
+					}
+				}
+			}
+			expect(gateCount).toBe(4); // 4 gates
+		});
+
+		it('should have no winners initially', () => {
+			expect(board.winners.length).toBe(0);
+		});
+	});
+
+	describe('Point Types', () => {
+		it('should have different point types', () => {
+			let hasNeutral = false;
+			let hasGate = false;
+
+			for (let row = 0; row < board.cells.length; row++) {
+				if (board.cells[row]) {
+					for (let col = 0; col < board.cells[row].length; col++) {
+						const point = board.cells[row][col];
+						if (point) {
+							if (point.isType(NEUTRAL)) hasNeutral = true;
+							if (point.isType(GATE)) hasGate = true;
+						}
+					}
+				}
+			}
+
+			expect(hasNeutral).toBe(true);
+			expect(hasGate).toBe(true);
+		});
+	});
+
+	describe('Tile Placement', () => {
+		it('should place tile on board', () => {
+			const tile = new SkudPaiShoTile('R4', 'H');
+			const point = board.cells[8][8]; // Center point
+			if (point) {
+				point.putTile(tile);
+				expect(point.hasTile()).toBe(true);
+				expect(point.tile).toBe(tile);
+			}
+		});
+
+		it('should remove tile from board', () => {
+			const tile = new SkudPaiShoTile('R4', 'H');
+			const point = board.cells[8][8];
+			if (point) {
+				point.putTile(tile);
+				const removed = point.removeTile();
+				expect(removed).toBe(tile);
+				expect(point.hasTile()).toBe(false);
+			}
+		});
+	});
+});
+
+describe('Skud Pai Sho - Harmony Chains', () => {
+	let gameManager;
+	const mockActuator = { actuate: vi.fn() };
+
+	beforeEach(() => {
+		gameManager = new SkudPaiShoGameManager(mockActuator, true, true);
+	});
+
+	it('should track harmonies on the board', () => {
+		expect(gameManager.board.harmonyManager).toBeDefined();
+	});
+
+	it('should have empty harmonies initially', () => {
+		const harmonies = gameManager.board.harmonyManager.harmonies;
+		expect(harmonies.length).toBe(0);
+	});
+});
+
+describe('Skud Pai Sho - Win Conditions', () => {
+	let gameManager;
+	const mockActuator = { actuate: vi.fn() };
+
+	beforeEach(() => {
+		gameManager = new SkudPaiShoGameManager(mockActuator, true, true);
+	});
+
+	it('should have no winner initially', () => {
+		expect(gameManager.board.winners.length).toBe(0);
+	});
+
+	it('should track winners in board', () => {
+		// Manually add a winner to test tracking
+		gameManager.board.winners.push(HOST);
+		expect(gameManager.board.winners).toContain(HOST);
 	});
 });

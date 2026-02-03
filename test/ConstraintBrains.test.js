@@ -3797,4 +3797,337 @@ describe('Capture Constraint Brains', () => {
 			expect(canCapture).toBe(true);
 		});
 	});
+
+	// --------------------------------------------------------------------------
+	// Edelweiss Cancel Abilities Tests
+	// --------------------------------------------------------------------------
+	describe('Edelweiss Cancel Abilities', () => {
+		/**
+		 * Tests for Edelweiss's cancelAbilities ability
+		 * Edelweiss has a territorial zone of 2 and cancels abilities of tiles in its zone
+		 */
+
+		it('should cancel Lavender immobilization when Edelweiss is adjacent', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.SnowLeopard  // Use SnowLeopard - water animal with standard movement
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Lavender,
+				TrifleTileCodes.Edelweiss
+			]);
+
+			// Deploy banners first (required for tile deployment and movement)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-5,5')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('5,-5')
+			}, false);
+
+			// Deploy SnowLeopard (standard movement)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.SnowLeopard,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy Lavender adjacent to SnowLeopard - should immobilize
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Lavender,
+				endPoint: new NotationPoint('1,0')
+			}, false);
+
+			// Get tiles for checks
+			const leopardPoints = gameManager.board.getTilePoints(TrifleTileCodes.SnowLeopard, HOST);
+			const leopardTile = leopardPoints[0].tile;
+			const lavenderPoints = gameManager.board.getTilePoints(TrifleTileCodes.Lavender, GUEST);
+			const lavenderTile = lavenderPoints[0].tile;
+
+			// Verify SnowLeopard is immobilized
+			let possibleMoves = getPossibleMovePoints(gameManager, '0,0');
+			expect(possibleMoves.length).toBe(0);
+
+			// Verify Lavender's immobilize ability exists
+			expect(gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles, leopardTile
+			)).toBe(true);
+
+			// Deploy Edelweiss adjacent to Lavender - should cancel immobilization
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Edelweiss,
+				endPoint: new NotationPoint('2,0')  // Adjacent to Lavender (distance 1)
+			}, false);
+
+			// Check Edelweiss is on the board
+			const edelweissPoints = gameManager.board.getTilePoints(TrifleTileCodes.Edelweiss, GUEST);
+			expect(edelweissPoints.length).toBe(1);
+			const edelweissTile = edelweissPoints[0].tile;
+
+			// Check all abilities for debugging
+			const allAbilities = gameManager.board.abilityManager.abilities;
+			const abilityTypes = allAbilities.map(a => ({
+				type: a.abilityType,
+				source: a.sourceTile.code,
+				activated: a.activated
+			}));
+
+			// Check if cancelAbilities ability exists
+			const cancelAbilityInList = allAbilities.filter(a =>
+				a.abilityType === TrifleAbilityName.cancelAbilities &&
+				a.sourceTile === edelweissTile
+			);
+
+			// Debug output
+			if (cancelAbilityInList.length === 0) {
+				throw new Error(`Expected cancelAbilities ability from Edelweiss. All abilities: ${JSON.stringify(abilityTypes)}`);
+			}
+
+			// Check if the cancelAbilities ability is activated and targets Lavender
+			const cancelAbility = cancelAbilityInList[0];
+			expect(cancelAbility.activated).toBe(true);
+			expect(cancelAbility.abilityTargetTiles).toContain(lavenderTile);
+
+			// The key check: abilityTargetingTileExists should return false
+			// because the immobilize ability's source (Lavender) is targeted by cancelAbilities
+			const immobilizeStillActive = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles, leopardTile
+			);
+			if (immobilizeStillActive) {
+				throw new Error(`Expected immobilizeTiles to NOT be active after Edelweiss cancels Lavender. All abilities: ${JSON.stringify(abilityTypes)}`);
+			}
+			expect(immobilizeStillActive).toBe(false);
+
+			// Check if tileMovementIsImmobilized returns false
+			const leopardInfo = gameManager.board.tileMetadata[TrifleTileCodes.SnowLeopard];
+			const movementInfo = leopardInfo.movements[0];
+			const isImmobilized = gameManager.board.tileMovementIsImmobilized(
+				leopardTile, movementInfo, leopardPoints[0]
+			);
+			if (isImmobilized) {
+				throw new Error(`tileMovementIsImmobilized returned true even though abilityTargetingTileExists returned false`);
+			}
+			expect(isImmobilized).toBe(false);
+
+			// Test movement via constraint checks directly (avoids turn-order dependency)
+			// SnowLeopard at (0,0) should be able to move since it's no longer immobilized
+			const startPoint = new NotationPoint('0,0');
+			const startRowCol = startPoint.rowAndColumn;
+			const originPoint = gameManager.board.cells[startRowCol.row][startRowCol.col];
+			const targetPoint = new NotationPoint('-1,0');
+			const targetRowCol = targetPoint.rowAndColumn;
+			const boardTargetPoint = gameManager.board.cells[targetRowCol.row][targetRowCol.col];
+
+			// movementPassesConstraintChecks should return true since Edelweiss canceled the immobilization
+			const result = gameManager.board.movementPassesConstraintChecks(boardTargetPoint, leopardTile, originPoint);
+			expect(result).toBe(true);
+		});
+
+		it('should cancel Lavender immobilization when Edelweiss is at distance 2 (zone edge)', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.SnowLeopard
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Lavender,
+				TrifleTileCodes.Edelweiss
+			]);
+
+			// Deploy banners first
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-5,5')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('5,-5')
+			}, false);
+
+			// Deploy SnowLeopard
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.SnowLeopard,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy Lavender adjacent to SnowLeopard - should immobilize
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Lavender,
+				endPoint: new NotationPoint('1,0')
+			}, false);
+
+			// Get tiles for checks
+			const leopardPoints = gameManager.board.getTilePoints(TrifleTileCodes.SnowLeopard, HOST);
+			const leopardTile = leopardPoints[0].tile;
+			const lavenderPoints = gameManager.board.getTilePoints(TrifleTileCodes.Lavender, GUEST);
+			const lavenderTile = lavenderPoints[0].tile;
+
+			// Verify SnowLeopard is immobilized
+			expect(gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles, leopardTile
+			)).toBe(true);
+
+			// Deploy Edelweiss at distance 2 from Lavender (still in zone)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Edelweiss,
+				endPoint: new NotationPoint('3,0')  // Distance 2 from Lavender at 1,0
+			}, false);
+
+			// Check Edelweiss is on the board
+			const edelweissPoints = gameManager.board.getTilePoints(TrifleTileCodes.Edelweiss, GUEST);
+			expect(edelweissPoints.length).toBe(1);
+			const edelweissTile = edelweissPoints[0].tile;
+
+			// Check if cancelAbilities ability targets Lavender
+			const allAbilities = gameManager.board.abilityManager.abilities;
+			const cancelAbilityInList = allAbilities.filter(a =>
+				a.abilityType === TrifleAbilityName.cancelAbilities &&
+				a.sourceTile === edelweissTile
+			);
+			expect(cancelAbilityInList.length).toBe(1);
+			const cancelAbility = cancelAbilityInList[0];
+			expect(cancelAbility.activated).toBe(true);
+			expect(cancelAbility.abilityTargetTiles).toContain(lavenderTile);
+
+			// The key check: abilityTargetingTileExists should return false
+			const immobilizeStillActive = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles, leopardTile
+			);
+			expect(immobilizeStillActive).toBe(false);
+
+			// Test movement via constraint checks directly
+			const startPoint = new NotationPoint('0,0');
+			const startRowCol = startPoint.rowAndColumn;
+			const originPoint = gameManager.board.cells[startRowCol.row][startRowCol.col];
+			const targetPoint = new NotationPoint('-1,0');
+			const targetRowCol = targetPoint.rowAndColumn;
+			const boardTargetPoint = gameManager.board.cells[targetRowCol.row][targetRowCol.col];
+
+			// movementPassesConstraintChecks should return true since Edelweiss canceled the immobilization
+			const result = gameManager.board.movementPassesConstraintChecks(boardTargetPoint, leopardTile, originPoint);
+			expect(result).toBe(true);
+		});
+
+		it('should NOT cancel Lavender immobilization when Edelweiss is at distance 3 (outside zone)', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.SnowLeopard
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Lavender,
+				TrifleTileCodes.Edelweiss
+			]);
+
+			// Deploy banners first
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-5,5')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('5,-5')
+			}, false);
+
+			// Deploy SnowLeopard
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.SnowLeopard,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy Lavender adjacent to SnowLeopard - should immobilize
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Lavender,
+				endPoint: new NotationPoint('1,0')
+			}, false);
+
+			// Get tiles for checks
+			const leopardPoints = gameManager.board.getTilePoints(TrifleTileCodes.SnowLeopard, HOST);
+			const leopardTile = leopardPoints[0].tile;
+			const lavenderPoints = gameManager.board.getTilePoints(TrifleTileCodes.Lavender, GUEST);
+			const lavenderTile = lavenderPoints[0].tile;
+
+			// Verify SnowLeopard is immobilized
+			expect(gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles, leopardTile
+			)).toBe(true);
+
+			// Deploy Edelweiss at distance 3 from Lavender (outside zone)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Edelweiss,
+				endPoint: new NotationPoint('4,0')  // Distance 3 from Lavender at 1,0
+			}, false);
+
+			// Check Edelweiss is on the board
+			const edelweissPoints = gameManager.board.getTilePoints(TrifleTileCodes.Edelweiss, GUEST);
+			expect(edelweissPoints.length).toBe(1);
+			const edelweissTile = edelweissPoints[0].tile;
+
+			// Check if cancelAbilities ability either doesn't exist or doesn't target Lavender
+			// (the ability might not be created at all if there are no targets in range)
+			const allAbilities = gameManager.board.abilityManager.abilities;
+			const cancelAbilityInList = allAbilities.filter(a =>
+				a.abilityType === TrifleAbilityName.cancelAbilities &&
+				a.sourceTile === edelweissTile
+			);
+			// If the ability exists, it should NOT target Lavender since it's outside the zone
+			if (cancelAbilityInList.length > 0) {
+				const cancelAbility = cancelAbilityInList[0];
+				expect(cancelAbility.abilityTargetTiles).not.toContain(lavenderTile);
+			}
+
+			// The key check: abilityTargetingTileExists should STILL return true (immobilize NOT canceled)
+			const immobilizeStillActive = gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles, leopardTile
+			);
+			expect(immobilizeStillActive).toBe(true);
+
+			// Test movement via constraint checks - should be blocked
+			const startPoint = new NotationPoint('0,0');
+			const startRowCol = startPoint.rowAndColumn;
+			const originPoint = gameManager.board.cells[startRowCol.row][startRowCol.col];
+			const targetPoint = new NotationPoint('-1,0');
+			const targetRowCol = targetPoint.rowAndColumn;
+			const boardTargetPoint = gameManager.board.cells[targetRowCol.row][targetRowCol.col];
+
+			// movementPassesConstraintChecks should return false since SnowLeopard is still immobilized
+			const result = gameManager.board.movementPassesConstraintChecks(boardTargetPoint, leopardTile, originPoint);
+			expect(result).toBe(false);
+		});
+	});
 });
