@@ -417,7 +417,38 @@ export class GodaiController {
      * @returns {string}
      */
     getDefaultHelpMessageText() {
-        return "<h4>Godai Pai Sho</h4><p></p><p>The objective of Godai Pai Sho is to capture one of each of your opponent's tiles using your own tiles.</p>"
+        return "<h4>Godai Pai Sho</h4>" +
+            "<p></p>" +
+            "<p>The objective of Godai Pai Sho; also known as <b>Wuxing Pai Sho</b>; is to capture one of each of your opponent's tiles using your own tiles.</p>" +
+            "<p>Alternatively, a player may win if their opponent is unable to win under normal conditions.</p>" +
+            '<p>For additional information, check out the <a href="https://tinyurl.com/65frxu6h" target="_blank">official ruleset.</a></p>' +
+            "<p><strong><center>Capture Cycle</center></strong></p>" +
+            "<p>The tiles mentioned capture the one mentioned after it:</p>" +
+            "<p>Wood &gt; Earth &gt; Water &gt; Fire &gt; Metal &gt; Wood</p>" +
+            "<p><strong><center>Cycles</center></strong></p>" +
+            "<p>A tile that sorrounds another tile, regardless of ownership, may affect the movement of said tile. This interaction is called a <b>Cycle</b>, and the four types of cycles are described below.</p>"+
+            "<ul>" +
+            "<li>" +
+                "<p><b>Sheng:</b> When a tile is being helped, it is in Sheng and can move up to <b>5 spaces.</b></p>" +
+                "<p>Wood &gt; Fire &gt; Earth &gt; Metal &gt; Water &gt; Wood</p>" +
+            "</li>" +
+            "<li>" +
+                "<p><b>Xie:</b> When a tile helps another tile in Sheng, it is in Xie and can move up to <b>2 spaces.</b></p>" +
+                "<p>It is the inverse of the Sheng Cycle.</p>" +
+                "<p>Wood &gt; Water &gt; Metal &gt; Earth &gt; Fire &gt; Wood</p>" +
+            "</li>" +
+            "<li><b>Ke:</b> When a tile is helped by another tile without being depleted, that tile can move up to <b>4 spaces.</b> This cycle is the same as the Capture Cycle.</li>" +
+            "<li><b>Wu:</b> When a tile is sorrounded by a tile of its own type, it can move up to <b>4 spaces.</b></li>" +
+            "</ul>" +
+            "<p><strong><center>Cycle Contridictment</center></strong></p>" +
+            "<ul>" +
+            "<li>Sheng and Xie Cycles are considered <b>Extreme Cycles</b></li>" +
+            "<li>Ke and Wu Cycles are considered <b>Normal Cycles</b></li>" +
+            "<li>A tile cannot be affected by multiple Cycles of the same type. (i. e. No tile can be affected by two Ke Cycles, only one is considered)</li>" +
+            "<li>The effects of an Extreme Cycle override that of the Normal Cycles.</li>" +
+            "<li>If a tile is affected by both Extreme Cycles, it can move up to its normal movement count.</li>" +
+            "<li>If a tile is affected by both Extreme Cycles, but is affected by a Normal Cycle, then it moves according to the effect of the Normal Cycle.</li>" +
+            "</ul>"
     }
 
     /** @param {GodaiBoardPoint} point */
