@@ -366,11 +366,6 @@ export class TrifleAbilityManager {
 	abilityIsCanceled(abilityObject) {
 		let isCanceled = false;
 
-		// Check if source tile is in a zone that removes its abilities (e.g., Buffalo Yak)
-		if (this.board.tileAbilitiesRemovedByZone(abilityObject.sourceTile, abilityObject.sourceTilePoint)) {
-			return true;
-		}
-
 		const affectingCancelAbilities = this.getAbilitiesTargetingTile(TrifleAbilityName.cancelAbilities, abilityObject.sourceTile);
 
 		affectingCancelAbilities.forEach((cancelingAbility) => {
@@ -448,6 +443,35 @@ export class TrifleAbilityManager {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get movement constraints for a tile based on active abilities affecting it.
+	 * Returns an array of constraint brain objects that can validate movement.
+	 * @param {Object} tile - The tile to get constraints for
+	 * @returns {Array} Array of constraint brain objects
+	 */
+	getMovementConstraintsForTile(tile) {
+		const constraints = [];
+
+		// Get all drawTilesAlongLineOfSight abilities targeting this tile
+		const drawAbilities = this.getAbilitiesTargetingTile(
+			TrifleAbilityName.drawTilesAlongLineOfSight,
+			tile
+		);
+
+		drawAbilities.forEach((ability) => {
+			const constraintBrain = TrifleBrainFactory.createConstraintBrain(
+				ability.abilityType,
+				this.board,
+				ability
+			);
+			if (constraintBrain) {
+				constraints.push(constraintBrain);
+			}
+		});
+
+		return constraints;
 	}
 
 	promptForNextNeededTargets() {
