@@ -2827,7 +2827,7 @@ export class PaiShoGameBoard {
 	 * Uses the Brain-based constraint system via the ability manager.
 	 */
 	deployPassesConstraintChecks(tile, tileInfo, deployPoint) {
-		const deployConstraints = this.abilityManager.getDeployConstraintsForPlayer(tile.ownerName);
+		const deployConstraints = this.abilityManager.getDeployConstraints();
 
 		for (let i = 0; i < deployConstraints.length; i++) {
 			const result = deployConstraints[i].isDeployAllowed(tile, tileInfo, deployPoint);

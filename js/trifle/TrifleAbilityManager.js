@@ -508,13 +508,12 @@ export class TrifleAbilityManager {
 	}
 
 	/**
-	 * Get deploy restriction constraints for a player.
-	 * Unlike movement/capture constraints which target specific tiles,
-	 * deploy restrictions are looked up by the deploying player's abilities.
-	 * @param {string} playerName - The player deploying a tile
+	 * Get all active deploy constraints on the board.
+	 * Deploy constraints apply globally - e.g., if any Water Hyacinth is on the board,
+	 * all banners (friendly and enemy) must deploy within its zone.
 	 * @returns {Array} Array of deploy constraint brain objects
 	 */
-	getDeployConstraintsForPlayer(playerName) {
+	getDeployConstraints() {
 		const constraints = [];
 		const abilityNames = getAbilityNamesForConstraintCategory(ConstraintCategory.DEPLOY_RESTRICTION);
 
@@ -522,7 +521,6 @@ export class TrifleAbilityManager {
 			this.abilities.forEach((ability) => {
 				if (ability.abilityType === abilityName
 						&& ability.activated
-						&& ability.sourceTile.ownerName === playerName
 						&& !this.abilityIsCanceled(ability)) {
 					const constraintBrain = TrifleBrainFactory.createConstraintBrain(
 						ability.abilityType,
