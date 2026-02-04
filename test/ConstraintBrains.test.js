@@ -53,6 +53,7 @@ import { POSSIBLE_MOVE } from '../js/trifle/TrifleBoardPoint';
 import { PaiShoGameBoard } from '../js/trifle/PaiShoGameBoard';
 import { TrifleBrainFactory, ConstraintCategory, getAbilityNamesForConstraintCategory } from '../js/trifle/brains/BrainFactory';
 import { TrifleDrawTilesAlongLineOfSightConstraintBrain } from '../js/trifle/brains/constraintBrains/DrawTilesAlongLineOfSightConstraintBrain';
+import { TrifleRequireDeployInZoneConstraintBrain } from '../js/trifle/brains/constraintBrains/RequireDeployInZoneConstraintBrain';
 
 // Initialize tile metadata
 defineTrifleTiles();
@@ -3530,6 +3531,7 @@ describe('Capture Constraint Brains', () => {
 			expect(ConstraintCategory.MOVEMENT).toBe('movement');
 			expect(ConstraintCategory.CAPTURE_PROHIBITION).toBe('captureProhibition');
 			expect(ConstraintCategory.CAPTURE_PROTECTION).toBe('captureProtection');
+			expect(ConstraintCategory.DEPLOY_RESTRICTION).toBe('deployRestriction');
 		});
 
 		it('should return movement constraint ability names', () => {
@@ -4128,6 +4130,271 @@ describe('Capture Constraint Brains', () => {
 			// movementPassesConstraintChecks should return false since SnowLeopard is still immobilized
 			const result = gameManager.board.movementPassesConstraintChecks(boardTargetPoint, leopardTile, originPoint);
 			expect(result).toBe(false);
+		});
+	});
+});
+
+describe('RequireDeployInZone Constraint Brain', () => {
+	let gameManager;
+
+	beforeEach(() => {
+		const mockActuator = { actuate: vi.fn() };
+		gameManager = new TrifleGameManager(mockActuator, true, true);
+	});
+
+	describe('Constraint Registry and BrainFactory', () => {
+		it('should return deploy restriction ability names from registry', () => {
+			const deployAbilities = getAbilityNamesForConstraintCategory(ConstraintCategory.DEPLOY_RESTRICTION);
+			expect(deployAbilities).toContain(TrifleAbilityName.requireDeployInZone);
+		});
+
+		it('should create RequireDeployInZoneConstraintBrain via createConstraintBrain', () => {
+			const mockAbility = {
+				abilityType: TrifleAbilityName.requireDeployInZone,
+				sourceTile: { code: 'TEST' },
+				abilityInfo: { deployTargetTileTypes: [TrifleTileType.banner] }
+			};
+
+			const brain = TrifleBrainFactory.createConstraintBrain(
+				TrifleAbilityName.requireDeployInZone,
+				gameManager.board,
+				mockAbility
+			);
+
+			expect(brain).not.toBeNull();
+			expect(brain instanceof TrifleRequireDeployInZoneConstraintBrain).toBe(true);
+			expect(typeof brain.isDeployAllowed).toBe('function');
+		});
+	});
+
+	describe('Brain Interface - isDeployAllowed', () => {
+		it('should allow deploy for non-targeted tile types', () => {
+			// Deploy WaterHyacinth to set up the zone source
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.WaterHyacinth,
+				TrifleTileCodes.Chrysanthemum
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.WaterHyacinth,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Chrysanthemum,
+				endPoint: new NotationPoint('7,7')
+			}, false);
+
+			// Chrysanthemum is a flower, not a banner - should be allowed anywhere
+			const flowerTile = new TrifleTile(TrifleTileCodes.Chrysanthemum, 'H');
+			const flowerTileInfo = TrifleTiles[TrifleTileCodes.Chrysanthemum];
+			const farPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('8,0'));
+
+			expect(gameManager.board.deployPassesConstraintChecks(flowerTile, flowerTileInfo, farPoint)).toBe(true);
+		});
+
+		it('should block banner deploy outside zone', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.WaterHyacinth
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.WaterHyacinth,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Chrysanthemum,
+				endPoint: new NotationPoint('7,7')
+			}, false);
+
+			// Banner at distance 8 from (0,0) should be blocked (zone is 6)
+			const bannerTile = new TrifleTile(TrifleTileCodes.AirBanner, 'H');
+			const bannerTileInfo = TrifleTiles[TrifleTileCodes.AirBanner];
+			const farPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('8,0'));
+
+			expect(gameManager.board.deployPassesConstraintChecks(bannerTile, bannerTileInfo, farPoint)).toBe(false);
+		});
+
+		it('should allow banner deploy inside zone', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.WaterHyacinth
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.WaterHyacinth,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Chrysanthemum,
+				endPoint: new NotationPoint('7,7')
+			}, false);
+
+			// Banner at distance 3 from (0,0) should be allowed (zone is 6)
+			const bannerTile = new TrifleTile(TrifleTileCodes.AirBanner, 'H');
+			const bannerTileInfo = TrifleTiles[TrifleTileCodes.AirBanner];
+			const nearPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('3,0'));
+
+			expect(gameManager.board.deployPassesConstraintChecks(bannerTile, bannerTileInfo, nearPoint)).toBe(true);
+		});
+
+		it('should not affect the other player\'s banner deployment', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.WaterHyacinth
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.WaterHyacinth,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// GUEST banner should not be restricted by HOST's WaterHyacinth
+			const guestBanner = new TrifleTile(TrifleTileCodes.WaterBanner, 'G');
+			const bannerTileInfo = TrifleTiles[TrifleTileCodes.WaterBanner];
+			const farPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('8,0'));
+
+			expect(gameManager.board.deployPassesConstraintChecks(guestBanner, bannerTileInfo, farPoint)).toBe(true);
+		});
+	});
+
+	describe('AbilityManager - getDeployConstraintsForPlayer', () => {
+		it('should have getDeployConstraintsForPlayer method', () => {
+			expect(typeof gameManager.board.abilityManager.getDeployConstraintsForPlayer).toBe('function');
+		});
+
+		it('should return deploy constraints for player with WaterHyacinth', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.WaterHyacinth
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.WaterHyacinth,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Chrysanthemum,
+				endPoint: new NotationPoint('7,7')
+			}, false);
+
+			const hostConstraints = gameManager.board.abilityManager.getDeployConstraintsForPlayer(HOST);
+			expect(hostConstraints.length).toBeGreaterThan(0);
+			expect(typeof hostConstraints[0].isDeployAllowed).toBe('function');
+
+			// GUEST should have no deploy constraints
+			const guestConstraints = gameManager.board.abilityManager.getDeployConstraintsForPlayer(GUEST);
+			expect(guestConstraints.length).toBe(0);
+		});
+
+		it('should return empty constraints when no deploy restriction abilities exist', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Chrysanthemum,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			const hostConstraints = gameManager.board.abilityManager.getDeployConstraintsForPlayer(HOST);
+			expect(hostConstraints.length).toBe(0);
+		});
+	});
+
+	describe('Edelweiss Cancel Abilities - Deploy Restriction', () => {
+		it('should allow banner deploy anywhere when requireDeployInZone is canceled by Edelweiss', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.WaterHyacinth
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Edelweiss
+			]);
+
+			// Deploy WaterHyacinth at (0,0) - has zone 6 requireDeployInZone
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.WaterHyacinth,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy Edelweiss adjacent to WaterHyacinth - should cancel its abilities
+			// Edelweiss has cancelAbilities with zone 2
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Edelweiss,
+				endPoint: new NotationPoint('1,0')
+			}, false);
+
+			// Verify Edelweiss cancelAbilities is targeting WaterHyacinth
+			const waterHyacinthPoints = gameManager.board.getTilePoints(TrifleTileCodes.WaterHyacinth, HOST);
+			expect(waterHyacinthPoints.length).toBe(1);
+
+			// The requireDeployInZone ability should be canceled
+			// So HOST's deploy constraints should be empty (ability canceled)
+			const hostConstraints = gameManager.board.abilityManager.getDeployConstraintsForPlayer(HOST);
+			expect(hostConstraints.length).toBe(0);
+
+			// Banner should be deployable outside the zone since the restriction is canceled
+			const bannerTile = new TrifleTile(TrifleTileCodes.AirBanner, 'H');
+			const bannerTileInfo = TrifleTiles[TrifleTileCodes.AirBanner];
+			const farPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('8,0'));
+
+			expect(gameManager.board.deployPassesConstraintChecks(bannerTile, bannerTileInfo, farPoint)).toBe(true);
 		});
 	});
 });

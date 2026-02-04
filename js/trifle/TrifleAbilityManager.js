@@ -507,6 +507,38 @@ export class TrifleAbilityManager {
 		return this.getConstraintsForTile(tile, ConstraintCategory.CAPTURE_PROTECTION);
 	}
 
+	/**
+	 * Get deploy restriction constraints for a player.
+	 * Unlike movement/capture constraints which target specific tiles,
+	 * deploy restrictions are looked up by the deploying player's abilities.
+	 * @param {string} playerName - The player deploying a tile
+	 * @returns {Array} Array of deploy constraint brain objects
+	 */
+	getDeployConstraintsForPlayer(playerName) {
+		const constraints = [];
+		const abilityNames = getAbilityNamesForConstraintCategory(ConstraintCategory.DEPLOY_RESTRICTION);
+
+		abilityNames.forEach((abilityName) => {
+			this.abilities.forEach((ability) => {
+				if (ability.abilityType === abilityName
+						&& ability.activated
+						&& ability.sourceTile.ownerName === playerName
+						&& !this.abilityIsCanceled(ability)) {
+					const constraintBrain = TrifleBrainFactory.createConstraintBrain(
+						ability.abilityType,
+						this.board,
+						ability
+					);
+					if (constraintBrain) {
+						constraints.push(constraintBrain);
+					}
+				}
+			});
+		});
+
+		return constraints;
+	}
+
 	promptForNextNeededTargets() {
 		if (!(this.abilitiesWithPromptTargetsNeeded && this.abilitiesWithPromptTargetsNeeded.length > 0)) {
 			debug("Error: No abilities that need prompt targets found");

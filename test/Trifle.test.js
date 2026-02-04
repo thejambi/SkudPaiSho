@@ -2156,13 +2156,15 @@ describe('Fixed TODO Tiles - Definition and Abilities', () => {
 			expect(tileInfo.cannotDeployAfterTileTypes).toContain(TrifleTileType.banner);
 		});
 
-		it('should have requireBannerDeployInZone ability', () => {
+		it('should have requireDeployInZone ability with deployTargetTileTypes', () => {
 			const tileInfo = TrifleTiles[TrifleTileCodes.WaterHyacinth];
 			expect(tileInfo.abilities).toBeDefined();
-			const requireBannerAbility = tileInfo.abilities.find(
-				a => a.type === TrifleAbilityName.requireBannerDeployInZone
+			const requireDeployAbility = tileInfo.abilities.find(
+				a => a.type === TrifleAbilityName.requireDeployInZone
 			);
-			expect(requireBannerAbility).toBeDefined();
+			expect(requireDeployAbility).toBeDefined();
+			expect(requireDeployAbility.deployTargetTileTypes).toBeDefined();
+			expect(requireDeployAbility.deployTargetTileTypes).toContain(TrifleTileType.banner);
 		});
 
 		it('should restrict banner deployment to within WaterHyacinth zone', () => {
@@ -2187,17 +2189,18 @@ describe('Fixed TODO Tiles - Definition and Abilities', () => {
 			const waterHyacinthPoints = gameManager.board.getTilePoints(TrifleTileCodes.WaterHyacinth, HOST);
 			expect(waterHyacinthPoints.length).toBe(1);
 
-			// Verify the board has getBannerDeployZoneRestriction method for checking banner zones
-			expect(typeof gameManager.board.getBannerDeployZoneRestriction).toBe('function');
+			// Verify the board has deployPassesConstraintChecks method
+			expect(typeof gameManager.board.deployPassesConstraintChecks).toBe('function');
 
 			// Verify WaterHyacinth tile info has the correct ability configuration
 			const waterHyacinthTileInfo = TrifleTiles[TrifleTileCodes.WaterHyacinth];
-			const requireBannerAbility = waterHyacinthTileInfo.abilities.find(
-				a => a.type === TrifleAbilityName.requireBannerDeployInZone
+			const requireDeployAbility = waterHyacinthTileInfo.abilities.find(
+				a => a.type === TrifleAbilityName.requireDeployInZone
 			);
-			expect(requireBannerAbility).toBeDefined();
-			expect(requireBannerAbility.triggers).toBeDefined();
-			expect(requireBannerAbility.triggers[0].triggerType).toBe(TrifleAbilityTriggerType.whileOnBoard);
+			expect(requireDeployAbility).toBeDefined();
+			expect(requireDeployAbility.triggers).toBeDefined();
+			expect(requireDeployAbility.triggers[0].triggerType).toBe(TrifleAbilityTriggerType.whileOnBoard);
+			expect(requireDeployAbility.deployTargetTileTypes).toContain(TrifleTileType.banner);
 
 			// Verify the zone size is correctly configured
 			expect(waterHyacinthTileInfo.territorialZone.size).toBe(6);
@@ -2237,7 +2240,7 @@ describe('Fixed TODO Tiles - Definition and Abilities', () => {
 			});
 		});
 
-		it('should activate requireBannerDeployInZone ability and restrict banner deploy points', () => {
+		it('should activate requireDeployInZone ability and restrict banner deploy points', () => {
 			const mockActuator = { actuate: vi.fn() };
 			const gameManager = new TrifleGameManager(mockActuator, true, true);
 
@@ -2271,20 +2274,30 @@ describe('Fixed TODO Tiles - Definition and Abilities', () => {
 				endPoint: new NotationPoint('7,7')
 			}, false);
 
-			// Verify the requireBannerDeployInZone ability is active
-			const requireBannerAbilities = gameManager.board.abilityManager.getActiveAbilitiesFromTile(
-				TrifleAbilityName.requireBannerDeployInZone,
+			// Verify the requireDeployInZone ability is active
+			const requireDeployAbilities = gameManager.board.abilityManager.getActiveAbilitiesFromTile(
+				TrifleAbilityName.requireDeployInZone,
 				waterHyacinthPoints[0].tile
 			);
-			expect(requireBannerAbilities.length).toBeGreaterThan(0);
+			expect(requireDeployAbilities.length).toBeGreaterThan(0);
 
-			// Create a banner tile and check the zone restriction
+			// Create a banner tile and verify deploy constraint checks work
 			const bannerTile = new TrifleTile(TrifleTileCodes.WaterBanner, 'H');
-			const zoneRestriction = gameManager.board.getBannerDeployZoneRestriction(bannerTile);
+			const bannerTileInfo = TrifleTiles[TrifleTileCodes.WaterBanner];
 
-			// Should return the WaterHyacinth point as the zone restriction
-			expect(zoneRestriction).not.toBeNull();
-			expect(zoneRestriction.tile.code).toBe(TrifleTileCodes.WaterHyacinth);
+			// Point within zone (distance 3 from (0,0)) should be allowed
+			const pointInZone = gameManager.board.getPointFromNotationPoint(new NotationPoint('3,0'));
+			expect(gameManager.board.deployPassesConstraintChecks(bannerTile, bannerTileInfo, pointInZone)).toBe(true);
+
+			// Point outside zone (distance 8 from (0,0)) should not be allowed
+			const pointOutsideZone = gameManager.board.getPointFromNotationPoint(new NotationPoint('8,0'));
+			expect(gameManager.board.deployPassesConstraintChecks(bannerTile, bannerTileInfo, pointOutsideZone)).toBe(false);
+
+			// Non-banner tile should be unaffected
+			const nonBannerTile = new TrifleTile(TrifleTileCodes.Chrysanthemum, 'H');
+			const nonBannerTileInfo = TrifleTiles[TrifleTileCodes.Chrysanthemum];
+			const farPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('8,0'));
+			expect(gameManager.board.deployPassesConstraintChecks(nonBannerTile, nonBannerTileInfo, farPoint)).toBe(true);
 		});
 	});
 

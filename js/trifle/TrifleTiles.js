@@ -718,7 +718,8 @@ export function defineTrifleTiles() {
 		cannotDeployAfterTileTypes: [TrifleTileType.banner],
 		abilities: [
 			{
-				type: TrifleAbilityName.requireBannerDeployInZone,
+				type: TrifleAbilityName.requireDeployInZone,
+				deployTargetTileTypes: [TrifleTileType.banner],
 				targetTypes: [TrifleTargetType.thisTile],
 				triggers: [
 					{

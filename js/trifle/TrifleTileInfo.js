@@ -140,7 +140,7 @@ export const TrifleAbilityName = {
 	exchangeWithCapturedTile: "exchangeWithCapturedTile",
 	enlargeZone: "enlargeZone",
 	setMovementDistance: "setMovementDistance",
-	requireBannerDeployInZone: "requireBannerDeployInZone",
+	requireDeployInZone: "requireDeployInZone",
 	resurrectAtDeployPosition: "resurrectAtDeployPosition",
 	substituteForCapture: "substituteForCapture"
 };

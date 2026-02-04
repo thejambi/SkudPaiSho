@@ -44,6 +44,7 @@ import { TrifleRestrictMovementWithinZoneConstraintBrain } from './constraintBra
 import { TrifleRestrictMovementWithinZoneUnlessCapturingConstraintBrain } from './constraintBrains/RestrictMovementWithinZoneUnlessCapturingConstraintBrain';
 import { TrifleProtectFromCaptureCaptureConstraintBrain } from './captureConstraintBrains/ProtectFromCaptureCaptureConstraintBrain';
 import { TrifleProhibitTileFromCapturingCaptureConstraintBrain } from './captureConstraintBrains/ProhibitTileFromCapturingCaptureConstraintBrain';
+import { TrifleRequireDeployInZoneConstraintBrain } from './constraintBrains/RequireDeployInZoneConstraintBrain';
 
 /**
  * Constraint categories for organizing different types of constraint brains
@@ -51,7 +52,8 @@ import { TrifleProhibitTileFromCapturingCaptureConstraintBrain } from './capture
 export const ConstraintCategory = {
 	MOVEMENT: 'movement',
 	CAPTURE_PROHIBITION: 'captureProhibition',
-	CAPTURE_PROTECTION: 'captureProtection'
+	CAPTURE_PROTECTION: 'captureProtection',
+	DEPLOY_RESTRICTION: 'deployRestriction'
 };
 
 /**
@@ -82,6 +84,10 @@ const CONSTRAINT_REGISTRY = {
 	[TrifleAbilityName.protectFromCapture]: {
 		category: ConstraintCategory.CAPTURE_PROTECTION,
 		brain: TrifleProtectFromCaptureCaptureConstraintBrain
+	},
+	[TrifleAbilityName.requireDeployInZone]: {
+		category: ConstraintCategory.DEPLOY_RESTRICTION,
+		brain: TrifleRequireDeployInZoneConstraintBrain
 	}
 };
 

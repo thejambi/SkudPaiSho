@@ -2723,9 +2723,6 @@ export class PaiShoGameBoard {
 			return; // No possible deploy points
 		}
 
-		// Check if banner must be deployed within a specific zone -- TODO: Should this be more flexible and not just banner but dynamically work for other types as well?
-		const bannerZoneRestriction = this.getBannerDeployZoneRestriction(tile);
-
 		if (tileInfo && tileInfo.specialDeployTypes) {
 			tileInfo.specialDeployTypes.forEach((specialDeployInfo) => {
 				this.setDeployPointsPossibleForSpecialDeploy(tile, tileInfo, specialDeployInfo);
@@ -2739,7 +2736,7 @@ export class PaiShoGameBoard {
 						&& !boardPoint.isType(GATE)
 						&& !this.tileZonedOutOfSpaceByAbility(tile, boardPoint)
 						&& this.tileCanOccupyPoint(tile, boardPoint)
-						&& (!bannerZoneRestriction || this.pointTileZoneContainsPoint(bannerZoneRestriction, boardPoint))) {
+						&& this.deployPassesConstraintChecks(tile, tileInfo, boardPoint)) {
 						boardPoint.addType(POSSIBLE_MOVE);
 					}
 				});
@@ -2751,7 +2748,7 @@ export class PaiShoGameBoard {
 						&& boardPoint.isType(GATE)
 						&& !this.tileZonedOutOfSpaceByAbility(tile, boardPoint)
 						&& this.tileCanOccupyPoint(tile, boardPoint)
-						&& (!bannerZoneRestriction || this.pointTileZoneContainsPoint(bannerZoneRestriction, boardPoint))) {
+						&& this.deployPassesConstraintChecks(tile, tileInfo, boardPoint)) {
 						boardPoint.addType(POSSIBLE_MOVE);
 					}
 				});
@@ -2765,7 +2762,7 @@ export class PaiShoGameBoard {
 							if (!pointAdjacentToTemple.hasTile()
 								&& !this.tileZonedOutOfSpaceByAbility(tile, pointAdjacentToTemple)
 								&& this.tileCanOccupyPoint(tile, pointAdjacentToTemple)
-								&& (!bannerZoneRestriction || this.pointTileZoneContainsPoint(bannerZoneRestriction, pointAdjacentToTemple))) {
+								&& this.deployPassesConstraintChecks(tile, tileInfo, pointAdjacentToTemple)) {
 								pointAdjacentToTemple.addType(POSSIBLE_MOVE);
 							}
 						});
@@ -2826,32 +2823,20 @@ export class PaiShoGameBoard {
 	}
 
 	/**
-	 * Check if a banner must be deployed within a specific zone
-	 * Returns the zone points if restricted, null otherwise
+	 * Check if deploying a tile at a given point passes all deploy constraint checks.
+	 * Uses the Brain-based constraint system via the ability manager.
 	 */
-	getBannerDeployZoneRestriction(tile) {
-		var tileInfo = this.tileMetadata[tile.code];
+	deployPassesConstraintChecks(tile, tileInfo, deployPoint) {
+		const deployConstraints = this.abilityManager.getDeployConstraintsForPlayer(tile.ownerName);
 
-		// Only applies to banners
-		if (!tileInfo || !tileInfo.types || !tileInfo.types.includes(TrifleTileType.banner)) {
-			return null;
+		for (let i = 0; i < deployConstraints.length; i++) {
+			const result = deployConstraints[i].isDeployAllowed(tile, tileInfo, deployPoint);
+			if (!result.allowed) {
+				return false;
+			}
 		}
 
-		// Check if there's a tile with requireBannerDeployInZone ability on the board for this player
-		let zoneSourcePoint = null;
-		this.forEachBoardPointWithTile((boardPoint) => {
-			if (boardPoint.tile.ownerName === tile.ownerName) {
-				const requireBannerAbilities = this.abilityManager.getActiveAbilitiesFromTile(
-					TrifleAbilityName.requireBannerDeployInZone,
-					boardPoint.tile
-				);
-				if (requireBannerAbilities.length > 0) {
-					zoneSourcePoint = boardPoint;
-				}
-			}
-		});
-
-		return zoneSourcePoint;
+		return true;
 	}
 
 	setDeployPointsPossibleForSpecialDeploy(tile, tileInfo, specialDeployInfo) {
