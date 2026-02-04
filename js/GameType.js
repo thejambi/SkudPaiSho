@@ -249,27 +249,27 @@ export const GameType = {
 	Trifle: {
 		id: 10,
 		name: "Pai and Sho's Trifle",
-		desc: "Pai and Sho's Trifle",
+		desc: "Pai and Sho's Trifle (Beta)",
 		color: "var(--triflecolor)",
 		description: "Like Vagabond Pai Sho, but with new collectable tiles.",
 		coverImg: "lotus.png",
 		rulesUrl: "https://skudpaisho.com/site/games/pai-shos-trifle/",
 		gameOptions: [],
-		usersWithAccess: [
-			'SkudPaiSho',
-			'abacadaren',
-			'Korron',
-			'vescucci',
-			'geebung02',
-			'sirstotes',
-			'Cannoli',
-			'SpinxKreuz',
-			'TheRealMomo',
-			'MrsSkud',
-			'markdwagner',
-			'The_IceL0rd',
-			'GreenCompass'
-		],
+		// usersWithAccess: [
+		// 	'SkudPaiSho',
+		// 	'abacadaren',
+		// 	'Korron',
+		// 	'vescucci',
+		// 	'geebung02',
+		// 	'sirstotes',
+		// 	'Cannoli',
+		// 	'SpinxKreuz',
+		// 	'TheRealMomo',
+		// 	'MrsSkud',
+		// 	'markdwagner',
+		// 	'The_IceL0rd',
+		// 	'GreenCompass'
+		// ],
 		noRankedGames: true
 	},
 	CapturePaiSho: {
