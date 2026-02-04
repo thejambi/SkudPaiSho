@@ -2879,6 +2879,33 @@ export class PaiShoGameBoard {
 	 * @param {Object} targetPoint - The point with the tile to be captured
 	 * @returns {boolean} True if capture passes all constraints
 	 */
+	/**
+	 * Check if capture passes prohibition/restriction constraints on the capturing tile.
+	 * Only checks CAPTURE_PROHIBITION category (e.g., restrictTileFromCapturing, prohibitTileFromCapturing).
+	 * Does NOT check CAPTURE_PROTECTION on the target tile.
+	 * @param {Object} capturingTile - The tile attempting to capture
+	 * @param {Object} fromPoint - The point the capturing tile is moving from (can be null for ability captures)
+	 * @param {Object} targetPoint - The point with the tile to be captured
+	 * @returns {boolean} True if capture passes all prohibition constraints
+	 */
+	capturePassesCaptureProhibitionChecks(capturingTile, fromPoint, targetPoint) {
+		const targetTile = targetPoint.tile;
+		if (!targetTile) {
+			return true;
+		}
+
+		const captureConstraints = this.abilityManager.getCaptureConstraintsForTile(capturingTile);
+		for (let i = 0; i < captureConstraints.length; i++) {
+			const constraint = captureConstraints[i];
+			const result = constraint.isCaptureAllowed(capturingTile, targetTile, fromPoint, targetPoint);
+			if (!result.allowed) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	capturePassesConstraintChecks(capturingTile, fromPoint, targetPoint) {
 		const targetTile = targetPoint.tile;
 		if (!targetTile) {
