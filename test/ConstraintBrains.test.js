@@ -3769,7 +3769,22 @@ describe('Capture Constraint Brains', () => {
 				TrifleTileCodes.Shirshu
 			]);
 
-			// Deploy tiles without any capture constraints
+			// Deploy banners so banner-based capture restrictions are lifted
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-4,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('4,0')
+			}, false);
+
+			// Deploy tiles without any capture constraints (not near Cattail, etc.)
 			gameManager.runNotationMove({
 				moveType: DEPLOY,
 				player: HOST,
@@ -4653,6 +4668,206 @@ describe('RequireDeployInZone Constraint Brain', () => {
 			const adjacentPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('1,0'));
 
 			expect(gameManager.board.deployPassesConstraintChecks(animalTile, animalTileInfo, adjacentPoint)).toBe(true);
+		});
+	});
+
+	// --------------------------------------------------------------------------
+	// restrictTileFromCapturing + whileTargetTileIsNotOnBoard Tests
+	// --------------------------------------------------------------------------
+	describe('restrictTileFromCapturing - Banner Capture Restrictions', () => {
+		it('should block flower capture when no banners deployed', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Shirshu
+			]);
+
+			// Deploy flower target and capturing tile - no banners
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Chrysanthemum,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Shirshu,
+				endPoint: new NotationPoint('3,0')
+			}, false);
+
+			const shirshuPoints = gameManager.board.getTilePoints(TrifleTileCodes.Shirshu, GUEST);
+			const shirshuTile = shirshuPoints[0].tile;
+			const shirshuPoint = shirshuPoints[0];
+
+			const chrysPoints = gameManager.board.getTilePoints(TrifleTileCodes.Chrysanthemum, HOST);
+			const chrysPoint = chrysPoints[0];
+
+			// No banners on board - flower capture should be blocked
+			const canCapture = gameManager.board.capturePassesConstraintChecks(
+				shirshuTile,
+				shirshuPoint,
+				chrysPoint
+			);
+			expect(canCapture).toBe(false);
+		});
+
+		it('should allow flower capture when friendly banner is deployed', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Shirshu
+			]);
+
+			// Deploy GUEST banner (friendly to Shirshu)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('4,0')
+			}, false);
+
+			// Deploy flower target and capturing tile
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Chrysanthemum,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Shirshu,
+				endPoint: new NotationPoint('3,0')
+			}, false);
+
+			const shirshuPoints = gameManager.board.getTilePoints(TrifleTileCodes.Shirshu, GUEST);
+			const shirshuTile = shirshuPoints[0].tile;
+			const shirshuPoint = shirshuPoints[0];
+
+			const chrysPoints = gameManager.board.getTilePoints(TrifleTileCodes.Chrysanthemum, HOST);
+			const chrysPoint = chrysPoints[0];
+
+			// Friendly banner on board - flower capture should be allowed
+			const canCapture = gameManager.board.capturePassesConstraintChecks(
+				shirshuTile,
+				shirshuPoint,
+				chrysPoint
+			);
+			expect(canCapture).toBe(true);
+		});
+
+		it('should block animal capture when only friendly banner is deployed (no enemy banner)', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.SnowLeopard
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Shirshu
+			]);
+
+			// Deploy only GUEST banner (friendly to Shirshu)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('4,0')
+			}, false);
+
+			// Deploy animal target and capturing tile
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.SnowLeopard,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Shirshu,
+				endPoint: new NotationPoint('3,0')
+			}, false);
+
+			const shirshuPoints = gameManager.board.getTilePoints(TrifleTileCodes.Shirshu, GUEST);
+			const shirshuTile = shirshuPoints[0].tile;
+			const shirshuPoint = shirshuPoints[0];
+
+			const leopardPoints = gameManager.board.getTilePoints(TrifleTileCodes.SnowLeopard, HOST);
+			const leopardPoint = leopardPoints[0];
+
+			// Only friendly banner on board, no enemy banner - animal capture should be blocked
+			const canCapture = gameManager.board.capturePassesConstraintChecks(
+				shirshuTile,
+				shirshuPoint,
+				leopardPoint
+			);
+			expect(canCapture).toBe(false);
+		});
+
+		it('should allow animal capture when both banners are deployed', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.SnowLeopard
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Shirshu
+			]);
+
+			// Deploy both banners
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-4,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('4,0')
+			}, false);
+
+			// Deploy animal target and capturing tile
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.SnowLeopard,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Shirshu,
+				endPoint: new NotationPoint('3,0')
+			}, false);
+
+			const shirshuPoints = gameManager.board.getTilePoints(TrifleTileCodes.Shirshu, GUEST);
+			const shirshuTile = shirshuPoints[0].tile;
+			const shirshuPoint = shirshuPoints[0];
+
+			const leopardPoints = gameManager.board.getTilePoints(TrifleTileCodes.SnowLeopard, HOST);
+			const leopardPoint = leopardPoints[0];
+
+			// Both banners on board - animal capture should be allowed
+			const canCapture = gameManager.board.capturePassesConstraintChecks(
+				shirshuTile,
+				shirshuPoint,
+				leopardPoint
+			);
+			expect(canCapture).toBe(true);
 		});
 	});
 });

@@ -6,7 +6,6 @@ import {
 	POSSIBLE_MOVE,
 } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import {
-	GUEST,
 	HOST,
 	NotationPoint,
 	RowAndColumn,
@@ -33,7 +32,6 @@ import {
 } from './TrifleTileInfo';
 import { TrifleAbilityManager } from './TrifleAbilityManager';
 import { TrifleBrainFactory } from './brains/BrainFactory';
-import { TrifleTileType } from './TrifleTiles';
 import { TrifleTriggerHelper } from './brains/TriggerHelper';
 import { arrayIncludesOneOf, debug } from '../GameData';
 import { currentTileMetadata } from './PaiShoGamesTileMetadata';
@@ -48,7 +46,6 @@ export class PaiShoGameBoard {
 		// TODO Eventually remove Trifle-specific?:
 		this.hostBannerPlayed = false;
 		this.guestBannerPlayed = false;
-		this.useBannerCaptureSystem = false;
 
 		this.tileMetadata = currentTileMetadata;
 
@@ -2258,7 +2255,8 @@ export class PaiShoGameBoard {
 	targetPointHasTileTileThatCanBeCaptured(tile, movementInfo, fromPoint, targetPoint) {
 		return targetPoint.hasTile()
 			&& this.tileCanCapture(tile, movementInfo, fromPoint, targetPoint)
-			&& !this.tileHasActiveCaptureProtectionFromCapturingTile(targetPoint.tile, tile);
+			&& !this.tileHasActiveCaptureProtectionFromCapturingTile(targetPoint.tile, tile)
+			&& this.capturePassesConstraintChecks(tile, fromPoint, targetPoint);
 	}
 
 	tileHasActiveCaptureProtectionFromCapturingTile(tile, capturingTile) {
@@ -2290,33 +2288,7 @@ export class PaiShoGameBoard {
 		return tileHasActiveCaptureProtection; */
 	}
 
-	capturePossibleBasedOnBannersPlayed(capturingPlayer, targetPoint) {
-		if (!this.useBannerCaptureSystem) {
-			return true;
-		}
-
-		var targetTile = targetPoint.tile;
-		var targetTileInfo = this.tileMetadata[targetTile.code];
-
-		var playerBannerPlayed = this.hostBannerPlayed;
-		var otherBannerPlayed = this.guestBannerPlayed;
-		if (capturingPlayer === GUEST) {
-			playerBannerPlayed = this.guestBannerPlayed;
-			otherBannerPlayed = this.hostBannerPlayed;
-		}
-
-		return (playerBannerPlayed && TrifleTileInfo.tileIsOneOfTheseTypes(targetTileInfo, [TrifleTileType.flower, TrifleTileType.banner]))
-			|| (playerBannerPlayed && otherBannerPlayed);
-	}
-
 	tileCanCapture(tile, movementInfo, fromPoint, targetPoint) {
-		var playerBannerPlayed = this.hostBannerPlayed;
-		var otherBannerPlayed = this.guestBannerPlayed;
-		if (tile.ownerName === GUEST) {
-			playerBannerPlayed = this.guestBannerPlayed;
-			otherBannerPlayed = this.hostBannerPlayed;
-		}
-
 		var captureProhibited = this.abilityManager.abilityTargetingTileExists(TrifleAbilityName.prohibitTileFromCapturing, tile);
 
 		var targetTile = targetPoint.tile;
@@ -2349,13 +2321,6 @@ export class PaiShoGameBoard {
 		return !captureProhibited
 			&& targetTileInfo
 			&& capturePossibleWithMovement
-			&& (
-				!this.useBannerCaptureSystem
-				|| (playerBannerPlayed
-					&& TrifleTileInfo.tileIsOneOfTheseTypes(targetTileInfo, [TrifleTileType.flower, TrifleTileType.banner])
-				)
-				|| (playerBannerPlayed && otherBannerPlayed)
-			)
 			&& this.tilesBelongToDifferentOwnersOrTargetTileHasFriendlyCapture(tile, targetTile, targetTileInfo) // TODO
 			&& !targetPoint.tile.protected;
 	}
@@ -2403,29 +2368,6 @@ export class PaiShoGameBoard {
 			activationRequirementsAreMet = true;
 		}
 		return activationRequirementsAreMet;
-	}
-
-	/** Can a tile be captured by a Capture ability? */
-	tileCanBeCaptured(capturingPlayer, targetPoint) {
-		var playerBannerPlayed = this.hostBannerPlayed;
-		var otherBannerPlayed = this.guestBannerPlayed;
-		if (capturingPlayer === GUEST) {
-			playerBannerPlayed = this.guestBannerPlayed;
-			otherBannerPlayed = this.hostBannerPlayed;
-		}
-
-		var targetTile = targetPoint.tile;
-		var targetTileInfo = this.tileMetadata[targetTile.code];
-
-		return targetTileInfo
-			&& (
-				!this.useBannerCaptureSystem
-				|| (playerBannerPlayed
-					&& TrifleTileInfo.tileIsOneOfTheseTypes(targetTileInfo, [TrifleTileType.flower, TrifleTileType.banner])
-				)
-				|| (playerBannerPlayed && otherBannerPlayed)
-			)
-			&& !targetPoint.tile.protected;
 	}
 
 	tilesBelongToDifferentOwnersOrTargetTileHasFriendlyCapture(tile, targetTile, targetTileInfo) {
@@ -3195,7 +3137,6 @@ export class PaiShoGameBoard {
 		// Copy state flags
 		copy.hostBannerPlayed = this.hostBannerPlayed;
 		copy.guestBannerPlayed = this.guestBannerPlayed;
-		copy.useBannerCaptureSystem = this.useBannerCaptureSystem;
 		copy.winners = this.winners ? [...this.winners] : [];
 
 		// Copy recordedTilePoints (deep copy needed for nested structure)

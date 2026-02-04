@@ -144,7 +144,8 @@ export const TrifleAbilityName = {
 	requireDeployInZone: "requireDeployInZone",
 	restrictDeploymentInZone: "restrictDeploymentInZone",
 	resurrectAtDeployPosition: "resurrectAtDeployPosition",
-	substituteForCapture: "substituteForCapture"
+	substituteForCapture: "substituteForCapture",
+	restrictTileFromCapturing: "restrictTileFromCapturing"
 };
 
 export const TrifleAbilityType = {
@@ -192,7 +193,8 @@ export const TrifleAbilityTriggerType = {
 	whenDeployed: "whenDeployed",
 	whenActiveMovement: "whenActiveMovement",
 	whenTargetTileLandsInTemple: "whenTargetTileLandsInTemple",
-	whenAdjacentFriendlyTileIsCaptured: "whenAdjacentFriendlyTileIsCaptured"
+	whenAdjacentFriendlyTileIsCaptured: "whenAdjacentFriendlyTileIsCaptured",
+	whileTargetTileIsNotOnBoard: "whileTargetTileIsNotOnBoard"
 };
 
 export const TriflePromptTargetType = {

@@ -1369,9 +1369,13 @@ describe('Water Tiles - Definition and Abilities', () => {
 			expect(tileInfo.movements[0].distance).toBe(2);
 		});
 
-		it('should have no abilities (simple banner)', () => {
+		it('should only have game-rule capture restriction abilities (simple banner)', () => {
 			const tileInfo = TrifleTiles[TrifleTileCodes.WaterBanner];
-			expect(tileInfo.abilities).toBeUndefined();
+			// All tiles get restrictTileFromCapturing abilities from applyCaptureRestrictionsGameRuleAbilities
+			expect(tileInfo.abilities).toBeDefined();
+			tileInfo.abilities.forEach(ability => {
+				expect(ability.type).toBe(TrifleAbilityName.restrictTileFromCapturing);
+			});
 		});
 	});
 

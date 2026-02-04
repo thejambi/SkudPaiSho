@@ -25,6 +25,7 @@ import { TrifleWhenActiveMovementTriggerBrain } from './triggerBrains/WhenActive
 import { TrifleWhenTargetTileLandsInTempleTriggerBrain } from './triggerBrains/WhenTargetTileLandsInTempleTriggerBrain';
 import { TrifleWhenAdjacentFriendlyTileIsCapturedTriggerBrain } from './triggerBrains/WhenAdjacentFriendlyTileIsCapturedTriggerBrain';
 import { TrifleWhileOnBoardTriggerBrain } from './triggerBrains/WhileOnBoardTriggerBrain';
+import { TrifleWhileTargetTileIsNotOnBoardTriggerBrain } from './triggerBrains/WhileTargetTileIsNotOnBoardTriggerBrain';
 import { TrifleTriggerTargetTilesTargetBrain } from './targetBrains/TriggerTargetTilesTargetBrain';
 import { TrifleAllTilesTargetBrain } from './targetBrains/AllTilesTargetBrain';
 import { TrifleSurroundingTilesTargetBrain } from './targetBrains/SurroundingTilesTargetBrain';
@@ -45,6 +46,7 @@ import { TrifleRestrictMovementWithinZoneConstraintBrain } from './constraintBra
 import { TrifleRestrictMovementWithinZoneUnlessCapturingConstraintBrain } from './constraintBrains/RestrictMovementWithinZoneUnlessCapturingConstraintBrain';
 import { TrifleProtectFromCaptureCaptureConstraintBrain } from './captureConstraintBrains/ProtectFromCaptureCaptureConstraintBrain';
 import { TrifleProhibitTileFromCapturingCaptureConstraintBrain } from './captureConstraintBrains/ProhibitTileFromCapturingCaptureConstraintBrain';
+import { TrifleRestrictTileFromCapturingCaptureConstraintBrain } from './captureConstraintBrains/RestrictTileFromCapturingCaptureConstraintBrain';
 import { TrifleRequireDeployInZoneConstraintBrain } from './constraintBrains/RequireDeployInZoneConstraintBrain';
 import { TrifleRestrictDeploymentInZoneConstraintBrain } from './constraintBrains/RestrictDeploymentInZoneConstraintBrain';
 
@@ -83,6 +85,10 @@ const CONSTRAINT_REGISTRY = {
 		category: ConstraintCategory.CAPTURE_PROHIBITION,
 		brain: TrifleProhibitTileFromCapturingCaptureConstraintBrain
 	},
+	[TrifleAbilityName.restrictTileFromCapturing]: {
+		category: ConstraintCategory.CAPTURE_PROHIBITION,
+		brain: TrifleRestrictTileFromCapturingCaptureConstraintBrain
+	},
 	[TrifleAbilityName.protectFromCapture]: {
 		category: ConstraintCategory.CAPTURE_PROTECTION,
 		brain: TrifleProtectFromCaptureCaptureConstraintBrain
@@ -120,6 +126,8 @@ TrifleBrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, t
 			return new TrifleWhileOutsideTempleTriggerBrain(triggerContext);
 		case TrifleAbilityTriggerType.whileTargetTileIsOnBoard:
 			return new TrifleWhileTargetTileIsOnBoardTriggerBrain(triggerContext);
+		case TrifleAbilityTriggerType.whileTargetTileIsNotOnBoard:
+			return new TrifleWhileTargetTileIsNotOnBoardTriggerBrain(triggerContext);
 		case TrifleAbilityTriggerType.whileTargetTileIsAdjacent:
 			return new TrifleWhileTargetTileIsAdjacentTriggerBrain(triggerContext);
 		case TrifleAbilityTriggerType.whileTargetTileIsSurrounding:

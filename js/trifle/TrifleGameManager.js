@@ -28,7 +28,6 @@ export class TrifleGameManager {
 	setup(ignoreActuate) {
 		this.board = new PaiShoGameBoard(this.tileManager);
 		this.board.useTrifleTempleRules = true;
-		this.board.useBannerCaptureSystem = true;
 		this.winners = [];
 		this.hostBannerPlayed = false;
 		this.guestBannerPlayed = false;

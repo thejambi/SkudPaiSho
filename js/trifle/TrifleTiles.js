@@ -1058,7 +1058,7 @@ export function defineTrifleTiles() {
 			"Deploys anywhere",
 			"Territorial Zone: 7",
 			"Chamomile cannot move",
-			"All tiles in zone have movement of 2 (ignores other effects)"
+			"All tiles in zone that can move have movement distance of 2"
 		]
 	};
 
@@ -1616,5 +1616,50 @@ export function defineTrifleTiles() {
 			}
 		]
 	}; */
+
+	/* Apply capture restriction game rules */
+	applyCaptureRestrictionsGameRuleAbilities(TrifleTiles);
+}
+
+function applyCaptureRestrictionsGameRuleAbilities(TrifleTiles) {
+	Object.keys(TrifleTiles).forEach(tileCode => {
+		const tileInfo = TrifleTiles[tileCode];
+
+		/* Make sure abilities is set up */
+		if (!tileInfo.abilities) {
+			tileInfo.abilities = [];
+		}
+
+		/* Add Ability: Restrict from capturing Flower Tiles unless friendly Banner is deployed */
+		const restrictFromCapturingFlowersAbility = {
+			type: TrifleAbilityName.restrictTileFromCapturing,
+			triggers: [
+				{
+					triggerType: TrifleAbilityTriggerType.whileTargetTileIsNotOnBoard,
+					targetTileTypes: [TrifleTileType.banner],
+					targetTeams: [TrifleTileTeam.friendly]
+				}
+			],
+			targetTypes: [TrifleTargetType.thisTile],
+			restrictedFromCapturingTileTypes: [TrifleTileType.flower],
+			inevitable: true
+		};
+		tileInfo.abilities.push(restrictFromCapturingFlowersAbility);
+
+		const restrictFromCapturingOtherTilesAbility = {
+			type: TrifleAbilityName.restrictTileFromCapturing,
+			triggers: [
+				{
+					triggerType: TrifleAbilityTriggerType.whileTargetTileIsNotOnBoard,
+					targetTileTypes: [TrifleTileType.banner],
+					targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy]
+				}
+			],
+			targetTypes: [TrifleTargetType.thisTile],
+			restrictedFromCapturingTileTypes: [TrifleTileType.animal, TrifleTileType.traveler, TrifleTileType.banner],
+			inevitable: true
+		};
+		tileInfo.abilities.push(restrictFromCapturingOtherTilesAbility);
+	});
 }
 
