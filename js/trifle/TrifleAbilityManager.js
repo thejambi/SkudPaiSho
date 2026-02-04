@@ -124,9 +124,14 @@ export class TrifleAbilityManager {
 
 		if (!boardHasChanged) {
 			// Default ability activation order
+			// Cancel abilities first, then capture constraints (so they're registered
+			// before any action abilities like captureTargetTiles in the catch-all phase)
 			let abilityActivationOrder = [
 				TrifleAbilityName.cancelAbilities,
-				TrifleAbilityName.cancelAbilitiesTargetingTiles
+				TrifleAbilityName.cancelAbilitiesTargetingTiles,
+				TrifleAbilityName.protectFromCapture,
+				TrifleAbilityName.prohibitTileFromCapturing,
+				TrifleAbilityName.restrictTileFromCapturing
 			];
 
 			if (this.abilityActivationOrder) {

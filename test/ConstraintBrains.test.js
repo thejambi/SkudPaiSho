@@ -4871,8 +4871,151 @@ describe('RequireDeployInZone Constraint Brain', () => {
 		});
 	});
 
+	describe('CaptureTargetTiles ability vs restrictTileFromCapturing (banner rules)', () => {
+		it('should NOT capture a flower when no banners are deployed (GrassWeed deploy)', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.GrassWeed
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			// Deploy Chrysanthemum (GUEST) at (0,0) - no banners on board
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Chrysanthemum,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy GrassWeed (HOST) at (1,0) - adjacent to Chrysanthemum
+			// GrassWeed's whenDeployed + captureTargetTiles should fire targeting adjacent flowers
+			// But no friendly banner is deployed, so capture should be restricted
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.GrassWeed,
+				endPoint: new NotationPoint('1,0')
+			}, false);
+
+			// Chrysanthemum should still be on the board (restricted from capture - no banner)
+			const chrysPointsAfter = gameManager.board.getTilePoints(TrifleTileCodes.Chrysanthemum, GUEST);
+			expect(chrysPointsAfter.length).toBe(1);
+
+			// GrassWeed should also still be on the board
+			const grassWeedPoints = gameManager.board.getTilePoints(TrifleTileCodes.GrassWeed, HOST);
+			expect(grassWeedPoints.length).toBe(1);
+		});
+
+		it('should capture a flower when friendly banner IS deployed (GrassWeed deploy)', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.GrassWeed
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			// Deploy HOST banner first
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-6,0')
+			}, false);
+
+			// Deploy Chrysanthemum (GUEST) at (0,0)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Chrysanthemum,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Deploy GrassWeed (HOST) at (1,0) - adjacent to Chrysanthemum
+			// Friendly banner is deployed, so flower capture should be allowed
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.GrassWeed,
+				endPoint: new NotationPoint('1,0')
+			}, false);
+
+			// Chrysanthemum should be captured (removed from board)
+			const chrysPointsAfter = gameManager.board.getTilePoints(TrifleTileCodes.Chrysanthemum, GUEST);
+			expect(chrysPointsAfter.length).toBe(0);
+		});
+	});
+
 	describe('CaptureTargetTiles ability vs CherryBlossom protectFromCapture', () => {
-		it('should NOT capture a flower protected by CherryBlossom zone when GrassWeed deploys adjacent', () => {
+		it('should NOT capture a flower protected by CherryBlossom when GrassWeed deploys inside the zone (trigger targets change)', () => {
+			// This test exercises the activation order: GrassWeed enters CherryBlossom's zone,
+			// changing trigger targets, causing the old protection to deactivate and new one to
+			// re-activate. protectFromCapture must activate BEFORE captureTargetTiles.
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.CherryBlossom,
+				TrifleTileCodes.GrassWeed
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			// Deploy banners
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-6,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('0,-6')
+			}, false);
+
+			// Deploy Chrysanthemum (GUEST) at (1,0) first
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Chrysanthemum,
+				endPoint: new NotationPoint('1,0')
+			}, false);
+
+			// Deploy CherryBlossom (HOST) at (0,0) - zone size 2, protects Chrysanthemum
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.CherryBlossom,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Verify protection is active
+			const chrysTile = gameManager.board.getTilePoints(TrifleTileCodes.Chrysanthemum, GUEST)[0].tile;
+			expect(gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.protectFromCapture, chrysTile
+			)).toBe(true);
+
+			// Deploy GrassWeed (HOST) at (2,0) - adjacent to Chrysanthemum AND inside CherryBlossom's zone
+			// This changes CherryBlossom's trigger targets (GrassWeed enters zone),
+			// causing old protection to deactivate and new one to be created.
+			// protectFromCapture must activate BEFORE captureTargetTiles fires.
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.GrassWeed,
+				endPoint: new NotationPoint('2,0')
+			}, false);
+
+			// Chrysanthemum should still be on the board (protected)
+			const chrysPointsAfter = gameManager.board.getTilePoints(TrifleTileCodes.Chrysanthemum, GUEST);
+			expect(chrysPointsAfter.length).toBe(1);
+		});
+
+		it('should NOT capture a flower protected by CherryBlossom zone when GrassWeed deploys adjacent (original order)', () => {
 			addTilesToTeam(gameManager, HOST, [
 				TrifleTileCodes.AirBanner,
 				TrifleTileCodes.CherryBlossom,

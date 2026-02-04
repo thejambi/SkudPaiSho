@@ -1642,7 +1642,8 @@ function applyCaptureRestrictionsGameRuleAbilities(TrifleTiles) {
 			],
 			targetTypes: [TrifleTargetType.thisTile],
 			restrictedFromCapturingTileTypes: [TrifleTileType.flower],
-			inevitable: true
+			inevitable: true,
+			priority: 1
 		};
 		tileInfo.abilities.push(restrictFromCapturingFlowersAbility);
 
@@ -1657,7 +1658,8 @@ function applyCaptureRestrictionsGameRuleAbilities(TrifleTiles) {
 			],
 			targetTypes: [TrifleTargetType.thisTile],
 			restrictedFromCapturingTileTypes: [TrifleTileType.animal, TrifleTileType.traveler, TrifleTileType.banner],
-			inevitable: true
+			inevitable: true,
+			priority: 1
 		};
 		tileInfo.abilities.push(restrictFromCapturingOtherTilesAbility);
 	});
