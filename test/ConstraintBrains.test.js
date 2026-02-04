@@ -2482,6 +2482,8 @@ describe('RestrictMovementWithinZone Constraint Brain', () => {
 			}, false);
 
 			// Deploy GUEST Chrysanthemum inside GrassWeed's zone (adjacent)
+			// whenDeployed only fires for source tile's own deployment,
+			// so Chrysanthemum deploying here won't trigger GrassWeed's capture
 			gameManager.runNotationMove({
 				moveType: DEPLOY,
 				player: GUEST,
@@ -4434,6 +4436,223 @@ describe('RequireDeployInZone Constraint Brain', () => {
 			const farPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('8,0'));
 
 			expect(gameManager.board.deployPassesConstraintChecks(bannerTile, bannerTileInfo, farPoint)).toBe(true);
+		});
+	});
+
+	describe('AdjacentTiles Target Brain', () => {
+		it('should have adjacentTiles in TrifleTargetType', () => {
+			expect(TrifleTargetType.adjacentTiles).toBe('adjacentTiles');
+		});
+
+		it('should capture adjacent flower when GrassWeed deploys', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.GrassWeed
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			// Deploy HOST banner first
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('0,8')
+			}, false);
+
+			// Deploy GUEST Chrysanthemum at (4,8) - a flower
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Chrysanthemum,
+				endPoint: new NotationPoint('4,8')
+			}, false);
+
+			// Verify Chrysanthemum is on the board
+			const chrysPoints = gameManager.board.getTilePoints(TrifleTileCodes.Chrysanthemum, GUEST);
+			expect(chrysPoints.length).toBe(1);
+
+			// Deploy GrassWeed adjacent to Chrysanthemum (orthogonally)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.GrassWeed,
+				endPoint: new NotationPoint('3,8')
+			}, false);
+
+			// Chrysanthemum should be captured (removed from board)
+			const chrysPointsAfter = gameManager.board.getTilePoints(TrifleTileCodes.Chrysanthemum, GUEST);
+			expect(chrysPointsAfter.length).toBe(0);
+		});
+
+		it('should NOT capture flower at diagonal when GrassWeed deploys', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.GrassWeed
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			// Deploy HOST banner
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('0,8')
+			}, false);
+
+			// Deploy GUEST Chrysanthemum at (4,9) - diagonally from where GrassWeed will go
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Chrysanthemum,
+				endPoint: new NotationPoint('4,9')
+			}, false);
+
+			// Deploy GrassWeed at (3,8) - diagonal to Chrysanthemum at (4,9)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.GrassWeed,
+				endPoint: new NotationPoint('3,8')
+			}, false);
+
+			// Chrysanthemum should NOT be captured (diagonal, not adjacent)
+			const chrysPointsAfter = gameManager.board.getTilePoints(TrifleTileCodes.Chrysanthemum, GUEST);
+			expect(chrysPointsAfter.length).toBe(1);
+		});
+
+	});
+
+	describe('RestrictDeploymentInZone Constraint Brain', () => {
+		it('should block flower deployment within GrassWeed zone', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.GrassWeed
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			// Deploy HOST banner
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-4,0')
+			}, false);
+
+			// Deploy GUEST banner
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('4,0')
+			}, false);
+
+			// Deploy GrassWeed at center (0,0)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.GrassWeed,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Flower deployment within GrassWeed's zone (distance 1) should be blocked
+			const chrysTile = new TrifleTile(TrifleTileCodes.Chrysanthemum, 'G');
+			const chrysTileInfo = TrifleTiles[TrifleTileCodes.Chrysanthemum];
+			const adjacentPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('1,0'));
+
+			expect(gameManager.board.deployPassesConstraintChecks(chrysTile, chrysTileInfo, adjacentPoint)).toBe(false);
+		});
+
+		it('should allow flower deployment outside GrassWeed zone', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.GrassWeed
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Chrysanthemum
+			]);
+
+			// Deploy HOST banner
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-4,0')
+			}, false);
+
+			// Deploy GUEST banner
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('4,0')
+			}, false);
+
+			// Deploy GrassWeed at center (0,0)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.GrassWeed,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Flower deployment outside GrassWeed's zone (distance 3) should be allowed
+			const chrysTile = new TrifleTile(TrifleTileCodes.Chrysanthemum, 'G');
+			const chrysTileInfo = TrifleTiles[TrifleTileCodes.Chrysanthemum];
+			const farPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('3,0'));
+
+			expect(gameManager.board.deployPassesConstraintChecks(chrysTile, chrysTileInfo, farPoint)).toBe(true);
+		});
+
+		it('should allow non-flower deployment within GrassWeed zone', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.GrassWeed
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.SnowLeopard
+			]);
+
+			// Deploy HOST banner
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-4,0')
+			}, false);
+
+			// Deploy GUEST banner
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('4,0')
+			}, false);
+
+			// Deploy GrassWeed at center (0,0)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.GrassWeed,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Non-flower (animal) deployment within zone should be allowed
+			const animalTile = new TrifleTile(TrifleTileCodes.SnowLeopard, 'G');
+			const animalTileInfo = TrifleTiles[TrifleTileCodes.SnowLeopard];
+			const adjacentPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('1,0'));
+
+			expect(gameManager.board.deployPassesConstraintChecks(animalTile, animalTileInfo, adjacentPoint)).toBe(true);
 		});
 	});
 });

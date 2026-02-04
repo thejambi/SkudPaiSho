@@ -42,7 +42,7 @@ import { TrifleGameManager } from '../js/trifle/TrifleGameManager';
 import { NotationPoint, DEPLOY, MOVE, TEAM_SELECTION, HOST, GUEST } from '../js/CommonNotationObjects';
 import { TrifleTileCodes, defineTrifleTiles, TrifleTileType, TrifleTileIdentifier } from '../js/trifle/TrifleTiles';
 import { TrifleMovementType, TrifleDeployType, TrifleCaptureType, TrifleMovementAbility } from '../js/trifle/TrifleTileInfo';
-import { TrifleAbilityName, TrifleAbilityTriggerType, TrifleAttributeType } from '../js/trifle/TrifleTileInfo';
+import { TrifleAbilityName, TrifleAbilityTriggerType, TrifleAttributeType, TrifleTargetType, TrifleTileCategory } from '../js/trifle/TrifleTileInfo';
 import { setCurrentTileMetadata, setCurrentTileCodes } from '../js/trifle/PaiShoGamesTileMetadata';
 import { TrifleTiles } from '../js/trifle/TrifleTileInfo';
 import { TrifleTile } from '../js/trifle/TrifleTile';
@@ -2033,7 +2033,7 @@ describe('Fixed TODO Tiles - Definition and Abilities', () => {
 			expect(tileInfo.territorialZone.size).toBe(1);
 		});
 
-		it('should have captureTargetTiles ability when deployed', () => {
+		it('should have captureTargetTiles ability when deployed targeting adjacentTiles', () => {
 			const tileInfo = TrifleTiles[TrifleTileCodes.GrassWeed];
 			const captureAbility = tileInfo.abilities.find(
 				a => a.type === TrifleAbilityName.captureTargetTiles
@@ -2042,7 +2042,17 @@ describe('Fixed TODO Tiles - Definition and Abilities', () => {
 			expect(captureAbility.triggers[0].triggerType).toBe(
 				TrifleAbilityTriggerType.whenDeployed
 			);
-			expect(captureAbility.triggers[0].targetTileTypes).toContain(TrifleTileType.flower);
+			expect(captureAbility.triggers[0].targetTileTypes).toContain(TrifleTileCategory.thisTile);
+			expect(captureAbility.targetTypes).toContain(TrifleTargetType.adjacentTiles);
+		});
+
+		it('should have restrictDeploymentInZone ability for flowers', () => {
+			const tileInfo = TrifleTiles[TrifleTileCodes.GrassWeed];
+			const restrictAbility = tileInfo.abilities.find(
+				a => a.type === TrifleAbilityName.restrictDeploymentInZone
+			);
+			expect(restrictAbility).toBeDefined();
+			expect(restrictAbility.deployTargetTileTypes).toContain(TrifleTileType.flower);
 		});
 
 		it('should have restrictMovementWithinZone ability for flowers', () => {

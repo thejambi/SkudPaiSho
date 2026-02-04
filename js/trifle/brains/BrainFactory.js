@@ -28,6 +28,7 @@ import { TrifleWhileOnBoardTriggerBrain } from './triggerBrains/WhileOnBoardTrig
 import { TrifleTriggerTargetTilesTargetBrain } from './targetBrains/TriggerTargetTilesTargetBrain';
 import { TrifleAllTilesTargetBrain } from './targetBrains/AllTilesTargetBrain';
 import { TrifleSurroundingTilesTargetBrain } from './targetBrains/SurroundingTilesTargetBrain';
+import { TrifleAdjacentTilesTargetBrain } from './targetBrains/AdjacentTilesTargetBrain';
 import { TrifleThisTileTargetBrain } from './targetBrains/ThisTileTargetBrain';
 import { TrifleChosenCapturedTileTargetBrain } from './targetBrains/ChosenCapturedTileTargetBrain';
 import { TrifleCaptureTargetTilesAbilityBrain } from './abilityBrains/CaptureTargetTilesAbilityBrain';
@@ -45,6 +46,7 @@ import { TrifleRestrictMovementWithinZoneUnlessCapturingConstraintBrain } from '
 import { TrifleProtectFromCaptureCaptureConstraintBrain } from './captureConstraintBrains/ProtectFromCaptureCaptureConstraintBrain';
 import { TrifleProhibitTileFromCapturingCaptureConstraintBrain } from './captureConstraintBrains/ProhibitTileFromCapturingCaptureConstraintBrain';
 import { TrifleRequireDeployInZoneConstraintBrain } from './constraintBrains/RequireDeployInZoneConstraintBrain';
+import { TrifleRestrictDeploymentInZoneConstraintBrain } from './constraintBrains/RestrictDeploymentInZoneConstraintBrain';
 
 /**
  * Constraint categories for organizing different types of constraint brains
@@ -88,6 +90,10 @@ const CONSTRAINT_REGISTRY = {
 	[TrifleAbilityName.requireDeployInZone]: {
 		category: ConstraintCategory.DEPLOY_RESTRICTION,
 		brain: TrifleRequireDeployInZoneConstraintBrain
+	},
+	[TrifleAbilityName.restrictDeploymentInZone]: {
+		category: ConstraintCategory.DEPLOY_RESTRICTION,
+		brain: TrifleRestrictDeploymentInZoneConstraintBrain
 	}
 };
 
@@ -186,6 +192,8 @@ TrifleBrainFactory.createTargetBrain = function(targetType, abilityObject) {
 			return new TrifleAllTilesTargetBrain(abilityObject);
 		case TrifleTargetType.surroundingTiles:
 			return new TrifleSurroundingTilesTargetBrain(abilityObject);
+		case TrifleTargetType.adjacentTiles:
+			return new TrifleAdjacentTilesTargetBrain(abilityObject);
 		case TrifleTargetType.thisTile:
 			return new TrifleThisTileTargetBrain(abilityObject);
 		case TrifleTargetType.chosenCapturedTile:

@@ -1286,11 +1286,11 @@ export function defineTrifleTiles() {
 				triggers: [
 					{
 						triggerType: TrifleAbilityTriggerType.whenDeployed,
-						targetTileTypes: [TrifleTileType.flower],
-						targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy]
+						targetTileTypes: [TrifleTileCategory.thisTile]
 					}
 				],
-				targetTypes: [TrifleTargetType.surroundingTiles]
+				targetTypes: [TrifleTargetType.adjacentTiles],
+				targetTileTypes: [TrifleTileType.flower]
 			},
 			{
 				type: TrifleAbilityName.restrictMovementWithinZone,
@@ -1303,6 +1303,16 @@ export function defineTrifleTiles() {
 				targetTypes: [TrifleTargetType.allTiles],
 				targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy],
 				targetTileTypes: [TrifleTileType.flower]
+			},
+			{
+				type: TrifleAbilityName.restrictDeploymentInZone,
+				deployTargetTileTypes: [TrifleTileType.flower],
+				targetTypes: [TrifleTargetType.thisTile],
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileOnBoard
+					}
+				]
 			}
 		],
 		textLines: [

@@ -15,14 +15,19 @@ TrifleSurroundingTilesTargetBrain.prototype.setTargets = function() {
 	this.targetTilePoints = [];
 
 	var self = this;
-	
-	this.abilityObject.triggerTargetTilePoints.forEach(function(boardPointWithTile) {
-		var targetHelper = new TrifleTargetHelper(self.abilityObject, boardPointWithTile, self);
+	var sourceTilePoint = this.abilityObject.sourceTilePoint;
+	var surroundingPoints = this.board.getSurroundingBoardPoints(sourceTilePoint);
+
+	surroundingPoints.forEach(function(surroundingPoint) {
+		if (!surroundingPoint.hasTile()) {
+			return;
+		}
+
+		var targetHelper = new TrifleTargetHelper(self.abilityObject, surroundingPoint, self);
 		if (targetHelper.tileIsTargeted()) {
-			self.targetTiles.push(boardPointWithTile.tile);
-			self.targetTilePoints.push(boardPointWithTile);
+			self.targetTiles.push(surroundingPoint.tile);
+			self.targetTilePoints.push(surroundingPoint);
 		}
 	});
 };
-
 

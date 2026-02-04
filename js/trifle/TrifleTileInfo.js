@@ -20,6 +20,7 @@ export const TrifleTargetType = {
 	allTiles: "allTiles",
 	triggerTargetTiles: "triggerTargetTiles",
 	surroundingTiles: "surroundingTiles",
+	adjacentTiles: "adjacentTiles",
 	chosenCapturedTile: "chosenCapturedTile"
 }
 
@@ -141,6 +142,7 @@ export const TrifleAbilityName = {
 	enlargeZone: "enlargeZone",
 	setMovementDistance: "setMovementDistance",
 	requireDeployInZone: "requireDeployInZone",
+	restrictDeploymentInZone: "restrictDeploymentInZone",
 	resurrectAtDeployPosition: "resurrectAtDeployPosition",
 	substituteForCapture: "substituteForCapture"
 };
