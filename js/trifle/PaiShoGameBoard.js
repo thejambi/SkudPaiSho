@@ -2414,21 +2414,39 @@ export class PaiShoGameBoard {
 	tileZonedOutOfSpaceByAbility(tile, targetPoint, canCaptureTarget) {
 		let isZonedOut = false;
 
+		// For gigantic tiles, check all points that would be occupied
+		let pointsToCheck = [targetPoint];
+		const tileInfo = this.tileMetadata[tile.code];
+		if (tileInfo && tileInfo.attributes && tileInfo.attributes.includes(TrifleAttributeType.gigantic)) {
+			const giganticPoints = this.getGrowGiantOccupiedPoints(targetPoint);
+			if (giganticPoints) {
+				pointsToCheck = pointsToCheck.concat(giganticPoints);
+			}
+		}
+
 		this.forEachBoardPointWithTile((checkBoardPoint) => {
+			if (isZonedOut) return;
+
 			const restrictMovementWithinZoneAbilities = this.abilityManager.getAbilitiesTargetingTileFromSourceTile(TrifleAbilityName.restrictMovementWithinZone, tile, checkBoardPoint.tile);
 
-			if (restrictMovementWithinZoneAbilities.length
-				&& this.pointTileZoneContainsPoint(checkBoardPoint, targetPoint)) {
-				isZonedOut = true;
-				return;
+			if (restrictMovementWithinZoneAbilities.length) {
+				for (let i = 0; i < pointsToCheck.length; i++) {
+					if (this.pointTileZoneContainsPoint(checkBoardPoint, pointsToCheck[i])) {
+						isZonedOut = true;
+						return;
+					}
+				}
 			}
 
 			const restrictMovementWithinZoneUnlessCapturingAbilities = this.abilityManager.getAbilitiesTargetingTileFromSourceTile(TrifleAbilityName.restrictMovementWithinZoneUnlessCapturing, tile, checkBoardPoint.tile);
 
-			if (!canCaptureTarget && restrictMovementWithinZoneUnlessCapturingAbilities.length
-				&& this.pointTileZoneContainsPoint(checkBoardPoint, targetPoint)) {
-				isZonedOut = true;
-				return;
+			if (!canCaptureTarget && restrictMovementWithinZoneUnlessCapturingAbilities.length) {
+				for (let i = 0; i < pointsToCheck.length; i++) {
+					if (this.pointTileZoneContainsPoint(checkBoardPoint, pointsToCheck[i])) {
+						isZonedOut = true;
+						return;
+					}
+				}
 			}
 		});
 
@@ -2771,10 +2789,21 @@ export class PaiShoGameBoard {
 	deployPassesConstraintChecks(tile, tileInfo, deployPoint) {
 		const deployConstraints = this.abilityManager.getDeployConstraints();
 
+		// For gigantic tiles, check all points that would be occupied
+		let pointsToCheck = [deployPoint];
+		if (tileInfo.attributes && tileInfo.attributes.includes(TrifleAttributeType.gigantic)) {
+			const giganticPoints = this.getGrowGiantOccupiedPoints(deployPoint);
+			if (giganticPoints) {
+				pointsToCheck = pointsToCheck.concat(giganticPoints);
+			}
+		}
+
 		for (let i = 0; i < deployConstraints.length; i++) {
-			const result = deployConstraints[i].isDeployAllowed(tile, tileInfo, deployPoint);
-			if (!result.allowed) {
-				return false;
+			for (let j = 0; j < pointsToCheck.length; j++) {
+				const result = deployConstraints[i].isDeployAllowed(tile, tileInfo, pointsToCheck[j]);
+				if (!result.allowed) {
+					return false;
+				}
 			}
 		}
 

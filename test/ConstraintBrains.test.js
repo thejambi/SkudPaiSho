@@ -4671,6 +4671,136 @@ describe('RequireDeployInZone Constraint Brain', () => {
 		});
 	});
 
+	describe('Gigantic tile deploy restriction checks (Sunflower + GrassWeed)', () => {
+		it('should block gigantic flower deploy when an occupied point would be in GrassWeed zone', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.GrassWeed
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Sunflower
+			]);
+
+			// Deploy banners
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-6,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('0,-6')
+			}, false);
+
+			// Deploy GrassWeed at (2,0) - zone size 1
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.GrassWeed,
+				endPoint: new NotationPoint('2,0')
+			}, false);
+
+			// Sunflower at (0,0) occupies: (0,0)[8,8], (0,-1)[9,8], (1,-1)[9,9], (1,0)[8,9]
+			// GrassWeed at (2,0)[8,10], zone size 1
+			// Distance from GrassWeed to (1,0)[8,9] = |8-8|+|9-10| = 1 → IN ZONE
+			// Primary point (0,0) is at distance 2 → outside zone
+			// But occupied point (1,0) is at distance 1 → inside zone → should be BLOCKED
+			const sunflowerTile = new TrifleTile(TrifleTileCodes.Sunflower, 'G');
+			const sunflowerTileInfo = TrifleTiles[TrifleTileCodes.Sunflower];
+			const deployPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('0,0'));
+
+			expect(gameManager.board.deployPassesConstraintChecks(sunflowerTile, sunflowerTileInfo, deployPoint)).toBe(false);
+		});
+
+		it('should allow gigantic flower deploy when all occupied points are outside GrassWeed zone', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.GrassWeed
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Sunflower
+			]);
+
+			// Deploy banners
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-6,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('0,-6')
+			}, false);
+
+			// Deploy GrassWeed at (2,0) - zone size 1
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.GrassWeed,
+				endPoint: new NotationPoint('2,0')
+			}, false);
+
+			// Sunflower at (-2,0) occupies: (-2,0)[8,6], (-2,-1)[9,6], (-1,-1)[9,7], (-1,0)[8,7]
+			// All points are distance >= 3 from GrassWeed at (2,0)[8,10] → should be ALLOWED
+			const sunflowerTile = new TrifleTile(TrifleTileCodes.Sunflower, 'G');
+			const sunflowerTileInfo = TrifleTiles[TrifleTileCodes.Sunflower];
+			const deployPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('-2,0'));
+
+			expect(gameManager.board.deployPassesConstraintChecks(sunflowerTile, sunflowerTileInfo, deployPoint)).toBe(true);
+		});
+
+		it('should block gigantic flower deploy when primary point is in GrassWeed zone', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.GrassWeed
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Sunflower
+			]);
+
+			// Deploy banners
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-6,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('0,-6')
+			}, false);
+
+			// Deploy GrassWeed at (2,0) - zone size 1
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.GrassWeed,
+				endPoint: new NotationPoint('2,0')
+			}, false);
+
+			// Sunflower at (1,0)[8,9] → distance 1 from GrassWeed → primary point IN zone
+			const sunflowerTile = new TrifleTile(TrifleTileCodes.Sunflower, 'G');
+			const sunflowerTileInfo = TrifleTiles[TrifleTileCodes.Sunflower];
+			const deployPoint = gameManager.board.getPointFromNotationPoint(new NotationPoint('1,0'));
+
+			expect(gameManager.board.deployPassesConstraintChecks(sunflowerTile, sunflowerTileInfo, deployPoint)).toBe(false);
+		});
+	});
+
 	// --------------------------------------------------------------------------
 	// restrictTileFromCapturing + whileTargetTileIsNotOnBoard Tests
 	// --------------------------------------------------------------------------
