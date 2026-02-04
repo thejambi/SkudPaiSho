@@ -92,6 +92,26 @@ export const TrifleTileIdentifier = {
 	fire: "Fire"
 };
 
+/**
+ * Convert a PascalCase tile code to a readable name with spaces
+ * e.g., "AirBanner" -> "Air Banner", "SkyBison" -> "Sky Bison"
+ */
+function toReadableName(code) {
+	return code.replace(/([a-z])([A-Z])/g, '$1 $2');
+}
+
+/**
+ * Generate readable tile names map from TrifleTileCodes
+ */
+export function generateTrifleTileNames() {
+	const tileNames = {};
+	Object.keys(TrifleTileCodes).forEach((key) => {
+		const code = TrifleTileCodes[key];
+		tileNames[code] = toReadableName(code);
+	});
+	return tileNames;
+}
+
 export function defineTrifleTiles() {
 	// var TrifleTiles = {};
 	clearObject(TrifleTiles);
