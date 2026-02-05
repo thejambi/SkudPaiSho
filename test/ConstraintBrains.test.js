@@ -3188,7 +3188,7 @@ describe('Capture Constraint Brains', () => {
 		 * PolarBearDog ability: When it captures a tile, it's protected from capture for 1 turn
 		 * - TriggerType: whenCapturingTargetTile
 		 * - TargetTypes: thisTile
-		 * - Duration: 1
+		 * - Duration: 1 (ticked after each move: 1 -> 0.5 after capture, 0.5 -> 0 after opponent's move)
 		 */
 
 		it('should activate protectFromCapture when PolarBearDog captures a tile', () => {
@@ -3265,7 +3265,8 @@ describe('Capture Constraint Brains', () => {
 				TrifleTileCodes.Shirshu
 			]);
 
-			// Deploy tiles
+			// Deploy tiles - deploy Shirshu BEFORE the capture so the post-capture
+			// tick doesn't get consumed by Shirshu's deploy
 			gameManager.runNotationMove({
 				moveType: DEPLOY,
 				player: HOST,
@@ -3294,7 +3295,15 @@ describe('Capture Constraint Brains', () => {
 				endPoint: new NotationPoint('0,4')
 			}, false);
 
-			// HOST captures to activate protection
+			// Deploy Shirshu before capture
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Shirshu,
+				endPoint: new NotationPoint('8,0')
+			}, false);
+
+			// HOST captures to activate protection (ticks after: 1 -> 0.5)
 			gameManager.runNotationMove({
 				moveType: MOVE,
 				player: HOST,
@@ -3302,18 +3311,9 @@ describe('Capture Constraint Brains', () => {
 				endPoint: '4,0'
 			}, false);
 
-			// Deploy GUEST Shirshu to try to capture PolarBearDog
-			gameManager.runNotationMove({
-				moveType: DEPLOY,
-				player: GUEST,
-				tileType: TrifleTileCodes.Shirshu,
-				endPoint: new NotationPoint('0,0')
-			}, false);
-
 			// Get the PolarBearDog tile
 			const polarBearPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, HOST);
 			const polarBearTile = polarBearPoints[0].tile;
-			const polarBearPoint = polarBearPoints[0];
 
 			// Get Shirshu
 			const shirshuPoints = gameManager.board.getTilePoints(TrifleTileCodes.Shirshu, GUEST);
@@ -3697,7 +3697,7 @@ describe('Capture Constraint Brains', () => {
 				TrifleTileCodes.Shirshu
 			]);
 
-			// Setup and make PolarBearDog capture to activate protection
+			// Deploy all tiles before capture so post-capture tick doesn't expire protection
 			gameManager.runNotationMove({
 				moveType: DEPLOY,
 				player: HOST,
@@ -3726,20 +3726,20 @@ describe('Capture Constraint Brains', () => {
 				endPoint: new NotationPoint('0,4')
 			}, false);
 
-			// PolarBearDog captures to activate protection
+			// Deploy Shirshu before capture
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Shirshu,
+				endPoint: new NotationPoint('8,0')
+			}, false);
+
+			// PolarBearDog captures to activate protection (ticks after: 1 -> 0.5)
 			gameManager.runNotationMove({
 				moveType: MOVE,
 				player: HOST,
 				startPoint: '0,0',
 				endPoint: '4,0'
-			}, false);
-
-			// Deploy Shirshu to try to capture
-			gameManager.runNotationMove({
-				moveType: DEPLOY,
-				player: GUEST,
-				tileType: TrifleTileCodes.Shirshu,
-				endPoint: new NotationPoint('0,0')
 			}, false);
 
 			// Get tiles
@@ -3750,7 +3750,7 @@ describe('Capture Constraint Brains', () => {
 			const polarBearPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, HOST);
 			const polarBearPoint = polarBearPoints[0];
 
-			// Check if capture passes constraint checks - should fail
+			// Check if capture passes constraint checks - should fail (protection active)
 			const canCapture = gameManager.board.capturePassesConstraintChecks(
 				shirshuTile,
 				shirshuPoint,

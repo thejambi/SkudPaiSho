@@ -135,8 +135,7 @@ describe('Trifle Duration Abilities', () => {
 			// Add tiles to teams first
 			addTilesToTeam(gameManager, HOST, [
 				TrifleTileCodes.WaterBanner,
-				TrifleTileCodes.PolarBearDog,
-				TrifleTileCodes.Lavender
+				TrifleTileCodes.PolarBearDog
 			]);
 			addTilesToTeam(gameManager, GUEST, [
 				TrifleTileCodes.AirBanner,
@@ -172,6 +171,7 @@ describe('Trifle Duration Abilities', () => {
 			const pbdTile = pbdPoints[0].tile;
 
 			// HOST moves Polar Bear Dog to capture
+			// Duration ticks after move: 1 -> 0.5, still active
 			gameManager.runNotationMove({
 				moveType: MOVE,
 				player: HOST,
@@ -179,14 +179,15 @@ describe('Trifle Duration Abilities', () => {
 				endPoint: new NotationPoint('0,4')
 			}, false);
 
-			// Protection should be active
+			// Protection should be active (0.5 remaining after post-move tick)
 			let hasProtection = gameManager.board.abilityManager.abilityTargetingTileExists(
 				TrifleAbilityName.protectFromCapture,
 				pbdTile
 			);
 			expect(hasProtection).toBe(true);
 
-			// GUEST makes a move (this ticks duration at the start)
+			// GUEST makes a move - protection active during move, then ticked after
+			// Duration ticks after move: 0.5 -> 0, expired
 			gameManager.runNotationMove({
 				moveType: MOVE,
 				player: GUEST,
@@ -194,24 +195,7 @@ describe('Trifle Duration Abilities', () => {
 				endPoint: new NotationPoint('4,3')
 			}, false);
 
-			// After GUEST's move, duration was ticked to 0.5
-			// Protection should still be active
-			hasProtection = gameManager.board.abilityManager.abilityTargetingTileExists(
-				TrifleAbilityName.protectFromCapture,
-				pbdTile
-			);
-			expect(hasProtection).toBe(true);
-
-			// Deploy another HOST tile for their next move
-			// This is HOST's next turn - tick happens at start, duration -> 0
-			gameManager.runNotationMove({
-				moveType: DEPLOY,
-				player: HOST,
-				tileType: TrifleTileCodes.Lavender,
-				endPoint: new NotationPoint('6,6')
-			}, false);
-
-			// Protection should now be expired
+			// Protection should now be expired (ticked to 0 after GUEST's move)
 			hasProtection = gameManager.board.abilityManager.abilityTargetingTileExists(
 				TrifleAbilityName.protectFromCapture,
 				pbdTile
@@ -233,7 +217,7 @@ describe('Trifle Ability Duration Tick Mechanism', () => {
 		expect(typeof gameManager.board.abilityManager.tickDurationAbilities).toBe('function');
 	});
 
-	it('should call tickDurationAbilities at the start of each move', () => {
+	it('should call tickDurationAbilities after each move', () => {
 		// Add tiles to teams first
 		addTilesToTeam(gameManager, HOST, [
 			TrifleTileCodes.WaterBanner,

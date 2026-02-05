@@ -1,7 +1,7 @@
 // Trifle Actuator
 
 import { ElementStyleTransform } from '../util/ElementStyleTransform';
-import { GUEST, HOST, MOVE } from '../CommonNotationObjects';
+import { DEPLOY, GUEST, HOST, MOVE } from '../CommonNotationObjects';
 import {
 	MARKED,
 	NON_PLAYABLE,
@@ -13,6 +13,7 @@ import {
 	RmbUp,
 	clearMessage,
 	gameController,
+	piecePlaceAnimation,
 	pieceAnimationLength,
 	pointClicked,
 	showPointMessage,
@@ -26,6 +27,7 @@ import {
 	cos45,
 	createBoardArrow,
 	createBoardPointDiv,
+	isSamePoint,
 	setupPaiShoBoard,
 	sin45,
 } from '../ActuatorHelp';
@@ -41,9 +43,10 @@ export class TrifleActuator {
 	static hostTeamTilesDivId = "hostTilesContainer";
 	static guestTeamTilesDivId = "guestTilesContainer";
 
-	constructor(gameContainer, isMobile) {
+	constructor(gameContainer, isMobile, enableAnimations) {
 		this.gameContainer = gameContainer;
 		this.mobile = isMobile;
+		this.animationOn = enableAnimations !== false; // Default to true
 
 		const containers = setupPaiShoBoard(
 			this.gameContainer,
@@ -354,60 +357,58 @@ export class TrifleActuator {
 			unitString = "vw";
 		}
 
-		let scaleValue = 1;
-		let animatingMovement = false;
-
-		// Handle gigantic tiles
+		// Handle gigantic tile positioning (on theDiv, always)
 		if (boardPoint.tile && boardPoint.tile.isGigantic) {
-			scaleValue = 2;
+			const giganticLeft = 0.7;
+			theDiv.style.left = ((giganticLeft * cos45) * pointSizeMultiplierX) + unitString;
+			theDiv.style.top = ((giganticLeft * sin45) * pointSizeMultiplierY) + unitString;
+			theDiv.style.transform = "scale(2)";
 			theDiv.style.zIndex = 90;
 		}
 
-		// Handle movement animation
-		if (moveToAnimate && moveToAnimate.animationInfo && moveToAnimate.moveType === MOVE) {
-			const endRow = moveToAnimate.endPoint.rowAndColumn.row;
-			const endCol = moveToAnimate.endPoint.rowAndColumn.col;
+		// Animation (on theImg, which has CSS transitions)
+		if (!this.animationOn || !moveToAnimate) return;
 
-			// Check if this is the destination point of the moved tile
-			if (boardPoint.row === endRow && boardPoint.col === endCol) {
-				// Start position: where the tile came from
+		if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
+			if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {
+				// Start from where tile came from
 				x = moveToAnimate.startPoint.rowAndColumn.col;
 				y = moveToAnimate.startPoint.rowAndColumn.row;
-				animatingMovement = true;
+				theImg.elementStyleTransform.setValue("scale", "1.2");
 				theDiv.style.zIndex = 99;
+			}
+		} else if (moveToAnimate.moveType === DEPLOY) {
+			if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {
+				if (piecePlaceAnimation === 1) {
+					theImg.elementStyleTransform.setValue("scale", 2);
+					theDiv.style.zIndex = 99;
+					requestAnimationFrame(function() {
+						theImg.elementStyleTransform.setValue("scale", 1);
+					});
+				}
 			}
 		}
 
-		// Calculate offset from final position
-		let left = (x - ox);
-		let top = (y - oy);
-		let finalLeft = 0;
-		let finalTop = 0;
+		// Set initial offset position on theImg
+		theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
+		theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
+		// const left = (x - ox);
+		// const top = (y - oy);
+		// theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
+		// theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
 
-		if (boardPoint.tile && boardPoint.tile.isGigantic) {
-			left += 0.7;
-			finalLeft += 0.7;
-		}
-
-		// Set initial position
-		theDiv.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
-		theDiv.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
-		theDiv.style.transform = "scale(" + scaleValue + ")";
-
-		// Animate to final position
-		requestAnimationFrame(() => {
-			theDiv.style.left = ((finalLeft * cos45 - finalTop * sin45) * pointSizeMultiplierX) + unitString;
-			theDiv.style.top = ((finalTop * cos45 + finalLeft * sin45) * pointSizeMultiplierY) + unitString;
+		// Animate to final position (CSS transition handles the slide)
+		requestAnimationFrame(function() {
+			theImg.style.left = "0px";
+			theImg.style.top = "0px";
 		});
 
-		// Reset z-index after animation
-		if (animatingMovement) {
-			setTimeout(() => {
-				requestAnimationFrame(() => {
-					theDiv.style.zIndex = "";
-				});
-			}, pieceAnimationLength);
-		}
+		// Reset scale after animation completes
+		setTimeout(function() {
+			requestAnimationFrame(function() {
+				theImg.elementStyleTransform.setValue("scale", 1);
+			});
+		}, pieceAnimationLength);
 	}
 
 	printBoard(board) {

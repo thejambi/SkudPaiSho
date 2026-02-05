@@ -50,8 +50,6 @@ export class TrifleGameManager {
 	runNotationMove(move, withActuate) {
 		debug("Running Move: " + move.fullMoveText);
 
-		this.board.tickDurationAbilities();
-
 		if (move.moveType === TEAM_SELECTION) {
 			move.teamTileCodes.forEach((tileCode) => {
 				const tile = new TrifleTile(tileCode, move.playerCode);
@@ -94,6 +92,12 @@ export class TrifleGameManager {
 		} else if (move.moveType === DRAW_ACCEPT) {
 			this.gameHasEndedInDraw = true;
 		}
+
+		/** 
+		 * Tick duration abilities at end of turn. 
+		 * This ensures that ability durations are the same during move planning, UI board interaction, and move execution.
+		 */
+		this.board.tickDurationAbilities();
 
 		if (withActuate) {
 			this.actuate(move);

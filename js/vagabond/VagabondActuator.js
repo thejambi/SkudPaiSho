@@ -232,6 +232,7 @@ export class VagabondActuator {
 
 		this.boardContainer.appendChild(theDiv);
 	}
+	
 	doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv) {
 		debug("Animating? " + this.animationOn);
 		if (!this.animationOn) return;
@@ -242,7 +243,7 @@ export class VagabondActuator {
 			if (isSamePoint(moveToAnimate.endPoint, x, y)) { // Piece moved
 				x = moveToAnimate.startPoint.rowAndColumn.col;
 				y = moveToAnimate.startPoint.rowAndColumn.row;
-				theImg.elementStyleTransform.setValue("scale", "1.2"); // Make the pieces look like they're picked up a little when moving, good idea or no?
+				theImg.elementStyleTransform.setValue("scale", "1.2"); // Make the pieces look like they're picked when moving
 				theDiv.style.zIndex = 99; // Make sure "picked up" pieces show up above others
 			}
 		} else if (moveToAnimate.moveType === DEPLOY) {
@@ -270,10 +271,7 @@ export class VagabondActuator {
 
 		theImg.style.left = ((x - ox) * pointSizeMultiplierX) + unitString;
 		theImg.style.top = ((y - oy) * pointSizeMultiplierY) + unitString;
-		// var left = (x - ox);
-		// var top = (y - oy);
-		// theImg.style.left = ((left * cos45 - top * sin45) * pointSizeMultiplierX) + unitString;
-		// theImg.style.top = ((top * cos45 + left * sin45) * pointSizeMultiplierY) + unitString;
+		
 		requestAnimationFrame(function() {
 			theImg.style.left = "0px";
 			theImg.style.top = "0px";
