@@ -4,7 +4,7 @@
 import { createBoardArrow, createBoardPointDiv, setupPaiShoBoard } from '../ActuatorHelp';
 import { DEPLOY, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
 import { PAIKO_GUEST_ROTATE } from '../GameOptions';
-import { clearMessage, pieceAnimationLength, piecePlaceAnimation, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from '../PaiShoMain';
+import { boardTileHovered, boardTileUnhovered, clearMessage, pieceAnimationLength, piecePlaceAnimation, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from '../PaiShoMain';
 import { ElementStyleTransform } from '../util/ElementStyleTransform';
 import { PaikoPointState, PaikoZone } from './PaikoBoardPoint';
 import { PaikoController } from './PaikoController';
@@ -326,6 +326,12 @@ export class PaikoActuator {
 
 			// Add owner indicator
 			theDiv.classList.add(tile.ownerName === HOST ? 'hostTile' : 'guestTile');
+
+			// Hover handlers for single-tile threat/cover highlight
+			if (!this.mobile) {
+				theDiv.addEventListener('mouseenter', function() { boardTileHovered(this); });
+				theDiv.addEventListener('mouseleave', function() { boardTileUnhovered(); });
+			}
 		}
 
 		// Captured tile animation - show captured tiles fading out at their positions

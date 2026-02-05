@@ -860,6 +860,28 @@ figure > div {
   box-shadow: inset 0px 0px 10px 4px rgba(180, 20, 80, 1), inset 0px 0px 3px 2px rgba(100, 100, 220, 1);
 }
 
+/* Single-tile threat/cover highlight (click/hover on board tile) */
+.tileHighlightThreat::after, .tileHighlightCover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  z-index: 10;
+  pointer-events: none;
+}
+.tileHighlightThreat::after {
+  box-shadow: inset 0px 0px 10px 4px rgba(255, 100, 140, 0.8);
+}
+.tileHighlightCover::after {
+  box-shadow: inset 0px 0px 10px 4px rgba(100, 100, 220, 0.8);
+}
+.tileHighlightThreat.tileHighlightCover::after {
+  box-shadow: inset 0px 0px 10px 4px rgba(255, 100, 140, 0.8), inset 0px 0px 3px 2px rgba(100, 100, 220, 1);
+}
+
 /* Paiko captured tile fade-out animation */
 .capturedTileAnim {
   position: absolute;

@@ -63,6 +63,11 @@ export class PaikoController {
 		this.showingHostThreat = false;
 		this.showingGuestThreat = false;
 
+		// Single-tile threat/cover highlight state
+		this.highlightedTileBoardPoint = null;
+		this.tileHighlightPinned = false;
+		this.tileHoverTimer = null;
+
 		// Error/warning message display
 		this.displayTempMessage = null;
 		this.displayTempMessageTimeout = null;
@@ -171,6 +176,9 @@ export class PaikoController {
 
 	resetNotationBuilder() {
 		this.moveBuilder = new PaikoMoveBuilder();
+		if (this.theGame) {
+			this.theGame.tileManager.removeSelectedTileFlags();
+		}
 	}
 
 	resetMoveBuilder() {
@@ -250,6 +258,14 @@ export class PaikoController {
 		// Use setTimeout to ensure DOM has updated
 		if (this.showingHostThreat || this.showingGuestThreat) {
 			setTimeout(() => this.applyThreatVisualization(), pieceAnimationLength + 50);
+		}
+		// Reapply single-tile highlight if pinned
+		if (this.highlightedTileBoardPoint && this.tileHighlightPinned) {
+			setTimeout(() => {
+				if (this.highlightedTileBoardPoint) {
+					this.showSingleTileThreatCover(this.highlightedTileBoardPoint);
+				}
+			}, pieceAnimationLength + 50);
 		}
 	}
 
@@ -741,6 +757,14 @@ export class PaikoController {
 		// Clear any existing point states (e.g., from previously selected tile)
 		this.theGame.board.clearAllPointStates();
 
+		// Mark the selected tile with a glow effect
+		this.theGame.tileManager.removeSelectedTileFlags();
+		const hand = this.theGame.tileManager.getHand(currentPlayer);
+		const selectedTile = hand.find(t => t.code === tileCode);
+		if (selectedTile) {
+			selectedTile.selectedFromPile = true;
+		}
+
 		// Show possible deployment points for the selected tile
 		const tempTile = new PaikoTile(tileCode, currentPlayer === HOST ? 'H' : 'G');
 		const deployPoints = this.theGame.board.getPossibleDeploymentPoints(currentPlayer, tempTile);
@@ -751,6 +775,37 @@ export class PaikoController {
 
 	// Handle clicking on a board point
 	pointClicked(htmlPoint) {
+		const npText = htmlPoint.getAttribute('name');
+		const notationPoint = new NotationPoint(npText);
+		const rowCol = notationPoint.rowAndColumn;
+		const boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+		// Handle single-tile threat/cover highlight (works anytime)
+		// Skip highlight if clicking own shiftable tile to start a move
+		const isStartingShift = boardPoint.hasTile()
+			&& this.moveBuilder.getStatus() === PaikoBuilderStatus.BRAND_NEW
+			&& myTurn()
+			&& boardPoint.tile.ownerName === this.getCurrentPlayer()
+			&& boardPoint.tile.canShift();
+
+		if (boardPoint.hasTile() && !isStartingShift) {
+			if (this.tileHighlightPinned && this.highlightedTileBoardPoint === boardPoint) {
+				// Click same tile again: unpin and clear
+				this.tileHighlightPinned = false;
+				this.clearSingleTileThreatCover();
+			} else {
+				// Pin and show this tile's zones
+				this.showSingleTileThreatCover(boardPoint);
+				this.tileHighlightPinned = true;
+			}
+		} else {
+			// Clear highlight when clicking empty space or starting a shift
+			if (this.tileHighlightPinned || this.highlightedTileBoardPoint) {
+				this.tileHighlightPinned = false;
+				this.clearSingleTileThreatCover();
+			}
+		}
+
 		if (this.theGame.getWinner()) {
 			return;
 		}
@@ -762,10 +817,6 @@ export class PaikoController {
 			return;
 		}
 
-		const npText = htmlPoint.getAttribute('name');
-		const notationPoint = new NotationPoint(npText);
-		const rowCol = notationPoint.rowAndColumn;
-		const boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 		const currentPlayer = this.getCurrentPlayer();
 
 		// Handle based on current builder status
@@ -1124,12 +1175,15 @@ export class PaikoController {
 		}
 
 		// Enter draw selection mode
+		this.theGame.tileManager.removeSelectedTileFlags();
+		this.theGame.board.clearAllPointStates();
 		this.moveBuilder.setStatus(PaikoBuilderStatus.SELECTING_DRAW_TILES);
 		this.moveBuilder.setPlayer(currentPlayer);
 		this.moveBuilder.setMoveType(PaikoMoveType.DRAW);
 		this.selectedDrawTiles = [];
 
 		// Refresh message to show draw selection UI
+		this.callActuate();
 		refreshMessage();
 	}
 
@@ -1156,11 +1210,19 @@ export class PaikoController {
 		// Add to selection
 		this.selectedDrawTiles.push(tileCode);
 
+		// Mark the reserve tile with glow
+		const reserve = this.theGame.tileManager.getReserve(currentPlayer);
+		const reserveTile = reserve.find(t => t.code === tileCode && !t.selectedFromPile);
+		if (reserveTile) {
+			reserveTile.selectedFromPile = true;
+		}
+
 		// Auto-confirm if we've selected 3
 		if (this.selectedDrawTiles.length >= 3) {
 			this.confirmDraw();
 		} else {
 			// Refresh to show updated selection
+			this.callActuate();
 			refreshMessage();
 		}
 	}
@@ -1171,7 +1233,17 @@ export class PaikoController {
 			return;
 		}
 
+		// Unmark the reserve tile glow
+		const removedCode = this.selectedDrawTiles[index];
+		const currentPlayer = this.getCurrentPlayer();
+		const reserve = this.theGame.tileManager.getReserve(currentPlayer);
+		const reserveTile = reserve.find(t => t.code === removedCode && t.selectedFromPile);
+		if (reserveTile) {
+			reserveTile.selectedFromPile = false;
+		}
+
 		this.selectedDrawTiles.splice(index, 1);
+		this.callActuate();
 		refreshMessage();
 	}
 
@@ -1395,6 +1467,92 @@ export class PaikoController {
 				}
 			}
 		});
+	}
+
+	// Show threat/cover zones for a single tile on the board
+	showSingleTileThreatCover(boardPoint) {
+		this.clearSingleTileThreatCover();
+
+		if (!boardPoint || !boardPoint.hasTile()) return;
+
+		const tile = boardPoint.tile;
+
+		// Apply threat pattern
+		const threatPattern = tile.getThreatPattern();
+		threatPattern.forEach(([rowOffset, colOffset]) => {
+			const targetRow = boardPoint.row + rowOffset;
+			const targetCol = boardPoint.col + colOffset;
+			const targetPoint = this.theGame.board.getPoint(targetRow, targetCol);
+
+			if (targetPoint && targetPoint.isPlayableOrBlack()) {
+				const np = this.theGame.board.getNotationPointFromRowCol(targetRow, targetCol);
+				const pointDiv = document.querySelector(`.point[name="${np.pointText}"]`);
+				if (pointDiv) {
+					pointDiv.classList.add('tileHighlightThreat');
+				}
+			}
+		});
+
+		// Apply cover pattern
+		const coverPattern = tile.getCoverPattern();
+		coverPattern.forEach(([rowOffset, colOffset]) => {
+			const targetRow = boardPoint.row + rowOffset;
+			const targetCol = boardPoint.col + colOffset;
+			const targetPoint = this.theGame.board.getPoint(targetRow, targetCol);
+
+			if (targetPoint) {
+				const np = this.theGame.board.getNotationPointFromRowCol(targetRow, targetCol);
+				const pointDiv = document.querySelector(`.point[name="${np.pointText}"]`);
+				if (pointDiv) {
+					pointDiv.classList.add('tileHighlightCover');
+				}
+			}
+		});
+
+		this.highlightedTileBoardPoint = boardPoint;
+	}
+
+	// Clear single-tile threat/cover highlight
+	clearSingleTileThreatCover() {
+		const allPoints = document.querySelectorAll('.point');
+		allPoints.forEach(pointDiv => {
+			pointDiv.classList.remove('tileHighlightThreat', 'tileHighlightCover');
+		});
+		this.highlightedTileBoardPoint = null;
+	}
+
+	// Called when mouse enters a board tile
+	boardTileHovered(htmlPoint) {
+		if (this.tileHoverTimer) {
+			clearTimeout(this.tileHoverTimer);
+			this.tileHoverTimer = null;
+		}
+
+		if (this.tileHighlightPinned) return;
+
+		this.tileHoverTimer = setTimeout(() => {
+			this.tileHoverTimer = null;
+			const npText = htmlPoint.getAttribute('name');
+			const notationPoint = new NotationPoint(npText);
+			const rowCol = notationPoint.rowAndColumn;
+			const boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+			if (boardPoint && boardPoint.hasTile()) {
+				this.showSingleTileThreatCover(boardPoint);
+			}
+		}, 500);
+	}
+
+	// Called when mouse leaves a board tile
+	boardTileUnhovered() {
+		if (this.tileHoverTimer) {
+			clearTimeout(this.tileHoverTimer);
+			this.tileHoverTimer = null;
+		}
+
+		if (this.tileHighlightPinned) return;
+
+		this.clearSingleTileThreatCover();
 	}
 
 	// Generate an HTML grid showing the tile's threat and cover patterns

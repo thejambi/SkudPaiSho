@@ -2419,6 +2419,18 @@ export function pointClicked(htmlPoint) {
 	gameController.pointClicked(htmlPoint);
 }
 
+export function boardTileHovered(htmlPoint) {
+	if (gameController.boardTileHovered) {
+		gameController.boardTileHovered(htmlPoint);
+	}
+}
+
+export function boardTileUnhovered() {
+	if (gameController.boardTileUnhovered) {
+		gameController.boardTileUnhovered();
+	}
+}
+
 export function RmbDown(htmlPoint) {
 	if (gameController.RmbDown) {
 		gameController.RmbDown(htmlPoint);

@@ -153,6 +153,14 @@ export class PaikoTileManager {
 		return summary;
 	}
 
+	// Clear selectedFromPile flag on all tiles
+	removeSelectedTileFlags() {
+		this.hostHand.forEach(tile => tile.selectedFromPile = false);
+		this.guestHand.forEach(tile => tile.selectedFromPile = false);
+		this.hostReserve.forEach(tile => tile.selectedFromPile = false);
+		this.guestReserve.forEach(tile => tile.selectedFromPile = false);
+	}
+
 	// Get summary of hand for display
 	getHandSummary(player) {
 		const summary = {};
