@@ -549,7 +549,7 @@ export function defineTrifleTiles() {
 					}
 				],
 				targetTypes: [TrifleTargetType.thisTile],
-				duration: 1
+				duration: 0.5 // Lasts until the end of opponent's next turn
 			}
 		],
 		textLines: [

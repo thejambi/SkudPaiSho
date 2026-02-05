@@ -1684,35 +1684,6 @@ export class PaiShoGameBoard {
 		}
 	}
 
-	getBonusMovementInfo(originPoint) {
-		var playerName = originPoint.tile.ownerName;
-		var tileInfo = this.tileMetadata[originPoint.tile.code];
-		var bonusMovementInfo = {};
-		/* this.tilePresenceAbilities.forEach(function(ability) {
-			if (ability.playerName === playerName) {
-				if (ability.abilityInfo.type === Trifle.BoardPresenceAbility.increaseFriendlyTileMovementDistance) {
-					if (
-							(
-								ability.abilityInfo.targetTileTypes 
-									&& arrayIncludesOneOf(ability.abilityInfo.targetTileTypes, tileInfo.types)
-							)
-							|| !ability.abilityInfo.targetTileTypes
-						) {
-						bonusMovementDistance = ability.abilityInfo.amount;
-						bonusMovementInfo = {
-							type: TrifleMovementType.standard,
-							distance: bonusMovementDistance,
-							movementFunction: PaiShoGameBoard.standardMovementFunction
-						}
-					}
-				}
-			}
-		}); */
-		if (bonusMovementInfo.type) {
-			return bonusMovementInfo;
-		}
-	}
-
 	setPossibleMovesForBonusMovement(movementInfo, originPoint, movementStartPoint, tile) {
 		this.movementPointChecks = 0;
 		var isImmobilized = this.tileMovementIsImmobilized(tile, movementInfo, originPoint);

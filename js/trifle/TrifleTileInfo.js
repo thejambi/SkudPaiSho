@@ -101,10 +101,10 @@ export const TrifleZoneAbility = {
 }
 
 export const TrifleBoardPresenceAbility = {
-	increaseFriendlyTileMovementDistance: "increaseFriendlyTileMovementDistance",	// TODO replace with Ability.grantBonusMovement
+	// increaseFriendlyTileMovementDistance: "increaseFriendlyTileMovementDistance",	// TODO replace with Ability.grantBonusMovement
 	// spawnAdditionalCopies: "spawnAdditionalCopies",	// TODO,
-	canBeCapturedByFriendlyTiles: "canBeCapturedByFriendlyTiles",
-	drawTilesInLineOfSight: "drawTilesInLineOfSight"
+	// canBeCapturedByFriendlyTiles: "canBeCapturedByFriendlyTiles",	// Replaced by attribute TrifleAttributeType.canBeCapturedByFriendlyTiles
+	// drawTilesInLineOfSight: "drawTilesInLineOfSight"	// Replaced by TrifleAbilityName.drawTilesAlongLineOfSight
 	// captureProtection: "captureProtection"
 }
 
@@ -280,7 +280,7 @@ TrifleTileInfo.tileHasBoardPresenceAbility = function(tileInfo, abilityType) {
 // };
 
 TrifleTileInfo.tileCanBeCapturedByFriendlyTiles = function(tileInfo) {
-	return TrifleTileInfo.tileHasBoardPresenceAbility(tileInfo, TrifleBoardPresenceAbility.canBeCapturedByFriendlyTiles);
+	return tileInfo && tileInfo.attributes && tileInfo.attributes.includes(TrifleAttributeType.canBeCapturedByFriendlyTiles);
 };
 
 TrifleTileInfo.tileHasOnlyOneMovement = function(tileInfo) {
