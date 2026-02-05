@@ -737,7 +737,8 @@ AdevarController.prototype.startAiGame = function(finalizeMove) {
 };
 
 AdevarController.prototype.getAiList = function() {
-	return [new AdevarStrategicAI()];
+	// return [new AdevarStrategicAI()];
+	return [];
 };
 
 AdevarController.prototype.getCurrentPlayer = function() {

@@ -740,7 +740,8 @@ GinsengController.prototype.startAiGame = function(gameFinalize) {
 };
 
 GinsengController.prototype.getAiList = function() {
-	return [new GinsengStrategicAI()];
+	// return [new GinsengStrategicAI()];
+	return [];
 }
 
 GinsengController.prototype.getCurrentPlayer = function() {
