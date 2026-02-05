@@ -4802,7 +4802,7 @@ describe('RequireDeployInZone Constraint Brain', () => {
 	});
 
 	// --------------------------------------------------------------------------
-	// restrictTileFromCapturing + whileTargetTileIsNotOnBoard Tests
+	// restrictTileFromCapturing + whileTargetTilesAreNotOnBoard Tests
 	// --------------------------------------------------------------------------
 	describe('restrictTileFromCapturing - Banner Capture Restrictions', () => {
 		it('should block flower capture when no banners deployed', () => {
@@ -4998,6 +4998,63 @@ describe('RequireDeployInZone Constraint Brain', () => {
 				leopardPoint
 			);
 			expect(canCapture).toBe(true);
+		});
+	});
+
+	describe('Multiple abilities of same type should not be deduplicated', () => {
+		// Regression test: appearsToBeTheSameAs was incorrectly deduplicating
+		// abilities with the same type but different configurations
+		it('should activate both friendly and enemy banner restriction abilities independently', () => {
+			// This test verifies that both restrictTileFromCapturing abilities
+			// (one for friendly banner, one for enemy banner) are treated as distinct.
+			// If only one activates, the other banner check would be skipped.
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.SnowLeopard
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.Shirshu
+			]);
+
+			// Deploy only HOST banner (enemy to Shirshu)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('-4,0')
+			}, false);
+
+			// Deploy animal target and capturing tile - no GUEST (friendly) banner
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.SnowLeopard,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Shirshu,
+				endPoint: new NotationPoint('3,0')
+			}, false);
+
+			const shirshuPoints = gameManager.board.getTilePoints(TrifleTileCodes.Shirshu, GUEST);
+			const shirshuTile = shirshuPoints[0].tile;
+			const shirshuPoint = shirshuPoints[0];
+
+			const leopardPoints = gameManager.board.getTilePoints(TrifleTileCodes.SnowLeopard, HOST);
+			const leopardPoint = leopardPoints[0];
+
+			// Enemy banner on board but no friendly banner - should still be blocked
+			// because both restriction abilities must pass (friendly AND enemy)
+			const canCapture = gameManager.board.capturePassesConstraintChecks(
+				shirshuTile,
+				shirshuPoint,
+				leopardPoint
+			);
+			expect(canCapture).toBe(false);
 		});
 	});
 

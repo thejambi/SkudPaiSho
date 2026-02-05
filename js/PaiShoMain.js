@@ -5660,6 +5660,10 @@ export function promptAddOption() {
 
 	const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 	if (usernameIsOneOf(['SkudPaiSho']) || isLocalDev) {
+		// Enable debug modes when opening the secrets modal
+		setDebugOn(true);
+		setGameDevOn(true);
+
 		const container = document.createElement('div');
 
 		// --- Current Game Info Section ---
@@ -6302,6 +6306,9 @@ document.onkeyup = function(e) {
 	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 80) {
 		/* Ctrl + Alt + P */
 		copyDivToClipboard();	// TODO fix name, which games are supported, etc
+	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode) == 68) {
+		/* Ctrl + Alt + D */
+		promptAddOption();
 	} else if (e.ctrlKey && e.altKey && (e.which || e.keyCode)) {
 		if (gameController && gameController.shortcutKey) {
 			gameController.shortcutKey(e.which || e.keyCode);

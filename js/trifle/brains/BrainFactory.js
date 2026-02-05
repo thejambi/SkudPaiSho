@@ -25,7 +25,7 @@ import { TrifleWhenActiveMovementTriggerBrain } from './triggerBrains/WhenActive
 import { TrifleWhenTargetTileLandsInTempleTriggerBrain } from './triggerBrains/WhenTargetTileLandsInTempleTriggerBrain';
 import { TrifleWhenAdjacentFriendlyTileIsCapturedTriggerBrain } from './triggerBrains/WhenAdjacentFriendlyTileIsCapturedTriggerBrain';
 import { TrifleWhileOnBoardTriggerBrain } from './triggerBrains/WhileOnBoardTriggerBrain';
-import { TrifleWhileTargetTileIsNotOnBoardTriggerBrain } from './triggerBrains/WhileTargetTileIsNotOnBoardTriggerBrain';
+import { TrifleWhileTargetTilesAreNotOnBoardTriggerBrain } from './triggerBrains/WhileTargetTilesAreNotOnBoardTriggerBrain';
 import { TrifleTriggerTargetTilesTargetBrain } from './targetBrains/TriggerTargetTilesTargetBrain';
 import { TrifleAllTilesTargetBrain } from './targetBrains/AllTilesTargetBrain';
 import { TrifleSurroundingTilesTargetBrain } from './targetBrains/SurroundingTilesTargetBrain';
@@ -51,6 +51,7 @@ import { TrifleRequireDeployInZoneConstraintBrain } from './constraintBrains/Req
 import { TrifleRestrictDeploymentInZoneConstraintBrain } from './constraintBrains/RestrictDeploymentInZoneConstraintBrain';
 import { TrifleWhenTargetTileInZoneIsCapturedTriggerBrain } from './triggerBrains/WhenTargetTileInZoneIsCapturedTriggerBrain';
 import { TrifleSubstituteForCaptureAbilityBrain } from './abilityBrains/SubstituteForCaptureAbilityBrain';
+import { TrifleWhileTargetTileIsNotOnBoardTriggerBrain } from './triggerBrains/WhileTargetTileIsNotOnBoardTriggerBrain';
 
 /**
  * Constraint categories for organizing different types of constraint brains
@@ -128,6 +129,8 @@ TrifleBrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, t
 			return new TrifleWhileOutsideTempleTriggerBrain(triggerContext);
 		case TrifleAbilityTriggerType.whileTargetTileIsOnBoard:
 			return new TrifleWhileTargetTileIsOnBoardTriggerBrain(triggerContext);
+		case TrifleAbilityTriggerType.whileTargetTilesAreNotOnBoard:
+			return new TrifleWhileTargetTilesAreNotOnBoardTriggerBrain(triggerContext);
 		case TrifleAbilityTriggerType.whileTargetTileIsNotOnBoard:
 			return new TrifleWhileTargetTileIsNotOnBoardTriggerBrain(triggerContext);
 		case TrifleAbilityTriggerType.whileTargetTileIsAdjacent:

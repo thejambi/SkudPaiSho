@@ -195,6 +195,7 @@ export const TrifleAbilityTriggerType = {
 	whenActiveMovement: "whenActiveMovement",
 	whenTargetTileLandsInTemple: "whenTargetTileLandsInTemple",
 	whenAdjacentFriendlyTileIsCaptured: "whenAdjacentFriendlyTileIsCaptured",
+	whileTargetTilesAreNotOnBoard: "whileTargetTilesAreNotOnBoard",
 	whileTargetTileIsNotOnBoard: "whileTargetTileIsNotOnBoard",
 	whenTargetTileInZoneIsCaptured: "whenTargetTileInZoneIsCaptured"
 };
@@ -463,21 +464,15 @@ TrifleTileInfo.getReadableDescription = function(tileCode, boardTile, abilityMan
 		}
 		
 		if (tileInfo.abilities) {
+			tileHtml += "<br />";
 			tileInfo.abilities.forEach(function(abilityInfo) {
-				tileHtml += "<br />";
-				/* tileHtml += "Ability: " + abilityInfo.type;
-
-				abilityInfo.triggers.forEach(function(triggerInfo) {
-					tileHtml += "<br />- Trigger: " + triggerInfo.triggerType;
-					if (triggerInfo.targetTeams) tileHtml += "<br />-- Target Tiles: " + triggerInfo.targetTeams;
-					if (triggerInfo.targetTileTypes) tileHtml += "<br />-- Target Tiles: " + triggerInfo.targetTileTypes;
-					if (triggerInfo.targetTileIdentifiers) tileHtml += "<br />-- Target Tile Identifiers: " + triggerInfo.targetTileIdentifiers;
-				});
-				tileHtml += "<br />- Ability Target Types: " + abilityInfo.targetTypes;
-				if (abilityInfo.targetTeams) tileHtml += "<br />-- Target Tiles: " + abilityInfo.targetTeams;
-				if (abilityInfo.targetTileTypes) tileHtml += "<br />-- Target Tiles: " + abilityInfo.targetTileTypes; */
-
-				tileHtml += TrifleTileInfo.getObjectSummary("Ability", abilityInfo, 0);
+				var abilityHeader = "Ability";
+				if (abilityInfo.title) {
+					abilityHeader += ": " + abilityInfo.title;
+				}
+				tileHtml += "<br /><details open><summary><b>" + abilityHeader + "</b></summary>";
+				tileHtml += TrifleTileInfo.getObjectSummary("", abilityInfo, 0);
+				tileHtml += "</details>";
 			});
 		}
 
@@ -574,7 +569,8 @@ TrifleTileInfo.getObjectSummary = function(origKey, theObject, indentDepth) {
 	if (theObject instanceof Array && !(theObject[0] instanceof Object)) {
 		htmlSummary += "<br />" + indentDashStr + " " + origKey + ": " + theObject;
 	} else if (theObject instanceof Object) {
-		if (!isNaN(origKey)) {
+		if (!isNaN(origKey) || origKey === "") {
+			// Skip header for numeric keys (array indices) or empty keys
 			indentDepth--;
 		} else {
 			htmlSummary += "<br />" + indentDashStr + " " + origKey + ": ";

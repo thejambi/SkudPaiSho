@@ -1632,13 +1632,14 @@ function applyCaptureRestrictionsGameRuleAbilities(TrifleTiles) {
 	Object.keys(TrifleTiles).forEach(tileCode => {
 		const tileInfo = TrifleTiles[tileCode];
 
-		/* Make sure abilities is set up */
+		/* Make sure abilities property is present */
 		if (!tileInfo.abilities) {
 			tileInfo.abilities = [];
 		}
 
 		/* Add Ability: Restrict from capturing Flower Tiles unless friendly Banner is deployed */
 		const restrictFromCapturingFlowersAbility = {
+			title: "Flower Capture Restriction Game Rule",
 			type: TrifleAbilityName.restrictTileFromCapturing,
 			triggers: [
 				{
@@ -1654,21 +1655,42 @@ function applyCaptureRestrictionsGameRuleAbilities(TrifleTiles) {
 		};
 		tileInfo.abilities.push(restrictFromCapturingFlowersAbility);
 
-		const restrictFromCapturingOtherTilesAbility = {
+		/* Get all types except for Flower */
+		const allNonFlowerTileTypes = Object.values(TrifleTileType).filter(type => type !== TrifleTileType.flower);
+
+		/* Add Abilities: Restrict from capturing non-Flower Tiles unless friendly Banner AND enemy Banner are deployed (one ability for each banner) */
+		const restrictFromCapturingOtherTilesAbilityFriendly = {
+			title: "Non-Flower Capture Restriction Game Rule (Friendly Banner)",
 			type: TrifleAbilityName.restrictTileFromCapturing,
 			triggers: [
 				{
 					triggerType: TrifleAbilityTriggerType.whileTargetTileIsNotOnBoard,
 					targetTileTypes: [TrifleTileType.banner],
-					targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy]
+					targetTeams: [TrifleTileTeam.friendly]
 				}
 			],
 			targetTypes: [TrifleTargetType.thisTile],
-			restrictedFromCapturingTileTypes: [TrifleTileType.animal, TrifleTileType.traveler, TrifleTileType.banner],
+			restrictedFromCapturingTileTypes: allNonFlowerTileTypes,
 			inevitable: true,
 			priority: 1
 		};
-		tileInfo.abilities.push(restrictFromCapturingOtherTilesAbility);
+		const restrictFromCapturingOtherTilesAbilityEnemy = {
+			title: "Non-Flower Capture Restriction Game Rule (Enemy Banner)",
+			type: TrifleAbilityName.restrictTileFromCapturing,
+			triggers: [
+				{
+					triggerType: TrifleAbilityTriggerType.whileTargetTileIsNotOnBoard,
+					targetTileTypes: [TrifleTileType.banner],
+					targetTeams: [TrifleTileTeam.enemy]
+				}
+			],
+			targetTypes: [TrifleTargetType.thisTile],
+			restrictedFromCapturingTileTypes: allNonFlowerTileTypes,
+			inevitable: true,
+			priority: 1
+		};
+		tileInfo.abilities.push(restrictFromCapturingOtherTilesAbilityFriendly);
+		tileInfo.abilities.push(restrictFromCapturingOtherTilesAbilityEnemy);
 	});
 }
 

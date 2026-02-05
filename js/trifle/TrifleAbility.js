@@ -195,6 +195,13 @@ export class TrifleAbility {
 			return false;
 		}
 
+		// Compare ability definitions to distinguish abilities of the same type
+		// with different configurations (e.g., two restrictTileFromCapturing with
+		// different triggers or restricted tile types)
+		if (!this.abilityInfoMatches(otherAbility.abilityInfo)) {
+			return false;
+		}
+
 		// If ability has triggerTypeToTarget, compare targets from that specific trigger
 		// This is necessary because triggerTargetTiles is the intersection of ALL trigger targets,
 		// which can be empty when triggers have non-overlapping purposes (e.g., one for targeting,
@@ -209,6 +216,12 @@ export class TrifleAbility {
 		// Otherwise, fall back to comparing the intersection (triggerTargetTiles)
 		return this.triggerTargetTiles.equals(otherAbility.triggerTargetTiles)
 			&& this.triggerTargetTilePoints.equals(otherAbility.triggerTargetTilePoints);
+	}
+
+	abilityInfoMatches(otherAbilityInfo) {
+		// Deep compare the ability definitions using JSON serialization
+		// This catches differences in triggers, targets, restricted types, etc.
+		return JSON.stringify(this.abilityInfo) === JSON.stringify(otherAbilityInfo);
 	}
 
 	abilityTargetsTile(tile) {

@@ -1,55 +1,52 @@
 import { TrifleTriggerHelper } from '../TriggerHelper';
+import { debug } from '../../../GameData';
 
 /**
  * WhileTargetTileIsNotOnBoardTriggerBrain
  *
- * Inverse of WhileTargetTileIsOnBoardTriggerBrain.
- * Trigger is met when the specified target tile is NOT on the board.
+ * Trigger is met when NO matching target tile is on the board.
+ * Scans all board tiles and checks if any match the trigger criteria
+ * (targetTileTypes, targetTeams, etc.). If none match, the trigger fires.
  *
- * For each team in targetTeams, independently checks if at least one
- * matching tile exists on the board. Trigger fires when ANY team is
- * missing its required tile.
+ * Note: This brain only supports a single targetTeam. If multiple teams
+ * are specified, a debug warning is logged and behavior may be unexpected.
+ * For multi-team logic (e.g. "either friendly OR enemy banner is missing"),
+ * use WhileTargetTilesAreNotOnBoardTriggerBrain instead.
  *
- * Examples:
+ * Example:
  * - targetTeams: [friendly], targetTileTypes: [banner]
  *   -> fires when no friendly banner is on the board
- * - targetTeams: [friendly, enemy], targetTileTypes: [banner]
- *   -> fires when either friendly OR enemy banner is missing
  */
-export function TrifleWhileTargetTileIsNotOnBoardTriggerBrain(triggerContext) {
-	this.board = triggerContext.board;
-	this.triggerContext = triggerContext;
-	this.targetTiles = [];
-	this.targetTilePoints = [];
-}
+export class TrifleWhileTargetTileIsNotOnBoardTriggerBrain {
+	constructor(triggerContext) {
+		this.board = triggerContext.board;
+		this.triggerContext = triggerContext;
+		this.targetTiles = [];
+		this.targetTilePoints = [];
+	}
 
-TrifleWhileTargetTileIsNotOnBoardTriggerBrain.prototype.isTriggerMet = function() {
-	var self = this;
-	var triggerInfo = this.triggerContext.currentTrigger;
-	var targetTeams = triggerInfo.targetTeams || [];
+	isTriggerMet() {
+		const triggerInfo = this.triggerContext.currentTrigger;
+		const targetTeams = triggerInfo.targetTeams || [];
 
-	// For each team, independently check if at least one matching tile is on the board
-	var allTeamsHaveMatchingTile = true;
+		if (targetTeams.length > 1) {
+			debug("TrifleWhileTargetTileIsNotOnBoardTriggerBrain: Multiple targetTeams specified, but this brain only supports a single targetTeam. May not work as expected.");
+		}
 
-	targetTeams.forEach(function(team) {
-		var teamHasMatch = false;
+		let tileOnBoard = false;
+		let tileNotOnBoard = true; // Assume tile is not on board until found
 
-		// Create a temporary context with just this one team for checking
-		var singleTeamTriggerInfo = Object.assign({}, triggerInfo, { targetTeams: [team] });
-		var singleTeamContext = Object.assign({}, self.triggerContext, { currentTrigger: singleTeamTriggerInfo });
-
-		self.board.forEachBoardPointWithTile(function(boardPointWithTile) {
-			var triggerHelper = new TrifleTriggerHelper(singleTeamContext, boardPointWithTile);
+		this.board.forEachBoardPointWithTile((boardPointWithTile) => {
+			const triggerHelper = new TrifleTriggerHelper(this.triggerContext, boardPointWithTile);
 			if (triggerHelper.tileIsTargeted()) {
-				teamHasMatch = true;
+				tileOnBoard = true;
 			}
 		});
 
-		if (!teamHasMatch) {
-			allTeamsHaveMatchingTile = false;
+		// Trigger is met when target tile is NOT found on the board
+		if (tileOnBoard) {
+			tileNotOnBoard = false;
 		}
-	});
-
-	// Trigger is met when at least one required team doesn't have its tile on the board
-	return !allTeamsHaveMatchingTile;
-};
+		return tileNotOnBoard;
+	}
+}
