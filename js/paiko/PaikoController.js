@@ -1500,7 +1500,7 @@ export class PaikoController {
 			const targetCol = boardPoint.col + colOffset;
 			const targetPoint = this.theGame.board.getPoint(targetRow, targetCol);
 
-			if (targetPoint) {
+			if (targetPoint && targetPoint.isPlayableOrBlack()) {
 				const np = this.theGame.board.getNotationPointFromRowCol(targetRow, targetCol);
 				const pointDiv = document.querySelector(`.point[name="${np.pointText}"]`);
 				if (pointDiv) {
