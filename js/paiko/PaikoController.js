@@ -68,6 +68,9 @@ export class PaikoController {
 		this.tileHighlightPinned = false;
 		this.tileHoverTimer = null;
 
+		// Replay visualization reapply timer
+		this.replayVizTimer = null;
+
 		// Error/warning message display
 		this.displayTempMessage = null;
 		this.displayTempMessageTimeout = null;
@@ -275,6 +278,31 @@ export class PaikoController {
 			this.gameNotation.removeLastMove();
 		}
 		rerunAll();
+	}
+
+	// Called when replay/move playback finishes
+	replayEnded() {
+		// Clear any pending timer to avoid redundant calls
+		if (this.replayVizTimer) {
+			clearTimeout(this.replayVizTimer);
+			this.replayVizTimer = null;
+		}
+
+		// Reapply threat visualizations after moves finish
+		const needsViz = (this.showingHostThreat || this.showingGuestThreat)
+			|| (this.highlightedTileBoardPoint && this.tileHighlightPinned);
+
+		if (needsViz) {
+			this.replayVizTimer = setTimeout(() => {
+				this.replayVizTimer = null;
+				if (this.showingHostThreat || this.showingGuestThreat) {
+					this.applyThreatVisualization();
+				}
+				if (this.highlightedTileBoardPoint && this.tileHighlightPinned) {
+					this.showSingleTileThreatCover(this.highlightedTileBoardPoint);
+				}
+			}, pieceAnimationLength + 50);
+		}
 	}
 
 	getDefaultHelpMessageText() {
