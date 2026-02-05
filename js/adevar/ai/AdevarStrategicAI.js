@@ -159,10 +159,10 @@ export class AdevarStrategicAI {
 		const notationBuilder = new AdevarNotationBuilder();
 		const moveText = `cHT:${selectedTileCode}`;
 		
-		// Build the move string in format: "1H. cHT:Iris"
+		// Build the move string in format: "0H.cHT:Iris"
 		const moveNum = 0;
 		const playerCode = this.player === HOST ? 'H' : 'G';
-		const fullMoveText = `${moveNum}${playerCode}. ${moveText}`;
+		const fullMoveText = `${moveNum}${playerCode}.${moveText}`;
 
 		return {
 			fullMoveText: fullMoveText,
@@ -240,9 +240,10 @@ export class AdevarStrategicAI {
 
 	getTilesInHand(game) {
 		const tiles = [];
-		for (let i = 0; i < game.tileManager[this.player === HOST ? 'hostTiles' : 'guestTiles'].length; i++) {
-			const tile = game.tileManager[this.player === HOST ? 'hostTiles' : 'guestTiles'][i];
-			if (!tile.selectedFromPile) {
+		const tilePile = this.player === HOST ? 'hostTiles' : 'guestTiles';
+		for (let i = 0; i < game.tileManager[tilePile].length; i++) {
+			const tile = game.tileManager[tilePile][i];
+			if (!tile.selectedFromPile && tile.type !== AdevarTileType.secondFace) {
 				tiles.push(tile);
 			}
 		}
@@ -270,7 +271,10 @@ export class AdevarStrategicAI {
 		for (let row = 0; row < game.board.cells.length; row++) {
 			for (let col = 0; col < game.board.cells[row].length; col++) {
 				const startPoint = game.board.cells[row][col];
-				if (startPoint.hasTile() && startPoint.tile.ownerName === this.player) {
+				if (startPoint.hasTile() && startPoint.tile.ownerName === this.player
+						&& startPoint.tile.type !== AdevarTileType.hiddenTile
+						&& startPoint.tile.type !== AdevarTileType.gate
+						&& startPoint.tile.type !== AdevarTileType.vanguard) {
 					points.push(startPoint);
 				}
 			}
@@ -303,8 +307,8 @@ export class AdevarStrategicAI {
 
 		const playerCode = this.player === HOST ? 'H' : 'G';
 		const tileTypeStr = tile.type === AdevarTileType.gate ? AdevarTileType.gate : tile.code;
-		const moveText = `${this.player}${tileTypeStr}(${this.getNotation(deployPoint)})`;
-		const fullMoveText = `${moveNum}${playerCode}. ${moveText}`;
+		const moveText = `${playerCode}${tileTypeStr}(${this.getNotation(deployPoint)})`;
+		const fullMoveText = `${moveNum}${playerCode}.${moveText}`;
 
 		return {
 			fullMoveText: fullMoveText,
@@ -324,7 +328,7 @@ export class AdevarStrategicAI {
 		const startNotation = this.getNotation(startPoint);
 		const endNotation = this.getNotation(endPoint);
 		const moveText = `(${startNotation})-(${endNotation})`;
-		const fullMoveText = `${moveNum}${playerCode}. ${moveText}`;
+		const fullMoveText = `${moveNum}${playerCode}.${moveText}`;
 
 		return {
 			fullMoveText: fullMoveText,
