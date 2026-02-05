@@ -1673,7 +1673,7 @@ export class PaikoController {
 					content = `<img src="${tileImgSrc}" style="width: 24px; height: 24px; display: block; ${rotateStyle}">`;
 				} else if (cell.threat && cell.cover) {
 					// Both threat and cover
-					bgColor = '#b8a';
+					bgColor = '#a6c';
 					content = '<span style="font-size: 10px; font-weight: bold; color: #fff;">T+C</span>';
 				} else if (cell.threat) {
 					// Threat only
@@ -1681,7 +1681,7 @@ export class PaikoController {
 					content = '<span style="font-size: 12px; font-weight: bold; color: #fff;">&nbsp</span>';
 				} else if (cell.cover) {
 					// Cover only
-					bgColor = '#6a6';
+					bgColor = '#66c';
 					content = '<span style="font-size: 12px; font-weight: bold; color: #fff;">&nbsp</span>';
 				}
 
@@ -1694,7 +1694,7 @@ export class PaikoController {
 		// Add legend
 		html += '<div style="font-size: 11px; text-align: center; margin-top: 4px;">';
 		html += '<span style="background: #e66; color: #fff; padding: 1px 4px; margin-right: 4px;">&nbsp;</span> Threat ';
-		html += '<span style="background: #6a6; color: #fff; padding: 1px 4px; margin-left: 8px; margin-right: 4px;">&nbsp;</span> Cover';
+		html += '<span style="background: #66c; color: #fff; padding: 1px 4px; margin-left: 8px; margin-right: 4px;">&nbsp;</span> Cover';
 		html += '</div>';
 
 		return html;
