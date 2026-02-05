@@ -2343,6 +2343,288 @@ describe('Fixed TODO Tiles - Definition and Abilities', () => {
 		});
 	});
 
+	describe('Saffron - substituteForCapture Behavior', () => {
+		let gameManager;
+		const mockActuator = { actuate: vi.fn() };
+
+		beforeEach(() => {
+			gameManager = new TrifleGameManager(mockActuator, true, true);
+		});
+
+		it('should substitute Saffron when a friendly tile in zone is captured at destination', () => {
+			// Setup: GUEST Saffron at (0,2), GUEST FireLily at (0,0) within zone,
+			// HOST PolarBearDog 4 spaces away at (0,-4) ready to capture FireLily.
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.PolarBearDog
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.FireBanner,
+				TrifleTileCodes.Saffron,
+				TrifleTileCodes.FireLily
+			]);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Saffron,
+				endPoint: new NotationPoint('0,2')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.FireLily,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.PolarBearDog,
+				endPoint: new NotationPoint('0,-4')
+			}, false);
+
+			// HOST PolarBearDog captures GUEST FireLily at (0,0)
+			gameManager.runNotationMove({
+				moveType: MOVE,
+				player: HOST,
+				startPoint: new NotationPoint('0,-4'),
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Saffron should be captured (substituted itself)
+			const saffronPoints = gameManager.board.getTilePoints(TrifleTileCodes.Saffron, GUEST);
+			expect(saffronPoints.length).toBe(0);
+
+			// FireLily should be restored to Saffron's old position (0,2)
+			// because capture point (0,0) is occupied by the attacker
+			const fireLilyPoints = gameManager.board.getTilePoints(TrifleTileCodes.FireLily, GUEST);
+			expect(fireLilyPoints.length).toBe(1);
+
+			// PolarBearDog should be at (0,0) where it landed
+			const pbdPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, HOST);
+			expect(pbdPoints.length).toBe(1);
+		});
+
+		// Charge capture mid-path substitution cannot be integration-tested because
+		// travelShape movement validation (setPossibleMovePoints) does not compute
+		// valid paths through occupied spaces, even with chargeCapture. This is a
+		// pre-existing limitation in the movement engine.
+		// The trigger brain and ability brain support mid-path captures correctly
+		// via the capturedTilePoints array - the standard capture test above
+		// verifies the full pipeline works end-to-end.
+
+		it('should NOT substitute when an enemy tile in zone is captured', () => {
+			// Saffron only protects FRIENDLY tiles. When a GUEST tile captures a HOST
+			// tile that's inside GUEST Saffron's zone, Saffron should NOT substitute
+			// because the captured tile is an enemy, not a friendly.
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.FireBanner,
+				TrifleTileCodes.Saffron,
+				TrifleTileCodes.PolarBearDog
+			]);
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.FireLily
+			]);
+
+			// GUEST Saffron at (0,2), zone covers (0,0)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Saffron,
+				endPoint: new NotationPoint('0,2')
+			}, false);
+
+			// HOST FireLily at (0,0) - enemy tile within Saffron's zone
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.FireLily,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// GUEST PolarBearDog at (0,-4) - friendly attacker
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.PolarBearDog,
+				endPoint: new NotationPoint('0,-4')
+			}, false);
+
+			// GUEST PolarBearDog captures HOST FireLily at (0,0)
+			gameManager.runNotationMove({
+				moveType: MOVE,
+				player: GUEST,
+				startPoint: new NotationPoint('0,-4'),
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// HOST FireLily should be captured (no substitution - it's an enemy)
+			const fireLilyPoints = gameManager.board.getTilePoints(TrifleTileCodes.FireLily, HOST);
+			expect(fireLilyPoints.length).toBe(0);
+
+			// GUEST Saffron should still be on the board (did not substitute)
+			const saffronPoints = gameManager.board.getTilePoints(TrifleTileCodes.Saffron, GUEST);
+			expect(saffronPoints.length).toBe(1);
+
+			// GUEST PolarBearDog should be at (0,0)
+			const pbdPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, GUEST);
+			expect(pbdPoints.length).toBe(1);
+		});
+
+		it('should NOT substitute when captured tile is outside Saffron zone', () => {
+			// Setup: GUEST Saffron at (0,7), GUEST FireLily at (0,0) - far outside zone.
+			// HOST PolarBearDog captures FireLily. No substitution should occur.
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.PolarBearDog
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.FireBanner,
+				TrifleTileCodes.Saffron,
+				TrifleTileCodes.FireLily
+			]);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Saffron,
+				endPoint: new NotationPoint('0,7')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.FireLily,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.PolarBearDog,
+				endPoint: new NotationPoint('0,-4')
+			}, false);
+
+			// HOST PolarBearDog captures GUEST FireLily at (0,0)
+			gameManager.runNotationMove({
+				moveType: MOVE,
+				player: HOST,
+				startPoint: new NotationPoint('0,-4'),
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// FireLily should be captured (no substitution - outside zone)
+			const fireLilyPoints = gameManager.board.getTilePoints(TrifleTileCodes.FireLily, GUEST);
+			expect(fireLilyPoints.length).toBe(0);
+
+			// Saffron should still be on the board
+			const saffronPoints = gameManager.board.getTilePoints(TrifleTileCodes.Saffron, GUEST);
+			expect(saffronPoints.length).toBe(1);
+		});
+
+		it('should NOT declare a winner when Saffron saves a captured banner', () => {
+			// If HOST captures GUEST's banner but Saffron substitutes for it,
+			// the banner is restored. No winner should be declared.
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.PolarBearDog
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.FireBanner,
+				TrifleTileCodes.Saffron
+			]);
+
+			// GUEST Saffron at (0,2)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Saffron,
+				endPoint: new NotationPoint('0,2')
+			}, false);
+
+			// GUEST FireBanner at (0,0) - within Saffron's zone
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.FireBanner,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// HOST PolarBearDog at (0,-4)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.PolarBearDog,
+				endPoint: new NotationPoint('0,-4')
+			}, false);
+
+			// HOST PolarBearDog captures GUEST FireBanner at (0,0)
+			gameManager.runNotationMove({
+				moveType: MOVE,
+				player: HOST,
+				startPoint: new NotationPoint('0,-4'),
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// FireBanner should be restored (at Saffron's old position)
+			const bannerPoints = gameManager.board.getTilePoints(TrifleTileCodes.FireBanner, GUEST);
+			expect(bannerPoints.length).toBe(1);
+
+			// Saffron should be captured
+			const saffronPoints = gameManager.board.getTilePoints(TrifleTileCodes.Saffron, GUEST);
+			expect(saffronPoints.length).toBe(0);
+
+			// No winner should be declared
+			expect(gameManager.getWinner()).toBeUndefined();
+		});
+
+		it('should NOT substitute when Saffron itself is captured', () => {
+			// Setup: GUEST Saffron at (0,0). HOST PolarBearDog captures Saffron directly.
+			// Saffron should not substitute for itself.
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.PolarBearDog
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.FireBanner,
+				TrifleTileCodes.Saffron
+			]);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.Saffron,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.PolarBearDog,
+				endPoint: new NotationPoint('0,-4')
+			}, false);
+
+			// HOST PolarBearDog captures GUEST Saffron at (0,0)
+			gameManager.runNotationMove({
+				moveType: MOVE,
+				player: HOST,
+				startPoint: new NotationPoint('0,-4'),
+				endPoint: new NotationPoint('0,0')
+			}, false);
+
+			// Saffron should be captured normally
+			const saffronPoints = gameManager.board.getTilePoints(TrifleTileCodes.Saffron, GUEST);
+			expect(saffronPoints.length).toBe(0);
+
+			// PolarBearDog should be at (0,0)
+			const pbdPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, HOST);
+			expect(pbdPoints.length).toBe(1);
+		});
+	});
+
 	describe('Elderberry', () => {
 		it('should have correct tile properties', () => {
 			const tileInfo = TrifleTiles[TrifleTileCodes.Elderberry];

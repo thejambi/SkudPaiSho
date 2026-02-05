@@ -28,10 +28,14 @@ TrifleTriggerTargetTilesTargetBrain.prototype.setTargets = function() {
 		possibleTargetPoints = this.abilityObject.triggerTargetTilePoints;
 	}
 	
-	possibleTargetPoints.forEach(function(boardPointWithTile) {
-		var targetHelper = new TrifleTargetHelper(self.abilityObject, boardPointWithTile, self);
+	/* Use the parallel tile from possibleTargetTiles rather than re-reading from the
+	   board point. The trigger brain already paired tiles with points, and the board
+	   state may have changed since then (e.g. a captured tile is no longer at its point). */
+	possibleTargetPoints.forEach(function(boardPointWithTile, index) {
+		var tileForPoint = possibleTargetTiles[index] || boardPointWithTile.tile;
+		var targetHelper = new TrifleTargetHelper(self.abilityObject, boardPointWithTile, self, tileForPoint);
 		if (targetHelper.tileIsTargeted()) {
-			self.targetTiles.push(boardPointWithTile.tile);
+			self.targetTiles.push(tileForPoint);
 			self.targetTilePoints.push(boardPointWithTile);
 		}
 	});

@@ -130,6 +130,7 @@ export class TrifleAbilityManager {
 				TrifleAbilityName.cancelAbilities,
 				TrifleAbilityName.cancelAbilitiesTargetingTiles,
 				TrifleAbilityName.protectFromCapture,
+				TrifleAbilityName.substituteForCapture,
 				TrifleAbilityName.prohibitTileFromCapturing,
 				TrifleAbilityName.restrictTileFromCapturing
 			];

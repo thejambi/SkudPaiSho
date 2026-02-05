@@ -9,11 +9,13 @@ export function TrifleTargetHelper(abilityObject, possibleTargetTilePoint, targe
 
 	this.possibleTargetTilePoint = possibleTargetTilePoint;
 
-	if (this.possibleTargetTilePoint && this.possibleTargetTilePoint.hasTile()) {
-		this.possibleTargetTile = this.possibleTargetTilePoint.tile;
-		this.possibleTargetTileInfo = this.tileMetadata[this.possibleTargetTile.code];
-	} else if (possibleTargetTile) {
+	/* When an explicit tile is provided, use it — the tile at the point may have
+	   changed since the trigger brain identified targets (e.g. captured tiles). */
+	if (possibleTargetTile) {
 		this.possibleTargetTile = possibleTargetTile;
+		this.possibleTargetTileInfo = this.tileMetadata[this.possibleTargetTile.code];
+	} else if (this.possibleTargetTilePoint && this.possibleTargetTilePoint.hasTile()) {
+		this.possibleTargetTile = this.possibleTargetTilePoint.tile;
 		this.possibleTargetTileInfo = this.tileMetadata[this.possibleTargetTile.code];
 	} else {
 		debug("No posible target tile found!");

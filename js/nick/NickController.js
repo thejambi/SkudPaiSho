@@ -59,6 +59,7 @@ import { NickGameManager } from './NickGameManager';
 import { NickOptions } from './NickOptions';
 import { initializeTrifleData, NickTileCodes, TileInfo, getNickTiles } from './NickTiles';
 import { NickStrategicAI } from './ai/NickStrategicAI';
+import { NickAggressiveAI } from './ai/NickAggressiveAI';
 
 export var NickConstants = {
 	preferencesKey: "NickPreferencesKey"
@@ -713,7 +714,7 @@ export class NickController {
 	}
 
 	getAiList() {
-		return [new NickStrategicAI()];
+		return [new NickAggressiveAI()];
 	}
 
 	getCurrentPlayer() {

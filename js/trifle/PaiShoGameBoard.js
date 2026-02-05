@@ -419,7 +419,7 @@ export class PaiShoGameBoard {
 
 		var capturedTiles = [];
 
-		this.processAbilities(tile, tileInfo, null, boardPoint, capturedTiles, {});
+		this.processAbilities(tile, tileInfo, null, boardPoint, capturedTiles, [], {});
 
 		// Check for tile resurrections after abilities are processed
 		var resurrectedTiles = this.checkAndPerformResurrections();
@@ -1133,6 +1133,7 @@ export class PaiShoGameBoard {
 		}
 
 		var capturedTiles = [];
+		var capturedTilePoints = [];
 
 		/* If movement path is needed, get that */
 		var movementPath = null;
@@ -1147,8 +1148,8 @@ export class PaiShoGameBoard {
 
 			movementPath.forEach((movePathPoint) => {
 				if (movePathPoint.hasTile() && movePathPoint !== boardPointStart) {
+					capturedTilePoints.push(movePathPoint);
 					capturedTiles.push(this.captureTileOnPoint(movePathPoint));
-					// capturedTiles.push(movePathPoint.removeTile());
 				}
 			});
 		}
@@ -1161,37 +1162,15 @@ export class PaiShoGameBoard {
 
 		/* // If tile is capturing a Banner tile, there's a winner
 		// This now happens in `captureTileOnPoint` function
-		if (boardPointEnd.hasTile() 
+		if (boardPointEnd.hasTile()
 				&& TrifleTileInfo.tileIsBanner(this.tileMetadata[boardPointEnd.tile.code])
 				&& tile.ownerName !== boardPointEnd.tile.ownerName) {
 			this.winners.push(tile.ownerName);
 		} */
 
 		if (boardPointEnd.hasTile() && !capturedTiles.includes(boardPointEnd.tile)) {
-			// Check for capture substitution (like Saffron's ability)
-			const substitutePoint = this.getCaptureSubstitutePoint(boardPointEnd);
-			if (substitutePoint) {
-				// Swap positions: substitute tile goes to capture location, original tile goes to substitute's location
-				const originalTile = boardPointEnd.tile;
-				const substituteTile = substitutePoint.tile;
-
-				// Remove both tiles from their positions
-				boardPointEnd.removeTile();
-				substitutePoint.removeTile();
-
-				// Move original tile to substitute's position (safe)
-				substitutePoint.putTile(originalTile);
-				originalTile.seatedPoint = substitutePoint;
-
-				// Place substitute tile at capture location and capture it
-				boardPointEnd.putTile(substituteTile);
-				substituteTile.seatedPoint = boardPointEnd;
-				capturedTiles.push(this.captureTileOnPoint(boardPointEnd));
-				debug("Capture substitution: " + substituteTile.code + " was captured instead of " + originalTile.code);
-			} else {
-				// Normal capture
-				capturedTiles.push(this.captureTileOnPoint(boardPointEnd));
-			}
+			capturedTilePoints.push(boardPointEnd);
+			capturedTiles.push(this.captureTileOnPoint(boardPointEnd));
 		}
 
 		capturedTiles.forEach((capturedTile) => {
@@ -1207,7 +1186,23 @@ export class PaiShoGameBoard {
 
 		/* Follow Order of Abilities and Triggers in Trifle documentation */
 
-		var abilityActivationFlags = this.processAbilities(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo);
+		var abilityActivationFlags = this.processAbilities(tile, tileInfo, boardPointStart, boardPointEnd, capturedTiles, capturedTilePoints, currentMoveInfo);
+
+		// After abilities fire, some captured tiles may have been restored to the board
+		// (e.g. by substituteForCapture). Remove them from the captured list.
+		capturedTiles = capturedTiles.filter(function(capturedTile) {
+			var restored = capturedTile.seatedPoint && capturedTile.seatedPoint.hasTile()
+				&& capturedTile.seatedPoint.tile === capturedTile;
+			if (restored) {
+				capturedTile.beingCaptured = false;
+			}
+			return !restored;
+		});
+
+		// Add tiles captured by abilities (e.g. Saffron sacrificing itself)
+		if (abilityActivationFlags.tileRecords && abilityActivationFlags.tileRecords.capturedTiles) {
+			capturedTiles = capturedTiles.concat(abilityActivationFlags.tileRecords.capturedTiles);
+		}
 
 		// Check for tile resurrections after abilities are processed
 		var resurrectedTiles = this.checkAndPerformResurrections();
@@ -1223,10 +1218,32 @@ export class PaiShoGameBoard {
 	}
 
 	/**
-	 * Process abilities on the board after a tile is moved or placed/deployed.
-	 * `boardPointStart` will probably be null for when a tile is placed.
+	 * Evaluate and activate tile abilities after a tile is moved or placed/deployed.
+	 *
+	 * Called after moveTile() or placeTile() completes. By this point, all captures
+	 * have already happened and captured tiles have been removed from the board.
+	 *
+	 * The function works in three phases:
+	 *   Phase 1 - Board tile scan: Check every tile still on the board for triggered abilities.
+	 *   Phase 2 - Captured tile scan: Check captured tiles for "when captured" abilities.
+	 *   Phase 3 - Activation: Hand collected abilities to the AbilityManager, which activates
+	 *             them in priority order (defined by abilityActivationOrder).
+	 *
+	 * After activation, if any ability changed the board state (e.g. substituteForCapture
+	 * restoring a tile), this function re-runs (cascade) so other abilities can react to the
+	 * new board state. The existingAbilityActivationFlags parameter carries forward which
+	 * instant abilities have already fired, preventing duplicates across cascade re-runs.
+	 *
+	 * @param {Object} tileMovedOrPlaced - The tile that was just moved or placed
+	 * @param {Object} tileMovedOrPlacedInfo - Metadata for that tile
+	 * @param {Object} boardPointStart - Where the tile moved from (null for placements)
+	 * @param {Object} boardPointEnd - Where the tile moved to or was placed
+	 * @param {Array} capturedTiles - Tiles captured during this move
+	 * @param {Array} capturedTilePoints - Where each capture occurred (parallel to capturedTiles)
+	 * @param {Object} currentMoveInfo - Additional move context (passive movement flag, prompt data)
+	 * @param {Object} existingAbilityActivationFlags - Flags from a previous cascade run, if any
 	 */
-	processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles, currentMoveInfo, existingAbilityActivationFlags) {
+	processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, capturedTiles, capturedTilePoints, currentMoveInfo, existingAbilityActivationFlags) {
 		if (!currentMoveInfo) {
 			currentMoveInfo = {};
 		}
@@ -1234,33 +1251,18 @@ export class PaiShoGameBoard {
 			existingAbilityActivationFlags = {};
 		}
 
+		/* Abilities are grouped by type (e.g. "protectFromCapture", "substituteForCapture")
+		   so the AbilityManager can activate them in the correct priority order. */
 		var abilitiesToActivate = {};
 		var abilitiesWithPromptTargetsNeeded = [];
 
-		/* 
-		- Get abilities that should be active/activated
-		- Activate/process them (if already active, skip)
-		- Save ongoing active abilities
-	
-		Triggers to look at:
-		- When Tile Moves From Within Zone
-		- When Tile Captures
-		- When Tile Lands In Zone
-		- While Tile is In Line of Sight
-		- While Inside of Temple
-		- While Outside of Temple
-		... Oh, yeah, it's all of them.. but in that order!
-	
-		Actually no, abilities will fire in order based on ability type.
-		*/
-
+		/* Phase 1: Scan every tile on the board for triggered abilities.
+		   For each tile, evaluate all of its ability triggers. If every trigger on an ability
+		   is met, create an AbilityObject and add it to the activation map. */
 		this.forEachBoardPointWithTile((pointWithTile) => {
 			const tile = pointWithTile.tile;
 			const tileInfo = this.tileMetadata[tile.code];
 			if (tileInfo.abilities) {
-				// if (tile.code === Ginseng.TileCodes.Bison) {
-				// debug("TILE YOU WERE LOOKING FOR"); // Can set breakpoint here
-				// }
 				tileInfo.abilities.forEach((tileAbilityInfo) => {
 					let allTriggerConditionsMet = true;
 
@@ -1277,11 +1279,15 @@ export class PaiShoGameBoard {
 							tileMovedOrPlacedInfo: tileMovedOrPlacedInfo,
 							boardPointStart: boardPointStart,
 							boardPointEnd: boardPointEnd,
-							capturedTiles: capturedTiles
+							capturedTiles: capturedTiles,
+							capturedTilePoints: capturedTilePoints
 						},
 						isPassiveMovement: currentMoveInfo.isPassiveMovement
 					};
 
+					/* Evaluate each trigger on this ability. An ability may have multiple triggers
+					   (AND logic): ALL must be met for the ability to activate. Each trigger brain
+					   also identifies target tiles that the ability will act upon. */
 					const triggers = tileAbilityInfo.triggers;
 					if (triggers && triggers.length) {
 						triggers.forEach((triggerInfo) => {
@@ -1301,6 +1307,8 @@ export class PaiShoGameBoard {
 						});
 					}
 
+					/* All triggers passed - create the ability object and queue it for activation.
+					   Skip if this instant ability already fired in a previous cascade run. */
 					if (allTriggerConditionsMet) {
 						const abilityContext = {
 							board: this,
@@ -1314,7 +1322,6 @@ export class PaiShoGameBoard {
 						}
 						const abilityObject = new TrifleAbility(abilityContext);
 
-						// if (abilityObject.worthy()) {
 						if (!abilityObject.hasNeededPromptTargetInfo()) {
 							abilitiesWithPromptTargetsNeeded.push(abilityObject);
 						}
@@ -1328,7 +1335,6 @@ export class PaiShoGameBoard {
 								abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
 							}
 						}
-						// }
 					}
 				});
 			}
@@ -1336,13 +1342,15 @@ export class PaiShoGameBoard {
 
 		var self = this;
 
+		/* Phase 2: Scan captured tiles for abilities that trigger when the tile is captured.
+		   These tiles are no longer on the board, so pointWithTile is null. Only abilities
+		   with capture-triggered types (e.g. whenCapturedByTargetTile) are evaluated here. */
 		capturedTiles.forEach(function(capturedTile) {
 			var tile = capturedTile;
 			var tileInfo = self.tileMetadata[tile.code];
 
 			if (tileInfo.abilities) {
 				tileInfo.abilities.forEach(function(tileAbilityInfo) {
-					/* Check that ability trigger is "When Captured By Target Tile" - or in future, any other triggers that apply to captured tiles */
 					if (TrifleTileInfo.tileAbilityIsTriggeredWhenCaptured(tileAbilityInfo)) {
 						var allTriggerConditionsMet = true;
 
@@ -1359,7 +1367,8 @@ export class PaiShoGameBoard {
 								tileMovedOrPlacedInfo: tileMovedOrPlacedInfo,
 								boardPointStart: boardPointStart,
 								boardPointEnd: boardPointEnd,
-								capturedTiles: capturedTiles
+								capturedTiles: capturedTiles,
+								capturedTilePoints: capturedTilePoints
 							},
 							isPassiveMovement: currentMoveInfo.isPassiveMovement
 						};
@@ -1395,7 +1404,6 @@ export class PaiShoGameBoard {
 							}
 							var abilityObject = new TrifleAbility(abilityContext);
 
-							// if (abilityObject.worthy()) {
 							if (!abilityObject.hasNeededPromptTargetInfo()) {
 								abilitiesWithPromptTargetsNeeded.push(abilityObject);
 							}
@@ -1409,32 +1417,29 @@ export class PaiShoGameBoard {
 									abilitiesToActivate[tileAbilityInfo.type] = [abilityObject];
 								}
 							}
-							// }
 						}
 					}
 				});
 			}
 		});
 
+		/* Phase 3: Hand the collected abilities to the AbilityManager for activation.
+		   The manager activates them in priority order (abilityActivationOrder), ensuring
+		   effects like protectFromCapture and substituteForCapture resolve before other
+		   abilities react to captures. */
 		this.abilityManager.setReadyAbilities(abilitiesToActivate);
 		this.abilityManager.setAbilitiesWithPromptTargetsNeeded(abilitiesWithPromptTargetsNeeded);
 
-		// var promptingExpected = abilitiesWithPromptTargetsNeeded.length > 0;
-
 		var abilityActivationFlags = this.abilityManager.activateReadyAbilitiesOrPromptForTargets();
 
-		// if (promptingExpected && abilityActivationFlags.neededPromptInfo && !abilityActivationFlags.neededPromptInfo.currentPromptTargetId) {
-		// 	abilityActivationFlags = this.abilityManager.activateReadyAbilitiesOrPromptForTargets();
-		// }
-
-		/* Debugging */
 		debug(this.abilityManager.abilities);
 
+		/* Cascade: If any ability changed the board (e.g. substituteForCapture restored a
+		   tile), re-run processAbilities so other abilities can react to the new board state.
+		   The current activation flags are passed forward to prevent instant abilities from
+		   firing twice. Captured tiles from the cascade are merged into the result. */
 		if (abilityActivationFlags.boardHasChanged) {
-		// Need to re-process abilities... 
-		// Pass in some sort of context from the activation flags???
-		/* Was: */ var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.tileRecords.capturedTiles, currentMoveInfo, abilityActivationFlags);
-			// /* New: */ var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, null, null, abilityActivationFlags.tileRecords.capturedTiles, null, abilityActivationFlags);
+			var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.tileRecords.capturedTiles, [], currentMoveInfo, abilityActivationFlags);
 			if (nextAbilityActivationFlags.tileRecords.capturedTiles && nextAbilityActivationFlags.tileRecords.capturedTiles.length) {
 				if (!abilityActivationFlags.tileRecords.capturedTiles) {
 					abilityActivationFlags.tileRecords.capturedTiles = [];
@@ -2542,48 +2547,6 @@ export class PaiShoGameBoard {
 		}
 
 		return capturedTile;
-	}
-
-	/**
-	 * Check if a tile being captured has a substitute (like Saffron's ability)
-	 * Returns the point of the substituting tile if found, null otherwise
-	 */
-	getCaptureSubstitutePoint(targetTilePoint) {
-		if (!targetTilePoint.hasTile()) {
-			return null;
-		}
-
-		const targetTile = targetTilePoint.tile;
-		let substitutePoint = null;
-
-		// Look for tiles with substituteForCapture ability
-		this.forEachBoardPointWithTile((checkPoint) => {
-			if (substitutePoint) return; // Already found one
-
-			const checkTile = checkPoint.tile;
-			const checkTileInfo = this.tileMetadata[checkTile.code];
-
-			// Must be friendly
-			if (checkTile.ownerName !== targetTile.ownerName) return;
-			// Don't substitute for yourself
-			if (checkPoint === targetTilePoint) return;
-
-			if (checkTileInfo && checkTileInfo.abilities) {
-				const hasSubstituteAbility = checkTileInfo.abilities.some(
-					ability => ability.type === TrifleAbilityName.substituteForCapture
-				);
-
-				if (hasSubstituteAbility && checkTileInfo.territorialZone) {
-					// Check if target is within the substitute tile's zone
-					const distance = this.getDistanceBetweenPoints(checkPoint, targetTilePoint);
-					if (distance <= checkTileInfo.territorialZone.size) {
-						substitutePoint = checkPoint;
-					}
-				}
-			}
-		});
-
-		return substitutePoint;
 	}
 
 	/**

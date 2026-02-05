@@ -1358,7 +1358,14 @@ export function defineTrifleTiles() {
 		},
 		abilities: [
 			{
-				type: TrifleAbilityName.substituteForCapture
+				type: TrifleAbilityName.substituteForCapture,
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whenTargetTileInZoneIsCaptured,
+						targetTeams: [TrifleTileTeam.friendly]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles]
 			}
 		],
 		textLines: [

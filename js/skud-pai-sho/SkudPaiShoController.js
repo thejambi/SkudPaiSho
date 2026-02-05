@@ -986,7 +986,7 @@ export class SkudPaiShoController {
 
 	getAiList() {
 		return [
-			// new SkudStrategicAI(), 
+			new SkudStrategicAI(), 
 			new SkudAIv1()
 		];
 	}

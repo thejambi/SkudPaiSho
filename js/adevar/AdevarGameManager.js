@@ -498,10 +498,17 @@ AdevarGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
 
 AdevarGameManager.prototype.opponentNonMatchingHTNotRevealed = function(sfTile) {
 	var opponent = getOpponentName(sfTile.ownerName);
-	return this.playerHiddenTiles[opponent].hidden
-		|| AdevarTile.hiddenTileMatchesSecondFace(this.playerHiddenTiles[opponent], sfTile)
+	var opponentHT = this.playerHiddenTiles[opponent];
+	
+	// If opponent's Hidden Tile hasn't been selected yet, return false (allow deployment)
+	if (!opponentHT) {
+		return false;
+	}
+	
+	return opponentHT.hidden
+		|| AdevarTile.hiddenTileMatchesSecondFace(opponentHT, sfTile)
 		/* Blank Hidden Tile check for Sandbox */
-		|| AdevarTileCode.blankHiddenTile === this.playerHiddenTiles[opponent].code;
+		|| AdevarTileCode.blankHiddenTile === opponentHT.code;
 }
 
 AdevarGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignoreActuate) {

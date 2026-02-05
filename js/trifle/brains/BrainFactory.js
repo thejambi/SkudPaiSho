@@ -49,6 +49,8 @@ import { TrifleProhibitTileFromCapturingCaptureConstraintBrain } from './capture
 import { TrifleRestrictTileFromCapturingCaptureConstraintBrain } from './captureConstraintBrains/RestrictTileFromCapturingCaptureConstraintBrain';
 import { TrifleRequireDeployInZoneConstraintBrain } from './constraintBrains/RequireDeployInZoneConstraintBrain';
 import { TrifleRestrictDeploymentInZoneConstraintBrain } from './constraintBrains/RestrictDeploymentInZoneConstraintBrain';
+import { TrifleWhenTargetTileInZoneIsCapturedTriggerBrain } from './triggerBrains/WhenTargetTileInZoneIsCapturedTriggerBrain';
+import { TrifleSubstituteForCaptureAbilityBrain } from './abilityBrains/SubstituteForCaptureAbilityBrain';
 
 /**
  * Constraint categories for organizing different types of constraint brains
@@ -100,7 +102,7 @@ const CONSTRAINT_REGISTRY = {
 	[TrifleAbilityName.restrictDeploymentInZone]: {
 		category: ConstraintCategory.DEPLOY_RESTRICTION,
 		brain: TrifleRestrictDeploymentInZoneConstraintBrain
-	}
+	},
 };
 
 /**
@@ -164,6 +166,8 @@ TrifleBrainFactory.prototype.createTriggerBrain = function(abilityTriggerInfo, t
 			return new TrifleWhenAdjacentFriendlyTileIsCapturedTriggerBrain(triggerContext);
 		case TrifleAbilityTriggerType.whileOnBoard:
 			return new TrifleWhileOnBoardTriggerBrain(triggerContext);
+		case TrifleAbilityTriggerType.whenTargetTileInZoneIsCaptured:
+			return new TrifleWhenTargetTileInZoneIsCapturedTriggerBrain(triggerContext);
 		default:
 			debug("No Trigger Brain created for trigger: " + abilityTriggerInfo.triggerType);
 	}
@@ -187,6 +191,8 @@ TrifleBrainFactory.createAbilityBrain = function(abilityName, abilityObject) {
 			return new TrifleMoveTargetTileToPileAbilityBrain(abilityObject);
 		case TrifleAbilityName.exchangeWithCapturedTile:
 			return new TrifleExchangeWithCapturedTileAbilityBrain(abilityObject);
+		case TrifleAbilityName.substituteForCapture:
+			return new TrifleSubstituteForCaptureAbilityBrain(abilityObject);
 		default:
 			return new TrifleSimpleOngoingAbilityBrain(abilityObject);
 	}

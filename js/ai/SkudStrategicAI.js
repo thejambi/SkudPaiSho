@@ -63,6 +63,9 @@ SkudStrategicAI.prototype.getMove = function(game, moveNum) {
 		return null;
 	}
 
+	// Enhance moves with harmony bonus actions where applicable
+	moves = this.enhanceMovesWithBonusActions(game, moves);
+
 	// Score all moves and find the best
 	var bestMove = null;
 	var bestScore = -Infinity;
@@ -143,6 +146,122 @@ SkudStrategicAI.prototype.selectAccentTiles = function(game) {
 	}
 
 	return new SkudPaiShoNotationMove("0" + this.player.charAt(0) + "." + chosenAccents.join());
+};
+
+/**
+ * Enhance moves with bonus actions when they create harmonies.
+ * For each move that creates a harmony, we add variants with bonus plant/arrange moves.
+ */
+SkudStrategicAI.prototype.enhanceMovesWithBonusActions = function(game, moves) {
+	var enhancedMoves = [];
+	var opponent = this.getOpponent();
+
+	for (var i = 0; i < moves.length; i++) {
+		var move = moves[i];
+		enhancedMoves.push(move); // Always include the basic move
+
+		// Check if this move creates a harmony
+		var copyGame = game.getCopy();
+		copyGame.runNotationMove(move);
+
+		var harmonyBefore = game.board.harmonyManager.numHarmoniesForPlayer(this.player);
+		var harmonyAfter = copyGame.board.harmonyManager.numHarmoniesForPlayer(this.player);
+
+		// If move creates a harmony, add bonus action variants
+		if (harmonyAfter > harmonyBefore) {
+			// Add variants with bonus plant moves
+			var plantBonusVariants = this.generateBonusPlantVariants(copyGame, move);
+			enhancedMoves = enhancedMoves.concat(plantBonusVariants);
+
+			// Add variants with bonus arrange moves
+			var arrangeBonusVariants = this.generateBonusArrangeVariants(copyGame, move);
+			enhancedMoves = enhancedMoves.concat(arrangeBonusVariants);
+		}
+	}
+
+	return enhancedMoves;
+};
+
+/**
+ * Generate bonus plant move variants for a given move.
+ * Takes a move that creates harmony, and returns versions with bonus plants attached.
+ */
+SkudStrategicAI.prototype.generateBonusPlantVariants = function(game, baseMove) {
+	var variants = [];
+	var tilePile = this.getTilePile(game, this.player);
+	var plantableFlowers = [];
+
+	// Collect available basic flowers to plant
+	for (var i = 0; i < tilePile.length; i++) {
+		if (tilePile[i].type === BASIC_FLOWER) {
+			plantableFlowers.push(tilePile[i]);
+		}
+	}
+
+	if (plantableFlowers.length === 0) {
+		return variants; // No flowers left to plant
+	}
+
+	// For each plantable flower, generate placement variants
+	for (var f = 0; f < plantableFlowers.length; f++) {
+		var flower = plantableFlowers[f];
+		game.revealOpenGates(this.player, flower, this.moveNum * 2, true);
+		var endPoints = this.getPossibleMovePoints(game);
+
+		for (var j = 0; j < endPoints.length; j++) {
+			var endPoint = endPoints[j];
+			var variant = baseMove.clone ? baseMove.clone() : JSON.parse(JSON.stringify(baseMove));
+			
+			// Add bonus plant information
+			variant.bonusTileCode = flower.code;
+			variant.bonusEndPoint = "(" + this.getNotation(endPoint) + ")";
+			variant.fullMoveText = baseMove.fullMoveText + "+" + variant.bonusTileCode + variant.bonusEndPoint;
+
+			// Prefer center placements for bonuses
+			if (j < 3) { // Only add some of the closest options to avoid explosion
+				variants.push(variant);
+			}
+		}
+
+		game.hidePossibleMovePoints(true);
+	}
+
+	return variants;
+};
+
+/**
+ * Generate bonus arrange move variants for a given move.
+ * Takes a move that creates harmony, and returns versions with bonus arrangements attached.
+ */
+SkudStrategicAI.prototype.generateBonusArrangeVariants = function(game, baseMove) {
+	var variants = [];
+	var startPoints = this.getStartPoints(game, this.player);
+
+	// For each tile we can move, generate movement variants
+	for (var i = 0; i < startPoints.length && variants.length < 6; i++) {
+		var startPoint = startPoints[i];
+		game.revealPossibleMovePoints(startPoint, true);
+		var endPoints = this.getPossibleMovePoints(game);
+
+		for (var j = 0; j < endPoints.length; j++) {
+			var endPoint = endPoints[j];
+			var variant = baseMove.clone ? baseMove.clone() : JSON.parse(JSON.stringify(baseMove));
+			
+			// Add bonus arrange information
+			variant.bonusStartPoint = this.getNotation(startPoint);
+			variant.bonusEndPoint = "(" + this.getNotation(endPoint) + ")";
+			variant.fullMoveText = baseMove.fullMoveText + "+" + this.getNotation(startPoint) + variant.bonusEndPoint;
+
+			variants.push(variant);
+
+			// Limit variants to avoid too many options
+			if (variants.length >= 6) break;
+		}
+
+		game.hidePossibleMovePoints(true);
+	}
+
+	return variants;
 };
 
 /**
@@ -250,6 +369,18 @@ SkudStrategicAI.prototype.evaluateMove = function(game, move) {
 	// Slight preference for planting to develop the position
 	if (move.moveType === PLANTING) {
 		score += 5;
+	}
+
+	// === HARMONY BONUS ACTIONS ===
+	// Big score boost for moves that have bonus actions attached
+	// These are moves that successfully chain combo actions
+	if (move.hasHarmonyBonus && move.hasHarmonyBonus()) {
+		score += 100; // Significant bonus for utilizing harmony extra actions
+		
+		// Extra bonus if the bonus action is a plant (develops board)
+		if (move.bonusTileCode && move.moveType === ARRANGING) {
+			score += 40; // Arranging with a bonus plant is very productive
+		}
 	}
 
 	return score;

@@ -165,7 +165,8 @@ TrifleAbilitiesByCategory[TrifleAbilityCategory.instant] = [
 	TrifleAbilityName.recordTilePoint,
 	TrifleAbilityName.moveTileToRecordedPoint,
 	TrifleAbilityName.moveTargetTileToPile,
-	TrifleAbilityName.exchangeWithCapturedTile
+	TrifleAbilityName.exchangeWithCapturedTile,
+	TrifleAbilityName.substituteForCapture
 ];
 
 export const TrifleAbilityPriorityLevel = {
@@ -194,7 +195,8 @@ export const TrifleAbilityTriggerType = {
 	whenActiveMovement: "whenActiveMovement",
 	whenTargetTileLandsInTemple: "whenTargetTileLandsInTemple",
 	whenAdjacentFriendlyTileIsCaptured: "whenAdjacentFriendlyTileIsCaptured",
-	whileTargetTileIsNotOnBoard: "whileTargetTileIsNotOnBoard"
+	whileTargetTileIsNotOnBoard: "whileTargetTileIsNotOnBoard",
+	whenTargetTileInZoneIsCaptured: "whenTargetTileInZoneIsCaptured"
 };
 
 export const TriflePromptTargetType = {

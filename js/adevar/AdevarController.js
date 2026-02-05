@@ -12,11 +12,14 @@ import {
 import { AdevarOptions } from "./AdevarOptions";
 import { AdevarTile, AdevarTileCode, AdevarTileType } from './AdevarTile';
 import { AdevarTileManager } from './AdevarTileManager';
+import { AdevarStrategicAI } from './ai/AdevarStrategicAI';
 import {
   BRAND_NEW,
   GameType,
   QueryString,
   WAITING_FOR_ENDPOINT,
+  activeAi,
+  activeAi2,
   callSubmitMove,
   clearMessage,
   createGameIfThatIsOk,
@@ -694,15 +697,47 @@ AdevarController.prototype.getPointMessage = function(htmlPoint) {
 };
 
 AdevarController.prototype.playAiTurn = function(finalizeMove) {
-	// 
+	if (this.theGame.getWinner()) {
+		return;
+	}
+
+	let theAi = activeAi;
+	if (activeAi2) {
+		if (activeAi2.player === getCurrentPlayer()) {
+			theAi = activeAi2;
+		}
+	}
+
+	if (!theAi) {
+		debug("No active AI found");
+		return;
+	}
+
+	// Get the move number for the AI to use (represents which pair of moves we're in)
+	const playerMoveNum = this.gameNotation.getPlayerMoveNum();
+
+	const self = this;
+
+	// Use setTimeout for move delays to prevent UI blocking
+	setTimeout(function() {
+		const move = theAi.getMove(self.theGame.getCopy(), playerMoveNum);
+		if (!move) {
+			debug("No move given from AI");
+			return;
+		}
+
+		self.gameNotation.addMove(move);
+		finalizeMove();
+	}, 10);
 };
 
 AdevarController.prototype.startAiGame = function(finalizeMove) {
-	// 
+	// Start AI game by playing first move (Host's Hidden Tile selection)
+	this.playAiTurn(finalizeMove);
 };
 
 AdevarController.prototype.getAiList = function() {
-	return [];
+	return [new AdevarStrategicAI()];
 };
 
 AdevarController.prototype.getCurrentPlayer = function() {

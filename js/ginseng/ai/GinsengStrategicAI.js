@@ -26,28 +26,35 @@ export class GinsengStrategicAI {
 			[GinsengTileCodes.Orchid]: 60          // Banishes itself when capturing
 		};
 
-		// Evaluation weights - prioritize Lotus advancement!
+		// Evaluation weights - prioritize Lotus advancement and defense!
 		this.weights = {
-			materialValue: 1.0,
-			lotusProgressToGoal: 200,       // Per point closer to goal - HIGH priority
-			lotusProtectedByGinseng: 150,   // Lotus protected by Ginseng harmony - moderate
-			lotusNearGoal: 500,             // Bonus for being close to winning
-			lotusThreatened: -300,          // Lotus is adjacent to enemy tile
-			ginsengInHarmony: 50,           // Ginseng protecting Lotus - low priority
-			badgermoleOnWhite: 100,         // Badgermole on White Garden (protective)
-			dragonOnRed: 120,               // Dragon on Red Garden (offensive)
-			koiOnWhite: 80,                 // Koi on White Garden (trapping)
-			bisonOnRed: 80,                 // Bison on Red Garden (push ability)
-			centerControl: 15,              // Controlling center area
-			protectingLotus: 30,            // Friendly tiles near Lotus
-			captureBonus: 1.5,              // Multiplier for captures - be aggressive
-			avoidCapture: -40,              // Penalty for moving into capture range
-			mobilityBonus: 5,               // More moves = better position
-			templeControl: 30,              // Tiles in temples are protected
-			tileAdvancement: 25,            // Bonus for advancing other tiles toward enemy
-			clearingPath: 40,               // Bonus for moving tiles that block Lotus path
-			steppingStone: 150,             // Tile positioned for Lotus to jump over toward goal
-			lotusJumpOpportunity: 200       // Lotus has a jump available toward goal
+			materialValue: 0.8,             // Less emphasis on material (quality > quantity)
+			lotusProgressToGoal: 250,       // Per point closer to goal - HIGHEST priority
+			lotusProtectedByGinseng: 200,   // Lotus protected by Ginseng harmony - high
+			lotusNearGoal: 800,             // HUGE bonus for being very close to winning
+			lotusThreatened: -500,          // Lotus is adjacent to enemy tile - serious threat
+			lotusIsolationPenalty: -400,    // Lotus surrounded without support is dangerous
+			ginsengInHarmony: 200,          // INCREASED: Ginseng harmony is critical protection
+			badgermoleOnWhite: 150,         // Badgermole on White Garden for defense
+			badgermoleProtection: 300,      // NEW: Badgermole defending threatened Lotus
+			dragonOnRed: 150,               // Dragon on Red Garden (offensive)
+			koiOnWhite: 120,                // INCREASED: Koi trapping is strategic
+			bisonOnRed: 120,                // INCREASED: Bison push ability
+			centerControl: 20,              // Controlling center area
+			protectingLotus: 80,            // INCREASED: Friendly tiles near Lotus
+			captureBonus: 2.0,              // INCREASED: Prioritize valuable captures
+			avoidCapture: -60,              // INCREASED penalty: avoid losing tiles
+			mobilityBonus: 3,               // Slightly reduced - quality over quantity
+			templeControl: 100,             // INCREASED: Temples are safe havens
+			tileAdvancement: 35,            // INCREASED: Spreading formation toward goal
+			clearingPath: 100,              // INCREASED: Clear the Lotus's path
+			opponentBlocking: 150,          // NEW: Block opponent's Lotus path
+			templeRefuge: 500,              // NEW: Emergency Lotus safety
+			lutusSurroundedBonus: 250,      // NEW: Escape surrounded Lotus
+			steppingStone: 180,             // Tile positioned for Lotus jump
+			lotusJumpOpportunity: 250,      // Lotus has a good jump available
+			capturePathBlocker: 300,        // NEW: Capture tiles blocking own path
+			preventOpponentWin: 1000        // CRITICAL: Moves that prevent opponent winning
 		};
 	}
 
@@ -71,9 +78,17 @@ export class GinsengStrategicAI {
 			return null;
 		}
 
+		const opponent = getOpponentName(this.player);
+
+		// CRITICAL: First, check if opponent can win on their next move
+		// If so, we must block it
+		const blockingMove = this.findBlockingMove(game, moves, opponent);
+		if (blockingMove) {
+			return blockingMove; // Prevent opponent from winning
+		}
+
 		let bestMove = null;
 		let bestScore = -Infinity;
-		const opponent = getOpponentName(this.player);
 
 		for (let i = 0; i < moves.length; i++) {
 			const move = moves[i];
@@ -192,8 +207,14 @@ export class GinsengStrategicAI {
 		// Evaluate Ginseng harmony
 		score += this.evaluateGinsengHarmony(board, player);
 
+		// Evaluate Lotus isolation (surrounded without support)
+		score += this.evaluateLotusSupport(board, myLotusPoint, player, opponent);
+
 		// Evaluate Lotus jump setup - stepping stones for diagonal jumps
 		score += this.evaluateLotusJumpSetup(board, myLotusPoint, player);
+
+		// Evaluate opponent blocking - can we block their path?
+		score += this.evaluateOpponentBlocking(board, oppLotusPoint, player, opponent);
 
 		// Mobility bonus (having more possible moves is good)
 		const myMobility = this.countPossibleMoves(game, player);
@@ -233,34 +254,57 @@ export class GinsengStrategicAI {
 			const endDist = this.getDistanceToGoal(endRowAndCol, player);
 
 			if (endDist < startDist) {
-				// Big bonus for moving Lotus closer to goal - scales with progress
-				score += 500 + (startDist - endDist) * 100;
+				// Massive bonus for moving Lotus closer to goal - scales with progress
+				score += 800 + (startDist - endDist) * 150;
 			} else if (endDist > startDist) {
-				score -= 200; // Moving Lotus away from goal
+				score -= 300; // Penalty for moving Lotus away from goal
 			}
 
-			// Avoid moving Lotus into danger, but don't be too scared
+			// Check danger level for Lotus
+			const endSurrounding = board.getSurroundingBoardPoints(endBp);
+			let dangerCount = 0;
+			let supportCount = 0;
 			if (this.canCaptureByMovement(board, player, opponent)) {
-				const endSurrounding = board.getSurroundingBoardPoints(endBp);
-				let dangerCount = 0;
 				for (let i = 0; i < endSurrounding.length; i++) {
 					const sp = endSurrounding[i];
-					if (sp.hasTile() && sp.tile.ownerName === opponent) {
-						dangerCount++;
+					if (sp.hasTile()) {
+						if (sp.tile.ownerName === opponent) {
+							dangerCount++;
+						} else {
+							supportCount++;
+						}
 					}
 				}
-				// Only penalize if there's real danger
-				if (dangerCount > 0) {
-					score -= dangerCount * 150;
+				// Serious penalty if surrounded by enemies and no support
+				if (dangerCount > 2 && supportCount === 0) {
+					score -= this.weights.lutusSurroundedBonus; // Try to escape
 				}
 			}
 
-			// Small bonus for moving into temple (but don't hide there)
+			// HUGE bonus for moving into temple when threatened (emergency refuge)
 			if (endBp.isType(TEMPLE)) {
-				score += 50;
+				const startSurrounding = board.getSurroundingBoardPoints(startBp);
+				let wasThreatened = false;
+				for (let i = 0; i < startSurrounding.length; i++) {
+					if (startSurrounding[i].hasTile() && startSurrounding[i].tile.ownerName === opponent) {
+						wasThreatened = true;
+						break;
+					}
+				}
+				if (wasThreatened) {
+					score += this.weights.templeRefuge; // Escape to safety!
+				} else {
+					score += 200; // Still good to be safe in temple
+				}
 			}
 		} else {
 			// Bonus for advancing other tiles toward enemy territory
+			// But check if this tile is blocking the Lotus path - clear it first!
+			const myLotusPoint = this.findTileOnBoard(board, player, GinsengTileCodes.WhiteLotus);
+			if (myLotusPoint && this.isBlockingLotusPath(startBp, myLotusPoint, board, player)) {
+				score += this.weights.clearingPath; // High priority to move blocking tiles
+			}
+
 			const startX = startRowAndCol.x;
 			const endX = endRowAndCol.x;
 			if (player === HOST) {
@@ -280,11 +324,18 @@ export class GinsengStrategicAI {
 		if (endBp.hasTile() && endBp.tile.ownerName === opponent) {
 			if (this.canCaptureByMovement(board, player, opponent)) {
 				const capturedCode = endBp.tile.code;
-				score += (this.tileValues[capturedCode] || 0) * this.weights.captureBonus;
+				const captureValue = (this.tileValues[capturedCode] || 0) * this.weights.captureBonus;
+				score += captureValue;
+
+				// BONUS: If we're capturing a tile that blocks opponent's Lotus path, extra credit
+				const oppLotusPoint = this.findTileOnBoard(board, opponent, GinsengTileCodes.WhiteLotus);
+				if (oppLotusPoint && this.isBlockingLotusPath(endBp, oppLotusPoint, board, opponent)) {
+					score += this.weights.capturePathBlocker; // Capture blocking tiles!
+				}
 
 				// Special consideration for Orchid (banishes itself)
 				if (tileCode === GinsengTileCodes.Orchid) {
-					score -= this.tileValues[GinsengTileCodes.Orchid] * 0.8; // Orchid sacrifice cost
+					score -= this.tileValues[GinsengTileCodes.Orchid] * 0.7; // Reduced Orchid cost
 				}
 			}
 		}
@@ -300,13 +351,27 @@ export class GinsengStrategicAI {
 			}
 		}
 
-		// Moving Ginseng - small bonus for maintaining harmony, but don't prioritize it
+		// Moving Ginseng - IMPORTANT for maintaining harmony protection
 		if (tileCode === GinsengTileCodes.Ginseng) {
 			const myLotusPoint = this.findTileOnBoard(board, player, GinsengTileCodes.WhiteLotus);
 			if (myLotusPoint) {
 				// Check if this move puts Ginseng in line of sight with Lotus
 				if (this.wouldBeInLineOfSight(endBp, myLotusPoint)) {
-					score += 30; // Small bonus for harmony - don't over-prioritize
+					score += 150; // Strong bonus - harmony is critical protection
+				}
+			}
+		}
+
+		// Moving Badgermole - exceptional when protecting Lotus
+		if (tileCode === GinsengTileCodes.Badgermole) {
+			const myLotusPoint = this.findTileOnBoard(board, player, GinsengTileCodes.WhiteLotus);
+			if (myLotusPoint) {
+				// Check if adjacent to Lotus to provide protection
+				const endGameCoords = new RowAndColumn(endRowAndCol.row, endRowAndCol.col);
+				const lotusGameCoords = new RowAndColumn(myLotusPoint.row, myLotusPoint.col);
+				const dist = Math.abs(endGameCoords.x - lotusGameCoords.x) + Math.abs(endGameCoords.y - lotusGameCoords.y);
+				if (dist === 1) {
+					score += this.weights.badgermoleProtection; // Badgermole defending Lotus
 				}
 			}
 		}
@@ -351,6 +416,24 @@ export class GinsengStrategicAI {
 			}
 		}
 
+		// CRITICAL: Check if this move reduces opponent's winning opportunities
+		// Simulate the board after this move and check opponent's win possibilities
+		const gameCopyAfterMove = game.getCopy();
+		gameCopyAfterMove.runNotationMove(move);
+		const opponentMovesAfter = this.aiHelp.getAllPossibleMoves(gameCopyAfterMove, opponent);
+		
+		let opponentWinCount = 0;
+		for (let i = 0; i < opponentMovesAfter.length; i++) {
+			if (this.isWinningMove(gameCopyAfterMove, opponentMovesAfter[i])) {
+				opponentWinCount++;
+			}
+		}
+
+		// If this move eliminates opponent's winning opportunities, big bonus!
+		if (opponentWinCount === 0) {
+			score += this.weights.preventOpponentWin; // HUGE bonus for saving the game
+		}
+
 		return score;
 	}
 
@@ -383,6 +466,78 @@ export class GinsengStrategicAI {
 			}
 		}
 
+		return false;
+	}
+
+	// NEW: Critical method to find blocking moves against opponent wins
+	findBlockingMove(game, moves, opponent) {
+		// Check if opponent has any winning moves available
+		const opponentMoves = this.aiHelp.getAllPossibleMoves(game, opponent);
+		const opponentWinningMoves = [];
+
+		for (let i = 0; i < opponentMoves.length; i++) {
+			if (this.isWinningMove(game, opponentMoves[i])) {
+				opponentWinningMoves.push(opponentMoves[i]);
+			}
+		}
+
+		// If opponent has no winning moves, no need to block
+		if (opponentWinningMoves.length === 0) {
+			return null;
+		}
+
+		// Opponent can win! We MUST find a move that prevents all winning opportunities
+		// Try each of our moves and see if any prevents opponent wins
+		for (let i = 0; i < moves.length; i++) {
+			const ourMove = moves[i];
+			const gameCopy = game.getCopy();
+			gameCopy.runNotationMove(ourMove);
+
+			// After our move, check if opponent still has winning moves
+			const remainingWins = opponentWinningMoves.filter(oppMove => {
+				// Simulate the opponent move on the updated board
+				const gameCopy2 = gameCopy.getCopy();
+				gameCopy2.runNotationMove(oppMove);
+				return this.gameHasWinner(gameCopy2, opponent);
+			});
+
+			// If this move eliminates all opponent winning moves, return it immediately
+			if (remainingWins.length === 0) {
+				return ourMove;
+			}
+		}
+
+		// If no move blocks all wins, at least block some (return best blocking attempt)
+		let bestBlockingMove = null;
+		let maxWinsBlocked = -1;
+
+		for (let i = 0; i < moves.length; i++) {
+			const ourMove = moves[i];
+			const gameCopy = game.getCopy();
+			gameCopy.runNotationMove(ourMove);
+
+			const remainingWins = opponentWinningMoves.filter(oppMove => {
+				const gameCopy2 = gameCopy.getCopy();
+				gameCopy2.runNotationMove(oppMove);
+				return this.gameHasWinner(gameCopy2, opponent);
+			});
+
+			const winsBlocked = opponentWinningMoves.length - remainingWins.length;
+			if (winsBlocked > maxWinsBlocked) {
+				maxWinsBlocked = winsBlocked;
+				bestBlockingMove = ourMove;
+			}
+		}
+
+		// Return the move that blocks the most wins (should be better than nothing)
+		return bestBlockingMove;
+	}
+
+	// Helper: Check if a game has a winner
+	gameHasWinner(game, expectedWinner) {
+		if (game.winners && game.winners.length > 0) {
+			return game.winners.includes(expectedWinner);
+		}
 		return false;
 	}
 
@@ -714,5 +869,89 @@ export class GinsengStrategicAI {
 		}
 
 		return count;
+	}
+
+	// NEW: Evaluate if Lotus is isolated or unsupported
+	evaluateLotusSupport(board, lotusPoint, player, opponent) {
+		if (!lotusPoint) return 0;
+
+		let score = 0;
+
+		// Count friendly and enemy tiles around Lotus
+		const surrounding = board.getSurroundingBoardPoints(lotusPoint);
+		let friendlyCount = 0;
+		let enemyCount = 0;
+
+		for (let i = 0; i < surrounding.length; i++) {
+			const sp = surrounding[i];
+			if (sp.hasTile()) {
+				if (sp.tile.ownerName === player) {
+					friendlyCount++;
+				} else {
+					enemyCount++;
+				}
+			}
+		}
+
+		// Penalty for isolated Lotus with many enemies nearby
+		if (enemyCount > 0 && friendlyCount === 0) {
+			score -= this.weights.lotusIsolationPenalty;
+		}
+
+		// Bonus for well-supported Lotus
+		if (friendlyCount >= 2) {
+			score += friendlyCount * 40;
+		}
+
+		return score;
+	}
+
+	// NEW: Check if a tile is blocking the Lotus's path toward goal
+	isBlockingLotusPath(bp, lotusPoint, board, player) {
+		if (!lotusPoint) return false;
+
+		const tileRow = bp.row;
+		const tileCol = bp.col;
+		const lotusRow = lotusPoint.row;
+		const lotusCol = lotusPoint.col;
+
+		// Only consider tiles in the same row or column as Lotus
+		if (tileRow !== lotusRow && tileCol !== lotusCol) {
+			return false;
+		}
+
+		// For HOST (going toward negative x), check if tile is between Lotus and goal
+		if (player === HOST) {
+			if (tileRow === lotusRow && tileCol < lotusCol) {
+				return true; // Tile is to the left, blocking path to negative x
+			}
+		}
+
+		// For GUEST (going toward positive x), check if tile is between Lotus and goal
+		if (player === GUEST) {
+			if (tileRow === lotusRow && tileCol > lotusCol) {
+				return true; // Tile is to the right, blocking path to positive x
+			}
+		}
+
+		return false;
+	}
+
+	// NEW: Evaluate ability to block opponent's Lotus path
+	evaluateOpponentBlocking(board, oppLotusPoint, player, opponent) {
+		if (!oppLotusPoint) return 0;
+
+		let score = 0;
+		const myTiles = this.getTilesOnBoard(board, player);
+
+		// Count friendly tiles positioned to block opponent
+		for (let i = 0; i < myTiles.length; i++) {
+			const bp = myTiles[i];
+			if (this.isBlockingLotusPath(bp, oppLotusPoint, board, opponent)) {
+				score += this.weights.opponentBlocking * 0.5; // Account for already placed
+			}
+		}
+
+		return score;
 	}
 }
