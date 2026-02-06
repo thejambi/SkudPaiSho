@@ -85,8 +85,9 @@ TrifleMoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeeded
 
 		if (this.abilityObject.abilityInfo.targetTileMovements) {
 			this.abilityObject.abilityInfo.targetTileMovements.forEach((movementInfo) => {
-				movementInfo.targetTilePoint = this.abilityObject.sourceTilePoint;	// TODO targetTileTypes not being checked yet...
-				this.abilityObject.board.setPossibleMovesForMovement(movementInfo, this.abilityObject.board.getBoardPointFromRowAndCol(movedTilePoint.rowAndColumn));
+				// Clone movementInfo to avoid mutating the shared tile definition (which causes circular reference errors in JSON.stringify)
+				const movementInfoWithTarget = { ...movementInfo, targetTilePoint: this.abilityObject.sourceTilePoint };
+				this.abilityObject.board.setPossibleMovesForMovement(movementInfoWithTarget, this.abilityObject.board.getBoardPointFromRowAndCol(movedTilePoint.rowAndColumn));
 
 				// Can check for any possible movements that were marked.. but for now, assume there are some
 				promptTargetsExist = true;
