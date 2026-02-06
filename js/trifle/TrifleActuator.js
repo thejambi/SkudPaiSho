@@ -855,6 +855,7 @@ export class TrifleActuator {
 
 	/**
 	 * Pulse a tile to indicate ability activation.
+	 * If a color is specified, adds a colored glow effect.
 	 */
 	animatePulse(instruction) {
 		const tileElement = this.findTileElement(instruction.tileId);
@@ -863,28 +864,49 @@ export class TrifleActuator {
 			return;
 		}
 
-		const { duration } = instruction;
+		const { duration, color } = instruction;
 		const pulseDuration = duration / 2;
 
-		tileElement.style.transition = `transform ${pulseDuration}ms ease-in-out`;
+		// Build transition with optional filter for glow
+		const transitionProps = color
+			? `transform ${pulseDuration}ms ease-in-out, filter ${pulseDuration}ms ease-in-out`
+			: `transform ${pulseDuration}ms ease-in-out`;
+
 		tileElement.style.zIndex = '100';
 
-		if (tileElement.elementStyleTransform) {
-			tileElement.elementStyleTransform.setValue("scale", 1.3);
-		} else {
-			tileElement.style.transform = "rotate(315deg) scale(1.3)";
-		}
+		// Use requestAnimationFrame to ensure browser paints before animating
+		requestAnimationFrame(() => {
+			tileElement.style.transition = transitionProps;
+
+			// Scale up and add glow
+			if (tileElement.elementStyleTransform) {
+				tileElement.elementStyleTransform.setValue("scale", 1.3);
+			} else {
+				tileElement.style.transform = "rotate(315deg) scale(1.3)";
+			}
+
+			// Add colored glow using drop-shadow filter
+			if (color) {
+				tileElement.style.filter = `drop-shadow(0 0 8px ${color}) drop-shadow(0 0 16px ${color})`;
+			}
+		});
 
 		setTimeout(() => {
+			// Scale back down and fade glow
 			if (tileElement.elementStyleTransform) {
 				tileElement.elementStyleTransform.setValue("scale", 1);
 			} else {
 				tileElement.style.transform = "rotate(315deg) scale(1)";
 			}
+			if (color) {
+				tileElement.style.filter = '';
+			}
 		}, pulseDuration);
 
 		setTimeout(() => {
 			tileElement.style.zIndex = '';
+			tileElement.style.transition = '';
+			tileElement.style.filter = '';
 		}, duration);
 	}
 

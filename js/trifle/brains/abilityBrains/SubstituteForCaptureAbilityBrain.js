@@ -77,6 +77,7 @@ TrifleSubstituteForCaptureAbilityBrain.prototype.activateAbility = function() {
 		startPoint: sourceTilePosition,
 		duration: 400,
 		priority: 0,
+		color: '#ffcc00',  // Golden glow for sacrifice ability
 		abilitySource: 'substituteForCapture:pulse'
 	}));
 

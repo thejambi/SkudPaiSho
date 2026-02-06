@@ -92,6 +92,7 @@ TrifleCaptureTargetTilesAbilityBrain.prototype.activateAbility = function() {
 				startPoint: { row: sourceTilePoint.row, col: sourceTilePoint.col },
 				duration: 400,
 				priority: hasMovingCapture ? 1 : 0,
+				color: '#ff4444',  // Red glow for capture ability
 				abilitySource: 'captureTargetTiles:pulse'
 			}));
 		}

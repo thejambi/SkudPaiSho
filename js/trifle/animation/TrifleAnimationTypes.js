@@ -32,6 +32,7 @@ export class TrifleAnimationInstruction {
 		this.parallel = options.parallel || false;    // Can run alongside previous animation?
 		this.abilitySource = options.abilitySource || null; // Source ability for debugging
 		this.startsAtMoveTime = options.startsAtMoveTime || false; // Start at time 0 with primary move
+		this.color = options.color || null;               // Color for pulse glow (e.g., '#ff6600')
 	}
 }
 
