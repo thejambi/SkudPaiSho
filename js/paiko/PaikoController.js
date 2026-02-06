@@ -1668,16 +1668,20 @@ export class PaikoController {
 
 				if (cell.tile) {
 					// Tile position - show small tile image, rotated to match facing
-					// bgColor = ownerColor;	/* Removing tile background */
+					// If tile also threatens itself (Fire), show threat pattern behind and make tile semi-transparent
+					const opacityStyle = cell.threat ? 'opacity: 0.75;' : '';
+					if (cell.threat) {
+						bgColor = 'repeating-linear-gradient(45deg, #e66, #e66 3px, #c44 3px, #c44 6px)';
+					}
 					const rotateStyle = rotationDeg !== 0 ? `transform: rotate(${rotationDeg}deg);` : '';
-					content = `<img src="${tileImgSrc}" style="width: 24px; height: 24px; display: block; ${rotateStyle}">`;
+					content = `<img src="${tileImgSrc}" style="width: 24px; height: 24px; display: block; ${rotateStyle} ${opacityStyle}">`;
 				} else if (cell.threat && cell.cover) {
 					// Both threat and cover
-					bgColor = '#a6c';
+					bgColor = 'repeating-linear-gradient(45deg, #66c, #66c 3px, #c66 3px, #c66 6px)';
 					content = '<span style="font-size: 10px; font-weight: bold; color: #fff;">T+C</span>';
 				} else if (cell.threat) {
 					// Threat only
-					bgColor = '#e66';
+					bgColor = 'repeating-linear-gradient(45deg, #e66, #e66 3px, #c44 3px, #c44 6px)';
 					content = '<span style="font-size: 12px; font-weight: bold; color: #fff;">&nbsp</span>';
 				} else if (cell.cover) {
 					// Cover only
@@ -1693,7 +1697,7 @@ export class PaikoController {
 
 		// Add legend
 		html += '<div style="font-size: 11px; text-align: center; margin-top: 4px;">';
-		html += '<span style="background: #e66; color: #fff; padding: 1px 4px; margin-right: 4px;">&nbsp;</span> Threat ';
+		html += '<span style="background: repeating-linear-gradient(45deg, #e66, #e66 2px, #c44 2px, #c44 4px); color: #fff; padding: 1px 4px; margin-right: 4px;">&nbsp;</span> Threat ';
 		html += '<span style="background: #66c; color: #fff; padding: 1px 4px; margin-left: 8px; margin-right: 4px;">&nbsp;</span> Cover';
 		html += '</div>';
 
