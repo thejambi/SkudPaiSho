@@ -13,6 +13,7 @@ export class TrifleAbility {
 		this.sourceTilePoint = abilityContext.pointWithTile;
 		this.triggerBrainMap = abilityContext.triggerBrainMap;
 		this.promptTargetInfo = abilityContext.promptTargetInfo;
+		this.lastTurnAction = abilityContext.lastTurnAction;
 
 		this.triggerTargetTiles = [];
 		this.triggerTargetTilePoints = [];

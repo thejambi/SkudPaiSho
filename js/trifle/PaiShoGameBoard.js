@@ -1213,7 +1213,8 @@ export class PaiShoGameBoard {
 			endPoint: boardPointEnd,
 			capturedTiles: capturedTiles,
 			resurrectedTiles: resurrectedTiles,
-			abilityActivationFlags: abilityActivationFlags
+			abilityActivationFlags: abilityActivationFlags,
+			animations: abilityActivationFlags.animations
 		}
 	}
 
@@ -1318,7 +1319,8 @@ export class PaiShoGameBoard {
 							tileAbilityInfo: tileAbilityInfo,
 							triggerBrainMap: triggerBrainMap,
 							promptTargetInfo: currentMoveInfo.promptTargetData,
-							isPassiveMovement: currentMoveInfo.isPassiveMovement
+							isPassiveMovement: currentMoveInfo.isPassiveMovement,
+							lastTurnAction: triggerContext.lastTurnAction
 						}
 						const abilityObject = new TrifleAbility(abilityContext);
 
@@ -1400,7 +1402,8 @@ export class PaiShoGameBoard {
 								tileInfo: tileInfo,
 								tileAbilityInfo: tileAbilityInfo,
 								triggerBrainMap: triggerBrainMap,
-								promptTargetInfo: currentMoveInfo.promptTargetData
+								promptTargetInfo: currentMoveInfo.promptTargetData,
+								lastTurnAction: triggerContext.lastTurnAction
 							}
 							var abilityObject = new TrifleAbility(abilityContext);
 

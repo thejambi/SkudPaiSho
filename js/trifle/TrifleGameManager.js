@@ -78,7 +78,8 @@ export class TrifleGameManager {
 				startPoint: move.startPoint,
 				endPoint: move.endPoint,
 				movedTile: moveDetails.movedTile,
-				capturedTiles: moveDetails.capturedTiles || []
+				capturedTiles: moveDetails.capturedTiles || [],
+				abilityAnimations: moveDetails.animations || null
 			};
 
 			// If tile is capturing a Banner tile, there's a winner

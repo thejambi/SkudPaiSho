@@ -6,6 +6,7 @@ import {
 } from './TrifleTileInfo';
 import { debug } from '../GameData';
 import { TrifleBrainFactory, ConstraintCategory, getAbilityNamesForConstraintCategory } from './brains/BrainFactory';
+import { TrifleAnimationSequence } from './animation/TrifleAnimationTypes';
 
 export class TrifleAbilityManager {
 	static MAX_CASCADE_DEPTH = 10;
@@ -68,6 +69,7 @@ export class TrifleAbilityManager {
 			tilesMovedToPiles: []
 		};
 		const abilitiesActivated = [];
+		const allAnimations = new TrifleAnimationSequence();
 
 		/* Mark all existing abilities as do not preserve */
 		this.abilities.forEach((existingAbility) => {
@@ -112,7 +114,7 @@ export class TrifleAbilityManager {
 					if (ability.isPriority(currentPriority)) {
 						priorityAbilityFound = true;
 						debug("!!!!Priority " + currentPriority + " Ability!!!! " + ability.getTitle());
-						boardHasChanged = this.doTheActivateThing(ability, tileRecords, abilitiesActivated);
+						boardHasChanged = this.doTheActivateThing(ability, tileRecords, abilitiesActivated, allAnimations);
 						return !boardHasChanged;	// Continue if board has not changed
 					}
 				});
@@ -143,7 +145,7 @@ export class TrifleAbilityManager {
 				const readyAbilitiesOfType = this.readyAbilities[abilityName];
 				if (readyAbilitiesOfType && readyAbilitiesOfType.length) {
 					readyAbilitiesOfType.every(ability => {
-						boardHasChanged = this.doTheActivateThing(ability, tileRecords, abilitiesActivated);
+						boardHasChanged = this.doTheActivateThing(ability, tileRecords, abilitiesActivated, allAnimations);
 						return !boardHasChanged;	// Continue if board has not changed
 					});
 				}
@@ -153,7 +155,7 @@ export class TrifleAbilityManager {
 			if (!boardHasChanged) {
 				Object.values(this.readyAbilities).every(abilityList => {
 					abilityList.every(ability => {
-						boardHasChanged = this.doTheActivateThing(ability, tileRecords, abilitiesActivated);
+						boardHasChanged = this.doTheActivateThing(ability, tileRecords, abilitiesActivated, allAnimations);
 						return !boardHasChanged;	// Continue if board has not changed
 					});
 					return !boardHasChanged;	// Continue if board has not changed
@@ -164,11 +166,12 @@ export class TrifleAbilityManager {
 		return {
 			abilitiesActivated: abilitiesActivated,
 			boardHasChanged: boardHasChanged,
-			tileRecords: tileRecords
+			tileRecords: tileRecords,
+			animations: allAnimations
 		};
 	}
 
-	doTheActivateThing(ability, tileRecords, abilitiesActivated, cascadeDepth = 0, visitedAbilityKeys = null) {
+	doTheActivateThing(ability, tileRecords, abilitiesActivated, allAnimations, cascadeDepth = 0, visitedAbilityKeys = null) {
 		const capturedTiles = tileRecords.capturedTiles;
 		const tilesMovedToPiles = tileRecords.tilesMovedToPiles;
 
@@ -223,6 +226,13 @@ export class TrifleAbilityManager {
 						tilesMovedToPiles.push(movedTile);
 					});
 				}
+
+				// Collect animations from ability results
+				if (ability.abilityActivatedResults
+						&& ability.abilityActivatedResults.animations
+						&& ability.abilityActivatedResults.animations.hasAnimations()) {
+					allAnimations.merge(ability.abilityActivatedResults.animations);
+				}
 			}
 			if (ability.boardChangedAfterActivation()) {
 				boardHasChanged = true;
@@ -231,7 +241,7 @@ export class TrifleAbilityManager {
 			// Now activate abilities triggered by same event
 			if (abilitiesTriggeredBySameAction && abilitiesTriggeredBySameAction.length > 0) {
 				abilitiesTriggeredBySameAction.forEach(otherAbility => {
-					this.doTheActivateThing(otherAbility, tileRecords, abilitiesActivated, cascadeDepth + 1, visitedAbilityKeys);
+					this.doTheActivateThing(otherAbility, tileRecords, abilitiesActivated, allAnimations, cascadeDepth + 1, visitedAbilityKeys);
 				});
 			}
 
