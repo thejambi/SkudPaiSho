@@ -871,6 +871,7 @@ figure > div {
   border-radius: inherit;
   z-index: 10;
   pointer-events: none;
+  animation: tileHighlightFadeIn 0.3s ease-in-out;
 }
 .tileHighlightThreat::after {
   box-shadow: inset 0px 0px 10px 4px rgba(255, 100, 140, 0.8);
@@ -880,6 +881,10 @@ figure > div {
 }
 .tileHighlightThreat.tileHighlightCover::after {
   box-shadow: inset 0px 0px 10px 4px rgba(255, 100, 140, 0.8), inset 0px 0px 3px 2px rgba(100, 100, 220, 1);
+}
+@keyframes tileHighlightFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Paiko captured tile fade-out animation */
