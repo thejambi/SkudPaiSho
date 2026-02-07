@@ -67,6 +67,7 @@ import {
 } from '../trifle/TrifleGameNotation';
 import { TrifleTile } from '../trifle/TrifleTile';
 import { TrifleTileInfo } from '../trifle/TrifleTileInfo';
+import { PromptTargetHelper } from '../trifle/PromptTargetHelper';
 import { debug, debugOn } from '../GameData';
 import { getPlayerCodeFromName } from '../pai-sho-common/PaiShoPlayerHelp';
 import { setCurrentTileCodes, setCurrentTileMetadata } from '../trifle/PaiShoGamesTileMetadata';
@@ -525,11 +526,7 @@ GinsengController.prototype.unplayedTileClicked = function(tileDiv) {
 	} else if (this.notationBuilder.status === TrifleNotationBuilderStatus.PROMPTING_FOR_TARGET) {
 		if (tile.tileIsSelectable) {
 			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
-				var sourceTileKey = JSON.stringify(this.notationBuilder.neededPromptTargetInfo.sourceTileKey);
-				if (!this.notationBuilder.promptTargetData[sourceTileKey]) {
-					this.notationBuilder.promptTargetData[sourceTileKey] = {};
-				}
-				this.notationBuilder.promptTargetData[sourceTileKey][this.notationBuilder.neededPromptTargetInfo.currentPromptTargetId] = tile.getOwnerCodeIdObject();
+				PromptTargetHelper.recordTileAnswer(this.notationBuilder.promptTargetData, this.notationBuilder.neededPromptTargetInfo, tile.getOwnerCodeIdObject());
 				// TODO - Does move require user to choose targets?... 
 				var notationBuilderSave = this.notationBuilder;
 				this.resetMove(true);
@@ -597,11 +594,7 @@ GinsengController.prototype.pointClicked = function(htmlPoint) {
 			this.theGame.hidePossibleMovePoints();
 
 			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
-				var sourceTileKey = JSON.stringify(this.notationBuilder.neededPromptTargetInfo.sourceTileKey);
-				if (!this.notationBuilder.promptTargetData[sourceTileKey]) {
-					this.notationBuilder.promptTargetData[sourceTileKey] = {};
-				}
-				this.notationBuilder.promptTargetData[sourceTileKey][this.notationBuilder.neededPromptTargetInfo.currentPromptTargetId] = new NotationPoint(htmlPoint.getAttribute("name"));
+				PromptTargetHelper.recordBoardPointAnswer(this.notationBuilder.promptTargetData, this.notationBuilder.neededPromptTargetInfo, htmlPoint.getAttribute("name"));
 				// TODO - Does move require user to choose targets?... 
 				var notationBuilderSave = this.notationBuilder;
 				this.resetMove(true);
@@ -784,11 +777,7 @@ GinsengController.prototype.setGameNotation = function(newGameNotation) {
 };
 
 GinsengController.prototype.skipClicked = function() {
-	var sourceTileKey = JSON.stringify(this.notationBuilder.neededPromptTargetInfo.sourceTileKey);
-	if (!this.notationBuilder.promptTargetData[sourceTileKey]) {
-		this.notationBuilder.promptTargetData[sourceTileKey] = {};
-	}
-	this.notationBuilder.promptTargetData[sourceTileKey].skipped = true;
+	PromptTargetHelper.recordSkip(this.notationBuilder.promptTargetData, this.notationBuilder.neededPromptTargetInfo);
 	var notationBuilderSave = this.notationBuilder;
 	this.resetMove();
 	this.notationBuilder = notationBuilderSave;

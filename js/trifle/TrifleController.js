@@ -33,14 +33,19 @@ import {
 	onlinePlayEnabled,
 	playingOnlineGame,
 	refreshMessage,
+	quickFinalizeMove,
 	rerunAll,
+	showResetMoveMessage,
+	showSkipButtonMessage,
 	userIsLoggedIn,
 } from '../PaiShoMain';
 import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import {
-	OldTrifleGameNotation,
-	OldTrifleNotationBuilder,
-} from './OldTrifleGameNotation';
+	TrifleGameNotation,
+	TrifleNotationBuilder,
+	TrifleNotationBuilderStatus,
+} from './TrifleGameNotation';
+import { PromptTargetHelper } from './PromptTargetHelper';
 import {
 	setCurrentTileCodes,
 	setCurrentTileMetadata,
@@ -97,7 +102,9 @@ export class TrifleController {
 		if (this.notationBuilder) {
 			offerDraw = this.notationBuilder.offerDraw;
 		}
-		this.notationBuilder = new OldTrifleNotationBuilder();
+		this.notationBuilder = new TrifleNotationBuilder();
+		this.notationBuilder.promptTargetData = {};
+		this.notationBuilder.currentPlayer = this.getCurrentPlayer();
 		if (offerDraw) {
 			this.notationBuilder.offerDraw = true;
 		}
@@ -109,7 +116,7 @@ export class TrifleController {
 	}
 
 	getNewGameNotation() {
-		return new OldTrifleGameNotation();
+		return new TrifleGameNotation(GUEST);
 	}
 
 	callActuate() {
@@ -147,7 +154,7 @@ export class TrifleController {
 		return settingsDiv;
 	}
 
-	resetMove() {
+	resetMove(skipAnimation) {
 		this.notationBuilder.offerDraw = false;
 		if (this.notationBuilder.status === BRAND_NEW) {
 			// Remove last move
@@ -156,7 +163,7 @@ export class TrifleController {
 			// Just rerun
 		}
 
-		rerunAll();
+		rerunAll(null, null, skipAnimation);
 	}
 
 	getDefaultHelpMessageText() {
@@ -330,6 +337,22 @@ export class TrifleController {
 			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
 
 			this.theGame.revealDeployPoints(tile);
+		} else if (this.notationBuilder.status === TrifleNotationBuilderStatus.PROMPTING_FOR_TARGET) {
+			if (tile.tileIsSelectable) {
+				if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
+					PromptTargetHelper.recordTileAnswer(
+						this.notationBuilder.promptTargetData,
+						this.notationBuilder.neededPromptTargetInfo,
+						tile.getOwnerCodeIdObject()
+					);
+					const notationBuilderSave = this.notationBuilder;
+					this.resetMove(true);
+					this.notationBuilder = notationBuilderSave;
+					this.completeMove();
+				} else {
+					this.resetNotationBuilder();
+				}
+			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
 			this.resetNotationBuilder();
@@ -406,22 +429,70 @@ export class TrifleController {
 				this.theGame.hidePossibleMovePoints();
 				this.resetNotationBuilder();
 			}
+		} else if (this.notationBuilder.status === TrifleNotationBuilderStatus.PROMPTING_FOR_TARGET) {
+			if (boardPoint.isType(POSSIBLE_MOVE)) {
+				this.theGame.hidePossibleMovePoints();
+
+				if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
+					PromptTargetHelper.recordBoardPointAnswer(
+						this.notationBuilder.promptTargetData,
+						this.notationBuilder.neededPromptTargetInfo,
+						htmlPoint.getAttribute("name")
+					);
+					const notationBuilderSave = this.notationBuilder;
+					this.resetMove(true);
+					this.notationBuilder = notationBuilderSave;
+					this.completeMove();
+				} else {
+					this.resetNotationBuilder();
+				}
+			}
 		}
 	}
 
 	completeMove() {
 		const move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
-		this.theGame.runNotationMove(move);
-		this.gameNotation.addMove(move);
-		if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
-			createGameIfThatIsOk(this.getGameTypeId());
+		const skipAnimation = this.notationBuilder.status === TrifleNotationBuilderStatus.PROMPTING_FOR_TARGET;
+		const neededPromptTargetInfo = this.theGame.runNotationMove(move, true, null, skipAnimation);
+
+		if (neededPromptTargetInfo) {
+			debug("Prompting user for the rest of the move!");
+			this.notationBuilder.status = TrifleNotationBuilderStatus.PROMPTING_FOR_TARGET;
+			this.notationBuilder.neededPromptTargetInfo = neededPromptTargetInfo;
+
+			if (neededPromptTargetInfo.sourceAbility.abilityInfo.optional) {
+				refreshMessage();
+				let abilityTitle = neededPromptTargetInfo.sourceAbility.abilityInfo.title;
+				if (!abilityTitle) {
+					abilityTitle = neededPromptTargetInfo.sourceAbility.abilityInfo.type;
+				}
+				showSkipButtonMessage("Skip ability: " + abilityTitle);
+			}
+
+			showResetMoveMessage();
 		} else {
-			if (playingOnlineGame()) {
-				callSubmitMove();
+			this.gameNotation.addMove(move);
+			if (onlinePlayEnabled && this.gameNotation.moves.length === 1) {
+				createGameIfThatIsOk(this.getGameTypeId());
 			} else {
-				finalizeMove();
+				if (playingOnlineGame()) {
+					callSubmitMove();
+				} else {
+					quickFinalizeMove();
+				}
 			}
 		}
+	}
+
+	skipClicked() {
+		PromptTargetHelper.recordSkip(
+			this.notationBuilder.promptTargetData,
+			this.notationBuilder.neededPromptTargetInfo
+		);
+		const notationBuilderSave = this.notationBuilder;
+		this.resetMove();
+		this.notationBuilder = notationBuilderSave;
+		this.completeMove();
 	}
 
 	skipHarmonyBonus() {

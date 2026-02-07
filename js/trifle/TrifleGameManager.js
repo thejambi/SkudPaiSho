@@ -47,8 +47,11 @@ export class TrifleGameManager {
 		setGameLogText(this.gameLogText);
 	}
 
-	runNotationMove(move, withActuate) {
-		debug("Running Move: " + move.fullMoveText);
+	runNotationMove(move, withActuate, moveAnimationBeginStep_unused, skipAnimation) {
+		debug("Running Move:");
+		debug(move);
+
+		var neededPromptInfo;
 
 		if (move.moveType === TEAM_SELECTION) {
 			move.teamTileCodes.forEach((tileCode) => {
@@ -70,8 +73,10 @@ export class TrifleGameManager {
 				}
 			}
 		} else if (move.moveType === MOVE) {
-			const moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint);
+			const moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint, move);
 			this.buildMoveGameLogText(move, moveDetails);
+
+			const abilityActivationFlags = moveDetails.abilityActivationFlags;
 
 			// Attach animation info for actuator
 			move.animationInfo = {
@@ -81,6 +86,14 @@ export class TrifleGameManager {
 				capturedTiles: moveDetails.capturedTiles || [],
 				abilityAnimations: moveDetails.animations || null
 			};
+
+			// Check if any abilities need user prompt targets
+			var needToPromptUser = abilityActivationFlags
+				&& abilityActivationFlags.neededPromptInfo
+				&& abilityActivationFlags.neededPromptInfo.currentPromptTargetId;
+			if (needToPromptUser) {
+				neededPromptInfo = abilityActivationFlags.neededPromptInfo;
+			}
 
 			// If tile is capturing a Banner tile, there's a winner
 			if (moveDetails.capturedTiles && moveDetails.capturedTiles.length) {
@@ -100,9 +113,11 @@ export class TrifleGameManager {
 		 */
 		this.board.tickDurationAbilities();
 
-		if (withActuate) {
+		if (withActuate && !skipAnimation) {
 			this.actuate(move);
 		}
+
+		return neededPromptInfo;
 	}
 
 	buildTeamSelectionGameLogText(move) {
