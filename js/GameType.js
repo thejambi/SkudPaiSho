@@ -478,6 +478,19 @@ export const GameType = {
 			'SkudPaiSho',
 		]
 	},
+	GiniPaiSho: {
+		id: 27,
+		name: "Gini Pai Sho",
+		desc: "Gini Pai Sho",
+		color: "var(--ginicolor)",
+		description: "A compact, tactical variant of Pai Sho. Advance your White Lotus to the opponent's win line using elemental benders and accent tiles.",
+		coverImg: "ginseng.png",
+		rulesUrl: "https://skudpaisho.com/site/games/gini-pai-sho/",
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho',
+		]
+	},
 	Fanorona: {
 		id: 26,
 		name: "Fanorona",

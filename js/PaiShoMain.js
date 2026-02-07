@@ -25,6 +25,7 @@ import {
 	getGameOptionDescription,
 } from './GameOptions';
 import { GameType, gameTypeIdSupported, getGameTypeEntryFromId } from './GameType';
+import { GiniController } from './gini/GiniController';
 import { GinsengController } from './ginseng/GinsengController';
 import { GodaiController } from './godai/GodaiController';
 import { HexentaflController } from './hexentafl/HexentaflController';
@@ -3281,6 +3282,9 @@ export function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Ginseng.id:
 			controller = new GinsengController(gameContainerDiv, isMobile);
+			break;
+		case GameType.GiniPaiSho.id:
+			controller = new GiniController(gameContainerDiv, isMobile);
 			break;
 		case GameType.KeyPaiSho.id:
 			controller = new KeyPaiShoController(gameContainerDiv, isMobile);
