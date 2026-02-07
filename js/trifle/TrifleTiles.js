@@ -9,9 +9,7 @@ import {
   TrifleMovementAbility,
   TrifleMovementRestriction,
   TrifleMovementType,
-  TriflePromptTargetType,
   TrifleSpecialDeployType,
-  TrifleTargetPromptId,
   TrifleTargetType,
   TrifleTileCategory,
   TrifleTileTeam,
@@ -1361,14 +1359,6 @@ export function defineTrifleTiles() {
 		abilities: [
 			{
 				type: TrifleAbilityName.substituteForCapture,
-				optional: true,
-				neededPromptTargetsInfo: [
-					{
-						title: "savedTile",
-						promptId: TrifleTargetPromptId.chosenSavedTile,
-						targetType: TriflePromptTargetType.capturedTile
-					}
-				],
 				triggers: [
 					{
 						triggerType: TrifleAbilityTriggerType.whenTargetTileInZoneIsCaptured,

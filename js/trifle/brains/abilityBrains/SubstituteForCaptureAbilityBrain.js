@@ -1,6 +1,4 @@
 import { debug } from '../../../GameData';
-import { TrifleAbilityManager } from '../../TrifleAbilityManager';
-import { TrifleTargetPromptId } from '../../TrifleTileInfo';
 import {
 	TrifleAnimationType,
 	TrifleAnimationInstruction,
@@ -10,46 +8,6 @@ import {
 export function TrifleSubstituteForCaptureAbilityBrain(abilityObject) {
 	this.abilityObject = abilityObject;
 }
-
-TrifleSubstituteForCaptureAbilityBrain.prototype.promptForTarget = function(
-		nextNeededPromptTargetInfo, sourceTileKeyStr, checkForTargetsOnly) {
-	var promptTargetsExist = false;
-
-	if (nextNeededPromptTargetInfo.promptId === TrifleTargetPromptId.chosenSavedTile) {
-		this.abilityObject.setAbilityTargetTiles();
-		var abilityTargetTiles = this.abilityObject.abilityTargetTiles;
-
-		if (checkForTargetsOnly) {
-			return abilityTargetTiles.length > 0;
-		}
-
-		if (abilityTargetTiles.length <= 1) {
-			// Single target: auto-fill the prompt answer, no user interaction needed
-			if (abilityTargetTiles.length === 1) {
-				var sourceTileKey = JSON.stringify(
-					TrifleAbilityManager.buildSourceTileKeyObject(this.abilityObject.sourceTile)
-				);
-				if (!this.abilityObject.promptTargetInfo) {
-					this.abilityObject.promptTargetInfo = {};
-				}
-				if (!this.abilityObject.promptTargetInfo[sourceTileKey]) {
-					this.abilityObject.promptTargetInfo[sourceTileKey] = {};
-				}
-				this.abilityObject.promptTargetInfo[sourceTileKey][TrifleTargetPromptId.chosenSavedTile] =
-					abilityTargetTiles[0].getOwnerCodeIdObject();
-			}
-			return false;
-		}
-
-		// Multiple targets: mark selectable for user to choose
-		abilityTargetTiles.forEach(function(targetTile) {
-			promptTargetsExist = true;
-			targetTile.tileIsSelectable = true;
-		});
-	}
-
-	return promptTargetsExist;
-};
 
 TrifleSubstituteForCaptureAbilityBrain.prototype.activateAbility = function() {
 	var targetTiles = this.abilityObject.abilityTargetTiles;
@@ -62,34 +20,11 @@ TrifleSubstituteForCaptureAbilityBrain.prototype.activateAbility = function() {
 		return { capturedTiles: this.capturedTiles, animations: animations };
 	}
 
-	// Determine which tile to restore: use prompt selection if available, otherwise first target
+	// Default to first captured tile
 	var restoredTile = targetTiles[0];
 	var restoredTileOriginalPoint = targetTilePoints && targetTilePoints.length > 0
 		? targetTilePoints[0]
 		: null;
-
-	var promptTargetInfo = this.abilityObject.promptTargetInfo;
-	if (promptTargetInfo) {
-		var sourceTileKey = JSON.stringify(
-			TrifleAbilityManager.buildSourceTileKeyObject(this.abilityObject.sourceTile)
-		);
-		if (promptTargetInfo[sourceTileKey]
-				&& promptTargetInfo[sourceTileKey][TrifleTargetPromptId.chosenSavedTile]) {
-			var chosenTileKeyObject = promptTargetInfo[sourceTileKey][TrifleTargetPromptId.chosenSavedTile];
-
-			for (var i = 0; i < targetTiles.length; i++) {
-				if (targetTiles[i].ownerName === chosenTileKeyObject.ownerName
-						&& targetTiles[i].code === chosenTileKeyObject.code
-						&& targetTiles[i].id === chosenTileKeyObject.id) {
-					restoredTile = targetTiles[i];
-					restoredTileOriginalPoint = targetTilePoints && targetTilePoints.length > i
-						? targetTilePoints[i]
-						: null;
-					break;
-				}
-			}
-		}
-	}
 
 	var sourceTile = this.abilityObject.sourceTile;
 	var sourceTilePoint = sourceTile.seatedPoint;

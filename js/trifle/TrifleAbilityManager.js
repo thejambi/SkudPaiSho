@@ -586,8 +586,10 @@ export class TrifleAbilityManager {
 		});
 
 		if (nextNeededPromptTargetInfo) {
+			debug("promptForNextNeededTargets: ability=" + abilityObject.abilityType + " promptId=" + nextNeededPromptTargetInfo.promptId);
 			const abilityBrain = TrifleBrainFactory.createAbilityBrain(abilityObject.abilityType, abilityObject);
 			const promptTargetsExist = abilityBrain.promptForTarget(nextNeededPromptTargetInfo, sourceTileKeyStr);
+			debug("promptForNextNeededTargets: promptTargetsExist=" + promptTargetsExist);
 			if (promptTargetsExist) {
 				neededPromptInfo.currentPromptTargetId = nextNeededPromptTargetInfo.promptId;
 			} else {

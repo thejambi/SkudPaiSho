@@ -289,12 +289,14 @@ export class TrifleController {
 	}
 
 	unplayedTileClicked(tileDiv) {
+		debug(">>> unplayedTileClicked ENTRY: status=" + this.notationBuilder.status + " divName=" + (tileDiv ? tileDiv.getAttribute("name") : 'null') + " divId=" + (tileDiv ? tileDiv.getAttribute("id") : 'null'));
 		this.theGame.markingManager.clearMarkings();
 		this.callActuate();
 
 		this.promptToAcceptDraw = false;
 
 		if (this.theGame.hasEnded() && this.notationBuilder.status !== READY_FOR_BONUS) {
+			debug(">>> unplayedTileClicked: RETURNING EARLY - game has ended");
 			return;
 		}
 
@@ -309,11 +311,13 @@ export class TrifleController {
 		}
 
 		const tile = this.theGame.tileManager.peekTile(player, tileCode, tileId);
+		debug(">>> unplayedTileClicked: peekTile result: " + (tile ? "found " + tile.code + " id=" + tile.id + " selectable=" + tile.tileIsSelectable : "NULL"));
 
 		if ((tile && tile.ownerName !== getCurrentPlayer()) || !myTurn()) {
 			this.checkingOutOpponentTileOrNotMyTurn = true;
 		}
 
+		debug(">>> unplayedTileClicked: before branching. status=" + this.notationBuilder.status + " playersSelectingTeams=" + this.theGame.playersAreSelectingTeams());
 		if (this.theGame.playersAreSelectingTeams()) {
 			const selectedTile = new TrifleTile(tileCode, playerCode);
 			if (tileDiv.classList.contains("selectedFromPile")) {
@@ -337,20 +341,23 @@ export class TrifleController {
 
 			this.theGame.revealDeployPoints(tile);
 		} else if (this.notationBuilder.status === TrifleNotationBuilderStatus.PROMPTING_FOR_TARGET) {
-			if (tile.tileIsSelectable) {
-				if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
-					PromptTargetHelper.recordTileAnswer(
-						this.notationBuilder.promptTargetData,
-						this.notationBuilder.neededPromptTargetInfo,
-						tile.getOwnerCodeIdObject()
-					);
-					const notationBuilderSave = this.notationBuilder;
-					this.resetMove(true);
-					this.notationBuilder = notationBuilderSave;
-					this.completeMove();
-				} else {
-					this.resetNotationBuilder();
-				}
+			debug("Prompt target click: tile=" + tileCode + " id=" + tileId + " player=" + player);
+			debug("  tile.tileIsSelectable=" + (tile ? tile.tileIsSelectable : 'tile is null'));
+			debug("  isInReplay=" + isInReplay);
+			debug("  notationBuilder.neededPromptTargetInfo=" + JSON.stringify(this.notationBuilder.neededPromptTargetInfo ? this.notationBuilder.neededPromptTargetInfo.currentPromptTargetId : 'none'));
+			if (tile.tileIsSelectable && !isInReplay) {
+				debug("  Recording tile answer and completing move");
+				PromptTargetHelper.recordTileAnswer(
+					this.notationBuilder.promptTargetData,
+					this.notationBuilder.neededPromptTargetInfo,
+					tile.getOwnerCodeIdObject()
+				);
+				const notationBuilderSave = this.notationBuilder;
+				this.resetMove(true);
+				this.notationBuilder = notationBuilderSave;
+				this.completeMove();
+			} else {
+				debug("  NOT processing click: selectable=" + (tile ? tile.tileIsSelectable : false) + " replay=" + isInReplay);
 			}
 		} else {
 			this.theGame.hidePossibleMovePoints();
@@ -429,22 +436,18 @@ export class TrifleController {
 				this.resetNotationBuilder();
 			}
 		} else if (this.notationBuilder.status === TrifleNotationBuilderStatus.PROMPTING_FOR_TARGET) {
-			if (boardPoint.isType(POSSIBLE_MOVE)) {
+			if (boardPoint.isType(POSSIBLE_MOVE) && !isInReplay) {
 				this.theGame.hidePossibleMovePoints();
 
-				if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
-					PromptTargetHelper.recordBoardPointAnswer(
-						this.notationBuilder.promptTargetData,
-						this.notationBuilder.neededPromptTargetInfo,
-						htmlPoint.getAttribute("name")
-					);
-					const notationBuilderSave = this.notationBuilder;
-					this.resetMove(true);
-					this.notationBuilder = notationBuilderSave;
-					this.completeMove();
-				} else {
-					this.resetNotationBuilder();
-				}
+				PromptTargetHelper.recordBoardPointAnswer(
+					this.notationBuilder.promptTargetData,
+					this.notationBuilder.neededPromptTargetInfo,
+					htmlPoint.getAttribute("name")
+				);
+				const notationBuilderSave = this.notationBuilder;
+				this.resetMove(true);
+				this.notationBuilder = notationBuilderSave;
+				this.completeMove();
 			}
 		}
 	}
@@ -455,7 +458,11 @@ export class TrifleController {
 		const neededPromptTargetInfo = this.theGame.runNotationMove(move, true, null, skipAnimation);
 
 		if (neededPromptTargetInfo) {
-			debug("Prompting user for the rest of the move!");
+			debug("Prompting user for the rest of the move! promptId=" + (neededPromptTargetInfo.currentPromptTargetId || 'none'));
+			debug("  Captured tiles in tileManager: " + this.theGame.tileManager.capturedTiles.length);
+			this.theGame.tileManager.capturedTiles.forEach(function(t) {
+				debug("    " + t.code + " id=" + t.id + " owner=" + t.ownerName + " selectable=" + t.tileIsSelectable);
+			});
 			this.notationBuilder.status = TrifleNotationBuilderStatus.PROMPTING_FOR_TARGET;
 			this.notationBuilder.neededPromptTargetInfo = neededPromptTargetInfo;
 

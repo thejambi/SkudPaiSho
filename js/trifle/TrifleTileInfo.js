@@ -209,8 +209,7 @@ export const TriflePromptTargetType = {
 export const TrifleTargetPromptId = {
 	movedTilePoint: "movedTilePoint",
 	movedTileDestinationPoint: "movedTileDestinationPoint",
-	chosenCapturedTile: "chosenCapturedTile",
-	chosenSavedTile: "chosenSavedTile"
+	chosenCapturedTile: "chosenCapturedTile"
 };
 
 export const TrifleTileTeam = {

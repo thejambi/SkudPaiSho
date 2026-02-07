@@ -308,6 +308,7 @@ export class TrifleActuator {
 	}
 
 	addCapturedTile(tile, container) {
+		debug("addCapturedTile: " + tile.code + " id=" + tile.id + " owner=" + tile.ownerName + " selectable=" + tile.tileIsSelectable);
 		const theDiv = document.createElement("div");
 		theDiv.classList.add("point");
 		theDiv.classList.add("hasTile");
