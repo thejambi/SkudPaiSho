@@ -33,7 +33,6 @@ import {
   usernameIsOneOf,
 } from '../PaiShoMain';
 import {
-  DEPLOY,
   DRAW_ACCEPT,
   GUEST,
   HOST,
@@ -43,6 +42,7 @@ import {
 } from '../CommonNotationObjects';
 import { GiniActuator } from './GiniActuator';
 import {
+  ACCENT_TILE_HOME,
   GiniGameManager,
   GiniNotationAdjustmentFunction
 } from './GiniGameManager';
@@ -419,16 +419,7 @@ GiniController.prototype.unplayedTileClicked = function(tileDiv) {
 	}
 
 	if (this.notationBuilder.status === BRAND_NEW) {
-		// Accent tile deploy
-		if (GiniTileInfo.isAccentTile(tileCode)) {
-			tile.selectedFromPile = true;
-
-			this.notationBuilder.moveType = DEPLOY;
-			this.notationBuilder.tileType = tileCode;
-			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
-
-			this.theGame.revealDeployPoints(tile);
-		}
+		// Accent tiles are on the board, not in side panel
 	} else if (this.notationBuilder.status === TrifleNotationBuilderStatus.PROMPTING_FOR_TARGET) {
 		if (tile.tileIsSelectable) {
 			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
@@ -471,11 +462,20 @@ GiniController.prototype.pointClicked = function(htmlPoint) {
 				this.checkingOutOpponentTileOrNotMyTurn = true;
 			}
 
-			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
-			this.notationBuilder.moveType = MOVE;
-			this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
+			if (boardPoint.isType(ACCENT_TILE_HOME)) {
+				// Accent tile at home position - move to playing area
+				this.notationBuilder.status = WAITING_FOR_ENDPOINT;
+				this.notationBuilder.moveType = MOVE;
+				this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
 
-			this.theGame.revealPossibleMovePoints(boardPoint);
+				this.theGame.revealDeployPoints(boardPoint.tile);
+			} else {
+				this.notationBuilder.status = WAITING_FOR_ENDPOINT;
+				this.notationBuilder.moveType = MOVE;
+				this.notationBuilder.startPoint = new NotationPoint(htmlPoint.getAttribute("name"));
+
+				this.theGame.revealPossibleMovePoints(boardPoint);
+			}
 		}
 	} else if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
@@ -701,9 +701,6 @@ GiniController.prototype.buildNotationString = function(move) {
 				}
 			});
 		}
-	} else if (move.moveType === DEPLOY) {
-		var endRowAndCol = new NotationPoint(move.endPoint).rowAndColumn;
-		moveNotation += move.tileType + "(" + GiniNotationAdjustmentFunction(endRowAndCol.row, endRowAndCol.col) + ")";
 	}
 
 	return moveNotation;

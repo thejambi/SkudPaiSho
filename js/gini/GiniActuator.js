@@ -22,13 +22,11 @@ import {
   unplayedTileClicked,
 } from '../PaiShoMain';
 import {
-  cos45,
   createBoardArrow,
   createBoardPointDiv,
   getTilesForPlayer,
   isSamePoint,
   setupPaiShoBoard,
-  sin45,
 } from '../ActuatorHelp';
 import { debug } from '../GameData';
 import { GiniNotationAdjustmentFunction } from './GiniGameManager';
@@ -275,6 +273,17 @@ export class GiniActuator {
 			const theImg = document.createElement("img");
 			theImg.elementStyleTransform = new ElementStyleTransform(theImg);
 
+			// Set rotation before animation
+			theImg.elementStyleTransform.setValue("rotate", 270, "deg");
+			if (GiniOptions.viewAsGuest) {
+				theImg.elementStyleTransform.adjustValue("rotate", 180, "deg");
+			}
+
+			// Animate before setting image src
+			if (this.animationOn && moveToAnimate) {
+				this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv, moveDetails);
+			}
+
 			const srcValue = this.getTileSrcPath();
 
 			let tileMoved = boardPoint.tile;
@@ -289,6 +298,9 @@ export class GiniActuator {
 
 			theDiv.appendChild(theImg);
 
+			// Show captured tile underneath during animation
+			const capturedTile = this.getCapturedTileFromMove(moveDetails);
+
 			if (showMovedTileDuringAnimation) {
 				setTimeout(() => {
 					requestAnimationFrame(() => {
@@ -301,13 +313,24 @@ export class GiniActuator {
 				}, pieceAnimationLength);
 			}
 
-			theImg.elementStyleTransform.setValue("rotate", 270, "deg");
-			if (GiniOptions.viewAsGuest) {
-				theImg.elementStyleTransform.adjustValue("rotate", 180, "deg");
-			}
+			if (this.animationOn && moveToAnimate && capturedTile && isSamePoint(moveToAnimate.endPoint, boardPoint.col, boardPoint.row)) {
+				const theImgCaptured = document.createElement("img");
+				theImgCaptured.elementStyleTransform = new ElementStyleTransform(theImgCaptured);
+				theImgCaptured.src = srcValue + capturedTile.getImageName() + ".png";
+				theImgCaptured.classList.add("underneath");
 
-			if (this.animationOn && moveToAnimate && moveToAnimate.moveType === MOVE) {
-				this.doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv, moveDetails);
+				theImgCaptured.elementStyleTransform.setValue("rotate", 270, "deg");
+				if (GiniOptions.viewAsGuest) {
+					theImgCaptured.elementStyleTransform.adjustValue("rotate", 180, "deg");
+				}
+
+				theDiv.appendChild(theImgCaptured);
+
+				setTimeout(() => {
+					requestAnimationFrame(() => {
+						theImgCaptured.style.visibility = "hidden";
+					});
+				}, pieceAnimationLength);
 			}
 		}
 
@@ -315,32 +338,105 @@ export class GiniActuator {
 	}
 
 	doAnimateBoardPoint(boardPoint, moveToAnimate, theImg, theDiv, moveDetails) {
-		if (moveToAnimate.endPoint) {
-			var endPoint = new NotationPoint(moveToAnimate.endPoint);
-			var endRowCol = endPoint.rowAndColumn;
+		if (!this.animationOn) return;
 
-			if (boardPoint.row === endRowCol.row && boardPoint.col === endRowCol.col) {
-				var startPoint = new NotationPoint(moveToAnimate.startPoint);
-				var startRowCol = startPoint.rowAndColumn;
+		var startX = boardPoint.col, startY = boardPoint.row, endX = startX, endY = startY;
+		var movementPath;
+		var movementStepIndex = 0;
 
-				var distR = startRowCol.row - endRowCol.row;
-				var distC = startRowCol.col - endRowCol.col;
+		if (moveToAnimate.moveType === MOVE && (boardPoint.tile || (moveDetails && moveDetails.movedTile))) {
+			if (isSamePoint(moveToAnimate.endPoint, endX, endY)) {
+				// This is the tile being moved
+				var moveStartPoint = new NotationPoint(moveToAnimate.startPoint);
+				startX = moveStartPoint.rowAndColumn.col;
+				startY = moveStartPoint.rowAndColumn.row;
+				theImg.elementStyleTransform.setValue("scale", 1.2);
+				theDiv.style.zIndex = 99;
 
-				var absDr = Math.abs(distR);
-				var absDc = Math.abs(distC);
-
-				if (absDr === 0 || absDc === 0 || absDr === absDc) {
-					theImg.style.transform = "translate(" + (distC * 34) + "px, " + (distR * 34) + "px)";
-				} else {
-					theImg.style.transform = "translate(" + ((distC + distR) * cos45 * 34) + "px, " + ((distR - distC) * sin45 * 34) + "px)";
+				// Get movement path for multi-point animation (e.g. Lotus jumps)
+				movementPath = moveToAnimate.endPointMovementPath;
+				if (!movementPath && moveToAnimate.movementPath) {
+					movementPath = moveToAnimate.movementPath;
 				}
-
-				requestAnimationFrame(function() {
-					theImg.style.transform = "translate(0px, 0px)";
-					theImg.classList.add("movingTile");
-				});
+			} else {
+				// Check if this tile was pushed by the move (e.g. Dragon push)
+				if (moveToAnimate.promptTargetData) {
+					Object.keys(moveToAnimate.promptTargetData).forEach((key) => {
+						var promptDataEntry = moveToAnimate.promptTargetData[key];
+						if (promptDataEntry.movedTilePoint && promptDataEntry.movedTileDestinationPoint) {
+							if (isSamePoint(promptDataEntry.movedTileDestinationPoint.pointText, endX, endY)) {
+								var pushStartPoint = promptDataEntry.movedTilePoint;
+								startX = pushStartPoint.rowAndColumn.col;
+								startY = pushStartPoint.rowAndColumn.row;
+								setTimeout(() => {
+									theImg.elementStyleTransform.setValue("scale", 1.2);
+									theDiv.style.zIndex = 105;
+								}, pieceAnimationLength / 1.2);
+								movementStepIndex = 1;
+							}
+						}
+					});
+				}
 			}
 		}
+
+		var pointSizeMultiplierX = 34;
+		var pointSizeMultiplierY = pointSizeMultiplierX;
+		var unitString = "px";
+
+		if (window.innerWidth <= 612) {
+			pointSizeMultiplierX = 5.5555;
+			pointSizeMultiplierY = 5.611;
+			unitString = "vw";
+		}
+
+		var left = (startX - endX);
+		var top = (startY - endY);
+
+		// Position tile at its origin (start) point
+		theImg.style.left = (left * pointSizeMultiplierX) + unitString;
+		theImg.style.top = (top * pointSizeMultiplierY) + unitString;
+
+		if (movementPath) {
+			// Multi-point animation (e.g. Lotus chain jumps)
+			var numMovements = movementPath.length - 1;
+			var movementAnimationLength = pieceAnimationLength / numMovements;
+			var cssLength = movementAnimationLength * (1 + (0.05 * numMovements));
+
+			theImg.style.transition = "left " + cssLength + "ms ease-out, right " + cssLength + "ms ease-out, top " + cssLength + "ms ease-out, bottom " + movementAnimationLength + "ms ease-out, transform 0.5s ease-in, opacity 0.5s";
+
+			var movementNum = -1;
+			movementPath.forEach(pathPointStr => {
+				var currentMovementAnimationTime = movementAnimationLength * movementNum;
+				setTimeout(() => {
+					requestAnimationFrame(() => {
+						var pathPoint = new NotationPoint(pathPointStr);
+						var pointX = pathPoint.rowAndColumn.col;
+						var pointY = pathPoint.rowAndColumn.row;
+						left = (pointX - endX);
+						top = (pointY - endY);
+						theImg.style.left = (left * pointSizeMultiplierX) + unitString;
+						theImg.style.top = (top * pointSizeMultiplierY) + unitString;
+					});
+				}, currentMovementAnimationTime);
+				movementNum++;
+			});
+		} else {
+			// Simple two-point animation
+			setTimeout(() => {
+				requestAnimationFrame(() => {
+					theImg.style.left = "0px";
+					theImg.style.top = "0px";
+				});
+			}, pieceAnimationLength * movementStepIndex);
+		}
+
+		// Scale back to normal after animation
+		setTimeout(() => {
+			requestAnimationFrame(() => {
+				theImg.elementStyleTransform.setValue("scale", 1);
+			});
+		}, pieceAnimationLength * (movementStepIndex + 0.5));
 	}
 
 	getCapturedTileFromMove(moveDetails) {

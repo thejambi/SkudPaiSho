@@ -1,27 +1,27 @@
 // Gini Game Manager
 
 import {
-  DEPLOY,
-  DRAW_ACCEPT,
-  GUEST,
-  HOST,
-  MOVE,
-  NotationPoint,
-  RowAndColumn,
-  SETUP,
+	DRAW_ACCEPT,
+	GUEST,
+	HOST,
+	MOVE,
+	NotationPoint,
+	RowAndColumn,
 } from '../CommonNotationObjects';
-import { GiniTileCodes, GiniTileInfo } from './GiniTiles';
-import { GiniTileManager } from './GiniTileManager';
-import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
-import { TrifleAbilityName } from '../trifle/TrifleTileInfo';
-import { TrifleTile } from '../trifle/TrifleTile';
 import { debug } from '../GameData';
+import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
 import {
-  getOpponentName,
-  getPlayerCodeFromName,
+	getOpponentName,
+	getPlayerCodeFromName,
 } from '../pai-sho-common/PaiShoPlayerHelp';
 import { setGameLogText } from '../PaiShoMain';
 import { PaiShoGameBoard } from '../trifle/PaiShoGameBoard';
+import { TrifleTile } from '../trifle/TrifleTile';
+import { TrifleAbilityName } from '../trifle/TrifleTileInfo';
+import { GiniTileManager } from './GiniTileManager';
+import { GiniTileCodes } from './GiniTiles';
+
+export var ACCENT_TILE_HOME = "AccentTileHome";
 
 export var GiniGameManager = function(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';
@@ -72,25 +72,7 @@ GiniGameManager.prototype.runNotationMove = function(move, withActuate, moveAnim
 	var neededPromptInfo;
 	var moveDetails;
 
-	if (move.moveType === SETUP) {
-		// No setup moves in Gini
-	} else if (move.moveType === DEPLOY) {
-		// Accent tile deployment
-		var tile = this.tileManager.grabAccentTile(move.player, move.tileType);
-		if (tile) {
-			this.board.placeTile(tile, new NotationPoint(move.endPoint));
-
-			// Process abilities triggered by deployment
-			moveDetails = {
-				capturedTiles: [],
-				movedTile: tile,
-				abilityActivationFlags: {}
-			};
-
-			this.buildDeployGameLogText(move, tile);
-			this.checkForWin();
-		}
-	} else if (move.moveType === MOVE) {
+	if (move.moveType === MOVE) {
 		moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint, move);
 		this.tileManager.addToCapturedTiles(moveDetails.capturedTiles);
 
@@ -122,15 +104,6 @@ GiniGameManager.prototype.runNotationMove = function(move, withActuate, moveAnim
 	}
 
 	return neededPromptInfo;
-};
-
-GiniGameManager.prototype.buildDeployGameLogText = function(move, tile) {
-	var endPoint = new NotationPoint(move.endPoint);
-	var endPointDisplay = GiniNotationAdjustmentFunction(endPoint.rowAndColumn.row, endPoint.rowAndColumn.col);
-
-	var moveNumLabel = move.moveNum + "" + getPlayerCodeFromName(move.player);
-
-	this.gameLogText = moveNumLabel + ". " + move.player + ' placed ' + TrifleTile.getTileName(tile.code) + ' at ' + endPointDisplay;
 };
 
 GiniGameManager.prototype.buildMoveGameLogText = function(move, moveDetails) {
@@ -278,6 +251,16 @@ GiniGameManager.prototype.doBoardSetup = function() {
 	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Koi), new NotationPoint("-4,2"));
 	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Bison), new NotationPoint("-4,-2"));
 	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Ginseng), new NotationPoint("-4,0"));
+
+	this.board.placeTile(this.tileManager.grabAccentTile(HOST, GiniTileCodes.Water), new NotationPoint("5,4"));
+	this.board.placeTile(this.tileManager.grabAccentTile(HOST, GiniTileCodes.Earth), new NotationPoint("5,5"));
+	this.board.placeTile(this.tileManager.grabAccentTile(HOST, GiniTileCodes.Fire), new NotationPoint("6,4"));
+	this.board.placeTile(this.tileManager.grabAccentTile(HOST, GiniTileCodes.Air), new NotationPoint("6,5"));
+
+	this.board.placeTile(this.tileManager.grabAccentTile(GUEST, GiniTileCodes.Water), new NotationPoint("-6,-5"));
+	this.board.placeTile(this.tileManager.grabAccentTile(GUEST, GiniTileCodes.Earth), new NotationPoint("-6,-4"));
+	this.board.placeTile(this.tileManager.grabAccentTile(GUEST, GiniTileCodes.Fire), new NotationPoint("-5,-5"));
+	this.board.placeTile(this.tileManager.grabAccentTile(GUEST, GiniTileCodes.Air), new NotationPoint("-5,-4"));
 };
 
 GiniGameManager.prototype.getCopy = function() {
