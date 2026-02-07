@@ -6,6 +6,8 @@ import {
   TrifleCaptureType,
   TrifleMovementDirection,
   TrifleMovementType,
+  TriflePromptTargetType,
+  TrifleTargetPromptId,
   TrifleTargetType,
   TrifleTileCategory,
   TrifleTileInfo,
@@ -138,7 +140,53 @@ GiniTileInfo.defineGiniTiles = function() {
 			}
 		],
 		abilities: [
-			/* TODO: Phase 4 - Add flipTileOverSelf ability */
+			{
+				title: "Badgermole Flip",
+				type: TrifleAbilityName.moveTargetTile,
+				isPassiveMovement: true,
+				optional: true,
+				neededPromptTargetsInfo: [
+					{
+						title: "flippedTile",
+						promptId: TrifleTargetPromptId.movedTilePoint,
+						targetType: TriflePromptTargetType.boardPoint
+					},
+					{
+						title: "flipLanding",
+						promptId: TrifleTargetPromptId.movedTileDestinationPoint,
+						targetType: TriflePromptTargetType.boardPoint
+					}
+				],
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whenLandsSurroundingTargetTile,
+						targetTileTypes: [TrifleTileCategory.allTileTypes],
+						activationRequirements: [
+							{
+								type: TrifleActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [TrifleTileCategory.thisTile],
+								targetPointTypes: [WHITE]
+							}
+						]
+					},
+					{
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.thisTile]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				triggerTypeToTarget: TrifleAbilityTriggerType.whenLandsSurroundingTargetTile,
+				numberOfTargetTiles: 1,
+				promptTargetTitle: "flippedTile",
+				targetTileMovements: [
+					{
+						type: TrifleMovementType.jumpTargetTile,
+						distance: 1,
+						targetTileTypes: [TrifleTileCategory.tileWithAbility],
+						regardlessOfImmobilization: true
+					}
+				]
+			}
 		],
 		textLines: [
 			"<strong>Movement</strong>",
