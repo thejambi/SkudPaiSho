@@ -301,11 +301,8 @@ export class GiniActuator {
 				}, pieceAnimationLength);
 			}
 
+			theImg.elementStyleTransform.setValue("rotate", 270, "deg");
 			if (GiniOptions.viewAsGuest) {
-				theImg.elementStyleTransform.setValue("rotate", 180, "deg");
-			}
-
-			if (boardPoint.tile.ownerName === GUEST) {
 				theImg.elementStyleTransform.adjustValue("rotate", 180, "deg");
 			}
 
