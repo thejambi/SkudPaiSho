@@ -130,7 +130,7 @@ export class BeyondTheMapsController {
 	}
 
 	resetMove() {
-		if (this.moveBuilder.status === BRAND_NEW) {
+		if (this.moveBuilder.getStatus() === BRAND_NEW) {
 			// Remove last move
 			this.gameNotation.removeLastMove();
 		}
