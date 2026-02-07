@@ -9,53 +9,52 @@ import {
 	NotationPoint,
 	TEAM_SELECTION,
 } from '../CommonNotationObjects';
-import { TrifleAggressiveAI } from './ai/TrifleAggressiveAI';
-import { TrifleDefensiveAI } from './ai/TrifleDefensiveAI';
 import { debug, debugOn, gameDevOn } from '../GameData';
 import {
 	activeAi,
 	activeAi2,
 	BRAND_NEW,
-	clearMessage,
-	GameType,
-	READY_FOR_BONUS,
-	WAITING_FOR_ENDPOINT,
 	callSubmitMove,
+	clearMessage,
 	createGameIfThatIsOk,
-	currentMoveIndex,
 	finalizeMove,
 	gameController,
 	gameId,
+	GameType,
 	getCurrentPlayer,
 	getGameOptionsMessageElement,
 	isInReplay,
 	myTurn,
 	onlinePlayEnabled,
 	playingOnlineGame,
-	refreshMessage,
 	quickFinalizeMove,
+	READY_FOR_BONUS,
+	refreshMessage,
 	rerunAll,
 	showResetMoveMessage,
 	showSkipButtonMessage,
 	userIsLoggedIn,
+	WAITING_FOR_ENDPOINT
 } from '../PaiShoMain';
 import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
-import {
-	TrifleGameNotation,
-	TrifleNotationBuilder,
-	TrifleNotationBuilderStatus,
-} from './TrifleGameNotation';
-import { PromptTargetHelper } from './PromptTargetHelper';
+import { TrifleAggressiveAI } from './ai/TrifleAggressiveAI';
+import { TrifleDefensiveAI } from './ai/TrifleDefensiveAI';
 import {
 	setCurrentTileCodes,
 	setCurrentTileMetadata,
 	setCurrentTileNames
 } from './PaiShoGamesTileMetadata';
+import { PromptTargetHelper } from './PromptTargetHelper';
 import { TrifleActuator } from './TrifleActuator';
 import { TrifleGameManager } from './TrifleGameManager';
+import {
+	TrifleGameNotation,
+	TrifleNotationBuilder,
+	TrifleNotationBuilderStatus,
+} from './TrifleGameNotation';
 import { TrifleTile } from './TrifleTile';
 import { TrifleTileInfo, TrifleTiles } from './TrifleTileInfo';
-import { TrifleTileCodes, defineTrifleTiles, generateTrifleTileNames } from './TrifleTiles';
+import { defineTrifleTiles, generateTrifleTileNames, TrifleTileCodes } from './TrifleTiles';
 
 export class TrifleController {
 	constructor(gameContainer, isMobile) {
@@ -69,8 +68,8 @@ export class TrifleController {
 		setCurrentTileCodes(TrifleTileCodes);
 		setCurrentTileNames(generateTrifleTileNames());
 		this.resetGameManager();
-		this.resetNotationBuilder();
 		this.resetGameNotation();
+		this.resetNotationBuilder();
 
 		this.hostAccentTiles = [];
 		this.guestAccentTiles = [];
@@ -116,7 +115,7 @@ export class TrifleController {
 	}
 
 	getNewGameNotation() {
-		return new TrifleGameNotation(GUEST);
+		return new TrifleGameNotation(HOST);
 	}
 
 	callActuate() {
@@ -593,7 +592,7 @@ export class TrifleController {
 	}
 
 	getCurrentPlayer() {
-		if (currentMoveIndex % 2 === 0) {	// To get right player during replay...
+		if (this.gameNotation.moves.length % 2 === 0) {
 			return HOST;
 		} else {
 			return GUEST;

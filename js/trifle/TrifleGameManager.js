@@ -7,9 +7,9 @@ import TrifleTileManager from "./TrifleTileManager";
 import { debug } from "../GameData";
 import { currentTileMetadata } from "./PaiShoGamesTileMetadata";
 import { TrifleTileInfo } from "./TrifleTileInfo";
-import { DEPLOY, DRAW_ACCEPT, HOST, MOVE, TEAM_SELECTION } from "../CommonNotationObjects";
+import { DEPLOY, DRAW_ACCEPT, HOST, MOVE, NotationPoint, TEAM_SELECTION } from "../CommonNotationObjects";
 import { TrifleTile } from "./TrifleTile";
-import { getOpponentName } from "../pai-sho-common/PaiShoPlayerHelp";
+import { getOpponentName, getPlayerCodeFromName } from "../pai-sho-common/PaiShoPlayerHelp";
 
 export class TrifleGameManager {
 	constructor(actuator, ignoreActuate, isCopy) {
@@ -54,14 +54,20 @@ export class TrifleGameManager {
 		var neededPromptInfo;
 
 		if (move.moveType === TEAM_SELECTION) {
-			move.teamTileCodes.forEach((tileCode) => {
-				const tile = new TrifleTile(tileCode, move.playerCode);
+			const tileCodes = move.teamSelection.split(',');
+			const playerCode = getPlayerCodeFromName(move.player);
+			tileCodes.forEach((tileCode) => {
+				const tile = new TrifleTile(tileCode, playerCode);
 				this.tileManager.addToTeamIfOk(tile);
 			});
 			this.buildTeamSelectionGameLogText(move);
 		} else if (move.moveType === DEPLOY) {
 			const tile = this.tileManager.grabTile(move.player, move.tileType);
-			this.board.placeTile(tile, move.endPoint);
+			var endPoint = move.endPoint;
+			if (!endPoint.rowAndColumn) {
+				endPoint = new NotationPoint(endPoint);
+			}
+			this.board.placeTile(tile, endPoint);
 			this.buildDeployGameLogText(move, tile);
 
 			/* Banner played? Could use this in future, currently in Board. */
@@ -77,6 +83,20 @@ export class TrifleGameManager {
 			this.buildMoveGameLogText(move, moveDetails);
 
 			const abilityActivationFlags = moveDetails.abilityActivationFlags;
+
+			// Add captured tiles to tile manager
+			this.tileManager.addToCapturedTiles(moveDetails.capturedTiles);
+
+			if (abilityActivationFlags.tileRecords) {
+				if (abilityActivationFlags.tileRecords.capturedTiles
+						&& abilityActivationFlags.tileRecords.capturedTiles.length) {
+					this.tileManager.addToCapturedTiles(abilityActivationFlags.tileRecords.capturedTiles);
+				}
+				if (abilityActivationFlags.tileRecords.tilesMovedToPiles
+						&& abilityActivationFlags.tileRecords.tilesMovedToPiles.length) {
+					this.tileManager.addToCapturedTiles(abilityActivationFlags.tileRecords.tilesMovedToPiles);
+				}
+			}
 
 			// Attach animation info for actuator
 			move.animationInfo = {
@@ -125,11 +145,14 @@ export class TrifleGameManager {
 	}
 
 	buildDeployGameLogText(move, tile) {
-		this.gameLogText = move.player + ' placed ' + TrifleTile.getTileName(tile.code) + ' at ' + move.endPoint.pointText;
+		var endPointText = typeof move.endPoint === 'string' ? move.endPoint : move.endPoint.pointText;
+		this.gameLogText = move.player + ' placed ' + TrifleTile.getTileName(tile.code) + ' at ' + endPointText;
 	}
 
 	buildMoveGameLogText(move, moveDetails) {
-		this.gameLogText = move.player + ' moved ' + TrifleTile.getTileName(moveDetails.movedTile.code) + ' from ' + move.startPoint.pointText + ' to ' + move.endPoint.pointText;
+		var startPointText = typeof move.startPoint === 'string' ? move.startPoint : move.startPoint.pointText;
+		var endPointText = typeof move.endPoint === 'string' ? move.endPoint : move.endPoint.pointText;
+		this.gameLogText = move.player + ' moved ' + TrifleTile.getTileName(moveDetails.movedTile.code) + ' from ' + startPointText + ' to ' + endPointText;
 		if (moveDetails.capturedTiles && moveDetails.capturedTiles.length > 0) {
 			this.gameLogText += ' and captured ' + getOpponentName(move.player) + '\'s ';// + TrifleTile.getTileName(moveDetails.capturedTile.code);
 			let first = true;

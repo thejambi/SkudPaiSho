@@ -1,7 +1,7 @@
 // Trifle Actuator
 
 import { ElementStyleTransform } from '../util/ElementStyleTransform';
-import { DEPLOY, GUEST, HOST, MOVE, RowAndColumn } from '../CommonNotationObjects';
+import { DEPLOY, GUEST, HOST, MOVE, NotationPoint, RowAndColumn } from '../CommonNotationObjects';
 import {
 	MARKED,
 	NON_PLAYABLE,
@@ -27,6 +27,7 @@ import {
 	cos45,
 	createBoardArrow,
 	createBoardPointDiv,
+	getTilesForPlayer,
 	isSamePoint,
 	setupPaiShoBoard,
 	sin45,
@@ -192,6 +193,40 @@ export class TrifleActuator {
 				}
 			});
 		}
+
+		/* Captured Tiles */
+		const hostCapturedTiles = getTilesForPlayer(tileManager.capturedTiles, HOST);
+		const guestCapturedTiles = getTilesForPlayer(tileManager.capturedTiles, GUEST);
+
+		if (hostCapturedTiles.length > 0) {
+			this.addLineBreakInTilePile(HOST);
+			const hostCapturedContainer = document.createElement("span");
+			hostCapturedContainer.classList.add("tileLibrary");
+			const capturedLabel = document.createElement("span");
+			capturedLabel.innerText = "--Captured Tiles--";
+			hostCapturedContainer.appendChild(capturedLabel);
+			hostCapturedContainer.appendChild(document.createElement("br"));
+			document.getElementById(TrifleActuator.hostTeamTilesDivId)
+				.appendChild(hostCapturedContainer);
+			hostCapturedTiles.forEach((tile) => {
+				this.addCapturedTile(tile, hostCapturedContainer);
+			});
+		}
+
+		if (guestCapturedTiles.length > 0) {
+			this.addLineBreakInTilePile(GUEST);
+			const guestCapturedContainer = document.createElement("span");
+			guestCapturedContainer.classList.add("tileLibrary");
+			const capturedLabel = document.createElement("span");
+			capturedLabel.innerText = "--Captured Tiles--";
+			guestCapturedContainer.appendChild(capturedLabel);
+			guestCapturedContainer.appendChild(document.createElement("br"));
+			document.getElementById(TrifleActuator.guestTeamTilesDivId)
+				.appendChild(guestCapturedContainer);
+			guestCapturedTiles.forEach((tile) => {
+				this.addCapturedTile(tile, guestCapturedContainer);
+			});
+		}
 	}
 
 	clearContainer(container) {
@@ -267,6 +302,48 @@ export class TrifleActuator {
 			theDiv.addEventListener('click', function() { unplayedTileClicked(this); });
 			theDiv.addEventListener('mouseover', function() { showTileMessage(this); });
 			theDiv.addEventListener('mouseout', clearMessage);
+		}
+
+		container.appendChild(theDiv);
+	}
+
+	addCapturedTile(tile, container) {
+		const theDiv = document.createElement("div");
+		theDiv.classList.add("point");
+		theDiv.classList.add("hasTile");
+
+		if (tile.selectedFromPile || tile.tileIsSelectable) {
+			theDiv.classList.add("selectedFromPile");
+		}
+
+		const theImg = document.createElement("img");
+		theImg.src = TrifleActuator.imagePath + tile.getImageName() + ".png";
+		theDiv.appendChild(theImg);
+
+		theDiv.setAttribute("name", tile.getImageName());
+		theDiv.setAttribute("id", tile.id);
+
+		if (tile.tileIsSelectable) {
+			if (this.mobile) {
+				theDiv.addEventListener('click', function() {
+					unplayedTileClicked(this);
+					showTileMessage(this);
+				});
+			} else if (gameController && gameController.clickToShowPointMessage) {
+				theDiv.addEventListener('click', () => {
+					unplayedTileClicked(theDiv);
+					showTileMessage(theDiv);
+				});
+			} else {
+				theDiv.addEventListener('click', function() { unplayedTileClicked(this); });
+				theDiv.addEventListener('mouseover', function() { showTileMessage(this); });
+				theDiv.addEventListener('mouseout', clearMessage);
+			}
+		} else {
+			if (!this.mobile) {
+				theDiv.addEventListener('mouseover', function() { showTileMessage(this); });
+				theDiv.addEventListener('mouseout', clearMessage);
+			}
 		}
 
 		container.appendChild(theDiv);
@@ -485,8 +562,9 @@ export class TrifleActuator {
 		if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
 			if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {
 				// Start from where tile came from
-				x = moveToAnimate.startPoint.rowAndColumn.col;
-				y = moveToAnimate.startPoint.rowAndColumn.row;
+				const moveStartPoint = new NotationPoint(moveToAnimate.startPoint);
+				x = moveStartPoint.rowAndColumn.col;
+				y = moveStartPoint.rowAndColumn.row;
 				theImg.elementStyleTransform.setValue("scale", "1.2");
 				theDiv.style.zIndex = 99;
 			}

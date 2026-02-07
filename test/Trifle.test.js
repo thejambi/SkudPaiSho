@@ -39,7 +39,8 @@ vi.mock('../js/GameOptions', async (importOriginal) => {
 
 // Import after mocking
 import { TrifleGameManager } from '../js/trifle/TrifleGameManager';
-import { NotationPoint, DEPLOY, MOVE, TEAM_SELECTION, HOST, GUEST } from '../js/CommonNotationObjects';
+import { TrifleGameNotation } from '../js/trifle/TrifleGameNotation';
+import { NotationPoint, DEPLOY, MOVE, TEAM_SELECTION, HOST, GUEST, DRAW_ACCEPT } from '../js/CommonNotationObjects';
 import { TrifleTileCodes, defineTrifleTiles, TrifleTileType, TrifleTileIdentifier } from '../js/trifle/TrifleTiles';
 import { TrifleMovementType, TrifleDeployType, TrifleCaptureType, TrifleMovementAbility } from '../js/trifle/TrifleTileInfo';
 import { TrifleAbilityName, TrifleAbilityTriggerType, TrifleAttributeType, TrifleTargetType, TrifleTileCategory } from '../js/trifle/TrifleTileInfo';
@@ -2803,3 +2804,156 @@ describe('Fixed TODO Tiles - Definition and Abilities', () => {
  * - Duckweed (Water) - Surface Calm (enemies can't capture in zone) + Floating Refuge (protects friendlies)
  * - Marigold (Fire) - Scorching Presence (cancels enemy flower abilities) + Flame's Vigor (+1 movement for banners)
  */
+
+describe('TrifleGameNotation', () => {
+	describe('JSON notation (new format)', () => {
+		it('should load moves from JSON notation', () => {
+			const notation = new TrifleGameNotation(HOST);
+			const jsonMoves = [
+				{ moveNum: 0, player: HOST, moveType: TEAM_SELECTION, teamSelection: 'L,D,W' },
+				{ moveNum: 0, player: GUEST, moveType: TEAM_SELECTION, teamSelection: 'L,D,W' },
+				{ moveNum: 1, player: HOST, moveType: DEPLOY, tileType: 'Dragon', endPoint: '-2,0' },
+				{ moveNum: 1, player: GUEST, moveType: MOVE, startPoint: '-8,0', endPoint: '-6,3' }
+			];
+			notation.setNotationText(JSON.stringify(jsonMoves));
+
+			expect(notation.moves.length).toBe(4);
+			expect(notation.moves[0].moveType).toBe(TEAM_SELECTION);
+			expect(notation.moves[0].teamSelection).toBe('L,D,W');
+			expect(notation.moves[2].moveType).toBe(DEPLOY);
+			expect(notation.moves[2].tileType).toBe('Dragon');
+			expect(notation.moves[2].endPoint).toBe('-2,0');
+			expect(notation.moves[3].moveType).toBe(MOVE);
+			expect(notation.moves[3].startPoint).toBe('-8,0');
+			expect(notation.moves[3].endPoint).toBe('-6,3');
+		});
+	});
+
+	describe('Old text notation (backward compatibility)', () => {
+		it('should parse old team selection notation', () => {
+			const notation = new TrifleGameNotation(HOST);
+			notation.setNotationText('0H.L,D,W');
+
+			expect(notation.moves.length).toBe(1);
+			expect(notation.moves[0].moveNum).toBe(0);
+			expect(notation.moves[0].player).toBe(HOST);
+			expect(notation.moves[0].moveType).toBe(TEAM_SELECTION);
+			expect(notation.moves[0].teamSelection).toBe('L,D,W');
+		});
+
+		it('should parse old deploy notation', () => {
+			const notation = new TrifleGameNotation(HOST);
+			notation.setNotationText('0H.L,D,W;0G.L,D,W;1H.Dragon(-2,0)');
+
+			expect(notation.moves.length).toBe(3);
+			const deployMove = notation.moves[2];
+			expect(deployMove.moveType).toBe(DEPLOY);
+			expect(deployMove.player).toBe(HOST);
+			expect(deployMove.tileType).toBe('Dragon');
+			expect(deployMove.endPoint).toBe('-2,0');
+		});
+
+		it('should parse old move notation', () => {
+			const notation = new TrifleGameNotation(HOST);
+			notation.setNotationText('0H.L,D,W;0G.L,D,W;1H.Dragon(-2,0);1G.(-8,0)-(-6,3)');
+
+			expect(notation.moves.length).toBe(4);
+			const moveMove = notation.moves[3];
+			expect(moveMove.moveType).toBe(MOVE);
+			expect(moveMove.player).toBe(GUEST);
+			expect(moveMove.startPoint).toBe('-8,0');
+			expect(moveMove.endPoint).toBe('-6,3');
+		});
+
+		it('should parse old draw offer notation', () => {
+			const notation = new TrifleGameNotation(HOST);
+			notation.setNotationText('0H.L,D,W;0G.L,D,W;1H.Dragon(-2,0)~~');
+
+			const deployMove = notation.moves[2];
+			expect(deployMove.offerDraw).toBe(true);
+		});
+
+		it('should parse old draw accept notation', () => {
+			const notation = new TrifleGameNotation(HOST);
+			notation.setNotationText('0H.L,D,W;0G.L,D,W;1H.==');
+
+			const acceptMove = notation.moves[2];
+			expect(acceptMove.moveType).toBe(DRAW_ACCEPT);
+		});
+
+		it('should produce same move format as new JSON notation', () => {
+			// Parse old format
+			const oldNotation = new TrifleGameNotation(HOST);
+			oldNotation.setNotationText('0H.L,D,W;0G.L,D,W;1H.Dragon(-2,0);1G.(-8,0)-(-6,3)');
+
+			// Parse equivalent new format
+			const newNotation = new TrifleGameNotation(HOST);
+			const jsonMoves = [
+				{ moveNum: 0, player: HOST, moveType: TEAM_SELECTION, teamSelection: 'L,D,W' },
+				{ moveNum: 0, player: GUEST, moveType: TEAM_SELECTION, teamSelection: 'L,D,W' },
+				{ moveNum: 1, player: HOST, moveType: DEPLOY, tileType: 'Dragon', endPoint: '-2,0' },
+				{ moveNum: 1, player: GUEST, moveType: MOVE, startPoint: '-8,0', endPoint: '-6,3' }
+			];
+			newNotation.setNotationText(JSON.stringify(jsonMoves));
+
+			// Verify same structure
+			expect(oldNotation.moves.length).toBe(newNotation.moves.length);
+			for (let i = 0; i < oldNotation.moves.length; i++) {
+				expect(oldNotation.moves[i].moveNum).toBe(newNotation.moves[i].moveNum);
+				expect(oldNotation.moves[i].player).toBe(newNotation.moves[i].player);
+				expect(oldNotation.moves[i].moveType).toBe(newNotation.moves[i].moveType);
+				if (oldNotation.moves[i].teamSelection) {
+					expect(oldNotation.moves[i].teamSelection).toBe(newNotation.moves[i].teamSelection);
+				}
+				if (oldNotation.moves[i].tileType) {
+					expect(oldNotation.moves[i].tileType).toBe(newNotation.moves[i].tileType);
+				}
+				if (oldNotation.moves[i].startPoint) {
+					expect(oldNotation.moves[i].startPoint).toBe(newNotation.moves[i].startPoint);
+				}
+				if (oldNotation.moves[i].endPoint) {
+					expect(oldNotation.moves[i].endPoint).toBe(newNotation.moves[i].endPoint);
+				}
+			}
+		});
+	});
+
+	describe('notationTextForUrl', () => {
+		it('should strip animationInfo from serialized output', () => {
+			const notation = new TrifleGameNotation(HOST);
+			notation.moves = [
+				{ moveNum: 0, player: HOST, moveType: TEAM_SELECTION, teamSelection: 'L,D,W' },
+				{ moveNum: 1, player: HOST, moveType: MOVE, startPoint: '0,0', endPoint: '0,1',
+					animationInfo: { startPoint: '0,0', endPoint: '0,1', movedTile: {} } }
+			];
+
+			const urlText = notation.notationTextForUrl();
+			const parsed = JSON.parse(urlText);
+			expect(parsed[1].animationInfo).toBeUndefined();
+			expect(parsed[1].startPoint).toBe('0,0');
+		});
+
+		it('should strip empty promptTargetData from serialized output', () => {
+			const notation = new TrifleGameNotation(HOST);
+			notation.moves = [
+				{ moveNum: 0, player: HOST, moveType: DEPLOY, tileType: 'Dragon', endPoint: '0,0', promptTargetData: {} }
+			];
+
+			const urlText = notation.notationTextForUrl();
+			const parsed = JSON.parse(urlText);
+			expect(parsed[0].promptTargetData).toBeUndefined();
+		});
+
+		it('should preserve non-empty promptTargetData', () => {
+			const notation = new TrifleGameNotation(HOST);
+			notation.moves = [
+				{ moveNum: 0, player: HOST, moveType: MOVE, startPoint: '0,0', endPoint: '0,1',
+					promptTargetData: { someKey: 'someValue' } }
+			];
+
+			const urlText = notation.notationTextForUrl();
+			const parsed = JSON.parse(urlText);
+			expect(parsed[0].promptTargetData).toEqual({ someKey: 'someValue' });
+		});
+	});
+});

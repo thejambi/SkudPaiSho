@@ -15,6 +15,35 @@ export class TrifleTileManager {
 		this.guestTeam = [];
 		this.hostTiles = [];
 		this.guestTiles = [];
+		this.capturedTiles = [];
+	}
+
+	addToCapturedTiles(tiles) {
+		tiles.forEach((tile) => {
+			if ((tile.beingCaptured || tile.beingCapturedByAbility) && !tile.moveToPile) {
+				this.capturedTiles.push(tile);
+			}
+			tile.beingCaptured = null;
+			tile.beingCapturedByAbility = null;
+		});
+	}
+
+	grabCapturedTile(player, tileCode) {
+		let tile;
+		for (let i = 0; i < this.capturedTiles.length; i++) {
+			if (this.capturedTiles[i].ownerName === player
+					&& this.capturedTiles[i].code === tileCode) {
+				const newTileArr = this.capturedTiles.splice(i, 1);
+				tile = newTileArr[0];
+				break;
+			}
+		}
+
+		if (!tile) {
+			debug("NONE OF THAT TILE FOUND IN CAPTURED TILES");
+		}
+
+		return tile;
 	}
 
 	grabTile(player, tileCode) {
@@ -62,6 +91,16 @@ export class TrifleTileManager {
 		}
 
 		if (!tile) {
+			this.capturedTiles.forEach((capturedTile) => {
+				if (tileId && capturedTile.id === tileId) {
+					tile = capturedTile;
+				} else if (!tile && capturedTile.code === tileCode && capturedTile.ownerName === player) {
+					tile = capturedTile;
+				}
+			});
+		}
+
+		if (!tile) {
 			debug("NONE OF THAT TILE FOUND");
 		}
 
@@ -74,6 +113,10 @@ export class TrifleTileManager {
 		});
 		this.guestTiles.forEach(tile => {
 			tile.selectedFromPile = false;
+		});
+		this.capturedTiles.forEach(tile => {
+			tile.selectedFromPile = false;
+			tile.tileIsSelectable = false;
 		});
 	}
 
@@ -220,6 +263,11 @@ export class TrifleTileManager {
 		});
 		this.guestTiles.forEach(tile => {
 			copy.guestTiles.push(tile.getCopy());
+		});
+
+		// Copy captured tiles
+		this.capturedTiles.forEach(tile => {
+			copy.capturedTiles.push(tile.getCopy());
 		});
 
 		return copy;

@@ -3,12 +3,13 @@
 // --------------------------------------------- // 
 
 import { BRAND_NEW, gameController } from '../PaiShoMain';
-import { DEPLOY, GUEST, MOVE, SETUP, TEAM_SELECTION } from '../CommonNotationObjects';
+import { DEPLOY, DRAW_ACCEPT, GUEST, MOVE, SETUP, TEAM_SELECTION } from '../CommonNotationObjects';
 import { debug } from '../GameData';
 import {
   getOpponentName,
   getPlayerCodeFromName,
 } from '../pai-sho-common/PaiShoPlayerHelp';
+import { OldTrifleNotationMove } from './OldTrifleGameNotation';
 
 export const TrifleNotationBuilderStatus = {
 	PROMPTING_FOR_TARGET: "PROMPTING_FOR_TARGET"
@@ -159,14 +160,56 @@ export class TrifleGameNotation {
 	loadMoves() {
 		this.moves = [];
 		if (this.notationText) {
-			this.moves = JSON.parse(this.notationText);
-
-			// this.moves.forEach(move => {
-			// 	if (!move.moveType) {
-			// 		move.moveType = MOVE;
-			// 	}
-			// });
+			try {
+				this.moves = JSON.parse(this.notationText);
+			} catch (e) {
+				// Old text notation format — parse and convert
+				this.moves = this.parseOldNotation(this.notationText);
+			}
 		}
+	}
+
+	parseOldNotation(text) {
+		const moves = [];
+		let lines = [];
+		if (text.includes(';')) {
+			lines = text.split(';');
+		} else {
+			lines = [text];
+		}
+
+		lines.forEach(function(line) {
+			const oldMove = new OldTrifleNotationMove(line);
+			if (!oldMove.isValidNotation()) {
+				return;
+			}
+
+			const newMove = {
+				moveNum: oldMove.moveNum,
+				player: oldMove.player,
+				moveType: oldMove.moveType
+			};
+
+			if (oldMove.moveType === TEAM_SELECTION) {
+				newMove.teamSelection = oldMove.teamTileCodes.join(',');
+			} else if (oldMove.moveType === DEPLOY) {
+				newMove.tileType = oldMove.tileType;
+				newMove.endPoint = oldMove.endPoint.pointText;
+			} else if (oldMove.moveType === MOVE) {
+				newMove.startPoint = oldMove.startPoint.pointText;
+				newMove.endPoint = oldMove.endPoint.pointText;
+			} else if (oldMove.moveType === DRAW_ACCEPT) {
+				// No extra fields needed
+			}
+
+			if (oldMove.offerDraw) {
+				newMove.offerDraw = true;
+			}
+
+			moves.push(newMove);
+		});
+
+		return moves;
 	}
 
 	buildSimplifiedNotationString(move) {
@@ -192,7 +235,11 @@ export class TrifleGameNotation {
 
 	notationTextForUrl() {
 		// TODO Could remove the 'moveType' field if it is equal to 'MOVE'
-		const str = JSON.stringify(this.moves);
+		const str = JSON.stringify(this.moves, function(key, value) {
+			if (key === 'animationInfo') return undefined;
+			if (key === 'promptTargetData' && value && Object.keys(value).length === 0) return undefined;
+			return value;
+		});
 		return str;
 	}
 

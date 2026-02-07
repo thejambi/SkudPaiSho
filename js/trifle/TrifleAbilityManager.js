@@ -32,11 +32,15 @@ export class TrifleAbilityManager {
 		const activateObj = this.activateReadyAbilities();
 		this.ensurePromptsStillNeeded();
 		if (this.abilitiesWithPromptTargetsNeeded && this.abilitiesWithPromptTargetsNeeded.length > 0) {
-			// return this.promptForNextNeededTargets();
-			const promptOjb = this.promptForNextNeededTargets();
-			return Object.assign(activateObj, promptOjb);
+			const promptObj = this.promptForNextNeededTargets();
+			// If prompt was auto-resolved (no currentPromptTargetId), the ability was
+			// removed from prompt queue. Re-run activation so it can fire.
+			if (!promptObj.neededPromptInfo || !promptObj.neededPromptInfo.currentPromptTargetId) {
+				const reactivateObj = this.activateReadyAbilities();
+				return Object.assign(activateObj, reactivateObj);
+			}
+			return Object.assign(activateObj, promptObj);
 		} else {
-			// return this.activateReadyAbilities();
 			return activateObj;
 		}
 	}
