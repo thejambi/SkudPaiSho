@@ -1337,6 +1337,49 @@ export function promptCustomBoardURL() {
     };
     container.appendChild(applyButton);
 
+    // Saved boards list
+    const customBoardArray = JSON.parse(localStorage.getItem(customBoardUrlArrayKey));
+    if (customBoardArray && customBoardArray.length > 0) {
+        container.appendChild(document.createElement("br"));
+
+        const listHeading = document.createElement("p");
+        listHeading.innerHTML = "<b>Your Custom Boards:</b>";
+        container.appendChild(listHeading);
+
+        customBoardArray.forEach(function(board, index) {
+            const row = document.createElement("div");
+            row.style.marginBottom = "6px";
+
+            const nameSpan = document.createElement("span");
+            nameSpan.textContent = board.name;
+            nameSpan.style.fontWeight = "bold";
+            row.appendChild(nameSpan);
+
+            row.appendChild(document.createTextNode(" — "));
+
+            const urlSpan = document.createElement("span");
+            const displayUrl = board.url.length > 40 ? board.url.substring(0, 40) + "..." : board.url;
+            urlSpan.textContent = displayUrl;
+            urlSpan.title = board.url;
+            urlSpan.style.fontSize = "0.85em";
+            urlSpan.style.opacity = "0.8";
+            row.appendChild(urlSpan);
+
+            row.appendChild(document.createTextNode(" "));
+
+            const removeLink = document.createElement("span");
+            removeLink.className = "clickableText";
+            removeLink.textContent = "Remove";
+            removeLink.style.fontSize = "0.85em";
+            removeLink.onclick = function() {
+                removeCustomBoardEntry(index);
+            };
+            row.appendChild(removeLink);
+
+            container.appendChild(row);
+        });
+    }
+
     container.appendChild(document.createElement("br"));
     container.appendChild(document.createElement("br"));
 
@@ -1357,6 +1400,21 @@ export function clearCustomBoardEntries() {
 	buildBoardDesignsValues();
 	clearMessage();
 	closeModal();
+}
+
+export function removeCustomBoardEntry(index) {
+	let customBoardArray = JSON.parse(localStorage.getItem(customBoardUrlArrayKey));
+	if (customBoardArray) {
+		customBoardArray.splice(index, 1);
+		if (customBoardArray.length > 0) {
+			localStorage.setItem(customBoardUrlArrayKey, JSON.stringify(customBoardArray));
+		} else {
+			localStorage.removeItem(customBoardUrlArrayKey);
+		}
+		buildBoardDesignsValues();
+		clearMessage();
+		promptCustomBoardURL();
+	}
 }
 
 export function setCustomBoardFromInput() {
@@ -5718,6 +5776,47 @@ export function promptAddOption() {
 			}
 		};
 		container.appendChild(guestDiv);
+
+		// --- Game Notation Section (collapsible) ---
+		container.appendChild(document.createElement('br'));
+		const notationHeader = document.createElement('div');
+		notationHeader.style.fontWeight = 'bold';
+		notationHeader.classList.add('clickableText');
+		notationHeader.textContent = '▶ Game Notation';
+		container.appendChild(notationHeader);
+
+		const notationContent = document.createElement('div');
+		notationContent.style.display = 'none';
+		notationContent.style.marginLeft = '10px';
+
+		const notationPre = document.createElement('pre');
+		notationPre.style.whiteSpace = 'pre-wrap';
+		notationPre.style.wordBreak = 'break-all';
+		notationPre.style.maxHeight = '300px';
+		notationPre.style.overflow = 'auto';
+		notationPre.style.fontSize = '12px';
+		notationPre.style.textAlign = 'left';
+		if (gameController && gameController.gameNotation && gameController.gameNotation.moves.length > 0) {
+			const lines = gameController.gameNotation.moves.map(function(move) {
+				return JSON.stringify(move, function(key, value) {	// TODO should this logic be handled by the game?
+					if (key === 'animationInfo') return undefined;
+					if (key === 'promptTargetData' && value && Object.keys(value).length === 0) return undefined;
+					return value;
+				});
+			});
+			notationPre.textContent = lines.join('\n');
+		} else {
+			notationPre.textContent = '(no moves)';
+		}
+		notationContent.appendChild(notationPre);
+
+		notationHeader.onclick = () => {
+			const isCollapsed = notationContent.style.display === 'none';
+			notationContent.style.display = isCollapsed ? 'block' : 'none';
+			notationHeader.textContent = (isCollapsed ? '▼' : '▶') + ' Game Notation';
+		};
+
+		container.appendChild(notationContent);
 
 		// --- Separator ---
 		container.appendChild(document.createElement('br'));
