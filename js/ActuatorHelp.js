@@ -352,7 +352,7 @@ export function applyBoardOptionToBgSvg(bgSvgIfKnown, overrideBoardName) {
 			boardUrl = customBoardUrl;
 		}
 
-		bgSvg.style.backgroundImage = "url('" + boardUrl + "')";
+		bgSvg.style.backgroundImage = "url('" + boardUrl.replace(/'/g, "\\'") + "')";
 	}
 }
 

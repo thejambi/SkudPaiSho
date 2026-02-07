@@ -1350,20 +1350,28 @@ export function promptCustomBoardURL() {
             const row = document.createElement("div");
             row.style.marginBottom = "6px";
 
-            const nameSpan = document.createElement("span");
-            nameSpan.textContent = board.name;
-            nameSpan.style.fontWeight = "bold";
-            row.appendChild(nameSpan);
+            const nameLink = document.createElement("a");
+            nameLink.textContent = board.name;
+            nameLink.style.fontWeight = "bold";
+            nameLink.style.cursor = "pointer";
+            nameLink.className = "clickableText";
+            nameLink.onclick = function() {
+                var boardKey = "customBoard" + board.name.replace(/ /g, '_');
+                setPaiShoBoardOption(boardKey);
+            };
+            row.appendChild(nameLink);
 
             row.appendChild(document.createTextNode(" — "));
 
-            const urlSpan = document.createElement("span");
+            const urlLink = document.createElement("a");
             const displayUrl = board.url.length > 40 ? board.url.substring(0, 40) + "..." : board.url;
-            urlSpan.textContent = displayUrl;
-            urlSpan.title = board.url;
-            urlSpan.style.fontSize = "0.85em";
-            urlSpan.style.opacity = "0.8";
-            row.appendChild(urlSpan);
+            urlLink.textContent = displayUrl;
+            urlLink.title = board.url;
+            urlLink.href = board.url;
+            urlLink.target = "_blank";
+            urlLink.style.fontSize = "0.85em";
+            urlLink.style.opacity = "0.8";
+            row.appendChild(urlLink);
 
             row.appendChild(document.createTextNode(" "));
 
@@ -1433,13 +1441,14 @@ export function setCustomBoardFromInput() {
 		});
 		localStorage.setItem(customBoardUrlArrayKey, JSON.stringify(customBoardArray));
 		buildBoardDesignsValues();
+		var boardKey = "customBoard" + customBoardName.replace(/ /g, '_');
+		setPaiShoBoardOption(boardKey);
 	}
 
 	if (customBoardUrl) {
 		localStorage.setItem(customBoardUrlKey, customBoardUrl);
 	}
 	applyBoardOptionToBgSvg();
-	clearMessage();
 }
 
 /* Skud Pai Sho Tile Design Switches */
