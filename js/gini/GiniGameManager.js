@@ -273,8 +273,8 @@ GiniGameManager.prototype.doBoardSetup = function() {
 
 	/* Guest tiles (left side, negative x) */
 	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.WhiteLotus), new NotationPoint("-6,0"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Badgermole), new NotationPoint("-7,1"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Dragon), new NotationPoint("-7,-1"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Badgermole), new NotationPoint("-5,1"));
+	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Dragon), new NotationPoint("-5,-1"));
 	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Koi), new NotationPoint("-4,2"));
 	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Bison), new NotationPoint("-4,-2"));
 	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Ginseng), new NotationPoint("-4,0"));
