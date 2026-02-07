@@ -1779,19 +1779,19 @@ export class PaikoController {
 		let zoneInfo = '';
 		switch (zone) {
 			case 'host_homeground':
-				zoneInfo = 'Host Homeground (Red Garden) - Host tiles here are covered';
+				zoneInfo = 'Host Homeground - Host tiles here are in cover. Guest tiles here are worth 2 points';
 				break;
 			case 'guest_homeground':
-				zoneInfo = 'Guest Homeground (Red Garden) - Guest tiles here are covered';
+				zoneInfo = 'Guest Homeground - Guest tiles here are in cover. Host tiles here are worth 2 points';
 				break;
 			case 'middleground':
-				zoneInfo = 'Middleground (White Garden) - 1 point';
+				zoneInfo = 'Middleground - Tiles here are worth 1 point';
 				break;
 			case 'blacked_out':
-				zoneInfo = 'Black Square - Only Lotus can deploy here';
+				zoneInfo = 'Black Square - Lotus can deploy here. Blocks movement of other tiles on the board.';
 				break;
 			default:
-				zoneInfo = 'Neutral - 0 points';
+				zoneInfo = 'Unplayable space';	// Shouldn't happen since all points should have a zone, but just in case
 		}
 
 		const message = [`<p>${zoneInfo}</p>`];
