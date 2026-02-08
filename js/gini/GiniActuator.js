@@ -2,7 +2,7 @@
 
 import { ElementStyleTransform } from '../util/ElementStyleTransform';
 import { GINSENG_GUEST_ROTATE, GINSENG_ROTATE } from '../GameOptions';
-import { GUEST, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
+import { GUEST, HOST, MOVE, NotationPoint, RowAndColumn } from '../CommonNotationObjects';
 import { GiniController } from './GiniController';
 import { GiniOptions } from './GiniOptions';
 import {
@@ -29,6 +29,7 @@ import {
   setupPaiShoBoard,
 } from '../ActuatorHelp';
 import { debug } from '../GameData';
+import { TrifleAnimationType } from '../trifle/animation/TrifleAnimationTypes';
 import { GiniNotationAdjustmentFunction } from './GiniGameManager';
 
 export class GiniActuator {
@@ -65,6 +66,12 @@ export class GiniActuator {
 
 		window.requestAnimationFrame(() => {
 			this.htmlify(board, tileManager, markingManager, moveToAnimate, moveDetails);
+
+			// Process ability animations after board is rendered
+			if (moveToAnimate && moveToAnimate.animationInfo
+					&& moveToAnimate.animationInfo.abilityAnimations) {
+				this.processAbilityAnimations(moveToAnimate.animationInfo.abilityAnimations);
+			}
 		});
 	}
 
@@ -269,6 +276,7 @@ export class GiniActuator {
 
 		if (boardPoint.hasTile()) {
 			theDiv.classList.add("hasTile");
+			theDiv.setAttribute('data-tile-id', String(boardPoint.tile.id));
 
 			const theImg = document.createElement("img");
 			theImg.elementStyleTransform = new ElementStyleTransform(theImg);
@@ -297,6 +305,9 @@ export class GiniActuator {
 			theImg.src = srcValue + tileMoved.getImageName() + ".png";
 
 			theDiv.appendChild(theImg);
+
+			// Pre-position tiles that will be animated via SLIDE
+			this.prePositionForAbilityAnimation(boardPoint, theImg, moveToAnimate);
 
 			// Show captured tile underneath during animation
 			const capturedTile = this.getCapturedTileFromMove(moveDetails);
@@ -423,12 +434,16 @@ export class GiniActuator {
 			});
 		} else {
 			// Simple two-point animation
-			setTimeout(() => {
-				requestAnimationFrame(() => {
-					theImg.style.left = "0px";
-					theImg.style.top = "0px";
-				});
-			}, pieceAnimationLength * movementStepIndex);
+			// Skip if this tile has an ability animation that will position it differently
+			var hasAbilityAnimation = boardPoint.tile && this.tileHasAbilityAnimation(boardPoint.tile.id, moveToAnimate);
+			if (!hasAbilityAnimation) {
+				setTimeout(() => {
+					requestAnimationFrame(() => {
+						theImg.style.left = "0px";
+						theImg.style.top = "0px";
+					});
+				}, pieceAnimationLength * movementStepIndex);
+			}
 		}
 
 		// Scale back to normal after animation
@@ -468,6 +483,331 @@ export class GiniActuator {
 			srcValue = srcValue + gameImgDir + "/";
 			return srcValue;
 		}
+	}
+
+	// ========== Ability Animation Methods ==========
+
+	processAbilityAnimations(animationSequence) {
+		if (!this.animationOn || !animationSequence || !animationSequence.hasAnimations()) {
+			return;
+		}
+
+		animationSequence.sort();
+
+		const ghostElements = this.createGhostElements(animationSequence);
+
+		let currentDelay = pieceAnimationLength;
+		let maxEndTime = currentDelay;
+
+		animationSequence.animations.forEach((instruction, index) => {
+			let startDelay;
+
+			if (instruction.parallel && index > 0) {
+				startDelay = currentDelay - instruction.duration / 2;
+			} else {
+				startDelay = currentDelay;
+			}
+
+			const endTime = startDelay + instruction.delay + instruction.duration;
+			maxEndTime = Math.max(maxEndTime, endTime);
+
+			setTimeout(() => {
+				this.executeAnimation(instruction);
+			}, startDelay + instruction.delay);
+
+			if (!instruction.parallel) {
+				currentDelay = startDelay + instruction.delay + instruction.duration;
+			}
+		});
+
+		if (ghostElements.length > 0) {
+			setTimeout(() => {
+				ghostElements.forEach(el => el.remove());
+			}, maxEndTime + 100);
+		}
+	}
+
+	createGhostElements(animationSequence) {
+		const ghostElements = [];
+		const needsGhost = [TrifleAnimationType.FADE_OUT, TrifleAnimationType.PULSE, TrifleAnimationType.SLIDE];
+
+		animationSequence.animations.forEach(instruction => {
+			if (!needsGhost.includes(instruction.type)) {
+				return;
+			}
+
+			const existingElement = this.findTileElement(instruction.tileId);
+			if (existingElement) {
+				return;
+			}
+
+			if (!instruction.tile || !instruction.startPoint) {
+				return;
+			}
+
+			const ghostElement = this.createGhostTileElement(instruction.tile, instruction.startPoint);
+			if (ghostElement) {
+				ghostElements.push(ghostElement);
+			}
+		});
+
+		return ghostElements;
+	}
+
+	createGhostTileElement(tile, position) {
+		const notationPointString = new RowAndColumn(position.row, position.col).notationPointString;
+		const targetPointDiv = this.boardContainer.querySelector(`.point[name="${notationPointString}"]`);
+
+		if (!targetPointDiv) {
+			debug("createGhostTileElement: Could not find point at " + notationPointString);
+			return null;
+		}
+
+		const theImg = document.createElement("img");
+		theImg.elementStyleTransform = new ElementStyleTransform(theImg);
+		theImg.elementStyleTransform.setValue("rotate", 270, "deg");
+		if (GiniOptions.viewAsGuest) {
+			theImg.elementStyleTransform.adjustValue("rotate", 180, "deg");
+		}
+		theImg.src = this.getTileSrcPath() + tile.getImageName() + ".png";
+		theImg.classList.add("ghost-tile");
+		theImg.style.position = "absolute";
+		theImg.style.left = "0";
+		theImg.style.top = "0";
+		theImg.style.zIndex = "100";
+		theImg.setAttribute('data-tile-id', String(tile.id));
+		targetPointDiv.appendChild(theImg);
+
+		return theImg;
+	}
+
+	executeAnimation(instruction) {
+		switch (instruction.type) {
+			case TrifleAnimationType.SLIDE:
+				this.animateSlide(instruction);
+				break;
+			case TrifleAnimationType.FADE_OUT:
+				this.animateFadeOut(instruction);
+				break;
+			case TrifleAnimationType.FADE_IN:
+				this.animateFadeIn(instruction);
+				break;
+			case TrifleAnimationType.POP:
+				this.animatePop(instruction);
+				break;
+			case TrifleAnimationType.PULSE:
+				this.animatePulse(instruction);
+				break;
+			default:
+				debug("Unknown animation type: " + instruction.type);
+		}
+	}
+
+	animateSlide(instruction) {
+		const tileElement = this.findTileElement(instruction.tileId);
+		if (!tileElement) {
+			debug("animateSlide: Could not find tile element for " + instruction.tileId);
+			return;
+		}
+
+		const { startPoint, endPoint, duration, easing } = instruction;
+		const { multiplierX, multiplierY, unitString } = this.getAnimationUnits();
+
+		const isGhost = tileElement.classList.contains('ghost-tile');
+
+		if (isGhost) {
+			const endLeft = (endPoint.col - startPoint.col);
+			const endTop = (endPoint.row - startPoint.row);
+
+			tileElement.style.transition = 'none';
+			tileElement.style.left = '0';
+			tileElement.style.top = '0';
+			tileElement.style.zIndex = '100';
+
+			requestAnimationFrame(() => {
+				tileElement.style.transition = `left ${duration}ms ${easing}, top ${duration}ms ${easing}`;
+				tileElement.style.left = (endLeft * multiplierX) + unitString;
+				tileElement.style.top = (endTop * multiplierY) + unitString;
+			});
+		} else {
+			const left = (startPoint.col - endPoint.col);
+			const top = (startPoint.row - endPoint.row);
+
+			tileElement.style.transition = 'none';
+			tileElement.style.left = (left * multiplierX) + unitString;
+			tileElement.style.top = (top * multiplierY) + unitString;
+			tileElement.style.zIndex = '100';
+
+			requestAnimationFrame(() => {
+				tileElement.style.transition = `left ${duration}ms ${easing}, top ${duration}ms ${easing}`;
+				tileElement.style.left = "0px";
+				tileElement.style.top = "0px";
+			});
+		}
+
+		setTimeout(() => {
+			tileElement.style.zIndex = '';
+		}, duration);
+	}
+
+	animateFadeOut(instruction) {
+		const tileElement = this.findTileElement(instruction.tileId);
+		if (!tileElement) return;
+
+		const { duration, easing } = instruction;
+		tileElement.style.transition = `opacity ${duration}ms ${easing}`;
+		requestAnimationFrame(() => {
+			tileElement.style.opacity = "0";
+		});
+	}
+
+	animateFadeIn(instruction) {
+		const tileElement = this.findTileElement(instruction.tileId);
+		if (!tileElement) return;
+
+		const { duration, easing } = instruction;
+		tileElement.style.opacity = "0";
+		tileElement.style.transition = `opacity ${duration}ms ${easing}`;
+		requestAnimationFrame(() => {
+			tileElement.style.opacity = "1";
+		});
+	}
+
+	animatePop(instruction) {
+		const tileElement = this.findTileElement(instruction.tileId);
+		if (!tileElement) return;
+
+		const { duration } = instruction;
+		if (tileElement.elementStyleTransform) {
+			tileElement.elementStyleTransform.setValue("scale", 0);
+		}
+		requestAnimationFrame(() => {
+			tileElement.style.transition = `transform ${duration}ms ease-out`;
+			if (tileElement.elementStyleTransform) {
+				tileElement.elementStyleTransform.setValue("scale", 1);
+			}
+		});
+	}
+
+	animatePulse(instruction) {
+		const tileElement = this.findTileElement(instruction.tileId);
+		if (!tileElement) return;
+
+		const { duration, color } = instruction;
+		const pulseDuration = duration / 2;
+
+		const transitionProps = color
+			? `transform ${pulseDuration}ms ease-in-out, filter ${pulseDuration}ms ease-in-out`
+			: `transform ${pulseDuration}ms ease-in-out`;
+
+		tileElement.style.zIndex = '100';
+
+		requestAnimationFrame(() => {
+			tileElement.style.transition = transitionProps;
+			if (tileElement.elementStyleTransform) {
+				tileElement.elementStyleTransform.setValue("scale", 1.3);
+			}
+			if (color) {
+				tileElement.style.filter = `drop-shadow(0 0 8px ${color}) drop-shadow(0 0 16px ${color})`;
+			}
+		});
+
+		setTimeout(() => {
+			if (tileElement.elementStyleTransform) {
+				tileElement.elementStyleTransform.setValue("scale", 1);
+			}
+			if (color) {
+				tileElement.style.filter = '';
+			}
+		}, pulseDuration);
+
+		setTimeout(() => {
+			tileElement.style.zIndex = '';
+			tileElement.style.transition = '';
+			tileElement.style.filter = '';
+		}, duration);
+	}
+
+	findTileElement(tileId) {
+		if (!tileId) return null;
+
+		const tileIdStr = String(tileId);
+
+		const ghostImg = this.boardContainer.querySelector(`img[data-tile-id="${tileIdStr}"]`);
+		if (ghostImg) {
+			return ghostImg;
+		}
+
+		const allPointDivs = this.boardContainer.querySelectorAll('.point');
+		for (const div of allPointDivs) {
+			const dataTileId = div.getAttribute('data-tile-id');
+			if (dataTileId === tileIdStr) {
+				return div.querySelector('img');
+			}
+		}
+
+		return null;
+	}
+
+	getAnimationUnits() {
+		let multiplierX = 34;
+		let multiplierY = 34;
+		let unitString = "px";
+
+		if (window.innerWidth <= 612) {
+			multiplierX = 5.5555;
+			multiplierY = 5.611;
+			unitString = "vw";
+		}
+
+		return { multiplierX, multiplierY, unitString };
+	}
+
+	prePositionForAbilityAnimation(boardPoint, theImg, moveToAnimate) {
+		if (!moveToAnimate || !moveToAnimate.animationInfo
+				|| !moveToAnimate.animationInfo.abilityAnimations) {
+			return;
+		}
+
+		const abilityAnimations = moveToAnimate.animationInfo.abilityAnimations;
+		if (!abilityAnimations.animations) {
+			return;
+		}
+
+		const tileId = boardPoint.tile.id;
+		const slideAnimation = abilityAnimations.animations.find(
+			anim => anim.type === TrifleAnimationType.SLIDE && anim.tileId === tileId
+		);
+
+		if (!slideAnimation) {
+			return;
+		}
+
+		const { startPoint, endPoint } = slideAnimation;
+		const { multiplierX, multiplierY, unitString } = this.getAnimationUnits();
+
+		const left = (startPoint.col - endPoint.col);
+		const top = (startPoint.row - endPoint.row);
+
+		theImg.style.transition = 'none';
+		theImg.style.left = (left * multiplierX) + unitString;
+		theImg.style.top = (top * multiplierY) + unitString;
+	}
+
+	tileHasAbilityAnimation(tileId, moveToAnimate) {
+		if (!moveToAnimate || !moveToAnimate.animationInfo
+				|| !moveToAnimate.animationInfo.abilityAnimations) {
+			return false;
+		}
+
+		const abilityAnimations = moveToAnimate.animationInfo.abilityAnimations;
+		if (!abilityAnimations.animations) {
+			return false;
+		}
+
+		return abilityAnimations.animations.some(
+			anim => anim.type === TrifleAnimationType.SLIDE && anim.tileId === tileId
+		);
 	}
 
 	printBoard(board) {
