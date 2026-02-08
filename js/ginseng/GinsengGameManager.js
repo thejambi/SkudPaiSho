@@ -77,11 +77,11 @@ GinsengGameManager.prototype.runNotationMove = function(move, withActuate, moveA
 	debug("Running Move:");
 	debug(move);
 
-	this.board.tickDurationAbilities();
-
 	var neededPromptInfo;
 
 	var moveDetails;
+
+	var abilityActivationFlags = null;
 
 	if (move.moveType === SETUP) {
 		this.doBoardSetup(move.setupNum);
@@ -89,7 +89,7 @@ GinsengGameManager.prototype.runNotationMove = function(move, withActuate, moveA
 		moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint, move);
 		this.tileManager.addToCapturedTiles(moveDetails.capturedTiles);
 
-		var abilityActivationFlags = moveDetails.abilityActivationFlags;
+		abilityActivationFlags = moveDetails.abilityActivationFlags;
 		debug(abilityActivationFlags);
 
 		if (abilityActivationFlags.tileRecords) {
@@ -101,10 +101,18 @@ GinsengGameManager.prototype.runNotationMove = function(move, withActuate, moveA
 			}
 		}
 
-		var needToPromptUser = abilityActivationFlags && abilityActivationFlags.neededPromptInfo && abilityActivationFlags.neededPromptInfo.currentPromptTargetId;
+		var needToPromptUser = abilityActivationFlags 
+			&& abilityActivationFlags.neededPromptInfo 
+			&& abilityActivationFlags.neededPromptInfo.currentPromptTargetId;
 		if (needToPromptUser) {
 			neededPromptInfo = abilityActivationFlags.neededPromptInfo;
 		}
+
+		/** 
+		 * Tick duration abilities at end of turn. 
+		 * This ensures that ability durations are the same during move planning, UI board interaction, and move execution.
+		 */
+		this.board.tickDurationAbilities();
 
 		this.buildMoveGameLogText(move, moveDetails);
 

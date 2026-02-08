@@ -436,7 +436,9 @@ export class TrifleController {
 				this.resetNotationBuilder();
 			}
 		} else if (this.notationBuilder.status === TrifleNotationBuilderStatus.PROMPTING_FOR_TARGET) {
+			debug(">>> pointClicked PROMPTING_FOR_TARGET: isPossibleMove=" + boardPoint.isType(POSSIBLE_MOVE) + " isInReplay=" + isInReplay);
 			if (boardPoint.isType(POSSIBLE_MOVE) && !isInReplay) {
+				debug(">>> Recording board point answer: " + htmlPoint.getAttribute("name"));
 				this.theGame.hidePossibleMovePoints();
 
 				PromptTargetHelper.recordBoardPointAnswer(

@@ -21,8 +21,12 @@ export class TrifleTile {
 		this.selectedFromPile = false;
 	}
 
-	static resetTrifleTileId() {
-		TrifleTileId = 1;
+	static resetTrifleTileId(value) {
+		TrifleTileId = value || 1;
+	}
+
+	static getTrifleTileId() {
+		return TrifleTileId;
 	}
 
 	getImageName() {

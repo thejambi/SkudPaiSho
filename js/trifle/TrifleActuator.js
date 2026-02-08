@@ -175,7 +175,8 @@ export class TrifleActuator {
 			});
 		}
 
-		/* Team Selection Area */
+		/* Team Selection Area — save/restore tile ID counter so display-only tiles don't pollute it */
+		const savedTileId = TrifleTile.getTrifleTileId();
 		if (!tileManager.hostTeamIsFull()) {
 			this.addLineBreakInTilePile(HOST);
 			this.addLineBreakInTilePile(HOST);
@@ -193,6 +194,7 @@ export class TrifleActuator {
 				}
 			});
 		}
+		TrifleTile.resetTrifleTileId(savedTileId);
 
 		/* Captured Tiles */
 		const hostCapturedTiles = getTilesForPlayer(tileManager.capturedTiles, HOST);

@@ -57,6 +57,12 @@ export class TrifleAbility {
 	promptTargetInfoPresent(neededPromptTargetInfo) {
 		const sourceTileKey = JSON.stringify(TrifleAbilityManager.buildSourceTileKeyObject(this.sourceTile));
 
+		debug(">>> promptTargetInfoPresent: looking for key=" + sourceTileKey);
+		debug(">>> promptTargetInfo exists=" + !!this.promptTargetInfo);
+		if (this.promptTargetInfo) {
+			debug(">>> promptTargetInfo keys=" + JSON.stringify(Object.keys(this.promptTargetInfo)));
+		}
+
 		return this.promptTargetInfo
 			&& this.promptTargetInfo[sourceTileKey]
 			&& (this.promptTargetInfo[sourceTileKey].skipped

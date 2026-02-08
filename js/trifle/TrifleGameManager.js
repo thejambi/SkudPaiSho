@@ -18,6 +18,7 @@ export class TrifleGameManager {
 
 		this.actuator = actuator;
 
+		TrifleTile.resetTrifleTileId();
 		this.tileManager = new TrifleTileManager();
 		this.markingManager = new PaiShoMarkingManager();
 
@@ -53,6 +54,8 @@ export class TrifleGameManager {
 
 		var neededPromptInfo;
 
+		let abilityActivationFlags = null;
+
 		if (move.moveType === TEAM_SELECTION) {
 			const tileCodes = move.teamSelection.split(',');
 			const playerCode = getPlayerCodeFromName(move.player);
@@ -82,7 +85,7 @@ export class TrifleGameManager {
 			const moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint, move);
 			this.buildMoveGameLogText(move, moveDetails);
 
-			const abilityActivationFlags = moveDetails.abilityActivationFlags;
+			abilityActivationFlags = moveDetails.abilityActivationFlags;
 
 			// Add captured tiles to tile manager
 			this.tileManager.addToCapturedTiles(moveDetails.capturedTiles);

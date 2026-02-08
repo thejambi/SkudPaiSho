@@ -2,6 +2,7 @@ import {
   TrifleAbilityName,
   TrifleAbilityTriggerType,
   TrifleAbilityType,
+  TrifleActivationRequirement,
   TrifleAttributeType,
   TrifleCaptureType,
   TrifleDeployType,
@@ -9,13 +10,16 @@ import {
   TrifleMovementAbility,
   TrifleMovementRestriction,
   TrifleMovementType,
+  TriflePromptTargetType,
   TrifleSpecialDeployType,
+  TrifleTargetPromptId,
   TrifleTargetType,
   TrifleTileCategory,
   TrifleTileTeam,
   TrifleTiles,
 } from './TrifleTileInfo';
 import { clearObject } from '../GameData';
+import { RED } from '../skud-pai-sho/SkudPaiShoTile';
 
 export const TrifleTileCodes = {
 	/* Spirit */
@@ -1247,6 +1251,61 @@ export function defineTrifleTiles() {
 		movements: [
 			{
 				type: TrifleMovementType.anywhere,
+			}
+		],
+		abilities: [
+			{
+				title: "Messenger Hawk Push",
+				type: TrifleAbilityName.moveTargetTile,
+				isPassiveMovement: true,
+				optional: true,
+				neededPromptTargetsInfo: [
+					{
+						title: "pushedTile",
+						promptId: TrifleTargetPromptId.movedTilePoint,
+						targetType: TriflePromptTargetType.boardPoint
+					},
+					{
+						title: "pushLanding",
+						promptId: TrifleTargetPromptId.movedTileDestinationPoint,
+						targetType: TriflePromptTargetType.boardPoint
+					}
+				],
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whenLandsSurroundingTargetTile,
+						targetTileTypes: [TrifleTileCategory.allTileTypes],
+						activationRequirements: [
+							{
+								type: TrifleActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [TrifleTileCategory.thisTile],
+								targetPointTypes: [RED]
+							}
+						]
+					},
+					{
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.thisTile]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				triggerTypeToTarget: TrifleAbilityTriggerType.whenLandsSurroundingTargetTile,
+				numberOfTargetTiles: 1,
+				promptTargetTitle: "pushedTile",
+				targetTileMovements: [
+					{
+						type: TrifleMovementType.awayFromTargetTileOrthogonal,
+						distance: 1,
+						targetTileTypes: [TrifleTileCategory.tileWithAbility],
+						regardlessOfImmobilization: true
+					},
+					{
+						type: TrifleMovementType.awayFromTargetTileDiagonal,
+						distance: 1,
+						targetTileTypes: [TrifleTileCategory.tileWithAbility],
+						regardlessOfImmobilization: true
+					}
+				]
 			}
 		],
 		textLines: [
