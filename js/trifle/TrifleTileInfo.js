@@ -145,7 +145,8 @@ export const TrifleAbilityName = {
 	restrictDeploymentInZone: "restrictDeploymentInZone",
 	resurrectAtDeployPosition: "resurrectAtDeployPosition",
 	substituteForCapture: "substituteForCapture",
-	restrictTileFromCapturing: "restrictTileFromCapturing"
+	restrictTileFromCapturing: "restrictTileFromCapturing",
+	rotateSurroundingTilesClockwise: "rotateSurroundingTilesClockwise"
 };
 
 export const TrifleAbilityType = {
@@ -166,7 +167,8 @@ TrifleAbilitiesByCategory[TrifleAbilityCategory.instant] = [
 	TrifleAbilityName.moveTileToRecordedPoint,
 	TrifleAbilityName.moveTargetTileToPile,
 	TrifleAbilityName.exchangeWithCapturedTile,
-	TrifleAbilityName.substituteForCapture
+	TrifleAbilityName.substituteForCapture,
+	TrifleAbilityName.rotateSurroundingTilesClockwise
 ];
 
 export const TrifleAbilityPriorityLevel = {

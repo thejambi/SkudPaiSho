@@ -209,13 +209,26 @@ GiniTileInfo.defineGiniTiles = function() {
 		],
 		abilities: [
 			{
-				title: "Push Tile",
+				title: "Dragon Push",
 				type: TrifleAbilityName.moveTargetTile,
+				isPassiveMovement: true,
 				optional: true,
+				neededPromptTargetsInfo: [
+					{
+						title: "pushedTile",
+						promptId: TrifleTargetPromptId.movedTilePoint,
+						targetType: TriflePromptTargetType.boardPoint
+					},
+					{
+						title: "pushLanding",
+						promptId: TrifleTargetPromptId.movedTileDestinationPoint,
+						targetType: TriflePromptTargetType.boardPoint
+					}
+				],
 				triggers: [
 					{
-						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
-						targetTileTypes: [TrifleTileCategory.thisTile],
+						triggerType: TrifleAbilityTriggerType.whenLandsSurroundingTargetTile,
+						targetTileTypes: [TrifleTileCategory.allTileTypes],
 						activationRequirements: [
 							{
 								type: TrifleActivationRequirement.tileIsOnPointOfType,
@@ -223,14 +236,28 @@ GiniTileInfo.defineGiniTiles = function() {
 								targetPointTypes: [RED]
 							}
 						]
+					},
+					{
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.thisTile]
 					}
 				],
-				targetTypes: [TrifleTargetType.surroundingTiles],
-				targetTeams: [TrifleTileTeam.friendly, TrifleTileTeam.enemy],
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				triggerTypeToTarget: TrifleAbilityTriggerType.whenLandsSurroundingTargetTile,
+				numberOfTargetTiles: 1,
+				promptTargetTitle: "pushedTile",
 				targetTileMovements: [
 					{
-						type: TrifleMovementType.awayFromTargetTile,
-						distance: 1
+						type: TrifleMovementType.awayFromTargetTileOrthogonal,
+						distance: 1,
+						targetTileTypes: [TrifleTileCategory.tileWithAbility],
+						regardlessOfImmobilization: true
+					},
+					{
+						type: TrifleMovementType.awayFromTargetTileDiagonal,
+						distance: 1,
+						targetTileTypes: [TrifleTileCategory.tileWithAbility],
+						regardlessOfImmobilization: true
 					}
 				]
 			}
@@ -343,7 +370,17 @@ GiniTileInfo.defineGiniTiles = function() {
 		types: [GiniTileType.accentTile],
 		movements: [],
 		abilities: [
-			/* TODO: Phase 5 - rotateSurroundingTilesClockwise triggered whenDeployed */
+			{
+				title: "Rotate Surrounding Tiles",
+				type: TrifleAbilityName.rotateSurroundingTilesClockwise,
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.thisTile]
+					}
+				],
+				targetTypes: [TrifleTargetType.surroundingTiles]
+			}
 		],
 		textLines: [
 			"<strong>Accent Tile</strong>",

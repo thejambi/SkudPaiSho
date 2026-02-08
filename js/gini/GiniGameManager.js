@@ -15,6 +15,8 @@ import {
 	getPlayerCodeFromName,
 } from '../pai-sho-common/PaiShoPlayerHelp';
 import { setGameLogText } from '../PaiShoMain';
+import { NEUTRAL, NON_PLAYABLE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { PaiShoGameBoard } from '../trifle/PaiShoGameBoard';
 import { TrifleTile } from '../trifle/TrifleTile';
 import { TrifleAbilityName } from '../trifle/TrifleTileInfo';
@@ -92,6 +94,15 @@ GiniGameManager.prototype.runNotationMove = function(move, withActuate, moveAnim
 		if (needToPromptUser) {
 			neededPromptInfo = abilityActivationFlags.neededPromptInfo;
 		}
+
+		// Attach animation info for actuator
+		move.animationInfo = {
+			startPoint: move.startPoint,
+			endPoint: move.endPoint,
+			movedTile: moveDetails.movedTile,
+			capturedTiles: moveDetails.capturedTiles || [],
+			abilityAnimations: moveDetails.animations || null
+		};
 
 		this.buildMoveGameLogText(move, moveDetails);
 		this.checkForWin();
@@ -216,7 +227,8 @@ GiniGameManager.prototype.buildAbilityActivationOrder = function() {
 		TrifleAbilityName.cancelAbilities,
 		TrifleAbilityName.cancelAbilitiesTargetingTiles,
 		TrifleAbilityName.protectFromCapture,
-		TrifleAbilityName.moveTargetTile
+		TrifleAbilityName.moveTargetTile,
+		TrifleAbilityName.rotateSurroundingTilesClockwise
 	];
 };
 
@@ -237,30 +249,71 @@ GiniGameManager.prototype.doBoardSetup = function() {
 	});
 
 	/* Host tiles (right side, positive x) */
-	this.board.placeTile(this.tileManager.grabTile(HOST, GiniTileCodes.WhiteLotus), new NotationPoint("6,0"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, GiniTileCodes.Badgermole), new NotationPoint("5,-1"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, GiniTileCodes.Dragon), new NotationPoint("5,1"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, GiniTileCodes.Koi), new NotationPoint("4,-2"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, GiniTileCodes.Bison), new NotationPoint("4,2"));
-	this.board.placeTile(this.tileManager.grabTile(HOST, GiniTileCodes.Ginseng), new NotationPoint("4,0"));
+	this.board.putTileOnPoint(this.tileManager.grabTile(HOST, GiniTileCodes.WhiteLotus), new NotationPoint("6,0"));
+	this.board.putTileOnPoint(this.tileManager.grabTile(HOST, GiniTileCodes.Badgermole), new NotationPoint("5,-1"));
+	this.board.putTileOnPoint(this.tileManager.grabTile(HOST, GiniTileCodes.Dragon), new NotationPoint("5,1"));
+	this.board.putTileOnPoint(this.tileManager.grabTile(HOST, GiniTileCodes.Koi), new NotationPoint("4,-2"));
+	this.board.putTileOnPoint(this.tileManager.grabTile(HOST, GiniTileCodes.Bison), new NotationPoint("4,2"));
+	this.board.putTileOnPoint(this.tileManager.grabTile(HOST, GiniTileCodes.Ginseng), new NotationPoint("4,0"));
 
 	/* Guest tiles (left side, negative x) */
-	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.WhiteLotus), new NotationPoint("-6,0"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Badgermole), new NotationPoint("-5,1"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Dragon), new NotationPoint("-5,-1"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Koi), new NotationPoint("-4,2"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Bison), new NotationPoint("-4,-2"));
-	this.board.placeTile(this.tileManager.grabTile(GUEST, GiniTileCodes.Ginseng), new NotationPoint("-4,0"));
+	this.board.putTileOnPoint(this.tileManager.grabTile(GUEST, GiniTileCodes.WhiteLotus), new NotationPoint("-6,0"));
+	this.board.putTileOnPoint(this.tileManager.grabTile(GUEST, GiniTileCodes.Badgermole), new NotationPoint("-5,1"));
+	this.board.putTileOnPoint(this.tileManager.grabTile(GUEST, GiniTileCodes.Dragon), new NotationPoint("-5,-1"));
+	this.board.putTileOnPoint(this.tileManager.grabTile(GUEST, GiniTileCodes.Koi), new NotationPoint("-4,2"));
+	this.board.putTileOnPoint(this.tileManager.grabTile(GUEST, GiniTileCodes.Bison), new NotationPoint("-4,-2"));
+	this.board.putTileOnPoint(this.tileManager.grabTile(GUEST, GiniTileCodes.Ginseng), new NotationPoint("-4,0"));
 
-	this.board.placeTile(this.tileManager.grabAccentTile(HOST, GiniTileCodes.Water), new NotationPoint("5,4"));
-	this.board.placeTile(this.tileManager.grabAccentTile(HOST, GiniTileCodes.Earth), new NotationPoint("5,5"));
-	this.board.placeTile(this.tileManager.grabAccentTile(HOST, GiniTileCodes.Fire), new NotationPoint("6,4"));
-	this.board.placeTile(this.tileManager.grabAccentTile(HOST, GiniTileCodes.Air), new NotationPoint("6,5"));
+	this.board.putTileOnPoint(this.tileManager.grabAccentTile(HOST, GiniTileCodes.Water), new NotationPoint("5,4"));
+	this.board.putTileOnPoint(this.tileManager.grabAccentTile(HOST, GiniTileCodes.Earth), new NotationPoint("5,5"));
+	this.board.putTileOnPoint(this.tileManager.grabAccentTile(HOST, GiniTileCodes.Fire), new NotationPoint("6,4"));
+	this.board.putTileOnPoint(this.tileManager.grabAccentTile(HOST, GiniTileCodes.Air), new NotationPoint("6,5"));
 
-	this.board.placeTile(this.tileManager.grabAccentTile(GUEST, GiniTileCodes.Water), new NotationPoint("-6,-5"));
-	this.board.placeTile(this.tileManager.grabAccentTile(GUEST, GiniTileCodes.Earth), new NotationPoint("-6,-4"));
-	this.board.placeTile(this.tileManager.grabAccentTile(GUEST, GiniTileCodes.Fire), new NotationPoint("-5,-5"));
-	this.board.placeTile(this.tileManager.grabAccentTile(GUEST, GiniTileCodes.Air), new NotationPoint("-5,-4"));
+	this.board.putTileOnPoint(this.tileManager.grabAccentTile(GUEST, GiniTileCodes.Water), new NotationPoint("-6,-5"));
+	this.board.putTileOnPoint(this.tileManager.grabAccentTile(GUEST, GiniTileCodes.Earth), new NotationPoint("-6,-4"));
+	this.board.putTileOnPoint(this.tileManager.grabAccentTile(GUEST, GiniTileCodes.Fire), new NotationPoint("-5,-5"));
+	this.board.putTileOnPoint(this.tileManager.grabAccentTile(GUEST, GiniTileCodes.Air), new NotationPoint("-5,-4"));
+
+	this.customizeBoardPoints();
+};
+
+GiniGameManager.prototype.getPoint = function(notationStr) {
+	var np = new NotationPoint(notationStr);
+	var rc = np.rowAndColumn;
+	return this.board.cells[rc.row][rc.col];
+};
+
+GiniGameManager.prototype.setPointType = function(notationStr, addTypes, removeTypes) {
+	var point = this.getPoint(notationStr);
+	if (removeTypes) {
+		removeTypes.forEach(function(type) { point.removeType(type); });
+	}
+	if (addTypes) {
+		addTypes.forEach(function(type) { point.addType(type); });
+	}
+};
+
+GiniGameManager.prototype.customizeBoardPoints = function() {
+	/* Pure Neutral garden points are not playable in Gini.
+	   Border points (redNeutral, whiteNeutral, redWhiteNeutral) remain playable. */
+	for (var row = 0; row < this.board.cells.length; row++) {
+		for (var col = 0; col < this.board.cells[row].length; col++) {
+			var point = this.board.cells[row][col];
+			if (point.isType(NEUTRAL) && !point.isType(RED) && !point.isType(WHITE)) {
+				point.addType(NON_PLAYABLE);
+			}
+		}
+	}
+
+	/* Mark accent tile home positions (removes NON_PLAYABLE so they render and are clickable) */
+	var accentHomePositions = [
+		"5,4", "5,5", "6,4", "6,5",
+		"-6,-5", "-6,-4", "-5,-5", "-5,-4"
+	];
+	var self = this;
+	accentHomePositions.forEach(function(pos) {
+		self.setPointType(pos, [ACCENT_TILE_HOME], [NON_PLAYABLE]);
+	});
 };
 
 GiniGameManager.prototype.getCopy = function() {
