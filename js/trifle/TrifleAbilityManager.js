@@ -1,3 +1,6 @@
+// Trifle Engine - Ability Manager
+// Documentation: ~/Dropbox/Programming/SkudPaiSho/TheGardenGate/backend/TGGDocumentation/Trifle/
+
 import {
   TrifleAbilitiesForType,
   TrifleAbilityName,

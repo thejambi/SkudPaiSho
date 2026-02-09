@@ -1,3 +1,6 @@
+// Trifle Engine - Brain Factory
+// Documentation: ~/Dropbox/Programming/SkudPaiSho/TheGardenGate/backend/TGGDocumentation/Trifle/
+
 import {
   TrifleAbilityName,
   TrifleAbilityTriggerType,
@@ -53,6 +56,8 @@ import { TrifleWhenTargetTileInZoneIsCapturedTriggerBrain } from './triggerBrain
 import { TrifleSubstituteForCaptureAbilityBrain } from './abilityBrains/SubstituteForCaptureAbilityBrain';
 import { TrifleRotateSurroundingTilesClockwiseAbilityBrain } from './abilityBrains/RotateSurroundingTilesClockwiseAbilityBrain';
 import { TrifleSwapTwoSurroundingTilesAbilityBrain } from './abilityBrains/SwapTwoSurroundingTilesAbilityBrain';
+import { TrifleDisplaceOccupiedTileAbilityBrain } from './abilityBrains/DisplaceOccupiedTileAbilityBrain';
+import { TrifleSwapAndRelocateTileAbilityBrain } from './abilityBrains/SwapAndRelocateTileAbilityBrain';
 import { TrifleWhileTargetTileIsNotOnBoardTriggerBrain } from './triggerBrains/WhileTargetTileIsNotOnBoardTriggerBrain';
 
 /**
@@ -202,6 +207,10 @@ TrifleBrainFactory.createAbilityBrain = function(abilityName, abilityObject) {
 			return new TrifleRotateSurroundingTilesClockwiseAbilityBrain(abilityObject);
 		case TrifleAbilityName.swapTwoSurroundingTiles:
 			return new TrifleSwapTwoSurroundingTilesAbilityBrain(abilityObject);
+		case TrifleAbilityName.displaceOccupiedTile:
+			return new TrifleDisplaceOccupiedTileAbilityBrain(abilityObject);
+		case TrifleAbilityName.swapAndRelocateTile:
+			return new TrifleSwapAndRelocateTileAbilityBrain(abilityObject);
 		default:
 			return new TrifleSimpleOngoingAbilityBrain(abilityObject);
 	}

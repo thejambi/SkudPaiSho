@@ -1,3 +1,6 @@
+// Trifle Engine - Tile Definitions
+// Documentation: ~/Dropbox/Programming/SkudPaiSho/TheGardenGate/backend/TGGDocumentation/Trifle/
+
 import {
   TrifleAbilityName,
   TrifleAbilityTriggerType,

@@ -20,11 +20,12 @@ import { NEUTRAL, NON_PLAYABLE, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiSho
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { PaiShoGameBoard } from '../trifle/PaiShoGameBoard';
 import { TrifleTile } from '../trifle/TrifleTile';
-import { TrifleAbilityName } from '../trifle/TrifleTileInfo';
+import { TrifleAbilityName, TrifleDeployType } from '../trifle/TrifleTileInfo';
 import { GiniTileManager } from './GiniTileManager';
 import { GiniTileCodes } from './GiniTiles';
 
 export var ACCENT_TILE_HOME = "AccentTileHome";
+export var PORTAL = "Portal";
 
 export var GiniGameManager = function(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';
@@ -76,6 +77,16 @@ GiniGameManager.prototype.runNotationMove = function(move, withActuate, moveAnim
 	var moveDetails;
 
 	if (move.moveType === MOVE) {
+		// Fire displacement: remove occupied tile before moveTile so it isn't captured
+		var startBP = this.board.getPointFromNotationPoint(new NotationPoint(move.startPoint));
+		var endBP = this.board.getPointFromNotationPoint(new NotationPoint(move.endPoint));
+		if (startBP.hasTile() && endBP.hasTile()) {
+			var startTileInfo = this.board.tileMetadata[startBP.tile.code];
+			if (startTileInfo && startTileInfo.deployTypes && startTileInfo.deployTypes.includes(TrifleDeployType.onOccupiedTile)) {
+				startBP.tile._displacedTile = endBP.removeTile();
+			}
+		}
+
 		moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint, move);
 		this.tileManager.addToCapturedTiles(moveDetails.capturedTiles);
 
@@ -111,6 +122,16 @@ GiniGameManager.prototype.runNotationMove = function(move, withActuate, moveAnim
 		var tile = this.tileManager.grabAccentTile(move.player, move.tileType);
 		if (tile) {
 			var endNotationPoint = new NotationPoint(move.endPoint);
+
+			// Fire displacement: remove occupied tile before placing Fire
+			var deployTileInfo = this.board.tileMetadata[tile.code];
+			if (deployTileInfo && deployTileInfo.deployTypes && deployTileInfo.deployTypes.includes(TrifleDeployType.onOccupiedTile)) {
+				var deployEndBP = this.board.getPointFromNotationPoint(endNotationPoint);
+				if (deployEndBP.hasTile()) {
+					tile._displacedTile = deployEndBP.removeTile();
+				}
+			}
+
 			this.board.putTileOnPoint(tile, endNotationPoint);
 
 			var tileInfo = this.board.tileMetadata[tile.code];
@@ -222,10 +243,35 @@ GiniGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignore
 	}
 	this.board.setPossibleMovePoints(boardPoint);
 
+	this.expandPortalMoves(boardPoint);
+
 	if (!ignoreActuate) {
 		this.actuate();
 	}
 };
+
+GiniGameManager.prototype.expandPortalMoves = function(startingPoint) {
+	/* If the tile starts on a portal or can reach a portal, all other empty portals
+	   become valid destinations at 0 movement cost. */
+	var canReachPortal = startingPoint.isType(PORTAL);
+
+	if (!canReachPortal) {
+		this.board.forEachBoardPoint(function(bp) {
+			if (bp.isType(PORTAL) && bp.isType(POSSIBLE_MOVE)) {
+				canReachPortal = true;
+			}
+		});
+	}
+
+	if (canReachPortal) {
+		this.board.forEachBoardPoint(function(bp) {
+			if (bp.isType(PORTAL) && !bp.hasTile() && bp !== startingPoint) {
+				bp.addType(POSSIBLE_MOVE);
+			}
+		});
+	}
+};
+
 
 GiniGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 	this.board.removePossibleMovePoints();
@@ -236,9 +282,19 @@ GiniGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 };
 
 GiniGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
+	var tileInfo = this.board.tileMetadata[tile.code];
+	var isDisplaceTile = tileInfo && tileInfo.deployTypes && tileInfo.deployTypes.includes(TrifleDeployType.onOccupiedTile);
+
 	this.board.forEachBoardPoint(function(boardPoint) {
-		if (!boardPoint.hasTile() && !boardPoint.isType(NON_PLAYABLE)) {
-			boardPoint.addType(POSSIBLE_MOVE);
+		if (isDisplaceTile) {
+			// Fire: show occupied tiles as valid targets (not the Fire tile itself)
+			if (boardPoint.hasTile() && !boardPoint.isType(NON_PLAYABLE) && boardPoint.tile !== tile) {
+				boardPoint.addType(POSSIBLE_MOVE);
+			}
+		} else {
+			if (!boardPoint.hasTile() && !boardPoint.isType(NON_PLAYABLE)) {
+				boardPoint.addType(POSSIBLE_MOVE);
+			}
 		}
 	});
 
@@ -271,8 +327,10 @@ GiniGameManager.prototype.buildAbilityActivationOrder = function() {
 		TrifleAbilityName.cancelAbilitiesTargetingTiles,
 		TrifleAbilityName.protectFromCapture,
 		TrifleAbilityName.moveTargetTile,
+		TrifleAbilityName.displaceOccupiedTile,
 		TrifleAbilityName.swapTwoSurroundingTiles,
-		TrifleAbilityName.rotateSurroundingTilesClockwise
+		TrifleAbilityName.rotateSurroundingTilesClockwise,
+		TrifleAbilityName.swapAndRelocateTile
 	];
 };
 
@@ -357,6 +415,12 @@ GiniGameManager.prototype.customizeBoardPoints = function() {
 	var self = this;
 	accentHomePositions.forEach(function(pos) {
 		self.setPointType(pos, [ACCENT_TILE_HOME], [NON_PLAYABLE]);
+	});
+
+	/* Mark portal positions at the 4 gate/temple points (tips of the diamond) */
+	var portalPositions = ["0,8", "0,-8", "-8,0", "8,0"];
+	portalPositions.forEach(function(pos) {
+		self.setPointType(pos, [PORTAL], []);
 	});
 };
 

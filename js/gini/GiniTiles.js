@@ -4,6 +4,7 @@ import {
   TrifleAbilityTriggerType,
   TrifleActivationRequirement,
   TrifleCaptureType,
+  TrifleDeployType,
   TrifleMovementDirection,
   TrifleMovementType,
   TriflePromptTargetType,
@@ -13,7 +14,6 @@ import {
   TrifleTileInfo,
   TrifleTileTeam,
 } from '../trifle/TrifleTileInfo';
-import { TrifleTileType } from '../trifle/TrifleTiles';
 import { clearObject } from '../GameData';
 import { setCurrentTileNames } from '../trifle/PaiShoGamesTileMetadata';
 
@@ -322,7 +322,13 @@ GiniTileInfo.defineGiniTiles = function() {
 		movements: [
 			{
 				type: TrifleMovementType.standard,
-				distance: 4
+				distance: 4,
+				captureTypes: [
+				{
+					type: TrifleCaptureType.onlyCertainTileTypes,
+					includedTileTypes: [GiniTileType.accentTile]
+				}
+			]
 			}
 		],
 		abilities: [
@@ -420,9 +426,28 @@ GiniTileInfo.defineGiniTiles = function() {
 	GiniTiles[GiniTileCodes.Fire] = {
 		available: true,
 		types: [GiniTileType.accentTile],
+		deployTypes: [TrifleDeployType.onOccupiedTile],
 		movements: [],
 		abilities: [
-			/* TODO: Phase 5 - place on any other tile, move that tile to surrounding spot */
+			{
+				title: "Displace Tile",
+				type: TrifleAbilityName.displaceOccupiedTile,
+				optional: true,
+				neededPromptTargetsInfo: [
+					{
+						title: "displacedTileDestination",
+						promptId: TrifleTargetPromptId.displacedTileDestinationPoint,
+						targetType: TriflePromptTargetType.boardPoint
+					}
+				],
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.thisTile]
+					}
+				],
+				targetTypes: [TrifleTargetType.thisTile]
+			}
 		],
 		textLines: [
 			"<strong>Accent Tile</strong>",
@@ -436,7 +461,31 @@ GiniTileInfo.defineGiniTiles = function() {
 		types: [GiniTileType.accentTile],
 		movements: [],
 		abilities: [
-			/* TODO: Phase 5 - swap with any tile, place exchanged tile anywhere */
+			{
+				title: "Swap and Relocate",
+				type: TrifleAbilityName.swapAndRelocateTile,
+				optional: true,
+				excludeTileCode: GiniTileCodes.WhiteLotus,
+				neededPromptTargetsInfo: [
+					{
+						title: "swappedTile",
+						promptId: TrifleTargetPromptId.swappedTilePoint,
+						targetType: TriflePromptTargetType.boardPoint
+					},
+					{
+						title: "relocatedTileDestination",
+						promptId: TrifleTargetPromptId.relocatedTileDestinationPoint,
+						targetType: TriflePromptTargetType.boardPoint
+					}
+				],
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.thisTile]
+					}
+				],
+				targetTypes: [TrifleTargetType.thisTile]
+			}
 		],
 		textLines: [
 			"<strong>Accent Tile</strong>",

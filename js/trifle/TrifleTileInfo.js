@@ -1,3 +1,5 @@
+// Trifle Engine - Tile Info & Enums
+// Documentation: ~/Dropbox/Programming/SkudPaiSho/TheGardenGate/backend/TGGDocumentation/Trifle/
 
 import { TrifleBoardPoint } from './TrifleBoardPoint';
 import { TrifleTileType } from './TrifleTiles';
@@ -27,7 +29,8 @@ export const TrifleTargetType = {
 export const TrifleDeployType = {
 	anywhere: "anywhere",
 	temple: "temple",
-	adjacentToTemple: "adjacentToTemple"
+	adjacentToTemple: "adjacentToTemple",
+	onOccupiedTile: "onOccupiedTile"
 };
 
 export const TrifleSpecialDeployType = {
@@ -82,7 +85,9 @@ export const TrifleCaptureType = {
 	none: "none",
 	all: "all",
 	tilesTargetedByAbility: "tilesTargetedByAbility",
-	allExcludingCertainTiles: "allExcludingCertainTiles"
+	allExcludingCertainTiles: "allExcludingCertainTiles",
+	onlyCertainTiles: "onlyCertainTiles",
+	onlyCertainTileTypes: "onlyCertainTileTypes"
 };
 
 export const TrifleActivationRequirement = {
@@ -147,7 +152,9 @@ export const TrifleAbilityName = {
 	substituteForCapture: "substituteForCapture",
 	restrictTileFromCapturing: "restrictTileFromCapturing",
 	rotateSurroundingTilesClockwise: "rotateSurroundingTilesClockwise",
-	swapTwoSurroundingTiles: "swapTwoSurroundingTiles"
+	swapTwoSurroundingTiles: "swapTwoSurroundingTiles",
+	displaceOccupiedTile: "displaceOccupiedTile",
+	swapAndRelocateTile: "swapAndRelocateTile"
 };
 
 export const TrifleAbilityType = {
@@ -170,7 +177,9 @@ TrifleAbilitiesByCategory[TrifleAbilityCategory.instant] = [
 	TrifleAbilityName.exchangeWithCapturedTile,
 	TrifleAbilityName.substituteForCapture,
 	TrifleAbilityName.rotateSurroundingTilesClockwise,
-	TrifleAbilityName.swapTwoSurroundingTiles
+	TrifleAbilityName.swapTwoSurroundingTiles,
+	TrifleAbilityName.displaceOccupiedTile,
+	TrifleAbilityName.swapAndRelocateTile
 ];
 
 export const TrifleAbilityPriorityLevel = {
@@ -215,7 +224,10 @@ export const TrifleTargetPromptId = {
 	movedTileDestinationPoint: "movedTileDestinationPoint",
 	chosenCapturedTile: "chosenCapturedTile",
 	firstSwapTile: "firstSwapTile",
-	secondSwapTile: "secondSwapTile"
+	secondSwapTile: "secondSwapTile",
+	displacedTileDestinationPoint: "displacedTileDestinationPoint",
+	swappedTilePoint: "swappedTilePoint",
+	relocatedTileDestinationPoint: "relocatedTileDestinationPoint"
 };
 
 export const TrifleTileTeam = {

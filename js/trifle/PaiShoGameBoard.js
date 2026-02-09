@@ -1,3 +1,5 @@
+// Trifle Engine - Game Board
+// Documentation: ~/Dropbox/Programming/SkudPaiSho/TheGardenGate/backend/TGGDocumentation/Trifle/
 // A more reusable and global Pai Sho Board
 
 import {
@@ -2287,6 +2289,14 @@ export class PaiShoGameBoard {
 					});
 				} else if (captureTypeInfo.type && captureTypeInfo.type === TrifleCaptureType.allExcludingCertainTiles) {
 					if (!captureTypeInfo.excludedTileCodes.includes(targetPoint.tile.code)) {
+						capturePossibleWithMovement = true;
+					}
+				} else if (captureTypeInfo.type && captureTypeInfo.type === TrifleCaptureType.onlyCertainTiles) {
+					if (captureTypeInfo.includedTileCodes.includes(targetPoint.tile.code)) {
+						capturePossibleWithMovement = true;
+					}
+				} else if (captureTypeInfo.type && captureTypeInfo.type === TrifleCaptureType.onlyCertainTileTypes) {
+					if (targetTileInfo && targetTileInfo.types && arrayIncludesOneOf(captureTypeInfo.includedTileTypes, targetTileInfo.types)) {
 						capturePossibleWithMovement = true;
 					}
 				}

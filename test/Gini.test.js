@@ -38,10 +38,10 @@ vi.mock('../js/GameOptions', async (importOriginal) => {
 });
 
 // Import after mocking
-import { ACCENT_TILE_HOME, GiniGameManager } from '../js/gini/GiniGameManager';
+import { ACCENT_TILE_HOME, PORTAL, GiniGameManager } from '../js/gini/GiniGameManager';
 import { NotationPoint, MOVE, DEPLOY, HOST, GUEST } from '../js/CommonNotationObjects';
 import { GiniTileInfo, GiniTiles, GiniTileCodes } from '../js/gini/GiniTiles';
-import { NON_PLAYABLE, NEUTRAL } from '../js/skud-pai-sho/SkudPaiShoBoardPoint';
+import { NON_PLAYABLE, NEUTRAL, POSSIBLE_MOVE } from '../js/skud-pai-sho/SkudPaiShoBoardPoint';
 import { RED, WHITE } from '../js/skud-pai-sho/SkudPaiShoTile';
 import { setCurrentTileMetadata, setCurrentTileCodes } from '../js/trifle/PaiShoGamesTileMetadata';
 
@@ -568,6 +568,467 @@ describe('Gini Water Accent Tile - Swap Two Surrounding Tiles', () => {
 		// for the first tile (since there IS a surrounding tile).
 		// But we'll verify Water is placed.
 		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Water);
+	});
+});
+
+// ─── Fire Displacement Tests ───
+
+describe('Gini Fire Accent Tile - Displace Occupied Tile', () => {
+	function manualMoveTile(game, fromStr, toStr) {
+		const fromNp = new NotationPoint(fromStr);
+		const fromRc = fromNp.rowAndColumn;
+		const toNp = new NotationPoint(toStr);
+		const toRc = toNp.rowAndColumn;
+		const tile = game.board.cells[fromRc.row][fromRc.col].removeTile();
+		game.board.cells[toRc.row][toRc.col].putTile(tile);
+	}
+
+	/**
+	 * Build promptTargetData for the Fire displace ability.
+	 * The source tile key uses the Fire tile's info with the destination boardPoint.
+	 */
+	function buildDisplacePromptData(game, fireNotationStr, destNotationStr, displacedDestStr) {
+		var fireTile = getTileAt(game, fireNotationStr);
+		var sourceTileKey = JSON.stringify({
+			tileOwner: fireTile.ownerCode,
+			tileCode: fireTile.code,
+			boardPoint: destNotationStr,
+			tileId: fireTile.id
+		});
+		var promptTargetData = {};
+		promptTargetData[sourceTileKey] = {
+			displacedTileDestinationPoint: new NotationPoint(displacedDestStr)
+		};
+		return promptTargetData;
+	}
+
+	it('should return neededPromptInfo when Fire moves onto an occupied tile without prompt data', () => {
+		const game = createGame();
+
+		// Move Guest Koi to center area
+		manualMoveTile(game, '-4,2', '0,0');
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Koi);
+
+		// Move Fire onto the occupied tile with empty prompt data
+		var neededPromptInfo = makeMove(game, GUEST, '-5,-5', '0,0', 0, {});
+
+		// Should prompt for displaced tile destination
+		expect(neededPromptInfo).toBeTruthy();
+		expect(neededPromptInfo.currentPromptTargetId).toBe('displacedTileDestinationPoint');
+	});
+
+	it('should displace the occupied tile to the prompted surrounding spot', () => {
+		const game = createGame();
+
+		// Move Guest Koi to center
+		manualMoveTile(game, '-4,2', '0,0');
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Koi);
+
+		// Build prompt data: Fire moves to (0,0), displaced Koi goes to (1,0)
+		var promptData = buildDisplacePromptData(game, '-5,-5', '0,0', '1,0');
+
+		// Move Fire onto Koi with displacement prompt
+		makeMove(game, GUEST, '-5,-5', '0,0', 0, promptData);
+
+		// Fire should be at center
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Fire);
+
+		// Koi should be displaced to (1,0)
+		expect(getTileAt(game, '1,0').code).toBe(GiniTileCodes.Koi);
+	});
+
+	it('should preserve ownership of the displaced tile', () => {
+		const game = createGame();
+
+		// Move Host Dragon to center
+		manualMoveTile(game, '5,1', '0,0');
+		expect(getTileAt(game, '0,0').ownerName).toBe(HOST);
+
+		// Guest Fire displaces Host Dragon
+		var promptData = buildDisplacePromptData(game, '-5,-5', '0,0', '0,1');
+		makeMove(game, GUEST, '-5,-5', '0,0', 0, promptData);
+
+		// Fire is Guest's, at center
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Fire);
+		expect(getTileAt(game, '0,0').ownerName).toBe(GUEST);
+
+		// Dragon is Host's, displaced to (0,1)
+		expect(getTileAt(game, '0,1').code).toBe(GiniTileCodes.Dragon);
+		expect(getTileAt(game, '0,1').ownerName).toBe(HOST);
+	});
+
+	it('should not capture the displaced tile (tile stays on board)', () => {
+		const game = createGame();
+
+		// Move Guest Koi to center
+		manualMoveTile(game, '-4,2', '0,0');
+
+		var promptData = buildDisplacePromptData(game, '-5,-5', '0,0', '1,0');
+		makeMove(game, GUEST, '-5,-5', '0,0', 0, promptData);
+
+		// Koi should still exist on the board (not captured)
+		expect(getTileAt(game, '1,0').code).toBe(GiniTileCodes.Koi);
+		// Verify it's not in captured tiles
+		expect(game.tileManager.capturedTiles.length).toBe(0);
+	});
+
+	it('should work with deploy from hand (DEPLOY move type)', () => {
+		const game = createGame();
+
+		// Remove Fire from board and return to hand
+		const firePoint = new NotationPoint('-5,-5');
+		const fireRC = firePoint.rowAndColumn;
+		const fireTile = game.board.cells[fireRC.row][fireRC.col].removeTile();
+		game.tileManager.returnAccentTile(fireTile);
+
+		// Move Guest Koi to center
+		manualMoveTile(game, '-4,2', '0,0');
+
+		// Build prompt data using the tile from the hand
+		var fireFromHand = game.tileManager.peekAccentTile(GUEST, GiniTileCodes.Fire);
+		var sourceTileKey = JSON.stringify({
+			tileOwner: fireFromHand.ownerCode,
+			tileCode: fireFromHand.code,
+			boardPoint: '0,0',
+			tileId: fireFromHand.id
+		});
+		var promptTargetData = {};
+		promptTargetData[sourceTileKey] = {
+			displacedTileDestinationPoint: new NotationPoint('1,0')
+		};
+
+		// Deploy Fire from hand onto occupied Koi at center
+		const move = {
+			moveNum: 0,
+			player: GUEST,
+			moveType: DEPLOY,
+			tileType: GiniTileCodes.Fire,
+			endPoint: '0,0',
+			promptTargetData: promptTargetData
+		};
+		game.runNotationMove(move, false);
+
+		// Fire at center, Koi displaced to (1,0)
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Fire);
+		expect(getTileAt(game, '1,0').code).toBe(GiniTileCodes.Koi);
+	});
+});
+
+// ─── Air Swap and Relocate Tests ───
+
+describe('Gini Air Accent Tile - Swap and Relocate', () => {
+	function manualMoveTile(game, fromStr, toStr) {
+		const fromNp = new NotationPoint(fromStr);
+		const fromRc = fromNp.rowAndColumn;
+		const toNp = new NotationPoint(toStr);
+		const toRc = toNp.rowAndColumn;
+		const tile = game.board.cells[fromRc.row][fromRc.col].removeTile();
+		game.board.cells[toRc.row][toRc.col].putTile(tile);
+	}
+
+	/**
+	 * Build promptTargetData for the Air swap-and-relocate ability.
+	 */
+	function buildAirPromptData(game, airNotationStr, destNotationStr, swappedTileStr, relocDestStr) {
+		var airTile = getTileAt(game, airNotationStr);
+		var sourceTileKey = JSON.stringify({
+			tileOwner: airTile.ownerCode,
+			tileCode: airTile.code,
+			boardPoint: destNotationStr,
+			tileId: airTile.id
+		});
+		var promptTargetData = {};
+		promptTargetData[sourceTileKey] = {
+			swappedTilePoint: new NotationPoint(swappedTileStr),
+			relocatedTileDestinationPoint: new NotationPoint(relocDestStr)
+		};
+		return promptTargetData;
+	}
+
+	it('should return neededPromptInfo when Air is placed without prompt data', () => {
+		const game = createGame();
+
+		// Move Guest Koi to center area so there's a tile to swap with
+		manualMoveTile(game, '-4,2', '0,0');
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Koi);
+
+		// Move Air to (0,1) with empty prompt data
+		var neededPromptInfo = makeMove(game, GUEST, '-5,-4', '0,1', 0, {});
+
+		// Should prompt for swapped tile
+		expect(neededPromptInfo).toBeTruthy();
+		expect(neededPromptInfo.currentPromptTargetId).toBe('swappedTilePoint');
+	});
+
+	it('should swap Air with target tile and relocate target to chosen spot', () => {
+		const game = createGame();
+
+		// Move Guest Koi to center
+		manualMoveTile(game, '-4,2', '0,0');
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Koi);
+
+		// Build prompt: Air at (-5,-4) moves to (0,1), swaps with Koi at (0,0), Koi goes to (2,0)
+		var promptData = buildAirPromptData(game, '-5,-4', '0,1', '0,0', '2,0');
+
+		makeMove(game, GUEST, '-5,-4', '0,1', 0, promptData);
+
+		// Air should now be where Koi was (0,0)
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Air);
+
+		// Koi should be at the relocation destination (2,0)
+		expect(getTileAt(game, '2,0').code).toBe(GiniTileCodes.Koi);
+
+		// Air's deploy position (0,1) should be empty
+		expect(isEmptyAt(game, '0,1')).toBe(true);
+	});
+
+	it('should preserve tile ownership after swap and relocate', () => {
+		const game = createGame();
+
+		// Move Host Dragon to center
+		manualMoveTile(game, '5,1', '0,0');
+		expect(getTileAt(game, '0,0').ownerName).toBe(HOST);
+
+		// Guest Air swaps with Host Dragon, Dragon relocated to (2,0)
+		var promptData = buildAirPromptData(game, '-5,-4', '0,1', '0,0', '2,0');
+		makeMove(game, GUEST, '-5,-4', '0,1', 0, promptData);
+
+		// Air is Guest's, now at (0,0)
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Air);
+		expect(getTileAt(game, '0,0').ownerName).toBe(GUEST);
+
+		// Dragon is Host's, relocated to (2,0)
+		expect(getTileAt(game, '2,0').code).toBe(GiniTileCodes.Dragon);
+		expect(getTileAt(game, '2,0').ownerName).toBe(HOST);
+	});
+
+	it('should work with deploy from hand (DEPLOY move type)', () => {
+		const game = createGame();
+
+		// Remove Air from board and return to hand
+		const airPoint = new NotationPoint('-5,-4');
+		const airRC = airPoint.rowAndColumn;
+		const airTile = game.board.cells[airRC.row][airRC.col].removeTile();
+		game.tileManager.returnAccentTile(airTile);
+
+		// Move Guest Koi to center
+		manualMoveTile(game, '-4,2', '0,0');
+
+		// Build prompt data using tile from hand
+		var airFromHand = game.tileManager.peekAccentTile(GUEST, GiniTileCodes.Air);
+		var sourceTileKey = JSON.stringify({
+			tileOwner: airFromHand.ownerCode,
+			tileCode: airFromHand.code,
+			boardPoint: '0,1',
+			tileId: airFromHand.id
+		});
+		var promptTargetData = {};
+		promptTargetData[sourceTileKey] = {
+			swappedTilePoint: new NotationPoint('0,0'),
+			relocatedTileDestinationPoint: new NotationPoint('2,0')
+		};
+
+		// Deploy Air from hand to (0,1), swap with Koi at (0,0), Koi goes to (2,0)
+		const move = {
+			moveNum: 0,
+			player: GUEST,
+			moveType: DEPLOY,
+			tileType: GiniTileCodes.Air,
+			endPoint: '0,1',
+			promptTargetData: promptTargetData
+		};
+		game.runNotationMove(move, false);
+
+		// Air at (0,0), Koi at (2,0), (0,1) empty
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Air);
+		expect(getTileAt(game, '2,0').code).toBe(GiniTileCodes.Koi);
+		expect(isEmptyAt(game, '0,1')).toBe(true);
+	});
+});
+
+// ─── Portal Tests ───
+
+describe('Gini Portal Movement', () => {
+	function manualMoveTile(game, fromStr, toStr) {
+		const fromNp = new NotationPoint(fromStr);
+		const fromRc = fromNp.rowAndColumn;
+		const toNp = new NotationPoint(toStr);
+		const toRc = toNp.rowAndColumn;
+		const tile = game.board.cells[fromRc.row][fromRc.col].removeTile();
+		game.board.cells[toRc.row][toRc.col].putTile(tile);
+	}
+
+	function getPoint(game, notationStr) {
+		const np = new NotationPoint(notationStr);
+		const rc = np.rowAndColumn;
+		return game.board.cells[rc.row][rc.col];
+	}
+
+	it('should mark the 4 gate positions as portals', () => {
+		const game = createGame();
+		var portalPositions = ["0,8", "0,-8", "-8,0", "8,0"];
+		portalPositions.forEach(pos => {
+			expect(getPointTypes(game, pos)).toContain(PORTAL);
+		});
+	});
+
+	it('should add all empty portals as possible moves when tile starts on a portal', () => {
+		const game = createGame();
+
+		// Move Guest Koi onto a portal
+		manualMoveTile(game, '-4,2', '-8,0');
+		expect(getTileAt(game, '-8,0').code).toBe(GiniTileCodes.Koi);
+
+		// Reveal possible moves — tile is on a portal, so other empty portals should be destinations
+		var startPoint = getPoint(game, '-8,0');
+		game.revealPossibleMovePoints(startPoint, true);
+
+		// Other 3 portals should be marked as POSSIBLE_MOVE (they're all empty)
+		expect(getPointTypes(game, '0,8')).toContain(POSSIBLE_MOVE);
+		expect(getPointTypes(game, '0,-8')).toContain(POSSIBLE_MOVE);
+		expect(getPointTypes(game, '8,0')).toContain(POSSIBLE_MOVE);
+	});
+
+	it('should add empty portals when a reachable point is a portal', () => {
+		const game = createGame();
+
+		// Move Guest Koi near a portal (1 space away from "-8,0")
+		manualMoveTile(game, '-4,2', '-7,0');
+
+		// Reveal possible moves — Koi has 4 movement, can reach portal at "-8,0"
+		var startPoint = getPoint(game, '-7,0');
+		game.revealPossibleMovePoints(startPoint, true);
+
+		// Portal at "-8,0" should be reachable (1 space away)
+		expect(getPointTypes(game, '-8,0')).toContain(POSSIBLE_MOVE);
+
+		// Other portals should also be marked as possible moves via portal expansion
+		expect(getPointTypes(game, '0,8')).toContain(POSSIBLE_MOVE);
+		expect(getPointTypes(game, '0,-8')).toContain(POSSIBLE_MOVE);
+		expect(getPointTypes(game, '8,0')).toContain(POSSIBLE_MOVE);
+	});
+
+	it('should not add occupied portals as possible moves', () => {
+		const game = createGame();
+
+		// Place tiles on two portals
+		manualMoveTile(game, '-4,2', '-8,0');   // Guest Koi on portal
+		manualMoveTile(game, '5,1', '8,0');     // Host Dragon on portal
+
+		// Reveal moves for Koi on the portal
+		var startPoint = getPoint(game, '-8,0');
+		game.revealPossibleMovePoints(startPoint, true);
+
+		// Portal at "8,0" is occupied by Dragon — should NOT be a possible move
+		// (unless the movement engine marks it for capture, but it's far away)
+		// The portal expansion only adds empty portals
+		// "0,8" and "0,-8" are empty and should be possible moves
+		expect(getPointTypes(game, '0,8')).toContain(POSSIBLE_MOVE);
+		expect(getPointTypes(game, '0,-8')).toContain(POSSIBLE_MOVE);
+	});
+
+	it('should allow a tile to move to a portal destination', () => {
+		const game = createGame();
+
+		// Move Guest Koi onto a portal
+		manualMoveTile(game, '-4,2', '-8,0');
+
+		// Move Koi from portal to another portal
+		makeMove(game, GUEST, '-8,0', '0,8', 0);
+
+		// Koi should be at the destination portal
+		expect(getTileAt(game, '0,8').code).toBe(GiniTileCodes.Koi);
+		expect(isEmptyAt(game, '-8,0')).toBe(true);
+	});
+});
+
+// ─── Ginseng Accent Tile Capture Tests ───
+
+describe('Gini Ginseng Accent Tile Capture', () => {
+	function manualMoveTile(game, fromStr, toStr) {
+		const fromNp = new NotationPoint(fromStr);
+		const fromRc = fromNp.rowAndColumn;
+		const toNp = new NotationPoint(toStr);
+		const toRc = toNp.rowAndColumn;
+		const tile = game.board.cells[fromRc.row][fromRc.col].removeTile();
+		game.board.cells[toRc.row][toRc.col].putTile(tile);
+	}
+
+	function getPoint(game, notationStr) {
+		const np = new NotationPoint(notationStr);
+		const rc = np.rowAndColumn;
+		return game.board.cells[rc.row][rc.col];
+	}
+
+	it('should return captured accent tile to owner hand instead of captured pile', () => {
+		const game = createGame();
+
+		// Move Guest Water accent tile to center area
+		manualMoveTile(game, '-6,-5', '0,0');
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Water);
+		expect(getTileAt(game, '0,0').ownerName).toBe(GUEST);
+
+		// Move Host Ginseng to capture the Water tile
+		manualMoveTile(game, '4,0', '0,1');
+		makeMove(game, HOST, '0,1', '0,0', 0);
+
+		// Ginseng should be at center
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Ginseng);
+
+		// Water should NOT be in captured tiles
+		expect(game.tileManager.capturedTiles.length).toBe(0);
+
+		// Water should be back in Guest's hand
+		var waterInHand = game.tileManager.peekAccentTile(GUEST, GiniTileCodes.Water);
+		expect(waterInHand).toBeTruthy();
+		expect(waterInHand.code).toBe(GiniTileCodes.Water);
+	});
+
+	it('should allow Ginseng to show accent tiles as possible capture targets', () => {
+		const game = createGame();
+
+		// Place Guest Water near Host Ginseng
+		manualMoveTile(game, '-6,-5', '0,0');
+		manualMoveTile(game, '4,0', '0,1');
+
+		// Reveal possible moves for Ginseng
+		var startPoint = getPoint(game, '0,1');
+		game.revealPossibleMovePoints(startPoint, true);
+
+		// Water at (0,0) should be a possible move (capturable)
+		expect(getPointTypes(game, '0,0')).toContain(POSSIBLE_MOVE);
+	});
+
+	it('should NOT allow non-Ginseng tiles to capture accent tiles', () => {
+		const game = createGame();
+
+		// Place Guest Water near Host Dragon
+		manualMoveTile(game, '-6,-5', '0,0');
+		manualMoveTile(game, '5,1', '0,1');
+
+		// Reveal possible moves for Dragon
+		var startPoint = getPoint(game, '0,1');
+		game.revealPossibleMovePoints(startPoint, true);
+
+		// Water at (0,0) should NOT be a possible move
+		expect(getPointTypes(game, '0,0')).not.toContain(POSSIBLE_MOVE);
+	});
+
+	it('should return enemy accent tile to enemy hand (not capturing player hand)', () => {
+		const game = createGame();
+
+		// Move Host Earth accent tile near center
+		manualMoveTile(game, '5,5', '0,0');
+		expect(getTileAt(game, '0,0').ownerName).toBe(HOST);
+
+		// Guest Ginseng captures Host Earth
+		manualMoveTile(game, '-4,0', '0,1');
+		makeMove(game, GUEST, '0,1', '0,0', 0);
+
+		// Earth should be in HOST's hand (returned to owner), not Guest's
+		expect(game.tileManager.capturedTiles.length).toBe(0);
+		var earthInHostHand = game.tileManager.peekAccentTile(HOST, GiniTileCodes.Earth);
+		expect(earthInHostHand).toBeTruthy();
 	});
 });
 
