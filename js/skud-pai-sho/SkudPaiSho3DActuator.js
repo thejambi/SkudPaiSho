@@ -26,7 +26,7 @@ import {
 import { SkudPaiShoController } from './SkudPaiShoController';
 import { SkudPaiShoTileManager } from './SkudPaiShoTileManager';
 import { getSkudTilesSrcPath, isSamePoint } from '../ActuatorHelp';
-import { isRoundBoardOn } from './SkudPaiShoOptions';
+import { getRoundBoardPreference } from './SkudPaiShoOptions';
 
 // Colors matching 2D CSS
 const COLOR_HOST_HARMONY = 0x66CCCC;
@@ -56,7 +56,7 @@ export class SkudPaiSho3DActuator {
 
 		// Camera
 		this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-		this.camera.position.set(0, 18, 13);
+		this.camera.position.set(0, 20, 13);
 		this.camera.lookAt(0, 0, 0);
 
 		// Renderer
@@ -78,7 +78,7 @@ export class SkudPaiSho3DActuator {
 		this.controls.maxPolarAngle = Math.PI / 2.1;
 		this.controls.minDistance = 5;
 		this.controls.maxDistance = 40;
-		this.controls.target.set(0, 0, 0);
+		this.controls.target.set(0, -1, 0);
 		// Disable right-click panning (reserved for arrow marking)
 		this.controls.mouseButtons = {
 			LEFT: THREE.MOUSE.ROTATE,
@@ -135,6 +135,10 @@ export class SkudPaiSho3DActuator {
 		// Active animations
 		this.activeAnimations = [];
 
+		// Round board auto-detection cache (url -> boolean)
+		this.roundBoardCache = {};
+		this.detectedRoundBoard = true; // default to round
+
 		// Build static board surface
 		this.buildBoardSurface();
 
@@ -150,6 +154,63 @@ export class SkudPaiSho3DActuator {
 		this.animationOn = isOn;
 	}
 
+	shouldUseRoundBoard() {
+		const pref = getRoundBoardPreference();
+		if (pref === "true") return true;
+		if (pref === "false") return false;
+		// Auto mode: check cache for current board URL
+		const url = this.getBoardImageUrl();
+		if (this.roundBoardCache && this.roundBoardCache[url] !== undefined) {
+			return this.roundBoardCache[url];
+		}
+		// Not yet detected, default to round
+		return true;
+	}
+
+	detectImageRoundness(image) {
+		try {
+			const canvas = document.createElement('canvas');
+			const size = Math.min(image.width, image.height);
+			canvas.width = size;
+			canvas.height = size;
+			const ctx = canvas.getContext('2d');
+			ctx.drawImage(image, 0, 0, size, size);
+
+			const margin = Math.max(2, Math.floor(size * 0.02));
+			const corners = [
+				[margin, margin],
+				[size - 1 - margin, margin],
+				[margin, size - 1 - margin],
+				[size - 1 - margin, size - 1 - margin]
+			];
+
+			let transparentCorners = 0;
+			for (const [x, y] of corners) {
+				const pixel = ctx.getImageData(x, y, 1, 1).data;
+				if (pixel[3] < 128) transparentCorners++;
+			}
+
+			return transparentCorners >= 3;
+		} catch (e) {
+			// CORS or other error - default to round
+			return true;
+		}
+	}
+
+	onBoardTextureLoaded(image) {
+		if (getRoundBoardPreference() !== null) return; // Manual override, skip
+		if (this.roundBoardCache[this.currentBoardUrl] !== undefined) return; // Already cached
+
+		const isRound = this.detectImageRoundness(image);
+		this.roundBoardCache[this.currentBoardUrl] = isRound;
+		this.detectedRoundBoard = isRound;
+
+		if (isRound !== this.currentRoundBoard) {
+			this.clearGroup(this.boardGroup);
+			this.buildBoardSurface();
+		}
+	}
+
 	updateSceneBackground() {
 		const bgColor = getComputedStyle(document.body).backgroundColor;
 		this.scene.background = new THREE.Color(bgColor || '#1a1a2e');
@@ -163,6 +224,13 @@ export class SkudPaiSho3DActuator {
 			this.gameContainer.removeChild(this.gameContainer.firstChild);
 		}
 
+		// Widen page content area to accommodate larger 3D board
+		const mainWrapper = document.getElementById('mainWrapper');
+		if (mainWrapper) {
+			this.originalMaxWidth = mainWrapper.style.maxWidth;
+			mainWrapper.style.maxWidth = '1400px';
+		}
+
 		// Board container with canvas (override CSS width for larger 3D view)
 		const bcontainer = document.createElement('div');
 		bcontainer.classList.add('board-container');
@@ -173,6 +241,9 @@ export class SkudPaiSho3DActuator {
 		canvasWrapper.classList.add('svgContainerContainer');
 		canvasWrapper.style.position = 'relative';
 		canvasWrapper.style.width = canvasSize;
+		canvasWrapper.style.boxShadow = 'inset 0 0 12px rgba(0,0,0,0.5)';
+		canvasWrapper.style.borderRadius = '4px';
+		canvasWrapper.style.overflow = 'hidden';
 		this.renderer.domElement.style.display = 'block';
 		canvasWrapper.appendChild(this.renderer.domElement);
 		bcontainer.appendChild(canvasWrapper);
@@ -246,11 +317,13 @@ export class SkudPaiSho3DActuator {
 		// to match the texture's grid alignment.
 		const boardSize = 18;
 		const boardThickness = 0.5;
-		const roundBoard = isRoundBoardOn();
+		const roundBoard = this.shouldUseRoundBoard();
 		this.currentRoundBoard = roundBoard;
 
 		this.currentBoardUrl = this.getBoardImageUrl();
-		const boardTexture = this.textureLoader.load(this.currentBoardUrl);
+		const boardTexture = this.textureLoader.load(this.currentBoardUrl, (texture) => {
+			this.onBoardTextureLoaded(texture.image);
+		});
 		boardTexture.colorSpace = THREE.SRGBColorSpace;
 
 		// CylinderGeometry top cap UVs map (u→Z, v→X) while BoxGeometry
@@ -367,26 +440,12 @@ export class SkudPaiSho3DActuator {
 		// Sync scene background with page background
 		this.updateSceneBackground();
 
-		// Rebuild board if round board preference changed
-		const roundBoard = isRoundBoardOn();
-		if (roundBoard !== this.currentRoundBoard) {
+		// Rebuild board if round preference or board design changed
+		const newRoundBoard = this.shouldUseRoundBoard();
+		const newBoardUrl = this.getBoardImageUrl();
+		if (newRoundBoard !== this.currentRoundBoard || newBoardUrl !== this.currentBoardUrl) {
 			this.clearGroup(this.boardGroup);
 			this.buildBoardSurface();
-		}
-
-		// Update board texture if design changed
-		const newBoardUrl = this.getBoardImageUrl();
-		if (newBoardUrl !== this.currentBoardUrl) {
-			this.currentBoardUrl = newBoardUrl;
-			const newTexture = this.textureLoader.load(newBoardUrl);
-			newTexture.colorSpace = THREE.SRGBColorSpace;
-			if (this.currentRoundBoard) {
-				newTexture.center.set(0.5, 0.5);
-				newTexture.rotation = -Math.PI / 2;
-			}
-			this.boardTopMaterial.map.dispose();
-			this.boardTopMaterial.map = newTexture;
-			this.boardTopMaterial.needsUpdate = true;
 		}
 
 		// Clear dynamic groups
@@ -1179,6 +1238,12 @@ export class SkudPaiSho3DActuator {
 
 	dispose() {
 		this.stopRenderLoop();
+
+		// Restore original page width
+		const mainWrapper = document.getElementById('mainWrapper');
+		if (mainWrapper) {
+			mainWrapper.style.maxWidth = this.originalMaxWidth || '';
+		}
 
 		// Dispose all scene objects
 		this.scene.traverse((object) => {

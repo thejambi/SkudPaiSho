@@ -88,7 +88,7 @@ import { SkudMctsGame } from './SkudMctsGame';
 import { SkudPaiShoActuator } from './SkudPaiShoActuator';
 import { SkudPaiSho3DActuator } from './SkudPaiSho3DActuator';
 import { SkudPaiShoGameManager } from './SkudPaiShoGameManager';
-import { is3DBoardOn, toggle3DBoardOn, isRoundBoardOn, toggleRoundBoard } from './SkudPaiShoOptions';
+import { is3DBoardOn, toggle3DBoardOn, getRoundBoardPreference, cycleRoundBoardPreference } from './SkudPaiShoOptions';
 import {
 	SkudPaiShoGameNotation,
 	SkudPaiShoNotationBuilder,
@@ -1029,7 +1029,9 @@ export class SkudPaiShoController {
 	}
 
 	cleanup() {
-		// Nothing.
+		if (this.actuator && this.actuator.dispose) {
+			this.actuator.dispose();
+		}
 	}
 
 	isSolitaire() {
@@ -1126,17 +1128,21 @@ export class SkudPaiShoController {
 
 	buildToggleRoundBoardDiv() {
 		const div = document.createElement("div");
-		const onOrOff = isRoundBoardOn() ? "on" : "off";
+		const pref = getRoundBoardPreference();
+		let stateText;
+		if (pref === null) stateText = "auto";
+		else if (pref === "true") stateText = "on";
+		else stateText = "off";
 
 		const textSpan = document.createElement("span");
-		textSpan.textContent = "Round board (3D only) is " + onOrOff + ": ";
+		textSpan.textContent = "Round board (3D only): " + stateText + " ";
 		div.appendChild(textSpan);
 
 		const toggleSpan = document.createElement("span");
 		toggleSpan.className = "skipBonus";
 		toggleSpan.textContent = "toggle";
 		toggleSpan.onclick = () => {
-			toggleRoundBoard();
+			cycleRoundBoardPreference();
 			clearMessage();
 		};
 		div.appendChild(toggleSpan);
