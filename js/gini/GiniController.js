@@ -33,6 +33,7 @@ import {
   usernameIsOneOf,
 } from '../PaiShoMain';
 import {
+  DEPLOY,
   DRAW_ACCEPT,
   GUEST,
   HOST,
@@ -419,7 +420,13 @@ GiniController.prototype.unplayedTileClicked = function(tileDiv) {
 	}
 
 	if (this.notationBuilder.status === BRAND_NEW) {
-		// Accent tiles are on the board, not in side panel
+		if (tile) {
+			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
+			this.notationBuilder.moveType = DEPLOY;
+			this.notationBuilder.tileType = tileCode;
+
+			this.theGame.revealDeployPoints(tile);
+		}
 	} else if (this.notationBuilder.status === TrifleNotationBuilderStatus.PROMPTING_FOR_TARGET) {
 		if (tile.tileIsSelectable) {
 			if (!this.checkingOutOpponentTileOrNotMyTurn && !isInReplay) {
@@ -683,7 +690,10 @@ GiniController.prototype.buildNotationString = function(move) {
 
 	var moveNotation = moveNum + playerCode + ".";
 
-	if (move.moveType === MOVE) {
+	if (move.moveType === DEPLOY) {
+		var endRowAndCol = new NotationPoint(move.endPoint).rowAndColumn;
+		moveNotation += move.tileType + "(" + GiniNotationAdjustmentFunction(endRowAndCol.row, endRowAndCol.col) + ")";
+	} else if (move.moveType === MOVE) {
 		var startRowAndCol = new NotationPoint(move.startPoint).rowAndColumn;
 		var endRowAndCol = new NotationPoint(move.endPoint).rowAndColumn;
 		moveNotation += "(" + GiniNotationAdjustmentFunction(startRowAndCol.row, startRowAndCol.col) + ")-";

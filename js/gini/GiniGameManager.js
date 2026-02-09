@@ -1,6 +1,7 @@
 // Gini Game Manager
 
 import {
+	DEPLOY,
 	DRAW_ACCEPT,
 	GUEST,
 	HOST,
@@ -15,7 +16,7 @@ import {
 	getPlayerCodeFromName,
 } from '../pai-sho-common/PaiShoPlayerHelp';
 import { setGameLogText } from '../PaiShoMain';
-import { NEUTRAL, NON_PLAYABLE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { NEUTRAL, NON_PLAYABLE, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { PaiShoGameBoard } from '../trifle/PaiShoGameBoard';
 import { TrifleTile } from '../trifle/TrifleTile';
@@ -106,6 +107,44 @@ GiniGameManager.prototype.runNotationMove = function(move, withActuate, moveAnim
 
 		this.buildMoveGameLogText(move, moveDetails);
 		this.checkForWin();
+	} else if (move.moveType === DEPLOY) {
+		var tile = this.tileManager.grabAccentTile(move.player, move.tileType);
+		if (tile) {
+			var endNotationPoint = new NotationPoint(move.endPoint);
+			this.board.putTileOnPoint(tile, endNotationPoint);
+
+			var tileInfo = this.board.tileMetadata[tile.code];
+			var boardPointEnd = this.board.getPointFromNotationPoint(endNotationPoint);
+			var capturedTiles = [];
+
+			var abilityActivationFlags = this.board.processAbilities(tile, tileInfo, null, boardPointEnd, capturedTiles, [], move);
+			this.tileManager.addToCapturedTiles(capturedTiles);
+
+			if (abilityActivationFlags.tileRecords) {
+				if (abilityActivationFlags.tileRecords.capturedTiles && abilityActivationFlags.tileRecords.capturedTiles.length) {
+					this.tileManager.addToCapturedTiles(abilityActivationFlags.tileRecords.capturedTiles);
+				}
+				if (abilityActivationFlags.tileRecords.tilesMovedToPiles && abilityActivationFlags.tileRecords.tilesMovedToPiles.length) {
+					this.tileManager.addToCapturedTiles(abilityActivationFlags.tileRecords.tilesMovedToPiles);
+				}
+			}
+
+			moveDetails = {
+				movedTile: tile,
+				capturedTiles: capturedTiles,
+				abilityActivationFlags: abilityActivationFlags,
+				animations: abilityActivationFlags.animations
+			};
+
+			move.animationInfo = {
+				endPoint: move.endPoint,
+				movedTile: tile,
+				capturedTiles: capturedTiles,
+				abilityAnimations: abilityActivationFlags.animations || null
+			};
+
+			this.checkForWin();
+		}
 	} else if (move.moveType === DRAW_ACCEPT) {
 		this.gameHasEndedInDraw = true;
 	}
@@ -197,7 +236,11 @@ GiniGameManager.prototype.hidePossibleMovePoints = function(ignoreActuate) {
 };
 
 GiniGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
-	this.board.setDeployPointsPossibleMoves(tile);
+	this.board.forEachBoardPoint(function(boardPoint) {
+		if (!boardPoint.hasTile() && !boardPoint.isType(NON_PLAYABLE)) {
+			boardPoint.addType(POSSIBLE_MOVE);
+		}
+	});
 
 	if (!ignoreActuate) {
 		this.actuate();
@@ -228,6 +271,7 @@ GiniGameManager.prototype.buildAbilityActivationOrder = function() {
 		TrifleAbilityName.cancelAbilitiesTargetingTiles,
 		TrifleAbilityName.protectFromCapture,
 		TrifleAbilityName.moveTargetTile,
+		TrifleAbilityName.swapTwoSurroundingTiles,
 		TrifleAbilityName.rotateSurroundingTilesClockwise
 	];
 };

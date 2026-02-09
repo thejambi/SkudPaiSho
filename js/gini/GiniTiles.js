@@ -300,7 +300,10 @@ GiniTileInfo.defineGiniTiles = function() {
 					}
 				],
 				targetTypes: [TrifleTargetType.triggerTargetTiles],
-				bonusMovement: 1
+				bonusMovement: {
+					type: TrifleMovementType.standard,
+					distance: 1
+				}
 			}
 		],
 		textLines: [
@@ -355,7 +358,31 @@ GiniTileInfo.defineGiniTiles = function() {
 		types: [GiniTileType.accentTile],
 		movements: [],
 		abilities: [
-			/* TODO: Phase 5 - swapTwoSurroundingTiles triggered whenDeployed */
+			{
+				title: "Swap Surrounding Tiles",
+				type: TrifleAbilityName.swapTwoSurroundingTiles,
+				optional: true,
+				excludeTileCode: GiniTileCodes.WhiteLotus,
+				neededPromptTargetsInfo: [
+					{
+						title: "firstSwapTile",
+						promptId: TrifleTargetPromptId.firstSwapTile,
+						targetType: TriflePromptTargetType.boardPoint
+					},
+					{
+						title: "secondSwapTile",
+						promptId: TrifleTargetPromptId.secondSwapTile,
+						targetType: TriflePromptTargetType.boardPoint
+					}
+				],
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
+						targetTileTypes: [TrifleTileCategory.thisTile]
+					}
+				],
+				targetTypes: [TrifleTargetType.surroundingTiles]
+			}
 		],
 		textLines: [
 			"<strong>Accent Tile</strong>",

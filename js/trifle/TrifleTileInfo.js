@@ -146,7 +146,8 @@ export const TrifleAbilityName = {
 	resurrectAtDeployPosition: "resurrectAtDeployPosition",
 	substituteForCapture: "substituteForCapture",
 	restrictTileFromCapturing: "restrictTileFromCapturing",
-	rotateSurroundingTilesClockwise: "rotateSurroundingTilesClockwise"
+	rotateSurroundingTilesClockwise: "rotateSurroundingTilesClockwise",
+	swapTwoSurroundingTiles: "swapTwoSurroundingTiles"
 };
 
 export const TrifleAbilityType = {
@@ -168,7 +169,8 @@ TrifleAbilitiesByCategory[TrifleAbilityCategory.instant] = [
 	TrifleAbilityName.moveTargetTileToPile,
 	TrifleAbilityName.exchangeWithCapturedTile,
 	TrifleAbilityName.substituteForCapture,
-	TrifleAbilityName.rotateSurroundingTilesClockwise
+	TrifleAbilityName.rotateSurroundingTilesClockwise,
+	TrifleAbilityName.swapTwoSurroundingTiles
 ];
 
 export const TrifleAbilityPriorityLevel = {
@@ -211,7 +213,9 @@ export const TriflePromptTargetType = {
 export const TrifleTargetPromptId = {
 	movedTilePoint: "movedTilePoint",
 	movedTileDestinationPoint: "movedTileDestinationPoint",
-	chosenCapturedTile: "chosenCapturedTile"
+	chosenCapturedTile: "chosenCapturedTile",
+	firstSwapTile: "firstSwapTile",
+	secondSwapTile: "secondSwapTile"
 };
 
 export const TrifleTileTeam = {

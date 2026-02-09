@@ -52,6 +52,7 @@ import { TrifleRestrictDeploymentInZoneConstraintBrain } from './constraintBrain
 import { TrifleWhenTargetTileInZoneIsCapturedTriggerBrain } from './triggerBrains/WhenTargetTileInZoneIsCapturedTriggerBrain';
 import { TrifleSubstituteForCaptureAbilityBrain } from './abilityBrains/SubstituteForCaptureAbilityBrain';
 import { TrifleRotateSurroundingTilesClockwiseAbilityBrain } from './abilityBrains/RotateSurroundingTilesClockwiseAbilityBrain';
+import { TrifleSwapTwoSurroundingTilesAbilityBrain } from './abilityBrains/SwapTwoSurroundingTilesAbilityBrain';
 import { TrifleWhileTargetTileIsNotOnBoardTriggerBrain } from './triggerBrains/WhileTargetTileIsNotOnBoardTriggerBrain';
 
 /**
@@ -199,6 +200,8 @@ TrifleBrainFactory.createAbilityBrain = function(abilityName, abilityObject) {
 			return new TrifleSubstituteForCaptureAbilityBrain(abilityObject);
 		case TrifleAbilityName.rotateSurroundingTilesClockwise:
 			return new TrifleRotateSurroundingTilesClockwiseAbilityBrain(abilityObject);
+		case TrifleAbilityName.swapTwoSurroundingTiles:
+			return new TrifleSwapTwoSurroundingTilesAbilityBrain(abilityObject);
 		default:
 			return new TrifleSimpleOngoingAbilityBrain(abilityObject);
 	}

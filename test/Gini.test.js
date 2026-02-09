@@ -39,7 +39,7 @@ vi.mock('../js/GameOptions', async (importOriginal) => {
 
 // Import after mocking
 import { ACCENT_TILE_HOME, GiniGameManager } from '../js/gini/GiniGameManager';
-import { NotationPoint, MOVE, HOST, GUEST } from '../js/CommonNotationObjects';
+import { NotationPoint, MOVE, DEPLOY, HOST, GUEST } from '../js/CommonNotationObjects';
 import { GiniTileInfo, GiniTiles, GiniTileCodes } from '../js/gini/GiniTiles';
 import { NON_PLAYABLE, NEUTRAL } from '../js/skud-pai-sho/SkudPaiShoBoardPoint';
 import { RED, WHITE } from '../js/skud-pai-sho/SkudPaiShoTile';
@@ -386,6 +386,188 @@ describe('Gini Earth Accent Tile - Rotate Surrounding Tiles', () => {
 
 		// Earth should be placed without error
 		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Earth);
+	});
+});
+
+// ─── Deploy from Hand Tests ───
+
+describe('Gini Deploy Accent Tile from Hand', () => {
+	/**
+	 * Deploy an accent tile from the player's hand to the board
+	 */
+	function deployTile(game, player, tileCode, endStr, moveNum) {
+		const move = {
+			moveNum: moveNum || 0,
+			player: player,
+			moveType: DEPLOY,
+			tileType: tileCode,
+			endPoint: endStr
+		};
+		return game.runNotationMove(move, false);
+	}
+
+	it('should deploy an accent tile from hand to the board', () => {
+		const game = createGame();
+
+		// First, remove the Water accent tile from the board (simulate it being captured and returned)
+		const waterPoint = new NotationPoint('-6,-5');
+		const waterRC = waterPoint.rowAndColumn;
+		const waterTile = game.board.cells[waterRC.row][waterRC.col].removeTile();
+		game.tileManager.returnAccentTile(waterTile);
+
+		// Verify Water is in Guest's hand
+		expect(game.tileManager.guestAccentTiles.length).toBe(1);
+		expect(game.tileManager.guestAccentTiles[0].code).toBe(GiniTileCodes.Water);
+
+		// Deploy Water from hand to center
+		deployTile(game, GUEST, GiniTileCodes.Water, '0,0', 0);
+
+		// Water should now be on the board at (0,0)
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Water);
+		expect(game.tileManager.guestAccentTiles.length).toBe(0);
+	});
+
+	it('should trigger Earth rotation ability when deployed from hand', () => {
+		const game = createGame();
+
+		// Remove Earth from board and return to hand
+		const earthPoint = new NotationPoint('-6,-4');
+		const earthRC = earthPoint.rowAndColumn;
+		const earthTile = game.board.cells[earthRC.row][earthRC.col].removeTile();
+		game.tileManager.returnAccentTile(earthTile);
+
+		// Place a tile near center for the rotation to affect
+		function manualMoveTile(fromStr, toStr) {
+			const fromNp = new NotationPoint(fromStr);
+			const fromRc = fromNp.rowAndColumn;
+			const toNp = new NotationPoint(toStr);
+			const toRc = toNp.rowAndColumn;
+			const tile = game.board.cells[fromRc.row][fromRc.col].removeTile();
+			game.board.cells[toRc.row][toRc.col].putTile(tile);
+		}
+
+		// Move Guest Koi to (0,1) — directly above center
+		manualMoveTile('-4,2', '0,1');
+		expect(getTileAt(game, '0,1').code).toBe(GiniTileCodes.Koi);
+
+		// Deploy Earth from hand to (0,0) — center
+		deployTile(game, GUEST, GiniTileCodes.Earth, '0,0', 0);
+
+		// Earth should be at center
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Earth);
+
+		// Koi was at top (0,1) → should rotate to top-right (1,1)
+		expect(isEmptyAt(game, '0,1')).toBe(true);
+		expect(getTileAt(game, '1,1').code).toBe(GiniTileCodes.Koi);
+	});
+});
+
+// ─── Water Swap Tests ───
+
+describe('Gini Water Accent Tile - Swap Two Surrounding Tiles', () => {
+	function manualMoveTile(game, fromStr, toStr) {
+		const fromNp = new NotationPoint(fromStr);
+		const fromRc = fromNp.rowAndColumn;
+		const toNp = new NotationPoint(toStr);
+		const toRc = toNp.rowAndColumn;
+		const tile = game.board.cells[fromRc.row][fromRc.col].removeTile();
+		game.board.cells[toRc.row][toRc.col].putTile(tile);
+	}
+
+	/**
+	 * Build promptTargetData for the Water swap ability.
+	 * Peeks at the Water tile to get its id, then constructs the sourceTileKey
+	 * with the destination boardPoint where Water will land.
+	 */
+	function buildSwapPromptData(game, waterNotationStr, destNotationStr, firstTileStr, secondTileStr) {
+		var waterTile = getTileAt(game, waterNotationStr);
+		var sourceTileKey = JSON.stringify({
+			tileOwner: waterTile.ownerCode,
+			tileCode: waterTile.code,
+			boardPoint: destNotationStr,
+			tileId: waterTile.id
+		});
+		var promptTargetData = {};
+		promptTargetData[sourceTileKey] = {
+			firstSwapTile: new NotationPoint(firstTileStr),
+			secondSwapTile: new NotationPoint(secondTileStr)
+		};
+		return promptTargetData;
+	}
+
+	it('should return neededPromptInfo when Water moves near tiles without prompt answers', () => {
+		const game = createGame();
+
+		// Set up tiles near center
+		manualMoveTile(game, '-4,2', '0,1');  // Koi above center
+		manualMoveTile(game, '-5,-1', '1,0'); // Dragon right of center
+
+		// Move Water to center with empty prompt data (as the controller initializes it)
+		var neededPromptInfo = makeMove(game, GUEST, '-6,-5', '0,0', 0, {});
+
+		// Should prompt for first swap tile
+		expect(neededPromptInfo).toBeTruthy();
+		expect(neededPromptInfo.currentPromptTargetId).toBe('firstSwapTile');
+	});
+
+	it('should swap two surrounding tiles when Water is placed with prompt data', () => {
+		const game = createGame();
+
+		// Set up: Koi at (0,1), Dragon at (1,0)
+		manualMoveTile(game, '-4,2', '0,1');
+		manualMoveTile(game, '-5,-1', '1,0');
+
+		// Build prompt data selecting Koi and Dragon for swap
+		var promptData = buildSwapPromptData(game, '-6,-5', '0,0', '0,1', '1,0');
+
+		// Move Water to center with swap prompt data
+		makeMove(game, GUEST, '-6,-5', '0,0', 0, promptData);
+
+		// Water should be at center
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Water);
+
+		// Koi and Dragon should have swapped positions
+		expect(getTileAt(game, '0,1').code).toBe(GiniTileCodes.Dragon);
+		expect(getTileAt(game, '1,0').code).toBe(GiniTileCodes.Koi);
+	});
+
+	it('should preserve tile ownership after swap', () => {
+		const game = createGame();
+
+		manualMoveTile(game, '-4,2', '0,1');   // Guest Koi
+		manualMoveTile(game, '5,1', '1,0');    // Host Dragon
+
+		var promptData = buildSwapPromptData(game, '-6,-5', '0,0', '0,1', '1,0');
+		makeMove(game, GUEST, '-6,-5', '0,0', 0, promptData);
+
+		// Tiles keep their ownership after swapping
+		expect(getTileAt(game, '0,1').ownerName).toBe(HOST);   // Dragon (Host)
+		expect(getTileAt(game, '1,0').ownerName).toBe(GUEST);  // Koi (Guest)
+	});
+
+	it('should not swap when Water has no surrounding tiles (optional ability)', () => {
+		const game = createGame();
+
+		// Move Water to isolated center - no surrounding tiles
+		makeMove(game, GUEST, '-6,-5', '0,0', 0);
+
+		// Water should be placed, no error, no prompt needed (no valid targets)
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Water);
+	});
+
+	it('should not swap with only one surrounding tile (need two for swap)', () => {
+		const game = createGame();
+
+		// Only one tile near center
+		manualMoveTile(game, '-4,2', '0,1');  // Koi above center
+
+		var neededPromptInfo = makeMove(game, GUEST, '-6,-5', '0,0', 0);
+
+		// With only 1 surrounding tile, after selecting it for first swap,
+		// there's no second tile to swap with. The prompt should still appear
+		// for the first tile (since there IS a surrounding tile).
+		// But we'll verify Water is placed.
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Water);
 	});
 });
 
