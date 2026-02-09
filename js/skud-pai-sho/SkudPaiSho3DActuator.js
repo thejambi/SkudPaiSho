@@ -55,13 +55,14 @@ export class SkudPaiSho3DActuator {
 
 		// Camera
 		this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-		this.camera.position.set(0, 14, 10);
+		this.camera.position.set(0, 18, 13);
 		this.camera.lookAt(0, 0, 0);
 
 		// Renderer
 		this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 		this.renderer.setPixelRatio(window.devicePixelRatio);
-		const size = Math.min(612, window.innerWidth);
+		this.maxCanvasSize = 800;
+		const size = Math.min(this.maxCanvasSize, window.innerWidth);
 		this.renderer.setSize(size, size);
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -156,13 +157,16 @@ export class SkudPaiSho3DActuator {
 			this.gameContainer.removeChild(this.gameContainer.firstChild);
 		}
 
-		// Board container with canvas
+		// Board container with canvas (override CSS width for larger 3D view)
 		const bcontainer = document.createElement('div');
 		bcontainer.classList.add('board-container');
+		const canvasSize = Math.min(this.maxCanvasSize, window.innerWidth) + 'px';
+		bcontainer.style.width = canvasSize;
 
 		const canvasWrapper = document.createElement('div');
 		canvasWrapper.classList.add('svgContainerContainer');
 		canvasWrapper.style.position = 'relative';
+		canvasWrapper.style.width = canvasSize;
 		this.renderer.domElement.style.display = 'block';
 		canvasWrapper.appendChild(this.renderer.domElement);
 		bcontainer.appendChild(canvasWrapper);
@@ -1063,10 +1067,15 @@ export class SkudPaiSho3DActuator {
 	// --- Responsive ---
 
 	handleResize() {
-		const size = Math.min(612, window.innerWidth);
+		const size = Math.min(this.maxCanvasSize, window.innerWidth);
 		this.camera.aspect = 1;
 		this.camera.updateProjectionMatrix();
 		this.renderer.setSize(size, size);
+		const sizeStr = size + 'px';
+		const bcontainer = this.gameContainer.querySelector('.board-container');
+		const canvasWrapper = this.gameContainer.querySelector('.svgContainerContainer');
+		if (bcontainer) bcontainer.style.width = sizeStr;
+		if (canvasWrapper) canvasWrapper.style.width = sizeStr;
 	}
 
 	// --- Render Loop ---
