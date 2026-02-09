@@ -31,6 +31,7 @@ import { Ads } from './Ads';
 
 let customBackgroundColor = "";
 
+
 const isValidColor = (strColor) => {
 	const s = new Option().style;
 	s.color = strColor;

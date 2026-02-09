@@ -86,7 +86,9 @@ import { SkudAIv1 } from '../ai/SkudAIv1';
 import { SkudStrategicAI } from '../ai/SkudStrategicAI';
 import { SkudMctsGame } from './SkudMctsGame';
 import { SkudPaiShoActuator } from './SkudPaiShoActuator';
+import { SkudPaiSho3DActuator } from './SkudPaiSho3DActuator';
 import { SkudPaiShoGameManager } from './SkudPaiShoGameManager';
+import { is3DBoardOn, toggle3DBoardOn } from './SkudPaiShoOptions';
 import {
 	SkudPaiShoGameNotation,
 	SkudPaiShoNotationBuilder,
@@ -102,7 +104,14 @@ export var SkudPreferences = {
 
 export class SkudPaiShoController {
 	constructor(gameContainer, isMobile) {
-		this.actuator = new SkudPaiShoActuator(gameContainer, isMobile, isAnimationsOn());
+		this.gameContainer = gameContainer;
+		this.isMobile = isMobile;
+
+		if (is3DBoardOn()) {
+			this.actuator = new SkudPaiSho3DActuator(gameContainer, isMobile, isAnimationsOn());
+		} else {
+			this.actuator = new SkudPaiShoActuator(gameContainer, isMobile, isAnimationsOn());
+		}
 
 		SkudPaiShoController.loadPreferences();
 
@@ -1045,6 +1054,10 @@ export class SkudPaiShoController {
 		settingsDiv.appendChild(this.buildToggleHarmonyAidsDiv());
 
 		settingsDiv.appendChild(document.createElement("br"));
+
+		settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+
+		settingsDiv.appendChild(document.createElement("br"));
 		return settingsDiv;
 	}
 
@@ -1087,8 +1100,45 @@ export class SkudPaiShoController {
 		this.callActuate();
 	}
 
+	buildToggle3DBoardDiv() {
+		const div = document.createElement("div");
+		const onOrOff = is3DBoardOn() ? "on" : "off";
+
+		const textSpan = document.createElement("span");
+		textSpan.textContent = "3D Board (experimental) is " + onOrOff + ": ";
+		div.appendChild(textSpan);
+
+		const toggleSpan = document.createElement("span");
+		toggleSpan.className = "skipBonus";
+		toggleSpan.textContent = "toggle";
+		toggleSpan.onclick = () => {
+			toggle3DBoardOn();
+			clearMessage();
+		};
+		div.appendChild(toggleSpan);
+
+		return div;
+	}
+
 	setAnimationsOn(isAnimationsOn) {
 		this.actuator.setAnimationOn(isAnimationsOn);
+	}
+
+	set3DBoardOn(isOn) {
+		const is3D = this.actuator instanceof SkudPaiSho3DActuator;
+		if (isOn === is3D) return;
+
+		if (this.actuator.dispose) {
+			this.actuator.dispose();
+		}
+
+		if (isOn) {
+			this.actuator = new SkudPaiSho3DActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+		} else {
+			this.actuator = new SkudPaiShoActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+		}
+		this.theGame.actuator = this.actuator;
+		this.callActuate();
 	}
 
 	static isUsingCustomTileDesigns = () => {
