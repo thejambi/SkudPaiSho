@@ -26,6 +26,7 @@ import {
 import { SkudPaiShoController } from './SkudPaiShoController';
 import { SkudPaiShoTileManager } from './SkudPaiShoTileManager';
 import { getSkudTilesSrcPath, isSamePoint } from '../ActuatorHelp';
+import { isRoundBoardOn } from './SkudPaiShoOptions';
 
 // Colors matching 2D CSS
 const COLOR_HOST_HARMONY = 0x66CCCC;
@@ -51,7 +52,7 @@ export class SkudPaiSho3DActuator {
 
 		// Three.js core
 		this.scene = new THREE.Scene();
-		this.scene.background = new THREE.Color(0x1a1a2e);
+		this.updateSceneBackground();
 
 		// Camera
 		this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
@@ -76,7 +77,7 @@ export class SkudPaiSho3DActuator {
 		this.controls.dampingFactor = 0.08;
 		this.controls.maxPolarAngle = Math.PI / 2.1;
 		this.controls.minDistance = 5;
-		this.controls.maxDistance = 25;
+		this.controls.maxDistance = 40;
 		this.controls.target.set(0, 0, 0);
 		// Disable right-click panning (reserved for arrow marking)
 		this.controls.mouseButtons = {
@@ -147,6 +148,11 @@ export class SkudPaiSho3DActuator {
 
 	setAnimationOn(isOn) {
 		this.animationOn = isOn;
+	}
+
+	updateSceneBackground() {
+		const bgColor = getComputedStyle(document.body).backgroundColor;
+		this.scene.background = new THREE.Color(bgColor || '#1a1a2e');
 	}
 
 	// --- Container Setup ---
@@ -233,53 +239,80 @@ export class SkudPaiSho3DActuator {
 	}
 
 	buildBoardSurface() {
-		// Board plane with texture
+		// Board as a thick slab with the texture on top.
 		// The 2D board image has 17px padding on each side (= 0.5 cell widths).
 		// The tile grid is 17 cells of 34px each = 578px, inside a 612px image.
-		// So the board plane must be 18 units (17 cells + 0.5 padding each side)
+		// So the board must be 18 units (17 cells + 0.5 padding each side)
 		// to match the texture's grid alignment.
-		const boardGeometry = new THREE.PlaneGeometry(18, 18);
-		boardGeometry.rotateX(-Math.PI / 2);
+		const boardSize = 18;
+		const boardThickness = 0.5;
+		const roundBoard = isRoundBoardOn();
+		this.currentRoundBoard = roundBoard;
 
 		this.currentBoardUrl = this.getBoardImageUrl();
 		const boardTexture = this.textureLoader.load(this.currentBoardUrl);
 		boardTexture.colorSpace = THREE.SRGBColorSpace;
-		const boardMaterial = new THREE.MeshStandardMaterial({
-			map: boardTexture,
-			roughness: 0.7,
-			metalness: 0.0,
-		});
-		this.boardMesh = new THREE.Mesh(boardGeometry, boardMaterial);
-		this.boardMesh.position.y = 0.01;
-		this.boardMesh.receiveShadow = true;
-		this.boardGroup.add(this.boardMesh);
 
-		// Frame around the outside edge of the board
-		const frameThickness = 0.3;
-		const frameHeight = 0.12;
-		const boardHalf = 9; // board plane spans -9 to +9
-		const frameOuter = boardHalf + frameThickness;
-		const frameMaterial = new THREE.MeshStandardMaterial({
+		// CylinderGeometry top cap UVs map (u→Z, v→X) while BoxGeometry
+		// top face maps (u→X, v→-Z). Rotate texture -90° to compensate.
+		if (roundBoard) {
+			boardTexture.center.set(0.5, 0.5);
+			boardTexture.rotation = -Math.PI / 2;
+		}
+
+		// Top face: board image. Sides/bottom: solid color.
+		const sideMaterial = new THREE.MeshStandardMaterial({
 			color: 0x5C4033,
 			roughness: 0.8,
 		});
+		this.boardTopMaterial = new THREE.MeshStandardMaterial({
+			map: boardTexture,
+			roughness: 0.7,
+			metalness: 0.0,
+			transparent: true,
+		});
 
-		// Top edge
-		const topFrame = new THREE.Mesh(new THREE.BoxGeometry(frameOuter * 2, frameHeight, frameThickness), frameMaterial);
-		topFrame.position.set(0, frameHeight / 2 - 0.05, -(boardHalf + frameThickness / 2));
-		this.boardGroup.add(topFrame);
-		// Bottom edge
-		const bottomFrame = new THREE.Mesh(new THREE.BoxGeometry(frameOuter * 2, frameHeight, frameThickness), frameMaterial);
-		bottomFrame.position.set(0, frameHeight / 2 - 0.05, boardHalf + frameThickness / 2);
-		this.boardGroup.add(bottomFrame);
-		// Left edge
-		const leftFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, frameHeight, boardHalf * 2), frameMaterial);
-		leftFrame.position.set(-(boardHalf + frameThickness / 2), frameHeight / 2 - 0.05, 0);
-		this.boardGroup.add(leftFrame);
-		// Right edge
-		const rightFrame = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, frameHeight, boardHalf * 2), frameMaterial);
-		rightFrame.position.set(boardHalf + frameThickness / 2, frameHeight / 2 - 0.05, 0);
-		this.boardGroup.add(rightFrame);
+		let boardGeometry;
+		let materials;
+
+		if (roundBoard) {
+			// CylinderGeometry material order: [side, top, bottom]
+			const radius = boardSize / 2;
+			boardGeometry = new THREE.CylinderGeometry(radius, radius, boardThickness, 64);
+			materials = [sideMaterial, this.boardTopMaterial, sideMaterial];
+		} else {
+			// BoxGeometry face order: +x, -x, +y (top), -y (bottom), +z, -z
+			boardGeometry = new THREE.BoxGeometry(boardSize, boardThickness, boardSize);
+			materials = [
+				sideMaterial, sideMaterial,
+				this.boardTopMaterial, sideMaterial,
+				sideMaterial, sideMaterial,
+			];
+		}
+
+		this.boardMesh = new THREE.Mesh(boardGeometry, materials);
+		// Position so the top face is at y = 0.01 (same as before)
+		this.boardMesh.position.y = 0.01 - boardThickness / 2;
+		this.boardMesh.receiveShadow = true;
+		this.boardGroup.add(this.boardMesh);
+
+		// "Table" surface just below the board top — visible through transparent
+		// areas of the board image. Color syncs with the page background.
+		let tableGeo;
+		if (roundBoard) {
+			tableGeo = new THREE.CircleGeometry(boardSize / 2, 64);
+			tableGeo.rotateX(-Math.PI / 2);
+		} else {
+			tableGeo = new THREE.PlaneGeometry(boardSize, boardSize);
+			tableGeo.rotateX(-Math.PI / 2);
+		}
+		this.tableMaterial = new THREE.MeshStandardMaterial({
+			color: 0x5C4033,
+			roughness: 0.8,
+		});
+		this.tableMesh = new THREE.Mesh(tableGeo, this.tableMaterial);
+		this.tableMesh.position.y = 0.009; // just under board top face
+		this.boardGroup.add(this.tableMesh);
 	}
 
 	buildClickTargets(board) {
@@ -331,15 +364,29 @@ export class SkudPaiSho3DActuator {
 	}
 
 	render3D(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep) {
+		// Sync scene background with page background
+		this.updateSceneBackground();
+
+		// Rebuild board if round board preference changed
+		const roundBoard = isRoundBoardOn();
+		if (roundBoard !== this.currentRoundBoard) {
+			this.clearGroup(this.boardGroup);
+			this.buildBoardSurface();
+		}
+
 		// Update board texture if design changed
 		const newBoardUrl = this.getBoardImageUrl();
 		if (newBoardUrl !== this.currentBoardUrl) {
 			this.currentBoardUrl = newBoardUrl;
 			const newTexture = this.textureLoader.load(newBoardUrl);
 			newTexture.colorSpace = THREE.SRGBColorSpace;
-			this.boardMesh.material.map.dispose();
-			this.boardMesh.material.map = newTexture;
-			this.boardMesh.material.needsUpdate = true;
+			if (this.currentRoundBoard) {
+				newTexture.center.set(0.5, 0.5);
+				newTexture.rotation = -Math.PI / 2;
+			}
+			this.boardTopMaterial.map.dispose();
+			this.boardTopMaterial.map = newTexture;
+			this.boardTopMaterial.needsUpdate = true;
 		}
 
 		// Clear dynamic groups

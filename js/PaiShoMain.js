@@ -2545,6 +2545,11 @@ export function setMessage(msg) {
 	const helpTextContent = document.getElementById("helpTextContent");
 
 	if (msg instanceof HTMLElement) {
+		// Toggle: if same content is already displayed, reset to default
+		if (msg.innerHTML === helpTextContent.innerHTML) {
+			clearMessage();
+			return;
+		}
 		// Clear existing content
 		while (helpTextContent.firstChild) {
 			helpTextContent.removeChild(helpTextContent.firstChild);
