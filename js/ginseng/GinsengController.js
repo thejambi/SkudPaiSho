@@ -49,11 +49,17 @@ import {
   gameOptionEnabled,
 } from '../GameOptions';
 import { GinsengActuator } from './GinsengActuator';
+import { Ginseng3DActuator } from './Ginseng3DActuator';
 import {
   GinsengGameManager,
   GinsengNotationAdjustmentFunction
 } from './GinsengGameManager';
 import { GinsengOptions } from './GinsengOptions';
+import {
+  is3DBoardOn,
+  buildToggle3DBoardDiv as _buildToggle3DBoardDiv,
+  buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv,
+} from '../PaiSho3DOptions';
 import {
   GinsengTileCodes,
   GinsengTileInfo,
@@ -122,7 +128,11 @@ GinsengController.loadPreferences = function() {
 };
 
 GinsengController.prototype.createActuator = function() {
-	this.actuator = new GinsengActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	if (is3DBoardOn()) {
+		this.actuator = new Ginseng3DActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	} else {
+		this.actuator = new GinsengActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	}
 	if (this.theGame) {
 		this.theGame.updateActuator(this.actuator);
 	}
@@ -392,6 +402,12 @@ GinsengController.prototype.getAdditionalHelpTabDiv = function() {
 		settingsDiv.appendChild(GinsengOptions.buildToggleViewAsGuestDiv());
 	}
 
+	settingsDiv.appendChild(document.createElement("br"));
+
+	settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+	if (is3DBoardOn()) {
+		settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
+	}
 	settingsDiv.appendChild(document.createElement("br"));
 
 	if (debugOn) {
@@ -760,7 +776,14 @@ GinsengController.prototype.getCurrentPlayer = function() {
 };
 
 GinsengController.prototype.cleanup = function() {
-	// Nothing to do
+	if (this.actuator && this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+};
+
+GinsengController.prototype.set3DBoardOn = function(isOn) {
+	this.createActuator();
+	this.callActuate();
 };
 
 GinsengController.prototype.isSolitaire = function() {
@@ -862,5 +885,13 @@ GinsengController.isUsingCustomTileDesigns = function() {
 
 GinsengController.getCustomTileDesignsUrl = function() {
 	return GinsengOptions.Preferences.customTilesUrl;
+};
+
+GinsengController.prototype.buildToggle3DBoardDiv = function() {
+	return _buildToggle3DBoardDiv();
+};
+
+GinsengController.prototype.buildToggleRoundBoardDiv = function() {
+	return _buildToggleRoundBoardDiv();
 };
 

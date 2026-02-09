@@ -44,6 +44,8 @@ import {
 import { POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint";
 import { SWAP_BISON_WITH_LEMUR, gameOptionEnabled } from '../GameOptions';
 import { VagabondActuator } from './VagabondActuator';
+import { Vagabond3DActuator } from './Vagabond3DActuator';
+import { is3DBoardOn, buildToggle3DBoardDiv as _buildToggle3DBoardDiv, buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv } from '../PaiSho3DOptions';
 import { VagabondGameManager } from './VagabondGameManager';
 import { VagabondTrifleGameManager } from './VagabondTrifleGameManager';
 import {
@@ -89,7 +91,14 @@ export class VagabondController {
 
 		VagabondController.loadPreferences();
 
-		this.actuator = new VagabondActuator(gameContainer, isMobile, this.isAnimationsEnabled());
+		this.gameContainer = gameContainer;
+		this.isMobile = isMobile;
+
+		if (is3DBoardOn()) {
+			this.actuator = new Vagabond3DActuator(gameContainer, isMobile, this.isAnimationsEnabled());
+		} else {
+			this.actuator = new VagabondActuator(gameContainer, isMobile, this.isAnimationsEnabled());
+		}
 
 		this.resetGameManager();
 		this.resetNotationBuilder();
@@ -696,7 +705,9 @@ export class VagabondController {
 		}
 	}
 	cleanup() {
-		// document.querySelector(".svgContainer").classList.remove("vagabondBoardRotate");
+		if (this.actuator && this.actuator.dispose) {
+			this.actuator.dispose();
+		}
 		if (this.bgIoGameClient) {
 			this.bgIoGameClient.stop();
 		}
@@ -743,6 +754,14 @@ export class VagabondController {
 		settingsDiv.appendChild(this.buildToggleAnimationsDiv());
 
 		settingsDiv.appendChild(document.createElement("br"));
+
+		settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+
+		settingsDiv.appendChild(document.createElement("br"));
+
+		settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
+
+		settingsDiv.appendChild(document.createElement("br"));
 		return settingsDiv;
 	}
 	buildToggleAnimationsDiv() {
@@ -787,6 +806,28 @@ export class VagabondController {
 		if (isAnimationsOn !== this.isAnimationsEnabled()) {
 			this.toggleAnimations();
 		}
+	}
+	buildToggle3DBoardDiv() {
+		return _buildToggle3DBoardDiv();
+	}
+	buildToggleRoundBoardDiv() {
+		return _buildToggleRoundBoardDiv();
+	}
+	set3DBoardOn(isOn) {
+		const is3D = this.actuator instanceof Vagabond3DActuator;
+		if (isOn === is3D) return;
+
+		if (this.actuator.dispose) {
+			this.actuator.dispose();
+		}
+
+		if (isOn) {
+			this.actuator = new Vagabond3DActuator(this.gameContainer, this.isMobile, this.isAnimationsEnabled());
+		} else {
+			this.actuator = new VagabondActuator(this.gameContainer, this.isMobile, this.isAnimationsEnabled());
+		}
+		this.theGame.actuator = this.actuator;
+		this.callActuate();
 	}
 }
 
