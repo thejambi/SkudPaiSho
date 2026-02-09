@@ -632,7 +632,8 @@ export class SkudPaiSho3DActuator {
 					this.animateTileMovement(tileGroup,
 						new THREE.Vector3(startX, 0.05, startZ),
 						new THREE.Vector3(intermediateX, 0.05, intermediateZ),
-						pieceAnimationLength
+						pieceAnimationLength,
+						1.2, 1
 					);
 				} else if (moveToAnimate.isOrchidMove) {
 					const dx = x - moveToAnimate.endPoint.rowAndColumn.col;
@@ -689,8 +690,9 @@ export class SkudPaiSho3DActuator {
 		}
 	}
 
-	animateTileMovement(tileGroup, fromPos, toPos, duration) {
+	animateTileMovement(tileGroup, fromPos, toPos, duration, fromScale, toScale) {
 		const startTime = performance.now();
+		const hasScale = fromScale !== undefined && toScale !== undefined;
 
 		const animate = (currentTime) => {
 			const elapsed = currentTime - startTime;
@@ -703,11 +705,17 @@ export class SkudPaiSho3DActuator {
 			const arc = Math.sin(progress * Math.PI) * 0.3;
 			tileGroup.position.y = fromPos.y + arc;
 
+			// Smooth scale transition during movement
+			if (hasScale) {
+				const scale = fromScale + (toScale - fromScale) * eased;
+				tileGroup.scale.set(scale, scale, scale);
+			}
+
 			if (progress < 1) {
 				requestAnimationFrame(animate);
 			} else {
 				tileGroup.position.copy(toPos);
-				tileGroup.scale.set(1, 1, 1);
+				tileGroup.scale.set(toScale || 1, toScale || 1, toScale || 1);
 			}
 		};
 
