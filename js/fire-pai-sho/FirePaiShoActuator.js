@@ -238,7 +238,7 @@ FirePaiShoActuator.prototype.addTile = function(tile, mainContainer, clickable) 
 				showTileMessage(theDiv);
 			});
 		} else {//not clickable, for reserve tiles
-			theDiv.setAttribute("showTileMessage(this);");
+			theDiv.addEventListener('click', () => showTileMessage(theDiv));
 		}
 	} else { //desktop
 		if (clickable) {
