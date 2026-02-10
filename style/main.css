@@ -1210,6 +1210,49 @@ input[type=submit] {
   padding-top: 4px;
 }
 
+/* --- 3D Mode: Collapsible Help Panel --- */
+.helpContainer.helpCollapsed3D {
+  width: 30px;
+  overflow: hidden;
+  position: relative;
+}
+.helpContainer.helpCollapsed3D > .tab,
+.helpContainer.helpCollapsed3D > .tabcontent {
+  display: none !important;
+}
+.helpCollapseBtn3D {
+  float: right;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 8px;
+  min-height: 40px;
+  line-height: 32px;
+}
+.helpCollapseBtn3D:hover {
+  background-color: #ddd;
+}
+.helpExpandTab3D {
+  display: none;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  cursor: pointer;
+  padding: 12px 6px;
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  letter-spacing: 1px;
+  user-select: none;
+  margin-top: 6px;
+}
+.helpExpandTab3D:hover {
+  background-color: #ddd;
+}
+.helpCollapsed3D .helpExpandTab3D {
+  display: block;
+}
+
 .license {
   margin-top: 20px;
   font-size: smaller;

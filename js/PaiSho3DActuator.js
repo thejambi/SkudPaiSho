@@ -19,7 +19,7 @@ import {
 	customBoardUrlKey,
 } from './PaiShoMain';
 import { RowAndColumn } from './CommonNotationObjects';
-import { getRoundBoardPreference } from './PaiSho3DOptions';
+import { getRoundBoardPreference, isHelpCollapsed, setHelpCollapsed } from './PaiSho3DOptions';
 
 // Common colors
 const COLOR_POSSIBLE_MOVE = 0x442211;
@@ -272,6 +272,62 @@ export class PaiSho3DActuator {
 
 		this.gameContainer.appendChild(bcontainer);
 		this.gameContainer.appendChild(tilePileContainer);
+
+		// Set up collapsible help panel
+		this.setupCollapsibleHelp();
+	}
+
+	// --- Collapsible Help Panel ---
+
+	setupCollapsibleHelp() {
+		const helpContainer = document.getElementById('help');
+		if (!helpContainer) return;
+
+		// Add collapse button to the tab bar
+		const tabBar = helpContainer.querySelector('.tab');
+		if (tabBar && !tabBar.querySelector('.helpCollapseBtn3D')) {
+			const collapseBtn = document.createElement('button');
+			collapseBtn.className = 'helpCollapseBtn3D';
+			collapseBtn.textContent = '\u00AB'; // «
+			collapseBtn.title = 'Collapse Help panel';
+			collapseBtn.addEventListener('click', () => this.toggleHelpCollapsed());
+			tabBar.appendChild(collapseBtn);
+		}
+
+		// Add expand tab (visible only when collapsed)
+		if (!helpContainer.querySelector('.helpExpandTab3D')) {
+			const expandTab = document.createElement('div');
+			expandTab.className = 'helpExpandTab3D';
+			expandTab.textContent = 'Help / Chat';
+			expandTab.title = 'Expand Help panel';
+			expandTab.addEventListener('click', () => this.toggleHelpCollapsed());
+			helpContainer.appendChild(expandTab);
+		}
+
+		// Apply initial collapsed state
+		if (isHelpCollapsed()) {
+			helpContainer.classList.add('helpCollapsed3D');
+			this.maxCanvasSize = 1050;
+			this.handleResize();
+		}
+	}
+
+	toggleHelpCollapsed() {
+		const helpContainer = document.getElementById('help');
+		if (!helpContainer) return;
+
+		const collapsed = !isHelpCollapsed();
+		setHelpCollapsed(collapsed);
+
+		if (collapsed) {
+			helpContainer.classList.add('helpCollapsed3D');
+			this.maxCanvasSize = 1050;
+		} else {
+			helpContainer.classList.remove('helpCollapsed3D');
+			this.maxCanvasSize = 800;
+		}
+
+		this.handleResize();
 	}
 
 	// Abstract - subclass must override
@@ -874,6 +930,16 @@ export class PaiSho3DActuator {
 
 	dispose() {
 		this.stopRenderLoop();
+
+		// Restore help panel
+		const helpContainer = document.getElementById('help');
+		if (helpContainer) {
+			helpContainer.classList.remove('helpCollapsed3D');
+			const collapseBtn = helpContainer.querySelector('.helpCollapseBtn3D');
+			if (collapseBtn) collapseBtn.remove();
+			const expandTab = helpContainer.querySelector('.helpExpandTab3D');
+			if (expandTab) expandTab.remove();
+		}
 
 		const mainWrapper = document.getElementById('mainWrapper');
 		if (mainWrapper) {

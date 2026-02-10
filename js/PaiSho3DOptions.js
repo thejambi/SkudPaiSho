@@ -5,6 +5,7 @@ import { clearMessage, gameController } from './PaiShoMain';
 
 const board3DKey = "paiShoBoard3DEnabled";
 const roundBoardKey = "paiShoRoundBoardEnabled";
+const helpCollapsedKey = "paiShoHelp3DCollapsed";
 
 // One-time migration from old Skud-specific keys to shared keys
 const oldBoard3DKey = "skudBoard3DEnabled";
@@ -49,6 +50,16 @@ export function cycleRoundBoardPreference() {
 	if (gameController && gameController.callActuate) {
 		gameController.callActuate();
 	}
+}
+
+// --- Help Panel Collapse (3D only) ---
+
+export function isHelpCollapsed() {
+	return localStorage.getItem(helpCollapsedKey) === "true";
+}
+
+export function setHelpCollapsed(collapsed) {
+	localStorage.setItem(helpCollapsedKey, collapsed.toString());
 }
 
 // --- Shared UI Toggle Helpers ---
