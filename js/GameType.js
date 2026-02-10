@@ -503,6 +503,20 @@ export const GameType = {
 		usersWithAccess: [
 			'SkudPaiSho',
 		]
+	},
+	UndergrowthSimplicity: {
+		id: 28,
+		name: "Undergrowth Simplicity",
+		desc: "Undergrowth Simplicity",
+		color: "var(--undergrowthcolor)",
+		description: "Build a ring of connected stones around the center while cutting off your opponent's supply lines.",
+		coverImg: "lotus.png",
+		rulesUrl: "https://skudpaisho.com/site/games/undergrowth-simplicity/",
+		gameOptions: [],
+		noRankedGames: true,
+		usersWithAccess: [
+			'SkudPaiSho',
+		]
 	}
 };
 

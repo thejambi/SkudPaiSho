@@ -92,6 +92,7 @@ import { buildLoginModalContentElement } from './ui/LoginModal';
 import { buildSignUpModalContentElement } from './ui/SignUpModal';
 import { addEventToElement, setupUiEvents } from './ui/UiSetup';
 import { UndergrowthController } from './undergrowth/UndergrowthController';
+import { UndergrowthSimplicityController } from './undergrowth-simplicity/UndergrowthSimplicityController';
 import {
 	getBooleanPreference,
 	hideConfirmMoveButton,
@@ -3381,6 +3382,9 @@ export function getGameControllerForGameType(gameTypeId) {
 			break;
 		case GameType.Fanorona.id:
 			controller = new FanoronaController(gameContainerDiv, isMobile);
+			break;
+		case GameType.UndergrowthSimplicity.id:
+			controller = new UndergrowthSimplicityController(gameContainerDiv, isMobile);
 			break;
 		default:
 			debug("Game Controller unavailable.");
