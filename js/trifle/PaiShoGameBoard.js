@@ -437,6 +437,8 @@ export class PaiShoGameBoard {
 	}
 
 	putTileOnPoint(tile, notationPoint) {
+		if (!tile) return;
+
 		var point = this.getPointFromNotationPoint(notationPoint);
 
 		point.putTile(tile);
