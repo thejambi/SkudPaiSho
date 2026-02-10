@@ -299,6 +299,12 @@ UndergrowthSimplicityController.prototype.pointClicked = function(htmlPoint) {
 				// Need more placements - preview the first one
 				this.previewPlacement(notationPoint);
 
+				// If the first placement wins, auto-complete the move
+				if (this.theGame.board.checkForRingVictory(getCurrentPlayer())) {
+					this.completeMove();
+					return;
+				}
+
 				// Auto-select for second placement
 				this.showSecondPlacementOptions();
 

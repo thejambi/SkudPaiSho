@@ -556,7 +556,7 @@ export class PaikoGameManager {
 
 	getWinner() {
 		if (this.endedInTie) {
-			return 'tie';
+			return 'Game ended in a tie!';
 		}
 		if (this.winners.length === 0) {
 			return null;
@@ -568,14 +568,14 @@ export class PaikoGameManager {
 
 	getWinReason() {
 		if (this.endedInTie) {
-			return 'Game ended in a tie! Both players lost 13+ tiles with 5 or fewer points.';
+			return ' Both players lost 13+ tiles with 5 or fewer points.';
 		}
 		const winner = this.getWinner();
 		if (!winner) {
 			return null;
 		}
 		const score = this.board.calculateScore(winner);
-		return `${winner === HOST ? 'Host' : 'Guest'} reached ${score} points!`;
+		return ` reached ${score} points and won the game!`;
 	}
 
 	getWinResultTypeCode() {

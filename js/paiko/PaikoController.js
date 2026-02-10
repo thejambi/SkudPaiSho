@@ -662,13 +662,6 @@ export class PaikoController {
 			}
 		}
 
-		// Winner message
-		if (gameInfo.winner) {
-			const winMsg = document.createElement('p');
-			winMsg.innerHTML = `<strong>${this.theGame.getWinReason()}</strong>`;
-			container.appendChild(winMsg);
-		}
-
 		return container;
 	}
 

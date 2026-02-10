@@ -453,7 +453,7 @@ describe('PaikoGameManager', () => {
 			gameManager.checkForWinners();
 
 			expect(gameManager.endedInTie).toBe(true);
-			expect(gameManager.getWinner()).toBe('tie');
+			expect(gameManager.getWinner()).toBe('Game ended in a tie!');
 			expect(gameManager.getWinResultTypeCode()).toBe(4);
 		});
 
@@ -499,7 +499,7 @@ describe('PaikoGameManager', () => {
 
 		it('should return correct win reason for tie', () => {
 			gameManager.endedInTie = true;
-			expect(gameManager.getWinReason()).toContain('tie');
+			expect(gameManager.getWinReason()).toContain('13+ tiles');
 		});
 	});
 
