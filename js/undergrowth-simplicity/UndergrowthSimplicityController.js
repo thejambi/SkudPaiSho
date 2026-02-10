@@ -34,9 +34,9 @@ import { UndergrowthSimplicityGameManager } from './UndergrowthSimplicityGameMan
 import {
 	UndergrowthSimplicityGameNotation,
 	UndergrowthSimplicityNotationBuilder,
-	UndergrowthSimplicityNotationMove,
 	WAITING_FOR_SECOND_PLACEMENT,
 } from './UndergrowthSimplicityGameNotation';
+import { UndergrowthSimplicityTile } from './UndergrowthSimplicityTile';
 import { debug } from '../GameData';
 
 export function UndergrowthSimplicityController(gameContainer, isMobile) {
@@ -260,6 +260,24 @@ UndergrowthSimplicityController.prototype.pointClicked = function(htmlPoint) {
 	var rowCol = notationPoint.rowAndColumn;
 	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
+	// Clicking own stone on the board activates placement (same as clicking tile pile)
+	if (boardPoint.hasTile() && boardPoint.tile.ownerName === getCurrentPlayer() && myTurn()) {
+		if (this.notationBuilder.status === BRAND_NEW || this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
+			this.theGame.hidePossibleMovePoints();
+			this.notationBuilder = new UndergrowthSimplicityNotationBuilder();
+			this.notationBuilder.status = WAITING_FOR_ENDPOINT;
+
+			var moveIndex = this.gameNotation.moves.length;
+			if (moveIndex <= 2) {
+				this.theGame.setOpenGatePossibleMoves();
+			} else {
+				this.theGame.setAllLegalPointsOpen(getCurrentPlayer());
+			}
+			refreshMessage();
+			return;
+		}
+	}
+
 	if (this.notationBuilder.status === WAITING_FOR_ENDPOINT) {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			this.theGame.hidePossibleMovePoints();
@@ -322,21 +340,21 @@ UndergrowthSimplicityController.prototype.pointClicked = function(htmlPoint) {
 
 // Preview the first placement on the board before the second
 UndergrowthSimplicityController.prototype.previewPlacement = function(notationPoint) {
-	// Build a temporary single-placement move to preview on the board
-	var moveNum = 1;
-	var player = HOST;
-	var lastMove = this.gameNotation.moves[this.gameNotation.moves.length - 1];
-	if (lastMove) {
-		moveNum = lastMove.moveNum;
-		if (lastMove.player === GUEST) {
-			moveNum++;
-		} else {
-			player = GUEST;
-		}
+	var playerCode = getCurrentPlayer() === HOST ? 'H' : 'G';
+	var tile = new UndergrowthSimplicityTile(playerCode);
+	var rowCol = notationPoint.rowAndColumn;
+	var bp = this.theGame.board.cells[rowCol.row][rowCol.col];
+
+	bp.putTile(tile);
+
+	// Register gate ownership if placing on a gate
+	if (bp.isType(GATE)) {
+		var key = rowCol.row + "," + rowCol.col;
+		this.theGame.board.gateOwners[key] = getCurrentPlayer();
 	}
-	var moveText = moveNum + player.charAt(0) + ".(" + notationPoint.pointText + ")";
-	var move = new UndergrowthSimplicityNotationMove(moveText);
-	this.theGame.runNotationMove(move, true);
+
+	this.theGame.board.analyzeConnections();
+	this.theGame.actuate();
 };
 
 // Show legal points for the second placement

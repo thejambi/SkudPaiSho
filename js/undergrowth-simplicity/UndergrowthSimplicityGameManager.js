@@ -34,23 +34,6 @@ UndergrowthSimplicityGameManager.prototype.actuate = function(move, moveAnimatio
 UndergrowthSimplicityGameManager.prototype.runNotationMove = function(move, withActuate, moveAnimationBeginStep) {
 	debug("Running Move: " + move.fullMoveText);
 
-	// For normal turns (move 3+), perform Decay then Cut before placement
-	if (move.moveNum >= 2 && this.allGatesFilled()) {
-		// Decay: Remove own stones in Neutral Garden
-		var decayedTiles = this.board.performDecay(move.player);
-		move.decayedTiles = decayedTiles;
-
-		// Re-analyze connections after decay
-		this.board.analyzeConnections();
-
-		// Cut: Remove opponent stones not connected to their gates
-		var cutTiles = this.board.performCut(move.player);
-		move.cutTiles = cutTiles;
-
-		// Re-analyze connections after cut
-		this.board.analyzeConnections();
-	}
-
 	// Execute placements
 	for (var i = 0; i < move.placements.length; i++) {
 		var notationPoint = move.placements[i];
@@ -70,8 +53,32 @@ UndergrowthSimplicityGameManager.prototype.runNotationMove = function(move, with
 	// Analyze connections after placement
 	this.board.analyzeConnections();
 
-	// Check win conditions
+	// Check ring victory (before end-of-turn processing)
 	this.checkWinConditions(move);
+
+	// End-of-turn: process decay and cut for the next player's perspective
+	// so the board is ready when the next player sees it
+	if (!this.hasEnded() && this.allGatesFilled()) {
+		var nextPlayer = (move.player === HOST) ? GUEST : HOST;
+
+		// Decay: next player's neutral-zone stones are removed
+		var decayedTiles = this.board.performDecay(nextPlayer);
+		move.decayedTiles = decayedTiles;
+
+		this.board.analyzeConnections();
+
+		// Cut: next player cuts current player's disconnected stones
+		var cutTiles = this.board.performCut(nextPlayer);
+		move.cutTiles = cutTiles;
+
+		this.board.analyzeConnections();
+
+		// Elimination: can the next player make any moves?
+		if (!this.board.canPlayerMakeAnyMoves(nextPlayer)) {
+			this.endGameWinners.push(move.player);
+			this.winReason = "elimination";
+		}
+	}
 
 	if (withActuate) {
 		this.actuate(move, moveAnimationBeginStep);
@@ -98,21 +105,6 @@ UndergrowthSimplicityGameManager.prototype.checkWinConditions = function(move) {
 		this.endGameWinners.push(opponent);
 		this.winReason = "ring";
 		return;
-	}
-
-	// Elimination check: after all gates filled, can opponent make moves?
-	if (this.allGatesFilled()) {
-		// Simulate opponent's turn: they would decay their own neutral stones, then we cut them
-		var boardCopy = this.board.getCopy();
-		boardCopy.performDecay(opponent);
-		boardCopy.analyzeConnections();
-		boardCopy.performCut(opponent);
-		boardCopy.analyzeConnections();
-
-		if (!boardCopy.canPlayerMakeAnyMoves(opponent)) {
-			this.endGameWinners.push(move.player);
-			this.winReason = "elimination";
-		}
 	}
 };
 

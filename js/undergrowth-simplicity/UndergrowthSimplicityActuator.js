@@ -218,6 +218,27 @@ UndergrowthSimplicityActuator.prototype.addBoardPoint = function(boardPoint, mov
 		theDiv.appendChild(theImg);
 	}
 
+	// Animate removed tiles (decay/cut) as fading ghosts
+	if (moveToAnimate && this.animationOn && !boardPoint.hasTile()) {
+		var removedTile = this.getRemovedTileAt(moveToAnimate, boardPoint.row, boardPoint.col);
+		if (removedTile) {
+			theDiv.classList.add("hasTile");
+			var ghostImg = document.createElement("img");
+			ghostImg.src = "images/Adevar/monochrome/" + removedTile.ownerCode + "Back.png";
+			ghostImg.style.opacity = "1";
+			ghostImg.style.transition = "opacity 0.6s ease-out, transform 0.6s ease-out";
+			theDiv.appendChild(ghostImg);
+			requestAnimationFrame(function() {
+				ghostImg.style.opacity = "0";
+				ghostImg.style.transform = "scale(0.3)";
+			});
+			ghostImg.addEventListener("transitionend", function() {
+				theDiv.classList.remove("hasTile");
+				theDiv.removeChild(ghostImg);
+			});
+		}
+	}
+
 	this.boardContainer.appendChild(theDiv);
 
 	if (boardPoint.betweenConnection && boardPoint.col === 16) {
@@ -225,4 +246,22 @@ UndergrowthSimplicityActuator.prototype.addBoardPoint = function(boardPoint, mov
 		theBr.classList.add("clear");
 		this.boardContainer.appendChild(theBr);
 	}
+};
+
+UndergrowthSimplicityActuator.prototype.getRemovedTileAt = function(move, row, col) {
+	if (move.decayedTiles) {
+		for (var i = 0; i < move.decayedTiles.length; i++) {
+			if (move.decayedTiles[i].row === row && move.decayedTiles[i].col === col) {
+				return move.decayedTiles[i].tile;
+			}
+		}
+	}
+	if (move.cutTiles) {
+		for (var i = 0; i < move.cutTiles.length; i++) {
+			if (move.cutTiles[i].row === row && move.cutTiles[i].col === col) {
+				return move.cutTiles[i].tile;
+			}
+		}
+	}
+	return null;
 };
