@@ -7,8 +7,10 @@ import { GATE, NEUTRAL, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoi
 import { GodaiActuator } from "./GodaiActuator.js";
 import { GodaiGameManager } from "./GodaiGameManager.js";
 import { GodaiGameNotation, GodaiNotationBuilder } from "./GodaiNotation.js";
-import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WHITE_GATE, GodaiBoardPoint, YELLOW_GATE } from "./GodaiBoardPoint.js";
+import { BLACK_GATE, GREEN_GATE, MOUNTAIN_ENTRANCE, MOUNTAIN_TILE, RED_GATE, RIVER_DL_TILE, RIVER_DR_TILE, RIVER_TILE, WHITE_GATE, GodaiBoardPoint, YELLOW_GATE, RIVER_MOUTH } from "./GodaiBoardPoint.js";
 import { GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD, GodaiTile } from "./GodaiTile.js";
+import { RED, WHITE } from "../skud-pai-sho/SkudPaiShoTile.js";
+import { gameOptionEnabled, GODAI_BOARD_ZONES } from "../GameOptions.js";
 
 export var GodaiPreferences = {
     tileDesignKey: "TileDesigns",
@@ -304,26 +306,58 @@ export class GodaiController {
             messageInfo.message.push(...tileInfo.message)
         }
 
-        // Add point data
-        if (boardPoint.isType(NEUTRAL)) {
-            messageInfo.heading = "Neutral Space"
-            messageInfo.message.push(this._getNeutralPointMessage())
-        }
         if (boardPoint.isType(GATE)) {
-            messageInfo.heading = "Gate"
-            messageInfo.message.push(this._getGateMessage(boardPoint))
+            let info = this._getGateMessage(boardPoint)
+            messageInfo.heading = info.header
+            messageInfo.message.push(info.message)
+
+            return messageInfo
         }
-        if (boardPoint.isType(MOUNTAIN_ENTRANCE)) {
-            messageInfo.heading = "Mountain Entrance"
-            messageInfo.message.push(this._getMountainEntranceMessage())
+
+        // Apply the board zone descriptions only when the option is enabled
+        if (gameOptionEnabled(GODAI_BOARD_ZONES)) {
+            if (boardPoint.isType(MOUNTAIN_ENTRANCE)) {
+                messageInfo.heading = "Mountain Entry Point"
+                messageInfo.message.push(this._getMountainEntranceMessage())
+            }
+            
+            if (boardPoint.isType(RIVER_MOUTH)) {
+                messageInfo.heading = "River Mouth/Mountain Entry Point"
+                messageInfo.message.push(this._getRiverMouthMessage())
+            }
+            else if (boardPoint.isType(MOUNTAIN_ENTRANCE) && boardPoint.isType(RIVER_TILE)) {
+                
+            }
+            else if (boardPoint.isType(RIVER_TILE)) {
+                messageInfo.heading = "River Space"
+                messageInfo.message.push(this._getRiverMessage(boardPoint))
+            }
+            else if (boardPoint.isType(MOUNTAIN_TILE)) {
+                messageInfo.heading = "Mountain Point"
+                messageInfo.message.push(this._getMountainMessage())
+            }
+        
+            if (boardPoint.isType(MOUNTAIN_ENTRANCE) && boardPoint.isType(RIVER_TILE) && !boardPoint.isType(RIVER_MOUTH)) {
+                messageInfo.heading = "River Space/Mountain Entry Point"
+            }
         }
-        else if (boardPoint.isType(MOUNTAIN_TILE)) {
-            messageInfo.heading = "Mountain Space"
-            messageInfo.message.push(...this._getMountainMessage())
+
+        // Add point data to neutral spaces
+        if (boardPoint.isType(RED) && boardPoint.isType(WHITE)) {
+            messageInfo.heading = "Red/White Point"
+            // messageInfo.message.push(this._getNeutralPointMessage())
         }
-        else if (boardPoint.isType(RIVER_TILE)) {
-            messageInfo.heading = "River Space"
-            messageInfo.message.push(...this._getRiverMessage(boardPoint))
+        else if (boardPoint.isType(RED)) {
+            messageInfo.heading = "Red Point"
+            // messageInfo.message.push(this._getNeutralPointMessage())
+        }
+        else if (boardPoint.isType(WHITE)) {
+            messageInfo.heading = "White Point"
+            // messageInfo.message.push(this._getNeutralPointMessage())
+        }
+        else if (boardPoint.isType(NEUTRAL) || ( !boardPoint.isType(NEUTRAL) && !gameOptionEnabled(GODAI_BOARD_ZONES) ) ) {
+            messageInfo.heading = "Neutral Point"
+            // messageInfo.message.push(this._getNeutralPointMessage())
         }
 
         return messageInfo
@@ -336,30 +370,46 @@ export class GodaiController {
     /** @param {GodaiBoardPoint} point */
     _getGateMessage(point) {
         let msg = "Gate."
+        let header = "Gate.";
         if (point.isType(WHITE_GATE)) {
-            msg = "White or Western Gate. Metal tiles are deployed here."
+            header = "Western/White Gate"
+            msg = "The Metal Tile is deployed in this Gate"
         } else if (point.isType(RED_GATE)) {
-            msg = "Red or South Gate. Fire tiles are deployed here."
+            header = "South/Red Gate"
+            msg = "The Fire Tile is deployed in this Gate"
         } else if (point.isType(BLACK_GATE)) {
-            msg = "Black or North Gate. Water tiles are deployed here."
+            header = "North/Black Gate"
+            msg = "The Water Tile is deployed in this Gate"
         } else if (point.isType(GREEN_GATE)) {
-            msg = "Green or Eastern Gate. Wood tiles are deployed here."
+            header = "Eastern/Green Gate"
+            msg = "The Wood Tile is deployed in this Gate"
         } else if (point.isType(YELLOW_GATE)) {
-            msg = "Yellow or Center Gate. Earth tiles are deployed here."
+            header = "Central/Yellow Gate"
+            msg = "The Earth Tile is deployed in this Gate"
         }
-        return msg
+
+        let message = [
+            msg,
+            "Tiles already on the board can not move onto any Gate but can move through unoccupied Gates",
+            "Each player may only have up to 1 tile in all the total Gates at a time",
+            "Tiles in Gates are unaffected by cycles and can not be captured",
+        ]
+
+        return { message: header + ": " + toBullets(message).outerHTML, header }
     }
 
     _getMountainMessage() {
         let msg = []
-        msg.push("Can only be entered from the mountain entrances located at the corners")
-        msg.push("Tiles located at a mountain space can go to a neutral space, as normal movement applies")
-        msg.push("If a tile located in a mountain space moves to a river, it will not be moved at the end of the turn")
-        return msg
+        msg.push("Tiles can only enter Mountains through the Mountain Entry Points")
+        msg.push("If tiles wish to move off the Mountains not through the Mountain Entry Points, they have to spend a turn moving onto the River point first, after which they are off the Mountains")
+        return "Mountain: " + toBullets(msg).outerHTML
     }
 
     _getMountainEntranceMessage() {
-        return "Entrance to mountain zones"
+        let bullets = toBullets([
+            "The point through which tiles can enter Mountains, either from on gates or not"
+        ])
+        return "Mountain Entry Point: " + bullets.outerHTML
     }
 
     /**
@@ -367,23 +417,65 @@ export class GodaiController {
      * @returns {string}
      */
     getDefaultHelpMessageText() {
-        return "<h4>Godai Pai Sho</h4><p></p><p>The objective of Godai Pai Sho is to capture one of each of your opponent's tiles using your own tiles.</p>"
+        return "<h4>Godai Pai Sho</h4>" +
+            "<p></p>" +
+            "<p>The objective of Godai Pai Sho; also known as <b>Wuxing Pai Sho</b>; is to capture one of each of your opponent's tiles using your own tiles.</p>" +
+            "<p>Alternatively, a player may win if their opponent is unable to win under normal conditions.</p>" +
+            '<p>For additional information, check out the <a href="https://tinyurl.com/65frxu6h" target="_blank">official ruleset.</a></p>' +
+            "<p><strong><center>Capture Cycle</center></strong></p>" +
+            "<p>The tiles mentioned capture the one mentioned after it:</p>" +
+            "<p>Wood &gt; Earth &gt; Water &gt; Fire &gt; Metal &gt; Wood</p>" +
+            "<p><strong><center>Cycles</center></strong></p>" +
+            "<p>A tile that sorrounds another tile, regardless of ownership, may affect the movement of said tile. This interaction is called a <b>Cycle</b>, and the four types of cycles are described below.</p>"+
+            "<ul>" +
+            "<li>" +
+                "<p><b>Sheng:</b> When a tile is being helped, it is in Sheng and can move up to <b>5 spaces.</b></p>" +
+                "<p>Wood &gt; Fire &gt; Earth &gt; Metal &gt; Water &gt; Wood</p>" +
+            "</li>" +
+            "<li>" +
+                "<p><b>Xie:</b> When a tile helps another tile in Sheng, it is in Xie and can move up to <b>2 spaces.</b></p>" +
+                "<p>It is the inverse of the Sheng Cycle.</p>" +
+                "<p>Wood &gt; Water &gt; Metal &gt; Earth &gt; Fire &gt; Wood</p>" +
+            "</li>" +
+            "<li><b>Ke:</b> When a tile is helped by another tile without being depleted, that tile can move up to <b>4 spaces.</b> This cycle is the same as the Capture Cycle.</li>" +
+            "<li><b>Wu:</b> When a tile is sorrounded by a tile of its own type, it can move up to <b>4 spaces.</b></li>" +
+            "</ul>" +
+            "<p><strong><center>Cycle Contridictment</center></strong></p>" +
+            "<ul>" +
+            "<li>Sheng and Xie Cycles are considered <b>Extreme Cycles</b></li>" +
+            "<li>Ke and Wu Cycles are considered <b>Normal Cycles</b></li>" +
+            "<li>A tile cannot be affected by multiple Cycles of the same type. (i. e. No tile can be affected by two Ke Cycles, only one is considered)</li>" +
+            "<li>The effects of an Extreme Cycle override that of the Normal Cycles.</li>" +
+            "<li>If a tile is affected by both Extreme Cycles, it can move up to its normal movement count.</li>" +
+            "<li>If a tile is affected by both Extreme Cycles, but is affected by a Normal Cycle, then it moves according to the effect of the Normal Cycle.</li>" +
+            "</ul>"
     }
 
     /** @param {GodaiBoardPoint} point */
     _getRiverMessage(point) {
         let msg = []
         msg.push("Rivers start from the Blue Gate to the Red Gate")
-        msg.push("At the end of the turn they move tiles one space downstream in direction of the Red Gate")
+        msg.push("All Water, Wood and Fire Tiles on the River float one space down the River at the end of each players' turn")
         msg.push("Earth tiles located in rivers will not be moved. Instead, they block the stream of river tiles downstream")
         msg.push("Tiles are not moved by rivers on the turn they enter")
         if (point.isType(RIVER_DL_TILE)) {
-            msg.push("This river space moves tiles to the South-West")
+            msg.push("This river space moves tiles to the <b>South-West</b>")
         }
         if (point.isType(RIVER_DR_TILE)) {
-            msg.push("This river space moves tiles to the South-East")
+            msg.push("This river space moves tiles to the <b>South-East</b>")
         }
-        return msg
+        return "River Space: " + toBullets(msg).outerHTML
+    }
+
+    _getRiverMouthMessage() {
+        let msg = []
+        msg.push("Rivers start from the Blue Gate to the Red Gate")
+        msg.push("All Water, Wood and Fire Tiles on the River float one space down the River at the end of each players' turn")
+        msg.push("Earth tiles located in rivers will not be moved. Instead, they block the stream of river tiles downstream")
+        msg.push("Tiles are not moved by rivers on the turn they enter")
+        msg.push("Tiles on this point are at the end of the River and cannot flow down any more")
+        msg.push("If two tiles simultaneously reach this point, then both tiles drown, resulting in both tiles getting captured regardless of the capture cycle. This is called <b>'The River Crash'</b>")
+        return "River Mouth: " + toBullets(msg).outerHTML
     }
 
     /**
@@ -438,63 +530,70 @@ export class GodaiController {
         let heading = ownerName + "'s " + GodaiTile.getTileName(tileCode) + ' Tile'
         switch (tileCode) {
             case GO_WOOD:
+                message.push("Basic Tile")
                 message.push("Deployed on East or Green Gate")
                 message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Earth Tiles")
-                message.push("If it's <b>Shēng</b> with Water it can move up to " + GodaiTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Fire it can move up to " + GodaiTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Metal it can move up to " + GodaiTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Wood it can move up to " + GodaiTile.wuMovement + " spaces")
+                message.push("Encounters a <b>Shēng</b> cycle when next to a Water tile; it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("Encounters a <b>Xiè</b> cycle when next to a Fire tile; it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("Encounters a <b>Kè</b> cycle when next to a Metal tile; it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("Encounters a <b>Wǔ</b> cycle when next to a Wood tile; it can move up to " + GodaiTile.wuMovement + " spaces")
                 break
             case GO_EARTH:
+                message.push("Basic Tile")
                 message.push("Deployed on Center or Yellow Gate")
                 message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Water Tiles")
-                message.push("If it's <b>Shēng</b> with Fire it can move up to " + GodaiTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Metal it can move up to " + GodaiTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Wood it can move up to " + GodaiTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Earth it can move up to " + GodaiTile.wuMovement + " spaces")
+                message.push("Encounters a <b>Shēng</b> cycle when next to a Fire tile; it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("Encounters a <b>Xiè</b> cycle when next to a Metal tile; it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("Encounters a <b>Kè</b> cycle when next to a Wood tile; it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("Encounters a <b>Wǔ</b> cycle when next to a Earth tile; it can move up to " + GodaiTile.wuMovement + " spaces")
+                message.push("Does not float on the River. 'Dams' the River, not allowing any tile downstream of it to continue flowing down the River")
                 break
             case GO_WATER:
+                message.push("Basic Tile")
                 message.push("Deployed on North or Black Gate")
                 message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Fire Tiles")
-                message.push("If it's <b>Shēng</b> with Metal it can move up to " + GodaiTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Wood it can move up to " + GodaiTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Earth it can move up to " + GodaiTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Water it can move up to " + GodaiTile.wuMovement + " spaces")
+                message.push("Encounters a <b>Shēng</b> when next to a Metal tile; it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("Encounters a <b>Xiè</b> when next to a Wood tile; it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("Encounters a <b>Kè</b> when next to a Earth tile; it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("Encounters a <b>Wǔ</b> when next to a Water tile; it can move up to " + GodaiTile.wuMovement + " spaces")
                 break
             case GO_FIRE:
+                message.push("Basic Tile")
                 message.push("Deployed on South or Red Gate")
                 message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Metal Tiles")
-                message.push("If it's <b>Shēng</b> with Wood it can move up to " + GodaiTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Earth it can move up to " + GodaiTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Water it can move up to " + GodaiTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Fire it can move up to " + GodaiTile.wuMovement + " spaces")
+                message.push("Encounters a <b>Shēng</b> when next to a Wood tile; it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("Encounters a <b>Xiè</b> when next to a Earth tile; it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("Encounters a <b>Kè</b> when next to a Water tile; it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("Encounters a <b>Wǔ</b> when next to a Fire tile; it can move up to " + GodaiTile.wuMovement + " spaces")
                 break
             case GO_METAL:
+                message.push("Basic Tile")
                 message.push("Deployed on West or White Gate")
                 message.push("Moves up to " + GodaiTile.baseMovement + " spaces")
                 message.push("Captures Wood Tiles")
-                message.push("If it's <b>Shēng</b> with Earth it can move up to " + GodaiTile.shengMovement + " spaces")
-                message.push("If it's <b>Xiè</b> with Water it can move up to " + GodaiTile.xieMovement + " spaces")
-                message.push("If it's <b>Kè</b> with Fire it can move up to " + GodaiTile.keMovement + " spaces")
-                message.push("If it's <b>Wǔ</b> with Metal it can move up to " + GodaiTile.wuMovement + " spaces")
+                message.push("Encounters a <b>Shēng</b> when next to a Earth tile; it can move up to " + GodaiTile.shengMovement + " spaces")
+                message.push("Encounters a <b>Xiè</b> when next to a Water tile; it can move up to " + GodaiTile.xieMovement + " spaces")
+                message.push("Encounters a <b>Kè</b> when next to a Fire tile; it can move up to " + GodaiTile.keMovement + " spaces")
+                message.push("Encounters a <b>Wǔ</b> when next to a Metal tile; it can move up to " + GodaiTile.wuMovement + " spaces")
                 break
             case GO_EMPTY:
+                message.push("Special Tile")
                 message.push("Deployed on any Gate")
                 message.push("Moves up to " + GodaiTile.emptyTileMovement + " spaces")
                 message.push("Can capture and be captured by any tile")
-                message.push("Transforms into the first tile it captures")
-                message.push("When the Empty Tile is transformed, it acts as the tile it captured")
-                message.push("If it is captured before it transforms, it counts towards the objective as if it were any tile")
+                message.push("Not affected by any cycle")
+                message.push("When it captures a Basic Tile, it 'transforms' into that tile, after which it only does what that Tile does")
+                message.push("If captured before transformation, it acts as a substitute for any of the required tiles still needed for the opponent to win")
                 break
         }
 
         return {
             heading: heading,
-            message: [GodaiTile.getTileName(tileCode) + ' Tile:' + toBullets(message)]
+            message: [GodaiTile.getTileName(tileCode) + ' Tile:' + toBullets(message).outerHTML]
         }
     }
 
