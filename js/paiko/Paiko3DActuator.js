@@ -283,6 +283,22 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 		this.addThreatCoverOverlay(boardPoint, x, z);
 		this.addSingleTileHighlightOverlay(boardPoint, x, z);
 
+		// Captured tile overlay during animation (before hasTile check so charge captures show)
+		if (this.animationOn && moveToAnimate && moveToAnimate.capturedTiles) {
+			for (const captured of moveToAnimate.capturedTiles) {
+				if (captured.row === boardPoint.row && captured.col === boardPoint.col) {
+					const capturedSrcPath = `images/Paiko/${captured.tile.getImageName()}.png`;
+					const capturedGroup = this.buildTileMeshWithFacing(capturedSrcPath, x, z, captured.tile);
+					capturedGroup.position.y = 0.05;
+					this.tilesGroup.add(capturedGroup);
+
+					setTimeout(() => {
+						this.animateTileFadeOut(capturedGroup, 300);
+					}, pieceAnimationLength);
+				}
+			}
+		}
+
 		// State indicators on empty points
 		if (!boardPoint.hasTile()) {
 			if (boardPoint.hasState(PaikoPointState.POSSIBLE_MOVE)) {
@@ -325,21 +341,6 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 			this.addStateIndicator(x, z, COLOR_SELECTED, 0.5);
 		}
 
-		// Captured tile overlay during animation
-		if (this.animationOn && moveToAnimate && moveToAnimate.capturedTiles) {
-			for (const captured of moveToAnimate.capturedTiles) {
-				if (captured.row === boardPoint.row && captured.col === boardPoint.col) {
-					const capturedSrcPath = `images/Paiko/${captured.tile.getImageName()}.png`;
-					const capturedGroup = this.buildTileMeshWithFacing(capturedSrcPath, x, z, captured.tile);
-					capturedGroup.position.y = 0.01;
-					this.tilesGroup.add(capturedGroup);
-
-					setTimeout(() => {
-						this.animateTileFadeOut(capturedGroup, 300);
-					}, pieceAnimationLength);
-				}
-			}
-		}
 	}
 
 	// --- Zone Overlay ---

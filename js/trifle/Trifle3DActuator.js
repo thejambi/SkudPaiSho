@@ -19,6 +19,7 @@ import { TrifleTileCodes } from './TrifleTiles';
 import { getTilesForPlayer, isSamePoint } from '../ActuatorHelp';
 import { PaiSho3DActuator } from '../PaiSho3DActuator';
 import { TrifleAnimationType } from './animation/TrifleAnimationTypes';
+import { TrifleAttributeType } from './TrifleTileInfo';
 import { currentTileMetadata } from './PaiShoGamesTileMetadata';
 import {
 	guestPlayerCode,
@@ -26,6 +27,9 @@ import {
 } from '../pai-sho-common/PaiShoPlayerHelp';
 import { HOST, GUEST } from '../CommonNotationObjects';
 import { debug } from '../GameData';
+
+// Gigantic tiles occupy 2x2 grid; offset centers the 2x-scaled mesh over the 4 points
+const GIGANTIC_OFFSET = 0.5;
 
 export class Trifle3DActuator extends PaiSho3DActuator {
 	constructor(gameContainer, isMobile, enableAnimations) {
@@ -57,6 +61,11 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 	// --- Game-specific rendering ---
 
 	render3DGame(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep) {
+		// Track whether a gigantic tile is being deployed (for possible move indicator offset)
+		this.deployingGigantic = board.currentlyDeployingTileInfo
+			&& board.currentlyDeployingTileInfo.attributes
+			&& board.currentlyDeployingTileInfo.attributes.includes(TrifleAttributeType.gigantic);
+
 		// Render all board cells
 		board.cells.forEach((column) => {
 			column.forEach((cell) => {
@@ -284,7 +293,9 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 				this.addMarkedIndicator(x, z);
 			}
 			if (boardPoint.isType(POSSIBLE_MOVE)) {
-				this.addPossibleMoveIndicator(x, z);
+				// Offset indicators when deploying a gigantic tile (col direction only, matching 2D)
+				const gOff = this.deployingGigantic ? GIGANTIC_OFFSET : 0;
+				this.addPossibleMoveIndicator(x + gOff, z);
 			}
 			return;
 		}
@@ -300,9 +311,11 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 			tileId: tile.id,
 		};
 
-		// Gigantic tile scaling
+		// Gigantic tile: scale 2x and offset to center over 2x2 grid area
 		if (tile.isGigantic) {
 			tileGroup.scale.set(2, 2, 2);
+			tileGroup.position.x += GIGANTIC_OFFSET;
+			tileGroup.position.z += GIGANTIC_OFFSET;
 			tileGroup.position.y = 0.1;
 		}
 
@@ -310,9 +323,11 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 		// so they don't flash at the final position before the animation kicks in
 		const abilitySlide = this.getAbilitySlideForTile(tile.id, moveToAnimate);
 		if (abilitySlide && this.animationOn) {
-			const slideStartX = abilitySlide.startPoint.col - this.gridOffset;
-			const slideStartZ = abilitySlide.startPoint.row - this.gridOffset;
-			tileGroup.position.set(slideStartX, 0.05, slideStartZ);
+			const gOff = tile.isGigantic ? GIGANTIC_OFFSET : 0;
+			const slideStartX = abilitySlide.startPoint.col - this.gridOffset + gOff;
+			const slideStartZ = abilitySlide.startPoint.row - this.gridOffset + gOff;
+			const posY = tile.isGigantic ? 0.1 : 0.05;
+			tileGroup.position.set(slideStartX, posY, slideStartZ);
 		}
 
 		// Primary move animations
@@ -335,6 +350,8 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 	handleTileAnimation(boardPoint, moveToAnimate, tileGroup) {
 		const x = boardPoint.col;
 		const y = boardPoint.row;
+		const isGigantic = boardPoint.tile && boardPoint.tile.isGigantic;
+		const gOff = isGigantic ? GIGANTIC_OFFSET : 0;
 
 		if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
 			// Check if this tile has a pending ability SLIDE animation
@@ -344,26 +361,29 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 
 			if (isSamePoint(moveToAnimate.endPoint, x, y)) {
 				const moveStartPoint = new NotationPoint(moveToAnimate.startPoint);
-				const startX = moveStartPoint.rowAndColumn.col - this.gridOffset;
-				const startZ = moveStartPoint.rowAndColumn.row - this.gridOffset;
-				const endX = x - this.gridOffset;
-				const endZ = y - this.gridOffset;
+				const startX = moveStartPoint.rowAndColumn.col - this.gridOffset + gOff;
+				const startZ = moveStartPoint.rowAndColumn.row - this.gridOffset + gOff;
+				const endX = x - this.gridOffset + gOff;
+				const endZ = y - this.gridOffset + gOff;
+				const posY = isGigantic ? 0.1 : 0.05;
+				const baseScale = isGigantic ? 2 : 1;
 
-				tileGroup.position.set(startX, 0.05, startZ);
-				tileGroup.scale.set(1.2, 1.2, 1.2);
+				tileGroup.position.set(startX, posY, startZ);
+				tileGroup.scale.set(baseScale * 1.2, baseScale * 1.2, baseScale * 1.2);
 
 				this.animateTileMovement(tileGroup,
-					new THREE.Vector3(startX, 0.05, startZ),
-					new THREE.Vector3(endX, 0.05, endZ),
+					new THREE.Vector3(startX, posY, startZ),
+					new THREE.Vector3(endX, posY, endZ),
 					pieceAnimationLength,
-					1.2, 1
+					baseScale * 1.2, baseScale
 				);
 			}
 		} else if (moveToAnimate.moveType === DEPLOY) {
 			if (isSamePoint(moveToAnimate.endPoint, x, y)) {
 				if (piecePlaceAnimation === 1) {
-					tileGroup.scale.set(2, 2, 2);
-					this.animateTileScale(tileGroup, 2, 1, 500);
+					const baseScale = isGigantic ? 2 : 1;
+					tileGroup.scale.set(baseScale * 2, baseScale * 2, baseScale * 2);
+					this.animateTileScale(tileGroup, baseScale * 2, baseScale, 500);
 				}
 			}
 		}
@@ -452,15 +472,23 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 				return;
 			}
 
-			const x = instruction.startPoint.col - this.gridOffset;
-			const z = instruction.startPoint.row - this.gridOffset;
+			const isGigantic = instruction.tile && instruction.tile.isGigantic;
+			const gOff = isGigantic ? GIGANTIC_OFFSET : 0;
+			const x = instruction.startPoint.col - this.gridOffset + gOff;
+			const z = instruction.startPoint.row - this.gridOffset + gOff;
 			const srcPath = this.getTileImageSourceDir() + instruction.tile.getImageName() + ".png";
 			const ghostGroup = this.buildTileMesh(srcPath, x, z);
 			ghostGroup.userData = { tileId: instruction.tileId, isGhost: true };
 
+			if (isGigantic) {
+				ghostGroup.scale.set(2, 2, 2);
+				ghostGroup.position.y = 0.1;
+			}
+
 			// startsAtMoveTime ghosts get the "lifted" scale like a normal move
 			if (instruction.startsAtMoveTime) {
-				ghostGroup.scale.set(1.2, 1.2, 1.2);
+				const baseScale = isGigantic ? 2 : 1;
+				ghostGroup.scale.set(baseScale * 1.2, baseScale * 1.2, baseScale * 1.2);
 			}
 
 			this.tilesGroup.add(ghostGroup);
@@ -508,21 +536,25 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 			return;
 		}
 
+		const isGigantic = instruction.tile && instruction.tile.isGigantic;
+		const gOff = isGigantic ? GIGANTIC_OFFSET : 0;
 		const { startPoint, endPoint, duration } = instruction;
-		const startX = startPoint.col - this.gridOffset;
-		const startZ = startPoint.row - this.gridOffset;
-		const endX = endPoint.col - this.gridOffset;
-		const endZ = endPoint.row - this.gridOffset;
+		const startX = startPoint.col - this.gridOffset + gOff;
+		const startZ = startPoint.row - this.gridOffset + gOff;
+		const endX = endPoint.col - this.gridOffset + gOff;
+		const endZ = endPoint.row - this.gridOffset + gOff;
+		const posY = isGigantic ? 0.1 : 0.05;
+		const baseScale = isGigantic ? 2 : 1;
 
 		// Position at start (may already be there from pre-positioning or ghost creation)
-		mesh.position.set(startX, 0.05, startZ);
-		const startScale = instruction.startsAtMoveTime ? 1.2 : 1;
+		mesh.position.set(startX, posY, startZ);
+		const startScale = instruction.startsAtMoveTime ? baseScale * 1.2 : baseScale;
 
 		this.animateTileMovement(mesh,
-			new THREE.Vector3(startX, 0.05, startZ),
-			new THREE.Vector3(endX, 0.05, endZ),
+			new THREE.Vector3(startX, posY, startZ),
+			new THREE.Vector3(endX, posY, endZ),
 			duration,
-			startScale, 1
+			startScale, baseScale
 		);
 	}
 
