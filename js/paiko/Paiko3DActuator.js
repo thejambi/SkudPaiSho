@@ -382,6 +382,36 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 		this.effectsGroup.add(overlay);
 	}
 
+	// --- Override base class indicators to sit above raised board surface ---
+
+	addPossibleMoveIndicator(x, z) {
+		const ringGeo = this.possibleMoveRingGeometry.clone();
+		ringGeo.rotateX(-Math.PI / 2);
+		const ringMat = new THREE.MeshBasicMaterial({
+			color: 0x44FF44,
+			transparent: true,
+			opacity: 0.7,
+			side: THREE.DoubleSide,
+		});
+		const ring = new THREE.Mesh(ringGeo, ringMat);
+		ring.position.set(x, 0.035, z);
+		this.effectsGroup.add(ring);
+	}
+
+	addMarkedIndicator(x, z) {
+		const ringGeo = this.markedRingGeometry.clone();
+		ringGeo.rotateX(-Math.PI / 2);
+		const ringMat = new THREE.MeshBasicMaterial({
+			color: 0xFF4444,
+			transparent: true,
+			opacity: 0.6,
+			side: THREE.DoubleSide,
+		});
+		const ring = new THREE.Mesh(ringGeo, ringMat);
+		ring.position.set(x, 0.035, z);
+		this.effectsGroup.add(ring);
+	}
+
 	// --- State Indicator ---
 
 	addStateIndicator(x, z, color, opacity) {

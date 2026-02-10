@@ -760,9 +760,9 @@ export class PaiSho3DActuator {
 		const canvas = this.renderer.domElement;
 
 		canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-		canvas.addEventListener('click', (event) => this.handleClick(event));
 
 		if (!this.mobile) {
+			canvas.addEventListener('click', (event) => this.handleClick(event));
 			canvas.addEventListener('mousemove', (event) => this.handleMouseMove(event));
 			canvas.addEventListener('mouseout', () => clearMessage());
 
