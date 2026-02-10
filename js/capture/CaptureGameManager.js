@@ -105,11 +105,14 @@ CaptureGameManager.prototype.getWinner = function() {
 	if (this.board.winners.length === 1) {
 		return this.board.winners[0];
 	} else if (this.board.winners.length > 1) {
-		return "BOTH players";
+		return "Game ended in a tie!";
 	}
 };
 
 CaptureGameManager.prototype.getWinReason = function() {
+	if (this.board.winners.length > 1) {
+		return " Both players have the same number of tiles remaining.";
+	}
 	return " has more tiles remaining and won the game!";
 };
 
