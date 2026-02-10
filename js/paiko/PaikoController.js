@@ -843,8 +843,8 @@ export class PaikoController {
 		const rowCol = notationPoint.rowAndColumn;
 		const boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
-		// Handle single-tile threat/cover highlight on click (2D only; 3D uses hover)
-		if (!PaikoOptions.is3DOn()) {
+		// Handle single-tile threat/cover highlight on click (3D desktop uses hover instead)
+		if (!PaikoOptions.is3DOn() || this.isMobile) {
 			// Skip highlight if clicking own shiftable tile to start a move
 			const isStartingShift = boardPoint.hasTile()
 				&& this.moveBuilder.getStatus() === PaikoBuilderStatus.BRAND_NEW
