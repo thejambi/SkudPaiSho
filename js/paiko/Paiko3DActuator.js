@@ -16,6 +16,7 @@ import { PaiSho3DActuator } from '../PaiSho3DActuator';
 import { PaikoController } from './PaikoController';
 import { PaikoPointState, PaikoZone } from './PaikoBoardPoint';
 import { PaikoOptions } from './PaikoOptions';
+import { PaikoMoveType } from './PaikoGameNotation';
 import { getAllTileCodes, getTileName } from './PaikoTile';
 
 // Zone overlay colors
@@ -330,7 +331,15 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 		// Render tile
 		const tile = boardPoint.tile;
 		const srcPath = `images/Paiko/${tile.getImageName()}.png`;
-		const tileGroup = this.buildTileMeshWithFacing(srcPath, x, z, tile);
+
+		// For rotation animations, build with old facing so we can animate to the new one
+		const moveData = moveToAnimate ? (moveToAnimate.moveData || {}) : {};
+		const isRotatingThisTile = moveToAnimate && this.animationOn
+			&& moveData.oldFacing !== undefined
+			&& this.isTileAnimationTarget(boardPoint, moveToAnimate);
+		const overrideFacing = isRotatingThisTile ? moveData.oldFacing : undefined;
+
+		const tileGroup = this.buildTileMeshWithFacing(srcPath, x, z, tile, overrideFacing);
 		tileGroup.userData = {
 			row: boardPoint.row,
 			col: boardPoint.col,
@@ -509,7 +518,7 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 
 	// --- Square Tile Mesh with Facing ---
 
-	buildTileMeshWithFacing(srcPath, x, z, tile) {
+	buildTileMeshWithFacing(srcPath, x, z, tile, overrideFacing) {
 		const group = new THREE.Group();
 
 		const bodyMat = new THREE.MeshStandardMaterial({
@@ -527,7 +536,8 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 		// Facing tiles: only apply facing rotation, let camera rotation naturally flip direction
 		// Non-facing tiles: apply boardRotation so image appears upright from camera angle
 		if (tile.hasFacing && tile.hasFacing()) {
-			const facingDegrees = -90 * tile.getFacing();
+			const facing = (overrideFacing !== undefined) ? overrideFacing : tile.getFacing();
+			const facingDegrees = -90 * facing;
 			if (facingDegrees !== 0) {
 				faceGeo.rotateY(facingDegrees * Math.PI / 180);
 			}
@@ -688,6 +698,20 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 			return;
 		}
 
+		// Rotate in place
+		if (moveToAnimate.moveType === PaikoMoveType.ROTATE && moveData.oldFacing !== undefined) {
+			if (this.isSamePointText(startPointText, x, y) && moveAnimationBeginStep === 0) {
+				const fromAngle = -90 * moveData.oldFacing * Math.PI / 180;
+				const toAngle = -90 * moveData.facing * Math.PI / 180;
+				// Pick shortest rotation path
+				let delta = toAngle - fromAngle;
+				if (delta > Math.PI) delta -= 2 * Math.PI;
+				if (delta < -Math.PI) delta += 2 * Math.PI;
+				this.animateTileRotation(tileGroup, 0, delta, pieceAnimationLength);
+			}
+			return;
+		}
+
 		// Move/shift
 		if (moveToAnimate.moveType === MOVE && boardPoint.tile && startPointText) {
 			if (this.isSamePointText(endPointText, x, y) && moveAnimationBeginStep === 0) {
@@ -705,9 +729,31 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 						pieceAnimationLength,
 						1.2, 1
 					);
+
+					// Animate facing change after move completes
+					if (moveData.oldFacing !== undefined) {
+						const fromAngle = -90 * moveData.oldFacing * Math.PI / 180;
+						const toAngle = -90 * moveData.facing * Math.PI / 180;
+						let delta = toAngle - fromAngle;
+						if (delta > Math.PI) delta -= 2 * Math.PI;
+						if (delta < -Math.PI) delta += 2 * Math.PI;
+						setTimeout(() => {
+							this.animateTileRotation(tileGroup, 0, delta, pieceAnimationLength / 2);
+						}, pieceAnimationLength);
+					}
 				}
 			}
 		}
+	}
+
+	// Check if this board point is the target of the current animation
+	isTileAnimationTarget(boardPoint, moveToAnimate) {
+		const moveData = moveToAnimate.moveData || {};
+		// For ROTATE, check startPoint; for MOVE with facing, check endPoint
+		const targetPoint = (moveToAnimate.moveType === PaikoMoveType.ROTATE)
+			? moveData.startPoint
+			: moveData.endPoint;
+		return this.isSamePointText(targetPoint, boardPoint.col, boardPoint.row);
 	}
 
 	// --- Point text helpers (same as PaikoActuator) ---
@@ -762,6 +808,22 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 			const progress = Math.min(elapsed / duration, 1);
 			const eased = 1 - Math.pow(1 - progress, 3);
 			tileGroup.position.y = startY + (targetY - startY) * eased;
+
+			if (progress < 1) {
+				requestAnimationFrame(animate);
+			}
+		};
+		requestAnimationFrame(animate);
+	}
+
+	animateTileRotation(tileGroup, fromAngle, toAngle, duration) {
+		const startTime = performance.now();
+
+		const animate = (currentTime) => {
+			const elapsed = currentTime - startTime;
+			const progress = Math.min(elapsed / duration, 1);
+			const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+			tileGroup.rotation.y = fromAngle + (toAngle - fromAngle) * eased;
 
 			if (progress < 1) {
 				requestAnimationFrame(animate);

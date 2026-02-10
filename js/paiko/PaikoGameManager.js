@@ -273,6 +273,8 @@ export class PaikoGameManager {
 
 		// Update facing if provided
 		if (facing !== undefined && tile.hasFacing()) {
+			// Save old facing for animation
+			moveData.oldFacing = tile.getFacing();
 			tile.setFacing(facing);
 		}
 
@@ -300,6 +302,9 @@ export class PaikoGameManager {
 		if (!tile.hasFacing()) {
 			return false;
 		}
+
+		// Save old facing for animation
+		moveData.oldFacing = tile.getFacing();
 
 		tile.setFacing(facing);
 
@@ -345,6 +350,8 @@ export class PaikoGameManager {
 		}
 
 		if (facing !== undefined && tile.hasFacing()) {
+			// Save old facing for animation
+			moveData.oldFacing = tile.getFacing();
 			tile.setFacing(facing);
 		}
 
