@@ -677,7 +677,7 @@ export class PaiSho3DActuator {
 		}
 
 		const theImg = document.createElement("img");
-		const srcValue = getTilesSrcPath();
+		const srcValue = getTilesSrcPath ? getTilesSrcPath() : this.getTileImageSourceDir();
 		theImg.src = srcValue + tile.getImageName() + ".png";
 		theDiv.appendChild(theImg);
 
