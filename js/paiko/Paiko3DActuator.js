@@ -283,7 +283,7 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 		this.addThreatCoverOverlay(boardPoint, x, z);
 		this.addSingleTileHighlightOverlay(boardPoint, x, z);
 
-		// Captured tile animation: red flash + shrink + fade
+		// Captured tile overlay during animation (before hasTile check so charge captures show)
 		if (this.animationOn && moveToAnimate && moveToAnimate.capturedTiles) {
 			for (const captured of moveToAnimate.capturedTiles) {
 				if (captured.row === boardPoint.row && captured.col === boardPoint.col) {
@@ -292,28 +292,23 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 					capturedGroup.position.y = 0.05;
 					this.tilesGroup.add(capturedGroup);
 
-					// Red threat flash overlay on the capture square
-					const flashSize = this.gridScale * 0.95;
-					const flashGeo = new THREE.PlaneGeometry(flashSize, flashSize);
-					flashGeo.rotateX(-Math.PI / 2);
-					const flashMat = new THREE.MeshBasicMaterial({
-						color: COLOR_THREAT_3,
-						transparent: true,
-						opacity: 0,
-						side: THREE.DoubleSide,
-						depthWrite: false,
-					});
-					const flashMesh = new THREE.Mesh(flashGeo, flashMat);
-					flashMesh.position.set(x, 0.036, z);
-					this.effectsGroup.add(flashMesh);
+					// Red threat overlay (same as addOverlayPlane — revealed as tile lifts)
+					const flashMesh = this.addOverlayPlane(x, z, COLOR_THREAT_3, 0.8, 0.035);
 
-					// Animate: flash in immediately, then fade tile + flash together
-					this.animateCaptureFlash(flashMat, 150);
+					var liftDelay = pieceAnimationLength * 0.2;  // When lift starts (fraction of move animation)
+					var liftHeight = 0.2;                        // How high the tile lifts
+					var liftDuration = 450;                      // How long the lift takes (ms)
+					var fadePause = 50;                         // Pause after lift before fades start
+					var tileFadeDuration = 300;                  // Tile fade-out duration (ms)
+					var threatFadeDuration = 350;                // Threat overlay fade-out duration (ms)
+
 					setTimeout(() => {
-						this.animateTileScale(capturedGroup, 1, 0, 400);
-						this.animateTileFadeOut(capturedGroup, 400);
-						this.animateCaptureFlashOut(flashMat, flashMesh, 400);
-					}, pieceAnimationLength);
+						this.animateTileLift(capturedGroup, liftHeight, liftDuration);
+						setTimeout(() => {
+							this.animateTileFadeOut(capturedGroup, tileFadeDuration);
+							this.animateTileFadeOut(flashMesh, threatFadeDuration);
+						}, fadePause);
+					}, liftDelay);
 				}
 			}
 		}
@@ -509,6 +504,7 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 		const overlay = new THREE.Mesh(overlayGeo, overlayMat);
 		overlay.position.set(x, yPos, z);
 		this.effectsGroup.add(overlay);
+		return overlay;
 	}
 
 	// --- Square Tile Mesh with Facing ---
@@ -756,33 +752,19 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 
 	// --- Capture Animation Helpers ---
 
-	animateCaptureFlash(flashMat, duration) {
+	animateTileLift(tileGroup, liftHeight, duration) {
+		const startY = tileGroup.position.y;
+		const targetY = startY + liftHeight;
 		const startTime = performance.now();
-		const animate = (currentTime) => {
-			const elapsed = currentTime - startTime;
-			const progress = Math.min(elapsed / duration, 1);
-			flashMat.opacity = 0.8 * progress;
-			if (progress < 1) {
-				requestAnimationFrame(animate);
-			}
-		};
-		requestAnimationFrame(animate);
-	}
 
-	animateCaptureFlashOut(flashMat, flashMesh, duration) {
-		const startTime = performance.now();
 		const animate = (currentTime) => {
 			const elapsed = currentTime - startTime;
 			const progress = Math.min(elapsed / duration, 1);
-			flashMat.opacity = 0.8 * (1 - progress);
+			const eased = 1 - Math.pow(1 - progress, 3);
+			tileGroup.position.y = startY + (targetY - startY) * eased;
+
 			if (progress < 1) {
 				requestAnimationFrame(animate);
-			} else {
-				if (flashMesh.parent) {
-					flashMesh.parent.remove(flashMesh);
-				}
-				flashMesh.geometry.dispose();
-				flashMat.dispose();
 			}
 		};
 		requestAnimationFrame(animate);
