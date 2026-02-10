@@ -298,9 +298,9 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 					var liftDelay = pieceAnimationLength * 0.2;  // When lift starts (fraction of move animation)
 					var liftHeight = 0.2;                        // How high the tile lifts
 					var liftDuration = 450;                      // How long the lift takes (ms)
-					var fadePause = 50;                         // Pause after lift before fades start
-					var tileFadeDuration = 300;                  // Tile fade-out duration (ms)
-					var threatFadeDuration = 350;                // Threat overlay fade-out duration (ms)
+					var fadePause = 150;                         // Pause after lift before fades start
+					var tileFadeDuration = 400;                  // Tile fade-out duration (ms)
+					var threatFadeDuration = 450;                // Threat overlay fade-out duration (ms)
 
 					setTimeout(() => {
 						this.animateTileLift(capturedGroup, liftHeight, liftDuration);
