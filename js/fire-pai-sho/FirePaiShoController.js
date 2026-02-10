@@ -1,6 +1,7 @@
 /* Skud Pai Sho specific UI interaction logic */
 
 import { FirePaiShoActuator } from './FirePaiShoActuator';
+import { FirePaiSho3DActuator } from './FirePaiSho3DActuator';
 import { FirePaiShoGameManager } from './FirePaiShoGameManager';
 import { FirePaiShoGameNotation, FirePaiShoNotationBuilder } from './FirePaiShoGameNotation';
 import { FirePaiShoTile } from './FirePaiShoTile';
@@ -53,14 +54,20 @@ import {
 	toBullets,
 } from '../PaiShoMain';
 import { NO_HARMONY_VISUAL_AIDS, gameOptionEnabled } from '../GameOptions';
+import {
+  is3DBoardOn,
+  buildToggle3DBoardDiv as _buildToggle3DBoardDiv,
+  buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv,
+} from '../PaiSho3DOptions';
 import { GATE, NEUTRAL, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { ACCENT_TILE, debugOn, debug } from '../GameData';
 import { boatOnlyMoves, newKnotweedRules, rocksUnwheelable, simpleRocks, simplest } from '../skud-pai-sho/SkudPaiShoRules';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 
 export function FirePaiShoController(gameContainer, isMobile) {
-	this.actuator = new FirePaiShoActuator(gameContainer, isMobile, isAnimationsOn());
 	this.gameContainer = gameContainer;
+	this.isMobile = isMobile;
+	this.createActuator();
 	this.resetGameManager();
 	this.resetNotationBuilder();
 	this.resetGameNotation();
@@ -72,7 +79,11 @@ export function FirePaiShoController(gameContainer, isMobile) {
 }
 
 FirePaiShoController.prototype.createActuator = function() {
-	this.actuator = new FirePaiShoActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	if (is3DBoardOn()) {
+		this.actuator = new FirePaiSho3DActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	} else {
+		this.actuator = new FirePaiShoActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	}
 	if (this.theGame) {
 		this.theGame.updateActuator(this.actuator);
 	}
@@ -865,7 +876,22 @@ FirePaiShoController.prototype.getCurrentPlayer = function() {
 };
 
 FirePaiShoController.prototype.cleanup = function() {
-	// Nothing.
+	if (this.actuator && this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+};
+
+FirePaiShoController.prototype.set3DBoardOn = function(isOn) {
+	this.createActuator();
+	this.callActuate();
+};
+
+FirePaiShoController.prototype.buildToggle3DBoardDiv = function() {
+	return _buildToggle3DBoardDiv();
+};
+
+FirePaiShoController.prototype.buildToggleRoundBoardDiv = function() {
+	return _buildToggleRoundBoardDiv();
 };
 
 FirePaiShoController.prototype.isSolitaire = function() {
@@ -893,6 +919,12 @@ FirePaiShoController.prototype.getAdditionalHelpTabDiv = function() {
 
 	settingsDiv.appendChild(this.buildBoardRotateDiv());
 
+	settingsDiv.appendChild(document.createElement("br"));
+
+	settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+	if (is3DBoardOn()) {
+		settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
+	}
 	settingsDiv.appendChild(document.createElement("br"));
 
 	return settingsDiv;

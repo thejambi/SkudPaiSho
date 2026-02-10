@@ -2,6 +2,7 @@
 
 import { ADEVAR_LITE, gameOptionEnabled } from '../GameOptions';
 import { AdevarActuator } from './AdevarActuator';
+import { Adevar3DActuator } from './Adevar3DActuator';
 import { AdevarBoardPointType } from './AdevarBoardPoint';
 import { AdevarGameManager } from './AdevarGameManager';
 import {
@@ -10,6 +11,11 @@ import {
   AdevarNotationBuilder,
 } from './AdevarGameNotation';
 import { AdevarOptions } from "./AdevarOptions";
+import {
+  is3DBoardOn,
+  buildToggle3DBoardDiv as _buildToggle3DBoardDiv,
+  buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv,
+} from '../PaiSho3DOptions';
 import { AdevarTile, AdevarTileCode, AdevarTileType } from './AdevarTile';
 import { AdevarTileManager } from './AdevarTileManager';
 import { AdevarStrategicAI } from './ai/AdevarStrategicAI';
@@ -71,7 +77,11 @@ export function AdevarController(gameContainer, isMobile) {
 }
 
 AdevarController.prototype.createActuator = function() {
-	this.actuator = new AdevarActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	if (is3DBoardOn()) {
+		this.actuator = new Adevar3DActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	} else {
+		this.actuator = new AdevarActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	}
 	if (this.theGame) {
 		this.theGame.updateActuator(this.actuator);
 	}
@@ -231,6 +241,10 @@ AdevarController.prototype.getAdditionalHelpTabDiv = function() {
 		settingsDiv.appendChild(AdevarOptions.buildToggleViewAsGuestDiv());
 	}
 
+	settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+	if (is3DBoardOn()) {
+		settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
+	}
 	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
 };
@@ -750,7 +764,22 @@ AdevarController.prototype.getCurrentPlayer = function() {
 };
 
 AdevarController.prototype.cleanup = function() {
-	// Nothing.
+	if (this.actuator && this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+};
+
+AdevarController.prototype.set3DBoardOn = function(isOn) {
+	this.createActuator();
+	this.callActuate();
+};
+
+AdevarController.prototype.buildToggle3DBoardDiv = function() {
+	return _buildToggle3DBoardDiv();
+};
+
+AdevarController.prototype.buildToggleRoundBoardDiv = function() {
+	return _buildToggleRoundBoardDiv();
 };
 
 AdevarController.prototype.isSolitaire = function() {

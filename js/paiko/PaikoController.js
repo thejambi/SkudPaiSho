@@ -3,7 +3,7 @@
 
 import { createClearBr } from '../ActuatorHelp';
 import { DEPLOY, GUEST, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
-import { debug } from '../GameData';
+import { debug, gameDevOn } from '../GameData';
 import { getPlayerCodeFromName } from '../pai-sho-common/PaiShoPlayerHelp';
 import {
 	GameType,
@@ -27,6 +27,7 @@ import {
 	rerunAll,
 } from '../PaiShoMain';
 import { TrifleGameNotation } from '../trifle/TrifleGameNotation';
+import { Paiko3DActuator } from './Paiko3DActuator';
 import { PaikoActuator } from './PaikoActuator';
 import { PaikoAI } from './PaikoAI';
 import { PaikoPointState } from './PaikoBoardPoint';
@@ -104,10 +105,35 @@ export class PaikoController {
 	}
 
 	createActuator() {
-		this.actuator = new PaikoActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+		if (PaikoOptions.is3DOn()) {
+			this.actuator = new Paiko3DActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+		} else {
+			this.actuator = new PaikoActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+		}
 		if (this.theGame) {
 			this.theGame.updateActuator(this.actuator);
 		}
+	}
+
+	set3DBoardOn(isOn) {
+		const is3D = this.actuator instanceof Paiko3DActuator;
+		if (isOn === is3D) return;
+
+		if (this.actuator.dispose) {
+			this.actuator.dispose();
+		}
+
+		if (isOn) {
+			this.actuator = new Paiko3DActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+		} else {
+			this.actuator = new PaikoActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+		}
+		this.theGame.actuator = this.actuator;
+		this.callActuate();
+	}
+
+	buildToggle3DBoardDiv() {
+		return PaikoOptions.buildToggle3DBoardDiv();
 	}
 
 	toggleViewAsGuest() {
@@ -1911,7 +1937,9 @@ export class PaikoController {
 	}
 
 	cleanup() {
-		// Cleanup if needed
+		if (this.actuator && this.actuator.dispose) {
+			this.actuator.dispose();
+		}
 	}
 
 	isSolitaire() {
@@ -1941,6 +1969,10 @@ export class PaikoController {
 		if (!playingOnlineGame() || !iAmPlayerInCurrentOnlineGame() || getOnlineGameOpponentUsername() === getUsername()) {
 			settingsDiv.appendChild(PaikoOptions.buildToggleViewAsGuestDiv());
 			settingsDiv.appendChild(document.createElement('br'));
+		}
+
+		if (gameDevOn) {
+			settingsDiv.appendChild(this.buildToggle3DBoardDiv());
 		}
 
 		return settingsDiv;

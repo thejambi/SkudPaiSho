@@ -44,7 +44,14 @@ import {
 	setCurrentTileMetadata,
 	setCurrentTileNames
 } from './PaiShoGamesTileMetadata';
+import { isAnimationsOn } from '../PaiShoMain';
+import {
+	is3DBoardOn,
+	buildToggle3DBoardDiv as _buildToggle3DBoardDiv,
+	buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv,
+} from '../PaiSho3DOptions';
 import { PromptTargetHelper } from './PromptTargetHelper';
+import { Trifle3DActuator } from './Trifle3DActuator';
 import { TrifleActuator } from './TrifleActuator';
 import { TrifleGameManager } from './TrifleGameManager';
 import {
@@ -60,7 +67,7 @@ export class TrifleController {
 	constructor(gameContainer, isMobile) {
 		this.gameContainer = gameContainer;
 		this.isMobile = isMobile;
-		this.actuator = new TrifleActuator(gameContainer, isMobile);
+		this.createActuator();
 
 		TrifleTileInfo.initializeTrifleData();
 		defineTrifleTiles();
@@ -86,6 +93,17 @@ export class TrifleController {
 
 	static getGuestTilesContainerDivs() {
 		return '';
+	}
+
+	createActuator() {
+		if (is3DBoardOn()) {
+			this.actuator = new Trifle3DActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+		} else {
+			this.actuator = new TrifleActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+		}
+		if (this.theGame) {
+			this.theGame.actuator = this.actuator;
+		}
 	}
 
 	getGameTypeId() {
@@ -124,31 +142,34 @@ export class TrifleController {
 
 	toggleClickToShowPointMessage() {
 		this.clickToShowPointMessage = !this.clickToShowPointMessage;
-		this.actuator = new TrifleActuator(this.gameContainer, this.isMobile);
-		this.theGame.actuator = this.actuator;
+		this.createActuator();
 		this.callActuate();
 		clearMessage();
 	}
 
 	getAdditionalHelpTabDiv() {
-		if (!debugOn) {
-			return null;
-		}
-
 		const settingsDiv = document.createElement("div");
 
-		const heading = document.createElement("h4");
-		heading.innerText = "Trifle Debug Preferences:";
-		settingsDiv.appendChild(heading);
+		settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+		if (is3DBoardOn()) {
+			settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
+		}
+		settingsDiv.appendChild(document.createElement("br"));
 
-		const clickToShowText = this.clickToShowPointMessage
-			? "Switch to show tile info on hover"
-			: "Switch to show tile info on click";
-		const clickToShowSpan = document.createElement("span");
-		clickToShowSpan.classList.add("skipBonus");
-		clickToShowSpan.onclick = function() { gameController.toggleClickToShowPointMessage(); };
-		clickToShowSpan.innerText = clickToShowText;
-		settingsDiv.appendChild(clickToShowSpan);
+		if (debugOn) {
+			const heading = document.createElement("h4");
+			heading.innerText = "Trifle Debug Preferences:";
+			settingsDiv.appendChild(heading);
+
+			const clickToShowText = this.clickToShowPointMessage
+				? "Switch to show tile info on hover"
+				: "Switch to show tile info on click";
+			const clickToShowSpan = document.createElement("span");
+			clickToShowSpan.classList.add("skipBonus");
+			clickToShowSpan.onclick = function() { gameController.toggleClickToShowPointMessage(); };
+			clickToShowSpan.innerText = clickToShowText;
+			settingsDiv.appendChild(clickToShowSpan);
+		}
 
 		return settingsDiv;
 	}
@@ -609,7 +630,22 @@ export class TrifleController {
 	}
 
 	cleanup() {
-		// document.querySelector(".svgContainer").classList.remove("TrifleBoardRotate");
+		if (this.actuator && this.actuator.dispose) {
+			this.actuator.dispose();
+		}
+	}
+
+	set3DBoardOn(isOn) {
+		this.createActuator();
+		this.callActuate();
+	}
+
+	buildToggle3DBoardDiv() {
+		return _buildToggle3DBoardDiv();
+	}
+
+	buildToggleRoundBoardDiv() {
+		return _buildToggleRoundBoardDiv();
 	}
 
 	isSolitaire() {
