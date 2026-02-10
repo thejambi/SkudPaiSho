@@ -61,7 +61,8 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 	// --- Game-specific rendering ---
 
 	render3DGame(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep) {
-		// Track whether a gigantic tile is being deployed (for possible move indicator offset)
+		// Clean up previous gigantic deploy click targets and detect current state
+		this.clearGiganticClickTargets();
 		this.deployingGigantic = board.currentlyDeployingTileInfo
 			&& board.currentlyDeployingTileInfo.attributes
 			&& board.currentlyDeployingTileInfo.attributes.includes(TrifleAttributeType.gigantic);
@@ -293,9 +294,16 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 				this.addMarkedIndicator(x, z);
 			}
 			if (boardPoint.isType(POSSIBLE_MOVE)) {
-				// Offset indicators when deploying a gigantic tile (col direction only, matching 2D)
-				const gOff = this.deployingGigantic ? GIGANTIC_OFFSET : 0;
-				this.addPossibleMoveIndicator(x + gOff, z);
+				if (this.deployingGigantic) {
+					// Show indicator at tile center position, with an offset click
+					// target that maps back to the actual grid point
+					const ox = x + GIGANTIC_OFFSET;
+					const oz = z + GIGANTIC_OFFSET;
+					this.addPossibleMoveIndicator(ox, oz);
+					this.addGiganticDeployClickTarget(boardPoint, ox, oz);
+				} else {
+					this.addPossibleMoveIndicator(x, z);
+				}
 			}
 			return;
 		}
@@ -343,6 +351,38 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
 			this.addPossibleMoveIndicator(x, z);
 		}
+	}
+
+	// --- Gigantic Deploy Click Targets ---
+
+	addGiganticDeployClickTarget(boardPoint, offsetX, offsetZ) {
+		const clickGeo = this.clickPlaneGeometry.clone();
+		clickGeo.rotateX(-Math.PI / 2);
+		const clickMat = new THREE.MeshBasicMaterial({ visible: false });
+		const clickMesh = new THREE.Mesh(clickGeo, clickMat);
+		// Position at offset but report original grid coordinates
+		clickMesh.position.set(offsetX, 0.02, offsetZ);
+		clickMesh.userData = {
+			row: boardPoint.row,
+			col: boardPoint.col,
+			isPoint: true,
+			isGiganticOffset: true,
+		};
+		this.clickTargetsGroup.add(clickMesh);
+	}
+
+	clearGiganticClickTargets() {
+		const toRemove = [];
+		this.clickTargetsGroup.children.forEach(child => {
+			if (child.userData && child.userData.isGiganticOffset) {
+				toRemove.push(child);
+			}
+		});
+		toRemove.forEach(child => {
+			this.clickTargetsGroup.remove(child);
+			child.geometry.dispose();
+			child.material.dispose();
+		});
 	}
 
 	// --- Primary Move Animation ---

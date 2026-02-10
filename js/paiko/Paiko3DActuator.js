@@ -283,7 +283,7 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 		this.addThreatCoverOverlay(boardPoint, x, z);
 		this.addSingleTileHighlightOverlay(boardPoint, x, z);
 
-		// Captured tile overlay during animation (before hasTile check so charge captures show)
+		// Captured tile animation: red flash + shrink + fade
 		if (this.animationOn && moveToAnimate && moveToAnimate.capturedTiles) {
 			for (const captured of moveToAnimate.capturedTiles) {
 				if (captured.row === boardPoint.row && captured.col === boardPoint.col) {
@@ -292,8 +292,27 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 					capturedGroup.position.y = 0.05;
 					this.tilesGroup.add(capturedGroup);
 
+					// Red threat flash overlay on the capture square
+					const flashSize = this.gridScale * 0.95;
+					const flashGeo = new THREE.PlaneGeometry(flashSize, flashSize);
+					flashGeo.rotateX(-Math.PI / 2);
+					const flashMat = new THREE.MeshBasicMaterial({
+						color: COLOR_THREAT_3,
+						transparent: true,
+						opacity: 0,
+						side: THREE.DoubleSide,
+						depthWrite: false,
+					});
+					const flashMesh = new THREE.Mesh(flashGeo, flashMat);
+					flashMesh.position.set(x, 0.036, z);
+					this.effectsGroup.add(flashMesh);
+
+					// Animate: flash in immediately, then fade tile + flash together
+					this.animateCaptureFlash(flashMat, 150);
 					setTimeout(() => {
-						this.animateTileFadeOut(capturedGroup, 300);
+						this.animateTileScale(capturedGroup, 1, 0, 400);
+						this.animateTileFadeOut(capturedGroup, 400);
+						this.animateCaptureFlashOut(flashMat, flashMesh, 400);
 					}, pieceAnimationLength);
 				}
 			}
@@ -733,6 +752,40 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 				this.clearGroup(child);
 			}
 		}
+	}
+
+	// --- Capture Animation Helpers ---
+
+	animateCaptureFlash(flashMat, duration) {
+		const startTime = performance.now();
+		const animate = (currentTime) => {
+			const elapsed = currentTime - startTime;
+			const progress = Math.min(elapsed / duration, 1);
+			flashMat.opacity = 0.8 * progress;
+			if (progress < 1) {
+				requestAnimationFrame(animate);
+			}
+		};
+		requestAnimationFrame(animate);
+	}
+
+	animateCaptureFlashOut(flashMat, flashMesh, duration) {
+		const startTime = performance.now();
+		const animate = (currentTime) => {
+			const elapsed = currentTime - startTime;
+			const progress = Math.min(elapsed / duration, 1);
+			flashMat.opacity = 0.8 * (1 - progress);
+			if (progress < 1) {
+				requestAnimationFrame(animate);
+			} else {
+				if (flashMesh.parent) {
+					flashMesh.parent.remove(flashMesh);
+				}
+				flashMesh.geometry.dispose();
+				flashMat.dispose();
+			}
+		};
+		requestAnimationFrame(animate);
 	}
 
 	// --- Hover Handling (tile threat highlight on hover) ---
