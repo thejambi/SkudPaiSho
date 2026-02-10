@@ -30,8 +30,16 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 			boardSurfaceSize: 19,
 		});
 
+		// Scale grid positions by 1.2x to align with board image (matches 2D overrideScale). Note: 1.26 seems to be the ticket!
+		this.gridScale = 1.26;
+
 		// Shared geometry for zone overlay planes
 		this.zoneOverlayGeometry = new THREE.PlaneGeometry(0.95, 0.95);
+
+		// Shared geometries for square tile meshes (scaled to match grid)
+		const size = this.discRadius * 2 * this.gridScale;
+		this.squareBodyGeometry = new THREE.BoxGeometry(size, 0.24, size);
+		this.squareFaceGeometry = new THREE.PlaneGeometry(size - 0.04, size - 0.04);
 	}
 
 	// --- Abstract method implementations ---
@@ -42,6 +50,40 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 
 	getGuestTilesContainerDivs() {
 		return PaikoController.getGuestTilesContainerDivs();
+	}
+
+	// --- Grid coordinate helper (applies 1.2x scale) ---
+
+	gridToWorld(col, row) {
+		return {
+			x: (col - this.gridOffset) * this.gridScale,
+			z: (row - this.gridOffset) * this.gridScale,
+		};
+	}
+
+	// Override base class arrow drawing to use scaled coordinates
+	addArrow3D(startBoardPoint, endBoardPoint) {
+		const start = this.gridToWorld(startBoardPoint.col, startBoardPoint.row);
+		const end = this.gridToWorld(endBoardPoint.col, endBoardPoint.row);
+
+		const points = [
+			new THREE.Vector3(start.x, 0.15, start.z),
+			new THREE.Vector3(end.x, 0.15, end.z),
+		];
+		const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+		const lineMaterial = new THREE.LineBasicMaterial({ color: 0xFFAA00, linewidth: 2 });
+		const line = new THREE.Line(lineGeometry, lineMaterial);
+		this.arrowsGroup.add(line);
+
+		const dir = new THREE.Vector3(end.x - start.x, 0, end.z - start.z).normalize();
+		const coneGeo = new THREE.ConeGeometry(0.1, 0.25, 8);
+		const coneMat = new THREE.MeshBasicMaterial({ color: 0xFFAA00 });
+		const cone = new THREE.Mesh(coneGeo, coneMat);
+		cone.position.set(end.x, 0.15, end.z);
+		const angle = Math.atan2(dir.x, dir.z);
+		cone.rotation.set(0, angle, 0);
+		cone.rotateX(Math.PI / 2);
+		this.arrowsGroup.add(cone);
 	}
 
 	// --- Override board surface for Paiko's square board ---
@@ -107,13 +149,14 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 			column.forEach((cell) => {
 				if (!cell || cell.zone === PaikoZone.NON_PLAYABLE) return;
 
+				const pos = this.gridToWorld(cell.col, cell.row);
 				const clickGeo = this.clickPlaneGeometry.clone();
 				clickGeo.rotateX(-Math.PI / 2);
 				const clickMat = new THREE.MeshBasicMaterial({
 					visible: false,
 				});
 				const clickMesh = new THREE.Mesh(clickGeo, clickMat);
-				clickMesh.position.set(cell.col - this.gridOffset, 0.01, cell.row - this.gridOffset);
+				clickMesh.position.set(pos.x, 0.01, pos.z);
 				clickMesh.userData = {
 					row: cell.row,
 					col: cell.col,
@@ -153,8 +196,9 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 	addBoardPoint3D(boardPoint, moveToAnimate, moveAnimationBeginStep) {
 		if (boardPoint.zone === PaikoZone.NON_PLAYABLE) return;
 
-		const x = boardPoint.col - this.gridOffset;
-		const z = boardPoint.row - this.gridOffset;
+		const pos = this.gridToWorld(boardPoint.col, boardPoint.row);
+		const x = pos.x;
+		const z = pos.z;
 
 		// Zone overlay
 		// this.addZoneOverlay(boardPoint, x, z);	// Skipping zones, probably don't need this
@@ -274,20 +318,39 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 		this.effectsGroup.add(ring);
 	}
 
-	// --- Tile Mesh with Facing ---
+	// --- Square Tile Mesh with Facing ---
 
 	buildTileMeshWithFacing(srcPath, x, z, tile) {
-		const group = this.buildTileMesh(srcPath, x, z);
+		const group = new THREE.Group();
 
-		// Apply facing rotation to the tile face
+		const bodyMat = new THREE.MeshStandardMaterial({
+			color: 0xBBBBBB,
+			roughness: 0.6,
+		});
+		const body = new THREE.Mesh(this.squareBodyGeometry, bodyMat);
+		body.castShadow = true;
+		group.add(body);
+
+		const texture = this.getTexture(srcPath);
+		const faceGeo = this.squareFaceGeometry.clone();
+		faceGeo.rotateX(-Math.PI / 2);
+
+		// Apply facing rotation
 		if (tile.hasFacing && tile.hasFacing() && tile.getFacing() !== PaikoTileFacing.UP) {
 			const facingDegrees = 90 * tile.getFacing();
-			const face = group.children[1]; // The circle face is the second child
-			if (face && face.geometry) {
-				face.geometry.rotateY(facingDegrees * Math.PI / 180);
-			}
+			faceGeo.rotateY(facingDegrees * Math.PI / 180);
 		}
 
+		const faceMat = new THREE.MeshStandardMaterial({
+			map: texture,
+			roughness: 0.6,
+			transparent: true,
+		});
+		const face = new THREE.Mesh(faceGeo, faceMat);
+		face.position.y = 0.121;
+		group.add(face);
+
+		group.position.set(x, 0.05, z);
 		return group;
 	}
 
@@ -396,13 +459,11 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 			if (this.isSamePointText(shiftEndPointText, x, y) && moveAnimationBeginStep === 0) {
 				const deployPoint = this.getRowColFromPointText(startPointText);
 				if (deployPoint) {
-					const deployX = deployPoint.col - this.gridOffset;
-					const deployZ = deployPoint.row - this.gridOffset;
-					const endX = x - this.gridOffset;
-					const endZ = y - this.gridOffset;
+					const deployPos = this.gridToWorld(deployPoint.col, deployPoint.row);
+					const endPos = this.gridToWorld(x, y);
 
 					// Start at deploy position with pop
-					tileGroup.position.set(deployX, 0.05, deployZ);
+					tileGroup.position.set(deployPos.x, 0.05, deployPos.z);
 					tileGroup.scale.set(2, 2, 2);
 
 					// Stage 1: Scale down at deploy position
@@ -411,8 +472,8 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 					// Stage 2: Slide to final position
 					setTimeout(() => {
 						this.animateTileMovement(tileGroup,
-							new THREE.Vector3(deployX, 0.05, deployZ),
-							new THREE.Vector3(endX, 0.05, endZ),
+							new THREE.Vector3(deployPos.x, 0.05, deployPos.z),
+							new THREE.Vector3(endPos.x, 0.05, endPos.z),
 							pieceAnimationLength / 2,
 							1.2, 1
 						);
@@ -438,17 +499,15 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 			if (this.isSamePointText(endPointText, x, y) && moveAnimationBeginStep === 0) {
 				const startPoint = this.getRowColFromPointText(startPointText);
 				if (startPoint) {
-					const startX = startPoint.col - this.gridOffset;
-					const startZ = startPoint.row - this.gridOffset;
-					const endX = x - this.gridOffset;
-					const endZ = y - this.gridOffset;
+					const startPos = this.gridToWorld(startPoint.col, startPoint.row);
+					const endPos = this.gridToWorld(x, y);
 
-					tileGroup.position.set(startX, 0.05, startZ);
+					tileGroup.position.set(startPos.x, 0.05, startPos.z);
 					tileGroup.scale.set(1.2, 1.2, 1.2);
 
 					this.animateTileMovement(tileGroup,
-						new THREE.Vector3(startX, 0.05, startZ),
-						new THREE.Vector3(endX, 0.05, endZ),
+						new THREE.Vector3(startPos.x, 0.05, startPos.z),
+						new THREE.Vector3(endPos.x, 0.05, endPos.z),
 						pieceAnimationLength,
 						1.2, 1
 					);
@@ -472,10 +531,37 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 		return np.rowAndColumn;
 	}
 
+	// --- Override clearGroup to protect shared square geometries ---
+
+	clearGroup(group) {
+		while (group.children.length > 0) {
+			const child = group.children[0];
+			group.remove(child);
+			if (child.geometry && child.geometry !== this.discGeometry
+				&& child.geometry !== this.faceGeometry
+				&& child.geometry !== this.squareBodyGeometry
+				&& child.geometry !== this.squareFaceGeometry) {
+				child.geometry.dispose();
+			}
+			if (child.material) {
+				if (Array.isArray(child.material)) {
+					child.material.forEach((m) => m.dispose());
+				} else {
+					child.material.dispose();
+				}
+			}
+			if (child.children && child.children.length > 0) {
+				this.clearGroup(child);
+			}
+		}
+	}
+
 	// --- Cleanup ---
 
 	dispose() {
 		this.zoneOverlayGeometry.dispose();
+		this.squareBodyGeometry.dispose();
+		this.squareFaceGeometry.dispose();
 		super.dispose();
 	}
 }

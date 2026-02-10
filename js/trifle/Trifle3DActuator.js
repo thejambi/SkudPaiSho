@@ -3,7 +3,7 @@
 // Includes ability animation system (SLIDE, FADE_OUT, FADE_IN, POP, PULSE)
 
 import * as THREE from 'three';
-import { DEPLOY, MOVE } from '../CommonNotationObjects';
+import { DEPLOY, MOVE, NotationPoint } from '../CommonNotationObjects';
 import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import {
 	clearMessage,
@@ -275,8 +275,8 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 	addBoardPoint3D(boardPoint, moveToAnimate) {
 		if (boardPoint.isType(NON_PLAYABLE)) return;
 
-		const x = boardPoint.col - 8;
-		const z = boardPoint.row - 8;
+		const x = boardPoint.col - this.gridOffset;
+		const z = boardPoint.row - this.gridOffset;
 
 		// Empty point indicators
 		if (!boardPoint.hasTile() || boardPoint.occupiedByAbility) {
@@ -304,6 +304,15 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 		if (tile.isGigantic) {
 			tileGroup.scale.set(2, 2, 2);
 			tileGroup.position.y = 0.1;
+		}
+
+		// Pre-position tiles that have ability SLIDE animations at their startPoint
+		// so they don't flash at the final position before the animation kicks in
+		const abilitySlide = this.getAbilitySlideForTile(tile.id, moveToAnimate);
+		if (abilitySlide && this.animationOn) {
+			const slideStartX = abilitySlide.startPoint.col - this.gridOffset;
+			const slideStartZ = abilitySlide.startPoint.row - this.gridOffset;
+			tileGroup.position.set(slideStartX, 0.05, slideStartZ);
 		}
 
 		// Primary move animations
@@ -334,10 +343,11 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 			}
 
 			if (isSamePoint(moveToAnimate.endPoint, x, y)) {
-				const startX = moveToAnimate.startPoint.rowAndColumn.col - 8;
-				const startZ = moveToAnimate.startPoint.rowAndColumn.row - 8;
-				const endX = x - 8;
-				const endZ = y - 8;
+				const moveStartPoint = new NotationPoint(moveToAnimate.startPoint);
+				const startX = moveStartPoint.rowAndColumn.col - this.gridOffset;
+				const startZ = moveStartPoint.rowAndColumn.row - this.gridOffset;
+				const endX = x - this.gridOffset;
+				const endZ = y - this.gridOffset;
 
 				tileGroup.position.set(startX, 0.05, startZ);
 				tileGroup.scale.set(1.2, 1.2, 1.2);
@@ -360,15 +370,20 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 	}
 
 	tileHasAbilitySlide(tileId, moveToAnimate) {
+		return !!this.getAbilitySlideForTile(tileId, moveToAnimate);
+	}
+
+	// Get the first ability SLIDE animation for a given tile, if any
+	getAbilitySlideForTile(tileId, moveToAnimate) {
 		if (!moveToAnimate || !moveToAnimate.animationInfo
 				|| !moveToAnimate.animationInfo.abilityAnimations) {
-			return false;
+			return null;
 		}
 		const abilityAnimations = moveToAnimate.animationInfo.abilityAnimations;
-		if (!abilityAnimations.animations) return false;
-		return abilityAnimations.animations.some(
+		if (!abilityAnimations.animations) return null;
+		return abilityAnimations.animations.find(
 			anim => anim.type === TrifleAnimationType.SLIDE && anim.tileId === tileId
-		);
+		) || null;
 	}
 
 	// --- Ability Animation System ---
@@ -379,6 +394,10 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 			return;
 		}
 
+		// Create ghost meshes upfront for tiles no longer on the board
+		// (e.g., captured tiles that need fade-out or slide animations)
+		this.createGhostMeshes(animationSequence);
+
 		animationSequence.sort();
 
 		let currentDelay = pieceAnimationLength;
@@ -388,8 +407,8 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 			let startDelay;
 
 			if (instruction.startsAtMoveTime) {
-				// Starts simultaneously with the primary move
-				this.executeAnimation3D(instruction, 0);
+				// Execute immediately — tile was pre-positioned at startPoint during render
+				this.executeAnimation3D(instruction);
 				const endTime = instruction.duration;
 				maxEndTime = Math.max(maxEndTime, endTime);
 				return;
@@ -403,7 +422,7 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 			maxEndTime = Math.max(maxEndTime, endTime);
 
 			setTimeout(() => {
-				this.executeAnimation3D(instruction, startDelay + instruction.delay);
+				this.executeAnimation3D(instruction);
 			}, startDelay + instruction.delay);
 
 			if (!instruction.parallel) {
@@ -412,7 +431,44 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 		});
 	}
 
-	executeAnimation3D(instruction, startTime) {
+	// Pre-create ghost meshes for all animations targeting tiles not on the board
+	createGhostMeshes(animationSequence) {
+		const needsGhost = [
+			TrifleAnimationType.SLIDE,
+			TrifleAnimationType.FADE_OUT,
+			TrifleAnimationType.PULSE
+		];
+
+		animationSequence.animations.forEach(instruction => {
+			if (!needsGhost.includes(instruction.type)) return;
+
+			// Check if tile mesh already exists on the board
+			const existing = this.findTileMesh(instruction.tileId);
+			if (existing) return;
+
+			// Create ghost at startPoint
+			if (!instruction.tile || !instruction.startPoint) {
+				debug("Cannot create ghost mesh: missing tile or startPoint for " + instruction.type);
+				return;
+			}
+
+			const x = instruction.startPoint.col - this.gridOffset;
+			const z = instruction.startPoint.row - this.gridOffset;
+			const srcPath = this.getTileImageSourceDir() + instruction.tile.getImageName() + ".png";
+			const ghostGroup = this.buildTileMesh(srcPath, x, z);
+			ghostGroup.userData = { tileId: instruction.tileId, isGhost: true };
+
+			// startsAtMoveTime ghosts get the "lifted" scale like a normal move
+			if (instruction.startsAtMoveTime) {
+				ghostGroup.scale.set(1.2, 1.2, 1.2);
+			}
+
+			this.tilesGroup.add(ghostGroup);
+			debug("Created ghost mesh for " + instruction.type + " tileId=" + instruction.tileId);
+		});
+	}
+
+	executeAnimation3D(instruction) {
 		switch (instruction.type) {
 			case TrifleAnimationType.SLIDE:
 				this.animateAbilitySlide(instruction);
@@ -434,7 +490,7 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 		}
 	}
 
-	// Find a tile's 3D mesh by tile ID
+	// Find a tile's 3D mesh by tile ID (searches tilesGroup and nested children)
 	findTileMesh(tileId) {
 		if (!tileId) return null;
 		for (const child of this.tilesGroup.children) {
@@ -445,59 +501,47 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 		return null;
 	}
 
-	// Find or create a ghost mesh for tiles no longer on the board
-	findOrCreateGhostMesh(instruction) {
-		let mesh = this.findTileMesh(instruction.tileId);
-		if (mesh) return mesh;
-
-		// Create ghost at startPoint
-		if (!instruction.tile || !instruction.startPoint) {
-			debug("Cannot create ghost mesh: missing tile or startPoint");
-			return null;
-		}
-
-		const x = instruction.startPoint.col - 8;
-		const z = instruction.startPoint.row - 8;
-		const srcPath = this.getTileImageSourceDir() + instruction.tile.getImageName() + ".png";
-		const ghostGroup = this.buildTileMesh(srcPath, x, z);
-		ghostGroup.userData = { tileId: instruction.tileId, isGhost: true };
-		this.tilesGroup.add(ghostGroup);
-		return ghostGroup;
-	}
-
 	animateAbilitySlide(instruction) {
-		const mesh = this.findOrCreateGhostMesh(instruction);
-		if (!mesh) return;
+		const mesh = this.findTileMesh(instruction.tileId);
+		if (!mesh) {
+			debug("animateAbilitySlide: Could not find mesh for tileId=" + instruction.tileId);
+			return;
+		}
 
 		const { startPoint, endPoint, duration } = instruction;
-		const startX = startPoint.col - 8;
-		const startZ = startPoint.row - 8;
-		const endX = endPoint.col - 8;
-		const endZ = endPoint.row - 8;
+		const startX = startPoint.col - this.gridOffset;
+		const startZ = startPoint.row - this.gridOffset;
+		const endX = endPoint.col - this.gridOffset;
+		const endZ = endPoint.row - this.gridOffset;
 
+		// Position at start (may already be there from pre-positioning or ghost creation)
 		mesh.position.set(startX, 0.05, startZ);
-		if (instruction.startsAtMoveTime) {
-			mesh.scale.set(1.2, 1.2, 1.2);
-		}
+		const startScale = instruction.startsAtMoveTime ? 1.2 : 1;
 
 		this.animateTileMovement(mesh,
 			new THREE.Vector3(startX, 0.05, startZ),
 			new THREE.Vector3(endX, 0.05, endZ),
 			duration,
-			instruction.startsAtMoveTime ? 1.2 : 1, 1
+			startScale, 1
 		);
 	}
 
 	animateAbilityFadeOut(instruction) {
-		const mesh = this.findOrCreateGhostMesh(instruction);
-		if (!mesh) return;
+		const mesh = this.findTileMesh(instruction.tileId);
+		if (!mesh) {
+			debug("animateAbilityFadeOut: Could not find mesh for tileId=" + instruction.tileId);
+			return;
+		}
 
 		this.animateTileFadeOut(mesh, instruction.duration);
 	}
 
 	animateAbilityFadeIn(instruction) {
 		const mesh = this.findTileMesh(instruction.tileId);
-		if (!mesh) return;
+		if (!mesh) {
+			debug("animateAbilityFadeIn: Could not find mesh for tileId=" + instruction.tileId);
+			return;
+		}
 
 		// Start invisible, fade in
 		this.setTileOpacity(mesh, 0);
@@ -517,7 +561,10 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 
 	animateAbilityPop(instruction) {
 		const mesh = this.findTileMesh(instruction.tileId);
-		if (!mesh) return;
+		if (!mesh) {
+			debug("animateAbilityPop: Could not find mesh for tileId=" + instruction.tileId);
+			return;
+		}
 
 		mesh.scale.set(0, 0, 0);
 		this.animateTileScale(mesh, 0, 1, instruction.duration);
@@ -525,7 +572,10 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 
 	animateAbilityPulse(instruction) {
 		const mesh = this.findTileMesh(instruction.tileId);
-		if (!mesh) return;
+		if (!mesh) {
+			debug("animateAbilityPulse: Could not find mesh for tileId=" + instruction.tileId);
+			return;
+		}
 
 		const duration = instruction.duration;
 		const halfDuration = duration / 2;
