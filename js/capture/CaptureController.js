@@ -24,6 +24,8 @@ import {
   userIsLoggedIn,
 } from '../PaiShoMain';
 import { CaptureActuator } from './CaptureActuator';
+import { Capture3DActuator } from './Capture3DActuator';
+import { is3DBoardOn, buildToggle3DBoardDiv as _buildToggle3DBoardDiv, buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv } from '../PaiSho3DOptions';
 import { CaptureGameManager } from './CaptureGameManager';
 import {
   CaptureGameNotation,
@@ -46,7 +48,14 @@ export var CapturePreferences = {
 };
 
 export function CaptureController(gameContainer, isMobile) {
-	this.actuator = new CaptureActuator(gameContainer, isMobile, this.isAnimationsEnabled());
+	this.gameContainer = gameContainer;
+	this.isMobile = isMobile;
+
+	if (is3DBoardOn()) {
+		this.actuator = new Capture3DActuator(gameContainer, isMobile, this.isAnimationsEnabled());
+	} else {
+		this.actuator = new CaptureActuator(gameContainer, isMobile, this.isAnimationsEnabled());
+	}
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -341,7 +350,9 @@ CaptureController.prototype.getCurrentPlayer = function() {
 };
 
 CaptureController.prototype.cleanup = function() {
-	// 
+	if (this.actuator && this.actuator.dispose) {
+		this.actuator.dispose();
+	}
 };
 
 CaptureController.prototype.isSolitaire = function() {
@@ -363,6 +374,12 @@ CaptureController.prototype.getAdditionalHelpTabDiv = function() {
 
 	settingsDiv.appendChild(document.createElement("br"));
 	settingsDiv.appendChild(this.buildToggleAnimationsDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
 
 	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
@@ -403,6 +420,31 @@ CaptureController.prototype.isAnimationsEnabled = function() {
 };
 
 CaptureController.animationsEnabledKey = "CaptureAnimationsEnabled";
+
+CaptureController.prototype.buildToggle3DBoardDiv = function() {
+	return _buildToggle3DBoardDiv();
+};
+
+CaptureController.prototype.buildToggleRoundBoardDiv = function() {
+	return _buildToggleRoundBoardDiv();
+};
+
+CaptureController.prototype.set3DBoardOn = function(isOn) {
+	var is3D = this.actuator instanceof Capture3DActuator;
+	if (isOn === is3D) return;
+
+	if (this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+
+	if (isOn) {
+		this.actuator = new Capture3DActuator(this.gameContainer, this.isMobile, this.isAnimationsEnabled());
+	} else {
+		this.actuator = new CaptureActuator(this.gameContainer, this.isMobile, this.isAnimationsEnabled());
+	}
+	this.theGame.actuator = this.actuator;
+	this.callActuate();
+};
 
 /* Capture Pai Sho specific methods */
 CaptureController.prototype.flagCaptureHelp = function(boardPoint) {

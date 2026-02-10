@@ -32,6 +32,8 @@ import { GUEST, HOST, NotationPoint, PLANTING } from '../CommonNotationObjects';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { UNDERGROWTH_SIMPLE, gameOptionEnabled } from '../GameOptions';
 import { UndergrowthActuator } from './UndergrowthActuator';
+import { Undergrowth3DActuator } from './Undergrowth3DActuator';
+import { is3DBoardOn, buildToggle3DBoardDiv as _buildToggle3DBoardDiv, buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv } from '../PaiSho3DOptions';
 import { UndergrowthGameManager } from './UndergrowthGameManager';
 import {
   UndergrowthGameNotation,
@@ -43,7 +45,14 @@ import { debug } from '../GameData';
 import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
 
 export function UndergrowthController(gameContainer, isMobile) {
-	this.actuator = new UndergrowthActuator(gameContainer, isMobile, isAnimationsOn());
+	this.gameContainer = gameContainer;
+	this.isMobile = isMobile;
+
+	if (is3DBoardOn()) {
+		this.actuator = new Undergrowth3DActuator(gameContainer, isMobile, isAnimationsOn());
+	} else {
+		this.actuator = new UndergrowthActuator(gameContainer, isMobile, isAnimationsOn());
+	}
 
 	this.resetGameNotation();	// First
 
@@ -441,7 +450,46 @@ UndergrowthController.prototype.getCurrentPlayer = function() {
 };
 
 UndergrowthController.prototype.cleanup = function() {
-	// 
+	if (this.actuator && this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+};
+
+UndergrowthController.prototype.getAdditionalHelpTabDiv = function() {
+	var settingsDiv = document.createElement("div");
+
+	settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	return settingsDiv;
+};
+
+UndergrowthController.prototype.buildToggle3DBoardDiv = function() {
+	return _buildToggle3DBoardDiv();
+};
+
+UndergrowthController.prototype.buildToggleRoundBoardDiv = function() {
+	return _buildToggleRoundBoardDiv();
+};
+
+UndergrowthController.prototype.set3DBoardOn = function(isOn) {
+	var is3D = this.actuator instanceof Undergrowth3DActuator;
+	if (isOn === is3D) return;
+
+	if (this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+
+	if (isOn) {
+		this.actuator = new Undergrowth3DActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	} else {
+		this.actuator = new UndergrowthActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	}
+	this.theGame.actuator = this.actuator;
+	this.callActuate();
 };
 
 UndergrowthController.prototype.isSolitaire = function() {

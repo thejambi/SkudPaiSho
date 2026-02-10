@@ -5,15 +5,18 @@ import * as THREE from 'three';
 import { DEPLOY, MOVE, NotationPoint } from '../CommonNotationObjects';
 import {
 	clearMessage,
+	gameController,
 	pieceAnimationLength,
 	piecePlaceAnimation,
+	showPointMessage,
 	showTileMessage,
 	unplayedTileClicked,
 } from '../PaiShoMain';
 import { PaiSho3DActuator } from '../PaiSho3DActuator';
 import { PaikoController } from './PaikoController';
 import { PaikoPointState, PaikoZone } from './PaikoBoardPoint';
-import { PaikoTileFacing, getAllTileCodes, getTileName } from './PaikoTile';
+import { PaikoOptions } from './PaikoOptions';
+import { getAllTileCodes, getTileName } from './PaikoTile';
 
 // Zone overlay colors
 const COLOR_HOST_HOMEGROUND = 0xCC4444;
@@ -23,12 +26,27 @@ const COLOR_BLACKED_OUT = 0x222222;
 const COLOR_POSSIBLE_DEPLOY = 0x44AA44;
 const COLOR_SELECTED = 0x44AAFF;
 
+// Threat/cover visualization colors
+const COLOR_THREAT_1 = 0xFF648C;  // Light threat (1 threatening tile)
+const COLOR_THREAT_2 = 0xDC3264;  // Medium threat (2 threatening tiles)
+const COLOR_THREAT_3 = 0xB41450;  // Heavy threat (3+ threatening tiles)
+const COLOR_COVER = 0x6464DC;     // Cover overlay
+const COLOR_TILE_THREAT = 0xFF648C; // Single-tile threat highlight
+const COLOR_TILE_COVER = 0x6464DC;  // Single-tile cover highlight
+
 export class Paiko3DActuator extends PaiSho3DActuator {
 	constructor(gameContainer, isMobile, enableAnimations) {
 		super(gameContainer, isMobile, enableAnimations, {
 			gridOffset: 8.5,
 			boardSurfaceSize: 19,
+			boardRotation: PaikoOptions.viewAsGuest ? 180 : 0,
 		});
+
+		// Add Paiko-specific classes to tilePileContainer (matches 2D setupPaiShoBoard)
+		const tilePileContainer = this.gameContainer.querySelector('.tilePileContainer');
+		if (tilePileContainer) {
+			tilePileContainer.classList.add('Paiko_zoom', 'Paiko');
+		}
 
 		// Scale grid positions by 1.2x to align with board image (matches 2D overrideScale). Note: 1.26 seems to be the ticket!
 		this.gridScale = 1.26;
@@ -38,8 +56,25 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 
 		// Shared geometries for square tile meshes (scaled to match grid)
 		const size = this.discRadius * 2 * this.gridScale;
-		this.squareBodyGeometry = new THREE.BoxGeometry(size, 0.24, size);
+		this.squareBodyGeometry = new THREE.BoxGeometry(size, 0.16, size);
+		this.squareBodyGeometry.translate(0, 0.04, 0); // Shift up so bottom sits on the board surface
 		this.squareFaceGeometry = new THREE.PlaneGeometry(size - 0.04, size - 0.04);
+
+		// Threat/cover visualization state (set by controller)
+		this.showingHostThreat = false;
+		this.showingGuestThreat = false;
+		this.highlightedTileBoardPoint = null;
+
+		// Hover tracking for single-tile threat highlight
+		this.lastHoveredTileKey = null;
+		if (!this.mobile) {
+			this.renderer.domElement.addEventListener('mouseout', () => {
+				if (this.lastHoveredTileKey) {
+					this.lastHoveredTileKey = null;
+					gameController.boardTileUnhovered();
+				}
+			});
+		}
 	}
 
 	// --- Abstract method implementations ---
@@ -86,10 +121,10 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 		this.arrowsGroup.add(cone);
 	}
 
-	// --- Override board surface for Paiko's square board ---
+	// --- Override board surface: round wood base with Paiko board overlay ---
 
 	shouldUseRoundBoard() {
-		return false;
+		return true;
 	}
 
 	getBoardImageUrl() {
@@ -99,36 +134,63 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 	buildBoardSurface() {
 		const boardSize = this.boardSurfaceSize;
 		const boardThickness = 0.5;
-		this.currentRoundBoard = false;
+		this.currentRoundBoard = true;
 		this.currentBoardUrl = this.getBoardImageUrl();
 
-		const boardTexture = this.textureLoader.load(this.currentBoardUrl);
-		boardTexture.colorSpace = THREE.SRGBColorSpace;
+		const radius = boardSize / 2 + 1;
 
-		const boardGeometry = new THREE.BoxGeometry(boardSize, boardThickness, boardSize);
+		// Layer 1: Round brown base cylinder
 		const sideMaterial = new THREE.MeshStandardMaterial({
 			color: 0x5C4033,
 			roughness: 0.8,
 		});
-		this.boardTopMaterial = new THREE.MeshStandardMaterial({
-			map: boardTexture,
+		const topMaterial = new THREE.MeshStandardMaterial({
+			color: 0x5C4033,
 			roughness: 0.7,
-			metalness: 0.0,
-			transparent: true,
 		});
-		const materials = [
-			sideMaterial, sideMaterial,
-			this.boardTopMaterial, sideMaterial,
-			sideMaterial, sideMaterial,
-		];
 
-		this.boardMesh = new THREE.Mesh(boardGeometry, materials);
+		const boardGeometry = new THREE.CylinderGeometry(radius, radius, boardThickness, 64);
+		this.boardMesh = new THREE.Mesh(boardGeometry, [sideMaterial, topMaterial, sideMaterial]);
 		this.boardMesh.position.y = 0.01 - boardThickness / 2;
 		this.boardMesh.receiveShadow = true;
 		this.boardGroup.add(this.boardMesh);
 
+		// Layer 2: Wood texture overlay (round, on top of brown base)
+		const woodTexture = this.textureLoader.load("style/wood_texture_round.png");
+		woodTexture.colorSpace = THREE.SRGBColorSpace;
+
+		const woodOverlayGeo = new THREE.CircleGeometry(radius, 64);
+		woodOverlayGeo.rotateX(-Math.PI / 2);
+		const woodOverlayMat = new THREE.MeshStandardMaterial({
+			map: woodTexture,
+			roughness: 0.7,
+			metalness: 0.0,
+			transparent: true,
+			depthWrite: false,
+		});
+		const woodOverlayMesh = new THREE.Mesh(woodOverlayGeo, woodOverlayMat);
+		woodOverlayMesh.position.y = 0.02;
+		this.boardGroup.add(woodOverlayMesh);
+
+		// Layer 3: Paiko board image overlay (square, on top of wood)
+		const paikoTexture = this.textureLoader.load(this.currentBoardUrl);
+		paikoTexture.colorSpace = THREE.SRGBColorSpace;
+
+		this.boardTopMaterial = new THREE.MeshStandardMaterial({
+			map: paikoTexture,
+			roughness: 0.7,
+			metalness: 0.0,
+			transparent: true,
+			depthWrite: false,
+		});
+		const paikoOverlayGeo = new THREE.PlaneGeometry(boardSize, boardSize);
+		paikoOverlayGeo.rotateX(-Math.PI / 2);
+		const paikoOverlayMesh = new THREE.Mesh(paikoOverlayGeo, this.boardTopMaterial);
+		paikoOverlayMesh.position.y = 0.03;
+		this.boardGroup.add(paikoOverlayMesh);
+
 		// Table shadow plane
-		const tableGeo = new THREE.PlaneGeometry(boardSize, boardSize);
+		const tableGeo = new THREE.CircleGeometry(radius, 64);
 		tableGeo.rotateX(-Math.PI / 2);
 		this.tableMaterial = new THREE.MeshStandardMaterial({
 			color: 0x5C4033,
@@ -171,6 +233,20 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 	// --- Game-specific rendering ---
 
 	render3DGame(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep) {
+		// Pre-compute single-tile highlight targets for efficient lookup
+		this.highlightThreatTargets = null;
+		this.highlightCoverTargets = null;
+		if (this.highlightedTileBoardPoint && this.highlightedTileBoardPoint.hasTile()) {
+			const hp = this.highlightedTileBoardPoint;
+			const tile = hp.tile;
+			this.highlightThreatTargets = new Set(
+				tile.getThreatPattern().map(([r, c]) => `${hp.row + r},${hp.col + c}`)
+			);
+			this.highlightCoverTargets = new Set(
+				tile.getCoverPattern().map(([r, c]) => `${hp.row + r},${hp.col + c}`)
+			);
+		}
+
 		// Render all board cells
 		board.cells.forEach((column) => {
 			column.forEach((cell) => {
@@ -202,6 +278,10 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 
 		// Zone overlay
 		// this.addZoneOverlay(boardPoint, x, z);	// Skipping zones, probably don't need this
+
+		// Threat/cover visualization overlays
+		this.addThreatCoverOverlay(boardPoint, x, z);
+		this.addSingleTileHighlightOverlay(boardPoint, x, z);
 
 		// State indicators on empty points
 		if (!boardPoint.hasTile()) {
@@ -318,6 +398,69 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 		this.effectsGroup.add(ring);
 	}
 
+	// --- Threat/Cover Visualization Overlays ---
+
+	addThreatCoverOverlay(boardPoint, x, z) {
+		if (!this.showingHostThreat && !this.showingGuestThreat) return;
+
+		let threatLevel = 0;
+		let hasCover = false;
+
+		if (this.showingHostThreat) {
+			threatLevel = Math.max(threatLevel, boardPoint.hostThreat || 0);
+			if (boardPoint.hostCover) hasCover = true;
+		}
+		if (this.showingGuestThreat) {
+			threatLevel = Math.max(threatLevel, boardPoint.guestThreat || 0);
+			if (boardPoint.guestCover) hasCover = true;
+		}
+
+		if (threatLevel > 0) {
+			let color, opacity;
+			if (threatLevel >= 3) {
+				color = COLOR_THREAT_3;
+				opacity = 0.8;
+			} else if (threatLevel === 2) {
+				color = COLOR_THREAT_2;
+				opacity = 0.7;
+			} else {
+				color = COLOR_THREAT_1;
+				opacity = 0.6;
+			}
+			this.addOverlayPlane(x, z, color, opacity, 0.013);
+		}
+
+		if (hasCover) {
+			this.addOverlayPlane(x, z, COLOR_COVER, 0.6, 0.016);
+		}
+	}
+
+	addSingleTileHighlightOverlay(boardPoint, x, z) {
+		const key = `${boardPoint.row},${boardPoint.col}`;
+
+		if (this.highlightThreatTargets && this.highlightThreatTargets.has(key)) {
+			this.addOverlayPlane(x, z, COLOR_TILE_THREAT, 0.6, 0.019);
+		}
+		if (this.highlightCoverTargets && this.highlightCoverTargets.has(key)) {
+			this.addOverlayPlane(x, z, COLOR_TILE_COVER, 0.6, 0.022);
+		}
+	}
+
+	addOverlayPlane(x, z, color, opacity, yPos) {
+		const size = this.gridScale * 0.9;
+		const overlayGeo = new THREE.PlaneGeometry(size, size);
+		overlayGeo.rotateX(-Math.PI / 2);
+		const overlayMat = new THREE.MeshBasicMaterial({
+			color: color,
+			transparent: true,
+			opacity: opacity,
+			side: THREE.DoubleSide,
+		});
+		const overlay = new THREE.Mesh(overlayGeo, overlayMat);
+		overlay.position.set(x, yPos, z);
+		this.effectsGroup.add(overlay);
+	}
+
 	// --- Square Tile Mesh with Facing ---
 
 	buildTileMeshWithFacing(srcPath, x, z, tile) {
@@ -335,10 +478,15 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 		const faceGeo = this.squareFaceGeometry.clone();
 		faceGeo.rotateX(-Math.PI / 2);
 
-		// Apply facing rotation
-		if (tile.hasFacing && tile.hasFacing() && tile.getFacing() !== PaikoTileFacing.UP) {
-			const facingDegrees = 90 * tile.getFacing();
-			faceGeo.rotateY(facingDegrees * Math.PI / 180);
+		// Facing tiles: only apply facing rotation, let camera rotation naturally flip direction
+		// Non-facing tiles: apply boardRotation so image appears upright from camera angle
+		if (tile.hasFacing && tile.hasFacing()) {
+			const facingDegrees = -90 * tile.getFacing();
+			if (facingDegrees !== 0) {
+				faceGeo.rotateY(facingDegrees * Math.PI / 180);
+			}
+		} else if (this.boardRotation) {
+			faceGeo.rotateY(this.boardRotation * Math.PI / 180);
 		}
 
 		const faceMat = new THREE.MeshStandardMaterial({
@@ -552,6 +700,36 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 			}
 			if (child.children && child.children.length > 0) {
 				this.clearGroup(child);
+			}
+		}
+	}
+
+	// --- Hover Handling (tile threat highlight on hover) ---
+
+	handleMouseMove(event) {
+		const hit = this.raycastBoard(event);
+		if (hit) {
+			showPointMessage(this.createFakeHtmlPoint(hit.userData));
+
+			if (hit.userData.isTile) {
+				const key = `${hit.userData.row},${hit.userData.col}`;
+				if (this.lastHoveredTileKey !== key) {
+					if (this.lastHoveredTileKey) {
+						gameController.boardTileUnhovered();
+					}
+					this.lastHoveredTileKey = key;
+					gameController.boardTileHovered(this.createFakeHtmlPoint(hit.userData));
+				}
+			} else {
+				if (this.lastHoveredTileKey) {
+					this.lastHoveredTileKey = null;
+					gameController.boardTileUnhovered();
+				}
+			}
+		} else {
+			if (this.lastHoveredTileKey) {
+				this.lastHoveredTileKey = null;
+				gameController.boardTileUnhovered();
 			}
 		}
 	}

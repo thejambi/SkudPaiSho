@@ -23,12 +23,21 @@ import {
 import { GATE, NEUTRAL, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { OvergrowthActuator } from './OvergrowthActuator';
+import { Overgrowth3DActuator } from './Overgrowth3DActuator';
+import { is3DBoardOn, buildToggle3DBoardDiv as _buildToggle3DBoardDiv, buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv } from '../PaiSho3DOptions';
 import { OvergrowthGameManager } from './OvergrowthGameManager';
 import { OvergrowthGameNotation, OvergrowthNotationBuilder } from './OvergrowthGameNotation';
 import { OvergrowthTile } from './OvergrowthTile';
 
 export function OvergrowthController(gameContainer, isMobile) {
-	this.actuator = new OvergrowthActuator(gameContainer, isMobile);
+	this.gameContainer = gameContainer;
+	this.isMobile = isMobile;
+
+	if (is3DBoardOn()) {
+		this.actuator = new Overgrowth3DActuator(gameContainer, isMobile, false);
+	} else {
+		this.actuator = new OvergrowthActuator(gameContainer, isMobile);
+	}
 
 	this.showGameMessageUnderneath = true;
 
@@ -334,7 +343,46 @@ OvergrowthController.prototype.getCurrentPlayer = function() {
 };
 
 OvergrowthController.prototype.cleanup = function() {
-	// 
+	if (this.actuator && this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+};
+
+OvergrowthController.prototype.getAdditionalHelpTabDiv = function() {
+	var settingsDiv = document.createElement("div");
+
+	settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	return settingsDiv;
+};
+
+OvergrowthController.prototype.buildToggle3DBoardDiv = function() {
+	return _buildToggle3DBoardDiv();
+};
+
+OvergrowthController.prototype.buildToggleRoundBoardDiv = function() {
+	return _buildToggleRoundBoardDiv();
+};
+
+OvergrowthController.prototype.set3DBoardOn = function(isOn) {
+	var is3D = this.actuator instanceof Overgrowth3DActuator;
+	if (isOn === is3D) return;
+
+	if (this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+
+	if (isOn) {
+		this.actuator = new Overgrowth3DActuator(this.gameContainer, this.isMobile, false);
+	} else {
+		this.actuator = new OvergrowthActuator(this.gameContainer, this.isMobile);
+	}
+	this.theGame.actuator = this.actuator;
+	this.callActuate();
 };
 
 OvergrowthController.prototype.isSolitaire = function() {

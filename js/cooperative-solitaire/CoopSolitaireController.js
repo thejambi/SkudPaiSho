@@ -39,6 +39,8 @@ import { GUEST, HOST, NotationPoint, PLANTING } from '../CommonNotationObjects';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { SolitaireTile } from '../solitaire/SolitaireTile';
 import { CoopSolitaireActuator } from './CoopSolitaireActuator';
+import { CoopSolitaire3DActuator } from './CoopSolitaire3DActuator';
+import { is3DBoardOn, buildToggle3DBoardDiv as _buildToggle3DBoardDiv, buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv } from '../PaiSho3DOptions';
 import { CoopSolitaireGameManager } from './CoopSolitaireGameManager';
 import {
   CoopSolitaireGameNotation,
@@ -46,7 +48,14 @@ import {
 } from './CoopSolitaireGameNotation';
 
 export function CoopSolitaireController(gameContainer, isMobile) {
-	this.actuator = new CoopSolitaireActuator(gameContainer, isMobile);
+	this.gameContainer = gameContainer;
+	this.isMobile = isMobile;
+
+	if (is3DBoardOn()) {
+		this.actuator = new CoopSolitaire3DActuator(gameContainer, isMobile, false);
+	} else {
+		this.actuator = new CoopSolitaireActuator(gameContainer, isMobile);
+	}
 
 	this.showGameMessageUnderneath = true;
 
@@ -470,7 +479,46 @@ CoopSolitaireController.prototype.getCurrentPlayer = function() {
 };
 
 CoopSolitaireController.prototype.cleanup = function() {
-	// 
+	if (this.actuator && this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+};
+
+CoopSolitaireController.prototype.getAdditionalHelpTabDiv = function() {
+	var settingsDiv = document.createElement("div");
+
+	settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	return settingsDiv;
+};
+
+CoopSolitaireController.prototype.buildToggle3DBoardDiv = function() {
+	return _buildToggle3DBoardDiv();
+};
+
+CoopSolitaireController.prototype.buildToggleRoundBoardDiv = function() {
+	return _buildToggleRoundBoardDiv();
+};
+
+CoopSolitaireController.prototype.set3DBoardOn = function(isOn) {
+	var is3D = this.actuator instanceof CoopSolitaire3DActuator;
+	if (isOn === is3D) return;
+
+	if (this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+
+	if (isOn) {
+		this.actuator = new CoopSolitaire3DActuator(this.gameContainer, this.isMobile, false);
+	} else {
+		this.actuator = new CoopSolitaireActuator(this.gameContainer, this.isMobile);
+	}
+	this.theGame.actuator = this.actuator;
+	this.callActuate();
 };
 
 CoopSolitaireController.prototype.isSolitaire = function() {

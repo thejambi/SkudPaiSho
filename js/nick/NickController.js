@@ -55,11 +55,17 @@ import {
 import { TrifleTile } from '../trifle/TrifleTile';
 import { TrifleTileInfo } from '../trifle/TrifleTileInfo';
 import { NickActuator } from './NickActuator';
+import { Nick3DActuator } from './Nick3DActuator';
 import { NickGameManager } from './NickGameManager';
 import { NickOptions } from './NickOptions';
 import { initializeTrifleData, NickTileCodes, TileInfo, getNickTiles } from './NickTiles';
 import { NickStrategicAI } from './ai/NickStrategicAI';
 import { NickAggressiveAI } from './ai/NickAggressiveAI';
+import {
+	is3DBoardOn,
+	buildToggle3DBoardDiv as _buildToggle3DBoardDiv,
+	buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv,
+} from '../PaiSho3DOptions';
 
 export var NickConstants = {
 	preferencesKey: "NickPreferencesKey"
@@ -104,7 +110,11 @@ export class NickController {
 	}
 
 	createActuator() {
-		this.actuator = new NickActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+		if (is3DBoardOn()) {
+			this.actuator = new Nick3DActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+		} else {
+			this.actuator = new NickActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+		}
 		if (this.theGame) {
 			this.theGame.updateActuator(this.actuator);
 		}
@@ -393,13 +403,36 @@ export class NickController {
 			settingsDiv.appendChild(document.createElement("br"));
 		}
 
+		settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+		settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
+
 		settingsDiv.appendChild(document.createElement("br"));
 
 		return settingsDiv;
 	}
 
+	set3DBoardOn() {
+		if (this.actuator && this.actuator.dispose) {
+			this.actuator.dispose();
+		}
+		this.createActuator();
+		this.callActuate();
+		clearMessage();
+	}
+
+	buildToggle3DBoardDiv() {
+		return _buildToggle3DBoardDiv();
+	}
+
+	buildToggleRoundBoardDiv() {
+		return _buildToggleRoundBoardDiv();
+	}
+
 	toggleViewAsGuest() {
 		NickOptions.viewAsGuest = !NickOptions.viewAsGuest;
+		if (this.actuator && this.actuator.dispose) {
+			this.actuator.dispose();
+		}
 		this.createActuator();
 		this.callActuate();
 		clearMessage();
@@ -740,7 +773,9 @@ export class NickController {
 	}
 
 	cleanup() {
-		// Nothing to do
+		if (this.actuator && this.actuator.dispose) {
+			this.actuator.dispose();
+		}
 	}
 
 	isSolitaire() {

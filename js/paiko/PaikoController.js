@@ -252,6 +252,7 @@ export class PaikoController {
 		handSection.appendChild(handDiv);
 
 		container.appendChild(handSection);
+		container.appendChild(document.createElement('br'));
 
 		// Reserve Section
 		const reserveSection = document.createElement('span');
@@ -282,19 +283,27 @@ export class PaikoController {
 	}
 
 	callActuate() {
-		this.theGame.actuate();
-		// Reapply threat visualization after board update
-		// Use setTimeout to ensure DOM has updated
-		if (this.showingHostThreat || this.showingGuestThreat) {
-			setTimeout(() => this.applyThreatVisualization(), pieceAnimationLength + 50);
+		// Sync threat viz state to 3D actuator before rendering
+		if (PaikoOptions.is3DOn()) {
+			this.actuator.showingHostThreat = this.showingHostThreat;
+			this.actuator.showingGuestThreat = this.showingGuestThreat;
+			this.actuator.highlightedTileBoardPoint = this.highlightedTileBoardPoint;
 		}
-		// Reapply single-tile highlight if pinned
-		if (this.highlightedTileBoardPoint && this.tileHighlightPinned) {
-			setTimeout(() => {
-				if (this.highlightedTileBoardPoint) {
-					this.showSingleTileThreatCover(this.highlightedTileBoardPoint);
-				}
-			}, pieceAnimationLength + 50);
+
+		this.theGame.actuate();
+
+		// 2D only: reapply threat visualization after DOM update
+		if (!PaikoOptions.is3DOn()) {
+			if (this.showingHostThreat || this.showingGuestThreat) {
+				setTimeout(() => this.applyThreatVisualization(), pieceAnimationLength + 50);
+			}
+			if (this.highlightedTileBoardPoint && this.tileHighlightPinned) {
+				setTimeout(() => {
+					if (this.highlightedTileBoardPoint) {
+						this.showSingleTileThreatCover(this.highlightedTileBoardPoint);
+					}
+				}, pieceAnimationLength + 50);
+			}
 		}
 	}
 
@@ -834,29 +843,31 @@ export class PaikoController {
 		const rowCol = notationPoint.rowAndColumn;
 		const boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
-		// Handle single-tile threat/cover highlight (works anytime)
-		// Skip highlight if clicking own shiftable tile to start a move
-		const isStartingShift = boardPoint.hasTile()
-			&& this.moveBuilder.getStatus() === PaikoBuilderStatus.BRAND_NEW
-			&& myTurn()
-			&& boardPoint.tile.ownerName === this.getCurrentPlayer()
-			&& boardPoint.tile.canShift();
+		// Handle single-tile threat/cover highlight on click (2D only; 3D uses hover)
+		if (!PaikoOptions.is3DOn()) {
+			// Skip highlight if clicking own shiftable tile to start a move
+			const isStartingShift = boardPoint.hasTile()
+				&& this.moveBuilder.getStatus() === PaikoBuilderStatus.BRAND_NEW
+				&& myTurn()
+				&& boardPoint.tile.ownerName === this.getCurrentPlayer()
+				&& boardPoint.tile.canShift();
 
-		if (boardPoint.hasTile() && !isStartingShift) {
-			if (this.tileHighlightPinned && this.highlightedTileBoardPoint === boardPoint) {
-				// Click same tile again: unpin and clear
-				this.tileHighlightPinned = false;
-				this.clearSingleTileThreatCover();
+			if (boardPoint.hasTile() && !isStartingShift) {
+				if (this.tileHighlightPinned && this.highlightedTileBoardPoint === boardPoint) {
+					// Click same tile again: unpin and clear
+					this.tileHighlightPinned = false;
+					this.clearSingleTileThreatCover();
+				} else {
+					// Pin and show this tile's zones
+					this.showSingleTileThreatCover(boardPoint);
+					this.tileHighlightPinned = true;
+				}
 			} else {
-				// Pin and show this tile's zones
-				this.showSingleTileThreatCover(boardPoint);
-				this.tileHighlightPinned = true;
-			}
-		} else {
-			// Clear highlight when clicking empty space or starting a shift
-			if (this.tileHighlightPinned || this.highlightedTileBoardPoint) {
-				this.tileHighlightPinned = false;
-				this.clearSingleTileThreatCover();
+				// Clear highlight when clicking empty space or starting a shift
+				if (this.tileHighlightPinned || this.highlightedTileBoardPoint) {
+					this.tileHighlightPinned = false;
+					this.clearSingleTileThreatCover();
+				}
 			}
 		}
 
@@ -1467,6 +1478,12 @@ export class PaikoController {
 	}
 
 	applyThreatVisualization() {
+		// 3D: overlays are rendered as part of the scene
+		if (PaikoOptions.is3DOn()) {
+			this.callActuate();
+			return;
+		}
+
 		// Remove all existing visualization classes from board points
 		const allPoints = document.querySelectorAll('.point');
 		allPoints.forEach(pointDiv => {
@@ -1525,9 +1542,18 @@ export class PaikoController {
 
 	// Show threat/cover zones for a single tile on the board
 	showSingleTileThreatCover(boardPoint) {
+		if (PaikoOptions.is3DOn()) {
+			// 3D: just set the highlight and re-render once
+			this.highlightedTileBoardPoint = (boardPoint && boardPoint.hasTile()) ? boardPoint : null;
+			this.callActuate();
+			return;
+		}
+
 		this.clearSingleTileThreatCover();
 
 		if (!boardPoint || !boardPoint.hasTile()) return;
+
+		this.highlightedTileBoardPoint = boardPoint;
 
 		const tile = boardPoint.tile;
 
@@ -1562,17 +1588,22 @@ export class PaikoController {
 				}
 			}
 		});
-
-		this.highlightedTileBoardPoint = boardPoint;
 	}
 
 	// Clear single-tile threat/cover highlight
 	clearSingleTileThreatCover() {
+		const wasHighlighting = this.highlightedTileBoardPoint !== null;
+		this.highlightedTileBoardPoint = null;
+
+		if (PaikoOptions.is3DOn()) {
+			if (wasHighlighting) this.callActuate();
+			return;
+		}
+
 		const allPoints = document.querySelectorAll('.point');
 		allPoints.forEach(pointDiv => {
 			pointDiv.classList.remove('tileHighlightThreat', 'tileHighlightCover');
 		});
-		this.highlightedTileBoardPoint = null;
 	}
 
 	// Called when mouse enters a board tile
@@ -1971,9 +2002,7 @@ export class PaikoController {
 			settingsDiv.appendChild(document.createElement('br'));
 		}
 
-		if (gameDevOn) {
-			settingsDiv.appendChild(this.buildToggle3DBoardDiv());
-		}
+		settingsDiv.appendChild(this.buildToggle3DBoardDiv());
 
 		return settingsDiv;
 	}

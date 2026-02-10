@@ -38,6 +38,8 @@ import {
 import { GUEST, HOST, NotationPoint, PLANTING } from '../CommonNotationObjects';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { SolitaireActuator } from './SolitaireActuator';
+import { Solitaire3DActuator } from './Solitaire3DActuator';
+import { is3DBoardOn, buildToggle3DBoardDiv as _buildToggle3DBoardDiv, buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv } from '../PaiSho3DOptions';
 import { SolitaireGameManager } from './SolitaireGameManager';
 import {
   SolitaireGameNotation,
@@ -47,7 +49,14 @@ import { SolitaireTile } from './SolitaireTile';
 import { hostPlayerCode } from '../pai-sho-common/PaiShoPlayerHelp';
 
 export function SolitaireController(gameContainer, isMobile) {
-	this.actuator = new SolitaireActuator(gameContainer, isMobile);
+	this.gameContainer = gameContainer;
+	this.isMobile = isMobile;
+
+	if (is3DBoardOn()) {
+		this.actuator = new Solitaire3DActuator(gameContainer, isMobile, false);
+	} else {
+		this.actuator = new SolitaireActuator(gameContainer, isMobile);
+	}
 
 	this.showGameMessageUnderneath = true;
 
@@ -503,7 +512,46 @@ SolitaireController.prototype.getCurrentPlayer = function() {
 };
 
 SolitaireController.prototype.cleanup = function() {
-	// 
+	if (this.actuator && this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+};
+
+SolitaireController.prototype.getAdditionalHelpTabDiv = function() {
+	var settingsDiv = document.createElement("div");
+
+	settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	return settingsDiv;
+};
+
+SolitaireController.prototype.buildToggle3DBoardDiv = function() {
+	return _buildToggle3DBoardDiv();
+};
+
+SolitaireController.prototype.buildToggleRoundBoardDiv = function() {
+	return _buildToggleRoundBoardDiv();
+};
+
+SolitaireController.prototype.set3DBoardOn = function(isOn) {
+	var is3D = this.actuator instanceof Solitaire3DActuator;
+	if (isOn === is3D) return;
+
+	if (this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+
+	if (isOn) {
+		this.actuator = new Solitaire3DActuator(this.gameContainer, this.isMobile, false);
+	} else {
+		this.actuator = new SolitaireActuator(this.gameContainer, this.isMobile);
+	}
+	this.theGame.actuator = this.actuator;
+	this.callActuate();
 };
 
 SolitaireController.prototype.isSolitaire = function() {

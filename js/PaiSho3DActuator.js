@@ -123,7 +123,8 @@ export class PaiSho3DActuator {
 		this.scene.add(this.arrowsGroup);
 
 		// Shared geometries
-		this.discGeometry = new THREE.CylinderGeometry(this.discRadius, this.discRadius, 0.24, 32);
+		this.discGeometry = new THREE.CylinderGeometry(this.discRadius, this.discRadius, 0.16, 32);
+		this.discGeometry.translate(0, 0.04, 0); // Shift up so bottom sits on the board surface
 		this.faceGeometry = new THREE.CircleGeometry(this.discRadius - 0.02, 32);
 		this.possibleMoveRingGeometry = new THREE.RingGeometry(0.20, 0.35, 16);
 		this.markedRingGeometry = new THREE.RingGeometry(0.30, 0.42, 16);

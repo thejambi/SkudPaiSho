@@ -26,6 +26,8 @@ import {
 import { GUEST, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
 import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { SpiritActuator } from './SpiritActuator';
+import { Spirit3DActuator } from './Spirit3DActuator';
+import { is3DBoardOn, buildToggle3DBoardDiv as _buildToggle3DBoardDiv, buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv } from '../PaiSho3DOptions';
 import { SpiritGameManager } from './SpiritGameManager';
 import {
   SpiritGameNotation,
@@ -47,7 +49,14 @@ export var SpiritPreferences = {
 };
 
 export function SpiritController(gameContainer, isMobile) {
-	this.actuator = new SpiritActuator(gameContainer, isMobile, this.isAnimationsEnabled());
+	this.gameContainer = gameContainer;
+	this.isMobile = isMobile;
+
+	if (is3DBoardOn()) {
+		this.actuator = new Spirit3DActuator(gameContainer, isMobile, this.isAnimationsEnabled());
+	} else {
+		this.actuator = new SpiritActuator(gameContainer, isMobile, this.isAnimationsEnabled());
+	}
 
 	this.resetGameManager();
 	this.resetNotationBuilder();
@@ -303,7 +312,9 @@ SpiritController.prototype.getCurrentPlayer = function() {
 };
 
 SpiritController.prototype.cleanup = function() {
-	// 
+	if (this.actuator && this.actuator.dispose) {
+		this.actuator.dispose();
+	}
 };
 
 SpiritController.prototype.isSolitaire = function() {
@@ -325,6 +336,12 @@ SpiritController.prototype.getAdditionalHelpTabDiv = function() {
 
 	settingsDiv.appendChild(document.createElement("br"));
 	settingsDiv.appendChild(this.buildToggleAnimationsDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
 
 	settingsDiv.appendChild(document.createElement("br"));
 	return settingsDiv;
@@ -365,6 +382,31 @@ SpiritController.prototype.isAnimationsEnabled = function() {
 };
 
 SpiritController.animationsEnabledKey = "SpiritAnimationsEnabled";
+
+SpiritController.prototype.buildToggle3DBoardDiv = function() {
+	return _buildToggle3DBoardDiv();
+};
+
+SpiritController.prototype.buildToggleRoundBoardDiv = function() {
+	return _buildToggleRoundBoardDiv();
+};
+
+SpiritController.prototype.set3DBoardOn = function(isOn) {
+	var is3D = this.actuator instanceof Spirit3DActuator;
+	if (isOn === is3D) return;
+
+	if (this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+
+	if (isOn) {
+		this.actuator = new Spirit3DActuator(this.gameContainer, this.isMobile, this.isAnimationsEnabled());
+	} else {
+		this.actuator = new SpiritActuator(this.gameContainer, this.isMobile, this.isAnimationsEnabled());
+	}
+	this.theGame.actuator = this.actuator;
+	this.callActuate();
+};
 
 /* Spirit Pai Sho specific methods */
 SpiritController.prototype.flagCaptureHelp = function(boardPoint) {

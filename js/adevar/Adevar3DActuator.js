@@ -27,7 +27,8 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 		// Shared geometries for square tile meshes (space tiles mode)
 		if (AdevarOptions.isSpaceTiles()) {
 			const size = this.discRadius * 2;
-			this.squareBodyGeometry = new THREE.BoxGeometry(size, 0.24, size);
+			this.squareBodyGeometry = new THREE.BoxGeometry(size, 0.16, size);
+			this.squareBodyGeometry.translate(0, 0.04, 0); // Shift up so bottom sits on the board surface
 			this.squareFaceGeometry = new THREE.PlaneGeometry(size - 0.04, size - 0.04);
 		}
 	}
