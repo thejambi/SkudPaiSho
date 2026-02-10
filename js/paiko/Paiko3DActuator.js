@@ -394,7 +394,7 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 			side: THREE.DoubleSide,
 		});
 		const ring = new THREE.Mesh(ringGeo, ringMat);
-		ring.position.set(x, 0.015, z);
+		ring.position.set(x, 0.035, z);
 		this.effectsGroup.add(ring);
 	}
 
@@ -427,11 +427,11 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 				color = COLOR_THREAT_1;
 				opacity = 0.6;
 			}
-			this.addOverlayPlane(x, z, color, opacity, 0.013);
+			this.addOverlayPlane(x, z, color, opacity, 0.035);
 		}
 
 		if (hasCover) {
-			this.addOverlayPlane(x, z, COLOR_COVER, 0.6, 0.016);
+			this.addOverlayPlane(x, z, COLOR_COVER, 0.6, 0.038);
 		}
 	}
 
@@ -439,10 +439,10 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 		const key = `${boardPoint.row},${boardPoint.col}`;
 
 		if (this.highlightThreatTargets && this.highlightThreatTargets.has(key)) {
-			this.addOverlayPlane(x, z, COLOR_TILE_THREAT, 0.6, 0.019);
+			this.addOverlayPlane(x, z, COLOR_TILE_THREAT, 0.6, 0.041);
 		}
 		if (this.highlightCoverTargets && this.highlightCoverTargets.has(key)) {
-			this.addOverlayPlane(x, z, COLOR_TILE_COVER, 0.6, 0.022);
+			this.addOverlayPlane(x, z, COLOR_TILE_COVER, 0.6, 0.044);
 		}
 	}
 

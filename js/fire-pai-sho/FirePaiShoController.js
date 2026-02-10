@@ -295,7 +295,7 @@ FirePaiShoController.prototype.getExtraHarmonyBonusHelpText = function() {
 };
 
 FirePaiShoController.prototype.showHarmonyBonusMessage = function() {
-	var messageDiv = document.createElement("div");
+	var messageDiv = document.createElement("span");
 	
 	// Create the main message text
 	var mainMessage = document.createElement("span");
