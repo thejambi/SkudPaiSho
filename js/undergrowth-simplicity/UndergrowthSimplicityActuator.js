@@ -181,6 +181,11 @@ UndergrowthSimplicityActuator.prototype.addBoardPoint = function(boardPoint, mov
 	if (boardPoint.hasTile()) {
 		theDiv.classList.add("hasTile");
 
+		// Danger highlight for tiles at risk of decay or cut
+		if (boardPoint.decayDanger || boardPoint.cutDanger) {
+			theDiv.style.boxShadow = "inset 0 0 6px 2px rgba(220, 50, 50, 0.35)";
+		}
+
 		var theImg = document.createElement("img");
 		theImg.src = "images/Adevar/monochrome/" + boardPoint.tile.ownerCode + "Back.png";
 

@@ -479,7 +479,7 @@ export const GameType = {
 		]
 	},
 	GiniPaiSho: {
-		id: 27,
+		id: 26,
 		name: "Gini Pai Sho",
 		desc: "Gini Pai Sho",
 		color: "var(--ginicolor)",
@@ -492,7 +492,7 @@ export const GameType = {
 		]
 	},
 	Fanorona: {
-		id: 26,
+		id: 28,
 		name: "Fanorona",
 		desc: "Fanorona",
 		color: "var(--fanoronacolor)",
@@ -505,13 +505,13 @@ export const GameType = {
 		]
 	},
 	UndergrowthSimplicity: {
-		id: 28,
-		name: "Undergrowth Simplicity",
-		desc: "Undergrowth Simplicity",
+		id: 27,
+		name: "Undergrowth - Briar",
+		desc: "Undergrowth - Briar",
 		color: "var(--undergrowthcolor)",
 		description: "Build a ring of connected stones around the center while cutting off your opponent's supply lines.",
-		coverImg: "lotus.png",
-		rulesUrl: "https://skudpaisho.com/site/games/undergrowth-simplicity/",
+		coverImg: "rose.png",
+		rulesUrl: "https://skudpaisho.com/site/games/undergrowth-briar/",
 		gameOptions: [],
 		noRankedGames: true,
 		usersWithAccess: [

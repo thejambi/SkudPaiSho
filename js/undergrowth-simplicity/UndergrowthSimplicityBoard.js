@@ -124,6 +124,7 @@ UndergrowthSimplicityBoard.prototype.analyzeConnections = function() {
 	}
 
 	this.markSpacesBetweenConnections();
+	this.markDangerStates();
 };
 
 // ============ Mark spaces between connections (visual indicators) ============
@@ -168,6 +169,36 @@ UndergrowthSimplicityBoard.prototype.markSpacesBetweenConnections = function() {
 					self.cells[row][col].betweenConnectionGuest = true;
 				}
 			}
+		}
+	});
+};
+
+// ============ Danger State Marking ============
+
+UndergrowthSimplicityBoard.prototype.markDangerStates = function() {
+	// Clear danger flags
+	this.forEachBoardPoint(function(bp) {
+		bp.decayDanger = false;
+		bp.cutDanger = false;
+	});
+
+	// Mark neutral-zone tiles as decay danger
+	this.forEachBoardPointWithTile(function(bp) {
+		if (bp.isNeutralGardenOnly()) {
+			bp.decayDanger = true;
+		}
+	});
+
+	// Mark tiles not connected to their owner's gates as cut danger
+	var hostConnected = this.getConnectedToGates(HOST);
+	var guestConnected = this.getConnectedToGates(GUEST);
+
+	this.forEachBoardPointWithTile(function(bp) {
+		var key = bp.row + "," + bp.col;
+		if (bp.tile.ownerName === HOST && !hostConnected.has(key)) {
+			bp.cutDanger = true;
+		} else if (bp.tile.ownerName === GUEST && !guestConnected.has(key)) {
+			bp.cutDanger = true;
 		}
 	});
 };

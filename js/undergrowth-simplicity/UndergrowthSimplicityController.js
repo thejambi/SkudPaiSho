@@ -87,7 +87,7 @@ UndergrowthSimplicityController.prototype.getDefaultHelpMessageText = function()
 	var container = document.createElement('div');
 
 	var h4 = document.createElement('h4');
-	h4.textContent = "Undergrowth Simplicity";
+	h4.textContent = "Undergrowth - Briar";
 	container.appendChild(h4);
 
 	var paragraphs = [
