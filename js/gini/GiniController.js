@@ -42,12 +42,18 @@ import {
   PASS_TURN,
 } from '../CommonNotationObjects';
 import { GiniActuator } from './GiniActuator';
+import { Gini3DActuator } from './Gini3DActuator';
 import {
   ACCENT_TILE_HOME,
   GiniGameManager,
   GiniNotationAdjustmentFunction
 } from './GiniGameManager';
 import { GiniOptions } from './GiniOptions';
+import {
+  is3DBoardOn,
+  buildToggle3DBoardDiv as _buildToggle3DBoardDiv,
+  buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv,
+} from '../PaiSho3DOptions';
 import {
   GiniTileCodes,
   GiniTileInfo,
@@ -109,7 +115,11 @@ GiniController.loadPreferences = function() {
 };
 
 GiniController.prototype.createActuator = function() {
-	this.actuator = new GiniActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	if (is3DBoardOn()) {
+		this.actuator = new Gini3DActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	} else {
+		this.actuator = new GiniActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	}
 	if (this.theGame) {
 		this.theGame.updateActuator(this.actuator);
 	}
@@ -326,6 +336,10 @@ GiniController.prototype.getAdditionalHelpTabDiv = function() {
 		settingsDiv.appendChild(GiniOptions.buildToggleViewAsGuestDiv());
 	}
 
+	settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+	if (is3DBoardOn()) {
+		settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
+	}
 	settingsDiv.appendChild(document.createElement("br"));
 
 	if (usernameIsOneOf(["SkudPaiSho"]) || debugOn) {
@@ -634,7 +648,9 @@ GiniController.prototype.getCurrentPlayer = function() {
 };
 
 GiniController.prototype.cleanup = function() {
-	// Nothing to do
+	if (this.actuator && this.actuator.dispose) {
+		this.actuator.dispose();
+	}
 };
 
 GiniController.prototype.isSolitaire = function() {
@@ -731,4 +747,17 @@ GiniController.isUsingCustomTileDesigns = function() {
 
 GiniController.getCustomTileDesignsUrl = function() {
 	return GiniOptions.Preferences.customTilesUrl;
+};
+
+GiniController.prototype.set3DBoardOn = function(isOn) {
+	this.createActuator();
+	this.callActuate();
+};
+
+GiniController.prototype.buildToggle3DBoardDiv = function() {
+	return _buildToggle3DBoardDiv();
+};
+
+GiniController.prototype.buildToggleRoundBoardDiv = function() {
+	return _buildToggleRoundBoardDiv();
 };
