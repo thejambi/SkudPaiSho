@@ -62,7 +62,7 @@ export function UndergrowthSimplicityController(gameContainer, isMobile) {
 }
 
 UndergrowthSimplicityController.prototype.getGameTypeId = function() {
-	return GameType.UndergrowthSimplicity.id;
+	return GameType.UndergrowthBriar.id;
 };
 
 UndergrowthSimplicityController.prototype.resetGameManager = function() {
@@ -121,7 +121,7 @@ UndergrowthSimplicityController.prototype.getAdditionalMessage = function() {
 	var msgElement = document.createElement("span");
 
 	if (this.gameNotation.moves.length === 0) {
-		msgElement.appendChild(getGameOptionsMessageElement(GameType.UndergrowthSimplicity.gameOptions));
+		msgElement.appendChild(getGameOptionsMessageElement(GameType.UndergrowthBriar.gameOptions));
 	}
 
 	var moveCount = this.gameNotation.moves.length;
@@ -300,7 +300,7 @@ UndergrowthSimplicityController.prototype.pointClicked = function(htmlPoint) {
 					// First move - create online game
 					var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 					this.gameNotation.addMove(move);
-					createGameIfThatIsOk(GameType.UndergrowthSimplicity.id);
+					createGameIfThatIsOk(GameType.UndergrowthBriar.id);
 				} else {
 					this.completeMove();
 				}
@@ -340,7 +340,7 @@ UndergrowthSimplicityController.prototype.pointClicked = function(htmlPoint) {
 			if (this.gameNotation.moves.length === 0 && onlinePlayEnabled) {
 				var move = this.gameNotation.getNotationMoveFromBuilder(this.notationBuilder);
 				this.gameNotation.addMove(move);
-				createGameIfThatIsOk(GameType.UndergrowthSimplicity.id);
+				createGameIfThatIsOk(GameType.UndergrowthBriar.id);
 			} else {
 				this.completeMove();
 			}

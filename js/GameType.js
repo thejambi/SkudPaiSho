@@ -246,7 +246,7 @@ export const GameType = {
 			UNDERGROWTH_SIMPLE
 		]
 	},
-	UndergrowthSimplicity: {
+	UndergrowthBriar: {
 		id: 27,
 		name: "Undergrowth - Briar",
 		desc: "Undergrowth - Briar",
@@ -255,10 +255,7 @@ export const GameType = {
 		coverImg: "rose.png",
 		rulesUrl: "https://skudpaisho.com/site/games/undergrowth-briar/",
 		gameOptions: [],
-		noRankedGames: true,
-		usersWithAccess: [
-			'SkudPaiSho',
-		]
+		noRankedGames: true
 	},
 	GiniPaiSho: {
 		id: 26,

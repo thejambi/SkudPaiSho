@@ -3383,7 +3383,7 @@ export function getGameControllerForGameType(gameTypeId) {
 		case GameType.Fanorona.id:
 			controller = new FanoronaController(gameContainerDiv, isMobile);
 			break;
-		case GameType.UndergrowthSimplicity.id:
+		case GameType.UndergrowthBriar.id:
 			controller = new UndergrowthSimplicityController(gameContainerDiv, isMobile);
 			break;
 		default:
