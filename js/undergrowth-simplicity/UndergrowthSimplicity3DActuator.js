@@ -201,17 +201,141 @@ export class UndergrowthSimplicity3DActuator extends PaiSho3DActuator {
 	// --- Center Point Indicator ---
 
 	addCenterPointIndicator(x, z) {
-		// Semi-transparent knotweed disc at center
-		const geo = new THREE.CylinderGeometry(0.38, 0.38, 0.06, 32);
-		const mat = new THREE.MeshStandardMaterial({
-			color: COLOR_CENTER_KNOTWEED,
-			transparent: true,
-			opacity: 0.5,
-			roughness: 0.6,
+		if (UndergrowthBriarOptions.getCenterpiece() !== "tree") {
+			this.addBrambleBush(x, z);
+		} else {
+			this.addTree(x, z);
+		}
+	}
+
+	// --- Procedural Tree ---
+
+	addTree(x, z) {
+		const treeGroup = new THREE.Group();
+
+		// Trunk - brown cylinder
+		const trunkGeo = new THREE.CylinderGeometry(0.08, 0.12, 0.7, 8);
+		const trunkMat = new THREE.MeshStandardMaterial({
+			color: 0x5C3A1E,
+			roughness: 0.9,
 		});
-		const mesh = new THREE.Mesh(geo, mat);
-		mesh.position.set(x, 0.03, z);
-		this.effectsGroup.add(mesh);
+		const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+		trunk.position.y = 0.35;
+		trunk.castShadow = true;
+		treeGroup.add(trunk);
+
+		// Canopy - layered cones for a fuller look
+		const canopyMat = new THREE.MeshStandardMaterial({
+			color: 0x2D6B2D,
+			roughness: 0.8,
+		});
+
+		// Lower canopy (wider)
+		const lowerCanopyGeo = new THREE.ConeGeometry(0.45, 0.5, 8);
+		const lowerCanopy = new THREE.Mesh(lowerCanopyGeo, canopyMat);
+		lowerCanopy.position.y = 0.65;
+		lowerCanopy.castShadow = true;
+		treeGroup.add(lowerCanopy);
+
+		// Upper canopy (narrower, overlapping)
+		const upperCanopyGeo = new THREE.ConeGeometry(0.32, 0.45, 8);
+		const upperCanopy = new THREE.Mesh(upperCanopyGeo, canopyMat);
+		upperCanopy.position.y = 0.95;
+		upperCanopy.castShadow = true;
+		treeGroup.add(upperCanopy);
+
+		treeGroup.position.set(x, 0.01, z);
+		this.effectsGroup.add(treeGroup);
+	}
+
+	// --- Procedural Bramble Bush ---
+
+	addBrambleBush(x, z) {
+		const bushGroup = new THREE.Group();
+
+		const branchMat = new THREE.MeshStandardMaterial({
+			color: 0x3D2B1F,
+			roughness: 0.95,
+		});
+		const branchMatLight = new THREE.MeshStandardMaterial({
+			color: 0x5C4030,
+			roughness: 0.9,
+		});
+
+		// Main branches arching out from center
+		const mainBranches = [
+			{ rx: 0.5, rz: 0.3, ry: 0, h: 0.6, rad: 0.035 },
+			{ rx: -0.4, rz: -0.5, ry: 1.1, h: 0.55, rad: 0.03 },
+			{ rx: 0.3, rz: 0.6, ry: 2.3, h: 0.65, rad: 0.04 },
+			{ rx: -0.6, rz: -0.15, ry: 3.4, h: 0.5, rad: 0.03 },
+			{ rx: 0.45, rz: -0.4, ry: 4.6, h: 0.58, rad: 0.035 },
+			{ rx: -0.2, rz: 0.55, ry: 5.5, h: 0.52, rad: 0.03 },
+		];
+
+		mainBranches.forEach((b) => {
+			const geo = new THREE.CylinderGeometry(0.015, b.rad, b.h, 5);
+			const mesh = new THREE.Mesh(geo, branchMat);
+			mesh.position.y = b.h / 2;
+
+			const pivot = new THREE.Group();
+			pivot.add(mesh);
+			pivot.rotation.set(b.rx, b.ry, b.rz);
+			pivot.castShadow = true;
+			bushGroup.add(pivot);
+		});
+
+		// Cross branches that weave between the main ones
+		const crossBranches = [
+			{ sx: 0.15, sy: 0.25, sz: 0.1, ex: -0.12, ey: 0.4, ez: -0.15 },
+			{ sx: -0.1, sy: 0.2, sz: 0.18, ex: 0.18, ey: 0.35, ez: -0.08 },
+			{ sx: 0.08, sy: 0.35, sz: -0.15, ex: -0.18, ey: 0.22, ez: 0.12 },
+			{ sx: -0.15, sy: 0.3, sz: -0.08, ex: 0.1, ey: 0.45, ez: 0.15 },
+			{ sx: 0.2, sy: 0.15, sz: 0.05, ex: -0.05, ey: 0.5, ez: -0.2 },
+			{ sx: -0.18, sy: 0.4, sz: 0.05, ex: 0.15, ey: 0.2, ez: -0.12 },
+			{ sx: 0.05, sy: 0.45, sz: 0.18, ex: -0.2, ey: 0.15, ez: -0.05 },
+		];
+
+		crossBranches.forEach((cb) => {
+			const start = new THREE.Vector3(cb.sx, cb.sy, cb.sz);
+			const end = new THREE.Vector3(cb.ex, cb.ey, cb.ez);
+			const mid = start.clone().lerp(end, 0.5);
+			const length = start.distanceTo(end);
+
+			const geo = new THREE.CylinderGeometry(0.01, 0.02, length, 4);
+			const mesh = new THREE.Mesh(geo, branchMatLight);
+
+			// Position at midpoint and orient toward endpoint
+			mesh.position.copy(mid);
+			const dir = end.clone().sub(start).normalize();
+			const up = new THREE.Vector3(0, 1, 0);
+			const quat = new THREE.Quaternion().setFromUnitVectors(up, dir);
+			mesh.setRotationFromQuaternion(quat);
+			mesh.castShadow = true;
+			bushGroup.add(mesh);
+		});
+
+		// A few curling tendrils reaching upward
+		const tendrils = [
+			{ rx: 0.2, rz: 0.1, ry: 0.5, h: 0.35 },
+			{ rx: -0.15, rz: -0.2, ry: 2.0, h: 0.3 },
+			{ rx: 0.1, rz: 0.25, ry: 3.5, h: 0.32 },
+			{ rx: -0.25, rz: 0.15, ry: 5.0, h: 0.28 },
+		];
+
+		tendrils.forEach((t) => {
+			const geo = new THREE.CylinderGeometry(0.008, 0.018, t.h, 4);
+			const mesh = new THREE.Mesh(geo, branchMat);
+			mesh.position.y = 0.35 + t.h / 2;
+
+			const pivot = new THREE.Group();
+			pivot.add(mesh);
+			pivot.rotation.set(t.rx, t.ry, t.rz);
+			bushGroup.add(pivot);
+		});
+
+		bushGroup.scale.set(1.25, 1.25, 1.25);
+		bushGroup.position.set(x, 0.01, z);
+		this.effectsGroup.add(bushGroup);
 	}
 
 	// --- Connection Glow ---

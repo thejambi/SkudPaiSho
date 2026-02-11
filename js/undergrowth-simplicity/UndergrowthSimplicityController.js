@@ -489,6 +489,9 @@ UndergrowthSimplicityController.prototype.getAdditionalHelpTabDiv = function() {
 	settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
 
 	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(UndergrowthBriarOptions.buildToggleCenterpieceDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
 	settingsDiv.appendChild(UndergrowthBriarOptions.buildTogglePieceStyleDiv());
 
 	return settingsDiv;
