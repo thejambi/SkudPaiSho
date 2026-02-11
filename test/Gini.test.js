@@ -1067,6 +1067,75 @@ describe('Gini Ginseng Accent Tile Capture', () => {
 	});
 });
 
+// ─── Ginseng Protection Tests ───
+
+describe('Gini Ginseng Protection Ability', () => {
+	function manualMoveTile(game, fromStr, toStr) {
+		const fromNp = new NotationPoint(fromStr);
+		const fromRc = fromNp.rowAndColumn;
+		const toNp = new NotationPoint(toStr);
+		const toRc = toNp.rowAndColumn;
+		const tile = game.board.cells[fromRc.row][fromRc.col].removeTile();
+		game.board.cells[toRc.row][toRc.col].putTile(tile);
+	}
+
+	it('should protect friendly tiles in line of sight from enemy Earth rotation', () => {
+		const game = createGame();
+
+		// Place Host Ginseng at (0,2), Host Koi at (0,1) — Koi is 1 space from Ginseng (in line of sight)
+		manualMoveTile(game, '4,0', '0,2');
+		manualMoveTile(game, '4,-2', '0,1');
+
+		// Verify setup
+		expect(getTileAt(game, '0,2').code).toBe(GiniTileCodes.Ginseng);
+		expect(getTileAt(game, '0,1').code).toBe(GiniTileCodes.Koi);
+
+		// Guest deploys Earth at (0,0), adjacent to Host Koi at (0,1)
+		// If protection works, Koi should NOT rotate
+		makeMove(game, GUEST, '-6,-4', '0,0', 0);
+
+		// Earth should be at (0,0)
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Earth);
+
+		// Koi should still be at (0,1) — protected by Ginseng
+		expect(getTileAt(game, '0,1').code).toBe(GiniTileCodes.Koi);
+	});
+
+	it('should NOT protect tiles outside line of sight distance', () => {
+		const game = createGame();
+
+		// Place Host Ginseng far away at (0,7), Host Koi at (0,1) — more than 4 spaces apart
+		manualMoveTile(game, '4,0', '0,7');
+		manualMoveTile(game, '4,-2', '0,1');
+
+		// Guest deploys Earth at (0,0), adjacent to Host Koi
+		makeMove(game, GUEST, '-6,-4', '0,0', 0);
+
+		// Earth at (0,0)
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Earth);
+
+		// Koi should have been rotated since Ginseng is too far — (0,1) is top of (0,0), rotates to top-right (1,1)
+		expect(isEmptyAt(game, '0,1')).toBe(true);
+		expect(getTileAt(game, '1,1').code).toBe(GiniTileCodes.Koi);
+	});
+
+	it('should NOT protect enemy tiles from abilities', () => {
+		const game = createGame();
+
+		// Place Host Ginseng at (0,2), Guest Dragon at (0,1) — enemy tile near Ginseng
+		manualMoveTile(game, '4,0', '0,2');
+		manualMoveTile(game, '-5,-1', '0,1');
+
+		// Guest deploys Earth at (0,0), adjacent to Guest Dragon
+		// Ginseng should NOT protect enemy tiles
+		makeMove(game, GUEST, '-6,-4', '0,0', 0);
+
+		// Dragon should have been rotated — (0,1) is top of (0,0), rotates to top-right (1,1)
+		expect(isEmptyAt(game, '0,1')).toBe(true);
+		expect(getTileAt(game, '1,1').code).toBe(GiniTileCodes.Dragon);
+	});
+});
+
 // ─── Game Log Tests ───
 
 describe('Gini Game Log', () => {

@@ -2,6 +2,7 @@ import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import {
   TrifleAbilityName,
   TrifleAbilityTriggerType,
+  TrifleAbilityType,
   TrifleActivationRequirement,
   TrifleAttributeType,
   TrifleCaptureType,
@@ -336,12 +337,14 @@ GiniTileInfo.defineGiniTiles = function() {
 			{
 				title: "Protect Friendly Tiles",
 				type: TrifleAbilityName.cancelAbilitiesTargetingTiles,
+				cancelAbilitiesFromTeam: TrifleTileTeam.enemy,
+				targetAbilityTypes: [TrifleAbilityType.all],
 				triggers: [
 					{
 						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInLineOfSight,
 						targetTeams: [TrifleTileTeam.friendly],
 						targetTileTypes: [TrifleTileCategory.allTileTypes],
-						lineOfSightDistance: 4
+						sightDistance: 4
 					}
 				],
 				targetTypes: [TrifleTargetType.triggerTargetTiles]
