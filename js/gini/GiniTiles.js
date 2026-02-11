@@ -302,6 +302,7 @@ GiniTileInfo.defineGiniTiles = function() {
 					}
 				],
 				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				excludeTileCodes: [GiniTileCodes.WhiteLotus],
 				bonusMovement: {
 					type: TrifleMovementType.standard,
 					distance: 1
