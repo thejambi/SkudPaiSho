@@ -30,6 +30,7 @@ import {
 import { GUEST, HOST, NotationPoint } from '../CommonNotationObjects';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { UndergrowthSimplicityActuator } from './UndergrowthSimplicityActuator';
+import { UndergrowthSimplicity3DActuator } from './UndergrowthSimplicity3DActuator';
 import { UndergrowthSimplicityGameManager } from './UndergrowthSimplicityGameManager';
 import {
 	UndergrowthSimplicityGameNotation,
@@ -38,6 +39,7 @@ import {
 } from './UndergrowthSimplicityGameNotation';
 import { UndergrowthSimplicityTile } from './UndergrowthSimplicityTile';
 import { UndergrowthBriarOptions } from './UndergrowthBriarOptions';
+import { is3DBoardOn, buildToggle3DBoardDiv as _buildToggle3DBoardDiv, buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv } from '../PaiSho3DOptions';
 import { debug } from '../GameData';
 
 export function UndergrowthSimplicityController(gameContainer, isMobile) {
@@ -46,7 +48,11 @@ export function UndergrowthSimplicityController(gameContainer, isMobile) {
 
 	UndergrowthBriarOptions();
 
-	this.actuator = new UndergrowthSimplicityActuator(gameContainer, isMobile, isAnimationsOn());
+	if (is3DBoardOn()) {
+		this.actuator = new UndergrowthSimplicity3DActuator(gameContainer, isMobile, isAnimationsOn());
+	} else {
+		this.actuator = new UndergrowthSimplicityActuator(gameContainer, isMobile, isAnimationsOn());
+	}
 
 	this.resetGameNotation();
 	this.resetGameManager();
@@ -477,13 +483,47 @@ UndergrowthSimplicityController.prototype.getAdditionalHelpTabDiv = function() {
 	heading.innerText = "Undergrowth - Briar Preferences:";
 	settingsDiv.appendChild(heading);
 
+	settingsDiv.appendChild(this.buildToggle3DBoardDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
+
+	settingsDiv.appendChild(document.createElement("br"));
 	settingsDiv.appendChild(UndergrowthBriarOptions.buildTogglePieceStyleDiv());
 
 	return settingsDiv;
 };
 
 UndergrowthSimplicityController.prototype.cleanup = function() {
-	// Nothing to clean up for 2D
+	if (this.actuator && this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+};
+
+UndergrowthSimplicityController.prototype.buildToggle3DBoardDiv = function() {
+	return _buildToggle3DBoardDiv();
+};
+
+UndergrowthSimplicityController.prototype.buildToggleRoundBoardDiv = function() {
+	return _buildToggleRoundBoardDiv();
+};
+
+UndergrowthSimplicityController.prototype.set3DBoardOn = function(isOn) {
+	var is3D = this.actuator instanceof UndergrowthSimplicity3DActuator;
+	if (isOn === is3D) return;
+
+	if (this.actuator.dispose) {
+		this.actuator.dispose();
+	}
+
+	if (isOn) {
+		this.actuator = new UndergrowthSimplicity3DActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	} else {
+		this.actuator = new UndergrowthSimplicityActuator(this.gameContainer, this.isMobile, isAnimationsOn());
+	}
+
+	this.theGame.actuator = this.actuator;
+	this.callActuate();
 };
 
 UndergrowthSimplicityController.prototype.isSolitaire = function() {
