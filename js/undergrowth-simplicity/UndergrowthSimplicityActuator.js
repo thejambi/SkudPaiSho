@@ -184,7 +184,7 @@ UndergrowthSimplicityActuator.prototype.addBoardPoint = function(boardPoint, mov
 		theDiv.classList.add("hasTile");
 		var centerImg = document.createElement("img");
 		centerImg.src = "images/SkudPaiSho/modernwood/HK.png";
-		centerImg.style.opacity = "0.5";
+		centerImg.style.opacity = "0.8";
 		theDiv.appendChild(centerImg);
 	}
 
