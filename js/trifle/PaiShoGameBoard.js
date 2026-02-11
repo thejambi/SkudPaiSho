@@ -2678,6 +2678,18 @@ export class PaiShoGameBoard {
 					}
 				});
 			}
+
+			if (tileInfo.deployTypes.includes(TrifleDeployType.onOccupiedTile)) {
+				var excludeCodes = tileInfo.deployExcludeTileCodes;
+				this.forEachBoardPoint((boardPoint) => {
+					if (boardPoint.hasTile()
+						&& boardPoint.tile !== tile
+						&& !boardPoint.isType(NON_PLAYABLE)
+						&& (!excludeCodes || !excludeCodes.includes(boardPoint.tile.code))) {
+						boardPoint.addType(POSSIBLE_MOVE);
+					}
+				});
+			}
 		}
 	}
 

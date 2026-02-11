@@ -727,20 +727,19 @@ describe('Gini Air Accent Tile - Swap and Relocate', () => {
 	}
 
 	/**
-	 * Build promptTargetData for the Air swap-and-relocate ability.
+	 * Build promptTargetData for the Air displace ability.
 	 */
-	function buildAirPromptData(game, airNotationStr, destNotationStr, swappedTileStr, relocDestStr) {
+	function buildAirPromptData(game, airNotationStr, deployOntoStr, displaceDestStr) {
 		var airTile = getTileAt(game, airNotationStr);
 		var sourceTileKey = JSON.stringify({
 			tileOwner: airTile.ownerCode,
 			tileCode: airTile.code,
-			boardPoint: destNotationStr,
+			boardPoint: deployOntoStr,
 			tileId: airTile.id
 		});
 		var promptTargetData = {};
 		promptTargetData[sourceTileKey] = {
-			swappedTilePoint: new NotationPoint(swappedTileStr),
-			relocatedTileDestinationPoint: new NotationPoint(relocDestStr)
+			displacedTileDestinationPoint: new NotationPoint(displaceDestStr)
 		};
 		return promptTargetData;
 	}
@@ -748,58 +747,55 @@ describe('Gini Air Accent Tile - Swap and Relocate', () => {
 	it('should return neededPromptInfo when Air is placed without prompt data', () => {
 		const game = createGame();
 
-		// Move Guest Koi to center area so there's a tile to swap with
+		// Move Guest Koi to center area so there's a tile to displace
 		manualMoveTile(game, '-4,2', '0,0');
 		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Koi);
 
-		// Move Air to (0,1) with empty prompt data
-		var neededPromptInfo = makeMove(game, GUEST, '-5,-4', '0,1', 0, {});
+		// Move Air onto Koi at (0,0) with empty prompt data
+		var neededPromptInfo = makeMove(game, GUEST, '-5,-4', '0,0', 0, {});
 
-		// Should prompt for swapped tile
+		// Should prompt for displaced tile destination
 		expect(neededPromptInfo).toBeTruthy();
-		expect(neededPromptInfo.currentPromptTargetId).toBe('swappedTilePoint');
+		expect(neededPromptInfo.currentPromptTargetId).toBe('displacedTileDestinationPoint');
 	});
 
-	it('should swap Air with target tile and relocate target to chosen spot', () => {
+	it('should displace target tile to chosen surrounding spot', () => {
 		const game = createGame();
 
 		// Move Guest Koi to center
 		manualMoveTile(game, '-4,2', '0,0');
 		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Koi);
 
-		// Build prompt: Air at (-5,-4) moves to (0,1), swaps with Koi at (0,0), Koi goes to (2,0)
-		var promptData = buildAirPromptData(game, '-5,-4', '0,1', '0,0', '2,0');
+		// Air at (-5,-4) moves onto Koi at (0,0), Koi displaced to (0,1)
+		var promptData = buildAirPromptData(game, '-5,-4', '0,0', '0,1');
 
-		makeMove(game, GUEST, '-5,-4', '0,1', 0, promptData);
+		makeMove(game, GUEST, '-5,-4', '0,0', 0, promptData);
 
-		// Air should now be where Koi was (0,0)
+		// Air should be at (0,0)
 		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Air);
 
-		// Koi should be at the relocation destination (2,0)
-		expect(getTileAt(game, '2,0').code).toBe(GiniTileCodes.Koi);
-
-		// Air's deploy position (0,1) should be empty
-		expect(isEmptyAt(game, '0,1')).toBe(true);
+		// Koi should be displaced to (0,1)
+		expect(getTileAt(game, '0,1').code).toBe(GiniTileCodes.Koi);
 	});
 
-	it('should preserve tile ownership after swap and relocate', () => {
+	it('should preserve tile ownership after displacement', () => {
 		const game = createGame();
 
 		// Move Host Dragon to center
 		manualMoveTile(game, '5,1', '0,0');
 		expect(getTileAt(game, '0,0').ownerName).toBe(HOST);
 
-		// Guest Air swaps with Host Dragon, Dragon relocated to (2,0)
-		var promptData = buildAirPromptData(game, '-5,-4', '0,1', '0,0', '2,0');
-		makeMove(game, GUEST, '-5,-4', '0,1', 0, promptData);
+		// Guest Air displaces Host Dragon, Dragon goes to (0,1)
+		var promptData = buildAirPromptData(game, '-5,-4', '0,0', '0,1');
+		makeMove(game, GUEST, '-5,-4', '0,0', 0, promptData);
 
 		// Air is Guest's, now at (0,0)
 		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Air);
 		expect(getTileAt(game, '0,0').ownerName).toBe(GUEST);
 
-		// Dragon is Host's, relocated to (2,0)
-		expect(getTileAt(game, '2,0').code).toBe(GiniTileCodes.Dragon);
-		expect(getTileAt(game, '2,0').ownerName).toBe(HOST);
+		// Dragon is Host's, displaced to (0,1)
+		expect(getTileAt(game, '0,1').code).toBe(GiniTileCodes.Dragon);
+		expect(getTileAt(game, '0,1').ownerName).toBe(HOST);
 	});
 
 	it('should work with deploy from hand (DEPLOY move type)', () => {
@@ -819,30 +815,28 @@ describe('Gini Air Accent Tile - Swap and Relocate', () => {
 		var sourceTileKey = JSON.stringify({
 			tileOwner: airFromHand.ownerCode,
 			tileCode: airFromHand.code,
-			boardPoint: '0,1',
+			boardPoint: '0,0',
 			tileId: airFromHand.id
 		});
 		var promptTargetData = {};
 		promptTargetData[sourceTileKey] = {
-			swappedTilePoint: new NotationPoint('0,0'),
-			relocatedTileDestinationPoint: new NotationPoint('2,0')
+			displacedTileDestinationPoint: new NotationPoint('0,1')
 		};
 
-		// Deploy Air from hand to (0,1), swap with Koi at (0,0), Koi goes to (2,0)
+		// Deploy Air from hand onto Koi at (0,0), Koi displaced to (0,1)
 		const move = {
 			moveNum: 0,
 			player: GUEST,
 			moveType: DEPLOY,
 			tileType: GiniTileCodes.Air,
-			endPoint: '0,1',
+			endPoint: '0,0',
 			promptTargetData: promptTargetData
 		};
 		game.runNotationMove(move, false);
 
-		// Air at (0,0), Koi at (2,0), (0,1) empty
+		// Air at (0,0), Koi displaced to (0,1)
 		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Air);
-		expect(getTileAt(game, '2,0').code).toBe(GiniTileCodes.Koi);
-		expect(isEmptyAt(game, '0,1')).toBe(true);
+		expect(getTileAt(game, '0,1').code).toBe(GiniTileCodes.Koi);
 	});
 });
 

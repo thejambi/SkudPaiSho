@@ -459,22 +459,18 @@ GiniTileInfo.defineGiniTiles = function() {
 	GiniTiles[GiniTileCodes.Air] = {
 		available: true,
 		types: [GiniTileType.accentTile],
+		deployTypes: [TrifleDeployType.onOccupiedTile],
+		deployExcludeTileCodes: [GiniTileCodes.WhiteLotus],
 		movements: [],
 		abilities: [
 			{
-				title: "Swap and Relocate",
-				type: TrifleAbilityName.swapAndRelocateTile,
+				title: "Displace Tile",
+				type: TrifleAbilityName.displaceOccupiedTile,
 				optional: true,
-				excludeTileCode: GiniTileCodes.WhiteLotus,
 				neededPromptTargetsInfo: [
 					{
-						title: "swappedTile",
-						promptId: TrifleTargetPromptId.swappedTilePoint,
-						targetType: TriflePromptTargetType.boardPoint
-					},
-					{
-						title: "relocatedTileDestination",
-						promptId: TrifleTargetPromptId.relocatedTileDestinationPoint,
+						title: "displacedTileDestination",
+						promptId: TrifleTargetPromptId.displacedTileDestinationPoint,
 						targetType: TriflePromptTargetType.boardPoint
 					}
 				],
@@ -489,7 +485,7 @@ GiniTileInfo.defineGiniTiles = function() {
 		],
 		textLines: [
 			"<strong>Accent Tile</strong>",
-			"- Swap your Air tile with any other tile (excluding the White Lotus), then place the exchanged tile on any free spot on the board."
+			"- Place this tile on any other tile (excluding the White Lotus), then move that tile to a surrounding spot."
 		]
 	};
 };
