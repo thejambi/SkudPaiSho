@@ -319,7 +319,7 @@ GiniController.prototype.getAdditionalHelpTabDiv = function() {
 	heading.innerText = "Gini Preferences:";
 
 	settingsDiv.appendChild(heading);
-	settingsDiv.appendChild(GiniOptions.buildTileDesignDropdownDiv("Tile Designs"));
+	// settingsDiv.appendChild(GiniOptions.buildTileDesignDropdownDiv("Tile Designs")); // Tile designs not supported
 
 	if (!playingOnlineGame() || !iAmPlayerInCurrentOnlineGame() || getOnlineGameOpponentUsername() === getUsername()) {
 		settingsDiv.appendChild(document.createElement("br"));

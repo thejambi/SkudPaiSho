@@ -24,6 +24,7 @@ import {
 	setupPaiShoBoard,
 } from '../ActuatorHelp';
 import { CENTER_POINT } from './UndergrowthSimplicityBoardPoint';
+import { UndergrowthBriarOptions } from './UndergrowthBriarOptions';
 
 export function UndergrowthSimplicityActuator(gameContainer, isMobile, enableAnimations) {
 	this.gameContainer = gameContainer;
@@ -110,7 +111,7 @@ UndergrowthSimplicityActuator.prototype.updateTilePile = function(container, cla
 	theDiv.classList.add("hasTile");
 
 	var theImg = document.createElement("img");
-	theImg.src = "images/Adevar/monochrome/" + ownerCode + "Back.png";
+	theImg.src = UndergrowthBriarOptions.getTileSrc(ownerCode);
 	theDiv.appendChild(theImg);
 
 	theDiv.setAttribute("name", ownerCode + "Back");
@@ -178,6 +179,15 @@ UndergrowthSimplicityActuator.prototype.addBoardPoint = function(boardPoint, mov
 		}
 	}
 
+	// Render Knotweed image at center point
+	if (boardPoint.isType(CENTER_POINT)) {
+		theDiv.classList.add("hasTile");
+		var centerImg = document.createElement("img");
+		centerImg.src = "images/SkudPaiSho/modernwood/HK.png";
+		centerImg.style.opacity = "0.5";
+		theDiv.appendChild(centerImg);
+	}
+
 	if (boardPoint.hasTile()) {
 		theDiv.classList.add("hasTile");
 
@@ -187,7 +197,7 @@ UndergrowthSimplicityActuator.prototype.addBoardPoint = function(boardPoint, mov
 		}
 
 		var theImg = document.createElement("img");
-		theImg.src = "images/Adevar/monochrome/" + boardPoint.tile.ownerCode + "Back.png";
+		theImg.src = UndergrowthBriarOptions.getTileSrc(boardPoint.tile.ownerCode);
 
 		// Show connection glow
 		if (boardPoint.tile.inConnection) {
@@ -229,7 +239,7 @@ UndergrowthSimplicityActuator.prototype.addBoardPoint = function(boardPoint, mov
 		if (removedTile) {
 			theDiv.classList.add("hasTile");
 			var ghostImg = document.createElement("img");
-			ghostImg.src = "images/Adevar/monochrome/" + removedTile.ownerCode + "Back.png";
+			ghostImg.src = UndergrowthBriarOptions.getTileSrc(removedTile.ownerCode);
 			ghostImg.style.opacity = "1";
 			ghostImg.style.transition = "opacity 0.6s ease-out, transform 0.6s ease-out";
 			theDiv.appendChild(ghostImg);

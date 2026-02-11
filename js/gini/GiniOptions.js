@@ -10,8 +10,9 @@ import {
 export function GiniOptions() {
 	if (!localStorage.getItem(GiniOptions.tileDesignTypeKey)
 		|| !GiniOptions.tileDesignTypeValues[localStorage.getItem(GiniOptions.tileDesignTypeKey)]) {
-		GiniOptions.setTileDesignsPreference("gaoling", true);
+		GiniOptions.setTileDesignsPreference("gaipan", true);	// Default
 	}
+	GiniOptions.setTileDesignsPreference("gaipan", true);	// Always ensure override to gaipan, it's the only supported tile design set
 
 	GiniOptions.viewAsGuest = false || GiniOptions.viewAsGuest;
 	if (currentGameData && currentGameData.gameTypeId === GameType.GiniPaiSho.id && usernameEquals(currentGameData.guestUsername)) {

@@ -37,11 +37,14 @@ import {
 	WAITING_FOR_SECOND_PLACEMENT,
 } from './UndergrowthSimplicityGameNotation';
 import { UndergrowthSimplicityTile } from './UndergrowthSimplicityTile';
+import { UndergrowthBriarOptions } from './UndergrowthBriarOptions';
 import { debug } from '../GameData';
 
 export function UndergrowthSimplicityController(gameContainer, isMobile) {
 	this.gameContainer = gameContainer;
 	this.isMobile = isMobile;
+
+	UndergrowthBriarOptions();
 
 	this.actuator = new UndergrowthSimplicityActuator(gameContainer, isMobile, isAnimationsOn());
 
@@ -465,6 +468,18 @@ UndergrowthSimplicityController.prototype.getCurrentPlayer = function() {
 	} else {
 		return GUEST;
 	}
+};
+
+UndergrowthSimplicityController.prototype.getAdditionalHelpTabDiv = function() {
+	var settingsDiv = document.createElement("div");
+
+	var heading = document.createElement("h4");
+	heading.innerText = "Undergrowth - Briar Preferences:";
+	settingsDiv.appendChild(heading);
+
+	settingsDiv.appendChild(UndergrowthBriarOptions.buildTogglePieceStyleDiv());
+
+	return settingsDiv;
 };
 
 UndergrowthSimplicityController.prototype.cleanup = function() {
