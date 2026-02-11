@@ -3,6 +3,7 @@ import {
   TrifleAbilityName,
   TrifleAbilityTriggerType,
   TrifleActivationRequirement,
+  TrifleAttributeType,
   TrifleCaptureType,
   TrifleDeployType,
   TrifleMovementDirection,
@@ -364,6 +365,9 @@ GiniTileInfo.defineGiniTiles = function() {
 		types: [GiniTileType.accentTile],
 		deployTypes: [TrifleDeployType.anywhere],
 		movements: [],
+		attributes: [
+			TrifleAttributeType.canBeCapturedByFriendlyTiles
+		],
 		abilities: [
 			{
 				title: "Swap Surrounding Tiles",
@@ -404,6 +408,9 @@ GiniTileInfo.defineGiniTiles = function() {
 		types: [GiniTileType.accentTile],
 		deployTypes: [TrifleDeployType.anywhere],
 		movements: [],
+		attributes: [
+			TrifleAttributeType.canBeCapturedByFriendlyTiles
+		],
 		abilities: [
 			{
 				title: "Rotate Surrounding Tiles",
@@ -430,6 +437,9 @@ GiniTileInfo.defineGiniTiles = function() {
 		types: [GiniTileType.accentTile],
 		deployTypes: [TrifleDeployType.onOccupiedTile],
 		movements: [],
+		attributes: [
+			TrifleAttributeType.canBeCapturedByFriendlyTiles
+		],
 		abilities: [
 			{
 				title: "Displace Tile",
@@ -464,6 +474,9 @@ GiniTileInfo.defineGiniTiles = function() {
 		deployTypes: [TrifleDeployType.onOccupiedTile],
 		deployExcludeTileCodes: [GiniTileCodes.WhiteLotus],
 		movements: [],
+		attributes: [
+			TrifleAttributeType.canBeCapturedByFriendlyTiles
+		],
 		abilities: [
 			{
 				title: "Displace Tile",

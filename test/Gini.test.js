@@ -1029,6 +1029,42 @@ describe('Gini Ginseng Accent Tile Capture', () => {
 		expect(earthAtHome.code).toBe(GiniTileCodes.Earth);
 		expect(earthAtHome.ownerName).toBe(HOST);
 	});
+
+	it('should allow Ginseng to capture friendly accent tiles', () => {
+		const game = createGame();
+
+		// Move Host Earth accent tile near center
+		manualMoveTile(game, '5,5', '0,0');
+		expect(getTileAt(game, '0,0').ownerName).toBe(HOST);
+
+		// Host Ginseng captures Host's own Earth (friendly capture)
+		manualMoveTile(game, '4,0', '0,1');
+		makeMove(game, HOST, '0,1', '0,0', 0);
+
+		// Ginseng should be at (0,0)
+		expect(getTileAt(game, '0,0').code).toBe(GiniTileCodes.Ginseng);
+		expect(getTileAt(game, '0,0').ownerName).toBe(HOST);
+
+		// Earth should be back at Host's home position
+		var earthAtHome = getTileAt(game, '5,5');
+		expect(earthAtHome).toBeTruthy();
+		expect(earthAtHome.code).toBe(GiniTileCodes.Earth);
+	});
+
+	it('should show friendly accent tiles as possible capture targets for Ginseng', () => {
+		const game = createGame();
+
+		// Place Host Water near Host Ginseng
+		manualMoveTile(game, '5,4', '0,0');
+		manualMoveTile(game, '4,0', '0,1');
+
+		// Reveal possible moves for Host Ginseng
+		var startPoint = getPoint(game, '0,1');
+		game.revealPossibleMovePoints(startPoint, true);
+
+		// Host Water at (0,0) should be a possible move (capturable by friendly Ginseng)
+		expect(getPointTypes(game, '0,0')).toContain(POSSIBLE_MOVE);
+	});
 });
 
 // ─── Game Log Tests ───
