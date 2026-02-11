@@ -489,6 +489,11 @@ export class TrifleAbilityManager {
 		abilityNames.forEach((abilityName) => {
 			const abilities = this.getAbilitiesTargetingTile(abilityName, tile);
 			abilities.forEach((ability) => {
+				// Skip abilities whose targeting is canceled (e.g., by Ginseng protection)
+				if (this.targetingIsCanceled(ability.sourceTile, ability.abilityType, tile)
+						|| this.abilityIsCanceled(ability)) {
+					return;
+				}
 				const constraintBrain = TrifleBrainFactory.createConstraintBrain(
 					ability.abilityType,
 					this.board,

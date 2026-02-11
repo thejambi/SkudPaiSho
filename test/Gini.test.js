@@ -1119,6 +1119,43 @@ describe('Gini Ginseng Protection Ability', () => {
 		expect(getTileAt(game, '1,1').code).toBe(GiniTileCodes.Koi);
 	});
 
+	it('should cancel existing immobilization when Ginseng moves into LOS of immobilized tile', () => {
+		const game = createGame();
+
+		function getPoint(notationStr) {
+			const np = new NotationPoint(notationStr);
+			const rc = np.rowAndColumn;
+			return game.board.cells[rc.row][rc.col];
+		}
+
+		// Move Host Ginseng out of line of sight of center (diagonal, not cardinal LOS)
+		manualMoveTile(game, '4,0', '1,1');
+
+		// Place Guest Koi on White garden (-1,0), adjacent to center
+		manualMoveTile(game, '-4,2', '-1,0');
+
+		// Place Host Dragon at center (0,0), adjacent to Koi — will be immobilized
+		manualMoveTile(game, '5,1', '0,0');
+
+		// Make a game move to trigger processAbilities
+		// Koi's immobilize should activate on Dragon (Koi on White, Dragon is surrounding enemy)
+		makeMove(game, GUEST, '-4,0', '-3,0', 0);
+
+		// Verify Dragon is immobilized — no possible moves
+		game.revealPossibleMovePoints(getPoint('0,0'), true);
+		expect(getPointTypes(game, '1,0')).not.toContain(POSSIBLE_MOVE);
+		expect(getPointTypes(game, '0,1')).not.toContain(POSSIBLE_MOVE);
+		game.board.removePossibleMovePoints();
+
+		// Move Host Ginseng into line of sight of Dragon
+		// (2,0) = row 8, col 10, same row as Dragon at row 8, col 8 — within sightDistance 4
+		makeMove(game, HOST, '1,1', '2,0', 1);
+
+		// Now Dragon should NOT be immobilized — Ginseng's protection cancels the targeting
+		game.revealPossibleMovePoints(getPoint('0,0'), true);
+		expect(getPointTypes(game, '0,1')).toContain(POSSIBLE_MOVE);
+	});
+
 	it('should NOT protect enemy tiles from abilities', () => {
 		const game = createGame();
 

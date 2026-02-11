@@ -7,6 +7,7 @@ import {
   TrifleAttributeType,
   TrifleCaptureType,
   TrifleDeployType,
+  TrifleMovementAbility,
   TrifleMovementDirection,
   TrifleMovementType,
   TriflePromptTargetType,
@@ -307,6 +308,32 @@ GiniTileInfo.defineGiniTiles = function() {
 					type: TrifleMovementType.standard,
 					distance: 1
 				}
+			},
+			{
+				title: "Grant Jump Over",
+				type: TrifleAbilityName.manipulateExistingMovement,
+				manipulateMovementType: TrifleMovementType.standard,
+				newMovementAbilities: [
+					{
+						type: TrifleMovementAbility.jumpOver
+					}
+				],
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whileTargetTileIsSurrounding,
+						targetTeams: [TrifleTileTeam.friendly],
+						targetTileTypes: [TrifleTileCategory.allTileTypes],
+						activationRequirements: [
+							{
+								type: TrifleActivationRequirement.tileIsOnPointOfType,
+								targetTileTypes: [TrifleTileCategory.thisTile],
+								targetPointTypes: [RED]
+							}
+						]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles],
+				excludeTileCodes: [GiniTileCodes.WhiteLotus]
 			}
 		],
 		textLines: [
