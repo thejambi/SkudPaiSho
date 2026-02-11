@@ -281,12 +281,12 @@ describe('Gini Win Condition', () => {
 
 	it('should detect HOST win when Host White Lotus reaches negative x', () => {
 		const game = createGame();
-		// Manually place Host White Lotus on the Guest side (negative x)
+		// Manually place Host White Lotus on the Guest side (x <= -3)
 		const lotusPoint = new NotationPoint('6,0');
 		const lotusRC = lotusPoint.rowAndColumn;
 		const tile = game.board.cells[lotusRC.row][lotusRC.col].removeTile();
 
-		const destPoint = new NotationPoint('-1,0');
+		const destPoint = new NotationPoint('-3,0');
 		const destRC = destPoint.rowAndColumn;
 		game.board.cells[destRC.row][destRC.col].putTile(tile);
 
@@ -296,12 +296,12 @@ describe('Gini Win Condition', () => {
 
 	it('should detect GUEST win when Guest White Lotus reaches positive x', () => {
 		const game = createGame();
-		// Manually place Guest White Lotus on the Host side (positive x)
+		// Manually place Guest White Lotus on the Host side (x >= 3)
 		const lotusPoint = new NotationPoint('-6,0');
 		const lotusRC = lotusPoint.rowAndColumn;
 		const tile = game.board.cells[lotusRC.row][lotusRC.col].removeTile();
 
-		const destPoint = new NotationPoint('1,0');
+		const destPoint = new NotationPoint('3,0');
 		const destRC = destPoint.rowAndColumn;
 		game.board.cells[destRC.row][destRC.col].putTile(tile);
 

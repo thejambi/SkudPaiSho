@@ -7,8 +7,7 @@
  * Movement rules:
  * - Target tile cannot move to any point
  * - This is an absolute block on all movement
- * - The only exception is if movement has regardlessOfImmobilization flag
- *   (handled at a higher level before this brain is invoked)
+ * - The only exception is if movementInfo has regardlessOfImmobilization flag
  */
 
 export function TrifleImmobilizeTilesConstraintBrain(board, ability) {
@@ -23,10 +22,13 @@ export function TrifleImmobilizeTilesConstraintBrain(board, ability) {
  * @param {Object} tile - The tile being moved
  * @param {Object} originPoint - The starting position
  * @param {Object} targetPoint - The proposed ending position
+ * @param {Object} movementInfo - The movement definition (optional)
  * @returns {Object} { allowed: boolean, reason?: string }
  */
-TrifleImmobilizeTilesConstraintBrain.prototype.isMovementAllowed = function(tile, originPoint, targetPoint) {
-	// Immobilization blocks ALL movement
+TrifleImmobilizeTilesConstraintBrain.prototype.isMovementAllowed = function(tile, originPoint, targetPoint, movementInfo) {
+	if (movementInfo && movementInfo.regardlessOfImmobilization) {
+		return { allowed: true };
+	}
 	return {
 		allowed: false,
 		reason: 'Tile is immobilized by ' + this.sourceTile.code

@@ -1944,7 +1944,7 @@ export class PaiShoGameBoard {
 					}
 
 					if (this.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint)) {
-						const movementOk = this.setPointAsPossibleMovement(adjacentPoint, tile, originPoint);
+						const movementOk = this.setPointAsPossibleMovement(adjacentPoint, tile, originPoint, null, movementInfo);
 						if (movementOk) {
 							adjacentPoint.setPossibleForMovementType(movementInfo);
 							// adjacentPoint.setPreviousPointForMovement(movementInfo, recentPoint);
@@ -1997,7 +1997,7 @@ export class PaiShoGameBoard {
 			if (!this.canMoveHereMoreEfficientlyAlready(adjacentPoint, distanceRemaining, movementInfo)) {
 				const canMoveThroughPoint = this.tileCanMoveThroughPoint(tile, movementInfo, adjacentPoint, recentPoint);
 				if (this.tileCanMoveOntoPoint(tile, movementInfo, adjacentPoint, recentPoint)) {
-					const movementOk = this.setPointAsPossibleMovement(adjacentPoint, originPoint.tile, originPoint, currentMovementPath);
+					const movementOk = this.setPointAsPossibleMovement(adjacentPoint, originPoint.tile, originPoint, currentMovementPath, movementInfo);
 					if (movementOk) {
 						adjacentPoint.setPossibleForMovementType(movementInfo);
 						if (!adjacentPoint.hasTile() || canMoveThroughPoint) {
@@ -2051,7 +2051,7 @@ export class PaiShoGameBoard {
 	setMovePointsAnywhere(boardPointStart, movementInfo) {
 		this.forEachBoardPoint((boardPoint) => {
 			if (this.tileCanMoveOntoPoint(boardPointStart.tile, movementInfo, boardPoint, boardPointStart)) {
-				this.setPointAsPossibleMovement(boardPoint, boardPointStart.tile, boardPointStart);
+				this.setPointAsPossibleMovement(boardPoint, boardPointStart.tile, boardPointStart, null, movementInfo);
 			}
 		});
 	}
@@ -2796,16 +2796,16 @@ export class PaiShoGameBoard {
 				const startAndEndPointAreInSameZone = this.oneOfTheseZonesContainsPoints(pointsOfZoneTiles, [boardPointStart, targetPoint]);
 				if (startAndEndPointAreInSameZone
 					&& this.tileCanMoveOntoPoint(tileBeingMoved, movementInfo, targetPoint, null)) {
-					this.setPointAsPossibleMovement(targetPoint, tileBeingMoved, boardPointStart);
+					this.setPointAsPossibleMovement(targetPoint, tileBeingMoved, boardPointStart, null, movementInfo);
 				}
 			});
 		}
 	}
 
-	setPointAsPossibleMovement(targetPoint, tileBeingMoved, originPoint, currentMovementPath) {
+	setPointAsPossibleMovement(targetPoint, tileBeingMoved, originPoint, currentMovementPath, movementInfo) {
 		// Enforce movement constraints from abilities (drawing-towards, etc)
 
-		var movementOk = this.movementPassesConstraintChecks(targetPoint, tileBeingMoved, originPoint);
+		var movementOk = this.movementPassesConstraintChecks(targetPoint, tileBeingMoved, originPoint, movementInfo);
 
 		if (movementOk) {
 			targetPoint.addType(POSSIBLE_MOVE);
@@ -2826,7 +2826,7 @@ export class PaiShoGameBoard {
 	 * @param {Object} originPoint - The point the tile is moving from
 	 * @returns {boolean} True if movement passes all constraints
 	 */
-	movementPassesConstraintChecks(targetPoint, tileBeingMoved, originPoint) {
+	movementPassesConstraintChecks(targetPoint, tileBeingMoved, originPoint, movementInfo) {
 		const constraints = this.abilityManager.getMovementConstraintsForTile(tileBeingMoved);
 
 		// If multiple conflicting draw abilities affect this tile, no movement is allowed
@@ -2834,10 +2834,10 @@ export class PaiShoGameBoard {
 			return false;
 		}
 
-		// Check each constraint
+		// Check each constraint, passing movementInfo so brains can check flags
 		for (let i = 0; i < constraints.length; i++) {
 			const constraint = constraints[i];
-			const result = constraint.isMovementAllowed(tileBeingMoved, originPoint, targetPoint);
+			const result = constraint.isMovementAllowed(tileBeingMoved, originPoint, targetPoint, movementInfo);
 			if (!result.allowed) {
 				return false;
 			}

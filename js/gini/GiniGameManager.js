@@ -249,7 +249,7 @@ GiniGameManager.prototype.checkForWin = function() {
 	if (hostLotusPoints.length === 1) {
 		var hostLotusPoint = hostLotusPoints[0];
 		var hostLotusRowAndCol = new RowAndColumn(hostLotusPoint.row, hostLotusPoint.col);
-		if (hostLotusRowAndCol.x < 0) {
+		if (hostLotusRowAndCol.x <= -3) {
 			this.winners.push(HOST);
 		}
 	}
@@ -257,7 +257,7 @@ GiniGameManager.prototype.checkForWin = function() {
 	if (guestLotusPoints.length === 1) {
 		var guestLotusPoint = guestLotusPoints[0];
 		var guestLotusRowAndCol = new RowAndColumn(guestLotusPoint.row, guestLotusPoint.col);
-		if (guestLotusRowAndCol.x > 0) {
+		if (guestLotusRowAndCol.x >= 3) {
 			this.winners.push(GUEST);
 		}
 	}
