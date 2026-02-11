@@ -106,13 +106,26 @@ TrifleDisplaceOccupiedTileAbilityBrain.prototype.promptForTarget = function(next
 	debug("Displace prompt for target: " + nextNeededPromptTargetInfo.promptId);
 
 	if (nextNeededPromptTargetInfo.promptId === TrifleTargetPromptId.displacedTileDestinationPoint) {
-		var surroundingEmptyPoints = this.getSurroundingEmptyPoints();
-		surroundingEmptyPoints.forEach(function(bp) {
-			promptTargetsExist = true;
-			if (!checkForTargetsOnly) {
-				bp.addType(POSSIBLE_MOVE);
-			}
-		});
+		var displaceAnywhere = this.abilityObject.abilityInfo && this.abilityObject.abilityInfo.displaceAnywhere;
+		if (displaceAnywhere) {
+			var board = this.abilityObject.board;
+			board.forEachBoardPoint(function(bp) {
+				if (!bp.isType(NON_PLAYABLE) && !bp.hasTile()) {
+					promptTargetsExist = true;
+					if (!checkForTargetsOnly) {
+						bp.addType(POSSIBLE_MOVE);
+					}
+				}
+			});
+		} else {
+			var surroundingEmptyPoints = this.getSurroundingEmptyPoints();
+			surroundingEmptyPoints.forEach(function(bp) {
+				promptTargetsExist = true;
+				if (!checkForTargetsOnly) {
+					bp.addType(POSSIBLE_MOVE);
+				}
+			});
+		}
 	}
 
 	debug("promptTargetsExist for displace? : " + promptTargetsExist);

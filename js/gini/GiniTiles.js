@@ -467,6 +467,7 @@ GiniTileInfo.defineGiniTiles = function() {
 				title: "Displace Tile",
 				type: TrifleAbilityName.displaceOccupiedTile,
 				optional: true,
+				displaceAnywhere: true,
 				neededPromptTargetsInfo: [
 					{
 						title: "displacedTileDestination",
@@ -485,7 +486,7 @@ GiniTileInfo.defineGiniTiles = function() {
 		],
 		textLines: [
 			"<strong>Accent Tile</strong>",
-			"- Place this tile on any other tile (excluding the White Lotus), then move that tile to a surrounding spot."
+			"- Place this tile on any other tile (excluding the White Lotus), then place that tile on any free spot on the board."
 		]
 	};
 };
