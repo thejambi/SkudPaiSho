@@ -296,7 +296,7 @@ export class Paiko3DActuator extends PaiSho3DActuator {
 					// Red threat overlay (same as addOverlayPlane — revealed as tile lifts)
 					const flashMesh = this.addOverlayPlane(x, z, COLOR_THREAT_3, 0.8, 0.035);
 
-					var liftDelay = pieceAnimationLength * 0.2;  // When lift starts (fraction of move animation)
+					var liftDelay = pieceAnimationLength * 0.3;  // When lift starts (fraction of move animation)
 					var liftHeight = 0.2;                        // How high the tile lifts
 					var liftDuration = 450;                      // How long the lift takes (ms)
 					var fadePause = 150;                         // Pause after lift before fades start
