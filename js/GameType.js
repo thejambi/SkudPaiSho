@@ -268,10 +268,7 @@ export const GameType = {
 		description: "A compact, tactical variant of Pai Sho. Advance your White Lotus to the opponent's win line using elemental benders and accent tiles.",
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/gini-pai-sho/",
-		gameOptions: [],
-		usersWithAccess: [
-			'SkudPaiSho',
-		]
+		gameOptions: []
 	},
 	Trifle: {
 		id: 10,
