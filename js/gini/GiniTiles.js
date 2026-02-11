@@ -362,6 +362,7 @@ GiniTileInfo.defineGiniTiles = function() {
 	GiniTiles[GiniTileCodes.Water] = {
 		available: true,
 		types: [GiniTileType.accentTile],
+		deployTypes: [TrifleDeployType.anywhere],
 		movements: [],
 		abilities: [
 			{
@@ -401,6 +402,7 @@ GiniTileInfo.defineGiniTiles = function() {
 	GiniTiles[GiniTileCodes.Earth] = {
 		available: true,
 		types: [GiniTileType.accentTile],
+		deployTypes: [TrifleDeployType.anywhere],
 		movements: [],
 		abilities: [
 			{
