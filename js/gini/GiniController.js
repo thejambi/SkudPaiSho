@@ -336,6 +336,9 @@ GiniController.prototype.getAdditionalHelpTabDiv = function() {
 		settingsDiv.appendChild(GiniOptions.buildToggleViewAsGuestDiv());
 	}
 
+	settingsDiv.appendChild(document.createElement("br"));
+	settingsDiv.appendChild(GiniOptions.buildToggleShowWinLinesDiv());
+
 	settingsDiv.appendChild(this.buildToggle3DBoardDiv());
 	if (is3DBoardOn()) {
 		settingsDiv.appendChild(this.buildToggleRoundBoardDiv());
@@ -364,6 +367,13 @@ GiniController.prototype.getAdditionalHelpTabDiv = function() {
 GiniController.prototype.toggleViewAsGuest = function() {
 	GiniOptions.viewAsGuest = !GiniOptions.viewAsGuest;
 	this.createActuator();
+	this.callActuate();
+	clearMessage();
+};
+
+GiniController.prototype.toggleShowWinLines = function() {
+	GiniOptions.showWinLines = !GiniOptions.showWinLines;
+	localStorage.setItem(GiniOptions.showWinLinesKey, GiniOptions.showWinLines);
 	this.callActuate();
 	clearMessage();
 };

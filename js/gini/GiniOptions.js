@@ -25,6 +25,9 @@ export function GiniOptions() {
 
 GiniOptions.Preferences = {};
 
+GiniOptions.showWinLinesKey = "giniShowWinLines";
+GiniOptions.showWinLines = localStorage.getItem(GiniOptions.showWinLinesKey) === "true";
+
 GiniOptions.tileDesignTypeKey = "giniTileDesignTypeKey";
 
 GiniOptions.tileDesignTypeValues = {
@@ -61,6 +64,24 @@ GiniOptions.buildTileDesignDropdownDiv = function(alternateLabelText) {
 							function() {
 								GiniOptions.setTileDesignsPreference(this.value);
 							});
+};
+
+GiniOptions.buildToggleShowWinLinesDiv = function() {
+	var div = document.createElement("div");
+	var message = GiniOptions.showWinLines ? "Win Lines shown" : "Win Lines hidden";
+	var linkText = GiniOptions.showWinLines ? "Hide Win Lines" : "Show Win Lines";
+
+	var textSpan = document.createElement("span");
+	textSpan.textContent = message + ": ";
+	div.appendChild(textSpan);
+
+	var toggleSpan = document.createElement("span");
+	toggleSpan.className = "skipBonus";
+	toggleSpan.textContent = linkText;
+	toggleSpan.onclick = function() { gameController.toggleShowWinLines(); };
+	div.appendChild(toggleSpan);
+
+	return div;
 };
 
 GiniOptions.buildToggleViewAsGuestDiv = function() {

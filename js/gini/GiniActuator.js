@@ -262,6 +262,14 @@ export class GiniActuator {
 				theDiv.style.zIndex = 95;
 			}
 
+			if (GiniOptions.showWinLines) {
+				if (boardPoint.col === 5) {
+					theDiv.classList.add("giniHostWinLine");
+				} else if (boardPoint.col === 11) {
+					theDiv.classList.add("giniGuestWinLine");
+				}
+			}
+
 			if (this.mobile) {
 				theDiv.addEventListener('click', () => pointClicked(theDiv));
 			} else {

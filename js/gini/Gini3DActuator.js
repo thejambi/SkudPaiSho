@@ -74,6 +74,11 @@ export class Gini3DActuator extends PaiSho3DActuator {
 		// Captured tiles in HTML tile pile
 		this.renderCapturedTiles(tileManager);
 
+		// Win line indicators
+		if (GiniOptions.showWinLines) {
+			this.renderWinLines();
+		}
+
 		// Process ability animations after board is rendered
 		if (moveToAnimate && moveToAnimate.animationInfo
 				&& moveToAnimate.animationInfo.abilityAnimations) {
@@ -333,6 +338,42 @@ export class Gini3DActuator extends PaiSho3DActuator {
 		const ring = new THREE.Mesh(ringGeo, ringMat);
 		ring.position.set(x, 0.17, z);
 		this.effectsGroup.add(ring);
+	}
+
+	// --- Win Line Rendering ---
+
+	renderWinLines() {
+		// Host win line at col 5 (x = -3), Guest win line at col 11 (x = 3)
+		const hostX = 5 - 8; // -3
+		const guestX = 11 - 8; // 3
+		const lineLength = 17;
+		const lineZ = 0; // centered
+
+		// Host win line - subtle red
+		const hostGeo = new THREE.PlaneGeometry(0.08, lineLength);
+		hostGeo.rotateX(-Math.PI / 2);
+		const hostMat = new THREE.MeshBasicMaterial({
+			color: 0xDD4444,
+			transparent: true,
+			opacity: 0.35,
+			side: THREE.DoubleSide,
+		});
+		const hostLine = new THREE.Mesh(hostGeo, hostMat);
+		hostLine.position.set(hostX + 0.5, 0.02, lineZ);
+		this.effectsGroup.add(hostLine);
+
+		// Guest win line - subtle blue
+		const guestGeo = new THREE.PlaneGeometry(0.08, lineLength);
+		guestGeo.rotateX(-Math.PI / 2);
+		const guestMat = new THREE.MeshBasicMaterial({
+			color: 0x4444DD,
+			transparent: true,
+			opacity: 0.35,
+			side: THREE.DoubleSide,
+		});
+		const guestLine = new THREE.Mesh(guestGeo, guestMat);
+		guestLine.position.set(guestX - 0.5, 0.02, lineZ);
+		this.effectsGroup.add(guestLine);
 	}
 
 	// --- Animation Handling ---
