@@ -41,6 +41,9 @@ import { UndergrowthSimplicityTile } from './UndergrowthSimplicityTile';
 import { UndergrowthBriarOptions } from './UndergrowthBriarOptions';
 import { is3DBoardOn, buildToggle3DBoardDiv as _buildToggle3DBoardDiv, buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv } from '../PaiSho3DOptions';
 import { debug } from '../GameData';
+import { activeAi, activeAi2 } from '../PaiShoMain';
+import { UndergrowthBriarRandomAI } from './ai/UndergrowthBriarRandomAI';
+import { UndergrowthBriarStrategicAI } from './ai/UndergrowthBriarStrategicAI';
 
 export function UndergrowthSimplicityController(gameContainer, isMobile) {
 	this.gameContainer = gameContainer;
@@ -457,15 +460,37 @@ UndergrowthSimplicityController.prototype.RmbUp = function(htmlPoint) {
 };
 
 UndergrowthSimplicityController.prototype.playAiTurn = function(finalizeMove) {
-	// No AI yet
+	if (this.theGame.hasEnded()) {
+		return;
+	}
+
+	var theAi = activeAi;
+	if (activeAi2) {
+		if (activeAi2.player === getCurrentPlayer()) {
+			theAi = activeAi2;
+		}
+	}
+
+	var moveIndex = this.gameNotation.moves.length;
+
+	var self = this;
+	setTimeout(function() {
+		var move = theAi.getMove(self.theGame.getCopy(), moveIndex);
+		if (!move) {
+			debug("AI returned no move");
+			return;
+		}
+		self.gameNotation.addMove(move);
+		finalizeMove();
+	}, 10);
 };
 
 UndergrowthSimplicityController.prototype.startAiGame = function(finalizeMove) {
-	// No AI yet
+	this.playAiTurn(finalizeMove);
 };
 
 UndergrowthSimplicityController.prototype.getAiList = function() {
-	return [];
+	return [new UndergrowthBriarRandomAI(), new UndergrowthBriarStrategicAI()];
 };
 
 UndergrowthSimplicityController.prototype.getCurrentPlayer = function() {
