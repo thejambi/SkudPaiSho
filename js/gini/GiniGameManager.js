@@ -27,6 +27,18 @@ import { GiniTileCodes } from './GiniTiles';
 export var ACCENT_TILE_HOME = "AccentTileHome";
 export var PORTAL = "Portal";
 
+var accentTileHomePositions = {};
+accentTileHomePositions[HOST] = {};
+accentTileHomePositions[HOST][GiniTileCodes.Water] = "5,4";
+accentTileHomePositions[HOST][GiniTileCodes.Earth] = "5,5";
+accentTileHomePositions[HOST][GiniTileCodes.Fire] = "6,4";
+accentTileHomePositions[HOST][GiniTileCodes.Air] = "6,5";
+accentTileHomePositions[GUEST] = {};
+accentTileHomePositions[GUEST][GiniTileCodes.Water] = "-6,-5";
+accentTileHomePositions[GUEST][GiniTileCodes.Earth] = "-6,-4";
+accentTileHomePositions[GUEST][GiniTileCodes.Fire] = "-5,-5";
+accentTileHomePositions[GUEST][GiniTileCodes.Air] = "-5,-4";
+
 export var GiniGameManager = function(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';
 	this.isCopy = isCopy;
@@ -88,17 +100,17 @@ GiniGameManager.prototype.runNotationMove = function(move, withActuate, moveAnim
 		}
 
 		moveDetails = this.board.moveTile(move.player, move.startPoint, move.endPoint, move);
-		this.tileManager.addToCapturedTiles(moveDetails.capturedTiles);
+		this.handleCapturedTiles(moveDetails.capturedTiles);
 
 		var abilityActivationFlags = moveDetails.abilityActivationFlags;
 		debug(abilityActivationFlags);
 
 		if (abilityActivationFlags.tileRecords) {
 			if (abilityActivationFlags.tileRecords.capturedTiles && abilityActivationFlags.tileRecords.capturedTiles.length) {
-				this.tileManager.addToCapturedTiles(abilityActivationFlags.tileRecords.capturedTiles);
+				this.handleCapturedTiles(abilityActivationFlags.tileRecords.capturedTiles);
 			}
 			if (abilityActivationFlags.tileRecords.tilesMovedToPiles && abilityActivationFlags.tileRecords.tilesMovedToPiles.length) {
-				this.tileManager.addToCapturedTiles(abilityActivationFlags.tileRecords.tilesMovedToPiles);
+				this.handleCapturedTiles(abilityActivationFlags.tileRecords.tilesMovedToPiles);
 			}
 		}
 
@@ -139,14 +151,14 @@ GiniGameManager.prototype.runNotationMove = function(move, withActuate, moveAnim
 			var capturedTiles = [];
 
 			var abilityActivationFlags = this.board.processAbilities(tile, tileInfo, null, boardPointEnd, capturedTiles, [], move);
-			this.tileManager.addToCapturedTiles(capturedTiles);
+			this.handleCapturedTiles(capturedTiles);
 
 			if (abilityActivationFlags.tileRecords) {
 				if (abilityActivationFlags.tileRecords.capturedTiles && abilityActivationFlags.tileRecords.capturedTiles.length) {
-					this.tileManager.addToCapturedTiles(abilityActivationFlags.tileRecords.capturedTiles);
+					this.handleCapturedTiles(abilityActivationFlags.tileRecords.capturedTiles);
 				}
 				if (abilityActivationFlags.tileRecords.tilesMovedToPiles && abilityActivationFlags.tileRecords.tilesMovedToPiles.length) {
-					this.tileManager.addToCapturedTiles(abilityActivationFlags.tileRecords.tilesMovedToPiles);
+					this.handleCapturedTiles(abilityActivationFlags.tileRecords.tilesMovedToPiles);
 				}
 			}
 
@@ -175,6 +187,24 @@ GiniGameManager.prototype.runNotationMove = function(move, withActuate, moveAnim
 	}
 
 	return neededPromptInfo;
+};
+
+GiniGameManager.prototype.handleCapturedTiles = function(capturedTiles) {
+	this.tileManager.addToCapturedTiles(capturedTiles);
+	this.returnAccentTilesToBoard();
+};
+
+GiniGameManager.prototype.returnAccentTilesToBoard = function() {
+	var self = this;
+	[this.tileManager.hostAccentTiles, this.tileManager.guestAccentTiles].forEach(function(pile) {
+		while (pile.length > 0) {
+			var tile = pile.pop();
+			var homePos = accentTileHomePositions[tile.ownerName] && accentTileHomePositions[tile.ownerName][tile.code];
+			if (homePos) {
+				self.board.putTileOnPoint(tile, new NotationPoint(homePos));
+			}
+		}
+	});
 };
 
 GiniGameManager.prototype.buildMoveGameLogText = function(move, moveDetails) {

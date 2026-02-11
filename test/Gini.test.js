@@ -960,7 +960,7 @@ describe('Gini Ginseng Accent Tile Capture', () => {
 		return game.board.cells[rc.row][rc.col];
 	}
 
-	it('should return captured accent tile to owner hand instead of captured pile', () => {
+	it('should return captured accent tile to owner home position instead of captured pile', () => {
 		const game = createGame();
 
 		// Move Guest Water accent tile to center area
@@ -978,10 +978,11 @@ describe('Gini Ginseng Accent Tile Capture', () => {
 		// Water should NOT be in captured tiles
 		expect(game.tileManager.capturedTiles.length).toBe(0);
 
-		// Water should be back in Guest's hand
-		var waterInHand = game.tileManager.peekAccentTile(GUEST, GiniTileCodes.Water);
-		expect(waterInHand).toBeTruthy();
-		expect(waterInHand.code).toBe(GiniTileCodes.Water);
+		// Water should be back at Guest's home position on the board
+		var waterAtHome = getTileAt(game, '-6,-5');
+		expect(waterAtHome).toBeTruthy();
+		expect(waterAtHome.code).toBe(GiniTileCodes.Water);
+		expect(waterAtHome.ownerName).toBe(GUEST);
 	});
 
 	it('should allow Ginseng to show accent tiles as possible capture targets', () => {
@@ -1014,7 +1015,7 @@ describe('Gini Ginseng Accent Tile Capture', () => {
 		expect(getPointTypes(game, '0,0')).not.toContain(POSSIBLE_MOVE);
 	});
 
-	it('should return enemy accent tile to enemy hand (not capturing player hand)', () => {
+	it('should return enemy accent tile to enemy home position (not capturing player)', () => {
 		const game = createGame();
 
 		// Move Host Earth accent tile near center
@@ -1025,10 +1026,14 @@ describe('Gini Ginseng Accent Tile Capture', () => {
 		manualMoveTile(game, '-4,0', '0,1');
 		makeMove(game, GUEST, '0,1', '0,0', 0);
 
-		// Earth should be in HOST's hand (returned to owner), not Guest's
+		// Earth should NOT be in captured tiles
 		expect(game.tileManager.capturedTiles.length).toBe(0);
-		var earthInHostHand = game.tileManager.peekAccentTile(HOST, GiniTileCodes.Earth);
-		expect(earthInHostHand).toBeTruthy();
+
+		// Earth should be back at Host's home position on the board
+		var earthAtHome = getTileAt(game, '5,5');
+		expect(earthAtHome).toBeTruthy();
+		expect(earthAtHome.code).toBe(GiniTileCodes.Earth);
+		expect(earthAtHome.ownerName).toBe(HOST);
 	});
 });
 
