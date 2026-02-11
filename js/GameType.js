@@ -246,6 +246,33 @@ export const GameType = {
 			UNDERGROWTH_SIMPLE
 		]
 	},
+	UndergrowthSimplicity: {
+		id: 27,
+		name: "Undergrowth - Briar",
+		desc: "Undergrowth - Briar",
+		color: "var(--undergrowthcolor)",
+		description: "Build a ring of connected stones around the center while cutting off your opponent's supply lines.",
+		coverImg: "rose.png",
+		rulesUrl: "https://skudpaisho.com/site/games/undergrowth-briar/",
+		gameOptions: [],
+		noRankedGames: true,
+		usersWithAccess: [
+			'SkudPaiSho',
+		]
+	},
+	GiniPaiSho: {
+		id: 26,
+		name: "Gini Pai Sho",
+		desc: "Gini Pai Sho",
+		color: "var(--ginicolor)",
+		description: "A compact, tactical variant of Pai Sho. Advance your White Lotus to the opponent's win line using elemental benders and accent tiles.",
+		coverImg: "ginseng.png",
+		rulesUrl: "https://skudpaisho.com/site/games/gini-pai-sho/",
+		gameOptions: [],
+		usersWithAccess: [
+			'SkudPaiSho',
+		]
+	},
 	Trifle: {
 		id: 10,
 		name: "Pai and Sho's Trifle",
@@ -478,19 +505,6 @@ export const GameType = {
 			'SkudPaiSho',
 		]
 	},
-	GiniPaiSho: {
-		id: 26,
-		name: "Gini Pai Sho",
-		desc: "Gini Pai Sho",
-		color: "var(--ginicolor)",
-		description: "A compact, tactical variant of Pai Sho. Advance your White Lotus to the opponent's win line using elemental benders and accent tiles.",
-		coverImg: "ginseng.png",
-		rulesUrl: "https://skudpaisho.com/site/games/gini-pai-sho/",
-		gameOptions: [],
-		usersWithAccess: [
-			'SkudPaiSho',
-		]
-	},
 	Fanorona: {
 		id: 28,
 		name: "Fanorona",
@@ -500,20 +514,6 @@ export const GameType = {
 		coverImg: "hexagon.png",
 		rulesUrl: "https://en.wikipedia.org/wiki/Fanorona",
 		gameOptions: [],
-		usersWithAccess: [
-			'SkudPaiSho',
-		]
-	},
-	UndergrowthSimplicity: {
-		id: 27,
-		name: "Undergrowth - Briar",
-		desc: "Undergrowth - Briar",
-		color: "var(--undergrowthcolor)",
-		description: "Build a ring of connected stones around the center while cutting off your opponent's supply lines.",
-		coverImg: "rose.png",
-		rulesUrl: "https://skudpaisho.com/site/games/undergrowth-briar/",
-		gameOptions: [],
-		noRankedGames: true,
 		usersWithAccess: [
 			'SkudPaiSho',
 		]
