@@ -275,6 +275,13 @@ GiniGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignore
 
 	this.expandPortalMoves(boardPoint);
 
+	// Accent tile home positions are never valid move destinations
+	this.board.forEachBoardPoint(function(bp) {
+		if (bp.isType(ACCENT_TILE_HOME) && bp.isType(POSSIBLE_MOVE)) {
+			bp.removeType(POSSIBLE_MOVE);
+		}
+	});
+
 	if (!ignoreActuate) {
 		this.actuate();
 	}
@@ -316,13 +323,16 @@ GiniGameManager.prototype.revealDeployPoints = function(tile, ignoreActuate) {
 	var isDisplaceTile = tileInfo && tileInfo.deployTypes && tileInfo.deployTypes.includes(TrifleDeployType.onOccupiedTile);
 
 	this.board.forEachBoardPoint(function(boardPoint) {
+		if (boardPoint.isType(NON_PLAYABLE) || boardPoint.isType(ACCENT_TILE_HOME)) {
+			return;
+		}
 		if (isDisplaceTile) {
 			// Fire: show occupied tiles as valid targets (not the Fire tile itself)
-			if (boardPoint.hasTile() && !boardPoint.isType(NON_PLAYABLE) && boardPoint.tile !== tile) {
+			if (boardPoint.hasTile() && boardPoint.tile !== tile) {
 				boardPoint.addType(POSSIBLE_MOVE);
 			}
 		} else {
-			if (!boardPoint.hasTile() && !boardPoint.isType(NON_PLAYABLE)) {
+			if (!boardPoint.hasTile()) {
 				boardPoint.addType(POSSIBLE_MOVE);
 			}
 		}
