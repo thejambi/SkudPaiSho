@@ -22,7 +22,7 @@ import { SkudPaiShoBoard } from './SkudPaiShoBoard';
 import { SkudPaiShoTile } from './SkudPaiShoTile';
 import { SkudPaiShoTileManager } from './SkudPaiShoTileManager';
 import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
-import { setGameLogText } from '../PaiShoMain';
+import { setGameLogText } from '../GameState';
 
 export class SkudPaiShoGameManager {
 	constructor(actuator, ignoreActuate, isCopy) {

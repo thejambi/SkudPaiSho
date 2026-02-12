@@ -33,7 +33,7 @@ import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { SolitaireBoardPoint } from './SolitaireBoardPoint';
 import { SolitaireHarmony, SolitaireHarmonyManager } from './SolitaireHarmony';
 import { SolitaireTile } from './SolitaireTile';
-import { showBadMoveModal } from '../PaiShoMain';
+import { showBadMoveModal } from '../ModalManager';
 
 export function SolitaireBoard() {
 	this.size = new RowAndColumn(17, 17);

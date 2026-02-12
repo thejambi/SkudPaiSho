@@ -1,10 +1,6 @@
-import {
-  GameType,
-  buildDropdownDiv,
-  currentGameData,
-  gameController,
-  usernameEquals
-} from '../PaiShoMain';
+import { GameType, currentGameData, gameController } from '../PaiShoMain';
+import { buildDropdownDiv } from '../GamePrefs';
+import { usernameEquals } from '../UserData';
 import { dateIsBetween } from "../GameData";
 
 export function AdevarOptions() {

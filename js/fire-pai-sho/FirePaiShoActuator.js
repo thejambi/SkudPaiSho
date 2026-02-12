@@ -17,18 +17,9 @@ import {
   NON_PLAYABLE,
   POSSIBLE_MOVE,
 } from '../skud-pai-sho/SkudPaiShoBoardPoint';
-import {
-  RmbDown,
-  RmbUp,
-  clearMessage,
-  getUserGamePreference,
-  pieceAnimationLength,
-  piecePlaceAnimation,
-  pointClicked,
-  showPointMessage,
-  showTileMessage,
-  unplayedTileClicked,
-} from '../PaiShoMain';
+import { pieceAnimationLength, piecePlaceAnimation } from '../PaiShoMain';
+import { RmbDown, RmbUp, clearMessage, pointClicked, showPointMessage, showTileMessage, unplayedTileClicked } from '../UiInteraction';
+import { getUserGamePreference } from '../GamePrefs';
 import {
   createBoardArrow,
   createBoardPointDiv,

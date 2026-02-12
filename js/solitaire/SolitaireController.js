@@ -20,16 +20,18 @@ import {
   finalizeMove,
   getCurrentPlayer,
   getGameOptionsMessageElement,
+  myTurn,
+  onlinePlayEnabled,
+  playingOnlineGame,
+} from '../PaiShoMain';
+import {
   getNeutralPointMessage,
   getRedPointMessage,
   getRedWhitePointMessage,
   getWhitePointMessage,
-  myTurn,
-  onlinePlayEnabled,
-  playingOnlineGame,
   toBullets,
   toHeading,
-} from '../PaiShoMain';
+} from '../TextHelpers';
 import {
   GATE,
   NEUTRAL,

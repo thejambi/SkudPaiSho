@@ -1,5 +1,7 @@
 
-import { activeAi, activeAi2, BRAND_NEW, callSubmitMove, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameController, GameType, getGameOptionsMessageElement, myTurn, onlinePlayEnabled, playingOnlineGame, rerunAll, WAITING_FOR_ENDPOINT } from '../PaiShoMain';
+import { BRAND_NEW, WAITING_FOR_ENDPOINT } from '../GameConstants';
+import { callSubmitMove, createGameIfThatIsOk, finalizeMove, GameType, getGameOptionsMessageElement, rerunAll } from '../PaiShoMain';
+import { activeAi, activeAi2, currentMoveIndex, gameController, myTurn, onlinePlayEnabled, playingOnlineGame } from '../GameState';
 import { TumbleweedActuator } from './TumbleweedActuator';
 import { TumbleweedGameNotation, TumbleweedNotationBuilder } from './TumbleweedGameNotation';
 import { TumbleweedGameManager } from './TumbleweedGameManager';

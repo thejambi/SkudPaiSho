@@ -1,5 +1,5 @@
 import { copyArray, copyObject } from './GameData';
-import { ggOptions } from './PaiShoMain';
+import { ggOptions } from './GameState';
 
 /* Game Options - Scroll down for new game options setup */
 export var OPTION_DOUBLE_TILES = "DoubleTiles";

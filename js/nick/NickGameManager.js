@@ -22,7 +22,7 @@ import { NickTileCodes } from './NickTiles';
 import { NickActuator } from './NickActuator';
 import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { PaiShoGameBoard } from '../trifle/PaiShoGameBoard';
-import { setGameLogText } from '../PaiShoMain';
+import { setGameLogText } from '../GameState';
 
 export class NickGameManager {
 	constructor(actuator, ignoreActuate, isCopy) {

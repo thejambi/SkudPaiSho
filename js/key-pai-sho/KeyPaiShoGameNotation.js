@@ -7,7 +7,7 @@ import {
   NotationPoint,
   PLANTING,
 } from '../CommonNotationObjects';
-import { BRAND_NEW } from '../PaiShoMain';
+import { BRAND_NEW } from '../GameConstants';
 import { KeyPaiShoTile } from './KeyPaiShoTile';
 import { NO_EFFECT_TILES, gameOptionEnabled } from '../GameOptions';
 import { debug } from '../GameData';

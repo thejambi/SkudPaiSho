@@ -1,9 +1,8 @@
 import {
-  getUsername,
   signUpClicked,
   submitSignInClicked,
-  userIsLoggedIn
 } from '../PaiShoMain';
+import { getUsername, userIsLoggedIn } from '../UserData';
 
 export function buildLoginModalContentElement() {
 	// Create the container div

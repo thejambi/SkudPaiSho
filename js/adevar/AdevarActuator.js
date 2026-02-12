@@ -15,7 +15,6 @@ import {
   RmbDown,
   RmbUp,
   clearMessage,
-  getUsername,
   pieceAnimationLength,
   piecePlaceAnimation,
   pointClicked,
@@ -23,6 +22,7 @@ import {
   showTileMessage,
   unplayedTileClicked,
 } from '../PaiShoMain';
+import { getUsername } from '../UserData';
 import {
   createBoardArrow,
   createBoardPointDiv,

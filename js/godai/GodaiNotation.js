@@ -1,6 +1,6 @@
 import { DEPLOY, GUEST, HOST, MOVE, NotationPoint } from "../CommonNotationObjects"
 import { debug } from "../GameData"
-import { BRAND_NEW } from "../PaiShoMain"
+import { BRAND_NEW } from '../GameConstants'
 import { GO_EARTH, GO_EMPTY, GO_FIRE, GO_METAL, GO_WATER, GO_WOOD } from "./GodaiTile"
 
 /**

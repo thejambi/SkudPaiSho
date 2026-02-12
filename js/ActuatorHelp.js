@@ -192,52 +192,97 @@ export function setupPaiShoBoard(gameContainer,
 		addPaikoGuestBoardRotate = true;
 	}
 
-	removeChildren(gameContainer);
+	/* Check if we can reuse the existing board */
+	var existingSvgContainer = gameContainer.querySelector('.svgContainer');
+	var existingBgSvg = gameContainer.querySelector('.bg-svg');
+	var ptContainerClass = playInSpaces ? "pointContainerForPlayInSpaces" : "pointContainer";
+	var existingPointContainer = existingSvgContainer
+		? existingSvgContainer.querySelector('.' + ptContainerClass)
+		: null;
 
-	var ptContainerClass = "pointContainer";
-	if (playInSpaces) {
-		ptContainerClass = "pointContainerForPlayInSpaces"
+	var canReuse = existingSvgContainer && existingBgSvg && existingPointContainer;
+
+	var svgContainer, boardContainer, arrowContainer, bcontainer;
+
+	if (canReuse) {
+		/* Reuse existing board structure so CSS transition animates rotation */
+		svgContainer = existingSvgContainer;
+		bcontainer = gameContainer.querySelector('.board-container');
+		boardContainer = existingPointContainer;
+
+		// Clear point container children (htmlify() will repopulate)
+		removeChildren(boardContainer);
+
+		// Replace arrow SVG with a fresh one
+		var oldArrowSvg = existingBgSvg.querySelector('.arrowContainer');
+		if (oldArrowSvg) oldArrowSvg.remove();
+		var arrowSvg = createArrowSvg(playInSpaces);
+		arrowContainer = document.createElementNS(svgns, 'g');
+		arrowSvg.appendChild(arrowContainer);
+		existingBgSvg.insertBefore(arrowSvg, boardContainer);
+
+		// Update board background image
+		applyBoardOptionToBgSvg(existingBgSvg, overrideBoardName);
+
+		// Update scale
+		if (overrideScale) {
+			boardContainer.style.scale = overrideScale;
+			boardContainer.classList.add("points-scaled");
+		} else {
+			boardContainer.style.scale = '';
+			boardContainer.classList.remove("points-scaled");
+		}
+
+		// Remove old tile pile (will be recreated below)
+		var oldTilePile = gameContainer.querySelector('.tilePileContainer');
+		if (oldTilePile) oldTilePile.remove();
+	} else {
+		/* Full create path — no existing board to reuse */
+		removeChildren(gameContainer);
+
+		boardContainer = createDivWithClass(ptContainerClass);
+		boardContainer.setAttribute("oncontextmenu", "return false;");
+
+		// Scale just the point container (not the whole board) so the board image
+		// stays full size while the interactive squares are zoomed in
+		if (overrideScale) {
+			boardContainer.style.scale = overrideScale;
+			boardContainer.classList.add("points-scaled");
+		}
+
+		bcontainer = createDivWithClass("board-container");
+
+		svgContainer = createDivWithClass("svgContainer");
+		var svgContainerContainer = createDivWithClass("svgContainerContainer");
+		var bgSvg = createDivWithClass("bg-svg");
+		var arrowSvg = createArrowSvg(playInSpaces);
+		arrowContainer = document.createElementNS(svgns, 'g');
+
+		applyBoardOptionToBgSvg(bgSvg, overrideBoardName);
+
+		if (addVagabondBoardRotate) {
+			svgContainer.classList.add("vagabondBoardRotate");
+		} else if (addAdevarBoardRotate) {
+			svgContainer.classList.add("adevarBoardRotate");
+		} else if (addAdevarGuestBoardRotate) {
+			svgContainer.classList.add("adevarGuestBoardRotate");
+		} else if (addGinsengBoardRotate) {
+			svgContainer.classList.add("ginsengBoardRotate");
+		} else if (addGinsengGuestBoardRotate) {
+			svgContainer.classList.add("ginsengGuestBoardRotate");
+		} else if (addPaikoGuestBoardRotate) {
+			svgContainer.classList.add("paikoGuestBoardRotate");
+		}
+
+		arrowSvg.appendChild(arrowContainer);
+		bgSvg.appendChild(arrowSvg);
+		bgSvg.appendChild(boardContainer);
+		svgContainer.appendChild(bgSvg);
+		svgContainerContainer.appendChild(svgContainer);
+		bcontainer.appendChild(svgContainerContainer);
+
+		gameContainer.appendChild(bcontainer);
 	}
-	var boardContainer = createDivWithClass(ptContainerClass);
-	boardContainer.setAttribute("oncontextmenu", "return false;");
-
-	// Scale just the point container (not the whole board) so the board image
-	// stays full size while the interactive squares are zoomed in
-	if (overrideScale) {
-		boardContainer.style.scale = overrideScale;
-		boardContainer.classList.add("points-scaled");
-	}
-
-	var bcontainer = createDivWithClass("board-container");
-
-	var svgContainer = createDivWithClass("svgContainer");
-	var svgContainerContainer = createDivWithClass("svgContainerContainer");
-	var bgSvg = createDivWithClass("bg-svg");
-	var arrowSvg = createArrowSvg(playInSpaces);
-	var arrowContainer = document.createElementNS(svgns, 'g');
-
-	applyBoardOptionToBgSvg(bgSvg, overrideBoardName);
-
-	if (addVagabondBoardRotate) {
-		svgContainer.classList.add("vagabondBoardRotate");
-	} else if (addAdevarBoardRotate) {
-		svgContainer.classList.add("adevarBoardRotate");
-	} else if (addAdevarGuestBoardRotate) {
-		svgContainer.classList.add("adevarGuestBoardRotate");
-	} else if (addGinsengBoardRotate) {
-		svgContainer.classList.add("ginsengBoardRotate");
-	} else if (addGinsengGuestBoardRotate) {
-		svgContainer.classList.add("ginsengGuestBoardRotate");
-	} else if (addPaikoGuestBoardRotate) {
-		svgContainer.classList.add("paikoGuestBoardRotate");
-	}
-
-	arrowSvg.appendChild(arrowContainer);
-	bgSvg.appendChild(arrowSvg);
-	bgSvg.appendChild(boardContainer);
-	svgContainer.appendChild(bgSvg);
-	svgContainerContainer.appendChild(svgContainer);
-	bcontainer.appendChild(svgContainerContainer);
 
 	var response = createDivWithId("response");
 	var gameMessage = createDivWithClass("gameMessage");
@@ -269,7 +314,6 @@ export function setupPaiShoBoard(gameContainer,
 	tilePileContainer.appendChild(guestTilesContainer);
 	tilePileContainer.appendChild(gameMessage2);
 
-	gameContainer.appendChild(bcontainer);
 	gameContainer.appendChild(tilePileContainer);
 
 	var addClassAfterThisManyMs = 100;

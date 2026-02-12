@@ -21,7 +21,7 @@ import {
   SkudPaiShoNotationBuilder,
   SkudPaiShoNotationMove,
 } from '../skud-pai-sho/SkudPaiShoGameNotation';
-import { WAITING_FOR_ENDPOINT } from '../PaiShoMain';
+import { WAITING_FOR_ENDPOINT } from '../GameConstants';
 
 export function SkudAIv1() {
 	this.scoreDepth = 1;	// This can't go higher than 1... Or can it?

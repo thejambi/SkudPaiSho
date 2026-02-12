@@ -2,7 +2,7 @@
 
 // --------------------------------------------- // 
 
-import { BRAND_NEW } from '../PaiShoMain';
+import { BRAND_NEW } from '../GameConstants';
 import { GUEST, HOST, INITIAL_SETUP, MOVE } from '../CommonNotationObjects';
 import { HexentaflVars, setHexentaflVars } from './HexentaflController';
 import { debug } from '../GameData';

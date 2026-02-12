@@ -1,9 +1,5 @@
-import {
-  GameType,
-  buildDropdownDiv,
-  gameController,
-  promptForCustomTileDesigns,
-} from '../PaiShoMain';
+import { GameType, gameController } from '../PaiShoMain';
+import { buildDropdownDiv, promptForCustomTileDesigns } from '../GamePrefs';
 
 export function KeyPaiShoOptions() {
 	if (!localStorage.getItem(KeyPaiShoOptions.tileDesignTypeKey)

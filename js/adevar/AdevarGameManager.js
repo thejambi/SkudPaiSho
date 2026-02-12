@@ -15,7 +15,7 @@ import {
 import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
 import { debug } from '../GameData';
 import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
-import { setGameLogText } from '../PaiShoMain';
+import { setGameLogText } from '../GameState';
 
 export var AdevarBoardSetupPoints = {
 	hiddenTile: {

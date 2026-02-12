@@ -1,28 +1,9 @@
 /* Spirit Pai Sho specific UI interaction logic */
 
-import {
-  BRAND_NEW,
-  GameType,
-  WAITING_FOR_ENDPOINT,
-  buildPreferenceDropdownDiv,
-  callSubmitMove,
-  clearMessage,
-  createGameIfThatIsOk,
-  currentMoveIndex,
-  finalizeMove,
-  gameController,
-  gameId,
-  getCurrentPlayer,
-  getLoginToken,
-  getUserGamePreference,
-  myTurn,
-  onlinePlayEnabled,
-  onlinePlayEngine,
-  playingOnlineGame,
-  rerunAll,
-  setUserGamePreference,
-  userIsLoggedIn,
-} from '../PaiShoMain';
+import { BRAND_NEW, GameType, WAITING_FOR_ENDPOINT, callSubmitMove, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameController, gameId, getCurrentPlayer, myTurn, onlinePlayEnabled, onlinePlayEngine, playingOnlineGame, rerunAll } from '../PaiShoMain';
+import { clearMessage } from '../UiInteraction';
+import { buildPreferenceDropdownDiv, getUserGamePreference, setUserGamePreference } from '../GamePrefs';
+import { getLoginToken, userIsLoggedIn } from '../UserData';
 import { GUEST, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
 import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { SpiritActuator } from './SpiritActuator';

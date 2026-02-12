@@ -6,11 +6,8 @@ import { ACCENT_TILE } from '../GameData';
 import { ARRANGING, PLANTING } from '../CommonNotationObjects';
 import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from './SkudPaiShoBoardPoint';
 import { NO_HARMONY_VISUAL_AIDS, gameOptionEnabled } from '../GameOptions';
-import {
-	getUserGamePreference,
-	pieceAnimationLength,
-	piecePlaceAnimation,
-} from '../PaiShoMain';
+import { pieceAnimationLength, piecePlaceAnimation } from '../PaiShoMain';
+import { getUserGamePreference } from '../GamePrefs';
 import { SkudPaiShoController } from './SkudPaiShoController';
 import { SkudPaiShoTileManager } from './SkudPaiShoTileManager';
 import { getSkudTilesSrcPath, isSamePoint } from '../ActuatorHelp';

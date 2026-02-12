@@ -1,6 +1,6 @@
 // Meadow Notation
 import { GUEST, HOST } from '../CommonNotationObjects';
-import { BRAND_NEW } from '../PaiShoMain';
+import { BRAND_NEW } from '../GameConstants';
 import { debug } from '../GameData';
 
 // --------------------------------------------- // 

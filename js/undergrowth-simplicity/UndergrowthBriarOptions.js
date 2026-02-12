@@ -1,6 +1,7 @@
 // Undergrowth Briar Options
 
-import { clearMessage, gameController } from '../PaiShoMain';
+import { clearMessage } from '../UiInteraction';
+import { gameController } from '../GameState';
 
 var pieceStyleKey = "undergrowthBriarPieceStyle";
 var centerpieceKey = "undergrowthBriarCenterpiece";

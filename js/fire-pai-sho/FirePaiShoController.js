@@ -12,47 +12,19 @@ import {
 	NotationPoint,
 	PLANTING,
 } from '../CommonNotationObjects';
-import {
-	BRAND_NEW,
-	GameType,
-	MOVE_DONE,
-	READY_FOR_BONUS,
-	WAITING_FOR_BOAT_BONUS_POINT,
-	WAITING_FOR_BONUS_ENDPOINT,
-	WAITING_FOR_ENDPOINT,
-	activeAi,
-	activeAi2,
-	buildDropdownDiv,
-	callSubmitMove,
-	clearMessage,
-	createGameIfThatIsOk,
-	currentMoveIndex,
-	finalizeMove,
-	gameController,
-	gameId,
-	getCurrentPlayer,
-	getGameOptionsMessageElement,
-	getResetMoveElement,
-	getUserGamePreference,
-	isAnimationsOn,
-	myTurn,
-	onlinePlayEnabled,
-	playingOnlineGame,
-	refreshMessage,
-	rerunAll,
-	setSkudTilesOption,
-	setUserGamePreference,
-	tileDesignTypeKey,
-	tileDesignTypeValues,
-	userIsLoggedIn,
-} from '../PaiShoMain';
+import { BRAND_NEW, MOVE_DONE, READY_FOR_BONUS, WAITING_FOR_BOAT_BONUS_POINT, WAITING_FOR_BONUS_ENDPOINT, WAITING_FOR_ENDPOINT } from '../GameConstants';
+import { getResetMoveElement } from '../GameFlow';
+import { GameType, activeAi, activeAi2, callSubmitMove, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameController, gameId, getCurrentPlayer, getGameOptionsMessageElement, isAnimationsOn, myTurn, onlinePlayEnabled, playingOnlineGame, rerunAll, setSkudTilesOption } from '../PaiShoMain';
+import { clearMessage, refreshMessage } from '../UiInteraction';
+import { buildDropdownDiv, getUserGamePreference, setUserGamePreference, tileDesignTypeKey, tileDesignTypeValues } from '../GamePrefs';
+import { userIsLoggedIn } from '../UserData';
 import {
 	getNeutralPointMessage,
 	getRedPointMessage,
 	getRedWhitePointMessage,
 	getWhitePointMessage,
 	toBullets,
-} from '../PaiShoMain';
+} from '../TextHelpers';
 import { NO_HARMONY_VISUAL_AIDS, gameOptionEnabled } from '../GameOptions';
 import {
   is3DBoardOn,

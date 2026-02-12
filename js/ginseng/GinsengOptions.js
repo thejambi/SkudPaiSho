@@ -1,11 +1,6 @@
-import {
-  GameType,
-  buildDropdownDiv,
-  currentGameData,
-  gameController,
-  promptForCustomTileDesigns,
-  usernameEquals,
-} from '../PaiShoMain';
+import { GameType, currentGameData, gameController } from '../PaiShoMain';
+import { buildDropdownDiv, promptForCustomTileDesigns } from '../GamePrefs';
+import { usernameEquals } from '../UserData';
 
 export function GinsengOptions() {
 	if (!localStorage.getItem(GinsengOptions.tileDesignTypeKey)

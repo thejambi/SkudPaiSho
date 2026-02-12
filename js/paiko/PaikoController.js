@@ -16,7 +16,6 @@ import {
 	finalizeMove,
 	getCurrentPlayer,
 	getOnlineGameOpponentUsername,
-	getUsername,
 	iAmPlayerInCurrentOnlineGame,
 	isAnimationsOn,
 	myTurn,
@@ -26,6 +25,7 @@ import {
 	refreshMessage,
 	rerunAll,
 } from '../PaiShoMain';
+import { getUsername } from '../UserData';
 import { TrifleGameNotation } from '../trifle/TrifleGameNotation';
 import { Paiko3DActuator } from './Paiko3DActuator';
 import { PaikoActuator } from './PaikoActuator';

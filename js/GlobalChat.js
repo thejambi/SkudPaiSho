@@ -3,9 +3,9 @@
 
 import {
 	onlinePlayEngine,
-	htmlEscape,
-	getLoginToken
 } from './PaiShoMain';
+import { getLoginToken } from './UserData';
+import { htmlEscape } from './TextHelpers';
 
 // Module state
 let lastGlobalChatTimestamp = '1970-01-01 00:00:00';

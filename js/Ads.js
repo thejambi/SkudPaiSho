@@ -1,7 +1,7 @@
 /* For controlling Ads spaces and appearances in UI */
 
 import { peekRandomFromArray } from "./GameData";
-import { closeModal, showModalElem } from "./PaiShoMain";
+import { closeModal, showModalElem } from "./ModalManager";
 
 export function Ads() {
 

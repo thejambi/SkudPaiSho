@@ -9,17 +9,19 @@ import {
 	currentMoveIndex,
 	finalizeMove,
 	getGameOptionsMessageElement,
-	getNeutralPointMessage,
-	getRedPointMessage,
-	getRedWhitePointMessage,
-	getWhitePointMessage,
 	getCurrentPlayer,
 	myTurn,
 	onlinePlayEnabled,
 	playingOnlineGame,
-	toHeading,
 	WAITING_FOR_ENDPOINT,
 } from '../PaiShoMain';
+import {
+	getNeutralPointMessage,
+	getRedPointMessage,
+	getRedWhitePointMessage,
+	getWhitePointMessage,
+	toHeading,
+} from '../TextHelpers';
 import { GATE, NEUTRAL, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { OvergrowthActuator } from './OvergrowthActuator';

@@ -1,5 +1,10 @@
 /* Nick specific UI interaction logic */
 
+import { READY_FOR_BONUS } from '../GameConstants';
+import {
+	showResetMoveMessage,
+	showSkipButtonMessage,
+} from '../GameFlow';
 import {
 	activeAi,
 	activeAi2,
@@ -14,7 +19,6 @@ import {
 	GameType,
 	getGameOptionsMessageElement,
 	getOnlineGameOpponentUsername,
-	getUsername,
 	iAmPlayerInCurrentOnlineGame,
 	isAnimationsOn,
 	isInReplay,
@@ -22,17 +26,13 @@ import {
 	onlinePlayEnabled,
 	playingOnlineGame,
 	quickFinalizeMove,
-	READY_FOR_BONUS,
 	refreshMessage,
 	rerunAll,
 	setAiIndex,
 	setGameTitleText,
-	showResetMoveMessage,
-	showSkipButtonMessage,
-	userIsLoggedIn,
-	usernameIsOneOf,
 	WAITING_FOR_ENDPOINT,
 } from '../PaiShoMain';
+import { getUsername, userIsLoggedIn, usernameIsOneOf } from '../UserData';
 import {
 	DEPLOY,
 	DRAW_ACCEPT,

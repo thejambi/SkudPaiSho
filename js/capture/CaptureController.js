@@ -1,28 +1,9 @@
 /* Capture Pai Sho specific UI interaction logic */
 
-import {
-  BRAND_NEW,
-  GameType,
-  WAITING_FOR_ENDPOINT,
-  buildPreferenceDropdownDiv,
-  callSubmitMove,
-  clearMessage,
-  createGameIfThatIsOk,
-  currentMoveIndex,
-  finalizeMove,
-  gameController,
-  gameId,
-  getCurrentPlayer,
-  getLoginToken,
-  getUserGamePreference,
-  myTurn,
-  onlinePlayEnabled,
-  onlinePlayEngine,
-  playingOnlineGame,
-  rerunAll,
-  setUserGamePreference,
-  userIsLoggedIn,
-} from '../PaiShoMain';
+import { BRAND_NEW, GameType, WAITING_FOR_ENDPOINT, callSubmitMove, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameController, gameId, getCurrentPlayer, myTurn, onlinePlayEnabled, onlinePlayEngine, playingOnlineGame, rerunAll } from '../PaiShoMain';
+import { clearMessage } from '../UiInteraction';
+import { buildPreferenceDropdownDiv, getUserGamePreference, setUserGamePreference } from '../GamePrefs';
+import { getLoginToken, userIsLoggedIn } from '../UserData';
 import { CaptureActuator } from './CaptureActuator';
 import { Capture3DActuator } from './Capture3DActuator';
 import { is3DBoardOn, buildToggle3DBoardDiv as _buildToggle3DBoardDiv, buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv } from '../PaiSho3DOptions';

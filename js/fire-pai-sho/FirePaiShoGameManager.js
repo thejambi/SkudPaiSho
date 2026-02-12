@@ -3,7 +3,7 @@
 import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager";
 import { FirePaiShoTileManager } from "./FirePaiShoTileManager";
 import { FirePaiShoBoard } from './FirePaiShoBoard';
-import { setGameLogText } from "../PaiShoMain";
+import { setGameLogText } from "../GameState";
 import { debug } from "../GameData";
 import { ARRANGING, GUEST, HOST, PLANTING } from "../CommonNotationObjects";
 import { FirePaiShoTile } from "./FirePaiShoTile";

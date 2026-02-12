@@ -7,17 +7,9 @@ import {
   NON_PLAYABLE,
   POSSIBLE_MOVE,
 } from '../skud-pai-sho/SkudPaiShoBoardPoint';
-import {
-  RmbDown,
-  RmbUp,
-  clearMessage,
-  gameController,
-  getUserGamePreference,
-  pointClicked,
-  showPointMessage,
-  showTileMessage,
-  unplayedTileClicked
-} from '../PaiShoMain';
+import { gameController } from '../PaiShoMain';
+import { RmbDown, RmbUp, clearMessage, pointClicked, showPointMessage, showTileMessage, unplayedTileClicked } from '../UiInteraction';
+import { getUserGamePreference } from '../GamePrefs';
 import {
   createBoardArrow,
   createBoardPointDiv,
@@ -25,7 +17,7 @@ import {
   setupPaiShoBoard,
 } from '../ActuatorHelp';
 import { MOVE } from '../CommonNotationObjects';
-import { pieceAnimationLength } from '../PaiShoMain';
+import { pieceAnimationLength } from '../GameConstants';
 import { debug } from '../GameData';
 
 export function CaptureActuator(gameContainer, isMobile, enableAnimations) {

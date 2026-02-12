@@ -1,4 +1,8 @@
-import { buildDropdownDiv, clearMessage, currentGameData, gameController, GameType, promptForCustomTileDesigns, usernameEquals } from "../PaiShoMain";
+import { GameType } from "../PaiShoMain";
+import { clearMessage } from "../UiInteraction";
+import { buildDropdownDiv, promptForCustomTileDesigns } from "../GamePrefs";
+import { currentGameData, gameController } from '../GameState';
+import { usernameEquals } from '../UserData';
 
 export class NickOptions {
 	constructor() {

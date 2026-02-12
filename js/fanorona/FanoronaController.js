@@ -3,24 +3,24 @@
 
 import { GUEST, HOST } from '../CommonNotationObjects';
 import { debug } from '../GameData';
+import { getResetMoveElement } from '../GameFlow';
 import {
-	GameType,
 	BRAND_NEW,
+	GameType,
 	callSubmitMove,
+	closeModal,
 	createGameIfThatIsOk,
 	currentMoveIndex,
 	finalizeMove,
 	gameId,
 	getCurrentPlayer,
-	getResetMoveElement,
 	myTurn,
 	onlinePlayEnabled,
 	playingOnlineGame,
 	rerunAll,
 	showModal,
-	closeModal,
-	userIsLoggedIn
 } from '../PaiShoMain';
+import { userIsLoggedIn } from '../UserData';
 import { FanoronaActuator } from './FanoronaActuator';
 import { FanoronaGameManager } from './FanoronaGameManager';
 import {

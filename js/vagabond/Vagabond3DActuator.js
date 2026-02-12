@@ -4,11 +4,8 @@
 import * as THREE from 'three';
 import { DEPLOY, MOVE } from '../CommonNotationObjects';
 import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
-import {
-	pieceAnimationLength,
-	piecePlaceAnimation,
-	vagabondTileDesignTypeKey,
-} from '../PaiShoMain';
+import { pieceAnimationLength, piecePlaceAnimation } from '../PaiShoMain';
+import { vagabondTileDesignTypeKey } from '../GamePrefs';
 import { VagabondController } from './VagabondController';
 import { VagabondTileManager } from './VagabondTileManager';
 import { isSamePoint } from '../ActuatorHelp';

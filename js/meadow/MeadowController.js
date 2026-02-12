@@ -6,6 +6,7 @@ import {
   gameOptionEnabled,
 } from '../GameOptions';
 import { GUEST, HOST } from '../CommonNotationObjects';
+import { getResetMoveElement } from '../GameFlow';
 import {
   GameType,
   activeAi,
@@ -16,7 +17,6 @@ import {
   gameController,
   getCurrentPlayer,
   getGameOptionsMessageElement,
-  getResetMoveElement,
   myTurn,
   onlinePlayEnabled,
   playingOnlineGame,

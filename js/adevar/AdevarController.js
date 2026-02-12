@@ -36,7 +36,6 @@ import {
   getCurrentPlayer,
   getGameOptionsMessageElement,
   getOnlineGameOpponentUsername,
-  getUsername,
   iAmPlayerInCurrentOnlineGame,
   isAnimationsOn,
   myTurn,
@@ -45,9 +44,8 @@ import {
   refreshMessage,
   rerunAll,
   showReplayControls,
-  userIsLoggedIn,
-  usernameEquals
 } from '../PaiShoMain';
+import { getUsername, userIsLoggedIn, usernameEquals } from '../UserData';
 import {
   DEPLOY,
   GUEST,

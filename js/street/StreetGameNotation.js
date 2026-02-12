@@ -2,7 +2,7 @@
 
 import { ARRANGING, GUEST, HOST, INITIAL_SETUP, NotationPoint, PLANTING } from '../CommonNotationObjects';
 import { debug } from '../GameData';
-import { BRAND_NEW } from '../PaiShoMain';
+import { BRAND_NEW } from '../GameConstants';
 import { sameStart, simpleCanonRules } from '../skud-pai-sho/SkudPaiShoRules';
 import { StreetTile } from './StreetTile';
 

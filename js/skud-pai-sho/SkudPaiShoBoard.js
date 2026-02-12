@@ -51,7 +51,7 @@ import {
 } from './SkudPaiShoHarmony';
 import { SkudPaiShoTile } from './SkudPaiShoTile';
 import { paiShoBoardMaxRowOrCol } from '../pai-sho-common/PaiShoBoardHelp';
-import { showBadMoveModal } from '../PaiShoMain';
+import { showBadMoveModal } from '../ModalManager';
 
 export class SkudPaiShoBoard {
 	constructor() {

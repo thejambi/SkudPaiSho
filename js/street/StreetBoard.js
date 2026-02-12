@@ -3,7 +3,7 @@
 import { GUEST, HOST, RowAndColumn } from '../CommonNotationObjects';
 import { debug } from '../GameData';
 import { RELEASE_CAPTIVE_TILES, gameOptionEnabled } from '../GameOptions';
-import { showBadMoveModal } from '../PaiShoMain';
+import { showBadMoveModal } from '../ModalManager';
 import { GATE, NON_PLAYABLE, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { newKnotweedRules } from '../skud-pai-sho/SkudPaiShoRules';
 import { StreetBoardPoint } from './StreetBoardPoint';

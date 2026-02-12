@@ -4,6 +4,119 @@ import $ from 'jquery';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
 import { loadGameController } from "./GameControllerLoader";
+import {
+	BRAND_NEW,
+	HOST_SELECT_ACCENTS,
+	MOVE_DONE,
+	READY_FOR_BONUS,
+	WAITING_FOR_BOAT_BONUS_POINT,
+	WAITING_FOR_BONUS_ENDPOINT,
+	WAITING_FOR_ENDPOINT,
+	pieceAnimationLength,
+	piecePlaceAnimation,
+	replayIntervalLength,
+} from './GameConstants';
+import {
+	htmlDecode,
+	htmlEscape,
+	toBullets,
+	toHeading,
+	toMessage,
+} from './TextHelpers';
+import {
+	deviceIdKey,
+	getDeviceId,
+	getLoginToken,
+	getUserEmail,
+	getUserId,
+	getUsername,
+	haveUserEmail,
+	localEmailKey,
+	userEmailKey,
+	userIdKey,
+	userIsLoggedIn,
+	usernameEquals,
+	usernameIsOneOf,
+	usernameKey,
+} from './UserData';
+import {
+	callFailed,
+	closeModal,
+	getLoadingModalElement,
+	showBadMoveModal,
+	showModal,
+	showModalElem,
+} from './ModalManager';
+import {
+	activeAi,
+	activeAi2,
+	addOption,
+	clearAiPlayers,
+	clearGameWatchInterval,
+	clearOptions,
+	currentGameData,
+	currentMoveIndex,
+	emptyCallback,
+	gameContainerDiv,
+	gameController,
+	gameId,
+	gameWatchIntervalValue,
+	getCurrentPlayer,
+	ggOptions,
+	isInReplay,
+	lastKnownGameNotation,
+	myTurn,
+	onlinePlayEnabled,
+	playingOnlineGame,
+	setActiveAi,
+	setActiveAi2,
+	setCurrentGameData,
+	setCurrentMoveIndex,
+	setGameControllerRef,
+	setGameId,
+	setGameLogText,
+	setGameWatchIntervalValue,
+	setGuestEmail,
+	setHostEmail,
+	setIsInReplay,
+	setLastKnownGameNotation,
+	setOnlinePlayEnabled,
+	setSoundManager,
+	soundManager,
+	getCurrentPlayerForReal,
+	myTurnForReal,
+	hostEmail,
+	guestEmail,
+	getGameWinner,
+	getGameWinReason,
+	iAmPlayerInCurrentOnlineGame,
+} from './GameState';
+import {
+	animationsOnKey,
+	buildDropdownDiv,
+	buildPreferenceDropdownDiv,
+	confirmMoveKey,
+	createNonRankedGamePreferredKey,
+	customBgColorKey,
+	customBoardUrlArrayKey,
+	customBoardUrlKey,
+	getUserGamePreference,
+	getUserGamePrefKeyName,
+	paiShoBoardDesignTypeKey,
+	paiShoBoardDesignTypeValues,
+	paiShoBoardKey,
+	promptForCustomTileDesigns,
+	setCustomTileDesignsFromInput,
+	setPaiShoBoardDesignTypeValues,
+	setPaiShoBoardKey,
+	setSkudTilesKey,
+	setUserGamePreference,
+	skudTilesKey,
+	svgBoardDesigns,
+	tileDesignTypeKey,
+	tileDesignTypeValues,
+	vagabondTileDesignTypeKey,
+} from './GamePrefs';
 import { Ads } from "./Ads";
 import { DummyAppCaller, IOSCaller } from "./AppCaller";
 import { GUEST, HOST } from "./CommonNotationObjects";
@@ -84,6 +197,30 @@ import {
 	isSuperSandboxMode,
 	truncateMovesForSuperSandboxMode
 } from './SuperSandbox.js';
+import {
+	boardTileHovered,
+	boardTileUnhovered,
+	clearMessage,
+	displayReturnedMessage,
+	getAdditionalMessage,
+	getGameMessageElement,
+	getTournamentText,
+	pointClicked,
+	refreshMessage,
+	RmbDown,
+	RmbUp,
+	setMessage,
+	showPointMessage,
+	showTileMessage,
+	unplayedTileClicked,
+} from './UiInteraction';
+import {
+	getResetMoveElement,
+	getSkipButtonElement,
+	showResetMoveMessage,
+	showSkipButtonMessage,
+	skipClicked,
+} from './GameFlow';
 
 
 export const QueryString = (() => {
@@ -157,51 +294,6 @@ export const shortLinkDataReady = QueryString.sl
 	})
 	: Promise.resolve();
 
-export let gameController;
-
-export let skudTilesKey = "tgggyatso";
-export let paiShoBoardKey = "default";
-
-const localEmailKey = "localUserEmail";
-
-export const tileDesignTypeKey = "tileDesignTypeKey";
-export const tileDesignTypeValues = {
-	// hlowe: "Modern Tiles v1",
-	tgggyatso: "The Garden Gate Gyatso Tiles",
-	gaoling: "TGG Gaoling",
-	tggproject: "TGG Pai Sho Project",
-	hlowenew: "Modern Tiles",
-	vescucci: "Vescucci Tiles",
-	vescuccicolor: "Classy Vescucci",
-	minimalist: "TGG Minimalist",
-	chujimono: "Chu Ji Canon Tiles",
-	chujired: "Chu Ji Red",
-	azulejos: "Azulejos by Cannoli",
-	keygyatso: "Key Pai Sho Gyatso Style",
-	pixelsho: "Pixel Sho v1 Tiles",
-	pixelsho2: "Pixel Sho v2 Tiles",
-	xiangqi: "Xiangqi Style",
-	standard: "Pai Sho Project Tiles",
-	tggproject2: "TGG Project Alt Colors",
-	rusticgyatso: "Rustic Gyatso TGG Project Tiles",
-	tggwatertribe: "Northern Water Tribe TGG Project",
-	hlowemono: "Modern Monochrome Tiles",
-	modernwood: "Modern Wooden Tiles",
-	tggprojectmono: "TGG Pai Sho Project Monochrome",
-	vescuccicolored: "Vescucci Alt Colors",
-	vescuccicolored2: "Vescucci Alt Colors 2",
-	water: "Water-Themed Vescucci Tiles",
-	earth: "Earth-Themed Vescucci Tiles",
-	chujiblue: "Chu Ji Canon - Blue",
-	azulejosmono: "Azulejos Monocromos",
-	azulejosdemadera: "Azulejos de Madera",
-	tggroyal: "TGG Royal",
-	custom: "Use Custom Designs"
-};
-
-export const paiShoBoardDesignTypeKey = "paiShoBoardDesignTypeKey";
-export const customBoardUrlKey = "customBoardUrlKey";
-export const customBoardUrlArrayKey = "customBoardUrlArrayKey";
 const defaultBoardDesignKey = "tgg20211007";
 const paiShoBoardDesignTypeValuesDefault = {
 	tgg20211007: "The Garden Gate",
@@ -252,18 +344,10 @@ const paiShoBoardDesignTypeValuesDefault = {
 	applycustomboard: "Add Custom Board from URL"
 };
 
-export let paiShoBoardDesignTypeValues = {};
-
-export const svgBoardDesigns = [
-	"lightmode",
-	"darkmode",
-	"xiangqi"
-];
-
 const paiShoBoardDesignDropdownId = "PaiShoBoardDesignSelect";
 
 export function buildBoardDesignsValues() {
-	paiShoBoardDesignTypeValues = copyObject(paiShoBoardDesignTypeValuesDefault);
+	setPaiShoBoardDesignTypeValues(copyObject(paiShoBoardDesignTypeValuesDefault));
 	const customBoardArray = JSON.parse(localStorage.getItem(customBoardUrlArrayKey));
 
 	if (customBoardArray && customBoardArray.length) {
@@ -277,37 +361,7 @@ export function buildBoardDesignsValues() {
 	}
 }
 
-export function buildDropdownDiv(dropdownId, labelText, valuesObject, selectedObjectKey, onchangeFunction) {
-	const containerDiv = document.createElement("div");
-
-	const theDropdown = document.createElement("select");
-	theDropdown.id = dropdownId;
-
-	const label = document.createElement("label");
-	label.for = dropdownId;
-	label.innerText = labelText;
-
-	Object.keys(valuesObject).forEach((key) => {
-		const option = document.createElement("option");
-		option.value = key;
-		option.innerText = valuesObject[key];
-
-		if (key === selectedObjectKey) {
-			option.selected = true;
-		}
-
-		theDropdown.appendChild(option);
-	});
-
-	theDropdown.onchange = onchangeFunction;
-
-	containerDiv.appendChild(label);
-	containerDiv.appendChild(theDropdown);
-
-	return containerDiv;
-}
-
-export function buildPaiShoBoardDesignDropdownDiv() {
+function buildPaiShoBoardDesignDropdownDiv() {
 	return buildDropdownDiv(paiShoBoardDesignDropdownId, "Pai Sho Board Design:", paiShoBoardDesignTypeValues,
 		localStorage.getItem(paiShoBoardDesignTypeKey),
 		function() {
@@ -331,18 +385,10 @@ export function buildPaiShoSettingsDiv() {
 	return settingsDiv;
 }
 
-export const vagabondTileDesignTypeKey = "vagabondTileDesignTypeKey";
-
-const usernameKey = "usernameKey";
-const userEmailKey = "userEmailKey";
-const userIdKey = "userIdKey";
-const deviceIdKey = "deviceIdKey";
 const deviceTokenKey = "deviceTokenKey";
 
 export const showTimestampsKey = "showTimestamps";
 export const showMoveLogsInChatKey = "showMoveLogsInChat";
-
-export const customBgColorKey = "customBgColorKey";
 
 export const markGameInactiveWithoutDialogKey = "markGameInactiveWithoutDialogKey";
 
@@ -355,42 +401,29 @@ let defaultHelpMessageText;
 
 let localStorage;
 
-let hostEmail;
-let guestEmail;
-
-export const BRAND_NEW = "Brand New";
-export const MOVE_DONE = "Move Done";
-export const WAITING_FOR_ENDPOINT = "Waiting for endpoint";
-export const READY_FOR_BONUS = "READY_FOR_BONUS";
-export const WAITING_FOR_BONUS_ENDPOINT = "WAITING_FOR_BONUS_ENDPOINT";
-export const WAITING_FOR_BOAT_BONUS_POINT = "WAITING_FOR_BOAT_BONUS_POINT";
-
-export const HOST_SELECT_ACCENTS = "HOST_SELECT_ACCENTS";
+// Game constants re-exported from GameConstants.js
+export {
+	BRAND_NEW,
+	HOST_SELECT_ACCENTS,
+	MOVE_DONE,
+	READY_FOR_BONUS,
+	WAITING_FOR_BOAT_BONUS_POINT,
+	WAITING_FOR_BONUS_ENDPOINT,
+	WAITING_FOR_ENDPOINT,
+	pieceAnimationLength,
+	piecePlaceAnimation,
+	replayIntervalLength,
+} from './GameConstants';
 
 let localPlayerRole = HOST;
 
-export let activeAi;
-export let activeAi2;
 let sandboxUrl;
 let metadata = {};
-export const replayIntervalLength = 2100;
-export const pieceAnimationLength = 1000; // Note that this must be changed in the `.point img` `transition` property as well(main.css)
-export const piecePlaceAnimation = 1; // 0 = None, they just appear, 1 =
 
 /* Online Play variables */
 let appCaller;
 
-export let onlinePlayEnabled = false;
-export let gameId = -1;
-export let lastKnownGameNotation = null;
-export let gameWatchIntervalValue;
-export let currentGameOpponentUsername;
-export let currentGameData = {};
-export let currentMoveIndex = 0;
-export let isInReplay = false;
-export function setIsInReplay(value) {
-	isInReplay = value;
-}
+let currentGameOpponentUsername;
 export let interval = 0;
 
 export let emailBeingVerified = "";
@@ -436,14 +469,6 @@ function createUserOfflineIconElement() {
 }
 export let logOnlineStatusIntervalValue;
 export let userTurnCountInterval;
-
-export const gameContainerDiv = document.getElementById("game-container");
-
-export let soundManager;
-/* Preference values should default to true */
-export const animationsOnKey = "animationsOn";
-export const confirmMoveKey = "confirmMove";
-export const createNonRankedGamePreferredKey = "createNonRankedGamePreferred";
 
 // var sendJoinGameChatMessage = false;
 /* --- */
@@ -513,12 +538,12 @@ window.requestAnimationFrame(function() {
 	}
 
 	/* Online play is enabled! */
-	onlinePlayEnabled = true;
+	setOnlinePlayEnabled(true);
 	/* ----------------------- */
 
 	localStorage = new LocalStorage().storage;
 
-	soundManager = new SoundManager();
+	setSoundManager(new SoundManager());
 
 	// Initialize GameStats module
 	GameStats.initGameStats({
@@ -614,7 +639,7 @@ window.requestAnimationFrame(function() {
 
 	// if ((url.startsWith("file") || url.includes("localhost")) && !ios && !runningOnAndroid) {
 	if ((url.startsWith("file")) && !ios && !runningOnAndroid) {
-		onlinePlayEnabled = false;
+		setOnlinePlayEnabled(false);
 	}
 
 	if (ios || runningOnAndroid || QueryString.appType === 'ios' || QueryString.appType === 'android') {
@@ -622,8 +647,8 @@ window.requestAnimationFrame(function() {
 		sandboxUrl = url;
 	}
 
-	hostEmail = QueryString.host;
-	guestEmail = QueryString.guest;
+	setHostEmail(QueryString.host);
+	setGuestEmail(QueryString.guest);
 
 	appCaller = new DummyAppCaller();
 
@@ -646,15 +671,15 @@ window.requestAnimationFrame(function() {
 
 		if (localUserEmail) {
 			if (localPlayerRole === HOST) {
-				hostEmail = localUserEmail;
+				setHostEmail(localUserEmail);
 			} else if (localPlayerRole === GUEST) {
-				guestEmail = localUserEmail;
+				setGuestEmail(localUserEmail);
 			}
 		} else {
 			if (localPlayerRole === HOST) {
-				hostEmail = null;
+				setHostEmail(null);
 			} else if (localPlayerRole === GUEST) {
-				guestEmail = null;
+				setGuestEmail(null);
 			}
 		}
 	}
@@ -756,16 +781,108 @@ export function getGameColor(gameMode) {
 	}
 	return "var(--othercolor)";
 }
-export function usernameIsOneOf(theseNames) {
-	if (theseNames && theseNames.length) {
-		for (let i = 0; i < theseNames.length; i++) {
-			if (getUsername() && getUsername().toLowerCase() === theseNames[i].toLowerCase()) {
-				return true;
-			}
-		}
-	}
-	return false;
-}
+// User identity functions re-exported from UserData.js
+export {
+	getDeviceId,
+	getLoginToken,
+	getUserEmail,
+	getUserId,
+	getUsername,
+	haveUserEmail,
+	userIsLoggedIn,
+	usernameEquals,
+	usernameIsOneOf,
+} from './UserData';
+
+export {
+	callFailed,
+	closeModal,
+	getLoadingModalElement,
+	showBadMoveModal,
+	showModal,
+	showModalElem,
+} from './ModalManager';
+
+export {
+	activeAi,
+	activeAi2,
+	addOption,
+	clearAiPlayers,
+	clearGameWatchInterval,
+	clearOptions,
+	currentGameData,
+	currentMoveIndex,
+	emptyCallback,
+	gameContainerDiv,
+	gameController,
+	gameId,
+	gameWatchIntervalValue,
+	getCurrentPlayer,
+	getCurrentPlayerForReal,
+	getGameWinReason,
+	getGameWinner,
+	ggOptions,
+	iAmPlayerInCurrentOnlineGame,
+	isInReplay,
+	lastKnownGameNotation,
+	myTurn,
+	myTurnForReal,
+	onlinePlayEnabled,
+	playingOnlineGame,
+	setCurrentMoveIndex,
+	setGameLogText,
+	setIsInReplay,
+	soundManager,
+} from './GameState';
+
+export {
+	animationsOnKey,
+	buildDropdownDiv,
+	buildPreferenceDropdownDiv,
+	confirmMoveKey,
+	createNonRankedGamePreferredKey,
+	customBgColorKey,
+	customBoardUrlArrayKey,
+	customBoardUrlKey,
+	getUserGamePreference,
+	getUserGamePrefKeyName,
+	paiShoBoardDesignTypeKey,
+	paiShoBoardDesignTypeValues,
+	paiShoBoardKey,
+	promptForCustomTileDesigns,
+	setUserGamePreference,
+	skudTilesKey,
+	svgBoardDesigns,
+	tileDesignTypeKey,
+	tileDesignTypeValues,
+	vagabondTileDesignTypeKey,
+} from './GamePrefs';
+
+export {
+	boardTileHovered,
+	boardTileUnhovered,
+	clearMessage,
+	displayReturnedMessage,
+	getAdditionalMessage,
+	getGameMessageElement,
+	getTournamentText,
+	pointClicked,
+	refreshMessage,
+	RmbDown,
+	RmbUp,
+	setMessage,
+	showPointMessage,
+	showTileMessage,
+	unplayedTileClicked,
+} from './UiInteraction';
+
+export {
+	getResetMoveElement,
+	getSkipButtonElement,
+	showResetMoveMessage,
+	showSkipButtonMessage,
+	skipClicked,
+} from './GameFlow';
 
 export function showReplayControls() {
 	if (window.navigator.onLine) {
@@ -896,7 +1013,7 @@ export function setAccountHeaderLinkText(countOfGamesWhereUserTurn) {
 	if (gameWatchIntervalValue && newGameNotation !== lastKnownGameNotation) {
 		gameController.setGameNotation(decodeURIComponent(newGameNotation));
 		rerunAll(true);
-		lastKnownGameNotation = newGameNotation;
+		setLastKnownGameNotation(newGameNotation);
 		showReplayControls();
 	}
 }; */
@@ -908,7 +1025,7 @@ const getGameNotationAndClockCallback = (newGameDataJsonString) => {
 			if (newGameData.notation !== lastKnownGameNotation) {
 				gameController.setGameNotation(decodeURIComponent(newGameData.notation));
 				rerunAll(true);
-				lastKnownGameNotation = newGameData.notation;
+				setLastKnownGameNotation(newGameData.notation);
 				showReplayControls();
 				if (myTurn()) {
 					GameClock.loadGameClock(GameClock.buildGameClockInstance(newGameData.clock));
@@ -927,9 +1044,7 @@ const getGameNotationAndClockCallback = (newGameDataJsonString) => {
 	}
 };
 
-export function usernameEquals(otherUsername) {
-	return otherUsername && getUsername() && otherUsername.toLowerCase() === getUsername().toLowerCase();
-}
+// usernameEquals re-exported above from UserData.js
 
 export function setResponseText(text) {
 	const responseDiv = document.getElementById("response");
@@ -1202,12 +1317,6 @@ export function gameWatchPulse() {
 	}
 }
 
-export function clearGameWatchInterval() {
-	if (gameWatchIntervalValue) {
-		clearInterval(gameWatchIntervalValue);
-		gameWatchIntervalValue = null;
-	}
-}
 const REAL_TIME_GAME_WATCH_INTERVAL = 3000;
 export function startWatchingGameRealTime() {
 	// Setup game watching...
@@ -1222,11 +1331,11 @@ export function startWatchingGameRealTime() {
 
 	clearGameWatchInterval();
 
-	gameWatchIntervalValue = setInterval(function() {
+	setGameWatchIntervalValue(setInterval(function() {
 		if (!onlinePlayPaused) {
 			gameWatchPulse();
 		}
-	}, REAL_TIME_GAME_WATCH_INTERVAL);
+	}, REAL_TIME_GAME_WATCH_INTERVAL));
 }
 
 /* Pai Sho Board Switches */
@@ -1239,7 +1348,7 @@ export function setPaiShoBoardOption(newPaiShoBoardKey, isTemporary) {
 	if (!isTemporary) {
 		localStorage.setItem(paiShoBoardDesignTypeKey, newPaiShoBoardKey);
 	}
-	paiShoBoardKey = newPaiShoBoardKey;
+	setPaiShoBoardKey(newPaiShoBoardKey);
 	const newClassName = paiShoBoardKey + "Board";
 	gameContainerDiv.classList.add(newClassName);
 
@@ -1427,7 +1536,7 @@ export async function setSkudTilesOption(newSkudTilesKey, applyCustomBoolean) {
 	} else {
 		gameContainerDiv.classList.remove(skudTilesKey);
 		localStorage.setItem(tileDesignTypeKey, newSkudTilesKey);
-		skudTilesKey = newSkudTilesKey;
+		setSkudTilesKey(newSkudTilesKey);
 		gameContainerDiv.classList.add(skudTilesKey);
 		gameController.callActuate();
 		clearMessage(); // Refresh Help tab text
@@ -1519,11 +1628,11 @@ export function signOut(reallySignOut) {
 	}
 
 	if (hostEmail == getUserEmail()) {
-		hostEmail = null;
+		setHostEmail(null);
 	}
 
 	if (guestEmail == getUserEmail()) {
-		guestEmail = null;
+		setGuestEmail(null);
 	}
 
 	document.title = "The Garden Gate";
@@ -1543,7 +1652,7 @@ export function rewindAllMoves() {
 	pauseRun();
 	gameController.resetGameManager();
 	gameController.resetNotationBuilder();
-	currentMoveIndex = 0;
+	setCurrentMoveIndex(0);
 	refreshMessage();
 }
 
@@ -1555,22 +1664,23 @@ export function rewindAllMoves() {
 export function playNextMove(withActuate, moveAnimationBeginStep, skipAnimation) {
 	if (currentMoveIndex >= gameController.gameNotation.moves.length) {
 		// no more moves to run
-		isInReplay = false;
+		setIsInReplay(false);
 		refreshMessage();
 		return false;
 	} else {
-		isInReplay = true;
+		setIsInReplay(true);
 		if (withActuate && soundManager.nextMoveSoundsAreEnabled()) {
 			soundManager.playSound(SoundManager.sounds.tileLand);
 		}
 		if (gameController.getSkipToIndex) {
 			const newMoveIndex = gameController.getSkipToIndex(currentMoveIndex);
-			for (currentMoveIndex; currentMoveIndex < newMoveIndex; currentMoveIndex++) {
+			while (currentMoveIndex < newMoveIndex) {
 				if (gameController.runMove) {
 					gameController.runMove(gameController.gameNotation.moves[currentMoveIndex], false);
 				} else {
 					gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], false);
 				}
+				setCurrentMoveIndex(currentMoveIndex + 1);
 			}
 		}
 		if (gameController.runMove) {
@@ -1578,9 +1688,9 @@ export function playNextMove(withActuate, moveAnimationBeginStep, skipAnimation)
 		} else {
 			gameController.theGame.runNotationMove(gameController.gameNotation.moves[currentMoveIndex], withActuate, moveAnimationBeginStep, skipAnimation);
 		}
-		currentMoveIndex++;
+		setCurrentMoveIndex(currentMoveIndex + 1);
 		if (currentMoveIndex >= gameController.gameNotation.moves.length) {
-			isInReplay = false;
+			setIsInReplay(false);
 			if (gameController.replayEnded) {
 				gameController.replayEnded();
 			}
@@ -1593,7 +1703,7 @@ export function playNextMove(withActuate, moveAnimationBeginStep, skipAnimation)
 }
 
 export function playPrevMove() {
-	isInReplay = true;
+	setIsInReplay(true);
 	pauseRun();
 
 	const moveToPlayTo = currentMoveIndex - 1;
@@ -1601,7 +1711,7 @@ export function playPrevMove() {
 	gameController.resetGameManager(true);
 	gameController.resetNotationBuilder();
 
-	currentMoveIndex = 0;
+	setCurrentMoveIndex(0);
 
 	while (currentMoveIndex < moveToPlayTo) {
 		playNextMove();
@@ -1666,104 +1776,13 @@ export function pauseRun() {
 	playButton.appendChild(playIcon);
 }
 
-export function getAdditionalMessage() {
-	const container = document.createElement("span");
-
-	// Is it the player's turn?
-	// TODO Could maybe get rid of this
-	if (myTurn() && !userIsLoggedIn()) {
-		const youSpan = document.createElement("span");
-		youSpan.textContent = " (You) ";
-		container.appendChild(youSpan);
-	}
-
-	const additionalMsg = gameController.getAdditionalMessage();
-	if (additionalMsg) {
-		if (typeof additionalMsg === 'string') {
-			const msgSpan = document.createElement("span");
-			msgSpan.innerHTML = additionalMsg;
-			container.appendChild(msgSpan);
-		} else {
-			container.appendChild(additionalMsg);
-		}
-	}
-
-	if (getGameWinner()) {
-		// There is a winner!
-		container.appendChild(document.createElement("br"));
-		const winnerSpan = document.createElement("strong");
-		winnerSpan.appendChild(document.createTextNode(getGameWinner()));
-		const winReason = getGameWinReason();
-		if (typeof winReason === 'string') {
-			winnerSpan.appendChild(document.createTextNode(winReason));
-		} else {
-			winnerSpan.appendChild(winReason);
-		}
-		container.appendChild(winnerSpan);
-	} else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
-		container.appendChild(document.createElement("br"));
-		const drawSpan = document.createElement("span");
-		drawSpan.textContent = "Game has ended in a draw.";
-		container.appendChild(drawSpan);
-	}
-
-	return container;
-}
-
-export function getGameMessageElement() {
-	const gameMessage = document.querySelector(".gameMessage");
-	const gameMessage2 = document.querySelector(".gameMessage2");
-
-	if (gameController.showGameMessageUnderneath) {
-		while (gameMessage.firstChild) {
-			gameMessage.removeChild(gameMessage.firstChild);
-		}
-		return gameMessage2;
-	} else {
-		if (gameMessage2) {
-			while (gameMessage2.firstChild) {
-				gameMessage2.removeChild(gameMessage2.firstChild);
-			}
-		}
-		return gameMessage;
-	}
-}
-
-export function refreshMessage() {
-	const messageElement = getGameMessageElement();
-	// Clear the message element
-	while (messageElement.firstChild) {
-		messageElement.removeChild(messageElement.firstChild);
-	}
-
-	if (!playingOnlineGame()) {
-		const playerText = document.createElement("span");
-		playerText.textContent = "Current Player: " + getCurrentPlayer();
-		messageElement.appendChild(playerText);
-		messageElement.appendChild(document.createElement("br"));
-	}
-
-	const additionalMsg = getAdditionalMessage();
-	if (additionalMsg) {
-		messageElement.appendChild(additionalMsg);
-	}
-
-	if (gameController && gameController.getAdditionalMessageElement) {
-		messageElement.appendChild(gameController.getAdditionalMessageElement());
-		messageElement.appendChild(document.createElement("br"));
-	}
-
-	if ((playingOnlineGame() && iAmPlayerInCurrentOnlineGame() && !myTurn() && !getGameWinner())
-		|| gameController.isSolitaire()) {
-		showResetMoveMessage();
-	}
-}
+// getAdditionalMessage, getGameMessageElement, refreshMessage moved to UiInteraction.js
 
 export function rerunAll(soundOkToPlay, moveAnimationBeginStep, skipAnimation) {
 	gameController.resetGameManager();
 	gameController.resetNotationBuilder();
 
-	currentMoveIndex = 0;
+	setCurrentMoveIndex(0);
 
 	playAllMoves(moveAnimationBeginStep, skipAnimation);
 
@@ -1776,7 +1795,7 @@ export function rerunAll(soundOkToPlay, moveAnimationBeginStep, skipAnimation) {
 export function quickFinalizeMove(soundOkToPlay) {
 	// gameController.resetGameManager();
 	gameController.resetNotationBuilder();
-	currentMoveIndex++;
+	setCurrentMoveIndex(currentMoveIndex + 1);
 	linkShortenCallback('');
 
 	if (soundOkToPlay && soundManager.rerunAllSoundsAreEnabled()) {
@@ -1885,37 +1904,7 @@ export function getNoUserEmailMessage() {
 	return container;
 }
 
-export function playingOnlineGame() {
-	return onlinePlayEnabled && gameId > 0;
-}
-
-export function getGameWinner() {
-	/* if (GameClock.playerIsOutOfTime(HOST)) {
-		return GUEST;
-	} else if (GameClock.playerIsOutOfTime(GUEST)) {
-		return HOST;
-	} else  */
-	if (currentGameData && currentGameData.resultId === 9 && currentGameData.winnerUsername) {
-		if (currentGameData.hostUsername === currentGameData.winnerUsername) {
-			return HOST;
-		} else {
-			return GUEST;
-		}
-	} else {
-		return gameController.theGame.getWinner();
-	}
-}
-
-export function getGameWinReason() {
-	/* if (GameClock.aPlayerIsOutOfTime()) {
-		return " won the game due to opponent running out of time";
-	} else  */
-	if (currentGameData && currentGameData.resultId === 9) {
-		return " wins ᕕ( ᐛ )ᕗ! Opponent has resigned.";
-	} else {
-		return gameController.theGame.getWinReason();
-	}
-}
+// getGameWinner, getGameWinReason moved to GameState.js
 
 export function linkShortenCallback(shortUrl, ignoreNoEmail, okToUpdateWinInfo) {
     const aiList = gameController.getAiList();
@@ -2068,9 +2057,7 @@ export function haveBothEmails() {
 	return hostEmail && guestEmail && haveUserEmail();
 }
 
-export function getUserEmail() {
-	return localStorage.getItem(userEmailKey);
-}
+// getUserEmail re-exported above from UserData.js
 
 export function getCurrentPlayerEmail() {
 	let address;
@@ -2101,14 +2088,6 @@ export function getEmailBody(url) {
 	return bodyMessage;
 }
 
-export function getCurrentPlayer() {
-	return gameController.getCurrentPlayer();
-}
-
-export function getCurrentPlayerForReal() {
-	return gameController.getCurrentPlayer();
-}
-
 // export function getResetMoveText() {
 // 	if (activeAi) {
 // 		return "";	// Hide "Undo" if playing against an AI
@@ -2120,64 +2099,8 @@ export function getCurrentPlayerForReal() {
 // 	}
 // }
 
-export function getResetMoveElement() {
-    if (activeAi) {
-        return document.createElement("span");	// Return empty span if playing against an AI
-    }
-
-    const container = document.createElement("span");
-
-    if (!gameController.undoMoveAllowed || gameController.undoMoveAllowed()) {
-        container.appendChild(document.createElement("br"));
-
-        const span = document.createElement("span");
-        span.className = "skipBonus";
-        span.textContent = "Undo move";
-        span.onclick = function() {
-            resetMove();
-        };
-
-        container.appendChild(span);
-    }
-
-    return container;
-}
-
-export function skipClicked() {
-	if (gameController && gameController.skipClicked) {
-		gameController.skipClicked();
-	}
-}
-
-// getSkipButtonHtmlText removed - use getSkipButtonElement instead
-
-export function getSkipButtonElement(overrideText) {
-    let text = "Skip";
-    if (overrideText) {
-        text = overrideText;
-    }
-
-    const container = document.createElement("span");
-    container.appendChild(document.createElement("br"));
-
-    const button = document.createElement("button");
-    button.style.fontSize = "medium";
-    button.textContent = text;
-    button.onclick = function() {
-        skipClicked();
-    };
-
-    container.appendChild(button);
-    return container;
-}
-
-export function showSkipButtonMessage(overrideText) {
-    getGameMessageElement().appendChild(getSkipButtonElement(overrideText));
-}
-
-export function showResetMoveMessage() {
-    getGameMessageElement().appendChild(getResetMoveElement());
-}
+// getResetMoveElement, skipClicked, getSkipButtonElement, showSkipButtonMessage, showResetMoveMessage
+// moved to GameFlow.js
 
 export function resetMove() {
 	lockedInNotationTextForUrlData = null;
@@ -2192,43 +2115,9 @@ export function resetMove() {
 
 window.resetMove = resetMove
 
-export function myTurn() {
-	if (isSuperSandboxMode()) {
-		return true;
-	}
-
-	const userEmail = localStorage.getItem(localEmailKey);
-	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
-		if (getCurrentPlayer() === HOST) {
-			return (!hostEmail && !playingOnlineGame()) ||
-				(localStorage.getItem(localEmailKey) === hostEmail ||
-					(currentGameData.hostUsername && usernameEquals(currentGameData.hostUsername)));
-		} else {
-			return (!guestEmail && !playingOnlineGame()) ||
-				(localStorage.getItem(localEmailKey) === guestEmail ||
-					(currentGameData.guestUsername && usernameEquals(currentGameData.guestUsername)));
-		}
-	} else {
-		return true;
-	}
-}
-
-export function myTurnForReal() {
-	const userEmail = localStorage.getItem(localEmailKey);
-	if (userEmail && userEmail.includes("@") && userEmail.includes(".")) {
-		if (getCurrentPlayerForReal() === HOST) {
-			return localStorage.getItem(localEmailKey) === hostEmail;
-		} else {
-			return localStorage.getItem(localEmailKey) === guestEmail;
-		}
-	} else {
-		return true;
-	}
-}
-
 const createGameCallback = (newGameId) => {
 	finalizeMove();
-	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
+	setLastKnownGameNotation(gameController.gameNotation.notationTextForUrl());
 
 	// If a solitaire game, automatically join game.
 	if (gameController.isSolitaire()) {
@@ -2247,7 +2136,7 @@ const createGameCallback = (newGameId) => {
 
 const createPrivateGameCallback = (newGameId) => {
 	finalizeMove();
-	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
+	setLastKnownGameNotation(gameController.gameNotation.notationTextForUrl());
 
 	// If a solitaire game, automatically join game.
 	if (gameController.isSolitaire()) {
@@ -2379,7 +2268,7 @@ export function yesJoinPrivateGame(privateGameId) {
 
 export let submitMoveData = {};
 const submitMoveCallback = (resultData, move) => {
-	lastKnownGameNotation = gameController.gameNotation.notationTextForUrl();
+	setLastKnownGameNotation(gameController.gameNotation.notationTextForUrl());
 	finalizeMove(submitMoveData.moveAnimationBeginStep, false, true);
 
 	if (move && move.fullMoveText) {
@@ -2394,251 +2283,22 @@ const submitMoveCallback = (resultData, move) => {
 	// onlinePlayEngine.notifyUser(getLoginToken(), currentGameOpponentUsername, emptyCallback);
 };
 
-export function clearMessage() {
-	const helpTabContentDiv = document.getElementById("helpTextContent");
+// clearMessage, unplayedTileClicked, pointClicked, boardTileHovered, boardTileUnhovered,
+// RmbDown, RmbUp, displayReturnedMessage, showTileMessage, showPointMessage,
+// setMessage, getTournamentText, getGameMessageElement, getAdditionalMessage, refreshMessage
+// moved to UiInteraction.js
 
-	// Clear the div
-	while (helpTabContentDiv.firstChild) {
-		helpTabContentDiv.removeChild(helpTabContentDiv.firstChild);
-	}
-
-	// if (!defaultHelpMessageText) {	// Load help message every time
-	defaultHelpMessageText = gameController.getDefaultHelpMessageText();
-	// }
-
-	const helpSpan = document.createElement("span");
-	if (defaultHelpMessageText instanceof HTMLElement) {
-		helpSpan.appendChild(defaultHelpMessageText);
-	} else {
-		helpSpan.innerHTML = defaultHelpMessageText;
-	}
-	helpTabContentDiv.appendChild(helpSpan);
-
-	const tournamentText = getTournamentText();
-	if (tournamentText) {
-		const tourSpan = document.createElement("span");
-		tourSpan.innerHTML = tournamentText;
-		helpTabContentDiv.insertBefore(tourSpan, helpTabContentDiv.firstChild);
-	}
-
-	if (gameController.getAdditionalHelpTabDiv) {
-		const additionalDiv = gameController.getAdditionalHelpTabDiv();
-		if (additionalDiv) {
-			helpTabContentDiv.appendChild(additionalDiv);
-		}
-	}
-
-	if (gameController.isPaiShoGame) {
-		helpTabContentDiv.appendChild(buildPaiShoSettingsDiv());
-	}
-}
-
-export function haveUserEmail() {
-	const userEmail = localStorage.getItem(localEmailKey);
-	return userEmail && userEmail.includes("@") && userEmail.includes(".");
-}
-
-export function unplayedTileClicked(tileDiv) {
-	/* If super sandbox mode, sandbox game immediately */
-	if (isSuperSandboxMode()) {
-		truncateMovesForSuperSandboxMode();
-	}
-
-	gameController.unplayedTileClicked(tileDiv);
-}
-
-export function pointClicked(htmlPoint) {
-	/* If super sandbox mode, sandbox game immediately */
-	if (isSuperSandboxMode()) {
-		truncateMovesForSuperSandboxMode();
-	}
-
-	gameController.pointClicked(htmlPoint);
-}
-
-export function boardTileHovered(htmlPoint) {
-	if (gameController.boardTileHovered) {
-		gameController.boardTileHovered(htmlPoint);
-	}
-}
-
-export function boardTileUnhovered() {
-	if (gameController.boardTileUnhovered) {
-		gameController.boardTileUnhovered();
-	}
-}
-
-export function RmbDown(htmlPoint) {
-	if (gameController.RmbDown) {
-		gameController.RmbDown(htmlPoint);
-	}
-}
-
-export function RmbUp(htmlPoint) {
-	if (gameController.RmbUp) {
-		gameController.RmbUp(htmlPoint);
-	}
-}
-
-export function displayReturnedMessage(messageReturned) {
-	const heading = messageReturned.heading;
-	const message = messageReturned.message;
-	const container = document.createElement('div');
-
-	if (heading) {
-		container.appendChild(toHeading(heading));
-	}
-
-	if (message.length > 1) {
-		container.appendChild(toBullets(message));
-	} else {
-		container.appendChild(toMessage(message));
-	}
-
-	setMessage(container);
-}
-
-export function showTileMessage(tileDiv) {
-	const messageReturned = gameController.getTileMessage(tileDiv);
-	displayReturnedMessage(messageReturned);
-}
-
-export function showPointMessage(htmlPoint) {
-	const messageReturned = gameController.getPointMessage(htmlPoint);
-	if (messageReturned) {
-		displayReturnedMessage(messageReturned);
-	}
-}
-
-export function setMessage(msg) {
-	const helpTextContent = document.getElementById("helpTextContent");
-
-	if (msg instanceof HTMLElement) {
-		// Toggle: if same content is already displayed, reset to default
-		if (msg.innerHTML === helpTextContent.innerHTML) {
-			clearMessage();
-			return;
-		}
-		// Clear existing content
-		while (helpTextContent.firstChild) {
-			helpTextContent.removeChild(helpTextContent.firstChild);
-		}
-		// Add tournament text if any
-		const tournamentText = getTournamentText();
-		if (tournamentText) {
-			const tourSpan = document.createElement('span');
-			tourSpan.innerHTML = tournamentText;
-			helpTextContent.appendChild(tourSpan);
-		}
-		helpTextContent.appendChild(msg);
-	} else {
-		if (msg === helpTextContent.innerHTML) {
-			clearMessage();
-		} else {
-			helpTextContent.innerHTML = getTournamentText() + msg;
-		}
-	}
-}
-
-// function getAltTilesOptionText() {
-// 	return "<p><span class='skipBonus' onclick='toggleTileDesigns();'>Click here</span> to switch between classic, modern, and Vescucci tile designs for Skud Pai Sho.<br />Currently selected: " + getSelectedTileDesignTypeDisplayName() + "</p>";
-// }
-
-// function getAltVagabondTilesOptionText() {
-// 	return "<p><span class='skipBonus' onclick='toggleVagabondTileDesigns();'>Click here</span> to switch between standard and modern tile designs for Vagabond Pai Sho.</p>";
-// }
-
-export function getTournamentText() {
-	if (metadata.tournamentMatchNotes) {
-		return metadata.tournamentName + "<br />" + metadata.tournamentMatchNotes + "<br />";
-	}
-	return "";
-}
-
-export function toHeading(str) {
-	const h4 = document.createElement('h4');
-	if (str instanceof HTMLElement) {
-		h4.appendChild(str);
-	} else {
-		h4.textContent = str;
-	}
-	return h4;
-}
-
-export function toMessage(paragraphs) {
-	const container = document.createElement('span');
-
-	if (paragraphs.length === 1) {
-		const item = paragraphs[0];
-		if (item instanceof HTMLElement) {
-			container.appendChild(item);
-		} else {
-			container.innerHTML = item;
-		}
-	} else if (paragraphs.length > 1) {
-		paragraphs.forEach((item) => {
-			const p = document.createElement('p');
-			if (item instanceof HTMLElement) {
-				p.appendChild(item);
-			} else {
-				p.innerHTML = item;
-			}
-			container.appendChild(p);
-		});
-	}
-
-	return container;
-}
-
-export function toBullets(paragraphs) {
-	const ul = document.createElement('ul');
-
-	paragraphs.forEach((item) => {
-		const li = document.createElement('li');
-		if (item instanceof HTMLElement) {
-			li.appendChild(item);
-		} else {
-			li.innerHTML = item;
-		}
-		ul.appendChild(li);
-	});
-
-	return ul;
-}
-
-export function getNeutralPointMessage() {
-	let msg = "<h4>Neutral Point</h4>";
-	msg += "<ul>";
-	msg += "<li>This point is Neutral, so any tile can land here.</li>";
-	msg += "<li>If a tile that is on a point touches a Neutral area of the board, that point is considered Neutral.</li>";
-	msg += "</ul>";
-	return msg;
-}
-
-export function getRedPointMessage() {
-	let msg = "<h4>Red Point</h4>";
-	msg += "<p>This point is Red, so Basic White Flower Tiles are not allowed to land here.</p>";
-	return msg;
-}
-
-export function getWhitePointMessage() {
-	let msg = "<h4>White Point</h4>";
-	msg += "<p>This point is White, so Basic Red Flower Tiles are not allowed to land here.</p>";
-	return msg;
-}
-
-export function getRedWhitePointMessage() {
-	let msg = "<h4>Red/White Point</h4>";
-	msg += "<p>This point is both Red and White, so any tile is allowed to land here.</p>";
-	return msg;
-}
-
-export function getGatePointMessage() {
-	let msg = "<h4>Gate</h4>";
-	msg += '<p>This point is a Gate. When Flower Tiles are played, they are <em>Planted</em> in an open Gate.</p>';
-	msg += '<p>Tiles in a Gate are considered <em>Growing</em>, and when they have moved out of the Gate, they are considered <em>Blooming</em>.</p>';
-	return msg;
-}
+// Text helpers re-exported from TextHelpers.js
+export {
+	getGatePointMessage,
+	getNeutralPointMessage,
+	getRedPointMessage,
+	getRedWhitePointMessage,
+	getWhitePointMessage,
+	toBullets,
+	toHeading,
+	toMessage,
+} from './TextHelpers';
 
 export function userHasGameAccess() {
 	const gameTypeId = gameController.getGameTypeId && gameController.getGameTypeId();
@@ -2716,19 +2376,16 @@ export function setAiIndex(i) {
 	const aiList = gameController.getAiList();
 
 	if (activeAi) {
-		activeAi2 = aiList[i];
+		setActiveAi2(aiList[i]);
 		activeAi2.setPlayer(getCurrentPlayer());
 	} else {
-		activeAi = aiList[i];
+		setActiveAi(aiList[i]);
 		activeAi.setPlayer(getCurrentPlayer());
 	}
 	gameController.startAiGame(finalizeMove);
 }
 
-export function clearAiPlayers() {
-	activeAi = null;
-	activeAi2 = null;
-}
+// clearAiPlayers imported from GameState.js
 
 export function playAiTurn() {
 	if (playingOnlineGame()) {
@@ -2755,152 +2412,6 @@ export function openLink(linkUrl) {
 	} else {
 		window.open(linkUrl);
 	}
-}
-
-/* Modal */
-export function callFailed() {
-	showModalElem("", document.createTextNode("Unable to load."));
-}
-
-export function showModalElem(headingText, modalMessageElement, onlyCloseByClickingX, yesNoOptions, useInvisibleModal) {
-	// Make sure sidenav is closed
-	closeNav();
-
-	// Get the modal
-	const modal = document.getElementById('myMainModal');
-
-	if (!useInvisibleModal) {
-		modal.classList.add('modalDefaultBackground');
-	} else {
-		modal.classList.remove('modalDefaultBackground');
-	}
-
-	// Get the <span> element that closes the modal
-	const span = document.getElementsByClassName("myMainModalClose")[0];
-
-	const modalHeading = document.getElementById('modalHeading');
-	modalHeading.innerHTML = headingText;
-
-	const modalMessage = document.getElementById('modalMessage');
-	modalMessage.innerHTML = '';
-	modalMessage.appendChild(modalMessageElement);
-
-	if (yesNoOptions && yesNoOptions.yesFunction) {
-		modalMessage.appendChild(document.createElement("br"));
-		modalMessage.appendChild(document.createElement("br"));
-
-		const yesDiv = document.createElement("div");
-		yesDiv.innerText = yesNoOptions.yesText ? yesNoOptions.yesText : "OK";
-		yesDiv.classList.add("clickableText");
-		yesDiv.onclick = yesNoOptions.yesFunction;
-		modalMessage.appendChild(yesDiv);
-
-		modalMessage.appendChild(document.createElement("br"));
-		const noDiv = document.createElement("div");
-		noDiv.innerText = yesNoOptions.noText ? yesNoOptions.noText : "Cancel";
-		noDiv.classList.add("clickableText");
-		if (yesNoOptions.noFunction) {
-			noDiv.onclick = yesNoOptions.noFunction;
-		} else {
-			noDiv.onclick = closeModal;
-		}
-		modalMessage.appendChild(noDiv);
-	}
-
-	// When the user clicks the button, open the modal
-	modal.style.display = "block";
-
-	// When the user clicks on <span> (x), close the modal
-	span.onclick = function() {
-		closeModal();
-	};
-
-	if (WelcomeTutorial.isTutorialInProgress()) {
-		onlyCloseByClickingX = true;
-	}
-
-	// When the user clicks anywhere outside of the modal, close it
-	window.onclick = function(event) {
-		if (event.target == modal && !onlyCloseByClickingX) {
-			closeModal();
-		}
-	};
-}
-
-export function showModal(headingHTMLText, modalMessageHTMLText, onlyCloseByClickingX, yesNoOptions, useInvisibleModal) {
-	// Make sure sidenav is closed
-	closeNav();
-
-	// Get the modal
-	const modal = document.getElementById('myMainModal');
-
-	if (!useInvisibleModal) {
-		modal.classList.add('modalDefaultBackground');
-	} else {
-		modal.classList.remove('modalDefaultBackground');
-	}
-
-	// Get the <span> element that closes the modal
-	const span = document.getElementsByClassName("myMainModalClose")[0];
-
-	const modalHeading = document.getElementById('modalHeading');
-	modalHeading.innerHTML = headingHTMLText;
-
-	const modalMessage = document.getElementById('modalMessage');
-	modalMessage.innerHTML = '';
-	// modalMessage.innerHTML = modalMessageHTMLText;
-	modalMessage.appendChild(convertToDomObject(modalMessageHTMLText));
-
-	if (yesNoOptions && yesNoOptions.yesFunction) {
-		modalMessage.appendChild(document.createElement("br"));
-		modalMessage.appendChild(document.createElement("br"));
-
-		const yesDiv = document.createElement("div");
-		yesDiv.innerText = yesNoOptions.yesText ? yesNoOptions.yesText : "OK";
-		yesDiv.classList.add("clickableText");
-		yesDiv.onclick = yesNoOptions.yesFunction;
-		modalMessage.appendChild(yesDiv);
-
-		modalMessage.appendChild(document.createElement("br"));
-		const noDiv = document.createElement("div");
-		noDiv.innerText = yesNoOptions.noText ? yesNoOptions.noText : "Cancel";
-		noDiv.classList.add("clickableText");
-		if (yesNoOptions.noFunction) {
-			noDiv.onclick = yesNoOptions.noFunction;
-		} else {
-			noDiv.onclick = closeModal;
-		}
-		modalMessage.appendChild(noDiv);
-	}
-
-	// When the user clicks the button, open the modal
-	modal.style.display = "block";
-
-	// When the user clicks on <span> (x), close the modal
-	span.onclick = function() {
-		closeModal();
-	};
-
-	if (WelcomeTutorial.isTutorialInProgress()) {
-		onlyCloseByClickingX = true;
-	}
-
-	// When the user clicks anywhere outside of the modal, close it
-	window.onclick = function(event) {
-		if (event.target == modal && !onlyCloseByClickingX) {
-			closeModal();
-		}
-	};
-}
-
-export function closeModal() {
-	document.getElementById('myMainModal').style.display = "none";
-
-	if (WelcomeTutorial.isTutorialInProgress() || WelcomeTutorial.isTutorialOpen()) {
-		OnboardingFunctions.showOnLoadAnnouncements();
-	}
-
-	WelcomeTutorial.resetTutorialState();
 }
 
 export let confirmMoveToSubmit = null;
@@ -3113,9 +2624,9 @@ const createDeviceIdCallback = (generatedDeviceId) => {
 	localStorage.setItem(localEmailKey, emailBeingVerified); // Old field..
 
 	if (localPlayerRole === HOST) {
-		hostEmail = emailBeingVerified;
+		setHostEmail(emailBeingVerified);
 	} else if (localPlayerRole === GUEST) {
-		guestEmail = emailBeingVerified;
+		setGuestEmail(emailBeingVerified);
 	}
 
 	emailBeingVerified = "";
@@ -3203,24 +2714,7 @@ const verifyCodeCallback = (result) => {
 	}
 };
 
-export function getUserId() {
-	return localStorage.getItem(userIdKey);
-}
-
-export function getUsername() {
-	return localStorage.getItem(usernameKey);
-}
-
-export function getDeviceId() {
-	return localStorage.getItem(deviceIdKey);
-}
-
-export function userIsLoggedIn() {
-	return getUserId() &&
-		getUsername() &&
-		getUserEmail() &&
-		getDeviceId();
-}
+// getUserId, getUsername, getDeviceId, userIsLoggedIn re-exported above from UserData.js
 
 export function forgetCurrentGameInfo() {
 	clearAiPlayers();
@@ -3232,23 +2726,23 @@ export function forgetCurrentGameInfo() {
 
 	if (gameWatchIntervalValue) {
 		clearInterval(gameWatchIntervalValue);
-		gameWatchIntervalValue = null;
+		setGameWatchIntervalValue(null);
 	}
 
-	gameId = -1;
-	lastKnownGameNotation = null;
+	setGameId(-1);
+	setLastKnownGameNotation(null);
 	if (gameWatchIntervalValue) {
 		clearInterval(gameWatchIntervalValue);
-		gameWatchIntervalValue = null;
+		setGameWatchIntervalValue(null);
 	}
 	currentGameOpponentUsername = null;
-	currentGameData = {};
-	currentMoveIndex = 0;
+	setCurrentGameData({});
+	setCurrentMoveIndex(0);
 	pauseRun();
 
 	// Change user to host
-	hostEmail = getUserEmail();
-	guestEmail = null;
+	setHostEmail(getUserEmail());
+	setGuestEmail(null);
 
 	updateFooter();
 
@@ -3300,12 +2794,24 @@ export async function setGameController(gameTypeId, keepGameOptions) {
 	showDefaultGameOpenedMessage(false);
 
 	// Show loading indicator while game code downloads
-	gameContainerDiv.innerHTML = '';
-	gameContainerDiv.appendChild(getLoadingModalElement());
+	/*gameContainerDiv.innerHTML = '';
+	gameContainerDiv.appendChild(getLoadingModalElement());*/
+	var existingSvgContainer = gameContainerDiv.querySelector('.svgContainer');
+	if (existingSvgContainer) {
+		// Board exists from a previous Pai Sho game — keep it visible during load.
+		// Remove tile piles (game-specific), but keep the board structure.
+		var tilePile = gameContainerDiv.querySelector('.tilePileContainer');
+		if (tilePile) tilePile.remove();
+	} else {
+		// No existing board (first load, or switching from non-Pai-Sho game) — full clear
+		gameContainerDiv.innerHTML = '';
+		gameContainerDiv.appendChild(getLoadingModalElement());
+	}
 
-	gameController = await getGameControllerForGameType(gameTypeId);
+
+	setGameControllerRef(await getGameControllerForGameType(gameTypeId));
 	if (!gameController) {
-		gameController = await getGameControllerForGameType(GameType.VagabondPaiSho.id);
+		setGameControllerRef(await getGameControllerForGameType(GameType.VagabondPaiSho.id));
 		const container = document.createElement('div');
 		container.appendChild(document.createTextNode("This game is unavailable. Try Vagabond Pai Sho instead :)"));
 		container.appendChild(document.createElement('br'));
@@ -3327,7 +2833,7 @@ export async function setGameController(gameTypeId, keepGameOptions) {
 		document.getElementById("toggleMoveLogDisplayDiv").classList.add("gone");
 	}
 
-	isInReplay = false;
+	setIsInReplay(false);
 
 	// New game stuff:
 	currentGameData.gameTypeId = gameTypeId;
@@ -3365,7 +2871,7 @@ const jumpToGameCallback = async (results) => {
 		const userIsPlaying = usernameEquals(myGame.hostUsername) ||
 			usernameEquals(myGame.guestUsername);
 
-		gameId = myGame.gameId;
+		setGameId(myGame.gameId);
 		currentGameOpponentUsername = null;
 		let opponentUsername;
 
@@ -3389,8 +2895,8 @@ const jumpToGameCallback = async (results) => {
 		currentGameData.gameClock = myGame.gameClock;
 		GameClock.loadGameClock(currentGameData.gameClock);
 
-		hostEmail = myGame.hostUsername;
-		guestEmail = myGame.guestUsername;
+		setHostEmail(myGame.hostUsername);
+		setGuestEmail(myGame.guestUsername);
 
 		startWatchingGameRealTime();
 		updateFooter();
@@ -3470,14 +2976,7 @@ export function populateMyGamesList(results) {
 	}
 }
 
-export function getLoginToken() {
-	return {
-		userId: getUserId(),
-		username: getUsername(),
-		userEmail: getUserEmail(),
-		deviceId: getDeviceId()
-	};
-}
+// getLoginToken re-exported above from UserData.js
 
 const showPastGamesCallback = (results) => {
 	const container = document.createElement('div');
@@ -4004,10 +3503,6 @@ export function showMyGames() {
 	}
 }
 
-export const emptyCallback = (results) => {
-	// Nothing to do
-};
-
 export function emailNotificationsCheckboxClicked() {
 	let value = 'N';
 	if (document.getElementById("emailNotificationsCheckbox").checked) {
@@ -4151,7 +3646,7 @@ export function acceptGameSeekClicked(gameIdChosen) {
 }
 
 export function tryRealTimeClicked() {
-	onlinePlayEnabled = true;
+	setOnlinePlayEnabled(true);
 	setAccountHeaderLinkText();
 	initialVerifyLogin();
 	rerunAll();
@@ -4418,11 +3913,7 @@ const getGameSeeksCallback = (results) => {
 };
 
 /* From https://css-tricks.com/snippets/javascript/unescape-html-in-js/ */
-export function htmlDecode(input) {
-	const e = document.createElement('div');
-	e.innerHTML = input;
-	return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
-}
+export { htmlDecode, htmlEscape } from './TextHelpers';
 
 export function parseGameOptions(optionsJsonString) {
 	try {
@@ -5135,9 +4626,7 @@ export function submitHumanAge() {
 // 	}
 // };
 
-export function htmlEscape(str) {
-	return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
-}
+// htmlEscape re-exported above with htmlDecode
 
 export function openTab(evt, tabIdName) {
 	let i, tabcontent, tablinks;
@@ -5398,9 +4887,7 @@ export async function quitOnlineGameCallback() {
 	}
 }
 
-export function iAmPlayerInCurrentOnlineGame() {
-	return usernameEquals(currentGameData.hostUsername) || usernameEquals(currentGameData.guestUsername);
-}
+// iAmPlayerInCurrentOnlineGame moved to GameState.js
 
 export function quitOnlineGame() {
 	// TODO eventually make it so if guest never made a move, then player only "leaves" game instead of updating the game result, so it returns to being an available game seek.
@@ -5614,16 +5101,6 @@ export function discordLinkClicked() {
 }
 
 /* Options */
-export let ggOptions = [];
-
-export function addOption(option) {
-	ggOptions.push(option);
-}
-
-export function clearOptions() {
-	ggOptions = [];
-}
-
 export function addOptionFromInput() {
 	addGameOption(document.getElementById('optionAddInput').value);
 	closeModal();
@@ -6117,30 +5594,6 @@ export function getGameOptionsMessageElement(options) {
     return container;
 }
 
-export function showBadMoveModal() {
-	clearGameWatchInterval();
-	const container = document.createElement('div');
-	container.appendChild(document.createTextNode("A move went wrong somewhere. If you see this each time you look at this game, then this game may be corrupt. "));
-	container.appendChild(document.createElement('br'));
-	container.appendChild(document.createElement('br'));
-	container.appendChild(document.createTextNode("Please let your opponent know that you saw this message. You may want to quit this game and try again."));
-	container.appendChild(document.createElement('br'));
-	container.appendChild(document.createTextNode("Live game updates have been paused."));
-	showModalElem("Uh Oh", container);
-}
-
-
-/* Utility function for loading modals */
-export function getLoadingModalElement() {
-	const span = document.createElement("span");
-	span.appendChild(document.createTextNode("Loading\u00A0"));
-	const icon = document.createElement("i");
-	icon.className = "fa fa-circle-o-notch fa-spin fa-fw";
-	span.appendChild(icon);
-	span.appendChild(document.createTextNode("\u00A0"));
-	return span;
-}
-
 /* Tournament functions - Re-exported from TournamentManager module */
 export {
 	changeTournamentPlayerStatus, changeTournamentStatus, createNewRound, createNewTournamentClicked, createNewTournamentMatch, manageTournamentClicked,
@@ -6234,42 +5687,6 @@ export function setExtraCSS(fileName) {
 	}
 }
 
-/* Game Controller classes should call these for user's preferences */
-export function getUserGamePrefKeyName(preferenceKey) {
-	return "GameType" + gameController.getGameTypeId() + preferenceKey;
-}
-export function getUserGamePreference(preferenceKey) {
-	if (gameController && gameController.getGameTypeId) {
-		const keyName = getUserGamePrefKeyName(preferenceKey);
-		return localStorage.getItem(keyName);
-	}
-}
-export function setUserGamePreference(preferenceKey, value) {
-	if (gameController && gameController.getGameTypeId) {
-		const keyName = getUserGamePrefKeyName(preferenceKey);
-		localStorage.setItem(keyName, value);
-	}
-}
-
-export function buildPreferenceDropdownDiv(labelText, dropdownId, valuesObject, preferenceKey) {
-	return buildDropdownDiv(dropdownId, labelText + ":", valuesObject,
-		getUserGamePreference(preferenceKey),
-		function() {
-			setUserGamePreference(preferenceKey, this.value);
-			gameController.callActuate();
-			if (gameController.gamePreferenceSet) {
-				gameController.gamePreferenceSet(preferenceKey);
-			}
-		});
-}
-
-export function setGameLogText(text) {
-	let newText = '';
-	if (text) {
-		newText = text;
-	}
-	document.getElementById('gameLogText').innerText = newText;
-}
 
 
 
@@ -6405,42 +5822,6 @@ export function toggleCollapsedContent(headingDiv, contentDiv) {
 	}
 }
 
-export function setCustomTileDesignsFromInput() {
-	let url = document.getElementById('customTileDesignsUrlInput').value;
-	url = url.substring(0, url.lastIndexOf("/") + 1);
-	if (gameController && gameController.setCustomTileDesignUrl) {
-		gameController.setCustomTileDesignUrl(url);
-	}
-}
-
-export function promptForCustomTileDesigns(gameType, existingCustomTilesUrl) {
-	const container = document.createElement('div');
-
-	const p = document.createElement('p');
-	p.textContent = "You can use fan-created tile design sets. See the #custom-tile-designs channel in The Garden Gate Discord. Copy and paste the link to one of the images here:";
-	container.appendChild(p);
-
-	container.appendChild(document.createElement('br'));
-	container.appendChild(document.createTextNode('URL: '));
-	const urlInput = document.createElement('input');
-	urlInput.type = 'text';
-	urlInput.id = 'customTileDesignsUrlInput';
-	urlInput.name = 'customTileDesignsUrlInput';
-	if (existingCustomTilesUrl) {
-		urlInput.value = existingCustomTilesUrl;
-	}
-	container.appendChild(urlInput);
-	container.appendChild(document.createElement('br'));
-
-	container.appendChild(document.createElement('br'));
-	const applyDiv = document.createElement('div');
-	applyDiv.classList.add('clickableText');
-	applyDiv.textContent = 'Apply Custom Tile Designs for ' + gameType.desc;
-	applyDiv.onclick = () => { closeModal(); setCustomTileDesignsFromInput(); };
-	container.appendChild(applyDiv);
-
-	showModalElem("Use Custom Tile Designs", container);
-}
 
 
 

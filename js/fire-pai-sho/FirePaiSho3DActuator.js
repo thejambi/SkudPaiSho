@@ -12,14 +12,9 @@ import {
 	NO_HARMONY_VISUAL_AIDS,
 	gameOptionEnabled,
 } from '../GameOptions';
-import {
-	clearMessage,
-	getUserGamePreference,
-	pieceAnimationLength,
-	piecePlaceAnimation,
-	showTileMessage,
-	unplayedTileClicked,
-} from '../PaiShoMain';
+import { pieceAnimationLength, piecePlaceAnimation } from '../PaiShoMain';
+import { clearMessage, showTileMessage, unplayedTileClicked } from '../UiInteraction';
+import { getUserGamePreference } from '../GamePrefs';
 import { FirePaiShoController } from './FirePaiShoController';
 import { FirePaiShoTileManager } from './FirePaiShoTileManager';
 import { getSkudTilesSrcPath, isSamePoint } from '../ActuatorHelp';

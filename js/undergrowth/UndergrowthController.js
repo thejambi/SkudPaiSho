@@ -1,9 +1,10 @@
 /* Undergrowth Pai Sho specific UI interaction logic */
 
 import { GameType } from '../GameType';
+import { READY_FOR_BONUS } from '../GameConstants';
+import { getResetMoveElement } from '../GameFlow';
 import {
   BRAND_NEW,
-  READY_FOR_BONUS,
   WAITING_FOR_ENDPOINT,
   callSubmitMove,
   createGameIfThatIsOk,
@@ -11,18 +12,19 @@ import {
   finalizeMove,
   getCurrentPlayer,
   getGameOptionsMessageElement,
-  getNeutralPointMessage,
-  getRedPointMessage,
-  getRedWhitePointMessage,
-  getResetMoveElement,
-  getWhitePointMessage,
   isAnimationsOn,
   myTurn,
   onlinePlayEnabled,
   playingOnlineGame,
   refreshMessage,
-  toHeading,
 } from '../PaiShoMain';
+import {
+  getNeutralPointMessage,
+  getRedPointMessage,
+  getRedWhitePointMessage,
+  getWhitePointMessage,
+  toHeading,
+} from '../TextHelpers';
 import {
   GATE,
   NEUTRAL,

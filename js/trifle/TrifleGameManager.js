@@ -1,7 +1,7 @@
 // Trifle Game Manager
 
 import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager";
-import { setGameLogText } from "../PaiShoMain";
+import { setGameLogText } from "../GameState";
 import { PaiShoGameBoard } from "./PaiShoGameBoard";
 import TrifleTileManager from "./TrifleTileManager";
 import { debug } from "../GameData";

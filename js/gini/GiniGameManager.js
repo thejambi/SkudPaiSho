@@ -15,7 +15,7 @@ import {
 	getOpponentName,
 	getPlayerCodeFromName,
 } from '../pai-sho-common/PaiShoPlayerHelp';
-import { setGameLogText } from '../PaiShoMain';
+import { setGameLogText } from '../GameState';
 import { NEUTRAL, NON_PLAYABLE, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { PaiShoGameBoard } from '../trifle/PaiShoGameBoard';

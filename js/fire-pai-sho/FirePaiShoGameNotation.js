@@ -1,7 +1,7 @@
 /* Fire Pai Sho Notation */
 
 import { ARRANGING, GUEST, HOST, NotationPoint, PLANTING } from "../CommonNotationObjects";
-import { BRAND_NEW } from "../PaiShoMain";
+import { BRAND_NEW } from '../GameConstants';
 import { FirePaiShoTile } from "./FirePaiShoTile";
 import { debug } from "../GameData";
 

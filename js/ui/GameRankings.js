@@ -2,11 +2,10 @@
 import {
   closeModal,
   getLoadingModalElement,
-  getLoginToken,
-  getUsername,
   onlinePlayEngine,
   showModalElem,
 } from '../PaiShoMain';
+import { getLoginToken, getUsername } from '../UserData';
 import { debug } from '../GameData';
 
 export function viewGameRankingsClicked() {

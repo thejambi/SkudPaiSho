@@ -2,7 +2,8 @@
 
 // --------------------------------------------- // 
 
-import { BRAND_NEW, gameController } from '../PaiShoMain';
+import { gameController } from '../GameState';
+import { BRAND_NEW } from '../GameConstants';
 import { DEPLOY, DRAW_ACCEPT, GUEST, MOVE, SETUP, TEAM_SELECTION } from '../CommonNotationObjects';
 import { debug } from '../GameData';
 import {

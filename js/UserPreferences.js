@@ -1,30 +1,9 @@
 // User Preferences Module
 // Handles device preferences, sound, animations, timestamps, and custom background colors
 
-import {
-	animationsOnKey,
-	showTimestampsKey,
-	showMoveLogsInChatKey,
-	customBgColorKey,
-	confirmMoveKey,
-	soundManager,
-	gameController,
-	clearGameChats,
-	showReplayControls,
-	callSubmitMove,
-	submitMoveData,
-	confirmMoveToSubmit,
-	showModalElem,
-	userIsLoggedIn,
-	getLoginToken,
-	isPushSupported,
-	isWebPushEnabled,
-	subscribeToPush,
-	unsubscribeFromPush,
-	isChatNotificationsEnabled,
-	enableChatNotifications,
-	disableChatNotifications,
-} from './PaiShoMain';
+import { callSubmitMove, clearGameChats, confirmMoveToSubmit, disableChatNotifications, enableChatNotifications, gameController, isChatNotificationsEnabled, isPushSupported, isWebPushEnabled, showModalElem, showMoveLogsInChatKey, showReplayControls, showTimestampsKey, soundManager, submitMoveData, subscribeToPush, unsubscribeFromPush } from './PaiShoMain';
+import { animationsOnKey, confirmMoveKey, customBgColorKey } from './GamePrefs';
+import { userIsLoggedIn, getLoginToken } from './UserData';
 import { OnboardingFunctions } from './OnBoardingVars';
 import { GameClock } from './util/GameClock';
 import { Ads } from './Ads';

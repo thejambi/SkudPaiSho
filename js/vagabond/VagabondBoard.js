@@ -3,7 +3,7 @@
 import { GUEST, HOST, RowAndColumn } from '../CommonNotationObjects';
 import { copyArray, debug } from '../GameData';
 import { gameOptionEnabled, V_DOUBLE_MOVE_DISTANCE } from '../GameOptions';
-import { showBadMoveModal } from '../PaiShoMain';
+import { showBadMoveModal } from '../ModalManager';
 import {
 	GATE,
 	NON_PLAYABLE,

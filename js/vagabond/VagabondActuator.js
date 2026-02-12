@@ -7,18 +7,9 @@ import {
   NON_PLAYABLE,
   POSSIBLE_MOVE,
 } from '../skud-pai-sho/SkudPaiShoBoardPoint';
-import {
-  RmbDown,
-  RmbUp,
-  clearMessage,
-  pieceAnimationLength,
-  piecePlaceAnimation,
-  pointClicked,
-  showPointMessage,
-  showTileMessage,
-  unplayedTileClicked,
-  vagabondTileDesignTypeKey
-} from '../PaiShoMain';
+import { pieceAnimationLength, piecePlaceAnimation } from '../PaiShoMain';
+import { clearMessage, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from '../UiInteraction';
+import { vagabondTileDesignTypeKey } from '../GamePrefs';
 import { VagabondController } from "./VagabondController";
 import { VagabondTileManager } from './VagabondTileManager';
 import {

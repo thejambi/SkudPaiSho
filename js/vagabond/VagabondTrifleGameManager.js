@@ -17,7 +17,7 @@ import {
   getOpponentName,
   getPlayerCodeFromName,
 } from '../pai-sho-common/PaiShoPlayerHelp';
-import { setGameLogText } from '../PaiShoMain';
+import { setGameLogText } from '../GameState';
 import { PaiShoGameBoard } from '../trifle/PaiShoGameBoard';
 
 export function VagabondTrifleGameManager(actuator, ignoreActuate, isCopy) {

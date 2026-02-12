@@ -7,7 +7,7 @@ import { VagabondTile } from './VagabondTile';
 import { VagabondTileManager } from './VagabondTileManager';
 import { debug } from '../GameData';
 import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
-import { setGameLogText } from '../PaiShoMain';
+import { setGameLogText } from '../GameState';
 
 export function VagabondGameManager(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';

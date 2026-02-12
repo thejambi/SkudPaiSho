@@ -3,7 +3,7 @@
 import { createBoardArrow, createBoardPointDiv, getSkudTilesSrcPath, setupPaiShoBoard } from "../ActuatorHelp";
 import { GUEST, HOST } from "../CommonNotationObjects";
 import { debug } from "../GameData";
-import { clearMessage, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from "../PaiShoMain";
+import { clearMessage, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from "../UiInteraction";
 import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint";
 import { OvergrowthController } from "./OvergrowthController";
 import { OvergrowthTileManager } from './OvergrowthTileManager';

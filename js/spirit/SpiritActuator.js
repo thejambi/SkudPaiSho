@@ -6,18 +6,12 @@ import {
 } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { SpiritController, SpiritPreferences } from './SpiritController';
 import { SpiritTileManager } from './SpiritTileManager';
-import {
-  clearMessage,
-  gameController,
-  getUserGamePreference,
-  pointClicked,
-  showPointMessage,
-  showTileMessage,
-  unplayedTileClicked
-} from '../PaiShoMain';
+import { gameController } from '../PaiShoMain';
+import { clearMessage, pointClicked, showPointMessage, showTileMessage, unplayedTileClicked } from '../UiInteraction';
+import { getUserGamePreference } from '../GamePrefs';
 import { createBoardPointDiv, isSamePoint, setupPaiShoBoard } from '../ActuatorHelp';
 import { MOVE } from '../CommonNotationObjects';
-import { pieceAnimationLength } from '../PaiShoMain';
+import { pieceAnimationLength } from '../GameConstants';
 import { debug } from '../GameData';
 
 export function SpiritActuator(gameContainer, isMobile, enableAnimations) {

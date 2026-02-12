@@ -1,7 +1,8 @@
 // Shared 3D Board Preferences
 // Single localStorage keys for all games - 3D is a display preference, not game logic
 
-import { clearMessage, gameController } from './PaiShoMain';
+import { clearMessage } from './UiInteraction';
+import { gameController } from './GameState';
 
 const board3DKey = "paiShoBoard3DEnabled";
 const roundBoardKey = "paiShoRoundBoardEnabled";

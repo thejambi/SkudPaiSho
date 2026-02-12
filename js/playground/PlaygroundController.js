@@ -5,46 +5,19 @@ import { CapturePreferences } from '../capture/CaptureController';
 import { DEPLOY, GUEST, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
 import { debug } from '../GameData';
 import { gameOptionEnabled, SPECTATORS_CAN_PLAY } from '../GameOptions';
+import { READY_FOR_BONUS } from '../GameConstants';
+import { BRAND_NEW, GameType, WAITING_FOR_ENDPOINT, callSubmitMove, closeModal, createGameIfThatIsOk, currentGameData, currentMoveIndex, finalizeMove, gameController, gameId, getGameOptionsMessageElement, isAnimationsOn, onlinePlayEnabled, playingOnlineGame, rerunAll, setPaiShoBoardOption, showModalElem, showReplayControls } from '../PaiShoMain';
+import { iAmPlayerInCurrentOnlineGame } from '../GameState';
+import { refreshMessage } from '../UiInteraction';
+import { buildPreferenceDropdownDiv, getUserGamePreference, paiShoBoardDesignTypeKey, paiShoBoardDesignTypeValues, setUserGamePreference, tileDesignTypeKey, tileDesignTypeValues, vagabondTileDesignTypeKey } from '../GamePrefs';
+import { getUsername, userIsLoggedIn, usernameEquals } from '../UserData';
 import {
-  BRAND_NEW,
-  buildPreferenceDropdownDiv,
-  callSubmitMove,
-  closeModal,
-  createGameIfThatIsOk,
-  currentGameData,
-  currentMoveIndex,
-  finalizeMove,
-  gameController,
-  gameId,
-  GameType,
   getGatePointMessage,
-  getGameOptionsMessageElement,
   getNeutralPointMessage,
   getRedPointMessage,
   getRedWhitePointMessage,
-  getUsername,
-  getUserGamePreference,
   getWhitePointMessage,
-  iAmPlayerInCurrentOnlineGame,
-  isAnimationsOn,
-  onlinePlayEnabled,
-  paiShoBoardDesignTypeKey,
-  playingOnlineGame,
-  READY_FOR_BONUS,
-  refreshMessage,
-  rerunAll,
-  setPaiShoBoardOption,
-  setUserGamePreference,
-  showModalElem,
-  showReplayControls,
-  tileDesignTypeKey,
-  tileDesignTypeValues,
-  userIsLoggedIn,
-  usernameEquals,
-  vagabondTileDesignTypeKey,
-  WAITING_FOR_ENDPOINT,
-  paiShoBoardDesignTypeValues,
-} from '../PaiShoMain';
+} from '../TextHelpers';
 import { GATE, NEUTRAL, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { VagabondController } from '../vagabond/VagabondController';

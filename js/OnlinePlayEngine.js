@@ -1,7 +1,8 @@
 /** OnlinePlayEngine */
 
 import $ from 'jquery';
-import { callFailed, emptyCallback } from './PaiShoMain';
+import { emptyCallback } from './GameState';
+import { callFailed } from './ModalManager';
 
 export class OnlinePlayEngine {
 	constructor() {

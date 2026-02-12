@@ -9,7 +9,7 @@ import { FirePaiShoBoardPoint } from './FirePaiShoBoardPoint';
 import { FirePaiShoTile } from './FirePaiShoTile';
 import { debug } from '../GameData';
 import { FirePaiShoHarmony, FirePaiShoHarmonyManager } from './FirePaiShoHarmony';
-import { showBadMoveModal } from '../PaiShoMain';
+import { showBadMoveModal } from '../ModalManager';
 
 export function FirePaiShoBoard() {
 	this.size = new RowAndColumn(17, 17);

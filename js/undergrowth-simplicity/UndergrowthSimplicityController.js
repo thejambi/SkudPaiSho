@@ -1,27 +1,25 @@
 /* Undergrowth Simplicity - Controller */
 
 import { GameType } from '../GameType';
+import { getResetMoveElement } from '../GameFlow';
 import {
 	BRAND_NEW,
 	WAITING_FOR_ENDPOINT,
 	callSubmitMove,
 	createGameIfThatIsOk,
-	currentMoveIndex,
 	finalizeMove,
-	getCurrentPlayer,
 	getGameOptionsMessageElement,
+	isAnimationsOn,
+	refreshMessage,
+} from '../PaiShoMain';
+import { currentMoveIndex, getCurrentPlayer, myTurn, onlinePlayEnabled, playingOnlineGame } from '../GameState';
+import {
 	getNeutralPointMessage,
 	getRedPointMessage,
 	getRedWhitePointMessage,
-	getResetMoveElement,
 	getWhitePointMessage,
-	isAnimationsOn,
-	myTurn,
-	onlinePlayEnabled,
-	playingOnlineGame,
-	refreshMessage,
 	toHeading,
-} from '../PaiShoMain';
+} from '../TextHelpers';
 import {
 	GATE,
 	NEUTRAL,
@@ -41,7 +39,7 @@ import { UndergrowthSimplicityTile } from './UndergrowthSimplicityTile';
 import { UndergrowthBriarOptions } from './UndergrowthBriarOptions';
 import { is3DBoardOn, buildToggle3DBoardDiv as _buildToggle3DBoardDiv, buildToggleRoundBoardDiv as _buildToggleRoundBoardDiv } from '../PaiSho3DOptions';
 import { debug } from '../GameData';
-import { activeAi, activeAi2 } from '../PaiShoMain';
+import { activeAi, activeAi2 } from '../GameState';
 import { UndergrowthBriarRandomAI } from './ai/UndergrowthBriarRandomAI';
 import { UndergrowthBriarStrategicAI } from './ai/UndergrowthBriarStrategicAI';
 

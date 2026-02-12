@@ -2,7 +2,7 @@
 // Handles move notation parsing and building
 
 import { GUEST, HOST } from '../CommonNotationObjects';
-import { BRAND_NEW } from '../PaiShoMain';
+import { BRAND_NEW } from '../GameConstants';
 
 // Capture types
 export const CaptureType = {

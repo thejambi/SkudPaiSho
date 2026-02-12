@@ -10,6 +10,11 @@ import {
 	TEAM_SELECTION,
 } from '../CommonNotationObjects';
 import { debug, debugOn, gameDevOn } from '../GameData';
+import { READY_FOR_BONUS } from '../GameConstants';
+import {
+	showResetMoveMessage,
+	showSkipButtonMessage,
+} from '../GameFlow';
 import {
 	activeAi,
 	activeAi2,
@@ -28,13 +33,9 @@ import {
 	onlinePlayEnabled,
 	playingOnlineGame,
 	quickFinalizeMove,
-	READY_FOR_BONUS,
 	refreshMessage,
 	rerunAll,
-	showResetMoveMessage,
-	showSkipButtonMessage,
-	userIsLoggedIn,
-	WAITING_FOR_ENDPOINT
+	WAITING_FOR_ENDPOINT,
 } from '../PaiShoMain';
 import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { TrifleAggressiveAI } from './ai/TrifleAggressiveAI';
@@ -45,6 +46,7 @@ import {
 	setCurrentTileNames
 } from './PaiShoGamesTileMetadata';
 import { isAnimationsOn } from '../PaiShoMain';
+import { userIsLoggedIn } from '../UserData';
 import {
 	is3DBoardOn,
 	buildToggle3DBoardDiv as _buildToggle3DBoardDiv,

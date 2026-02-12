@@ -9,14 +9,9 @@ import {
   NotationPoint,
   PLANTING,
 } from '../CommonNotationObjects';
+import { BRAND_NEW, MOVE_DONE, READY_FOR_BONUS, WAITING_FOR_BOAT_BONUS_POINT, WAITING_FOR_BONUS_ENDPOINT, WAITING_FOR_ENDPOINT } from '../GameConstants';
 import {
-  BRAND_NEW,
   GameType,
-  MOVE_DONE,
-  READY_FOR_BONUS,
-  WAITING_FOR_BOAT_BONUS_POINT,
-  WAITING_FOR_BONUS_ENDPOINT,
-  WAITING_FOR_ENDPOINT,
   activeAi,
   activeAi2,
   callSubmitMove,
@@ -26,19 +21,21 @@ import {
   gameId,
   getCurrentPlayer,
   getGameOptionsMessageElement,
-  getGatePointMessage,
-  getNeutralPointMessage,
-  getRedPointMessage,
-  getRedWhitePointMessage,
-  getWhitePointMessage,
   isAnimationsOn,
   myTurn,
   onlinePlayEnabled,
   playingOnlineGame,
   rerunAll,
-  toBullets,
-  userIsLoggedIn,
 } from '../PaiShoMain';
+import { userIsLoggedIn } from '../UserData';
+import {
+  getGatePointMessage,
+  getNeutralPointMessage,
+  getRedPointMessage,
+  getRedWhitePointMessage,
+  getWhitePointMessage,
+  toBullets,
+} from '../TextHelpers';
 import {
   GATE,
   NEUTRAL,

@@ -4,7 +4,7 @@ import { GUEST, HOST } from '../CommonNotationObjects';
 import { getPlayerCodeFromName, getPlayerNameFromCode, guestPlayerCode, hostPlayerCode } from '../pai-sho-common/PaiShoPlayerHelp';
 import { CHOOSE_NEUTRAL_STACK_SPACE, gameOptionEnabled } from '../GameOptions';
 import { debug } from '../GameData';
-import { BRAND_NEW } from '../PaiShoMain';
+import { BRAND_NEW } from '../GameConstants';
 
 // --------------------------------------------- //
 

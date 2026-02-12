@@ -13,7 +13,7 @@ import {
   WHITE_LOTUS,
   debug,
 } from '../GameData';
-import { showBadMoveModal } from '../PaiShoMain';
+import { showBadMoveModal } from '../ModalManager';
 import {
   GATE,
   NON_PLAYABLE,

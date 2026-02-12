@@ -3,7 +3,7 @@
 import { ARRANGING, HOST, PLANTING } from '../CommonNotationObjects';
 import { ACCENT_TILE, debug } from '../GameData';
 import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
-import { gameController, getCurrentPlayer, isInReplay } from '../PaiShoMain';
+import { gameController, getCurrentPlayer, isInReplay } from '../GameState';
 import { lessBonus, newGatesRule, newSpecialFlowerRules } from '../skud-pai-sho/SkudPaiShoRules';
 import { CoopSolitaireBoard } from './CoopSolitaireBoard';
 import { CoopSolitaireTileManager } from './CoopSolitaireTileManager';

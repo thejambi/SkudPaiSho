@@ -4,7 +4,8 @@
 import { createBoardArrow, createBoardPointDiv, setupPaiShoBoard } from '../ActuatorHelp';
 import { DEPLOY, HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
 import { PAIKO_GUEST_ROTATE } from '../GameOptions';
-import { boardTileHovered, boardTileUnhovered, clearMessage, pieceAnimationLength, piecePlaceAnimation, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from '../PaiShoMain';
+import { boardTileHovered, boardTileUnhovered, clearMessage, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from '../UiInteraction';
+import { pieceAnimationLength, piecePlaceAnimation } from '../GameConstants';
 import { ElementStyleTransform } from '../util/ElementStyleTransform';
 import { PaikoPointState, PaikoZone } from './PaikoBoardPoint';
 import { PaikoController } from './PaikoController';

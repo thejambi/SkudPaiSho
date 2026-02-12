@@ -67,7 +67,7 @@
 */
 
 
-import { gameController, gameId, playingOnlineGame } from '../js/PaiShoMain';
+import { gameController, gameId, playingOnlineGame } from '../js/GameState';
 
 export class MersenneTwister {
   constructor(seed) {

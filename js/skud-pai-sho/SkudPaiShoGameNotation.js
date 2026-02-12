@@ -7,7 +7,7 @@ import {
   NotationPoint,
   PLANTING,
 } from '../CommonNotationObjects';
-import { BRAND_NEW } from '../PaiShoMain';
+import { BRAND_NEW } from '../GameConstants';
 import { SkudPaiShoTile } from './SkudPaiShoTile';
 import { debug } from '../GameData';
 import { sameStart, simpleCanonRules } from './SkudPaiShoRules';

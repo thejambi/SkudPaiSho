@@ -26,48 +26,20 @@ import {
 	NotationPoint,
 	PLANTING,
 } from '../CommonNotationObjects';
+import { BRAND_NEW, MOVE_DONE, READY_FOR_BONUS, WAITING_FOR_BOAT_BONUS_POINT, WAITING_FOR_BONUS_ENDPOINT, WAITING_FOR_ENDPOINT } from '../GameConstants';
+import { getResetMoveElement, showResetMoveMessage } from '../GameFlow';
+import { GameType, activeAi, activeAi2, callSubmitMove, closeModal, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameId, getCurrentPlayer, getGameOptionsMessageElement, isAnimationsOn, myTurn, onlinePlayEnabled, playingOnlineGame, rerunAll, setSkudTilesOption, showModalElem } from '../PaiShoMain';
+import { clearMessage } from '../UiInteraction';
+import { buildDropdownDiv, getUserGamePreference, setUserGamePreference, skudTilesKey, tileDesignTypeKey, tileDesignTypeValues } from '../GamePrefs';
+import { userIsLoggedIn } from '../UserData';
 import {
-	BRAND_NEW,
-	GameType,
-	MOVE_DONE,
-	READY_FOR_BONUS,
-	WAITING_FOR_BOAT_BONUS_POINT,
-	WAITING_FOR_BONUS_ENDPOINT,
-	WAITING_FOR_ENDPOINT,
-	activeAi,
-	activeAi2,
-	buildDropdownDiv,
-	callSubmitMove,
-	clearMessage,
-	closeModal,
-	createGameIfThatIsOk,
-	currentMoveIndex,
-	finalizeMove,
-	gameId,
-	getCurrentPlayer,
-	getGameOptionsMessageElement,
 	getGatePointMessage,
 	getNeutralPointMessage,
 	getRedPointMessage,
 	getRedWhitePointMessage,
-	getResetMoveElement,
-	getUserGamePreference,
 	getWhitePointMessage,
-	isAnimationsOn,
-	myTurn,
-	onlinePlayEnabled,
-	playingOnlineGame,
-	rerunAll,
-	setSkudTilesOption,
-	setUserGamePreference,
-	showModalElem,
-	showResetMoveMessage,
-	skudTilesKey,
-	tileDesignTypeKey,
-	tileDesignTypeValues,
 	toBullets,
-	userIsLoggedIn
-} from '../PaiShoMain';
+} from '../TextHelpers';
 import {
 	DIAGONAL_MOVEMENT,
 	EVERYTHING_CAPTURE,

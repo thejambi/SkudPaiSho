@@ -21,36 +21,12 @@ import {
   NotationPoint,
   PLANTING,
 } from '../CommonNotationObjects';
-import {
-  BRAND_NEW,
-  GameType,
-  MOVE_DONE,
-  READY_FOR_BONUS,
-  WAITING_FOR_BOAT_BONUS_POINT,
-  WAITING_FOR_BONUS_ENDPOINT,
-  WAITING_FOR_ENDPOINT,
-  activeAi,
-  activeAi2,
-  addOption,
-  callSubmitMove,
-  clearMessage,
-  createGameIfThatIsOk,
-  currentMoveIndex,
-  finalizeMove,
-  gameId,
-  getCurrentPlayer,
-  getGameOptionsMessageElement,
-  getResetMoveElement,
-  getUserGamePreference,
-  isAnimationsOn,
-  myTurn,
-  onlinePlayEnabled,
-  playingOnlineGame,
-  rerunAll,
-  setUserGamePreference,
-  showResetMoveMessage,
-  userIsLoggedIn,
-} from '../PaiShoMain';
+import { BRAND_NEW, MOVE_DONE, READY_FOR_BONUS, WAITING_FOR_BOAT_BONUS_POINT, WAITING_FOR_BONUS_ENDPOINT, WAITING_FOR_ENDPOINT } from '../GameConstants';
+import { getResetMoveElement, showResetMoveMessage } from '../GameFlow';
+import { GameType, activeAi, activeAi2, addOption, callSubmitMove, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameId, getCurrentPlayer, getGameOptionsMessageElement, isAnimationsOn, myTurn, onlinePlayEnabled, playingOnlineGame, rerunAll } from '../PaiShoMain';
+import { clearMessage } from '../UiInteraction';
+import { getUserGamePreference, setUserGamePreference } from '../GamePrefs';
+import { userIsLoggedIn } from '../UserData';
 import {
   GATE,
   NEUTRAL,

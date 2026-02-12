@@ -3,10 +3,6 @@
 
 import {
 	closeModal,
-	getLoginToken,
-	getUsername,
-	userIsLoggedIn,
-	htmlEscape,
 	onlinePlayEngine,
 	toggleCollapsedContent,
 	jumpToGame,
@@ -16,6 +12,8 @@ import {
 	showModalElem,
 	getLoadingModalElement,
 } from './PaiShoMain';
+import { getLoginToken, getUsername, userIsLoggedIn } from './UserData';
+import { htmlEscape } from './TextHelpers';
 import { debug } from './GameData';
 
 // Module state

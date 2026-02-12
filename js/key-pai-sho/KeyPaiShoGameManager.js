@@ -18,7 +18,7 @@ import {
 } from '../skud-pai-sho/SkudPaiShoRules';
 import { SPECIAL_FLOWERS_BOUNCE, gameOptionEnabled } from '../GameOptions';
 import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
-import { setGameLogText } from '../PaiShoMain';
+import { setGameLogText } from '../GameState';
 
 export function KeyPaiShoGameManager(actuator, ignoreActuate, isCopy) {
 	this.gameLogText = '';

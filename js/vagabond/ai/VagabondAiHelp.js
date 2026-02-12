@@ -9,7 +9,7 @@ import {
 } from '../../CommonNotationObjects';
 import { NON_PLAYABLE, POSSIBLE_MOVE } from '../../skud-pai-sho/SkudPaiShoBoardPoint';
 import { VagabondNotationBuilder } from '../VagabondGameNotation';
-import { WAITING_FOR_ENDPOINT } from '../../PaiShoMain';
+import { WAITING_FOR_ENDPOINT } from '../../GameConstants';
 import { gameDevOn } from '../../GameData';
 
 export function VagabondAiHelp() {

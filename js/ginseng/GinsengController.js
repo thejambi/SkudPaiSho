@@ -1,11 +1,15 @@
 /* Ginseng specific UI interaction logic */
 
+import { READY_FOR_BONUS } from '../GameConstants';
+import {
+  showResetMoveMessage,
+  showSkipButtonMessage,
+} from '../GameFlow';
 import {
   activeAi,
   activeAi2,
   BRAND_NEW,
   GameType,
-  READY_FOR_BONUS,
   WAITING_FOR_ENDPOINT,
   callSubmitMove,
   clearMessage,
@@ -16,7 +20,6 @@ import {
   getCurrentPlayer,
   getGameOptionsMessageElement,
   getOnlineGameOpponentUsername,
-  getUsername,
   iAmPlayerInCurrentOnlineGame,
   isAnimationsOn,
   isInReplay,
@@ -27,11 +30,8 @@ import {
   refreshMessage,
   rerunAll,
   setGameTitleText,
-  showResetMoveMessage,
-  showSkipButtonMessage,
-  userIsLoggedIn,
-  usernameIsOneOf,
 } from '../PaiShoMain';
+import { getUsername, userIsLoggedIn, usernameIsOneOf } from '../UserData';
 import { GinsengStrategicAI } from './ai/GinsengStrategicAI';
 import {
   DEPLOY,

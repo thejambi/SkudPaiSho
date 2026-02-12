@@ -1,4 +1,4 @@
-import { BRAND_NEW } from '../PaiShoMain';
+import { BRAND_NEW } from '../GameConstants';
 import { BeyondTheMapsMoveType } from './BeyondTheMapsGameManager';
 import { TrifleNotationBuilder } from '../trifle/TrifleGameNotation';
 import { copyArray } from '../GameData';

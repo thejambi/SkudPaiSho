@@ -3,10 +3,10 @@
 
 import {
 	showModalElem,
-	userIsLoggedIn,
 	loginClicked,
 	markGameInactiveWithoutDialogKey
 } from './PaiShoMain';
+import { userIsLoggedIn } from './UserData';
 import { OnboardingFunctions } from './OnBoardingVars';
 
 export const welcomeTutorialDismissedKey = "welcomeTutorialDismissedKey";

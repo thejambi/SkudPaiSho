@@ -3,7 +3,7 @@
 // --------------------------------------------- // 
 
 import { AdevarTileCode, AdevarTileType } from './AdevarTile';
-import { BRAND_NEW } from '../PaiShoMain';
+import { BRAND_NEW } from '../GameConstants';
 import {
   DEPLOY,
   GUEST,

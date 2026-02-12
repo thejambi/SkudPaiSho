@@ -21,7 +21,7 @@ import {
   getOpponentName,
   getPlayerCodeFromName,
 } from '../pai-sho-common/PaiShoPlayerHelp';
-import { showBadMoveModal } from '../PaiShoMain';
+import { showBadMoveModal } from '../ModalManager';
 import BeyondTheMapsTile, { BeyondTheMapsTileType } from './BeyondTheMapsTile';
 
 const FULL_BOARD_SIZE_LENGTH = 18;

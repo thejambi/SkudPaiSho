@@ -1,11 +1,8 @@
 import { HOST } from '../CommonNotationObjects';
-import {
-  buildDropdownDiv,
-  gameController,
-  htmlDecode,
-  playingOnlineGame,
-  refreshMessage,
-} from '../PaiShoMain';
+import { gameController, playingOnlineGame } from '../GameState';
+import { refreshMessage } from '../UiInteraction';
+import { buildDropdownDiv } from '../GamePrefs';
+import { htmlDecode } from '../TextHelpers';
 import { debug } from '../GameData';
 
 export function GameClock() {}

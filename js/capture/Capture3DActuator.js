@@ -5,14 +5,9 @@
 import * as THREE from 'three';
 import { MOVE } from '../CommonNotationObjects';
 import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
-import {
-	clearMessage,
-	getUserGamePreference,
-	pieceAnimationLength,
-	piecePlaceAnimation,
-	showTileMessage,
-	unplayedTileClicked,
-} from '../PaiShoMain';
+import { pieceAnimationLength, piecePlaceAnimation } from '../PaiShoMain';
+import { clearMessage, showTileMessage, unplayedTileClicked } from '../UiInteraction';
+import { getUserGamePreference } from '../GamePrefs';
 import { CaptureController, CapturePreferences } from './CaptureController';
 import { CaptureTileManager } from './CaptureTileManager';
 import { isSamePoint } from '../ActuatorHelp';

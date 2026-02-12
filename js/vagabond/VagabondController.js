@@ -2,37 +2,11 @@
 
 /* import { Client } from 'boardgame.io/client'; */
 
-import {
-  BRAND_NEW,
-  GameType,
-  READY_FOR_BONUS,
-  WAITING_FOR_ENDPOINT,
-  activeAi,
-  activeAi2,
-  buildDropdownDiv,
-  callSubmitMove,
-  clearMessage,
-  closeModal,
-  createGameIfThatIsOk,
-  currentMoveIndex,
-  finalizeMove,
-  gameController,
-  gameId,
-  getCurrentPlayer,
-  getGameOptionsMessageElement,
-  getUserGamePreference,
-  isInReplay,
-  myTurn,
-  onlinePlayEnabled,
-  playingOnlineGame,
-  promptForCustomTileDesigns,
-  refreshMessage,
-  rerunAll,
-  setUserGamePreference,
-  showModalElem,
-  userIsLoggedIn,
-  vagabondTileDesignTypeKey
-} from '../PaiShoMain';
+import { READY_FOR_BONUS } from '../GameConstants';
+import { BRAND_NEW, GameType, WAITING_FOR_ENDPOINT, activeAi, activeAi2, callSubmitMove, closeModal, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameController, gameId, getCurrentPlayer, getGameOptionsMessageElement, isInReplay, myTurn, onlinePlayEnabled, playingOnlineGame, rerunAll, showModalElem } from '../PaiShoMain';
+import { clearMessage, refreshMessage } from '../UiInteraction';
+import { buildDropdownDiv, getUserGamePreference, promptForCustomTileDesigns, setUserGamePreference, vagabondTileDesignTypeKey } from '../GamePrefs';
+import { userIsLoggedIn } from '../UserData';
 import {
   DEPLOY,
   DRAW_ACCEPT,

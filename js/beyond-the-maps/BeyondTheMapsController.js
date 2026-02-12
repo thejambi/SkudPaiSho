@@ -1,10 +1,10 @@
 /* Beyond The Edges of The Maps specific UI interaction logic */
 
+import { WAITING_FOR_BONUS_ENDPOINT, replayIntervalLength } from '../GameConstants';
 import {
   activeAi,
   BRAND_NEW,
   GameType,
-  WAITING_FOR_BONUS_ENDPOINT,
   WAITING_FOR_ENDPOINT,
   callSubmitMove,
   closeModal,
@@ -20,12 +20,11 @@ import {
   onlinePlayEnabled,
   playingOnlineGame,
   refreshMessage,
-  replayIntervalLength,
   rerunAll,
   showModalElem,
   showReplayControls,
-  userIsLoggedIn,
 } from '../PaiShoMain';
+import { userIsLoggedIn } from '../UserData';
 import { BeyondTheMapsActuator } from './BeyondTheMapsActuator';
 import {
   BeyondTheMapsGameManager,

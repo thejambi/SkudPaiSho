@@ -8,7 +8,7 @@ import {
 import { GUEST, HOST, RowAndColumn } from '../CommonNotationObjects';
 import { SpiritBoardPoint } from './SpiritBoardPoint';
 import { debug } from '../GameData';
-import { showBadMoveModal } from '../PaiShoMain';
+import { showBadMoveModal } from '../ModalManager';
 
 export function SpiritBoard() {
 	this.size = new RowAndColumn(17, 17);

@@ -30,7 +30,7 @@ import {
 	SkudPaiShoNotationBuilder,
 	SkudPaiShoNotationMove,
 } from '../skud-pai-sho/SkudPaiShoGameNotation';
-import { WAITING_FOR_ENDPOINT } from '../PaiShoMain';
+import { WAITING_FOR_ENDPOINT } from '../GameConstants';
 
 export function SkudStrategicAI() {
 	this.player = null;

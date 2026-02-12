@@ -1,7 +1,7 @@
 /* For showing users helpful tips that can be dismissed */
 
 import { dateIsBetween } from "./GameData";
-import { closeModal, showModalElem } from "./PaiShoMain";
+import { closeModal, showModalElem } from "./ModalManager";
 
 export var OnBoardingKeys = {
 	confirmMoveButtonHelpDismissed: "confirmMoveButtonHelpDismissed",

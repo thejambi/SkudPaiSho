@@ -1,6 +1,6 @@
 // Undergrowth Simplicity Game Notation
 
-import { BRAND_NEW } from '../PaiShoMain';
+import { BRAND_NEW } from '../GameConstants';
 import { GUEST, HOST, NotationPoint } from '../CommonNotationObjects';
 import { debug } from '../GameData';
 

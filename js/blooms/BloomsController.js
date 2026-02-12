@@ -7,6 +7,7 @@ import {
 	SIX_SIDED_BOARD,
 	gameOptionEnabled,
 } from '../GameOptions';
+import { getResetMoveElement } from '../GameFlow';
 import {
 	GameType,
 	activeAi,
@@ -17,7 +18,6 @@ import {
 	gameController,
 	getCurrentPlayer,
 	getGameOptionsMessageElement,
-	getResetMoveElement,
 	myTurn,
 	onlinePlayEnabled,
 	playingOnlineGame,

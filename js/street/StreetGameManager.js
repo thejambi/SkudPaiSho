@@ -3,7 +3,7 @@ import { ARRANGING, GUEST, HOST, INITIAL_SETUP, NotationPoint, PLANTING } from '
 import { debug } from '../GameData';
 import { FORMAL_WIN_CONDITION, gameOptionEnabled } from '../GameOptions';
 import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
-import { getCurrentPlayer } from '../PaiShoMain';
+import { getCurrentPlayer } from '../GameState';
 import { lessBonus, limitedGatesRule, newGatesRule, newSpecialFlowerRules } from '../skud-pai-sho/SkudPaiShoRules';
 import { StreetBoard } from './StreetBoard';
 import { StreetTileManager } from './StreetTileManager';

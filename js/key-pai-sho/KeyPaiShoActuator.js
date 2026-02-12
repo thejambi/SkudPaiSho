@@ -12,18 +12,9 @@ import { KeyPaiShoController } from './KeyPaiShoController';
 import { KeyPaiShoOptions } from './KeyPaiShoOptions';
 import { KeyPaiShoTileManager } from './KeyPaiShoTileManager';
 import { NO_HARMONY_VISUAL_AIDS, gameOptionEnabled } from '../GameOptions';
-import {
-  RmbDown,
-  RmbUp,
-  clearMessage,
-  getUserGamePreference,
-  pieceAnimationLength,
-  piecePlaceAnimation,
-  pointClicked,
-  showPointMessage,
-  showTileMessage,
-  unplayedTileClicked,
-} from '../PaiShoMain';
+import { pieceAnimationLength, piecePlaceAnimation } from '../PaiShoMain';
+import { clearMessage, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from '../UiInteraction';
+import { getUserGamePreference } from '../GamePrefs';
 import {
   createBoardArrow,
   createBoardPointDiv,

@@ -1,6 +1,8 @@
 import html2canvas from 'html2canvas';
 
-import { QueryString, gameContainerDiv, showModalElem } from "./PaiShoMain";
+import { QueryString } from "./PaiShoMain";
+import { gameContainerDiv } from "./GameState";
+import { showModalElem } from "./ModalManager";
 
 // Skud Pai Sho specific game rules have been moved to skud-pai-sho/SkudPaiShoRules.js
 // This keeps game-specific configuration separate from shared utilities and constants.

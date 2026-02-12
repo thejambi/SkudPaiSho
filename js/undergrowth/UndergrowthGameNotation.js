@@ -1,4 +1,4 @@
-import { BRAND_NEW } from '../PaiShoMain';
+import { BRAND_NEW } from '../GameConstants';
 import { GUEST, HOST, NotationPoint, PLANTING } from '../CommonNotationObjects';
 import { debug } from '../GameData';
 

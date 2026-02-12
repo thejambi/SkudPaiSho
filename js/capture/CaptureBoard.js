@@ -13,7 +13,7 @@ import {
   NotationPoint,
   RowAndColumn,
 } from '../CommonNotationObjects';
-import { showBadMoveModal } from '../PaiShoMain';
+import { showBadMoveModal } from '../ModalManager';
 
 export function CaptureBoard() {
 	this.size = new RowAndColumn(17, 17);

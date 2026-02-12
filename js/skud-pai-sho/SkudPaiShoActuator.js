@@ -4,18 +4,9 @@ import { ACCENT_TILE, debug } from '../GameData';
 import { ARRANGING, PLANTING } from '../CommonNotationObjects';
 import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from './SkudPaiShoBoardPoint';
 import { NO_HARMONY_VISUAL_AIDS, gameOptionEnabled } from '../GameOptions';
-import {
-  RmbDown,
-  RmbUp,
-  clearMessage,
-  getUserGamePreference,
-  pieceAnimationLength,
-  piecePlaceAnimation,
-  pointClicked,
-  showPointMessage,
-  showTileMessage,
-  unplayedTileClicked,
-} from '../PaiShoMain';
+import { pieceAnimationLength, piecePlaceAnimation } from '../PaiShoMain';
+import { RmbDown, RmbUp, clearMessage, pointClicked, showPointMessage, showTileMessage, unplayedTileClicked } from '../UiInteraction';
+import { getUserGamePreference } from '../GamePrefs';
 import { SkudPaiShoController } from "./SkudPaiShoController";
 import { SkudPaiShoTileManager } from './SkudPaiShoTileManager';
 import {

@@ -1,6 +1,6 @@
 import { createBoardArrow, createBoardPointDiv, setupPaiShoBoard } from "../ActuatorHelp"
 import { PaiShoMarkingManager } from "../pai-sho-common/PaiShoMarkingManager"
-import { clearMessage, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from "../PaiShoMain"
+import { clearMessage, pointClicked, RmbDown, RmbUp, showPointMessage, showTileMessage, unplayedTileClicked } from "../UiInteraction"
 import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint"
 import { GodaiBoard } from "./GodaiBoard"
 import { GodaiController } from "./GodaiController"

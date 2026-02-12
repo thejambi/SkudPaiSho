@@ -3,8 +3,8 @@ import {
   clearMessage,
   currentGameData,
   gameController,
-  usernameEquals,
 } from '../PaiShoMain';
+import { usernameEquals } from '../UserData';
 
 const paiko3DKey = "paikoBoard3DEnabled";
 

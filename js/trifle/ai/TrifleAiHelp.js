@@ -14,7 +14,7 @@ import {
 } from '../../CommonNotationObjects';
 import { NON_PLAYABLE, POSSIBLE_MOVE } from '../../skud-pai-sho/SkudPaiShoBoardPoint';
 import { OldTrifleNotationBuilder } from '../OldTrifleGameNotation';
-import { WAITING_FOR_ENDPOINT } from '../../PaiShoMain';
+import { WAITING_FOR_ENDPOINT } from '../../GameConstants';
 import { TrifleTileCodes } from '../TrifleTiles';
 import { TrifleTileInfo, TrifleTiles } from '../TrifleTileInfo';
 import { TrifleTile } from '../TrifleTile';

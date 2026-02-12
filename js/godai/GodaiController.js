@@ -2,7 +2,11 @@
 
 import { DEPLOY, GUEST, HOST, MOVE, NotationPoint } from "../CommonNotationObjects.js";
 import { debug } from "../GameData.js";
-import { BRAND_NEW, callSubmitMove, createGameIfThatIsOk, currentMoveIndex, finalizeMove, gameId, GameType, getGameOptionsMessageElement, isAnimationsOn, isInReplay, myTurn, onlinePlayEnabled, playingOnlineGame, READY_FOR_BONUS, rerunAll, toBullets, userIsLoggedIn, WAITING_FOR_ENDPOINT } from "../PaiShoMain.js";
+import { BRAND_NEW, READY_FOR_BONUS, WAITING_FOR_ENDPOINT } from '../GameConstants';
+import { callSubmitMove, createGameIfThatIsOk, finalizeMove, GameType, getGameOptionsMessageElement, isAnimationsOn, rerunAll } from "../PaiShoMain.js";
+import { currentMoveIndex, gameId, isInReplay, myTurn, onlinePlayEnabled, playingOnlineGame } from "../GameState";
+import { userIsLoggedIn } from "../UserData.js";
+import { toBullets } from '../TextHelpers';
 import { GATE, NEUTRAL, POSSIBLE_MOVE } from "../skud-pai-sho/SkudPaiShoBoardPoint.js";
 import { GodaiActuator } from "./GodaiActuator.js";
 import { GodaiGameManager } from "./GodaiGameManager.js";
