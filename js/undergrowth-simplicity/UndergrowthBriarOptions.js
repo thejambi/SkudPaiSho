@@ -1,7 +1,6 @@
 // Undergrowth Briar Options
 
 import { clearMessage, gameController } from '../PaiShoMain';
-import { AdevarOptions } from '../adevar/AdevarOptions';
 
 var pieceStyleKey = "undergrowthBriarPieceStyle";
 var centerpieceKey = "undergrowthBriarCenterpiece";
@@ -9,7 +8,7 @@ var centerpieceKey = "undergrowthBriarCenterpiece";
 export function UndergrowthBriarOptions() {
 	// Initialize default if not set
 	if (!localStorage.getItem(pieceStyleKey)) {
-		localStorage.setItem(pieceStyleKey, "monochrome");
+		localStorage.setItem(pieceStyleKey, "adevarBack");
 	}
 }
 
@@ -31,8 +30,7 @@ UndergrowthBriarOptions.togglePieceStyle = function() {
 
 UndergrowthBriarOptions.getTileSrc = function(ownerCode) {
 	if (UndergrowthBriarOptions.useTileBack()) {
-		var adevarKey = localStorage.getItem(AdevarOptions.tileDesignTypeKey) || "gaoling";
-		return "images/Adevar/" + adevarKey + "/" + ownerCode + "Back.png";
+		return "images/Adevar/classic/" + ownerCode + "Back.png";
 	}
 	return "images/Adevar/monochrome/" + ownerCode + "Back.png";
 };
