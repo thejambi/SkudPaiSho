@@ -47,6 +47,13 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 		return "images/Adevar/" + localStorage.getItem(AdevarOptions.tileDesignTypeKey) + "/";
 	}
 
+	getBoardImageUrl() {
+		if (AdevarOptions.isSpaceTiles()) {
+			return "style/board_adevar_in_space.png";
+		}
+		return super.getBoardImageUrl();
+	}
+
 	// --- Override actuate to handle Adevar's different signature ---
 	// Adevar GameManager calls: actuate(board, tileManager, markingManager, capturedTiles, moveToAnimate)
 	// Base class expects: actuate(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep)
@@ -203,7 +210,7 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 		face.position.y = 0.121;
 		group.add(face);
 
-		group.position.set(x, 0.05, z);
+		group.position.set(x, 0.21, z);
 		return group;
 	}
 
@@ -377,6 +384,8 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 	handleTileAnimation(boardPoint, moveToAnimate, tileGroup) {
 		const x = boardPoint.col;
 		const y = boardPoint.row;
+		const isSpace = AdevarOptions.isSpaceTiles();
+		const tileY = isSpace ? 0.21 : 0.05;
 
 		if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
 			if (isSamePoint(moveToAnimate.endPoint, x, y)) {
@@ -386,15 +395,24 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 				const endX = x - this.gridOffset;
 				const endZ = y - this.gridOffset;
 
-				tileGroup.position.set(startX, 0.05, startZ);
+				tileGroup.position.set(startX, tileY, startZ);
 				tileGroup.scale.set(1.2, 1.2, 1.2);
 
-				this.animateTileMovement(tileGroup,
-					new THREE.Vector3(startX, 0.05, startZ),
-					new THREE.Vector3(endX, 0.05, endZ),
-					pieceAnimationLength,
-					1.2, 1
-				);
+				if (isSpace) {
+					this.animateSpaceTileMovement(tileGroup,
+						new THREE.Vector3(startX, tileY, startZ),
+						new THREE.Vector3(endX, tileY, endZ),
+						pieceAnimationLength,
+						1.2, 1
+					);
+				} else {
+					this.animateTileMovement(tileGroup,
+						new THREE.Vector3(startX, tileY, startZ),
+						new THREE.Vector3(endX, tileY, endZ),
+						pieceAnimationLength,
+						1.2, 1
+					);
+				}
 			}
 		} else if (moveToAnimate.moveType === DEPLOY) {
 			if (isSamePoint(moveToAnimate.endPoint, x, y)) {
@@ -405,5 +423,46 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 				}
 			}
 		}
+	}
+
+	animateSpaceTileMovement(tileGroup, fromPos, toPos, duration, fromScale, toScale) {
+		const startTime = performance.now();
+		const hasScale = fromScale !== undefined && toScale !== undefined;
+		const wobbleAngle = 0.3; // ~17 degrees
+		const wobbleCycles = 1.5;
+		// Randomly pick wobble axis: nose up/down or wing-to-wing
+		const altAxis = Math.random() < 0.5;
+		const zMix = altAxis ? -0.707 : 0.707;
+		const xMix = 0.707;
+
+		const animate = (currentTime) => {
+			const elapsed = currentTime - startTime;
+			const progress = Math.min(elapsed / duration, 1);
+			const eased = 1 - Math.pow(1 - progress, 3);
+
+			tileGroup.position.lerpVectors(fromPos, toPos, eased);
+
+			// Wobble: rock along a random axis, fading out toward the end
+			const wobbleFade = 1 - progress;
+			const wobble = Math.sin(progress * Math.PI * 2 * wobbleCycles) * wobbleAngle * wobbleFade;
+			tileGroup.rotation.z = wobble * zMix;
+			tileGroup.rotation.x = wobble * xMix;
+
+			if (hasScale) {
+				const scale = fromScale + (toScale - fromScale) * eased;
+				tileGroup.scale.set(scale, scale, scale);
+			}
+
+			if (progress < 1) {
+				requestAnimationFrame(animate);
+			} else {
+				tileGroup.position.copy(toPos);
+				tileGroup.rotation.z = 0;
+				tileGroup.rotation.x = 0;
+				tileGroup.scale.set(toScale || 1, toScale || 1, toScale || 1);
+			}
+		};
+
+		requestAnimationFrame(animate);
 	}
 }

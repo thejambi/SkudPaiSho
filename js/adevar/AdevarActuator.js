@@ -40,12 +40,13 @@ export function AdevarActuator(gameContainer, isMobile, enableAnimations) {
 	this.orientalLilyDivs = [];
 
 	var containers = setupPaiShoBoard(
-		this.gameContainer, 
+		this.gameContainer,
 		AdevarController.getHostTilesContainerDivs(),
-		AdevarController.getGuestTilesContainerDivs(), 
-		true, 
+		AdevarController.getGuestTilesContainerDivs(),
+		true,
 		AdevarOptions.viewAsGuest ? ADEVAR_GUEST_ROTATE : ADEVAR_ROTATE,
-		true
+		true,
+		AdevarOptions.isSpaceTiles() ? "adevar_in_space" : undefined
 	);
 
 	this.boardContainer = containers.boardContainer;
