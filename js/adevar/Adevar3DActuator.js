@@ -13,7 +13,7 @@ import {
 } from '../PaiShoMain';
 import { AdevarController } from './AdevarController';
 import { AdevarOptions } from './AdevarOptions';
-import { AdevarTileType } from './AdevarTile';
+import { AdevarTileCode, AdevarTileType } from './AdevarTile';
 import { getTilesForPlayer, isSamePoint } from '../ActuatorHelp';
 import { PaiSho3DActuator } from '../PaiSho3DActuator';
 
@@ -31,6 +31,11 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 			this.squareBodyGeometry.translate(0, 0.04, 0); // Shift up so bottom sits on the board surface
 			this.squareFaceGeometry = new THREE.PlaneGeometry(size - 0.04, size - 0.04);
 		}
+
+		// Oriental Lily garden highlight tracking
+		this.orientalLilyData = [];
+		this.lilyHighlightsGroup = new THREE.Group();
+		this.scene.add(this.lilyHighlightsGroup);
 	}
 
 	// --- Abstract method implementations ---
@@ -66,6 +71,10 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 	// --- Game-specific rendering ---
 
 	render3DGame(board, tileManager, markingManager, moveToAnimate, moveAnimationBeginStep) {
+		// Reset Oriental Lily tracking
+		this.orientalLilyData = [];
+		this.clearGroup(this.lilyHighlightsGroup);
+
 		// Render all board cells
 		board.cells.forEach((column) => {
 			column.forEach((cell) => {
@@ -183,8 +192,19 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 
 	// --- Square Tile Mesh (for Space Tiles mode) ---
 
-	buildSquareTileMesh(srcPath, x, z, isHost) {
+	getSpaceTileHoverHeight(tile) {
+		const heightAdjustFactor = 1.2;
+		switch (tile && tile.code) {
+			case AdevarTileCode.lilac: return 0.30 * heightAdjustFactor;
+			case AdevarTileCode.zinnia: return 0.23 * heightAdjustFactor;
+			case AdevarTileCode.foxglove: return 0.17 * heightAdjustFactor;
+			default: return 0.21 * heightAdjustFactor;
+		}
+	}
+
+	buildSquareTileMesh(srcPath, x, z, tile) {
 		const group = new THREE.Group();
+		const isHost = tile.ownerName === HOST;
 
 		const bodyMat = new THREE.MeshStandardMaterial({
 			color: 0xBBBBBB,
@@ -210,13 +230,13 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 		face.position.y = 0.121;
 		group.add(face);
 
-		group.position.set(x, 0.21, z);
+		group.position.set(x, this.getSpaceTileHoverHeight(tile), z);
 		return group;
 	}
 
 	buildTileMeshForTile(srcPath, x, z, tile) {
 		if (AdevarOptions.isSpaceTiles()) {
-			return this.buildSquareTileMesh(srcPath, x, z, tile.ownerName === HOST);
+			return this.buildSquareTileMesh(srcPath, x, z, tile);
 		}
 		return this.buildTileMesh(srcPath, x, z);
 	}
@@ -228,6 +248,15 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 
 		const x = boardPoint.col - this.gridOffset;
 		const z = boardPoint.row - this.gridOffset;
+
+		// Track Oriental Lily garden highlights
+		if (boardPoint.gardenHighlightNumbers && boardPoint.gardenHighlightNumbers.length > 0) {
+			this.orientalLilyData.push({
+				x: x,
+				z: z,
+				numbers: boardPoint.gardenHighlightNumbers.slice(),
+			});
+		}
 
 		// Empty point indicators
 		if (!boardPoint.hasTile()) {
@@ -344,6 +373,57 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 		this.effectsGroup.add(ring);
 	}
 
+	// --- Oriental Lily Garden Highlights ---
+
+	getGardenHighlightColor(number) {
+		const colors = {
+			1: 0xddee66,  // Host Garden A
+			2: 0x66ccbb,  // Host Garden B
+			3: 0x8877ff,  // Host Garden C
+			4: 0x6c7532,  // Guest Garden A
+			5: 0x347066,  // Guest Garden B
+			6: 0x362e64,  // Guest Garden C
+		};
+		return colors[number] || 0xffffff;
+	}
+
+	showOrientalLilyHighlights(player, gardenIndex) {
+		this.clearGroup(this.lilyHighlightsGroup);
+
+		var numberOffset = 1;
+		if (player === GUEST) {
+			numberOffset = 4;
+		}
+		var targetNumber = numberOffset + gardenIndex;
+
+		var filteredData = this.orientalLilyData;
+		if (player && gardenIndex >= 0) {
+			filteredData = this.orientalLilyData.filter(function(data) {
+				return data.numbers.indexOf(targetNumber) >= 0;
+			});
+		}
+
+		var self = this;
+		filteredData.forEach(function(data) {
+			var color = self.getGardenHighlightColor(targetNumber);
+			var ringGeo = new THREE.RingGeometry(0.44, 0.54, 32);
+			ringGeo.rotateX(-Math.PI / 2);
+			var ringMat = new THREE.MeshBasicMaterial({
+				color: color,
+				transparent: true,
+				opacity: 0.8,
+				side: THREE.DoubleSide,
+			});
+			var ring = new THREE.Mesh(ringGeo, ringMat);
+			ring.position.set(data.x, 0.18, data.z);
+			self.lilyHighlightsGroup.add(ring);
+		});
+	}
+
+	hideOrientalLilyHighlights() {
+		this.clearGroup(this.lilyHighlightsGroup);
+	}
+
 	// --- Override clearGroup to protect shared square geometries ---
 
 	clearGroup(group) {
@@ -385,7 +465,7 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 		const x = boardPoint.col;
 		const y = boardPoint.row;
 		const isSpace = AdevarOptions.isSpaceTiles();
-		const tileY = isSpace ? 0.21 : 0.05;
+		const tileY = isSpace ? this.getSpaceTileHoverHeight(boardPoint.tile) : 0.05;
 
 		if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
 			if (isSamePoint(moveToAnimate.endPoint, x, y)) {
@@ -429,7 +509,8 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 		const startTime = performance.now();
 		const hasScale = fromScale !== undefined && toScale !== undefined;
 		const wobbleAngle = 0.3; // ~17 degrees
-		const wobbleCycles = 1.5;
+		const wobbleCyclesRandomness = 1 + (Math.random() * 0.5) - 0.25;
+		const wobbleCycles = 1.5 * wobbleCyclesRandomness;
 		// Randomly pick wobble axis: nose up/down or wing-to-wing
 		const altAxis = Math.random() < 0.5;
 		const zMix = altAxis ? -0.707 : 0.707;
