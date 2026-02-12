@@ -1,9 +1,8 @@
 // UI interaction handlers and game messaging.
-// Dependencies: GameState, UserData, TextHelpers, SuperSandbox, GameFlow, PaiShoMain.
+// Dependencies: GameState, UserData, TextHelpers, SuperSandbox, GameFlow.
 
 import { showResetMoveMessage } from './GameFlow';
 import { activeAi, gameController, getCurrentPlayer, getGameWinner, getGameWinReason, iAmPlayerInCurrentOnlineGame, myTurn, playingOnlineGame } from './GameState';
-import { buildPaiShoSettingsDiv } from './PaiShoMain';
 import { toHeading, toBullets, toMessage } from './TextHelpers';
 import { userIsLoggedIn } from './UserData';
 import { isSuperSandboxMode, truncateMovesForSuperSandboxMode } from './SuperSandbox';
@@ -12,6 +11,11 @@ import { isSuperSandboxMode, truncateMovesForSuperSandboxMode } from './SuperSan
 
 let defaultHelpMessageText;
 let metadata = {};
+
+/* ── Registered handlers (set by PaiShoMain to avoid circular dep) ── */
+
+let _buildPaiShoSettingsDiv = null;
+export function registerBuildPaiShoSettingsDivFunction(fn) { _buildPaiShoSettingsDiv = fn; }
 
 /* ── Helpers ─────────────────────────────────────────── */
 
@@ -181,8 +185,8 @@ export function clearMessage() {
 		}
 	}
 
-	if (gameController.isPaiShoGame) {
-		helpTabContentDiv.appendChild(buildPaiShoSettingsDiv());
+	if (gameController.isPaiShoGame && _buildPaiShoSettingsDiv) {
+		helpTabContentDiv.appendChild(_buildPaiShoSettingsDiv());
 	}
 }
 

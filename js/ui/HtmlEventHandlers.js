@@ -1,43 +1,44 @@
 // HTML Event Handlers Module
 // Centralizes event listener setup for HTML elements that previously used inline onclick handlers
 
-import {
-	viewGameSeeksClicked,
-	viewTournamentsClicked,
-	viewGameRankingsClicked,
-	toggleReplayControls,
-	sandboxFromMove,
-	showGameReplayLink,
-	showGameNotationModal,
-	markGameInactiveClicked,
-	resignOnlineGameClicked,
-	closeGame,
-	aboutClicked,
-	showWelcomeScreensClicked,
-	openShop,
-	promptAddOption,
-	showPreferences,
-	setWebsiteTheme,
-	confirmMoveClicked,
-	rewindAllMoves,
-	playPrevMove,
-	playPause,
-	playNextMove,
-	pauseRun,
-	playAllMoves,
-	updatePasswordClicked,
-	forgetPasswordClicked,
-	sendGlobalChat,
-	sendChat,
-	dismissChatAlert,
-	toggleTimestamps,
-	toggleMoveLogDisplay,
-	superSandboxFromMove
-} from '../PaiShoMain';
 import { showSuperSandboxInfoModal } from '../SuperSandbox.js';
 import { addEventToElementId } from './UiSetup';
 
-export function setupHtmlEventHandlers() {
+export function setupHtmlEventHandlers(handlers) {
+	// Destructure handlers passed from PaiShoMain to avoid circular dependency
+	const {
+		viewGameSeeksClicked,
+		viewTournamentsClicked,
+		viewGameRankingsClicked,
+		toggleReplayControls,
+		sandboxFromMove,
+		showGameReplayLink,
+		showGameNotationModal,
+		markGameInactiveClicked,
+		resignOnlineGameClicked,
+		closeGame,
+		aboutClicked,
+		showWelcomeScreensClicked,
+		openShop,
+		promptAddOption,
+		showPreferences,
+		setWebsiteTheme,
+		confirmMoveClicked,
+		rewindAllMoves,
+		playPrevMove,
+		playPause,
+		playNextMove,
+		pauseRun,
+		playAllMoves,
+		updatePasswordClicked,
+		forgetPasswordClicked,
+		sendGlobalChat,
+		sendChat,
+		dismissChatAlert,
+		toggleTimestamps,
+		toggleMoveLogDisplay,
+		superSandboxFromMove
+	} = handlers;
 	// Sidenav Menu - Play section
 	addEventToElementId('sidenavJoinGame', 'click', viewGameSeeksClicked);
 	addEventToElementId('sidenavTournaments', 'click', viewTournamentsClicked);

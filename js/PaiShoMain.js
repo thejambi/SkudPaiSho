@@ -3,50 +3,37 @@
 import $ from 'jquery';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
+import { Ads } from "./Ads";
+import { DummyAppCaller, IOSCaller } from "./AppCaller";
+import { GUEST, HOST } from "./CommonNotationObjects";
+import {
+	replayIntervalLength
+} from './GameConstants';
 import { loadGameController } from "./GameControllerLoader";
 import {
-	BRAND_NEW,
-	HOST_SELECT_ACCENTS,
-	MOVE_DONE,
-	READY_FOR_BONUS,
-	WAITING_FOR_BOAT_BONUS_POINT,
-	WAITING_FOR_BONUS_ENDPOINT,
-	WAITING_FOR_ENDPOINT,
-	pieceAnimationLength,
-	piecePlaceAnimation,
-	replayIntervalLength,
-} from './GameConstants';
+	DIAGONAL_MOVEMENT,
+	EVERYTHING_CAPTURE,
+	gameOptionEnabled,
+	getGameOptionDescription,
+	V_DOUBLE_MOVE_DISTANCE,
+} from './GameOptions';
 import {
-	htmlDecode,
-	htmlEscape,
-	toBullets,
-	toHeading,
-	toMessage,
-} from './TextHelpers';
-import {
-	deviceIdKey,
-	getDeviceId,
-	getLoginToken,
-	getUserEmail,
-	getUserId,
-	getUsername,
-	haveUserEmail,
-	localEmailKey,
-	userEmailKey,
-	userIdKey,
-	userIsLoggedIn,
-	usernameEquals,
-	usernameIsOneOf,
-	usernameKey,
-} from './UserData';
-import {
-	callFailed,
-	closeModal,
-	getLoadingModalElement,
-	showBadMoveModal,
-	showModal,
-	showModalElem,
-} from './ModalManager';
+	buildDropdownDiv,
+	createNonRankedGamePreferredKey,
+	customBgColorKey,
+	customBoardUrlArrayKey,
+	customBoardUrlKey,
+	paiShoBoardDesignTypeKey,
+	paiShoBoardDesignTypeValues,
+	paiShoBoardKey,
+	promptForCustomTileDesigns,
+	setPaiShoBoardDesignTypeValues,
+	setPaiShoBoardKey,
+	setSkudTilesKey,
+	skudTilesKey,
+	tileDesignTypeKey,
+	tileDesignTypeValues
+} from './GamePrefs';
 import {
 	activeAi,
 	activeAi2,
@@ -62,8 +49,12 @@ import {
 	gameId,
 	gameWatchIntervalValue,
 	getCurrentPlayer,
+	getGameWinner,
+	getGameWinReason,
 	ggOptions,
-	isInReplay,
+	guestEmail,
+	hostEmail,
+	iAmPlayerInCurrentOnlineGame,
 	lastKnownGameNotation,
 	myTurn,
 	onlinePlayEnabled,
@@ -82,145 +73,116 @@ import {
 	setLastKnownGameNotation,
 	setOnlinePlayEnabled,
 	setSoundManager,
-	soundManager,
-	getCurrentPlayerForReal,
-	myTurnForReal,
-	hostEmail,
-	guestEmail,
-	getGameWinner,
-	getGameWinReason,
-	iAmPlayerInCurrentOnlineGame,
+	soundManager
 } from './GameState';
-import {
-	animationsOnKey,
-	buildDropdownDiv,
-	buildPreferenceDropdownDiv,
-	confirmMoveKey,
-	createNonRankedGamePreferredKey,
-	customBgColorKey,
-	customBoardUrlArrayKey,
-	customBoardUrlKey,
-	getUserGamePreference,
-	getUserGamePrefKeyName,
-	paiShoBoardDesignTypeKey,
-	paiShoBoardDesignTypeValues,
-	paiShoBoardKey,
-	promptForCustomTileDesigns,
-	setCustomTileDesignsFromInput,
-	setPaiShoBoardDesignTypeValues,
-	setPaiShoBoardKey,
-	setSkudTilesKey,
-	setUserGamePreference,
-	skudTilesKey,
-	svgBoardDesigns,
-	tileDesignTypeKey,
-	tileDesignTypeValues,
-	vagabondTileDesignTypeKey,
-} from './GamePrefs';
-import { Ads } from "./Ads";
-import { DummyAppCaller, IOSCaller } from "./AppCaller";
-import { GUEST, HOST } from "./CommonNotationObjects";
-import {
-	DIAGONAL_MOVEMENT,
-	EVERYTHING_CAPTURE,
-	V_DOUBLE_MOVE_DISTANCE,
-	gameOptionEnabled,
-	getGameOptionDescription,
-} from './GameOptions';
 import { GameType, gameTypeIdSupported, getGameTypeEntryFromId } from './GameType';
+import {
+	closeModal,
+	getLoadingModalElement,
+	showModalElem
+} from './ModalManager';
+import {
+	htmlDecode,
+	htmlEscape
+} from './TextHelpers';
+import { viewTournamentsClicked } from './TournamentManager.js';
+import {
+	deviceIdKey,
+	getDeviceId,
+	getLoginToken,
+	getUserEmail,
+	getUserId,
+	getUsername,
+	haveUserEmail,
+	localEmailKey,
+	userEmailKey,
+	userIdKey,
+	userIsLoggedIn,
+	usernameEquals,
+	usernameIsOneOf,
+	usernameKey,
+} from './UserData';
 import { Elo } from "./util/elo";
 import { GameClock } from "./util/GameClock";
 import { Giveaway } from "./util/Giveaway";
 // Re-export for backward compatibility
 export { GameType, gameTypeIdSupported, getGameTypeEntryFromId };
 // HonoraryTitleChecker moved to GameStats module
-import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
-import {
-	arrayIncludesAll,
-	convertToDomObject,
-	copyDivToClipboard,
-	copyObject,
-	copyTextToClipboard,
-	customBoardUrl,
-	dateIsAprilFools,
-	dateIsBetween,
-	debug,
-	debugOn,
-	gameDevOn,
-	humanYearsToTreeYears,
-	ios,
-	randomIntFromInterval,
-	runningOnAndroid,
-	setCustomBoardUrl,
-	setDebugOn,
-	setGameDevOn
-} from './GameData';
-import * as GameStats from './GameStats';
-import {
-	fetchGlobalChats,
-	fetchInitialGlobalChats,
-	resetGlobalChats
-} from './GlobalChat';
-import { LocalStorage } from "./LocalStorage";
-import {
-	notifyThisMessage,
-	requestNotificationPermission
-} from './Notifications';
-import { OnboardingFunctions } from "./OnBoardingVars";
-import { OnlinePlayEngine } from "./OnlinePlayEngine";
-import { viewGameRankingsClicked } from './ui/GameRankings';
-import { PREF_IOS_DEVICE_TOKEN } from './preferenceTypes';
-import { SoundManager } from "./SoundManager";
-import { setupHtmlEventHandlers } from './ui/HtmlEventHandlers';
-import { buildLoginModalContentElement } from './ui/LoginModal';
-import { buildSignUpModalContentElement } from './ui/SignUpModal';
-import { addEventToElement, setupUiEvents } from './ui/UiSetup';
-import {
-	getBooleanPreference,
-	hideConfirmMoveButton,
-	isMoveConfirmationRequired,
-	isMoveLogDisplayOn,
-	isTimestampsOn,
-	setBackgroundColor,
-	showConfirmMoveButton,
-	showPreferences,
-	toggleBooleanPreference
-} from './UserPreferences';
-import {
-	initWebPush,
-	saveWebPushSubscriptionIfNeeded
-} from './WebPush';
-import * as WelcomeTutorial from './WelcomeTutorial';
-import {
-	enterSuperSandboxMode,
-	exitSuperSandboxMode,
-	isSuperSandboxMode,
-	truncateMovesForSuperSandboxMode
-} from './SuperSandbox.js';
-import {
-	boardTileHovered,
-	boardTileUnhovered,
-	clearMessage,
-	displayReturnedMessage,
-	getAdditionalMessage,
-	getGameMessageElement,
-	getTournamentText,
-	pointClicked,
-	refreshMessage,
-	RmbDown,
-	RmbUp,
-	setMessage,
-	showPointMessage,
-	showTileMessage,
-	unplayedTileClicked,
-} from './UiInteraction';
-import {
-	getResetMoveElement,
-	getSkipButtonElement,
-	showResetMoveMessage,
-	showSkipButtonMessage,
-	skipClicked,
-} from './GameFlow';
+	import { applyBoardOptionToBgSvg, mobileAndTabletcheck } from "./ActuatorHelp";
+	import {
+		arrayIncludesAll,
+		convertToDomObject,
+		copyDivToClipboard,
+		copyObject,
+		copyTextToClipboard,
+		customBoardUrl,
+		dateIsAprilFools,
+		dateIsBetween,
+		debug,
+		debugOn,
+		gameDevOn,
+		humanYearsToTreeYears,
+		ios,
+		randomIntFromInterval,
+		runningOnAndroid,
+		setCustomBoardUrl,
+		setDebugOn,
+		setGameDevOn
+	} from './GameData';
+	import {
+		getResetMoveElement,
+		showResetMoveMessage
+	} from './GameFlow';
+	import * as GameStats from './GameStats';
+	import {
+		fetchGlobalChats,
+		fetchInitialGlobalChats,
+		resetGlobalChats,
+		sendGlobalChat
+	} from './GlobalChat';
+	import { LocalStorage } from "./LocalStorage";
+	import {
+		notifyThisMessage,
+		requestNotificationPermission
+	} from './Notifications';
+	import { OnboardingFunctions } from "./OnBoardingVars";
+	import { OnlinePlayEngine } from "./OnlinePlayEngine";
+	import { PREF_IOS_DEVICE_TOKEN } from './preferenceTypes';
+	import { SoundManager } from "./SoundManager";
+	import {
+		enterSuperSandboxMode,
+		exitSuperSandboxMode
+	} from './SuperSandbox.js';
+	import { viewGameRankingsClicked } from './ui/GameRankings';
+	import { setupHtmlEventHandlers } from './ui/HtmlEventHandlers';
+	import { buildLoginModalContentElement } from './ui/LoginModal';
+	import { buildSignUpModalContentElement } from './ui/SignUpModal';
+	import { addEventToElement, setupUiEvents } from './ui/UiSetup';
+	import {
+		clearMessage,
+		getGameMessageElement,
+		refreshMessage,
+		registerBuildPaiShoSettingsDivFunction
+	} from './UiInteraction';
+	import {
+		confirmMoveClicked,
+		getBooleanPreference,
+		hideConfirmMoveButton,
+		isMoveConfirmationRequired,
+		isMoveLogDisplayOn,
+		isTimestampsOn,
+		setBackgroundColor,
+		showConfirmMoveButton,
+		showPreferences,
+		toggleBooleanPreference,
+		toggleMoveLogDisplay,
+		toggleTimestamps
+	} from './UserPreferences';
+	import {
+		initWebPush,
+		saveWebPushSubscriptionIfNeeded
+	} from './WebPush';
+	import * as WelcomeTutorial from './WelcomeTutorial';
 
 
 export const QueryString = (() => {
@@ -405,14 +367,10 @@ let localStorage;
 export {
 	BRAND_NEW,
 	HOST_SELECT_ACCENTS,
-	MOVE_DONE,
-	READY_FOR_BONUS,
-	WAITING_FOR_BOAT_BONUS_POINT,
+	MOVE_DONE, pieceAnimationLength,
+	piecePlaceAnimation, READY_FOR_BONUS, replayIntervalLength, WAITING_FOR_BOAT_BONUS_POINT,
 	WAITING_FOR_BONUS_ENDPOINT,
-	WAITING_FOR_ENDPOINT,
-	pieceAnimationLength,
-	piecePlaceAnimation,
-	replayIntervalLength,
+	WAITING_FOR_ENDPOINT
 } from './GameConstants';
 
 let localPlayerRole = HOST;
@@ -522,225 +480,263 @@ window.requestAnimationFrame(function() {
 	// Wait for short link data to be loaded (if any) before initializing
 	shortLinkDataReady.then(async () => {
 
-	setupUiEvents();
-	setupHtmlEventHandlers();
-
-	// Initialize service worker for push notifications
-	initWebPush();
-
-	// Listen for messages from service worker (e.g., notification clicks)
-	if ('serviceWorker' in navigator) {
-		navigator.serviceWorker.addEventListener('message', (event) => {
-			if (event.data?.type === 'NAVIGATE_TO_GAME' && event.data?.gameId) {
-				jumpToGameIfPlayerIsInGame(event.data.gameId);
-			}
+		initializeDependencies();
+		setupUiEvents();
+		setupHtmlEventHandlers({
+			viewGameSeeksClicked,
+			viewTournamentsClicked,
+			viewGameRankingsClicked,
+			toggleReplayControls,
+			sandboxFromMove,
+			showGameReplayLink,
+			showGameNotationModal,
+			markGameInactiveClicked,
+			resignOnlineGameClicked,
+			closeGame,
+			aboutClicked,
+			showWelcomeScreensClicked,
+			openShop,
+			promptAddOption,
+			showPreferences,
+			setWebsiteTheme,
+			confirmMoveClicked,
+			rewindAllMoves,
+			playPrevMove,
+			playPause,
+			playNextMove,
+			pauseRun,
+			playAllMoves,
+			updatePasswordClicked,
+			forgetPasswordClicked,
+			sendGlobalChat,
+			sendChat,
+			dismissChatAlert,
+			toggleTimestamps,
+			toggleMoveLogDisplay,
+			superSandboxFromMove
 		});
-	}
 
-	/* Online play is enabled! */
-	setOnlinePlayEnabled(true);
-	/* ----------------------- */
+		// Initialize service worker for push notifications
+		initWebPush();
 
-	localStorage = new LocalStorage().storage;
-
-	setSoundManager(new SoundManager());
-
-	// Initialize GameStats module
-	GameStats.initGameStats({
-		onlinePlayEngine,
-		getLoginToken,
-		getUsername,
-		showModalElem,
-		closeModal
-	});
-
-	/* Dark Mode Preferences (dark mode now default) */
-	if (!localStorage.getItem("data-theme")) {
-		/* to always have dark as default instead of system preferences */
-		let dataTheme = "dark";
-		/* to set based on preference */
-		// let dataTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? "dark" : "light";
-
-		// check for old theme system.
-		if (localStorage.getItem("darkMode")) {
-			dataTheme = localStorage.getItem("darkMode") === "true" ? "dark" : "light";
-			// remove old local storage variable (no longer needed).
-			localStorage.removeItem("darkMode");
+		// Listen for messages from service worker (e.g., notification clicks)
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.addEventListener('message', (event) => {
+				if (event.data?.type === 'NAVIGATE_TO_GAME' && event.data?.gameId) {
+					jumpToGameIfPlayerIsInGame(event.data.gameId);
+				}
+			});
 		}
 
-		localStorage.setItem("data-theme", dataTheme);
-	}
+		/* Online play is enabled! */
+		setOnlinePlayEnabled(true);
+		/* ----------------------- */
 
-	setWebsiteTheme(localStorage.getItem("data-theme"));
-	document.getElementById("websiteStyleDropdown").value = localStorage.getItem("data-theme");
+		localStorage = new LocalStorage().storage;
 
-	const customBgColorValue = localStorage.getItem(customBgColorKey);
-	if (customBgColorValue) {
-		setBackgroundColor(customBgColorValue);
-	}
+		setSoundManager(new SoundManager());
 
-	// defaultEmailMessageText = document.querySelector(".footer").innerHTML;
+		// Initialize GameStats module
+		GameStats.initGameStats({
+			onlinePlayEngine,
+			getLoginToken,
+			getUsername,
+			showModalElem,
+			closeModal
+		});
 
-	buildBoardDesignsValues();
+		/* Dark Mode Preferences (dark mode now default) */
+		if (!localStorage.getItem("data-theme")) {
+			/* to always have dark as default instead of system preferences */
+			let dataTheme = "dark";
+			/* to set based on preference */
+			// let dataTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? "dark" : "light";
 
-	  if (dateIsAprilFools()) {
-		  Ads.enableAds(true);
-		  GameType.SkudPaiSho.gameOptions.push(DIAGONAL_MOVEMENT, EVERYTHING_CAPTURE);
-		  GameType.VagabondPaiSho.gameOptions.push(V_DOUBLE_MOVE_DISTANCE);
-	  }
-
-	if (QueryString.game && !QueryString.gameType) {
-		QueryString.gameType = "1";
-	}
-	if (QueryString.gameType) {
-		clearOptions();
-		if (QueryString.gameOptions) {
-			const optionsArray = parseGameOptions(QueryString.gameOptions);
-			for (let i = 0; i < optionsArray.length; i++) {
-				addOption(optionsArray[i]);
+			// check for old theme system.
+			if (localStorage.getItem("darkMode")) {
+				dataTheme = localStorage.getItem("darkMode") === "true" ? "dark" : "light";
+				// remove old local storage variable (no longer needed).
+				localStorage.removeItem("darkMode");
 			}
-		}
-		await setGameController(parseInt(QueryString.gameType), true);
 
-		gameController.setGameNotation(QueryString.game);
-
-		if (!QueryString.game || QueryString.game.length < 3) {
-			sandboxFromMove();
+			localStorage.setItem("data-theme", dataTheme);
 		}
 
-		if (gameController.gameNotation.moves.length > 1) {
-			showReplayControls();
+		setWebsiteTheme(localStorage.getItem("data-theme"));
+		document.getElementById("websiteStyleDropdown").value = localStorage.getItem("data-theme");
+
+		const customBgColorValue = localStorage.getItem(customBgColorKey);
+		if (customBgColorValue) {
+			setBackgroundColor(customBgColorValue);
 		}
-	} else {
-		await closeGame();
-	}
 
-	/* Tile Design Preferences */
-	if (!localStorage.getItem(tileDesignTypeKey)) {
-		setSkudTilesOption("tgggyatso");
-	} else {
-		setSkudTilesOption(localStorage.getItem(tileDesignTypeKey), true);
-	}
+		// defaultEmailMessageText = document.querySelector(".footer").innerHTML;
 
-	if (localStorage.getItem(paiShoBoardDesignTypeKey)) {
-		setPaiShoBoardOption(localStorage.getItem(paiShoBoardDesignTypeKey));
-	} else {
-		setPaiShoBoardOption(defaultBoardDesignKey);
-	}
+		buildBoardDesignsValues();
 
-	/* --- */
+		if (dateIsAprilFools()) {
+			Ads.enableAds(true);
+			GameType.SkudPaiSho.gameOptions.push(DIAGONAL_MOVEMENT, EVERYTHING_CAPTURE);
+			GameType.VagabondPaiSho.gameOptions.push(V_DOUBLE_MOVE_DISTANCE);
+		}
 
-	url = window.location.href.split('?')[0];
-	sandboxUrl = url;
+		if (QueryString.game && !QueryString.gameType) {
+			QueryString.gameType = "1";
+		}
+		if (QueryString.gameType) {
+			clearOptions();
+			if (QueryString.gameOptions) {
+				const optionsArray = parseGameOptions(QueryString.gameOptions);
+				for (let i = 0; i < optionsArray.length; i++) {
+					addOption(optionsArray[i]);
+				}
+			}
+			await setGameController(parseInt(QueryString.gameType), true);
 
-	if (url.includes("calebhugo.com")) {
-		url = "https://skudpaisho.com/";
-	}
+			gameController.setGameNotation(QueryString.game);
 
-	// if ((url.startsWith("file") || url.includes("localhost")) && !ios && !runningOnAndroid) {
-	if ((url.startsWith("file")) && !ios && !runningOnAndroid) {
-		setOnlinePlayEnabled(false);
-	}
+			if (!QueryString.game || QueryString.game.length < 3) {
+				sandboxFromMove();
+			}
 
-	if (ios || runningOnAndroid || QueryString.appType === 'ios' || QueryString.appType === 'android') {
-		url = "https://skudpaisho.com/";
-		sandboxUrl = url;
-	}
-
-	setHostEmail(QueryString.host);
-	setGuestEmail(QueryString.guest);
-
-	appCaller = new DummyAppCaller();
-
-	if (QueryString.appType === 'ios') {
-		appCaller = new IOSCaller();
-	}
-
-	let localUserEmail = localStorage.getItem(localEmailKey);
-
-	if (!userIsLoggedIn()) {
-		localUserEmail = null;
-		localStorage.removeItem(localEmailKey);
-	}
-
-	if (hostEmail && hostEmail != localUserEmail
-		&& guestEmail && guestEmail != localUserEmail) {
-		localPlayerRole = null;
-	} else {
-		localPlayerRole = getCurrentPlayer();
-
-		if (localUserEmail) {
-			if (localPlayerRole === HOST) {
-				setHostEmail(localUserEmail);
-			} else if (localPlayerRole === GUEST) {
-				setGuestEmail(localUserEmail);
+			if (gameController.gameNotation.moves.length > 1) {
+				showReplayControls();
 			}
 		} else {
-			if (localPlayerRole === HOST) {
-				setHostEmail(null);
-			} else if (localPlayerRole === GUEST) {
-				setGuestEmail(null);
+			await closeGame();
+		}
+
+		/* Tile Design Preferences */
+		if (!localStorage.getItem(tileDesignTypeKey)) {
+			setSkudTilesOption("tgggyatso");
+		} else {
+			setSkudTilesOption(localStorage.getItem(tileDesignTypeKey), true);
+		}
+
+		if (localStorage.getItem(paiShoBoardDesignTypeKey)) {
+			setPaiShoBoardOption(localStorage.getItem(paiShoBoardDesignTypeKey));
+		} else {
+			setPaiShoBoardOption(defaultBoardDesignKey);
+		}
+
+		/* --- */
+
+		url = window.location.href.split('?')[0];
+		sandboxUrl = url;
+
+		if (url.includes("calebhugo.com")) {
+			url = "https://skudpaisho.com/";
+		}
+
+		// if ((url.startsWith("file") || url.includes("localhost")) && !ios && !runningOnAndroid) {
+		if ((url.startsWith("file")) && !ios && !runningOnAndroid) {
+			setOnlinePlayEnabled(false);
+		}
+
+		if (ios || runningOnAndroid || QueryString.appType === 'ios' || QueryString.appType === 'android') {
+			url = "https://skudpaisho.com/";
+			sandboxUrl = url;
+		}
+
+		setHostEmail(QueryString.host);
+		setGuestEmail(QueryString.guest);
+
+		appCaller = new DummyAppCaller();
+
+		if (QueryString.appType === 'ios') {
+			appCaller = new IOSCaller();
+		}
+
+		let localUserEmail = localStorage.getItem(localEmailKey);
+
+		if (!userIsLoggedIn()) {
+			localUserEmail = null;
+			localStorage.removeItem(localEmailKey);
+		}
+
+		if (hostEmail && hostEmail != localUserEmail
+			&& guestEmail && guestEmail != localUserEmail) {
+			localPlayerRole = null;
+		} else {
+			localPlayerRole = getCurrentPlayer();
+
+			if (localUserEmail) {
+				if (localPlayerRole === HOST) {
+					setHostEmail(localUserEmail);
+				} else if (localPlayerRole === GUEST) {
+					setGuestEmail(localUserEmail);
+				}
+			} else {
+				if (localPlayerRole === HOST) {
+					setHostEmail(null);
+				} else if (localPlayerRole === GUEST) {
+					setGuestEmail(null);
+				}
 			}
 		}
-	}
 
-	updateFooter();
+		updateFooter();
 
-	clearMessage();
+		clearMessage();
 
-	rerunAll();
+		rerunAll();
 
-	setAccountHeaderLinkText();
+		setAccountHeaderLinkText();
 
-	setSidenavNewGameSection();
+		setSidenavNewGameSection();
 
-	if (onlinePlayEnabled) {
-		onlinePlayEngine.testOnlinePlay(emptyCallback);
-		if (gameId > 0) {
-			startWatchingGameRealTime();
+		if (onlinePlayEnabled) {
+			onlinePlayEngine.testOnlinePlay(emptyCallback);
+			if (gameId > 0) {
+				startWatchingGameRealTime();
+			}
 		}
-	}
 
-	resetGlobalChats();	//"Global Chats" tab is now "Links"
+		resetGlobalChats();	//"Global Chats" tab is now "Links"
 
-	initialVerifyLogin();
+		initialVerifyLogin();
 
-	// Open default help/chat tab
-	document.getElementById("defaultOpenTab").click();
+		// Open default help/chat tab
+		document.getElementById("defaultOpenTab").click();
 
-	if (dateIsBetween("04/01/2023", "04/02/2023")) {
-		Ads.enableAds(true);
-		GameType.SkudPaiSho.gameOptions.push(DIAGONAL_MOVEMENT, EVERYTHING_CAPTURE);
-	}
+		if (dateIsBetween("04/01/2023", "04/02/2023")) {
+			Ads.enableAds(true);
+			GameType.SkudPaiSho.gameOptions.push(DIAGONAL_MOVEMENT, EVERYTHING_CAPTURE);
+		}
 
-	if (WelcomeTutorial.shouldShowWelcomeTutorial(debugOn, QueryString.game, userIsLoggedIn())) {
-		WelcomeTutorial.showWelcomeTutorial();
-	} else {
-		OnboardingFunctions.showOnLoadAnnouncements();
-	}
+		if (WelcomeTutorial.shouldShowWelcomeTutorial(debugOn, QueryString.game, userIsLoggedIn())) {
+			WelcomeTutorial.showWelcomeTutorial();
+		} else {
+			OnboardingFunctions.showOnLoadAnnouncements();
+		}
 
-	if (QueryString.wg) {	/* `wg` for watch game id */
-		QueryString.watchGame = QueryString.wg;
-	}
-	if (QueryString.watchGame) {
-		jumpToGame(QueryString.watchGame);
-	}
+		if (QueryString.wg) {	/* `wg` for watch game id */
+			QueryString.watchGame = QueryString.wg;
+		}
+		if (QueryString.watchGame) {
+			jumpToGame(QueryString.watchGame);
+		}
 
-	if (QueryString.gameInApp) {	/* `gameInApp` for game id to open from app notification */
-		jumpToGameIfPlayerIsInGame(QueryString.gameInApp);
-	}
+		if (QueryString.gameInApp) {	/* `gameInApp` for game id to open from app notification */
+			jumpToGameIfPlayerIsInGame(QueryString.gameInApp);
+		}
 
-	/* If a link to a private game, jump to the game. */
-	if (QueryString.ig && QueryString.h) {	/* `ig` for invite game id, `h` for host username */
-		QueryString.joinPrivateGame = QueryString.ig;
-		QueryString.hostUserName = QueryString.h;
-		QueryString.rankedGameInd = QueryString.r;
-	}
-	if (QueryString.joinPrivateGame) {
-		jumpToGame(QueryString.joinPrivateGame);
-	}
+		/* If a link to a private game, jump to the game. */
+		if (QueryString.ig && QueryString.h) {	/* `ig` for invite game id, `h` for host username */
+			QueryString.joinPrivateGame = QueryString.ig;
+			QueryString.hostUserName = QueryString.h;
+			QueryString.rankedGameInd = QueryString.r;
+		}
+		if (QueryString.joinPrivateGame) {
+			jumpToGame(QueryString.joinPrivateGame);
+		}
 	}); // end shortLinkDataReady.then()
 });
+
+function initializeDependencies() {
+	registerBuildPaiShoSettingsDivFunction(buildPaiShoSettingsDiv);
+}
+
 export function getGameColor(gameMode) {
 	switch (gameMode) {
 	case "Skud Pai Sho":
@@ -791,7 +787,7 @@ export {
 	haveUserEmail,
 	userIsLoggedIn,
 	usernameEquals,
-	usernameIsOneOf,
+	usernameIsOneOf
 } from './UserData';
 
 export {
@@ -800,7 +796,7 @@ export {
 	getLoadingModalElement,
 	showBadMoveModal,
 	showModal,
-	showModalElem,
+	showModalElem
 } from './ModalManager';
 
 export {
@@ -818,10 +814,7 @@ export {
 	gameId,
 	gameWatchIntervalValue,
 	getCurrentPlayer,
-	getCurrentPlayerForReal,
-	getGameWinReason,
-	getGameWinner,
-	ggOptions,
+	getCurrentPlayerForReal, getGameWinner, getGameWinReason, ggOptions,
 	iAmPlayerInCurrentOnlineGame,
 	isInReplay,
 	lastKnownGameNotation,
@@ -832,7 +825,7 @@ export {
 	setCurrentMoveIndex,
 	setGameLogText,
 	setIsInReplay,
-	soundManager,
+	soundManager
 } from './GameState';
 
 export {
@@ -855,7 +848,7 @@ export {
 	svgBoardDesigns,
 	tileDesignTypeKey,
 	tileDesignTypeValues,
-	vagabondTileDesignTypeKey,
+	vagabondTileDesignTypeKey
 } from './GamePrefs';
 
 export {
@@ -873,7 +866,7 @@ export {
 	setMessage,
 	showPointMessage,
 	showTileMessage,
-	unplayedTileClicked,
+	unplayedTileClicked
 } from './UiInteraction';
 
 export {
@@ -881,7 +874,7 @@ export {
 	getSkipButtonElement,
 	showResetMoveMessage,
 	showSkipButtonMessage,
-	skipClicked,
+	skipClicked
 } from './GameFlow';
 
 export function showReplayControls() {
@@ -2297,7 +2290,7 @@ export {
 	getWhitePointMessage,
 	toBullets,
 	toHeading,
-	toMessage,
+	toMessage
 } from './TextHelpers';
 
 export function userHasGameAccess() {
@@ -5593,12 +5586,6 @@ export function getGameOptionsMessageElement(options) {
 
     return container;
 }
-
-/* Tournament functions - Re-exported from TournamentManager module */
-export {
-	changeTournamentPlayerStatus, changeTournamentStatus, createNewRound, createNewTournamentClicked, createNewTournamentMatch, manageTournamentClicked,
-	manageTournamentsClicked, matchGameClicked, playerNameClicked, roundClicked, showPastTournamentsClicked, signUpForTournament, submitCreateTournament, submitTournamentSignup, viewTournamentInfo, viewTournamentsClicked
-} from './TournamentManager';
 
 /* Game Rankings - Re-exported from GameRankings module */
 export {
