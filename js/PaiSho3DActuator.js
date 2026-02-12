@@ -17,6 +17,7 @@ import {
 	svgBoardDesigns,
 	customBoardUrlArrayKey,
 	customBoardUrlKey,
+	customBgColorKey,
 } from './PaiShoMain';
 import { RowAndColumn } from './CommonNotationObjects';
 import { getRoundBoardPreference, isHelpCollapsed, setHelpCollapsed } from './PaiSho3DOptions';
@@ -209,7 +210,8 @@ export class PaiSho3DActuator {
 	}
 
 	updateSceneBackground() {
-		const bgColor = getComputedStyle(document.body).backgroundColor;
+		const customBgColor = localStorage.getItem(customBgColorKey);
+		const bgColor = customBgColor || getComputedStyle(document.body).backgroundColor;
 		this.scene.background = new THREE.Color(bgColor || '#1a1a2e');
 	}
 

@@ -3,20 +3,10 @@
 import $ from 'jquery';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 
-import { AdevarController } from "./adevar/AdevarController";
-import { AdevarOptions } from './adevar/AdevarOptions';
+import { loadGameController } from "./GameControllerLoader";
 import { Ads } from "./Ads";
 import { DummyAppCaller, IOSCaller } from "./AppCaller";
-import {
-	BeyondTheMapsController,
-} from './beyond-the-maps/BeyondTheMapsController';
-import { BloomsController } from './blooms/BloomsController';
-import { CaptureController } from './capture/CaptureController';
 import { GUEST, HOST } from "./CommonNotationObjects";
-import {
-	CoopSolitaireController,
-} from './cooperative-solitaire/CoopSolitaireController';
-import { FirePaiShoController } from './fire-pai-sho/FirePaiShoController';
 import {
 	DIAGONAL_MOVEMENT,
 	EVERYTHING_CAPTURE,
@@ -25,10 +15,6 @@ import {
 	getGameOptionDescription,
 } from './GameOptions';
 import { GameType, gameTypeIdSupported, getGameTypeEntryFromId } from './GameType';
-import { GiniController } from './gini/GiniController';
-import { GinsengController } from './ginseng/GinsengController';
-import { GodaiController } from './godai/GodaiController';
-import { HexentaflController } from './hexentafl/HexentaflController';
 import { Elo } from "./util/elo";
 import { GameClock } from "./util/GameClock";
 import { Giveaway } from "./util/Giveaway";
@@ -62,37 +48,20 @@ import {
 	fetchInitialGlobalChats,
 	resetGlobalChats
 } from './GlobalChat';
-import { FanoronaController } from './fanorona/FanoronaController';
-import { HexController } from './hex/HexController';
-import { KeyPaiShoController } from './key-pai-sho/KeyPaiShoController';
 import { LocalStorage } from "./LocalStorage";
-import { MeadowController } from './meadow/MeadowController';
-import NickController from './nick/NickController';
 import {
 	notifyThisMessage,
 	requestNotificationPermission
 } from './Notifications';
 import { OnboardingFunctions } from "./OnBoardingVars";
 import { OnlinePlayEngine } from "./OnlinePlayEngine";
-import { OvergrowthController } from './overgrowth/OvergrowthController';
-import { PaikoController } from './paiko/PaikoController';
-import { viewGameRankingsClicked } from './PaiShoMain';
-import { PlaygroundController } from './playground/PlaygroundController';
+import { viewGameRankingsClicked } from './ui/GameRankings';
 import { PREF_IOS_DEVICE_TOKEN } from './preferenceTypes';
-import { SkudPaiShoController, SkudPreferences } from "./skud-pai-sho/SkudPaiShoController";
-import { SolitaireController } from './solitaire/SolitaireController';
 import { SoundManager } from "./SoundManager";
-import { SpiritController } from './spirit/SpiritController';
-import { StreetController } from './street/StreetController';
-import { TicTacToeController } from './tictactoe/TicTacToeController';
-import { TrifleController } from './trifle/TrifleController';
-import { TumbleweedController } from './tumbleweed/TumbleweedController';
 import { setupHtmlEventHandlers } from './ui/HtmlEventHandlers';
 import { buildLoginModalContentElement } from './ui/LoginModal';
 import { buildSignUpModalContentElement } from './ui/SignUpModal';
 import { addEventToElement, setupUiEvents } from './ui/UiSetup';
-import { UndergrowthController } from './undergrowth/UndergrowthController';
-import { UndergrowthSimplicityController } from './undergrowth-simplicity/UndergrowthSimplicityController';
 import {
 	getBooleanPreference,
 	hideConfirmMoveButton,
@@ -104,13 +73,11 @@ import {
 	showPreferences,
 	toggleBooleanPreference
 } from './UserPreferences';
-import { VagabondController } from "./vagabond/VagabondController";
 import {
 	initWebPush,
 	saveWebPushSubscriptionIfNeeded
 } from './WebPush';
 import * as WelcomeTutorial from './WelcomeTutorial';
-import { YammaController } from './yamma/YammaController';
 import {
 	enterSuperSandboxMode,
 	exitSuperSandboxMode,
@@ -528,7 +495,7 @@ export function sortGameListWithFavoritesFirst(gameList) {
 
 window.requestAnimationFrame(function() {
 	// Wait for short link data to be loaded (if any) before initializing
-	shortLinkDataReady.then(() => {
+	shortLinkDataReady.then(async () => {
 
 	setupUiEvents();
 	setupHtmlEventHandlers();
@@ -608,7 +575,7 @@ window.requestAnimationFrame(function() {
 				addOption(optionsArray[i]);
 			}
 		}
-		setGameController(parseInt(QueryString.gameType), true);
+		await setGameController(parseInt(QueryString.gameType), true);
 
 		gameController.setGameNotation(QueryString.game);
 
@@ -620,7 +587,7 @@ window.requestAnimationFrame(function() {
 			showReplayControls();
 		}
 	} else {
-		closeGame();
+		await closeGame();
 	}
 
 	/* Tile Design Preferences */
@@ -1453,8 +1420,9 @@ export function setCustomBoardFromInput() {
 }
 
 /* Skud Pai Sho Tile Design Switches */
-export function setSkudTilesOption(newSkudTilesKey, applyCustomBoolean) {
+export async function setSkudTilesOption(newSkudTilesKey, applyCustomBoolean) {
 	if (newSkudTilesKey === 'custom' && !applyCustomBoolean) {
+		const { SkudPreferences } = await import("./skud-pai-sho/SkudPaiShoController");
 		promptForCustomTileDesigns(GameType.SkudPaiSho, SkudPreferences.customTilesUrl);
 	} else {
 		gameContainerDiv.classList.remove(skudTilesKey);
@@ -2680,7 +2648,7 @@ export function userHasGameAccess() {
 			|| usernameIsOneOf(getGameTypeEntryFromId(gameTypeId).usersWithAccess));
 }
 
-export function sandboxitize(isSuperSandbox) {
+export async function sandboxitize(isSuperSandbox) {
 	/* Verify game access if it would start a new game at move 0 */
 	if (currentMoveIndex === 0 && !userHasGameAccess()) {
 		return;
@@ -2695,7 +2663,7 @@ export function sandboxitize(isSuperSandbox) {
 		}
 	}
 
-	setGameController(currentGameData.gameTypeId, true);
+	await setGameController(currentGameData.gameTypeId, true);
 
 	if (isSuperSandbox) {
 		enterSuperSandboxMode();
@@ -3289,108 +3257,9 @@ export function forgetCurrentGameInfo() {
 	updateCurrentGameTitle();
 }
 
-export function getGameControllerForGameType(gameTypeId) {
-	let controller;
-
+export async function getGameControllerForGameType(gameTypeId) {
 	const isMobile = mobileAndTabletcheck();
-
-	switch (gameTypeId) {
-		case GameType.SkudPaiSho.id:
-			controller = new SkudPaiShoController(gameContainerDiv, isMobile);
-			break;
-		case GameType.VagabondPaiSho.id:
-			controller = new VagabondController(gameContainerDiv, isMobile);
-			break;
-		case GameType.SolitairePaiSho.id:
-			controller = new SolitaireController(gameContainerDiv, isMobile);
-			break;
-		case GameType.CapturePaiSho.id:
-			controller = new CaptureController(gameContainerDiv, isMobile);
-			break;
-		case GameType.SpiritPaiSho.id:
-			controller = new SpiritController(gameContainerDiv, isMobile);
-			break;
-		case GameType.StreetPaiSho.id:
-			controller = new StreetController(gameContainerDiv, isMobile);
-			break;
-		case GameType.Nick.id:
-			controller = new NickController(gameContainerDiv, isMobile);
-			break;
-		case GameType.CoopSolitaire.id:
-			controller = new CoopSolitaireController(gameContainerDiv, isMobile);
-			break;
-		case GameType.Playground.id:
-			controller = new PlaygroundController(gameContainerDiv, isMobile);
-			break;
-		case GameType.OvergrowthPaiSho.id:
-			controller = new OvergrowthController(gameContainerDiv, isMobile);
-			break;
-		case GameType.Undergrowth.id:
-			controller = new UndergrowthController(gameContainerDiv, isMobile);
-			break;
-		case GameType.Blooms.id:
-			controller = new BloomsController(gameContainerDiv, isMobile);
-			break;
-		case GameType.Meadow.id:
-			controller = new MeadowController(gameContainerDiv, isMobile);
-			break;
-		case GameType.Trifle.id:
-			// if (gameDevOn || usernamionof.... GameType.Trifle.usersWithAccess.includes(getUsername())) {
-			controller = new TrifleController(gameContainerDiv, isMobile);
-			// } else {
-			// 	closeGame();
-			// }
-			break;
-		case GameType.Hexentafl.id:
-			controller = new HexentaflController(gameContainerDiv, isMobile);
-			break;
-		case GameType.Adevar.id:
-			controller = new AdevarController(gameContainerDiv, isMobile);
-			break;
-		case GameType.Tumbleweed.id:
-			controller = new TumbleweedController(gameContainerDiv, isMobile);
-			break;
-		case GameType.FirePaiSho.id:
-			controller = new FirePaiShoController(gameContainerDiv, isMobile);
-			break;
-		case GameType.Ginseng.id:
-			controller = new GinsengController(gameContainerDiv, isMobile);
-			break;
-		case GameType.GiniPaiSho.id:
-			controller = new GiniController(gameContainerDiv, isMobile);
-			break;
-		case GameType.KeyPaiSho.id:
-			controller = new KeyPaiShoController(gameContainerDiv, isMobile);
-			break;
-		case GameType.BeyondTheMaps.id:
-			controller = new BeyondTheMapsController(gameContainerDiv, isMobile);
-			break;
-		case GameType.GodaiPaiSho.id:
-			controller = new GodaiController(gameContainerDiv, isMobile)
-			break;
-		case GameType.Yamma.id:
-			controller = new YammaController(gameContainerDiv, isMobile);
-			break;
-		case GameType.TicTacToe.id:
-			controller = new TicTacToeController(gameContainerDiv, isMobile);
-			break;
-		case GameType.Hex.id:
-			controller = new HexController(gameContainerDiv, isMobile);
-			break;
-		case GameType.Paiko.id:
-			controller = new PaikoController(gameContainerDiv, isMobile);
-			break;
-		case GameType.Fanorona.id:
-			controller = new FanoronaController(gameContainerDiv, isMobile);
-			break;
-		case GameType.UndergrowthBriar.id:
-			controller = new UndergrowthSimplicityController(gameContainerDiv, isMobile);
-			break;
-		default:
-			debug("Game Controller unavailable.");
-	}
-
-	return controller;
+	return await loadGameController(gameTypeId, gameContainerDiv, isMobile);
 }
 
 export function showDefaultGameOpenedMessage(show) {
@@ -3408,7 +3277,7 @@ export function setGameTitleText(gameTitle) {
 	}
 }
 
-export function setGameController(gameTypeId, keepGameOptions) {
+export async function setGameController(gameTypeId, keepGameOptions) {
 	setGameLogText('');
 
 	let successResult = true;
@@ -3430,9 +3299,13 @@ export function setGameController(gameTypeId, keepGameOptions) {
 
 	showDefaultGameOpenedMessage(false);
 
-	gameController = getGameControllerForGameType(gameTypeId);
+	// Show loading indicator while game code downloads
+	gameContainerDiv.innerHTML = '';
+	gameContainerDiv.appendChild(getLoadingModalElement());
+
+	gameController = await getGameControllerForGameType(gameTypeId);
 	if (!gameController) {
-		gameController = getGameControllerForGameType(GameType.VagabondPaiSho.id);
+		gameController = await getGameControllerForGameType(GameType.VagabondPaiSho.id);
 		const container = document.createElement('div');
 		container.appendChild(document.createTextNode("This game is unavailable. Try Vagabond Pai Sho instead :)"));
 		container.appendChild(document.createElement('br'));
@@ -3470,7 +3343,7 @@ export function setGameController(gameTypeId, keepGameOptions) {
 	return successResult;
 }
 
-const jumpToGameCallback = (results) => {
+const jumpToGameCallback = async (results) => {
 	if (results) {
 		populateMyGamesList(results);
 
@@ -3482,7 +3355,7 @@ const jumpToGameCallback = (results) => {
 				addOption(myGame.gameOptions[i]);
 			}
 		}
-		const gameControllerSuccess = setGameController(myGame.gameTypeId, true);
+		const gameControllerSuccess = await setGameController(myGame.gameTypeId, true);
 
 		if (!gameControllerSuccess) {
 			return;
@@ -4856,18 +4729,17 @@ export function clearLogOnlineStatusInterval() {
 }
 
 export function setSidenavNewGameSection() {
-	let message = "";
+	const section = document.getElementById("sidenavNewGameSection");
+	section.innerHTML = "";
 
-	Object.keys(GameType).forEach((key, index) => {
-		message += getSidenavNewGameEntryForGameType(GameType[key]);
+	Object.keys(GameType).forEach((key) => {
+		section.appendChild(getSidenavNewGameEntryForGameType(GameType[key]));
 	});
-
-	document.getElementById("sidenavNewGameSection").innerHTML = message;
 }
 
-export function closeGame() {
+export async function closeGame() {
 	if (gameDevOn) {
-		setGameController(GameType.Trifle.id);
+		await setGameController(GameType.Trifle.id);
 		return;
 	}
 	const defaultGameTypeIds = [
@@ -4876,12 +4748,35 @@ export function closeGame() {
 		GameType.Adevar.id,
 		GameType.Ginseng.id
 	];
-	setGameController(defaultGameTypeIds[randomIntFromInterval(0, defaultGameTypeIds.length - 1)]);
+	await setGameController(defaultGameTypeIds[randomIntFromInterval(0, defaultGameTypeIds.length - 1)]);
 	showDefaultGameOpenedMessage(true);
 }
 
 export function getSidenavNewGameEntryForGameType(gameType) {
-	return "<div class='sidenavEntry'><span class='sidenavLink skipBonus' onclick='setGameController(" + gameType.id + "); closeModal();'>" + gameType.desc + "</span><span>&nbsp;-&nbsp;<i class='fa fa-book' aria-hidden='true'></i>&nbsp;</span><a href='" + gameType.rulesUrl + "' target='_blank' class='newGameRulesLink sidenavLink'>Rules</a></div>";
+	const div = document.createElement('div');
+	div.className = 'sidenavEntry';
+
+	const span = document.createElement('span');
+	span.className = 'sidenavLink skipBonus';
+	span.textContent = gameType.desc;
+	span.onclick = async function() {
+		await setGameController(gameType.id);
+		closeModal();
+	};
+	div.appendChild(span);
+
+	const separator = document.createElement('span');
+	separator.innerHTML = '&nbsp;-&nbsp;<i class="fa fa-book" aria-hidden="true"></i>&nbsp;';
+	div.appendChild(separator);
+
+	const rulesLink = document.createElement('a');
+	rulesLink.href = gameType.rulesUrl;
+	rulesLink.target = '_blank';
+	rulesLink.className = 'newGameRulesLink sidenavLink';
+	rulesLink.textContent = 'Rules';
+	div.appendChild(rulesLink);
+
+	return div;
 }
 
 function getNewGameEntryForGameType(gameType) {
@@ -4913,8 +4808,8 @@ function getNewGameEntryForGameType(gameType) {
 			// Image
 			const img = document.createElement('img');
 			img.src = 'style/game-icons/' + gameType.coverImg;
-			img.ondblclick = function() {
-				setGameController(gameType.id);
+			img.ondblclick = async function() {
+				await setGameController(gameType.id);
 				closeModal();
 			};
 			newGameElem.appendChild(img);
@@ -4922,8 +4817,8 @@ function getNewGameEntryForGameType(gameType) {
 			// Title
 			const h3 = document.createElement('h3');
 			h3.textContent = gameType.desc;
-			h3.onclick = function() {
-				setGameController(gameType.id);
+			h3.onclick = async function() {
+				await setGameController(gameType.id);
 				closeModal();
 			};
 			newGameElem.appendChild(h3);
@@ -5046,8 +4941,8 @@ function getNewGameEntryForGameType(gameType) {
 			div.appendChild(contentDiv);
 
 			// Make entire card clickable
-			div.onclick = function() {
-				setGameController(gameType.id);
+			div.onclick = async function() {
+				await setGameController(gameType.id);
 				closeModal();
 			};
 
@@ -5151,9 +5046,10 @@ const processChatCommands = (chatMessage) => {
 	return false;
 };
 
-const processChatEasterEggCommands = (chatMessage) => {
+const processChatEasterEggCommands = async (chatMessage) => {
 	/* Secret easter eggs... */
 	if (chatMessage.toLowerCase().includes('spoopy')) {
+		const { AdevarOptions } = await import('./adevar/AdevarOptions');
 		new AdevarOptions();
 		AdevarOptions.commenceSpoopy();
 	}
@@ -5494,11 +5390,11 @@ export function getOnlineGameOpponentUsername() {
 	return opponentUsername;
 }
 
-export function quitOnlineGameCallback() {
+export async function quitOnlineGameCallback() {
 	if (currentGameData) {
-		setGameController(currentGameData.gameTypeId);
+		await setGameController(currentGameData.gameTypeId);
 	} else {
-		closeGame();
+		await closeGame();
 	}
 }
 
@@ -6165,9 +6061,9 @@ export function showGiveawayDrawingModal() {
 	showModalElem("Giveaway Winner Chooser!", container);
 }
 
-export function addGameOption(option) {
+export async function addGameOption(option) {
 	addOption(option);
-	setGameController(gameController.getGameTypeId(), true);
+	await setGameController(gameController.getGameTypeId(), true);
 }
 
 export function getGameOptionsMessageElement(options) {

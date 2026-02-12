@@ -20,10 +20,10 @@
 		"test:ui": "vitest --ui",
 		"clean": "rm -rf dist .parcel-cache",
 		"start": "parcel index.html --open",
-		"build": "npm run clean && parcel build index.html --public-url ./",
+		"build": "npm run clean && parcel build index.html --public-url ./ --no-scope-hoist",
 		"build:deploy": "npm run build && ./deploy-prep.sh",
 		"start-ugly": "./minify.sh && parcel --open",
-		"build-ugly": "npm run clean && ./minify.sh && parcel build --public-url ./",
+		"build-ugly": "npm run clean && ./minify.sh && parcel build --public-url ./ --no-scope-hoist",
 		"build-ugly:deploy": "npm run build-ugly && ./deploy-prep.sh",
 		"lint": "eslint ./js/*.js"
 	},
