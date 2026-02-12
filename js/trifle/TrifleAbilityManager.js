@@ -95,12 +95,16 @@ export class TrifleAbilityManager {
 		this.abilities.forEach((existingAbility) => {
 			// Preserve if:
 			// 1. Marked as preserve (re-triggered this turn) and not canceled, OR
-			// 2. Has remaining duration (duration abilities should persist until expired)
+			// 2. Has remaining duration (duration abilities should persist until expired), OR
+			// 3. Has remaining activation delay (pending abilities should persist until activated)
 			const hasDurationRemaining = existingAbility.remainingDuration !== undefined
 				&& existingAbility.remainingDuration > 0;
+			const hasDelayRemaining = existingAbility.remainingDelay !== undefined
+				&& existingAbility.remainingDelay > 0;
 
 			if ((existingAbility.preserve && !this.abilityIsCanceled(existingAbility))
-					|| hasDurationRemaining) {
+					|| hasDurationRemaining
+					|| hasDelayRemaining) {
 				newAbilities.push(existingAbility);
 			} else {
 				existingAbility.deactivate();
@@ -458,9 +462,19 @@ export class TrifleAbilityManager {
 	}
 
 	tickDurationAbilities() {
-		// Tick duration for all abilities that have duration, remove expired ones
 		for (let i = this.abilities.length - 1; i >= 0; i--) {
 			const ability = this.abilities[i];
+
+			// Tick delay for pending abilities (not yet activated)
+			if (ability.hasActivationDelay() && ability.pendingActivation && !ability.activated) {
+				const delayExpired = ability.tickDelay();
+				if (delayExpired) {
+					ability.activateDelayedAbility();
+				}
+				continue;
+			}
+
+			// Tick duration for active abilities, remove expired ones
 			if (ability.hasDuration() && ability.activated) {
 				const expired = ability.tickDuration();
 				if (expired) {

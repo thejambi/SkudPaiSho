@@ -114,11 +114,24 @@ export class TrifleAbility {
 
 	activateAbility() {
 		debug("Activating ability: " + this.abilityInfo.type + " from " + this.sourceTile.ownerCode + this.sourceTile.code);
+
+		// If ability has an activation delay, don't activate yet - just set up the delay
+		if (this.hasActivationDelay()) {
+			this.remainingDelay = this.abilityInfo.activationDelay;
+			this.pendingActivation = true;
+			debug("Ability has activation delay: " + this.remainingDelay);
+		} else {
+			this.doActivate();
+		}
+	}
+
+	doActivate() {
 		this.setAbilityTargetTiles();
 
 		if (this.abilityTargetTiles.length > 0) {	// Ability must have target tile?
 			this.abilityActivatedResults = this.abilityBrain.activateAbility();
 			this.activated = true;
+			this.pendingActivation = false;
 
 			// Initialize duration tracking if ability has duration
 			if (this.abilityInfo.duration && this.abilityInfo.duration > 0) {
@@ -126,6 +139,24 @@ export class TrifleAbility {
 				debug("Ability has duration: " + this.remainingDuration);
 			}
 		}
+	}
+
+	activateDelayedAbility() {
+		debug("Delayed ability now activating: " + this.abilityInfo.type + " from " + this.sourceTile.ownerCode + this.sourceTile.code);
+		this.doActivate();
+	}
+
+	hasActivationDelay() {
+		return this.abilityInfo.activationDelay && this.abilityInfo.activationDelay > 0;
+	}
+
+	tickDelay() {
+		if (this.remainingDelay !== undefined) {
+			this.remainingDelay -= 0.5;
+			debug("Ability delay ticked, remaining: " + this.remainingDelay);
+			return this.remainingDelay <= 0;
+		}
+		return false;
 	}
 
 	hasDuration() {

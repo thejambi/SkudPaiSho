@@ -605,7 +605,8 @@ export function defineTrifleTiles() {
 					}
 				],
 				targetTypes: [TrifleTargetType.thisTile],
-				duration: 1 // Lasts through opponent's next turn (ticked at end of each turn)
+				activationDelay: 0.5, // Activates after Polar Bear Dog player's turn
+				duration: 0.5 // Lasts through opponent's next turn
 			}
 		],
 		textLines: [

@@ -72,7 +72,7 @@ describe('Trifle Duration Abilities', () => {
 	});
 
 	describe('Polar Bear Dog - Capture Protection Duration', () => {
-		it('should have duration property defined on Polar Bear Dog ability', () => {
+		it('should have activationDelay and duration properties defined on Polar Bear Dog ability', () => {
 			const polarBearDogInfo = TrifleTiles[TrifleTileCodes.PolarBearDog];
 			expect(polarBearDogInfo).toBeDefined();
 			expect(polarBearDogInfo.abilities).toBeDefined();
@@ -81,13 +81,14 @@ describe('Trifle Duration Abilities', () => {
 				a => a.type === TrifleAbilityName.protectFromCapture
 			);
 			expect(protectAbility).toBeDefined();
-			expect(protectAbility.duration).toBe(1);
+			expect(protectAbility.activationDelay).toBe(0.5);
+			expect(protectAbility.duration).toBe(0.5);
 		});
 
-		it('should activate protectFromCapture when capturing a tile', () => {
+		it('should activate protectFromCapture after capturing (delay consumed at end of turn)', () => {
 			// Add tiles to teams first
 			addTilesToTeam(gameManager, HOST, [
-				TrifleTileCodes.WaterBanner,  // Need a banner
+				TrifleTileCodes.WaterBanner,
 				TrifleTileCodes.PolarBearDog
 			]);
 			addTilesToTeam(gameManager, GUEST, [
@@ -95,7 +96,7 @@ describe('Trifle Duration Abilities', () => {
 				TrifleTileCodes.Firefly
 			]);
 
-			// Deploy HOST Polar Bear Dog
+			// Deploy tiles
 			gameManager.runNotationMove({
 				moveType: DEPLOY,
 				player: HOST,
@@ -103,7 +104,6 @@ describe('Trifle Duration Abilities', () => {
 				endPoint: new NotationPoint('0,0')
 			}, false);
 
-			// Deploy GUEST tile nearby that can be captured
 			gameManager.runNotationMove({
 				moveType: DEPLOY,
 				player: GUEST,
@@ -111,12 +111,12 @@ describe('Trifle Duration Abilities', () => {
 				endPoint: new NotationPoint('0,4')
 			}, false);
 
-			// Get the Polar Bear Dog tile
 			const pbdPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, HOST);
 			expect(pbdPoints.length).toBe(1);
 			const pbdTile = pbdPoints[0].tile;
 
-			// Move Polar Bear Dog to capture the Firefly (distance 4)
+			// Move PBD to capture Firefly. At end of turn, activationDelay (0.5) ticks to 0,
+			// triggering delayed activation with duration 0.5.
 			gameManager.runNotationMove({
 				moveType: MOVE,
 				player: HOST,
@@ -124,7 +124,7 @@ describe('Trifle Duration Abilities', () => {
 				endPoint: new NotationPoint('0,4')
 			}, false);
 
-			// Check that protectFromCapture ability is now active for the Polar Bear Dog
+			// Protection should be ACTIVE (delay expired at end of turn, ability activated)
 			const hasProtection = gameManager.board.abilityManager.abilityTargetingTileExists(
 				TrifleAbilityName.protectFromCapture,
 				pbdTile
@@ -132,7 +132,7 @@ describe('Trifle Duration Abilities', () => {
 			expect(hasProtection).toBe(true);
 		});
 
-		it('should expire protection after opponent turn (2 ticks)', () => {
+		it('should expire protection after opponent turn (1 tick)', () => {
 			// Add tiles to teams first
 			addTilesToTeam(gameManager, HOST, [
 				TrifleTileCodes.WaterBanner,
@@ -144,7 +144,7 @@ describe('Trifle Duration Abilities', () => {
 				TrifleTileCodes.Chrysanthemum
 			]);
 
-			// Deploy HOST Polar Bear Dog
+			// Deploy tiles
 			gameManager.runNotationMove({
 				moveType: DEPLOY,
 				player: HOST,
@@ -152,7 +152,6 @@ describe('Trifle Duration Abilities', () => {
 				endPoint: new NotationPoint('0,0')
 			}, false);
 
-			// Deploy GUEST tile nearby that can be captured
 			gameManager.runNotationMove({
 				moveType: DEPLOY,
 				player: GUEST,
@@ -160,7 +159,6 @@ describe('Trifle Duration Abilities', () => {
 				endPoint: new NotationPoint('0,4')
 			}, false);
 
-			// Deploy another GUEST tile for their move
 			gameManager.runNotationMove({
 				moveType: DEPLOY,
 				player: GUEST,
@@ -171,8 +169,7 @@ describe('Trifle Duration Abilities', () => {
 			const pbdPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, HOST);
 			const pbdTile = pbdPoints[0].tile;
 
-			// HOST moves Polar Bear Dog to capture
-			// Duration ticks after move: 1 -> 0.5, still active
+			// HOST moves PBD to capture. End-of-turn tick: delay 0.5 -> 0, activates with duration 0.5
 			gameManager.runNotationMove({
 				moveType: MOVE,
 				player: HOST,
@@ -180,15 +177,14 @@ describe('Trifle Duration Abilities', () => {
 				endPoint: new NotationPoint('0,4')
 			}, false);
 
-			// Protection should be active (0.5 remaining after post-move tick)
+			// Protection should be active (delay consumed, duration 0.5 remaining)
 			let hasProtection = gameManager.board.abilityManager.abilityTargetingTileExists(
 				TrifleAbilityName.protectFromCapture,
 				pbdTile
 			);
 			expect(hasProtection).toBe(true);
 
-			// GUEST makes a move - protection active during move, then ticked after
-			// Duration ticks after move: 0.5 -> 0, expired
+			// GUEST makes a move. End-of-turn tick: duration 0.5 -> 0, expired
 			gameManager.runNotationMove({
 				moveType: MOVE,
 				player: GUEST,
@@ -196,7 +192,7 @@ describe('Trifle Duration Abilities', () => {
 				endPoint: new NotationPoint('4,3')
 			}, false);
 
-			// Protection should now be expired (ticked to 0 after GUEST's move)
+			// Protection should now be expired
 			hasProtection = gameManager.board.abilityManager.abilityTargetingTileExists(
 				TrifleAbilityName.protectFromCapture,
 				pbdTile
