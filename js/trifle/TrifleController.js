@@ -83,7 +83,7 @@ export class TrifleController {
 		this.hostAccentTiles = [];
 		this.guestAccentTiles = [];
 
-		this.isInviteOnly = true;
+		// this.isInviteOnly = true;	// Public games now allowed!
 		this.isPaiShoGame = true;
 
 		this.clickToShowPointMessage = false;
