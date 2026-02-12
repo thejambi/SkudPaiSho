@@ -399,7 +399,12 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 				return; // Let ability animation handle it
 			}
 
-			if (isSamePoint(moveToAnimate.endPoint, x, y)) {
+			// Only animate the tile that was actually moved, not a different tile
+			// that happens to be at the endPoint (e.g., a resurrected tile)
+			const isMovedTile = !moveToAnimate.animationInfo
+				|| !moveToAnimate.animationInfo.movedTile
+				|| boardPoint.tile.id === moveToAnimate.animationInfo.movedTile.id;
+			if (isMovedTile && isSamePoint(moveToAnimate.endPoint, x, y)) {
 				const moveStartPoint = new NotationPoint(moveToAnimate.startPoint);
 				const startX = moveStartPoint.rowAndColumn.col - this.gridOffset + gOff;
 				const startZ = moveStartPoint.rowAndColumn.row - this.gridOffset + gOff;

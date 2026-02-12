@@ -9,6 +9,7 @@ export function TrifleCaptureTargetTilesAbilityBrain(abilityObject) {
 }
 
 TrifleCaptureTargetTilesAbilityBrain.prototype.activateAbility = function() {
+	var targetTiles = this.abilityObject.abilityTargetTiles;
 	var targetTilePoints = this.abilityObject.abilityTargetTilePoints;
 
 	this.capturedTiles = [];
@@ -25,12 +26,14 @@ TrifleCaptureTargetTilesAbilityBrain.prototype.activateAbility = function() {
 
 	var self = this;
 	if (targetTilePoints && targetTilePoints.length > 0) {
-		targetTilePoints.forEach(function(targetTilePoint) {
+		targetTilePoints.forEach(function(targetTilePoint, index) {
 			var tileIsCapturable = self.abilityObject.board.targetPointTileIsCapturableByTileAbility(targetTilePoint, self.abilityObject.sourceTile);
 			var passesRestrictions = self.abilityObject.board.capturePassesCaptureProhibitionChecks(self.abilityObject.sourceTile, self.abilityObject.sourceTile.seatedPoint, targetTilePoint);
 			if ((tileIsCapturable || self.abilityObject.abilityInfo.regardlessOfCaptureProtection) && passesRestrictions) {
-				// Record position before capture
-				var tileToCapture = targetTilePoint.tile;
+				// Use the pre-resolved tile from trigger evaluation rather than re-reading
+				// from the board point, as the board state may have changed since the trigger
+				// identified this tile (e.g., a different tile now occupies the point)
+				var tileToCapture = targetTiles[index] || targetTilePoint.tile;
 				var capturePosition = { row: targetTilePoint.row, col: targetTilePoint.col };
 
 				// Check if this is the tile that just moved - if so, record its move start position

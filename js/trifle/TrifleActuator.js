@@ -563,7 +563,12 @@ export class TrifleActuator {
 		if (!this.animationOn || !moveToAnimate) return;
 
 		if (moveToAnimate.moveType === MOVE && boardPoint.tile) {
-			if (isSamePoint(moveToAnimate.endPoint, ox, oy)) {
+			// Only animate the tile that was actually moved, not a different tile
+			// that happens to be at the endPoint (e.g., a resurrected tile)
+			const isMovedTile = !moveToAnimate.animationInfo
+				|| !moveToAnimate.animationInfo.movedTile
+				|| boardPoint.tile.id === moveToAnimate.animationInfo.movedTile.id;
+			if (isMovedTile && isSamePoint(moveToAnimate.endPoint, ox, oy)) {
 				// Start from where tile came from
 				const moveStartPoint = new NotationPoint(moveToAnimate.startPoint);
 				x = moveStartPoint.rowAndColumn.col;
