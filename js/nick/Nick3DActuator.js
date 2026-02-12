@@ -4,7 +4,7 @@
 // and White Lotus in-check highlighting
 
 import * as THREE from 'three';
-import { HOST, MOVE, NotationPoint, RowAndColumn } from '../CommonNotationObjects';
+import { HOST, MOVE, NotationPoint } from '../CommonNotationObjects';
 import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import {
 	clearMessage,
@@ -47,19 +47,6 @@ export class Nick3DActuator extends PaiSho3DActuator {
 			return NickController.getCustomTileDesignsUrl();
 		}
 		return "images/Nick/" + localStorage.getItem(NickOptions.tileDesignTypeKey) + "/";
-	}
-
-	// --- Override createFakeHtmlPoint for Nick's notation format ---
-	// Nick uses (col, 16-row) notation adjustment
-
-	createFakeHtmlPoint(userData) {
-		const notationPointString = new RowAndColumn(userData.col, 16 - userData.row).notationPointString;
-		return {
-			getAttribute: (name) => {
-				if (name === 'name') return notationPointString;
-				return null;
-			}
-		};
 	}
 
 	// --- Override actuate to handle Nick's signature ---
