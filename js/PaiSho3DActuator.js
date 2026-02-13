@@ -68,7 +68,7 @@ export class PaiSho3DActuator {
 		// Renderer
 		this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 		this.renderer.setPixelRatio(window.devicePixelRatio);
-		const size = Math.min(this.maxCanvasSize, window.innerWidth);
+		const size = this.getAdjustedViewWidth();
 		this.renderer.setSize(size, size);
 		this.renderer.shadowMap.enabled = true;
 		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -240,10 +240,8 @@ export class PaiSho3DActuator {
 		// - width is clamped by maxCanvasSize and viewport width
 		// - height normally follows width, but if page height is smaller than the width we shrink the canvas height to fit
 		// - fullViewportHeight still forces viewport height
-		const canvasWidth = Math.min(this.maxCanvasSize, window.innerWidth);
-		const canvasHeight = this.fullViewportHeight
-			? Math.min(this.maxCanvasSize, window.innerHeight)
-			: Math.min(canvasWidth, window.innerHeight);
+		const canvasWidth = this.getAdjustedViewWidth();
+		const canvasHeight = this.getAdjustedViewHeight();
 		// debug: initial computed sizes
 		debug('[3D] setupContainers — window:', { innerWidth: window.innerWidth, innerHeight: window.innerHeight });
 		debug('[3D] setupContainers — computed canvas:', { canvasWidth, canvasHeight, maxCanvasSize: this.maxCanvasSize, fullViewportHeight: this.fullViewportHeight });
@@ -908,11 +906,22 @@ export class PaiSho3DActuator {
 
 	// --- Responsive ---
 
-	handleResize() {
+	getAdjustedViewWidth() {
 		// width is limited by maxCanvasSize and viewport width; height follows width unless fullViewportHeight is enabled
-		const width = Math.min(this.maxCanvasSize, window.innerWidth);
+		return Math.min(this.maxCanvasSize, window.innerWidth);
+	}
+
+	getAdjustedViewHeight() {
+		const width = this.getAdjustedViewWidth();
 		const adjustedHeight = window.innerHeight - 100; // account for other page elements
-		const height = this.fullViewportHeight && (width > adjustedHeight) ? Math.min(this.maxCanvasSize, adjustedHeight) : width;
+		return this.fullViewportHeight && (width > adjustedHeight) 
+				? Math.min(this.maxCanvasSize, adjustedHeight) 
+				: width;
+	}
+
+	handleResize() {
+		const width = this.getAdjustedViewWidth();
+		const height = this.getAdjustedViewHeight();
 
 		this.camera.aspect = width / height;
 		this.camera.updateProjectionMatrix();
