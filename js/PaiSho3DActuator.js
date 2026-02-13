@@ -4,23 +4,24 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { NON_PLAYABLE } from './skud-pai-sho/SkudPaiShoBoardPoint';
+import { RowAndColumn } from './CommonNotationObjects';
+import { debug } from './GameData';
+import { getRoundBoardPreference, isHelpCollapsed, setHelpCollapsed } from './PaiSho3DOptions';
 import {
 	RmbDown,
 	RmbUp,
 	clearMessage,
+	customBgColorKey,
+	customBoardUrlArrayKey,
+	customBoardUrlKey,
+	paiShoBoardKey,
 	pointClicked,
 	showPointMessage,
 	showTileMessage,
-	unplayedTileClicked,
-	paiShoBoardKey,
 	svgBoardDesigns,
-	customBoardUrlArrayKey,
-	customBoardUrlKey,
-	customBgColorKey,
+	unplayedTileClicked,
 } from './PaiShoMain';
-import { RowAndColumn } from './CommonNotationObjects';
-import { getRoundBoardPreference, isHelpCollapsed, setHelpCollapsed } from './PaiSho3DOptions';
+import { NON_PLAYABLE } from './skud-pai-sho/SkudPaiShoBoardPoint';
 
 // Common colors
 const COLOR_POSSIBLE_MOVE = 0x442211;
@@ -42,6 +43,8 @@ export class PaiSho3DActuator {
 		this.discRadius = config.discRadius || 0.42;
 		this.pageMaxWidth = config.pageMaxWidth || '1400px';
 		this.boardRotation = config.boardRotation || 0; // degrees to rotate view around Y axis
+		// If true, canvas height will match the viewport height (bounded by maxCanvasSize)
+		this.fullViewportHeight = config.fullViewportHeight || true;
 
 		// Three.js core
 		this.scene = new THREE.Scene();
@@ -133,6 +136,7 @@ export class PaiSho3DActuator {
 
 		// Active animations
 		this.activeAnimations = [];
+		this._resizeTimeout = null;
 
 		// Round board auto-detection cache
 		this.roundBoardCache = {};
@@ -231,13 +235,28 @@ export class PaiSho3DActuator {
 
 		const bcontainer = document.createElement('div');
 		bcontainer.classList.add('board-container');
-		const canvasSize = Math.min(this.maxCanvasSize, window.innerWidth) + 'px';
-		bcontainer.style.width = canvasSize;
+
+		// compute initial canvas width/height
+		// - width is clamped by maxCanvasSize and viewport width
+		// - height normally follows width, but if page height is smaller than the width we shrink the canvas height to fit
+		// - fullViewportHeight still forces viewport height
+		const canvasWidth = Math.min(this.maxCanvasSize, window.innerWidth);
+		const canvasHeight = this.fullViewportHeight
+			? Math.min(this.maxCanvasSize, window.innerHeight)
+			: Math.min(canvasWidth, window.innerHeight);
+		// debug: initial computed sizes
+		debug('[3D] setupContainers — window:', { innerWidth: window.innerWidth, innerHeight: window.innerHeight });
+		debug('[3D] setupContainers — computed canvas:', { canvasWidth, canvasHeight, maxCanvasSize: this.maxCanvasSize, fullViewportHeight: this.fullViewportHeight });
+		const canvasWidthStr = canvasWidth + 'px';
+		const canvasHeightStr = canvasHeight + 'px';
+		bcontainer.style.width = canvasWidthStr;
+		bcontainer.style.height = canvasHeightStr;
 
 		const canvasWrapper = document.createElement('div');
 		canvasWrapper.classList.add('svgContainerContainer');
 		canvasWrapper.style.position = 'relative';
-		canvasWrapper.style.width = canvasSize;
+		canvasWrapper.style.width = canvasWidthStr;
+		canvasWrapper.style.height = canvasHeightStr;
 		canvasWrapper.style.boxShadow = 'inset 0 0 12px rgba(0,0,0,0.5)';
 		canvasWrapper.style.borderRadius = '4px';
 		canvasWrapper.style.overflow = 'hidden';
@@ -310,6 +329,7 @@ export class PaiSho3DActuator {
 		if (isHelpCollapsed()) {
 			helpContainer.classList.add('helpCollapsed3D');
 			this.maxCanvasSize = 1050;
+			debug('[3D] setupCollapsibleHelp — help is collapsed, maxCanvasSize set to', this.maxCanvasSize);
 			this.handleResize();
 		}
 	}
@@ -324,9 +344,11 @@ export class PaiSho3DActuator {
 		if (collapsed) {
 			helpContainer.classList.add('helpCollapsed3D');
 			this.maxCanvasSize = 1050;
+			debug('[3D] toggleHelpCollapsed — collapsed, maxCanvasSize=', this.maxCanvasSize);
 		} else {
 			helpContainer.classList.remove('helpCollapsed3D');
 			this.maxCanvasSize = 800;
+			debug('[3D] toggleHelpCollapsed — expanded, maxCanvasSize=', this.maxCanvasSize);
 		}
 
 		this.handleResize();
@@ -789,7 +811,16 @@ export class PaiSho3DActuator {
 			canvas.addEventListener('touchend', (event) => this.handleTouchEnd(event), { passive: true });
 		}
 
-		this.resizeHandler = () => this.handleResize();
+		// debounced resize handler to avoid excessive work while the user is resizing
+		this.resizeHandler = () => {
+			debug('[3D] resize event fired — scheduling debounced handler', { innerWidth: window.innerWidth, innerHeight: window.innerHeight, timestamp: Date.now() });
+			clearTimeout(this._resizeTimeout);
+			this._resizeTimeout = setTimeout(() => {
+				debug('[3D] debounced resize executing');
+				debug({ innerWidth: window.innerWidth, innerHeight: window.innerHeight, timestamp: Date.now() });
+				this.handleResize();
+			}, 100);
+		};
 		window.addEventListener('resize', this.resizeHandler);
 	}
 
@@ -878,15 +909,21 @@ export class PaiSho3DActuator {
 	// --- Responsive ---
 
 	handleResize() {
-		const size = Math.min(this.maxCanvasSize, window.innerWidth);
-		this.camera.aspect = 1;
+		// width is limited by maxCanvasSize and viewport width; height follows width unless fullViewportHeight is enabled
+		const width = Math.min(this.maxCanvasSize, window.innerWidth);
+		const adjustedHeight = window.innerHeight - 100; // account for other page elements
+		const height = this.fullViewportHeight && (width > adjustedHeight) ? Math.min(this.maxCanvasSize, adjustedHeight) : width;
+
+		this.camera.aspect = width / height;
 		this.camera.updateProjectionMatrix();
-		this.renderer.setSize(size, size);
-		const sizeStr = size + 'px';
+		this.renderer.setSize(width, height);
+
+		const widthStr = width + 'px';
+		const heightStr = height + 'px';
 		const bcontainer = this.gameContainer.querySelector('.board-container');
 		const canvasWrapper = this.gameContainer.querySelector('.svgContainerContainer');
-		if (bcontainer) bcontainer.style.width = sizeStr;
-		if (canvasWrapper) canvasWrapper.style.width = sizeStr;
+		if (bcontainer) { bcontainer.style.width = widthStr; bcontainer.style.height = heightStr; }
+		if (canvasWrapper) { canvasWrapper.style.width = widthStr; canvasWrapper.style.height = heightStr; }
 	}
 
 	// --- Render Loop ---
@@ -971,6 +1008,10 @@ export class PaiSho3DActuator {
 
 		this.renderer.dispose();
 		this.controls.dispose();
+		if (this._resizeTimeout) {
+			clearTimeout(this._resizeTimeout);
+			this._resizeTimeout = null;
+		}
 		window.removeEventListener('resize', this.resizeHandler);
 	}
 }
