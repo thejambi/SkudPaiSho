@@ -2725,7 +2725,7 @@ export class PaiShoGameBoard {
 			// Check if any of those tile types are already on the board for this player
 			let blockedByTileOnBoard = false;
 			this.forEachBoardPointWithTile((boardPoint) => {
-				if (boardPoint.tile.ownerName === tile.ownerName) {
+				// if (boardPoint.tile.ownerName === tile.ownerName) {	// Removing owner check to allow for restrictions based on opponent's tiles as well. `cannotDeployAfterTileTypes` may need updating to be better handled and fully featured.
 					const boardTileInfo = this.tileMetadata[boardPoint.tile.code];
 					if (boardTileInfo && boardTileInfo.types) {
 						tileInfo.cannotDeployAfterTileTypes.forEach((restrictedType) => {
@@ -2734,7 +2734,7 @@ export class PaiShoGameBoard {
 							}
 						});
 					}
-				}
+				// }
 			});
 			if (blockedByTileOnBoard) {
 				return false;
