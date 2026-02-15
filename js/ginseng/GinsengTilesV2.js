@@ -1,8 +1,6 @@
 /* Ginseng 2.0 Tiles */
 import {
-	BISON_GRANTS_FLYING,
   DIAGONAL_BISON_ABILITY_TESTING,
-  GINSENG_GINSENG_5,
   SWAP_BISON_AND_DRAGON_ABILITIES,
   gameOptionEnabled,
 } from '../GameOptions';
@@ -438,7 +436,7 @@ export function defineGinsengTilesV2() {
 						targetTypes: [TrifleTargetType.triggerTargetTiles],
 						targetTeams: [TrifleTileTeam.friendly]
 					}, 
-					gameOptionEnabled(BISON_GRANTS_FLYING) && {
+					{
 						type: TrifleAbilityName.manipulateExistingMovement,
 						manipulateMovementType: TrifleMovementType.standard,
 						newMovementAbilities: [
@@ -639,7 +637,7 @@ export function defineGinsengTilesV2() {
 					{
 						triggerType: TrifleAbilityTriggerType.whileTargetTileIsInLineOfSight,
 						targetTeams: [TrifleTileTeam.friendly],
-						sightDistance: gameOptionEnabled(GINSENG_GINSENG_5) ? 5 : 99
+						sightDistance: 5
 					}
 				],
 				targetTypes: [TrifleTargetType.triggerTargetTiles]

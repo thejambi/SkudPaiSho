@@ -134,10 +134,7 @@ export const GameType = {
 		description: "Advance your Lotus into enemy territory with the power of the original benders and protective harmonies.",
 		coverImg: "ginseng.png",
 		rulesUrl: "https://skudpaisho.com/site/games/ginseng-pai-sho/",
-		gameOptions: [
-			GINSENG_GINSENG_5,
-			BISON_GRANTS_FLYING
-		],
+		gameOptions: [],
 		secretGameOptions: [
 			LION_TURTLE_ABILITY_ANYWHERE,
 			SWAP_BISON_AND_DRAGON,
