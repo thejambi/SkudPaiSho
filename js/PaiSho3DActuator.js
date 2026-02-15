@@ -83,12 +83,19 @@ export class PaiSho3DActuator {
 		this.controls.maxPolarAngle = Math.PI / 2.1;
 		this.controls.minDistance = 5;
 		this.controls.maxDistance = 40;
-		this.controls.target.set(0, 0, 0);
+		this.controls.target.set(0, -4, 0);
 		this.controls.mouseButtons = {
 			LEFT: THREE.MOUSE.ROTATE,
 			MIDDLE: THREE.MOUSE.PAN,
 			RIGHT: null
 		};
+
+		// Restore camera state from previous 3D actuator (e.g. when actuator is recreated on game update)
+		if (PaiSho3DActuator.savedCameraState) {
+			this.camera.position.copy(PaiSho3DActuator.savedCameraState.position);
+			this.controls.target.copy(PaiSho3DActuator.savedCameraState.target);
+			this.controls.update();
+		}
 
 		// Lights
 		const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
@@ -942,6 +949,12 @@ export class PaiSho3DActuator {
 			this.animationFrameId = requestAnimationFrame(animate);
 			this.controls.update();
 			this.renderer.render(this.scene, this.camera);
+
+			// Save camera state so it can be restored if the actuator is recreated
+			PaiSho3DActuator.savedCameraState = {
+				position: this.camera.position.clone(),
+				target: this.controls.target.clone(),
+			};
 		};
 		animate();
 	}
@@ -978,6 +991,9 @@ export class PaiSho3DActuator {
 
 	dispose() {
 		this.stopRenderLoop();
+
+		// Clear saved camera state so it doesn't carry over to a different game
+		PaiSho3DActuator.savedCameraState = null;
 
 		// Restore help panel
 		const helpContainer = document.getElementById('help');
