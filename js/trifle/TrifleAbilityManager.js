@@ -2,10 +2,13 @@
 // Documentation: ~/Dropbox/Programming/SkudPaiSho/TheGardenGate/backend/TGGDocumentation/Trifle/
 
 import {
-  TrifleAbilitiesForType,
-  TrifleAbilityName,
-  TrifleAbilityType,
-  TrifleTileTeam
+	TrifleAbilitiesForType,
+	TrifleAbilityName,
+	TrifleAbilityType,
+	TrifleTileTeam,
+	TrifleAbilityCategory,
+	TrifleTileInfo,
+	TrifleAbilityTriggerType,
 } from './TrifleTileInfo';
 import { debug } from '../GameData';
 import { TrifleBrainFactory, ConstraintCategory, getAbilityNamesForConstraintCategory } from './brains/BrainFactory';
@@ -151,6 +154,24 @@ export class TrifleAbilityManager {
 			if (this.abilityActivationOrder) {
 				abilityActivationOrder = this.abilityActivationOrder;
 			}
+
+			// Deterministic per-type ordering: prefer landing-captures before reactive-captures
+			const triggerRank = (ability) => {
+				const ttt = ability.abilityInfo && ability.abilityInfo.triggerTypeToTarget;
+				if (ttt === TrifleAbilityTriggerType.whenLandsSurroundingTargetTile) return 0;
+				if (ttt === TrifleAbilityTriggerType.whenTargetTileLandsSurrounding) return 1;
+				// If not specified, infer from trigger brains
+				if (ability.triggerBrainMap && ability.triggerBrainMap[TrifleAbilityTriggerType.whenLandsSurroundingTargetTile]) return 0;
+				if (ability.triggerBrainMap && ability.triggerBrainMap[TrifleAbilityTriggerType.whenTargetTileLandsSurrounding]) return 1;
+				return 2;
+			};
+
+			Object.keys(this.readyAbilities).forEach((abilityType) => {
+				const list = this.readyAbilities[abilityType];
+				if (list && list.length > 1) {
+					this.readyAbilities[abilityType] = list.slice().sort((a, b) => triggerRank(a) - triggerRank(b));
+				}
+			});
 
 			abilityActivationOrder.every(abilityName => {
 				const readyAbilitiesOfType = this.readyAbilities[abilityName];
@@ -322,7 +343,12 @@ export class TrifleAbilityManager {
 	markExistingMatchingAbility(otherAbility) {
 		this.abilities.forEach((existingAbility) => {
 			if (existingAbility.appearsToBeTheSameAs(otherAbility)) {
-				existingAbility.preserve = true;
+				// Only preserve ongoing abilities; instant ones should be re-evaluated per action
+				if (TrifleTileInfo.abilityIsCategory(existingAbility, TrifleAbilityCategory.ongoing)) {
+					existingAbility.preserve = true;
+				} else {
+					existingAbility.preserve = false;
+				}
 				return;
 			}
 		});

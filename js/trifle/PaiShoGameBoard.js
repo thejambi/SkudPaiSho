@@ -39,6 +39,7 @@ import { arrayIncludesOneOf, debug } from '../GameData';
 import { currentTileMetadata } from './PaiShoGamesTileMetadata';
 import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
 import { paiShoBoardMaxRowOrCol } from '../pai-sho-common/PaiShoBoardHelp';
+import { gameOptionEnabled } from '../GameOptions';
 
 export class PaiShoGameBoard {
 	constructor(tileManager, customAbilityActivationOrder) {
@@ -875,8 +876,16 @@ export class PaiShoGameBoard {
 
 		const surroundingPoints = this.getSurroundingBoardPoints(pointAlongTheWay);
 
+		// Allow Nick option to jump over enemy tiles by expanding targetTeams
+		let effectiveTargetTeams = movementInfo.targetTeams || [];
+		if (gameOptionEnabled("NickJumpOverEnemies")) {
+			if (!effectiveTargetTeams.includes(TrifleTileTeam.enemy)) {
+				effectiveTargetTeams = effectiveTargetTeams.concat([TrifleTileTeam.enemy]);
+			}
+		}
+
 		surroundingPoints.forEach((surroundingPoint) => {
-			if (surroundingPoint.hasTile() && this.targetTileMatchesTargetTeam(surroundingPoint.tile, originPoint.tile, movementInfo.targetTeams)) {
+			if (surroundingPoint.hasTile() && this.targetTileMatchesTargetTeam(surroundingPoint.tile, originPoint.tile, effectiveTargetTeams)) {
 				potentialMovePoints = [];
 
 				if (movementInfo.jumpDirections && movementInfo.jumpDirections.includes(TrifleMovementDirection.diagonal)

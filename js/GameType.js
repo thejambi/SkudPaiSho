@@ -182,7 +182,9 @@ export const GameType = {
 		description: "Advance your lotus to the center of the board and protect it using the four elements and the Avatar.",
 		coverImg: "nick.png",
 		rulesUrl: "https://skudpaisho.com/site/games/nick-pai-sho/",
-		gameOptions: [],
+		gameOptions: [
+			"NickJumpOverEnemies"
+		],
 		noRankedGames: true
 	},
 	SolitairePaiSho: {

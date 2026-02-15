@@ -55,6 +55,9 @@ export var ADEVAR_GUEST_ROTATE = "AdevarBoardGuestRotation";
 export var ADEVAR_LITE = "LiteGame";
 export var ADEVAR_ONE_VANGUARD = "AdevarOneVanguard";
 
+/* Nick */
+export var NICK_JUMP_OVER_ENEMIES = "NickJumpOverEnemies";
+
 /* Game Option Legacy Map - These were stored as full names in database before current setup, must support */
 export var legacyGameOptionsMap = {};
 legacyGameOptionsMap[OPTION_DOUBLE_TILES] = "Double Tiles";
@@ -88,6 +91,7 @@ legacyGameOptionsMap[ADEVAR_GUEST_ROTATE] = "Adevar Board Guest Rotation";
 
 legacyGameOptionsMap[ADEVAR_LITE] = "Lite - Beginner Game";
 // No legacy mapping needed for ADEVAR_ONE_VANGUARD (new option)
+// No legacy mapping needed for NICK_JUMP_OVER_ENEMIES (new option)
 
 /* New Game Options Setup */
 
@@ -149,6 +153,9 @@ gameOptionDescriptions[VARIABLE_ACCENT_TILES] = "Variable Accent Tiles";
 gameOptionDescriptions[ADEVAR_ONE_VANGUARD] = "Vanguard - Only need to capture one";
 export var NO_ALT_WIN = "NoAltWin";
 gameOptionDescriptions[NO_ALT_WIN] = "No Alt Win Condition";
+
+// Nick
+gameOptionDescriptions[NICK_JUMP_OVER_ENEMIES] = "Jump over enemy tiles";
 
 export var GINSENG_ROTATE = "GinsengBoardRotation";
 gameOptionDescriptions[GINSENG_ROTATE] = "Ginseng Board Rotation";
