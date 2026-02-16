@@ -94,15 +94,17 @@ export class TrifleAbilityManager {
 		const newAbilities = [];
 		this.abilities.forEach((existingAbility) => {
 			// Preserve if:
-			// 1. Marked as preserve (re-triggered this turn) and not canceled, OR
+			// 1. Marked as preserve (re-triggered this turn), actually activated, and not canceled, OR
 			// 2. Has remaining duration (duration abilities should persist until expired), OR
 			// 3. Has remaining activation delay (pending abilities should persist until activated)
+			// Note: Non-activated abilities (e.g. blocked by a cancel at activation time) must NOT
+			// be preserved, so they can be freshly added and re-evaluated when conditions change.
 			const hasDurationRemaining = existingAbility.remainingDuration !== undefined
 				&& existingAbility.remainingDuration > 0;
 			const hasDelayRemaining = existingAbility.remainingDelay !== undefined
 				&& existingAbility.remainingDelay > 0;
 
-			if ((existingAbility.preserve && !this.abilityIsCanceled(existingAbility))
+			if ((existingAbility.preserve && existingAbility.activated && !this.abilityIsCanceled(existingAbility))
 					|| hasDurationRemaining
 					|| hasDelayRemaining) {
 				newAbilities.push(existingAbility);
