@@ -91,7 +91,9 @@ export class PaiSho3DActuator {
 		};
 
 		// Restore camera state from previous 3D actuator (e.g. when actuator is recreated on game update)
-		if (PaiSho3DActuator.savedCameraState) {
+		// Only restore if boardRotation matches, so rotation changes (e.g. host vs guest perspective) aren't overwritten
+		if (PaiSho3DActuator.savedCameraState
+				&& PaiSho3DActuator.savedCameraState.boardRotation === this.boardRotation) {
 			this.camera.position.copy(PaiSho3DActuator.savedCameraState.position);
 			this.controls.target.copy(PaiSho3DActuator.savedCameraState.target);
 			this.controls.update();
@@ -954,6 +956,7 @@ export class PaiSho3DActuator {
 			PaiSho3DActuator.savedCameraState = {
 				position: this.camera.position.clone(),
 				target: this.controls.target.clone(),
+				boardRotation: this.boardRotation,
 			};
 		};
 		animate();

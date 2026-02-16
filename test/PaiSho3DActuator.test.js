@@ -229,7 +229,7 @@ describe('PaiSho3DActuator camera state preservation', () => {
 		expect(actuator.camera.position.z).toBe(13);
 	});
 
-	it('should save camera state during render loop', () => {
+	it('should save camera state including boardRotation during render loop', () => {
 		const actuator = new TestActuator(createGameContainer(), false, false);
 
 		// Move camera to a custom position
@@ -249,13 +249,15 @@ describe('PaiSho3DActuator camera state preservation', () => {
 		expect(PaiSho3DActuator.savedCameraState.target.x).toBe(1);
 		expect(PaiSho3DActuator.savedCameraState.target.y).toBe(2);
 		expect(PaiSho3DActuator.savedCameraState.target.z).toBe(3);
+		expect(PaiSho3DActuator.savedCameraState.boardRotation).toBe(0);
 	});
 
-	it('should restore camera state when a new actuator is created', () => {
-		// Simulate saved state from a previous actuator
+	it('should restore camera state when a new actuator is created with same boardRotation', () => {
+		// Simulate saved state from a previous actuator (boardRotation=0 matches default)
 		PaiSho3DActuator.savedCameraState = {
 			position: new MockVector3(3, 8, -2),
 			target: new MockVector3(0.5, 1, -0.5),
+			boardRotation: 0,
 		};
 
 		const actuator = new TestActuator(createGameContainer(), false, false);
@@ -274,10 +276,27 @@ describe('PaiSho3DActuator camera state preservation', () => {
 		expect(actuator.controls.update).toHaveBeenCalled();
 	});
 
+	it('should NOT restore camera state when boardRotation differs', () => {
+		// Saved state from an actuator with no rotation
+		PaiSho3DActuator.savedCameraState = {
+			position: new MockVector3(3, 8, -2),
+			target: new MockVector3(0.5, 1, -0.5),
+			boardRotation: 0,
+		};
+
+		// Create actuator with a different rotation (e.g. viewing from guest side)
+		const actuator = new TestActuator(createGameContainer(), false, false, { boardRotation: 180 });
+
+		// Camera should NOT be restored — should use the rotated default instead
+		expect(actuator.camera.position.x).not.toBe(3);
+		expect(actuator.camera.position.z).not.toBe(-2);
+	});
+
 	it('should clear saved camera state on dispose', () => {
 		PaiSho3DActuator.savedCameraState = {
 			position: new MockVector3(1, 2, 3),
 			target: new MockVector3(0, 0, 0),
+			boardRotation: 0,
 		};
 
 		const actuator = new TestActuator(createGameContainer(), false, false);
