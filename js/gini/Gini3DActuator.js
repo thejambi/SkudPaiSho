@@ -520,7 +520,7 @@ export class Gini3DActuator extends PaiSho3DActuator {
 				maxEndTime = Math.max(maxEndTime, endTime);
 				return;
 			} else if (instruction.parallel && index > 0) {
-				startDelay = currentDelay - instruction.duration / 2;
+				startDelay = currentDelay;
 			} else {
 				startDelay = currentDelay;
 			}

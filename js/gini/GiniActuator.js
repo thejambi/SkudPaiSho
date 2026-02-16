@@ -511,7 +511,7 @@ export class GiniActuator {
 			let startDelay;
 
 			if (instruction.parallel && index > 0) {
-				startDelay = currentDelay - instruction.duration / 2;
+				startDelay = currentDelay;
 			} else {
 				startDelay = currentDelay;
 			}
