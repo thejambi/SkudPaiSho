@@ -407,6 +407,9 @@ GiniGameManager.prototype.doBoardSetup = function() {
 	this.board.putTileOnPoint(this.tileManager.grabAccentTile(GUEST, GiniTileCodes.Air), new NotationPoint("-5,-4"));
 
 	this.customizeBoardPoints();
+
+	// Process abilities so passive effects (e.g. Bison movement boost) are active from the start
+	this.board.processAbilities(null, null, null, null, [], [], {});
 };
 
 GiniGameManager.prototype.getPoint = function(notationStr) {
