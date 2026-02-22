@@ -1856,7 +1856,6 @@ export class PaiShoGameBoard {
 			} else if (movementInfo.type === TrifleMovementType.jumpTargetTile) {
 				this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGameBoard.jumpTargetTileMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementDistance, 0);
 			} else if (movementInfo.type === TrifleMovementType.standardAndAlongGardenWall) {
-				/* Standard movement plus diagonal movement along border/garden wall points */
 				this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGameBoard.standardAndAlongGardenWallMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementDistance, 0);
 			}
 		}
