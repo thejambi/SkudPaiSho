@@ -50,7 +50,8 @@ export const TrifleMovementType = {
 	awayFromTargetTileOrthogonal: "awayFromTargetTileOrthogonal",
 	awayFromTargetTileDiagonal: "awayFromTargetTileDiagonal",
 	jumpTargetTile: "jumpTargetTile",
-	jumpSurroundingTiles: "jumpSurroundingTiles"
+	jumpSurroundingTiles: "jumpSurroundingTiles",
+	standardAndAlongGardenWall: "standardAndAlongGardenWall"
 };
 
 export const TrifleMovementDirection = {

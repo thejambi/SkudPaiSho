@@ -4,9 +4,11 @@
 
 import {
 	GATE,
+	NEUTRAL,
 	NON_PLAYABLE,
 	POSSIBLE_MOVE,
 } from '../skud-pai-sho/SkudPaiShoBoardPoint';
+import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import {
 	HOST,
 	NotationPoint,
@@ -550,6 +552,10 @@ export class PaiShoGameBoard {
 			}
 		}
 		return diagonalPoints;
+	}
+
+	isGardenWallPoint(point) {
+		return point.isType(NEUTRAL) && (point.isType(RED) || point.isType(WHITE));
 	}
 
 	getAdjacentRowAndCols(rowAndCol) {
@@ -1849,6 +1855,9 @@ export class PaiShoGameBoard {
 				this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGameBoard.awayFromTargetTileDiagonalMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementDistance, 0);
 			} else if (movementInfo.type === TrifleMovementType.jumpTargetTile) {
 				this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGameBoard.jumpTargetTileMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementDistance, 0);
+			} else if (movementInfo.type === TrifleMovementType.standardAndAlongGardenWall) {
+				/* Standard movement plus diagonal movement along border/garden wall points */
+				this.setPossibleMovementPointsFromMovePoints([boardPointStart], PaiShoGameBoard.standardAndAlongGardenWallMovementFunction, boardPointStart.tile, movementInfo, boardPointStart, movementDistance, 0);
 			}
 		}
 		// debug("Movement Point Checks: " + this.movementPointChecks);
@@ -1857,6 +1866,20 @@ export class PaiShoGameBoard {
 	static standardMovementFunction(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
 		const mustPreserveDirection = TrifleTileInfo.movementMustPreserveDirection(movementInfo);
 		return board.getAdjacentPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
+	}
+
+	static standardAndAlongGardenWallMovementFunction(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
+		const mustPreserveDirection = TrifleTileInfo.movementMustPreserveDirection(movementInfo);
+		var points = board.getAdjacentPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);
+		if (board.isGardenWallPoint(boardPointAlongTheWay)) {
+			var diagonalPoints = board.getAdjacentDiagonalPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, false, movementInfo);
+			diagonalPoints.forEach(function(dp) {
+				if (board.isGardenWallPoint(dp)) {
+					points.push(dp);
+				}
+			});
+		}
+		return points;
 	}
 
 	static diagonalMovementFunction(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {

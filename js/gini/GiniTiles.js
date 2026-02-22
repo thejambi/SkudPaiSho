@@ -98,7 +98,7 @@ GiniTileInfo.defineGiniTiles = function() {
 		types: [GiniTileType.mainTile],
 		movements: [
 			{
-				type: TrifleMovementType.standard,
+				type: TrifleMovementType.standardAndAlongGardenWall,
 				distance: 4
 			}
 		],
@@ -138,7 +138,7 @@ GiniTileInfo.defineGiniTiles = function() {
 		types: [GiniTileType.mainTile],
 		movements: [
 			{
-				type: TrifleMovementType.standard,
+				type: TrifleMovementType.standardAndAlongGardenWall,
 				distance: 4
 			}
 		],
@@ -206,7 +206,7 @@ GiniTileInfo.defineGiniTiles = function() {
 		types: [GiniTileType.mainTile],
 		movements: [
 			{
-				type: TrifleMovementType.standard,
+				type: TrifleMovementType.standardAndAlongGardenWall,
 				distance: 4
 			}
 		],
@@ -280,7 +280,7 @@ GiniTileInfo.defineGiniTiles = function() {
 		types: [GiniTileType.mainTile],
 		movements: [
 			{
-				type: TrifleMovementType.standard,
+				type: TrifleMovementType.standardAndAlongGardenWall,
 				distance: 4
 			}
 		],
@@ -351,7 +351,7 @@ GiniTileInfo.defineGiniTiles = function() {
 		types: [GiniTileType.mainTile],
 		movements: [
 			{
-				type: TrifleMovementType.standard,
+				type: TrifleMovementType.standardAndAlongGardenWall,
 				distance: 4,
 				captureTypes: [
 				{
