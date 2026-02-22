@@ -1210,6 +1210,114 @@ describe('Gini Ginseng Protection Ability', () => {
 	});
 });
 
+// ─── Garden Wall Movement Tests ───
+
+describe('Gini Garden Wall Movement', () => {
+	function manualMoveTile(game, fromStr, toStr) {
+		const fromNp = new NotationPoint(fromStr);
+		const fromRc = fromNp.rowAndColumn;
+		const toNp = new NotationPoint(toStr);
+		const toRc = toNp.rowAndColumn;
+		const tile = game.board.cells[fromRc.row][fromRc.col].removeTile();
+		game.board.cells[toRc.row][toRc.col].putTile(tile);
+	}
+
+	function getPoint(game, notationStr) {
+		const np = new NotationPoint(notationStr);
+		const rc = np.rowAndColumn;
+		return game.board.cells[rc.row][rc.col];
+	}
+
+	it('should not crash with infinite recursion when calculating moves on garden wall', () => {
+		const game = createGame();
+
+		// Move Koi (standardAndAlongGardenWall, distance 4) onto a garden wall point
+		// "-4,3" is a whiteNeutral border point (garden wall)
+		manualMoveTile(game, '-4,2', '-4,3');
+		expect(getTileAt(game, '-4,3').code).toBe(GiniTileCodes.Koi);
+
+		// This triggers the BFS with diagonal garden wall movement
+		var startPoint = getPoint(game, '-4,3');
+		expect(game.board.isGardenWallPoint(startPoint)).toBe(true);
+
+		// revealPossibleMovePoints should not throw (triggers BFS)
+		expect(() => {
+			game.revealPossibleMovePoints(startPoint, true);
+		}).not.toThrow();
+
+		// Should have some possible moves
+		var possibleMovePoints = [];
+		game.board.forEachBoardPoint(function(bp) {
+			if (bp.isType(POSSIBLE_MOVE)) {
+				possibleMovePoints.push(bp);
+			}
+		});
+		expect(possibleMovePoints.length).toBeGreaterThan(0);
+
+		// buildMovementPath on each possible move point should not throw
+		possibleMovePoints.forEach(function(bp) {
+			expect(() => {
+				bp.buildMovementPath();
+			}).not.toThrow();
+		});
+	});
+
+	it('should not crash when moving a tile along the garden wall', () => {
+		const game = createGame();
+
+		// Move Koi to a garden wall point
+		manualMoveTile(game, '-4,2', '-4,3');
+
+		// Find a valid destination on the garden wall
+		var startPoint = getPoint(game, '-4,3');
+		game.revealPossibleMovePoints(startPoint, true);
+
+		// Find a possible move point that is also on the garden wall
+		var gardenWallDest = null;
+		game.board.forEachBoardPoint(function(bp) {
+			if (bp.isType(POSSIBLE_MOVE) && game.board.isGardenWallPoint(bp) && !gardenWallDest) {
+				gardenWallDest = bp;
+			}
+		});
+
+		game.board.removePossibleMovePoints();
+
+		// If we found a garden wall destination, move there and verify
+		if (gardenWallDest) {
+			var destNotation = gardenWallDest.getNotationPointString();
+			makeMove(game, GUEST, '-4,3', destNotation, 0);
+			expect(getTileAt(game, destNotation).code).toBe(GiniTileCodes.Koi);
+			expect(isEmptyAt(game, '-4,3')).toBe(true);
+		}
+	});
+
+	it('should not crash when multiple tiles are on the garden wall', () => {
+		const game = createGame();
+
+		// Place two tiles on garden wall points
+		// "4,3" is a redNeutral border point (garden wall)
+		manualMoveTile(game, '-4,2', '-4,3');
+		manualMoveTile(game, '-5,-1', '-3,3');
+
+		var startPoint = getPoint(game, '-4,3');
+		expect(game.board.isGardenWallPoint(startPoint)).toBe(true);
+
+		// Should not throw even with adjacent tiles on garden wall
+		expect(() => {
+			game.revealPossibleMovePoints(startPoint, true);
+		}).not.toThrow();
+
+		// buildMovementPath should not crash on any possible move
+		game.board.forEachBoardPoint(function(bp) {
+			if (bp.isType(POSSIBLE_MOVE)) {
+				expect(() => {
+					bp.buildMovementPath();
+				}).not.toThrow();
+			}
+		});
+	});
+});
+
 // ─── Game Log Tests ───
 
 describe('Gini Game Log', () => {

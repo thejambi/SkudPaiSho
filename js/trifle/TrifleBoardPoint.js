@@ -127,14 +127,25 @@ export class TrifleBoardPoint {
 	}
 
 	setPreviousPoint(previousPoint) {
-		this.previousMovePoint = previousPoint;
+		if (previousPoint !== this && previousPoint.previousMovePoint !== this) {
+			this.previousMovePoint = previousPoint;
+		}
 	}
 
-	buildMovementPath() {
+	buildMovementPath(visited) {
 		this.movementPath = [];
 
+		if (!visited) {
+			visited = new Set();
+		}
+
+		if (visited.has(this)) {
+			return [this];
+		}
+		visited.add(this);
+
 		if (this.previousMovePoint) {
-			this.movementPath = this.previousMovePoint.buildMovementPath().concat(this);
+			this.movementPath = this.previousMovePoint.buildMovementPath(visited).concat(this);
 		} else {
 			this.movementPath = [this];
 		}
