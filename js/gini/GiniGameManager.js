@@ -282,6 +282,15 @@ GiniGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignore
 		}
 	});
 
+	// White Lotus cannot land on Temple/Portal points
+	if (boardPoint.tile && boardPoint.tile.code === GiniTileCodes.WhiteLotus) {
+		this.board.forEachBoardPoint(function(bp) {
+			if (bp.isType(PORTAL) && bp.isType(POSSIBLE_MOVE)) {
+				bp.removeType(POSSIBLE_MOVE);
+			}
+		});
+	}
+
 	if (!ignoreActuate) {
 		this.actuate();
 	}
