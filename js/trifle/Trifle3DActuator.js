@@ -349,7 +349,7 @@ export class Trifle3DActuator extends PaiSho3DActuator {
 			this.addMarkedIndicator(x, z);
 		}
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
-			this.addPossibleMoveIndicator(x, z);
+			this.addSelectableTileHighlight(x, z);
 		}
 	}
 

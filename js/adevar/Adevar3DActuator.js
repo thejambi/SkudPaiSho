@@ -357,22 +357,6 @@ export class Adevar3DActuator extends PaiSho3DActuator {
 		return null;
 	}
 
-	// --- Selectable Tile Highlight ---
-
-	addSelectableTileHighlight(x, z) {
-		const ringGeo = new THREE.RingGeometry(0.44, 0.54, 32);
-		ringGeo.rotateX(-Math.PI / 2);
-		const ringMat = new THREE.MeshBasicMaterial({
-			color: 0x44AAFF,
-			transparent: true,
-			opacity: 0.8,
-			side: THREE.DoubleSide,
-		});
-		const ring = new THREE.Mesh(ringGeo, ringMat);
-		ring.position.set(x, 0.17, z);
-		this.effectsGroup.add(ring);
-	}
-
 	// --- Oriental Lily Garden Highlights ---
 
 	getGardenHighlightColor(number) {

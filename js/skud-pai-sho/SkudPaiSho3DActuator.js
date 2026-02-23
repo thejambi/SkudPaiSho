@@ -189,7 +189,7 @@ export class SkudPaiSho3DActuator extends PaiSho3DActuator {
 			}
 
 			if (boardPoint.isType(POSSIBLE_MOVE)) {
-				this.addPossibleMoveIndicator(x, z);
+				this.addSelectableTileHighlight(x, z);
 			}
 
 			// Captured tile overlay during animation

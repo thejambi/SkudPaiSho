@@ -110,7 +110,7 @@ export class Vagabond3DActuator extends PaiSho3DActuator {
 
 		// Possible move with tile (capture target)
 		if (boardPoint.isType(POSSIBLE_MOVE)) {
-			this.addPossibleMoveIndicator(x, z);
+			this.addSelectableTileHighlight(x, z);
 		}
 
 		// Captured tile overlay during animation
