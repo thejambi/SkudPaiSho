@@ -319,19 +319,32 @@ export class OnlinePlayEngine {
 		);
 	}
 	submitMove(gameToUpdateId, gameNotationText, loginToken, gameTypeName, callback,
-		gameClockJson, gameResultId, move) {
+		gameClockJson, gameResultId, move, winInfo) {
+		var postData = {
+			id: gameToUpdateId,
+			t: gameNotationText,
+			userId: loginToken.userId,
+			username: loginToken.username,
+			userEmail: loginToken.userEmail,
+			deviceId: loginToken.deviceId,
+			gameTypeName: gameTypeName,
+			gameClockJson: gameClockJson,
+			gameResultId: gameResultId
+		};
+		if (winInfo && winInfo.resultTypeCode !== undefined) {
+			postData.winResultTypeCode = winInfo.resultTypeCode;
+			postData.winnerUsername = winInfo.winnerUsername || '';
+			postData.winGameTypeId = winInfo.gameTypeId || '';
+			postData.winHostUsername = winInfo.hostUsername || '';
+			postData.winGuestUsername = winInfo.guestUsername || '';
+			if (winInfo.updateRatings) {
+				postData.winUpdateRatings = winInfo.updateRatings;
+				postData.winHostRating = winInfo.hostRating;
+				postData.winGuestRating = winInfo.guestRating;
+			}
+		}
 		$.post("backend/updateGameNotationV3.php",
-			{
-				id: gameToUpdateId,
-				t: gameNotationText,
-				userId: loginToken.userId,
-				username: loginToken.username,
-				userEmail: loginToken.userEmail,
-				deviceId: loginToken.deviceId,
-				gameTypeName: gameTypeName,
-				gameClockJson: gameClockJson,
-				gameResultId: gameResultId
-			},
+			postData,
 			function(data, status) {
 				if (status === 'success') {
 					callback(data.trim(), move);

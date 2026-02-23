@@ -2262,7 +2262,7 @@ export function yesJoinPrivateGame(privateGameId) {
 export let submitMoveData = {};
 const submitMoveCallback = (resultData, move) => {
 	setLastKnownGameNotation(gameController.gameNotation.notationTextForUrl());
-	finalizeMove(submitMoveData.moveAnimationBeginStep, false, true);
+	finalizeMove(submitMoveData.moveAnimationBeginStep, false, false); // Win info already sent with move submission
 
 	if (move && move.fullMoveText) {
 		sendChat("➢ " + move.fullMoveText);
@@ -2434,8 +2434,38 @@ export function callSubmitMove(moveAnimationBeginStep, moveIsConfirmed, move) {
 		GameClock.stopGameClock();
 		// if (!GameClock.currentClockIsOutOfTime()) {
 		showCallSubmitMoveModal();
+
+		// Calculate win info to send with the move (so it's recorded atomically)
+		var winInfo = null;
+		if (playingOnlineGame()) {
+			if (getGameWinner()) {
+				winInfo = {};
+				var hostResultCode = 0.5;
+				if (getGameWinner() === HOST) {
+					winInfo.winnerUsername = currentGameData.hostUsername;
+					hostResultCode = 1;
+				} else if (getGameWinner() === GUEST) {
+					winInfo.winnerUsername = currentGameData.guestUsername;
+					hostResultCode = 0;
+				}
+				winInfo.resultTypeCode = gameController.theGame.getWinResultTypeCode();
+				winInfo.gameTypeId = currentGameData.gameTypeId;
+				winInfo.hostUsername = currentGameData.hostUsername;
+				winInfo.guestUsername = currentGameData.guestUsername;
+				if (currentGameData.isRankedGame && currentGameData.hostUsername !== currentGameData.guestUsername) {
+					var newPlayerRatings = Elo.getNewPlayerRatings(currentGameData.hostRating, currentGameData.guestRating, hostResultCode);
+					winInfo.updateRatings = currentGameData.isRankedGame;
+					winInfo.hostRating = newPlayerRatings.hostRating;
+					winInfo.guestRating = newPlayerRatings.guestRating;
+				}
+			} else if (gameController.gameHasEndedInDraw && gameController.gameHasEndedInDraw()) {
+				winInfo = {};
+				winInfo.resultTypeCode = gameController.theGame.getWinResultTypeCode();
+			}
+		}
+
 		onlinePlayEngine.submitMove(gameId, encodeURIComponent(lockedInNotationTextForUrlData.notationText), getLoginToken(), getGameTypeEntryFromId(currentGameData.gameTypeId).desc, submitMoveCallback,
-			GameClock.getCurrentGameClockJsonString(), currentGameData.resultId, move);
+			GameClock.getCurrentGameClockJsonString(), currentGameData.resultId, move, winInfo);
 		lockedInNotationTextForUrlData = null;
 		// }
 	} else {
