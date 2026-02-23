@@ -1,17 +1,18 @@
 import {
-  accountHeaderClicked,
-  closeNav,
-  discordLinkClicked,
-  dismissChatAlert,
-  newGameClicked,
-  openNav,
-  openShop,
-  openTab,
-  sendChat,
-  sendGlobalChat,
-  signUpClicked,
-  viewGameSeeksClicked
+	accountHeaderClicked,
+	closeNav,
+	discordLinkClicked,
+	dismissChatAlert,
+	newGameClicked,
+	openNav,
+	openShop,
+	openTab,
+	sendChat,
+	sendGlobalChat,
+	viewGameSeeksClicked
 } from '../PaiShoMain';
+
+import { clearMessage } from '../UiInteraction';
 
 export function setupUiEvents() {
 	/* Sidenav Open/Close */
@@ -34,6 +35,7 @@ export function setupUiEvents() {
 	var helpTabHeader = document.getElementById('defaultOpenTab');
 	if (helpTabHeader) {
 		helpTabHeader.addEventListener('click', (event) => {
+			clearMessage();	// Set Help tab text to default when clicked
 			openTab(event, 'helpTextTab');
 		});
 	}
