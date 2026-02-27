@@ -305,6 +305,13 @@ GiniController.prototype.toggleDebug = function() {
 	clearMessage();
 };
 
+GiniController.prototype.toggleClickToShowPointMessage = function() {
+	this.clickToShowPointMessage = !this.clickToShowPointMessage;
+	this.createActuator();
+	this.callActuate();
+	clearMessage();
+};
+
 GiniController.prototype.completeSetup = function() {
 	rerunAll();
 	this.callActuate();
@@ -352,10 +359,21 @@ GiniController.prototype.getAdditionalHelpTabDiv = function() {
 		}
 		var toggleDebugSpan = document.createElement("span");
 		toggleDebugSpan.classList.add("skipBonus");
-		toggleDebugSpan.setAttribute("onclick", "gameController.toggleDebug();");
+		// toggleDebugSpan.setAttribute("onclick", "gameController.toggleDebug();");
+		toggleDebugSpan.addEventListener('click', this.toggleDebug);
 		toggleDebugSpan.innerText = toggleDebugText;
 
 		settingsDiv.appendChild(toggleDebugSpan);
+		settingsDiv.appendChild(document.createElement("br"));
+		var clickToShowText = "Switch to show tile info on click";
+		if (this.clickToShowPointMessage) {
+			clickToShowText = "Switch to show tile info on hover";
+		}
+		var clickToShowSpan = document.createElement("span");
+		clickToShowSpan.classList.add("skipBonus");
+		clickToShowSpan.addEventListener('click', function() { gameController.toggleClickToShowPointMessage(); });
+		clickToShowSpan.innerText = clickToShowText;
+		settingsDiv.appendChild(clickToShowSpan);
 		settingsDiv.appendChild(document.createElement("br"));
 	}
 
@@ -580,13 +598,13 @@ GiniController.prototype.skipHarmonyBonus = function() {
 	}
 };
 
-GiniController.prototype.getTheMessage = function(tile, ownerName) {
+GiniController.prototype.getTheMessage = function(tile, ownerName, boardTile) {
 	var message = [];
 
 	var tileCode = tile.code;
 	var heading = TrifleTile.getTileName(tileCode);
 
-	message.push(TrifleTileInfo.getReadableDescription(tileCode));
+	message.push(TrifleTileInfo.getReadableDescription(tileCode, boardTile, boardTile ? this.theGame.board.abilityManager : null));
 
 	return {
 		heading: heading,
@@ -617,7 +635,7 @@ GiniController.prototype.getPointMessage = function(htmlPoint) {
 	var boardPoint = this.theGame.board.cells[rowCol.row][rowCol.col];
 
 	if (boardPoint.hasTile()) {
-		return this.getTheMessage(boardPoint.tile, boardPoint.tile.ownerName);
+		return this.getTheMessage(boardPoint.tile, boardPoint.tile.ownerName, boardPoint.tile);
 	} else if (this.showDebugInfo) {
 		var messageLines = this.theGame.buildAbilitySummaryLines();
 		return {

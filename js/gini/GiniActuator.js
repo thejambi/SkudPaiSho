@@ -194,6 +194,18 @@ export class GiniActuator {
 					unplayedTileClicked(theDiv);
 					showTileMessage(theDiv);
 				});
+			} else if (gameController && gameController.clickToShowPointMessage) {
+				theDiv.addEventListener('click', () => {
+					unplayedTileClicked(theDiv);
+					const tileName = theDiv.getAttribute("name");
+					if (gameController.lastClickedTileForMessage === tileName) {
+						gameController.lastClickedTileForMessage = null;
+						clearMessage();
+					} else {
+						gameController.lastClickedTileForMessage = tileName;
+						showTileMessage(theDiv);
+					}
+				});
 			} else {
 				theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
 				theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
@@ -233,6 +245,18 @@ export class GiniActuator {
 					unplayedTileClicked(theDiv);
 					showTileMessage(theDiv);
 				});
+		} else if (gameController && gameController.clickToShowPointMessage) {
+			theDiv.addEventListener('click', () => {
+				unplayedTileClicked(theDiv);
+				const tileName = theDiv.getAttribute("name");
+				if (gameController.lastClickedTileForMessage === tileName) {
+					gameController.lastClickedTileForMessage = null;
+					clearMessage();
+				} else {
+					gameController.lastClickedTileForMessage = tileName;
+					showTileMessage(theDiv);
+				}
+			});
 		} else {
 			theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
 			theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
@@ -272,6 +296,21 @@ export class GiniActuator {
 
 			if (this.mobile) {
 				theDiv.addEventListener('click', () => pointClicked(theDiv));
+			} else if (gameController && gameController.clickToShowPointMessage) {
+				theDiv.addEventListener('click', () => {
+					pointClicked(theDiv);
+					const pointName = theDiv.getAttribute("name");
+					if (gameController.lastClickedPointForMessage === pointName) {
+						gameController.lastClickedPointForMessage = null;
+						clearMessage();
+					} else {
+						gameController.lastClickedPointForMessage = pointName;
+						showPointMessage(theDiv);
+					}
+				});
+				theDiv.addEventListener('mousedown', (e) => { if (e.button === 2) RmbDown(theDiv); });
+				theDiv.addEventListener('mouseup', (e) => { if (e.button === 2) RmbUp(theDiv); });
+				theDiv.addEventListener('contextmenu', (e) => e.preventDefault());
 			} else {
 				theDiv.addEventListener('click', () => pointClicked(theDiv));
 				theDiv.addEventListener('mouseover', () => showPointMessage(theDiv));

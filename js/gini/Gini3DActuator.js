@@ -7,6 +7,7 @@ import { HOST, GUEST } from '../CommonNotationObjects';
 import { MARKED, NON_PLAYABLE, POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import {
 	clearMessage,
+	gameController,
 	pieceAnimationLength,
 	piecePlaceAnimation,
 	showTileMessage,
@@ -143,6 +144,18 @@ export class Gini3DActuator extends PaiSho3DActuator {
 				unplayedTileClicked(theDiv);
 				showTileMessage(theDiv);
 			});
+		} else if (gameController && gameController.clickToShowPointMessage) {
+			theDiv.addEventListener('click', () => {
+				unplayedTileClicked(theDiv);
+				const tileName = theDiv.getAttribute("name");
+				if (gameController.lastClickedTileForMessage === tileName) {
+					gameController.lastClickedTileForMessage = null;
+					clearMessage();
+				} else {
+					gameController.lastClickedTileForMessage = tileName;
+					showTileMessage(theDiv);
+				}
+			});
 		} else {
 			theDiv.addEventListener('click', () => unplayedTileClicked(theDiv));
 			theDiv.addEventListener('mouseover', () => showTileMessage(theDiv));
@@ -206,6 +219,11 @@ export class Gini3DActuator extends PaiSho3DActuator {
 
 		if (tile.tileIsSelectable) {
 			if (this.mobile) {
+				theDiv.addEventListener('click', () => {
+					unplayedTileClicked(theDiv);
+					showTileMessage(theDiv);
+				});
+			} else if (gameController && gameController.clickToShowPointMessage) {
 				theDiv.addEventListener('click', () => {
 					unplayedTileClicked(theDiv);
 					showTileMessage(theDiv);
