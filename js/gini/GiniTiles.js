@@ -1,4 +1,5 @@
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
+import { ACCENT_TILE_HOME } from './GiniGameManager';
 import {
   TrifleAbilityName,
   TrifleAbilityTriggerType,
@@ -403,8 +404,8 @@ GiniTileInfo.defineGiniTiles = function() {
 			{
 				title: "Swap Surrounding Tiles",
 				type: TrifleAbilityName.swapTwoSurroundingTiles,
-				optional: true,
 				excludeTileCode: GiniTileCodes.WhiteLotus,
+				excludePointTypes: [ACCENT_TILE_HOME],
 				neededPromptTargetsInfo: [
 					{
 						title: "firstSwapTile",
@@ -446,6 +447,7 @@ GiniTileInfo.defineGiniTiles = function() {
 			{
 				title: "Rotate Surrounding Tiles",
 				type: TrifleAbilityName.rotateSurroundingTilesClockwise,
+				excludePointTypes: [ACCENT_TILE_HOME],
 				triggers: [
 					{
 						triggerType: TrifleAbilityTriggerType.whenActiveMovement,
@@ -475,7 +477,7 @@ GiniTileInfo.defineGiniTiles = function() {
 			{
 				title: "Displace Tile",
 				type: TrifleAbilityName.displaceOccupiedTile,
-				optional: true,
+				excludePointTypes: [ACCENT_TILE_HOME],
 				neededPromptTargetsInfo: [
 					{
 						title: "displacedTileDestination",
@@ -512,7 +514,7 @@ GiniTileInfo.defineGiniTiles = function() {
 			{
 				title: "Displace Tile",
 				type: TrifleAbilityName.displaceOccupiedTile,
-				optional: true,
+				excludePointTypes: [ACCENT_TILE_HOME],
 				displaceAnywhere: true,
 				neededPromptTargetsInfo: [
 					{

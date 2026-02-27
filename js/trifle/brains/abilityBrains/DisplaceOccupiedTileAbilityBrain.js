@@ -32,6 +32,7 @@ TrifleDisplaceOccupiedTileAbilityBrain.prototype.getSurroundingEmptyPoints = fun
 	var centerPoint = this.abilityObject.sourceTilePoint;
 	var centerRow = centerPoint.row;
 	var centerCol = centerPoint.col;
+	var excludePointTypes = this.abilityObject.abilityInfo.excludePointTypes || [];
 	var points = [];
 
 	TrifleDisplaceOccupiedTileAbilityBrain.surroundingOffsets.forEach(function(offset) {
@@ -39,7 +40,8 @@ TrifleDisplaceOccupiedTileAbilityBrain.prototype.getSurroundingEmptyPoints = fun
 		var c = centerCol + offset.col;
 		if (r >= 0 && r < 17 && c >= 0 && c < 17) {
 			var bp = board.cells[r][c];
-			if (!bp.isType(NON_PLAYABLE) && !bp.hasTile()) {
+			if (!bp.isType(NON_PLAYABLE) && !bp.hasTile()
+					&& !excludePointTypes.some(function(t) { return bp.isType(t); })) {
 				points.push(bp);
 			}
 		}
@@ -107,10 +109,12 @@ TrifleDisplaceOccupiedTileAbilityBrain.prototype.promptForTarget = function(next
 
 	if (nextNeededPromptTargetInfo.promptId === TrifleTargetPromptId.displacedTileDestinationPoint) {
 		var displaceAnywhere = this.abilityObject.abilityInfo && this.abilityObject.abilityInfo.displaceAnywhere;
+		var excludePointTypes = this.abilityObject.abilityInfo.excludePointTypes || [];
 		if (displaceAnywhere) {
 			var board = this.abilityObject.board;
 			board.forEachBoardPoint(function(bp) {
-				if (!bp.isType(NON_PLAYABLE) && !bp.hasTile()) {
+				if (!bp.isType(NON_PLAYABLE) && !bp.hasTile()
+						&& !excludePointTypes.some(function(t) { return bp.isType(t); })) {
 					promptTargetsExist = true;
 					if (!checkForTargetsOnly) {
 						bp.addType(POSSIBLE_MOVE);

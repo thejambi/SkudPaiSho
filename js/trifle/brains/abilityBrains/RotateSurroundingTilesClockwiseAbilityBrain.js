@@ -29,6 +29,7 @@ TrifleRotateSurroundingTilesClockwiseAbilityBrain.prototype.activateAbility = fu
 	var centerPoint = this.abilityObject.sourceTilePoint;
 	var centerRow = centerPoint.row;
 	var centerCol = centerPoint.col;
+	var excludePointTypes = this.abilityObject.abilityInfo.excludePointTypes || [];
 	var animations = new TrifleAnimationSequence();
 
 	/* Build ordered ring of valid surrounding positions */
@@ -38,7 +39,7 @@ TrifleRotateSurroundingTilesClockwiseAbilityBrain.prototype.activateAbility = fu
 		var c = centerCol + offset.col;
 		if (r >= 0 && r < 17 && c >= 0 && c < 17) {
 			var bp = board.cells[r][c];
-			if (!bp.isType(NON_PLAYABLE)) {
+			if (!bp.isType(NON_PLAYABLE) && !excludePointTypes.some(function(t) { return bp.isType(t); })) {
 				positions.push(bp);
 			}
 		}

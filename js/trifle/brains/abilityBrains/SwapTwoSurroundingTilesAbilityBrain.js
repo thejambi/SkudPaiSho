@@ -33,6 +33,7 @@ TrifleSwapTwoSurroundingTilesAbilityBrain.prototype.getSurroundingTilePoints = f
 	var centerRow = centerPoint.row;
 	var centerCol = centerPoint.col;
 	var excludeTileCode = this.abilityObject.abilityInfo.excludeTileCode;
+	var excludePointTypes = this.abilityObject.abilityInfo.excludePointTypes || [];
 	var points = [];
 
 	TrifleSwapTwoSurroundingTilesAbilityBrain.surroundingOffsets.forEach(function(offset) {
@@ -42,7 +43,9 @@ TrifleSwapTwoSurroundingTilesAbilityBrain.prototype.getSurroundingTilePoints = f
 			var bp = board.cells[r][c];
 			if (!bp.isType(NON_PLAYABLE) && bp.hasTile()) {
 				if (!excludeTileCode || bp.tile.code !== excludeTileCode) {
-					points.push(bp);
+					if (!excludePointTypes.some(function(t) { return bp.isType(t); })) {
+						points.push(bp);
+					}
 				}
 			}
 		}
