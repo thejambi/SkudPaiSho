@@ -114,6 +114,18 @@ export class TrifleAbilityManager {
 		});
 		this.abilities = newAbilities;
 
+		/* Refresh target tiles for preserved active abilities.
+		 * Cancel state may have changed during step 3 (e.g., a cancelAbilitiesTargetingTiles
+		 * ability was deactivated), which affects which tiles can be targeted.
+		 * Without this refresh, an ability preserved via appearsToBeTheSameAs keeps stale
+		 * abilityTargetTiles — e.g., missing a tile that was previously shielded by a
+		 * now-removed cancel (the Host Koi / Guest Ginseng interaction in Gini). */
+		this.abilities.forEach(ability => {
+			if (ability.activated) {
+				ability.setAbilityTargetTiles();
+			}
+		});
+
 		/* Activate abilities! */
 
 		// Priority abilities first

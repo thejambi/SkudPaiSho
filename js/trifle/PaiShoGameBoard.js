@@ -3,19 +3,24 @@
 // A more reusable and global Pai Sho Board
 
 import {
+	HOST,
+	NotationPoint,
+	RowAndColumn,
+} from '../CommonNotationObjects';
+import { arrayIncludesOneOf, debug } from '../GameData';
+import { paiShoBoardMaxRowOrCol } from '../pai-sho-common/PaiShoBoardHelp';
+import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
+import {
 	GATE,
 	NEUTRAL,
 	NON_PLAYABLE,
 	POSSIBLE_MOVE,
 } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
-import {
-	HOST,
-	NotationPoint,
-	RowAndColumn,
-} from '../CommonNotationObjects';
-import { TEMPLE, TrifleBoardPoint } from './TrifleBoardPoint';
+import { currentTileMetadata } from './PaiShoGamesTileMetadata';
 import { TrifleAbility } from './TrifleAbility';
+import { TrifleAbilityManager } from './TrifleAbilityManager';
+import { TEMPLE, TrifleBoardPoint } from './TrifleBoardPoint';
 import {
 	TrifleAbilityCategory,
 	TrifleAbilityName,
@@ -34,13 +39,8 @@ import {
 	TrifleTileTeam,
 	TrifleZoneAbility
 } from './TrifleTileInfo';
-import { TrifleAbilityManager } from './TrifleAbilityManager';
 import { TrifleBrainFactory } from './brains/BrainFactory';
 import { TrifleTriggerHelper } from './brains/TriggerHelper';
-import { arrayIncludesOneOf, debug } from '../GameData';
-import { currentTileMetadata } from './PaiShoGamesTileMetadata';
-import { getOpponentName } from '../pai-sho-common/PaiShoPlayerHelp';
-import { paiShoBoardMaxRowOrCol } from '../pai-sho-common/PaiShoBoardHelp';
 
 export class PaiShoGameBoard {
 	constructor(tileManager, customAbilityActivationOrder) {
