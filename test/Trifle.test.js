@@ -2953,3 +2953,254 @@ describe('TrifleGameNotation', () => {
 		});
 	});
 });
+
+describe('Stale abilityTargetTiles - immobilize refresh after cancel removed', () => {
+	/**
+	 * Regression test for the bug where an immobilizeTiles ability preserved via
+	 * appearsToBeTheSameAs retains stale abilityTargetTiles when a
+	 * cancelAbilitiesTargetingTiles ability is removed.
+	 *
+	 * Scenario:
+	 *   - Host Lavender at (0,0) immobilizes all adjacent tiles.
+	 *   - Guest HermitCrab at (1,0): adjacent to Lavender, outside Elderberry zone.
+	 *   - Guest Elderberry at (-4,0): zone 3, cancels immobilizeTiles on friendly tiles in zone.
+	 *   - Guest WaterBanner at (-1,0): adjacent to Lavender (distance 1), inside Elderberry zone
+	 *     (distance 3 from Elderberry).
+	 *   - Host PolarBearDog at (-4,2): captures Elderberry by moving to (-4,0).
+	 *
+	 * Turn sequence:
+	 *   1. Host: Deploy Lavender at (0,0)
+	 *   2. Guest: Deploy HermitCrab at (1,0)  →  Lavender activates, targets [HermitCrab]
+	 *   3. Host: Deploy PolarBearDog at (-4,2)
+	 *   4. Guest: Deploy Elderberry at (-4,0)  →  no Guest tiles in zone yet, cancel not active
+	 *   5. Host: Deploy Firefly at (3,0)       →  filler
+	 *   6. Guest: Deploy WaterBanner at (-1,0) →  WaterBanner enters Lavender adjacency.
+	 *             Lavender's triggerTargetTiles changes → old ability deactivated, new one
+	 *             activates with Elderberry cancel active → abilityTargetTiles=[HermitCrab]
+	 *             (WaterBanner excluded). BUG STATE: activated=true with stale targets.
+	 *   7. Host: Move PolarBearDog (-4,2)→(-4,0), captures Elderberry.
+	 *             Lavender's triggerTargetTiles unchanged → appearsToBeTheSameAs=true →
+	 *             preserved, doActivate() skipped.
+	 *
+	 * Without fix: abilityTargetTiles stays [HermitCrab]; WaterBanner NOT immobilized.
+	 * With fix:    setAbilityTargetTiles() refreshed after cancel removed; WaterBanner IS
+	 *              immobilized.
+	 */
+	let gameManager;
+	const mockActuator = { actuate: vi.fn() };
+
+	beforeEach(() => {
+		gameManager = new TrifleGameManager(mockActuator, true, true);
+	});
+
+	it('should immobilize a tile that was previously shielded by a now-removed cancelAbilitiesTargetingTiles', () => {
+		addTilesToTeam(gameManager, HOST, [
+			TrifleTileCodes.WaterBanner,
+			TrifleTileCodes.Lavender,
+			TrifleTileCodes.PolarBearDog,
+			TrifleTileCodes.Firefly
+		]);
+		addTilesToTeam(gameManager, GUEST, [
+			TrifleTileCodes.WaterBanner,
+			TrifleTileCodes.HermitCrab,
+			TrifleTileCodes.Elderberry
+		]);
+
+		// Turn 1 - Host: Deploy Lavender at (0,0)
+		gameManager.runNotationMove({
+			moveType: DEPLOY,
+			player: HOST,
+			tileType: TrifleTileCodes.Lavender,
+			endPoint: new NotationPoint('0,0')
+		}, false);
+
+		// Turn 2 - Guest: Deploy HermitCrab at (1,0) - adjacent to Lavender, outside Elderberry zone
+		// After this turn: Lavender activated=true, abilityTargetTiles=[HermitCrab]
+		gameManager.runNotationMove({
+			moveType: DEPLOY,
+			player: GUEST,
+			tileType: TrifleTileCodes.HermitCrab,
+			endPoint: new NotationPoint('1,0')
+		}, false);
+
+		const hermitCrabPoints = gameManager.board.getTilePoints(TrifleTileCodes.HermitCrab, GUEST);
+		expect(hermitCrabPoints.length).toBe(1);
+		const hermitCrabTile = hermitCrabPoints[0].tile;
+
+		// Verify Lavender is already immobilizing HermitCrab
+		expect(
+			gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles, hermitCrabTile
+			)
+		).toBe(true);
+
+		// Turn 3 - Host: Deploy PolarBearDog at (-4,2)
+		gameManager.runNotationMove({
+			moveType: DEPLOY,
+			player: HOST,
+			tileType: TrifleTileCodes.PolarBearDog,
+			endPoint: new NotationPoint('-4,2')
+		}, false);
+
+		// Turn 4 - Guest: Deploy Elderberry at (-4,0) - zone 3, no Guest tiles in zone yet
+		gameManager.runNotationMove({
+			moveType: DEPLOY,
+			player: GUEST,
+			tileType: TrifleTileCodes.Elderberry,
+			endPoint: new NotationPoint('-4,0')
+		}, false);
+
+		// Turn 5 - Host: Deploy Firefly at (3,0) - filler, not adjacent to Lavender
+		gameManager.runNotationMove({
+			moveType: DEPLOY,
+			player: HOST,
+			tileType: TrifleTileCodes.Firefly,
+			endPoint: new NotationPoint('3,0')
+		}, false);
+
+		// Turn 6 - Guest: Deploy WaterBanner at (-1,0)
+		//   - Adjacent to Lavender (distance 1)
+		//   - Inside Elderberry zone (distance 3 from Elderberry at (-4,0))
+		//   → Lavender's triggerTargetTiles changes to [HermitCrab, WaterBanner]
+		//   → Old Lavender ability deactivated, new one activates
+		//   → Elderberry cancel is now active (WaterBanner in zone)
+		//   → abilityTargetTiles=[HermitCrab] (WaterBanner excluded) — BUG STATE
+		gameManager.runNotationMove({
+			moveType: DEPLOY,
+			player: GUEST,
+			tileType: TrifleTileCodes.WaterBanner,
+			endPoint: new NotationPoint('-1,0')
+		}, false);
+
+		const guestWBPoints = gameManager.board.getTilePoints(TrifleTileCodes.WaterBanner, GUEST);
+		expect(guestWBPoints.length).toBe(1);
+		const guestWBTile = guestWBPoints[0].tile;
+
+		// Confirm WaterBanner is NOT yet immobilized (protected by Elderberry cancel)
+		expect(
+			gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles, guestWBTile
+			)
+		).toBe(false);
+
+		// HermitCrab is still immobilized (outside Elderberry zone)
+		expect(
+			gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles, hermitCrabTile
+			)
+		).toBe(true);
+
+		// Turn 7 - Host: Move PolarBearDog from (-4,2) to (-4,0), capturing Elderberry
+		//   → Elderberry is captured, its cancel ability is removed
+		//   → processAbilities: Lavender triggerTargetTiles unchanged [HermitCrab, WaterBanner]
+		//     → appearsToBeTheSameAs=true → preserved, doActivate() skipped
+		//   WITHOUT FIX: abilityTargetTiles stays [HermitCrab], WaterBanner not immobilized
+		//   WITH FIX:    setAbilityTargetTiles() refreshed, WaterBanner now immobilized
+		gameManager.runNotationMove({
+			moveType: MOVE,
+			player: HOST,
+			startPoint: new NotationPoint('-4,2'),
+			endPoint: new NotationPoint('-4,0')
+		}, false);
+
+		// WaterBanner is now adjacent to Lavender with no cancel protecting it — must be immobilized
+		expect(
+			gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles, guestWBTile
+			)
+		).toBe(true);
+
+		// HermitCrab remains immobilized
+		expect(
+			gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles, hermitCrabTile
+			)
+		).toBe(true);
+	});
+
+	it('should NOT immobilize a tile still protected by an active Elderberry cancel', () => {
+		// Verifies the cancel is working correctly: a tile adjacent to Lavender but inside
+		// Elderberry's zone is NOT immobilized while Elderberry is on the board.
+		addTilesToTeam(gameManager, HOST, [
+			TrifleTileCodes.WaterBanner,
+			TrifleTileCodes.Lavender,
+			TrifleTileCodes.Firefly
+		]);
+		addTilesToTeam(gameManager, GUEST, [
+			TrifleTileCodes.WaterBanner,
+			TrifleTileCodes.HermitCrab,
+			TrifleTileCodes.Elderberry
+		]);
+
+		// Turn 1 - Host: Deploy Lavender at (0,0)
+		gameManager.runNotationMove({
+			moveType: DEPLOY,
+			player: HOST,
+			tileType: TrifleTileCodes.Lavender,
+			endPoint: new NotationPoint('0,0')
+		}, false);
+
+		// Turn 2 - Guest: Deploy HermitCrab at (1,0) - adjacent to Lavender, outside Elderberry zone
+		gameManager.runNotationMove({
+			moveType: DEPLOY,
+			player: GUEST,
+			tileType: TrifleTileCodes.HermitCrab,
+			endPoint: new NotationPoint('1,0')
+		}, false);
+
+		// Turn 3 - Host: Deploy Firefly at (3,0) - filler
+		gameManager.runNotationMove({
+			moveType: DEPLOY,
+			player: HOST,
+			tileType: TrifleTileCodes.Firefly,
+			endPoint: new NotationPoint('3,0')
+		}, false);
+
+		// Turn 4 - Guest: Deploy Elderberry at (-4,0) - zone 3, no Guest tiles in zone yet
+		gameManager.runNotationMove({
+			moveType: DEPLOY,
+			player: GUEST,
+			tileType: TrifleTileCodes.Elderberry,
+			endPoint: new NotationPoint('-4,0')
+		}, false);
+
+		// Turn 5 - Host: Deploy Host WaterBanner at (5,0) - filler, far from Lavender
+		gameManager.runNotationMove({
+			moveType: DEPLOY,
+			player: HOST,
+			tileType: TrifleTileCodes.WaterBanner,
+			endPoint: new NotationPoint('5,0')
+		}, false);
+
+		// Turn 6 - Guest: Deploy WaterBanner at (-1,0)
+		//   - Adjacent to Lavender (distance 1)
+		//   - Inside Elderberry zone (distance 3)
+		//   → Elderberry cancel is active → WaterBanner NOT immobilized
+		gameManager.runNotationMove({
+			moveType: DEPLOY,
+			player: GUEST,
+			tileType: TrifleTileCodes.WaterBanner,
+			endPoint: new NotationPoint('-1,0')
+		}, false);
+
+		const guestWBPoints = gameManager.board.getTilePoints(TrifleTileCodes.WaterBanner, GUEST);
+		const guestWBTile = guestWBPoints[0].tile;
+
+		const hermitCrabPoints = gameManager.board.getTilePoints(TrifleTileCodes.HermitCrab, GUEST);
+		const hermitCrabTile = hermitCrabPoints[0].tile;
+
+		// WaterBanner is protected by Elderberry cancel - NOT immobilized
+		expect(
+			gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles, guestWBTile
+			)
+		).toBe(false);
+
+		// HermitCrab outside zone - IS immobilized
+		expect(
+			gameManager.board.abilityManager.abilityTargetingTileExists(
+				TrifleAbilityName.immobilizeTiles, hermitCrabTile
+			)
+		).toBe(true);
+	});
+});
