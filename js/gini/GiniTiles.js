@@ -293,7 +293,7 @@ GiniTileInfo.defineGiniTiles = function() {
 					{
 						triggerType: TrifleAbilityTriggerType.whileTargetTileIsSurrounding,
 						targetTeams: [TrifleTileTeam.friendly],
-						targetTileTypes: [TrifleTileCategory.allTileTypes],
+						targetTileTypes: [GiniTileType.mainTile],
 						activationRequirements: [
 							{
 								type: TrifleActivationRequirement.tileIsOnPointOfType,
@@ -323,7 +323,7 @@ GiniTileInfo.defineGiniTiles = function() {
 					{
 						triggerType: TrifleAbilityTriggerType.whileTargetTileIsSurrounding,
 						targetTeams: [TrifleTileTeam.friendly],
-						targetTileTypes: [TrifleTileCategory.allTileTypes],
+						targetTileTypes: [GiniTileType.mainTile],
 						activationRequirements: [
 							{
 								type: TrifleActivationRequirement.tileIsOnPointOfType,
