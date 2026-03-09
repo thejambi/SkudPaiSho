@@ -4521,7 +4521,7 @@ const sendChatCallback = (result) => {
 };
 
 export function sendChat(chatMessageIfDifferentFromInput) {
-	let chatMessage = htmlEscape(document.getElementById('chatMessageInput').value).trim();
+	let chatMessage = document.getElementById('chatMessageInput').value.trim();
 	if (chatMessageIfDifferentFromInput) {
 		chatMessage = chatMessageIfDifferentFromInput;
 	}
