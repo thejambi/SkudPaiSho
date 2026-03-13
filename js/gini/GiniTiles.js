@@ -287,8 +287,10 @@ GiniTileInfo.defineGiniTiles = function() {
 		],
 		abilities: [
 			{
-				title: "Grant Bonus Movement",
-				type: TrifleAbilityName.grantBonusMovement,
+				title: "Grant Extended Movement",
+				type: TrifleAbilityName.extendMovement,
+				extendMovementType: TrifleMovementType.standardAndAlongGardenWall,
+				extendDistance: 1,
 				triggers: [
 					{
 						triggerType: TrifleAbilityTriggerType.whileTargetTileIsSurrounding,
@@ -304,16 +306,12 @@ GiniTileInfo.defineGiniTiles = function() {
 					}
 				],
 				targetTypes: [TrifleTargetType.triggerTargetTiles],
-				excludeTileCodes: [GiniTileCodes.WhiteLotus],
-				bonusMovement: {
-					type: TrifleMovementType.standard,
-					distance: 1
-				}
+				excludeTileCodes: [GiniTileCodes.WhiteLotus]
 			},
 			{
 				title: "Grant Jump Over",
 				type: TrifleAbilityName.manipulateExistingMovement,
-				manipulateMovementType: TrifleMovementType.standard,
+				manipulateMovementType: TrifleMovementType.standardAndAlongGardenWall,
 				newMovementAbilities: [
 					{
 						type: TrifleMovementAbility.jumpOver

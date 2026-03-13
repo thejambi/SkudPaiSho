@@ -1788,7 +1788,7 @@ export class PaiShoGameBoard {
 			var newMovementAbilities = manipulateAbility.abilityInfo.newMovementAbilities;
 			if (newMovementAbilities && newMovementAbilities.length) {
 				// Does it target the movementInfo?
-				if (!manipulateAbility.abilityInfo.maniputlateMovementType
+				if (!manipulateAbility.abilityInfo.manipulateMovementType
 					|| (manipulateAbility.abilityInfo.manipulateMovementType
 						&& manipulateAbility.abilityInfo.manipulateMovementType == movementInfo.type)) {
 					movementInfo.abilities = movementInfo.abilities || [];
