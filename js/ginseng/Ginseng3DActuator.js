@@ -74,6 +74,10 @@ export class Ginseng3DActuator extends PaiSho3DActuator {
 	// --- Captured Tiles Rendering ---
 
 	renderCapturedTiles(tileManager) {
+		// Clear existing captured tile HTML before re-rendering
+		this.hostTilesContainer.innerHTML = this.getHostTilesContainerDivs();
+		this.guestTilesContainer.innerHTML = this.getGuestTilesContainerDivs();
+
 		const hostCapturedTiles = getTilesForPlayer(tileManager.capturedTiles, HOST);
 		const guestCapturedTiles = getTilesForPlayer(tileManager.capturedTiles, GUEST);
 
