@@ -1862,6 +1862,22 @@ export class PaiShoGameBoard {
 		// debug("Movement Point Checks: " + this.movementPointChecks);
 	}
 
+	getMovementFunctionForType(movementType) {
+		var functionMap = {};
+		functionMap[TrifleMovementType.standard] = PaiShoGameBoard.standardMovementFunction;
+		functionMap[TrifleMovementType.diagonal] = PaiShoGameBoard.diagonalMovementFunction;
+		functionMap[TrifleMovementType.orthAndDiag] = PaiShoGameBoard.orthAndDiagMovementFunction;
+		functionMap[TrifleMovementType.jumpAlongLineOfSight] = PaiShoGameBoard.jumpAlongLineOfSightMovementFunction;
+		functionMap[TrifleMovementType.jumpShape] = PaiShoGameBoard.jumpShapeMovementFunction;
+		functionMap[TrifleMovementType.jumpSurroundingTiles] = PaiShoGameBoard.jumpSurroundingTilesMovementFunction;
+		functionMap[TrifleMovementType.awayFromTargetTile] = PaiShoGameBoard.awayFromTargetTileOrthogonalMovementFunction;
+		functionMap[TrifleMovementType.awayFromTargetTileOrthogonal] = PaiShoGameBoard.awayFromTargetTileOrthogonalMovementFunction;
+		functionMap[TrifleMovementType.awayFromTargetTileDiagonal] = PaiShoGameBoard.awayFromTargetTileDiagonalMovementFunction;
+		functionMap[TrifleMovementType.jumpTargetTile] = PaiShoGameBoard.jumpTargetTileMovementFunction;
+		functionMap[TrifleMovementType.standardAndAlongGardenWall] = PaiShoGameBoard.standardAndAlongGardenWallMovementFunction;
+		return functionMap[movementType] || null;
+	}
+
 	static standardMovementFunction(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber) {
 		const mustPreserveDirection = TrifleTileInfo.movementMustPreserveDirection(movementInfo);
 		return board.getAdjacentPointsPotentialPossibleMoves(boardPointAlongTheWay, originPoint, mustPreserveDirection, movementInfo);

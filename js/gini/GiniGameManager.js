@@ -297,25 +297,94 @@ GiniGameManager.prototype.revealPossibleMovePoints = function(boardPoint, ignore
 };
 
 GiniGameManager.prototype.expandPortalMoves = function(startingPoint) {
-	/* If the tile starts on a portal or can reach a portal, all other empty portals
-	   become valid destinations at 0 movement cost. */
-	var canReachPortal = startingPoint.isType(PORTAL);
+	/* Temples/portals are connected: jumping between them costs 0 movement.
+	   When a tile can reach a portal (or starts on one), it can continue its
+	   remaining movement from ALL other empty portals. */
+	var board = this.board;
+	var tile = startingPoint.tile;
+	var tileInfo = board.tileMetadata[tile.code];
+	if (!tileInfo || !tileInfo.movements || tileInfo.movements.length === 0) return;
 
-	if (!canReachPortal) {
-		this.board.forEachBoardPoint(function(bp) {
-			if (bp.isType(PORTAL) && bp.isType(POSSIBLE_MOVE)) {
-				canReachPortal = true;
+	// Collect all portal points
+	var portalPoints = [];
+	board.forEachBoardPoint(function(bp) {
+		if (bp.isType(PORTAL)) {
+			portalPoints.push(bp);
+		}
+	});
+
+	tileInfo.movements.forEach(function(movementInfo) {
+		movementInfo = board.getManipulatedMovementInfo(startingPoint, movementInfo);
+		var movementFunction = board.getMovementFunctionForType(movementInfo.type);
+		if (!movementFunction) return;
+
+		// Calculate total movement distance (mirrors setPossibleMovesForMovement logic)
+		var overriddenDistance = board.getOverriddenMovementDistance(tile);
+		var totalDistance;
+		if (overriddenDistance !== null) {
+			totalDistance = overriddenDistance;
+		} else {
+			var baseDistance = movementInfo.distance + board.getMovementExtendedDistance(startingPoint, movementInfo);
+			var distanceFactor = board.getMovementDistanceFactor(tile);
+			totalDistance = Math.floor(baseDistance * distanceFactor);
+		}
+
+		// Find reachable portals and their remaining movement distance
+		var reachablePortals = [];
+		portalPoints.forEach(function(portalPoint) {
+			var distRemaining;
+			if (portalPoint === startingPoint) {
+				distRemaining = totalDistance;
+			} else if (portalPoint.isType(POSSIBLE_MOVE)) {
+				distRemaining = portalPoint.getMoveDistanceRemaining(movementInfo);
+				if (distRemaining === undefined || distRemaining === null) distRemaining = 0;
+			} else {
+				return;
+			}
+			if (distRemaining > 0) {
+				reachablePortals.push({ point: portalPoint, distance: distRemaining });
 			}
 		});
-	}
 
-	if (canReachPortal) {
-		this.board.forEachBoardPoint(function(bp) {
-			if (bp.isType(PORTAL) && !bp.hasTile() && bp !== startingPoint) {
-				bp.addType(POSSIBLE_MOVE);
-			}
+		if (reachablePortals.length === 0) return;
+
+		// For each destination portal, use the best available remaining distance
+		// from any reachable source portal, then continue movement expansion
+		portalPoints.forEach(function(destPortal) {
+			// Can't jump to an occupied portal (unless it's the starting point)
+			if (destPortal.hasTile() && destPortal !== startingPoint) return;
+
+			reachablePortals.forEach(function(source) {
+				if (source.point === destPortal) return;
+
+				var distanceRemaining = source.distance;
+
+				// Skip if dest already has equal or better distance for this movement
+				var existingDistance = destPortal.getMoveDistanceRemaining(movementInfo);
+				if (existingDistance !== undefined && existingDistance !== null && existingDistance >= distanceRemaining) return;
+
+				// Mark destination portal as a valid move and link path to source portal
+				if (!destPortal.hasTile()) {
+					board.setPointAsPossibleMovement(destPortal, tile, startingPoint, null, movementInfo);
+					destPortal.setPossibleForMovementType(movementInfo);
+					destPortal.setPreviousPoint(source.point);
+				}
+				destPortal.setMoveDistanceRemaining(movementInfo, distanceRemaining);
+
+				// Continue movement expansion from the destination portal
+				var moveStepNumber = totalDistance - distanceRemaining;
+				board.setPossibleMovementPointsFromMovePoints(
+					[destPortal],
+					movementFunction,
+					tile,
+					movementInfo,
+					startingPoint,
+					distanceRemaining,
+					moveStepNumber
+				);
+			});
 		});
-	}
+	});
 };
 
 
