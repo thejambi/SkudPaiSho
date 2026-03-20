@@ -338,6 +338,9 @@ GiniGameManager.prototype.expandPortalMoves = function(startingPoint) {
 			} else if (portalPoint.isType(POSSIBLE_MOVE)) {
 				distRemaining = portalPoint.getMoveDistanceRemaining(movementInfo);
 				if (distRemaining === undefined || distRemaining === null) distRemaining = 0;
+				// Subtract 1: moveDistanceRemaining is set before the step decrement,
+				// so it includes the step onto the portal itself
+				distRemaining = distRemaining - 1;
 			} else {
 				return;
 			}
