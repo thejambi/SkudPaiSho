@@ -69,6 +69,8 @@ import {
 	V_DOUBLE_MOVE_DISTANCE,
 	VAGABOND_ROTATE,
 	VARIABLE_ACCENT_TILES,
+	YAMMA_PIE_RULE,
+	YAMMA_SWAP_RULE,
 } from './GameOptions';
 
 export const GameType = {
@@ -468,7 +470,10 @@ export const GameType = {
 		description: "A 3D four-in-a-row game with cubes viewed from three perspectives.",
 		coverImg: "hexagon.png",
 		rulesUrl: "https://boardgamegeek.com/boardgame/388435/yamma",
-		gameOptions: []
+		gameOptions: [
+			YAMMA_SWAP_RULE,
+			YAMMA_PIE_RULE,
+		]
 	},
 	TicTacToe: {
 		id: 23,

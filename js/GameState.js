@@ -54,6 +54,7 @@ export function clearGameWatchInterval() {
 
 export let ggOptions = [];
 export function addOption(option) { ggOptions.push(option); }
+export function removeOption(option) { ggOptions = ggOptions.filter(o => o !== option); }
 export function clearOptions() { ggOptions = []; }
 
 /* State used by myTurn / myTurnForReal */

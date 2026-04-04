@@ -16,6 +16,7 @@ export class YammaNotationMove {
 		this.col = 0;
 		this.level = 0;
 		this.rotation = 0; // 0, 1, or 2 for 120° increments
+		this.isSwap = false; // Pie Rule: Guest claims Host's first piece
 
 		// For backwards compatibility with old code
 		this.x = 0;
@@ -29,11 +30,17 @@ export class YammaNotationMove {
 
 	parse(notation) {
 		// Format: "H:row,col,level,rotation" (e.g., "H:2,1,0,1")
+		// Pie Rule swap: "G:SWAP"
 		// Rotation is optional for backwards compatibility
 		const parts = notation.split(':');
 		if (parts.length !== 2) return;
 
 		this.player = parts[0] === 'H' ? HOST : GUEST;
+
+		if (parts[1] === 'SWAP') {
+			this.isSwap = true;
+			return;
+		}
 
 		const coords = parts[1].split(',');
 		if (coords.length >= 2) {
@@ -50,6 +57,9 @@ export class YammaNotationMove {
 	}
 
 	toString() {
+		if (this.isSwap) {
+			return 'G:SWAP';
+		}
 		const playerCode = this.player === HOST ? 'H' : 'G';
 		return `${playerCode}:${this.row},${this.col},${this.level},${this.rotation}`;
 	}

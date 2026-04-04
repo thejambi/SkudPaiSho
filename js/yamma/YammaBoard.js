@@ -177,6 +177,13 @@ export class YammaBoard {
 		return cube;
 	}
 
+	swapCubeOwner(row, col, level) {
+		const cube = this.levels[level][row][col];
+		if (!cube) return;
+		const newOwner = cube.owner === PLAYER.WHITE ? PLAYER.BLUE : PLAYER.WHITE;
+		this.levels[level][row][col] = new YammaCube(newOwner, row, col, level, cube.rotation);
+	}
+
 	getAllCubes() {
 		const cubes = [];
 		for (let level = 0; level < this.maxLevels; level++) {

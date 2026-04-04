@@ -234,6 +234,12 @@ gameOptionDescriptions[GODAI_BOARD_ZONES] = "Board Zones: Rivers & Mountains";
 export var GODAI_EMPTY_TILE = "GodaiEmptyTile";
 gameOptionDescriptions[GODAI_EMPTY_TILE] = "Play with Empty tile";
 
+/* Yamma */
+export var YAMMA_SWAP_RULE = "YammaSwapRule";
+gameOptionDescriptions[YAMMA_SWAP_RULE] = "Swap Opening Rule";
+export var YAMMA_PIE_RULE = "YammaPieRule";
+gameOptionDescriptions[YAMMA_PIE_RULE] = "Pie Rule (Guest May Claim First Piece)";
+
 /* -------- */
 
 export function getGameOptionDescription(optionName) {

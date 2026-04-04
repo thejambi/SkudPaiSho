@@ -822,6 +822,7 @@ export {
 	myTurnForReal,
 	onlinePlayEnabled,
 	playingOnlineGame,
+	removeOption,
 	setCurrentMoveIndex,
 	setGameLogText,
 	setIsInReplay,

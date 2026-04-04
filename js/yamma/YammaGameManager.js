@@ -4,6 +4,7 @@
 
 import { YammaBoard, PLAYER } from './YammaBoard';
 import { GUEST, HOST } from '../CommonNotationObjects';
+import { gameOptionEnabled, YAMMA_SWAP_RULE } from '../GameOptions';
 
 export class YammaGameManager {
 	constructor(actuator) {
@@ -38,12 +39,36 @@ export class YammaGameManager {
 			return; // Game is over
 		}
 
-		const color = this.getPlayerColor(move.player);
+		// Pie Rule: Guest swaps Host's first piece
+		if (move.isSwap) {
+			if (this.firstCubePos) {
+				this.board.swapCubeOwner(this.firstCubePos.row, this.firstCubePos.col, this.firstCubePos.level);
+			}
+			this.moveCount++;
+			if (withActuate) {
+				this.actuate();
+			}
+			return;
+		}
+
+		let color = this.getPlayerColor(move.player);
+
+		// Swap Opening Rule: first two placements are for the opponent
+		if (gameOptionEnabled(YAMMA_SWAP_RULE) && this.moveCount < 2) {
+			color = color === PLAYER.WHITE ? PLAYER.BLUE : PLAYER.WHITE;
+		}
+
 		const rotation = move.rotation || 0;
 		const cube = this.board.placeCube(move.row, move.col, move.level, color, rotation);
 
 		if (cube) {
 			this.lastMove = { row: move.row, col: move.col, level: move.level, rotation };
+
+			// Track first cube position for Pie Rule swap
+			if (this.moveCount === 0) {
+				this.firstCubePos = { row: move.row, col: move.col, level: move.level };
+			}
+
 			this.moveCount++;
 
 			// Check for winner
@@ -97,6 +122,7 @@ export class YammaGameManager {
 		copy.winningAngle = this.winningAngle;
 		copy.moveCount = this.moveCount;
 		copy.lastMove = this.lastMove ? { ...this.lastMove } : null;
+		copy.firstCubePos = this.firstCubePos ? { ...this.firstCubePos } : null;
 		copy.isCopy = true;
 		return copy;
 	}

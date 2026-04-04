@@ -12,6 +12,7 @@ import {
 	finalizeMove,
 	GameType,
 	getCurrentPlayer,
+	getGameOptionsMessageElement,
 	myTurn,
 	onlinePlayEnabled,
 	playingOnlineGame,
@@ -19,12 +20,14 @@ import {
 	BRAND_NEW,
 	WAITING_FOR_ENDPOINT
 } from '../PaiShoMain';
+import { gameOptionEnabled, YAMMA_PIE_RULE, YAMMA_SWAP_RULE } from '../GameOptions';
 import { YammaActuator } from './YammaActuator';
 import { PLAYER } from './YammaBoard';
 import { YammaGameManager } from './YammaGameManager';
 import {
 	YammaGameNotation,
-	YammaNotationBuilder
+	YammaNotationBuilder,
+	YammaNotationMove
 } from './YammaGameNotation';
 import { YammaRandomAI } from './ai/YammaRandomAI';
 import { YammaStrategicAI } from './ai/YammaStrategicAI';
@@ -128,6 +131,7 @@ export class YammaController {
 
 	getAdditionalMessage() {
 		const container = document.createElement('span');
+		const moveCount = this.gameNotation.moves.length;
 
 		if (this.theGame.getWinner()) {
 			const winnerText = this.theGame.getWinner() === HOST ? 'White (Host)' : 'Blue (Guest)';
@@ -136,8 +140,33 @@ export class YammaController {
 			container.textContent = `${winnerText} wins! (4-in-a-row from ${angleName} view)`;
 		} else if (this.actuator.pendingMove) {
 			container.textContent = 'Use arrows to rotate, then click the green button to place.';
-		} else if (this.gameNotation.moves.length === 0) {
-			container.textContent = 'Click a slot on the board to place your first cube.';
+		} else if (moveCount === 0) {
+			if (gameOptionEnabled(YAMMA_PIE_RULE)) {
+				container.textContent = 'Pie Rule: Place your first cube — Guest may then claim it as their own.';
+			} else {
+				container.appendChild(document.createTextNode('Click a slot on the board to place your first cube.'));
+				container.appendChild(getGameOptionsMessageElement(GameType.Yamma.gameOptions));
+			}
+		} else if (gameOptionEnabled(YAMMA_PIE_RULE) && moveCount === 1) {
+			if (myTurn()) {
+				container.appendChild(document.createTextNode('Pie Rule: Claim the Host\'s first piece as your own, or place a cube to play normally.'));
+				container.appendChild(document.createElement('br'));
+				const claimBtn = document.createElement('span');
+				claimBtn.className = 'skipBonus';
+				claimBtn.textContent = 'Claim Host\'s Piece';
+				claimBtn.onclick = () => this.performPieRuleSwap();
+				container.appendChild(claimBtn);
+			} else {
+				container.textContent = 'Pie Rule: Waiting for Guest to decide whether to claim your piece or place their own.';
+			}
+		} else if (gameOptionEnabled(YAMMA_SWAP_RULE) && moveCount < 2) {
+			if (myTurn()) {
+				const opponentName = moveCount === 0 ? 'Blue (Guest)' : 'White (Host)';
+				container.textContent = `Swap Opening Rule: You are placing a cube for ${opponentName}.`;
+			} else {
+				const currentName = moveCount === 0 ? 'White (Host)' : 'Blue (Guest)';
+				container.textContent = `Swap Opening Rule: ${currentName} is placing a cube for you.`;
+			}
 		}
 
 		return container;
@@ -167,7 +196,13 @@ export class YammaController {
 		}
 
 		// No rotation provided - show rotation selection UI
-		const playerColor = this.getCurrentPlayer() === HOST ? PLAYER.WHITE : PLAYER.BLUE;
+		// Under Swap Opening Rule (or default new-game auto-add), first two placements
+		// show the opponent's color since the cube will belong to them.
+		const moveCount = this.gameNotation.moves.length;
+		let playerColor = this.getCurrentPlayer() === HOST ? PLAYER.WHITE : PLAYER.BLUE;
+		if (gameOptionEnabled(YAMMA_SWAP_RULE) && moveCount < 2) {
+			playerColor = playerColor === PLAYER.WHITE ? PLAYER.BLUE : PLAYER.WHITE;
+		}
 		this.actuator.showRotationSelection(row, col, level, playerColor);
 	}
 
@@ -220,6 +255,31 @@ export class YammaController {
 
 	getCurrentPlayer() {
 		return this.gameNotation.moves.length % 2 === 0 ? HOST : GUEST;
+	}
+
+	optionOkToShow(option) {
+		if (option === YAMMA_SWAP_RULE) {
+			return !gameOptionEnabled(YAMMA_PIE_RULE);
+		}
+		if (option === YAMMA_PIE_RULE) {
+			return !gameOptionEnabled(YAMMA_SWAP_RULE);
+		}
+		return true;
+	}
+
+	performPieRuleSwap() {
+		if (!myTurn()) return;
+		if (this.theGame.hasEnded()) return;
+
+		const swapMove = new YammaNotationMove('G:SWAP');
+		this.theGame.runNotationMove(swapMove);
+		this.gameNotation.addMove(swapMove);
+
+		if (playingOnlineGame()) {
+			callSubmitMove();
+		} else {
+			finalizeMove();
+		}
 	}
 
 	cleanup() {
