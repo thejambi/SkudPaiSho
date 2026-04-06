@@ -72,7 +72,7 @@ export class YammaGameManager {
 			this.moveCount++;
 
 			// Check for winner
-			const result = this.board.checkWinner();
+			const result = this.board.checkWinner(color);
 			if (result) {
 				this.winner = result.winner === PLAYER.WHITE ? HOST : GUEST;
 				this.winningAngle = result.angle;

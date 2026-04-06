@@ -370,14 +370,20 @@ export class YammaBoard {
 		return null; // No 4-in-a-row found
 	}
 
-	checkWinner() {
+	checkWinner(activePlayerColor) {
+		let firstResult = null;
 		for (let angle = 0; angle < 3; angle++) {
 			const winner = this.checkWinFromAngle(angle);
 			if (winner) {
-				return { winner, angle };
+				if (winner === activePlayerColor) {
+					return { winner, angle };
+				}
+				if (!firstResult) {
+					firstResult = { winner, angle };
+				}
 			}
 		}
-		return null;
+		return firstResult;
 	}
 
 	isBoardFull() {
