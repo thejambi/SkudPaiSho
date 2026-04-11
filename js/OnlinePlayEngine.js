@@ -121,6 +121,19 @@ export class OnlinePlayEngine {
 		);
 	}
 
+	forgotUsername(emailOrUsername, callback) {
+		$.post("backend/forgotUsername.php",
+			{
+				emailOrUsername: emailOrUsername
+			},
+			function(data, status) {
+				if (status === 'success') {
+					callback(data.trim());
+				}
+			}
+		);
+	}
+
 	removeUserPassword(loginToken, callback) {
 		$.post("backend/removeUserPassword.php",
 			{

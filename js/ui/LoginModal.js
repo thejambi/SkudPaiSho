@@ -1,4 +1,5 @@
 import {
+  forgotUsernameClicked,
   signUpClicked,
   submitSignInClicked,
 } from '../PaiShoMain';
@@ -79,6 +80,16 @@ export function buildLoginModalContentElement() {
 
 	// Append the button to the button container
 	buttonContainer.appendChild(signInButton);
+
+	// Add "Forgot your username?" link
+	const forgotLink = document.createElement('div');
+	forgotLink.style.marginTop = '8px';
+	const forgotSpan = document.createElement('span');
+	forgotSpan.className = 'clickableText';
+	forgotSpan.textContent = 'Forgot your username?';
+	forgotSpan.onclick = () => forgotUsernameClicked();
+	forgotLink.appendChild(forgotSpan);
+	buttonContainer.appendChild(forgotLink);
 
 	// Append the button container to the center container
 	centerContainer.appendChild(buttonContainer);

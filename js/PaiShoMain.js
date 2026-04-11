@@ -155,6 +155,7 @@ export { GameType, gameTypeIdSupported, getGameTypeEntryFromId };
 	} from './SuperSandbox.js';
 	import { viewGameRankingsClicked } from './ui/GameRankings';
 	import { setupHtmlEventHandlers } from './ui/HtmlEventHandlers';
+	import { buildForgotUsernameModalContentElement } from './ui/ForgotUsernameModal';
 	import { buildLoginModalContentElement } from './ui/LoginModal';
 	import { buildSignUpModalContentElement } from './ui/SignUpModal';
 	import { addEventToElement, setupUiEvents } from './ui/UiSetup';
@@ -3586,6 +3587,32 @@ export function accountHeaderClicked() {
 export function loginClicked() {
 	const loginModalContentElement = buildLoginModalContentElement();
 	showModalElem("Sign In", loginModalContentElement);
+}
+
+export function forgotUsernameClicked() {
+	const inputElem = document.getElementById("forgotUsernameInput");
+	if (!inputElem) {
+		// First open: show the modal with the form
+		const modalContent = buildForgotUsernameModalContentElement();
+		showModalElem("Forgot Username", modalContent);
+		return;
+	}
+
+	const emailOrUsername = inputElem.value.trim();
+	if (!emailOrUsername) {
+		return;
+	}
+
+	const responseDiv = document.getElementById("forgotUsernameResponse");
+	if (responseDiv) {
+		responseDiv.textContent = "Sending...";
+	}
+
+	onlinePlayEngine.forgotUsername(emailOrUsername, (data) => {
+		if (responseDiv) {
+			responseDiv.textContent = data;
+		}
+	});
 }
 
 export function signUpClicked() {

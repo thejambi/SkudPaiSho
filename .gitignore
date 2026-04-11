@@ -395,3 +395,4 @@ images_unused
 js/vagabond/VagabondToTrifleConversionPlanAndExperience.md
 js/trifle/TrifleEngine.md
 ignoreFolder/
+.claude/
