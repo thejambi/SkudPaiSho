@@ -55,7 +55,7 @@ import { GATE, NEUTRAL, POSSIBLE_MOVE } from './SkudPaiShoBoardPoint';
 import { MCTS } from '../ai/MCTS';
 import { RED, SkudPaiShoTile, WHITE } from './SkudPaiShoTile';
 import { SkudAIv1 } from '../ai/SkudAIv1';
-import { SkudStrategicAI } from '../ai/SkudStrategicAI';
+import { SkudStrategicAIv2 } from '../ai/SkudStrategicAIv2';
 import { SkudMctsGame } from './SkudMctsGame';
 import { SkudPaiShoActuator } from './SkudPaiShoActuator';
 import { SkudPaiSho3DActuator } from './SkudPaiSho3DActuator';
@@ -967,8 +967,8 @@ export class SkudPaiShoController {
 
 	getAiList() {
 		return [
-			// new SkudStrategicAI(), 
-			new SkudAIv1()
+			new SkudAIv1(),
+			new SkudStrategicAIv2()
 		];
 	}
 
