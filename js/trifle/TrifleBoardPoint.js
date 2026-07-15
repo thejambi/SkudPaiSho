@@ -254,6 +254,7 @@ export class TrifleBoardPoint {
 		// tile
 		if (this.hasTile()) {
 			copy.tile = this.tile.getCopy();
+			copy.tile.seatedPoint = copy;
 		}
 
 		return copy;

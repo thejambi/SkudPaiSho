@@ -325,6 +325,59 @@ export class TrifleAbility {
 		return false;
 	}
 
+	/**
+	 * Clone this ability record for a copied board (see PaiShoGameBoard.getCopy),
+	 * remapping tile and point references to the copy's objects so ongoing effects
+	 * (immobilize, protect from capture, movement restrictions, etc.) constrain the
+	 * copy exactly like the original before its first processAbilities run.
+	 *
+	 * Returns null when the source tile is no longer on the copied board (e.g. a
+	 * when-captured ability record) — such a record's effect is already reflected
+	 * in the copied board state.
+	 *
+	 * The clone carries no trigger brains; the next processAbilities run on the copy
+	 * re-evaluates triggers fresh, the same as it would on the original board.
+	 */
+	cloneForBoardCopy(copyBoard, copyTilesById) {
+		const sourceTile = copyTilesById[this.sourceTile.id];
+		if (!sourceTile) {
+			return null;
+		}
+
+		const mapPoint = (point) => (point && point.row !== undefined)
+			? copyBoard.cells[point.row][point.col]
+			: point;
+		const mapTiles = (tiles) => tiles
+			? tiles.map((tile) => copyTilesById[tile.id]).filter((tile) => tile)
+			: [];
+
+		const clone = Object.create(TrifleAbility.prototype);
+		clone.board = copyBoard;
+		clone.abilityType = this.abilityType;
+		clone.abilityInfo = this.abilityInfo;
+		clone.sourceTile = sourceTile;
+		clone.sourceTileInfo = this.sourceTileInfo;
+		clone.sourceTilePoint = mapPoint(this.sourceTilePoint);
+		clone.triggerBrainMap = {};
+		clone.promptTargetInfo = this.promptTargetInfo;
+		clone.lastTurnAction = null;
+
+		clone.triggerTargetTiles = mapTiles(this.triggerTargetTiles);
+		clone.triggerTargetTilePoints = (this.triggerTargetTilePoints || []).map(mapPoint);
+		clone.abilityTargetTiles = mapTiles(this.abilityTargetTiles);
+		clone.abilityTargetTilePoints = (this.abilityTargetTilePoints || []).map(mapPoint);
+
+		clone.abilityBrain = TrifleBrainFactory.createAbilityBrain(this.abilityType, clone);
+
+		clone.boardChanged = false;
+		clone.activated = this.activated;
+		clone.pendingActivation = this.pendingActivation;
+		clone.remainingDuration = this.remainingDuration;
+		clone.remainingDelay = this.remainingDelay;
+
+		return clone;
+	}
+
 	getTriggeringActions() {
 		const allTriggeringActions = [];
 

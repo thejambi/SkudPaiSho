@@ -3194,7 +3194,7 @@ export class PaiShoGameBoard {
 	}
 
 	getCopy() {
-		const copy = new PaiShoGameBoard(this.tileManager);
+		const copy = new PaiShoGameBoard(this.tileManager, this.abilityManager.abilityActivationOrder);
 
 		// Copy cells
 		copy.cells = [];
@@ -3205,21 +3205,76 @@ export class PaiShoGameBoard {
 			}
 		}
 
+		/* Relink cross-references that individual point copies can't resolve:
+		   deployPoint, gigantic-tile shared occupancy, and an id -> tile map
+		   used below to remap ability records onto the copy. */
+		const copyTilesById = {};
+		for (let row = 0; row < this.cells.length; row++) {
+			for (let col = 0; col < this.cells[row].length; col++) {
+				const origPoint = this.cells[row][col];
+				const copyPoint = copy.cells[row][col];
+
+				if (origPoint.occupiedByAbility && origPoint.pointOccupiedBy) {
+					/* Extra point occupied by a gigantic tile: share the main
+					   point's tile copy instead of a separate one */
+					copyPoint.occupiedByAbility = true;
+					copyPoint.pointOccupiedBy = copy.cells[origPoint.pointOccupiedBy.row][origPoint.pointOccupiedBy.col];
+					copyPoint.tile = copyPoint.pointOccupiedBy.tile;
+				}
+				if (origPoint.otherPointsOccupied && origPoint.otherPointsOccupied.length) {
+					copyPoint.otherPointsOccupied = origPoint.otherPointsOccupied.map(
+						(occupiedPoint) => copy.cells[occupiedPoint.row][occupiedPoint.col]
+					);
+				}
+
+				if (origPoint.hasTile() && copyPoint.hasTile()) {
+					copyTilesById[copyPoint.tile.id] = copyPoint.tile;
+					if (origPoint.tile.deployPoint) {
+						copyPoint.tile.deployPoint = copy.cells[origPoint.tile.deployPoint.row][origPoint.tile.deployPoint.col];
+					}
+				}
+			}
+		}
+
 		// Copy state flags
 		copy.hostBannerPlayed = this.hostBannerPlayed;
 		copy.guestBannerPlayed = this.guestBannerPlayed;
 		copy.winners = this.winners ? [...this.winners] : [];
 
-		// Copy recordedTilePoints (deep copy needed for nested structure)
+		// Copy recordedTilePoints, remapping recorded points to the copy's own points
 		copy.recordedTilePoints = {};
 		if (this.recordedTilePoints) {
 			for (const pointType of Object.keys(this.recordedTilePoints)) {
 				copy.recordedTilePoints[pointType] = {};
 				for (const tileKey of Object.keys(this.recordedTilePoints[pointType])) {
-					copy.recordedTilePoints[pointType][tileKey] = this.recordedTilePoints[pointType][tileKey];
+					const recordedPoint = this.recordedTilePoints[pointType][tileKey];
+					copy.recordedTilePoints[pointType][tileKey] = (recordedPoint && recordedPoint.row !== undefined)
+						? copy.cells[recordedPoint.row][recordedPoint.col]
+						: recordedPoint;
 				}
 			}
 		}
+
+		// Copy tiles awaiting resurrection (off-board, so not in the cells pass above)
+		copy.capturedTilesForResurrection = this.capturedTilesForResurrection.map((capturedTile) => {
+			const tileCopy = capturedTile.getCopy();
+			if (capturedTile.deployPoint) {
+				tileCopy.deployPoint = copy.cells[capturedTile.deployPoint.row][capturedTile.deployPoint.col];
+			}
+			return tileCopy;
+		});
+
+		/* Clone active ability records so ongoing effects (immobilize, protect from
+		   capture, movement/deploy restrictions) constrain the copy immediately —
+		   without this, simulated moves on a copy (e.g. AI evaluation) ignore all
+		   active abilities until the first processAbilities run. */
+		copy.abilityManager.abilities = [];
+		this.abilityManager.abilities.forEach((ability) => {
+			const clonedAbility = ability.cloneForBoardCopy(copy, copyTilesById);
+			if (clonedAbility) {
+				copy.abilityManager.abilities.push(clonedAbility);
+			}
+		});
 
 		return copy;
 	}

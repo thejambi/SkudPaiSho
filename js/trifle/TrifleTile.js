@@ -66,7 +66,18 @@ export class TrifleTile {
 	}
 
 	getCopy() {
-		return new TrifleTile(this.code, this.ownerCode);
+		const copy = new TrifleTile(this.code, this.ownerCode);
+		/* Keep the same id: copies must stay addressable by keys built from the
+		   original (ability records, recordedTilePoints, prompt target keys) */
+		copy.id = this.id;
+		copy.selectedFromPile = this.selectedFromPile;
+		copy.beingCaptured = this.beingCaptured;
+		copy.beingCapturedByAbility = this.beingCapturedByAbility;
+		copy.moveToPile = this.moveToPile;
+		copy.isGigantic = this.isGigantic;
+		/* seatedPoint and deployPoint reference board points; they are relinked
+		   by TrifleBoardPoint.getCopy / PaiShoGameBoard.getCopy */
+		return copy;
 	}
 
 	static getTileName(tileCode) {

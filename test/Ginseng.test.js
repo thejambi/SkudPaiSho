@@ -685,7 +685,7 @@ describe('Ginseng Tile Metadata', () => {
 // Board Point Type Tests
 // ============================================================================
 
-import { GATE, POSSIBLE_MOVE } from '../js/skud-pai-sho/SkudPaiShoBoardPoint';
+import { GATE, POSSIBLE_MOVE, WHITE } from '../js/skud-pai-sho/SkudPaiShoBoardPoint';
 import { RED, WHITE } from '../js/skud-pai-sho/SkudPaiShoTile';
 
 describe('Ginseng Board Point Types', () => {
@@ -2565,5 +2565,164 @@ describe('Ginseng - Regression Tests', () => {
 
 		// Should be an array with multiple entries
 		expect(activationOrder.length).toBeGreaterThan(1);
+	});
+});
+
+// ============================================================================
+// Board Copy Fidelity Tests (getCopy) - regression tests for AI simulation
+// ============================================================================
+
+describe('Ginseng Board Copy Fidelity (getCopy)', () => {
+	function createGame() {
+		const mockActuator = { actuate: vi.fn() };
+		return new GinsengGameManager(mockActuator, true, true);
+	}
+
+	it('should preserve tile ids and link seatedPoint to the copied points', () => {
+		const game = createGame();
+		const copy = game.getCopy();
+
+		let tilesChecked = 0;
+		for (let row = 0; row < game.board.cells.length; row++) {
+			for (let col = 0; col < game.board.cells[row].length; col++) {
+				const origPoint = game.board.cells[row][col];
+				const copyPoint = copy.board.cells[row][col];
+				if (origPoint.hasTile()) {
+					expect(copyPoint.hasTile()).toBe(true);
+					// Regression: copies used to mint brand-new tile ids
+					expect(copyPoint.tile.id).toBe(origPoint.tile.id);
+					// Regression: copies used to leave seatedPoint undefined
+					expect(copyPoint.tile.seatedPoint).toBe(copyPoint);
+					// Copy must not alias the original tile object
+					expect(copyPoint.tile).not.toBe(origPoint.tile);
+					tilesChecked++;
+				}
+			}
+		}
+		expect(tilesChecked).toBeGreaterThan(0);
+	});
+
+	it('should clone active ability records onto the copy', () => {
+		const game = createGame();
+
+		// At game start the White Lotus temple protection (and other ongoing
+		// abilities) are active on the original board
+		const originalAbilities = game.board.abilityManager.abilities;
+		expect(originalAbilities.length).toBeGreaterThan(0);
+
+		const copy = game.getCopy();
+		const copiedAbilities = copy.board.abilityManager.abilities;
+
+		// Regression: copies used to start with an empty ability manager
+		expect(copiedAbilities.length).toBe(originalAbilities.length);
+
+		copiedAbilities.forEach((ability) => {
+			// Cloned records must reference the copy's objects, not the original's
+			expect(ability.board).toBe(copy.board);
+			const seat = ability.sourceTile.seatedPoint;
+			expect(copy.board.cells[seat.row][seat.col].tile).toBe(ability.sourceTile);
+		});
+	});
+
+	it('should apply capture protection on the copy just like the original', () => {
+		const game = createGame();
+		const copy = game.getCopy();
+
+		const origLotusTile = game.board.getTilePoints(GinsengTileCodes.WhiteLotus, GUEST)[0].tile;
+		const copyLotusTile = copy.board.getTilePoints(GinsengTileCodes.WhiteLotus, GUEST)[0].tile;
+
+		const origProtected = game.board.abilityManager.abilityTargetingTileExists(
+			TrifleAbilityName.protectFromCapture, origLotusTile);
+		const copyProtected = copy.board.abilityManager.abilityTargetingTileExists(
+			TrifleAbilityName.protectFromCapture, copyLotusTile);
+
+		// Lotus starts in a temple, so it is protected on the original board
+		expect(origProtected).toBe(true);
+		// Regression: the copy used to have no ability state, so this was false
+		expect(copyProtected).toBe(copyProtected && origProtected);
+		expect(copyProtected).toBe(true);
+	});
+
+	it('should immobilize tiles on the copy when trapped by Koi on the original', () => {
+		const game = createGame();
+		const board = game.board;
+
+		// The Koi trap only arms while the Koi is on a WHITE garden point,
+		// so relocate the Koi onto an empty white point first
+		const koiTile = board.getTilePoints(GinsengTileCodes.Koi, GUEST)[0].tile;
+		let whitePoint;
+		board.forEachBoardPoint((point) => {
+			if (!whitePoint && point.isType(WHITE) && !point.hasTile()
+					&& board.getSurroundingBoardPoints(point).some((p) => !p.hasTile())) {
+				whitePoint = point;
+			}
+		});
+		expect(whitePoint).toBeDefined();
+		board.relocateTile(koiTile, whitePoint);
+
+		// Set up the trap: relocate a Host Bison to a point surrounding the Koi
+		const koiPoint = whitePoint;
+		const bisonPoint = board.getTilePoints(GinsengTileCodes.Bison, HOST)[0];
+		const bisonTile = bisonPoint.tile;
+
+		const emptySurroundingPoint = board.getSurroundingBoardPoints(koiPoint)
+			.find((p) => !p.hasTile());
+		expect(emptySurroundingPoint).toBeDefined();
+		board.relocateTile(bisonTile, emptySurroundingPoint);
+
+		// Process abilities as if the Bison had just moved there
+		board.processAbilities(bisonTile, GinsengTiles[bisonTile.code],
+			bisonPoint, emptySurroundingPoint, [], [], {});
+
+		const origImmobilized = board.abilityManager.abilityTargetingTileExists(
+			TrifleAbilityName.immobilizeTiles, bisonTile);
+		expect(origImmobilized).toBe(true);
+
+		// The copy must carry the immobilization without re-running processAbilities
+		const copy = game.getCopy();
+		const copyBisonTile = copy.board.cells[emptySurroundingPoint.row][emptySurroundingPoint.col].tile;
+		expect(copyBisonTile.id).toBe(bisonTile.id);
+
+		const copyImmobilized = copy.board.abilityManager.abilityTargetingTileExists(
+			TrifleAbilityName.immobilizeTiles, copyBisonTile);
+		expect(copyImmobilized).toBe(true);
+
+		// And the copy must generate zero legal moves for the trapped tile
+		copy.board.removePossibleMovePoints();
+		copy.board.setPossibleMovePoints(copy.board.cells[emptySurroundingPoint.row][emptySurroundingPoint.col]);
+		const copyMoves = [];
+		copy.board.forEachBoardPoint((point) => {
+			if (point.isType(POSSIBLE_MOVE)) {
+				copyMoves.push(point);
+			}
+		});
+		expect(copyMoves.length).toBe(0);
+	});
+
+	it('should remap recordedTilePoints to the copied board points', () => {
+		const game = createGame();
+		const board = game.board;
+
+		const koiPoint = board.getTilePoints(GinsengTileCodes.Koi, GUEST)[0];
+		board.recordTilePoint(koiPoint, 'testPointType');
+
+		const copy = game.getCopy();
+		const tileKey = koiPoint.tile.getOwnerCodeIdObjectString();
+		const copiedRecordedPoint = copy.board.recordedTilePoints['testPointType'][tileKey];
+
+		// Regression: recorded points used to alias the original board's points
+		expect(copiedRecordedPoint).toBe(copy.board.cells[koiPoint.row][koiPoint.col]);
+		expect(copiedRecordedPoint).not.toBe(koiPoint);
+	});
+
+	it('should preserve the custom ability activation order on the copy', () => {
+		const game = createGame();
+		expect(game.board.abilityManager.abilityActivationOrder).toBeDefined();
+
+		const copy = game.getCopy();
+
+		// Regression: the copy used to fall back to the default activation order
+		expect(copy.board.abilityManager.abilityActivationOrder)
+			.toEqual(game.board.abilityManager.abilityActivationOrder);
 	});
 });
