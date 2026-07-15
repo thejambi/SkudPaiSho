@@ -7,7 +7,7 @@ import {
   HOST,
   MOVE,
 } from '../CommonNotationObjects';
-import { VagabondTrifleTileCodes } from './VagabondTrifleTiles';
+import { VagabondTrifleTileCodes, VagabondTrifleTiles } from './VagabondTrifleTiles';
 import { VagabondTrifleTileManager } from './VagabondTrifleTileManager';
 import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
 import { TrifleAbilityName } from '../trifle/TrifleTileInfo';
@@ -39,7 +39,7 @@ VagabondTrifleGameManager.prototype.updateActuator = function(newActuator) {
 
 // Set up the game
 VagabondTrifleGameManager.prototype.setup = function(ignoreActuate) {
-	this.board = new PaiShoGameBoard(this.tileManager, this.buildAbilityActivationOrder());
+	this.board = new PaiShoGameBoard(this.tileManager, this.buildAbilityActivationOrder(), VagabondTrifleTiles);
 	this.board.useBannerCaptureSystem = false; // Vagabond uses Lotus capture, not Banner
 	this.winners = [];
 

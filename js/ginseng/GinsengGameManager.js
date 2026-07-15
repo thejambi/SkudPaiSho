@@ -15,7 +15,7 @@ import {
   SWAP_BISON_AND_DRAGON,
   gameOptionEnabled,
 } from '../GameOptions';
-import { GinsengTileCodes } from './GinsengTiles';
+import { GinsengTileCodes, GinsengTiles } from './GinsengTiles';
 import { GinsengTileManager } from './GinsengTileManager';
 import { PaiShoMarkingManager } from '../pai-sho-common/PaiShoMarkingManager';
 import { TrifleAbilityName } from '../trifle/TrifleTileInfo';
@@ -48,7 +48,7 @@ GinsengGameManager.prototype.updateActuator = function(newActuator) {
 
 // Set up the game
 GinsengGameManager.prototype.setup = function (ignoreActuate) {
-	this.board = new PaiShoGameBoard(this.tileManager, this.buildAbilityActivationOrder());
+	this.board = new PaiShoGameBoard(this.tileManager, this.buildAbilityActivationOrder(), GinsengTiles);
 	this.board.useBannerCaptureSystem = false;
 	this.winners = [];
 	this.hostBannerPlayed = false;

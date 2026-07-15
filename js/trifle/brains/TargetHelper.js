@@ -1,11 +1,10 @@
 import { TrifleTileCategory, TrifleTileTeam } from '../TrifleTileInfo';
 import { arrayIncludesOneOf, debug } from '../../GameData';
-import { currentTileMetadata } from '../PaiShoGamesTileMetadata';
 
 export function TrifleTargetHelper(abilityObject, possibleTargetTilePoint, targetBrain, possibleTargetTile) {
 	this.abilityObject = abilityObject;
 	this.abilityInfo = abilityObject.abilityInfo;
-	this.tileMetadata = currentTileMetadata;
+	this.tileMetadata = abilityObject.board.tileMetadata;
 
 	this.possibleTargetTilePoint = possibleTargetTilePoint;
 

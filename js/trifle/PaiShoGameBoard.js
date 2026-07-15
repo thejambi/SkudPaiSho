@@ -43,7 +43,7 @@ import { TrifleBrainFactory } from './brains/BrainFactory';
 import { TrifleTriggerHelper } from './brains/TriggerHelper';
 
 export class PaiShoGameBoard {
-	constructor(tileManager, customAbilityActivationOrder) {
+	constructor(tileManager, customAbilityActivationOrder, tileMetadata) {
 		this.size = new RowAndColumn(17, 17);
 		this.cells = this.brandNew();
 
@@ -51,7 +51,9 @@ export class PaiShoGameBoard {
 		this.hostBannerPlayed = false;
 		this.guestBannerPlayed = false;
 
-		this.tileMetadata = currentTileMetadata;
+		/* Game managers pass their game's tile metadata explicitly; the global
+		   currentTileMetadata fallback exists only for legacy construction paths */
+		this.tileMetadata = tileMetadata || currentTileMetadata;
 
 		this.activeDurationAbilities = [];
 		this.recordedTilePoints = {};
@@ -3194,7 +3196,7 @@ export class PaiShoGameBoard {
 	}
 
 	getCopy() {
-		const copy = new PaiShoGameBoard(this.tileManager, this.abilityManager.abilityActivationOrder);
+		const copy = new PaiShoGameBoard(this.tileManager, this.abilityManager.abilityActivationOrder, this.tileMetadata);
 
 		// Copy cells
 		copy.cells = [];

@@ -22,7 +22,7 @@ import { PaiShoGameBoard } from '../trifle/PaiShoGameBoard';
 import { TrifleTile } from '../trifle/TrifleTile';
 import { TrifleAbilityName, TrifleDeployType } from '../trifle/TrifleTileInfo';
 import { GiniTileManager } from './GiniTileManager';
-import { GiniTileCodes } from './GiniTiles';
+import { GiniTileCodes, GiniTiles } from './GiniTiles';
 
 export var ACCENT_TILE_HOME = "AccentTileHome";
 export var PORTAL = "Portal";
@@ -58,7 +58,7 @@ GiniGameManager.prototype.updateActuator = function(newActuator) {
 
 // Set up the game
 GiniGameManager.prototype.setup = function(ignoreActuate) {
-	this.board = new PaiShoGameBoard(this.tileManager, this.buildAbilityActivationOrder());
+	this.board = new PaiShoGameBoard(this.tileManager, this.buildAbilityActivationOrder(), GiniTiles);
 	this.board.useBannerCaptureSystem = false;
 	this.winners = [];
 

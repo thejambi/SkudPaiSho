@@ -18,7 +18,7 @@ import {
 	getPlayerCodeFromName,
 } from '../pai-sho-common/PaiShoPlayerHelp';
 import { NickTileManager } from './NickTileManager';
-import { NickTileCodes } from './NickTiles';
+import { NickTileCodes, NickTiles } from './NickTiles';
 import { NickActuator } from './NickActuator';
 import { POSSIBLE_MOVE } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { PaiShoGameBoard } from '../trifle/PaiShoGameBoard';
@@ -44,7 +44,7 @@ export class NickGameManager {
 
 	// Set up the game
 	setup(ignoreActuate) {
-		this.board = new PaiShoGameBoard(this.tileManager, this.buildAbilityActivationOrder());
+		this.board = new PaiShoGameBoard(this.tileManager, this.buildAbilityActivationOrder(), NickTiles);
 		this.board.useBannerCaptureSystem = false;
 		this.winners = [];
 		this.hostBannerPlayed = false;

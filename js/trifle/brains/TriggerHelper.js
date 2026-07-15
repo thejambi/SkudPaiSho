@@ -1,6 +1,5 @@
 import { TrifleTileCategory, TrifleTileTeam } from '../TrifleTileInfo';
 import { arrayIncludesOneOf, debug } from '../../GameData';
-import { currentTileMetadata } from '../PaiShoGamesTileMetadata';
 
 export function TrifleTriggerHelper(triggerContext, possibleTargetTilePoint, possibleTargetTile) {
 	this.triggerContext = triggerContext;
@@ -9,7 +8,7 @@ export function TrifleTriggerHelper(triggerContext, possibleTargetTilePoint, pos
 	} else if (possibleTargetTilePoint) {
 		this.possibleTargetTile = possibleTargetTilePoint.tile;
 	}
-	this.possibleTargetTileInfo = this.possibleTargetTile && currentTileMetadata[this.possibleTargetTile.code];
+	this.possibleTargetTileInfo = this.possibleTargetTile && triggerContext.board.tileMetadata[this.possibleTargetTile.code];
 	this.abilityInfo = this.triggerContext.tileAbilityInfo;
 	this.triggerInfo = this.triggerContext.currentTrigger;
 }

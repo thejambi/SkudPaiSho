@@ -1359,3 +1359,39 @@ describe('Gini Game Log', () => {
 		expect(game.gameLogText).toContain('Ginseng');
 	});
 });
+
+// ─── Tile Metadata Isolation Tests (injected metadata, not the global) ───
+
+describe('Gini Board Metadata Isolation', () => {
+	it('should keep working when the global tile metadata is switched to another game', () => {
+		const game = createGame();
+
+		// Simulate another game's controller taking over the global singleton
+		setCurrentTileMetadata({ SomeOtherGameTile: { types: [] } });
+		try {
+			// Regression: the board used to read the module-level currentTileMetadata,
+			// so switching games corrupted any live board's tile info
+			expect(game.board.tileMetadata[GiniTileCodes.WhiteLotus]).toBeDefined();
+
+			// Move generation must still work off the injected metadata
+			// (Host Ginseng at 4,0 has moves at game start; the Lotus does not)
+			const ginsengRc = new NotationPoint('4,0').rowAndColumn;
+			const ginsengPoint = game.board.cells[ginsengRc.row][ginsengRc.col];
+			game.board.removePossibleMovePoints();
+			game.board.setPossibleMovePoints(ginsengPoint);
+			const moves = [];
+			game.board.forEachBoardPoint((point) => {
+				if (point.isType(POSSIBLE_MOVE)) {
+					moves.push(point);
+				}
+			});
+			expect(moves.length).toBeGreaterThan(0);
+
+			// Copies inherit the injected metadata too
+			const copy = game.getCopy();
+			expect(copy.board.tileMetadata).toBe(game.board.tileMetadata);
+		} finally {
+			setCurrentTileMetadata(GiniTiles);
+		}
+	});
+});

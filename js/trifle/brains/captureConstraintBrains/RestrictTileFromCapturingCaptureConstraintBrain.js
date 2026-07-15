@@ -1,5 +1,4 @@
 import { arrayIncludesOneOf } from '../../../GameData';
-import { currentTileMetadata } from '../../PaiShoGamesTileMetadata';
 
 /**
  * RestrictTileFromCapturingCaptureConstraintBrain
@@ -27,7 +26,7 @@ export function TrifleRestrictTileFromCapturingCaptureConstraintBrain(board, abi
  * @returns {Object} { allowed: boolean, reason?: string }
  */
 TrifleRestrictTileFromCapturingCaptureConstraintBrain.prototype.isCaptureAllowed = function(capturingTile, targetTile, fromPoint, targetPoint) {
-	var targetTileInfo = currentTileMetadata[targetTile.code];
+	var targetTileInfo = this.board.tileMetadata[targetTile.code];
 
 	if (!targetTileInfo || !targetTileInfo.types) {
 		return { allowed: true };

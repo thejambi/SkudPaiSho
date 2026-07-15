@@ -5,8 +5,7 @@ import { setGameLogText } from "../GameState";
 import { PaiShoGameBoard } from "./PaiShoGameBoard";
 import TrifleTileManager from "./TrifleTileManager";
 import { debug } from "../GameData";
-import { currentTileMetadata } from "./PaiShoGamesTileMetadata";
-import { TrifleTileInfo } from "./TrifleTileInfo";
+import { TrifleTileInfo, TrifleTiles } from "./TrifleTileInfo";
 import { DEPLOY, DRAW_ACCEPT, HOST, MOVE, NotationPoint, TEAM_SELECTION } from "../CommonNotationObjects";
 import { TrifleTile } from "./TrifleTile";
 import { getOpponentName, getPlayerCodeFromName } from "../pai-sho-common/PaiShoPlayerHelp";
@@ -27,7 +26,7 @@ export class TrifleGameManager {
 
 	// Set up the game
 	setup(ignoreActuate) {
-		this.board = new PaiShoGameBoard(this.tileManager);
+		this.board = new PaiShoGameBoard(this.tileManager, undefined, TrifleTiles);
 		this.board.useTrifleTempleRules = true;
 		this.winners = [];
 		this.hostBannerPlayed = false;
@@ -74,7 +73,7 @@ export class TrifleGameManager {
 			this.buildDeployGameLogText(move, tile);
 
 			/* Banner played? Could use this in future, currently in Board. */
-			if (TrifleTileInfo.tileIsBanner(currentTileMetadata[tile.code])) {
+			if (TrifleTileInfo.tileIsBanner(this.board.tileMetadata[tile.code])) {
 				if (tile.ownerName === HOST) {
 					this.hostBannerPlayed = true;
 				} else {
@@ -121,7 +120,7 @@ export class TrifleGameManager {
 			// If tile is capturing a Banner tile, there's a winner
 			if (moveDetails.capturedTiles && moveDetails.capturedTiles.length) {
 				moveDetails.capturedTiles.forEach((capturedTile) => {
-					if (capturedTile && TrifleTileInfo.tileIsBanner(currentTileMetadata[capturedTile.code])) {
+					if (capturedTile && TrifleTileInfo.tileIsBanner(this.board.tileMetadata[capturedTile.code])) {
 						this.winners.push(getOpponentName(capturedTile.ownerName));
 					}
 				});
