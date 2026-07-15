@@ -27,9 +27,11 @@ export function TrifleWhenAdjacentFriendlyTileIsCapturedTriggerBrain(triggerCont
 }
 
 TrifleWhenAdjacentFriendlyTileIsCapturedTriggerBrain.prototype.setAction = function() {
+	/* Identify the capture event by the captured tile ids (see
+	   WhenCapturedByTargetTileTriggerBrain.setAction) */
 	this.triggeringAction = {
 		actionType: "CaptureRetaliation",
-		tileId: this.thisTile.tileId
+		capturedTileIds: (this.capturedTiles || []).map((tile) => tile.id).sort((a, b) => a - b)
 	};
 };
 

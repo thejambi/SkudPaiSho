@@ -24,9 +24,12 @@ export function TrifleWhenCapturedByTargetTileTriggerBrain(triggerContext) {
 }
 
 TrifleWhenCapturedByTargetTileTriggerBrain.prototype.setAction = function() {
+	/* Identify the capture event: the set of tiles captured by the current action.
+	   Abilities whose triggers share a capture event co-activate even if an earlier
+	   activation changed the board (see getReadyAbilitiesWithTriggeringActions). */
 	this.triggeringAction = {
-		actionType: "Capture",	// TODO clean up!
-		tileId: this.thisTile.tileId
+		actionType: "Capture",
+		capturedTileIds: (this.capturedTiles || []).map((tile) => tile.id).sort((a, b) => a - b)
 	};
 };
 

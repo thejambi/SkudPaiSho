@@ -73,6 +73,7 @@ export class TrifleAbilityManager {
 		let boardHasChanged = false;
 		const tileRecords = {
 			capturedTiles: [],
+			capturedTilePoints: [],	// Parallel to capturedTiles: where each capture happened
 			tilesMovedToPiles: []
 		};
 		const abilitiesActivated = [];
@@ -128,26 +129,31 @@ export class TrifleAbilityManager {
 
 		/* Activate abilities! */
 
-		// Priority abilities first
-		let currentPriority = 1;
-		let priorityAbilityFound = true;
-		while (priorityAbilityFound) {
-			priorityAbilityFound = false;
+		// Priority abilities first, in ascending priority level.
+		// Collect the distinct levels present so gaps (e.g. priorities 1 and 3 with
+		// no 2) don't end the scan early.
+		const priorityLevels = new Set();
+		Object.values(this.readyAbilities).forEach(abilityList => {
+			abilityList.forEach(ability => {
+				if (ability.abilityInfo.priority) {
+					priorityLevels.add(ability.abilityInfo.priority);
+				}
+			});
+		});
 
+		Array.from(priorityLevels).sort((a, b) => a - b).every(currentPriority => {
 			Object.values(this.readyAbilities).every(abilityList => {
 				abilityList.every(ability => {
 					if (ability.isPriority(currentPriority)) {
-						priorityAbilityFound = true;
 						debug("!!!!Priority " + currentPriority + " Ability!!!! " + ability.getTitle());
 						boardHasChanged = this.doTheActivateThing(ability, tileRecords, abilitiesActivated, allAnimations);
-						return !boardHasChanged;	// Continue if board has not changed
 					}
+					return !boardHasChanged;	// Continue if board has not changed
 				});
 				return !boardHasChanged;	// Continue if board has not changed
 			});
-
-			currentPriority++;
-		}
+			return !boardHasChanged;	// Continue if board has not changed
+		});
 
 		if (!boardHasChanged) {
 			// Default ability activation order
@@ -241,6 +247,12 @@ export class TrifleAbilityManager {
 						&& ability.abilityActivatedResults.capturedTiles.length) {
 					ability.abilityActivatedResults.capturedTiles.forEach((capturedTile) => {
 						capturedTiles.push(capturedTile);
+						/* Keep capturedTilePoints parallel to capturedTiles. A captured
+						   tile's seatedPoint still references where it sat when captured
+						   (captureTileOnPoint does not clear it). */
+						if (tileRecords.capturedTilePoints) {
+							tileRecords.capturedTilePoints.push(capturedTile.seatedPoint || null);
+						}
 					});
 				}
 

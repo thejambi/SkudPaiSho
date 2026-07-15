@@ -1469,7 +1469,7 @@ export class PaiShoGameBoard {
 		   The current activation flags are passed forward to prevent instant abilities from
 		   firing twice. Captured tiles from the cascade are merged into the result. */
 		if (abilityActivationFlags.boardHasChanged) {
-			var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.tileRecords.capturedTiles, [], currentMoveInfo, abilityActivationFlags);
+			var nextAbilityActivationFlags = this.processAbilities(tileMovedOrPlaced, tileMovedOrPlacedInfo, boardPointStart, boardPointEnd, abilityActivationFlags.tileRecords.capturedTiles, abilityActivationFlags.tileRecords.capturedTilePoints || [], currentMoveInfo, abilityActivationFlags);
 			if (nextAbilityActivationFlags.tileRecords.capturedTiles && nextAbilityActivationFlags.tileRecords.capturedTiles.length) {
 				if (!abilityActivationFlags.tileRecords.capturedTiles) {
 					abilityActivationFlags.tileRecords.capturedTiles = [];

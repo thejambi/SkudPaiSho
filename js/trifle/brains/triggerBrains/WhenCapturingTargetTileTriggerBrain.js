@@ -23,9 +23,12 @@ export function TrifleWhenCapturingTargetTileTriggerBrain(triggerContext) {
 }
 
 TrifleWhenCapturingTargetTileTriggerBrain.prototype.setAction = function() {
+	/* Identify the capture event by the captured tile ids (see
+	   WhenCapturedByTargetTileTriggerBrain.setAction) */
+	const capturedTiles = this.triggerContext.lastTurnAction.capturedTiles || [];
 	this.triggeringAction = {
-		actionType: "Capture",	// TODO clean up!
-		tileId: this.possibleTargetTile && this.possibleTargetTile.tileId
+		actionType: "Capture",
+		capturedTileIds: capturedTiles.map((tile) => tile.id).sort((a, b) => a - b)
 	};
 };
 
