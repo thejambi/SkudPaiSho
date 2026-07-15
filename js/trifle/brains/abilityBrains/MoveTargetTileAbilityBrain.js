@@ -79,8 +79,6 @@ TrifleMoveTargetTileAbilityBrain.prototype.promptForTarget = function(nextNeeded
 		}
 	} else if (nextNeededPromptTargetInfo.promptId === TrifleTargetPromptId.movedTileDestinationPoint
 			&& !checkForTargetsOnly) {
-		// this.abilityObject.board.promptForBoardPointInAVeryHackyWay();
-
 		var movedTilePoint = this.abilityObject.promptTargetInfo[sourceTileKeyStr][TrifleTargetPromptId.movedTilePoint];
 
 		if (this.abilityObject.abilityInfo.targetTileMovements) {

@@ -3488,7 +3488,7 @@ describe('Capture Constraint Brains', () => {
 				sourceTile: { code: 'TEST' }
 			};
 
-			const brain = TrifleBrainFactory.createCaptureConstraintBrain(
+			const brain = TrifleBrainFactory.createConstraintBrain(
 				TrifleAbilityName.prohibitTileFromCapturing,
 				gameManager.board,
 				mockAbility
@@ -3504,7 +3504,7 @@ describe('Capture Constraint Brains', () => {
 				sourceTile: { code: 'TEST' }
 			};
 
-			const brain = TrifleBrainFactory.createCaptureConstraintBrain(
+			const brain = TrifleBrainFactory.createConstraintBrain(
 				TrifleAbilityName.protectFromCapture,
 				gameManager.board,
 				mockAbility
@@ -3515,7 +3515,7 @@ describe('Capture Constraint Brains', () => {
 		});
 
 		it('should return null for unknown capture constraint types', () => {
-			const brain = TrifleBrainFactory.createCaptureConstraintBrain(
+			const brain = TrifleBrainFactory.createConstraintBrain(
 				'nonExistentAbility',
 				gameManager.board,
 				{}

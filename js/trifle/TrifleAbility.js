@@ -48,12 +48,6 @@ export class TrifleAbility {
 		return hasPromptInfo;
 	}
 
-	worthy() {
-		return !this.abilityInfo.neededPromptTargetsInfo
-			|| (this.abilityInfo.neededPromptTargetsInfo
-			&& this.promptTargetsExist());
-	}
-
 	promptTargetInfoPresent(neededPromptTargetInfo) {
 		const sourceTileKey = JSON.stringify(TrifleAbilityManager.buildSourceTileKeyObject(this.sourceTile));
 
@@ -67,26 +61,6 @@ export class TrifleAbility {
 			&& this.promptTargetInfo[sourceTileKey]
 			&& (this.promptTargetInfo[sourceTileKey].skipped
 				|| this.promptTargetInfo[sourceTileKey][neededPromptTargetInfo.promptId]);
-	}
-
-	promptTargetsExist() {
-		let promptTargetsExist = false;
-
-		const neededPromptInfo = {};
-
-		neededPromptInfo.abilitySourceTile = this.sourceTile;
-		neededPromptInfo.sourceAbility = this;
-		neededPromptInfo.sourceTileKey = TrifleAbilityManager.buildSourceTileKeyObject(this.sourceTile);
-		const sourceTileKeyStr = JSON.stringify(neededPromptInfo.sourceTileKey);
-
-		const nextNeededPromptTargetInfo = this.abilityInfo.neededPromptTargetsInfo[0];
-
-		if (nextNeededPromptTargetInfo) {
-			const abilityBrain = TrifleBrainFactory.createAbilityBrain(this.abilityType, this);
-			promptTargetsExist = abilityBrain.promptForTarget(nextNeededPromptTargetInfo, sourceTileKeyStr, true);
-		}
-
-		return promptTargetsExist;
 	}
 
 	setAbilityTargetTiles() {

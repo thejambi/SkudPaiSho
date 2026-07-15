@@ -249,10 +249,4 @@ TrifleBrainFactory.createConstraintBrain = function(abilityName, board, ability)
 	return null;
 };
 
-/**
- * @deprecated Use createConstraintBrain instead - kept for backwards compatibility
- */
-TrifleBrainFactory.createCaptureConstraintBrain = function(abilityName, board, ability) {
-	return TrifleBrainFactory.createConstraintBrain(abilityName, board, ability);
-};
 

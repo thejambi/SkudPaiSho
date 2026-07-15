@@ -146,7 +146,7 @@ export class TrifleAbilityManager {
 				abilityList.every(ability => {
 					if (ability.isPriority(currentPriority)) {
 						debug("!!!!Priority " + currentPriority + " Ability!!!! " + ability.getTitle());
-						boardHasChanged = this.doTheActivateThing(ability, tileRecords, abilitiesActivated, allAnimations);
+						boardHasChanged = this.activateAbilityAndCascade(ability, tileRecords, abilitiesActivated, allAnimations);
 					}
 					return !boardHasChanged;	// Continue if board has not changed
 				});
@@ -176,7 +176,7 @@ export class TrifleAbilityManager {
 				const readyAbilitiesOfType = this.readyAbilities[abilityName];
 				if (readyAbilitiesOfType && readyAbilitiesOfType.length) {
 					readyAbilitiesOfType.every(ability => {
-						boardHasChanged = this.doTheActivateThing(ability, tileRecords, abilitiesActivated, allAnimations);
+						boardHasChanged = this.activateAbilityAndCascade(ability, tileRecords, abilitiesActivated, allAnimations);
 						return !boardHasChanged;	// Continue if board has not changed
 					});
 				}
@@ -186,7 +186,7 @@ export class TrifleAbilityManager {
 			if (!boardHasChanged) {
 				Object.values(this.readyAbilities).every(abilityList => {
 					abilityList.every(ability => {
-						boardHasChanged = this.doTheActivateThing(ability, tileRecords, abilitiesActivated, allAnimations);
+						boardHasChanged = this.activateAbilityAndCascade(ability, tileRecords, abilitiesActivated, allAnimations);
 						return !boardHasChanged;	// Continue if board has not changed
 					});
 					return !boardHasChanged;	// Continue if board has not changed
@@ -202,7 +202,7 @@ export class TrifleAbilityManager {
 		};
 	}
 
-	doTheActivateThing(ability, tileRecords, abilitiesActivated, allAnimations, cascadeDepth = 0, visitedAbilityKeys = null) {
+	activateAbilityAndCascade(ability, tileRecords, abilitiesActivated, allAnimations, cascadeDepth = 0, visitedAbilityKeys = null) {
 		const capturedTiles = tileRecords.capturedTiles;
 		const tilesMovedToPiles = tileRecords.tilesMovedToPiles;
 
@@ -278,7 +278,7 @@ export class TrifleAbilityManager {
 			// Now activate abilities triggered by same event
 			if (abilitiesTriggeredBySameAction && abilitiesTriggeredBySameAction.length > 0) {
 				abilitiesTriggeredBySameAction.forEach(otherAbility => {
-					this.doTheActivateThing(otherAbility, tileRecords, abilitiesActivated, allAnimations, cascadeDepth + 1, visitedAbilityKeys);
+					this.activateAbilityAndCascade(otherAbility, tileRecords, abilitiesActivated, allAnimations, cascadeDepth + 1, visitedAbilityKeys);
 				});
 			}
 
