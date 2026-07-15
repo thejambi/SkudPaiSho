@@ -18,6 +18,7 @@ import {
 } from '../skud-pai-sho/SkudPaiShoBoardPoint';
 import { RED, WHITE } from '../skud-pai-sho/SkudPaiShoTile';
 import { currentTileMetadata } from './PaiShoGamesTileMetadata';
+import { validateTileMetadataOnce } from './TrifleTileMetadataValidator';
 import { TrifleAbility } from './TrifleAbility';
 import { TrifleAbilityManager } from './TrifleAbilityManager';
 import { TEMPLE, TrifleBoardPoint } from './TrifleBoardPoint';
@@ -54,6 +55,7 @@ export class PaiShoGameBoard {
 		/* Game managers pass their game's tile metadata explicitly; the global
 		   currentTileMetadata fallback exists only for legacy construction paths */
 		this.tileMetadata = tileMetadata || currentTileMetadata;
+		validateTileMetadataOnce(this.tileMetadata);
 
 		this.activeDurationAbilities = [];
 		this.recordedTilePoints = {};

@@ -119,7 +119,11 @@ export const TrifleSpawnLocation = {
 };
 
 export const TrifleAttributeType = {
-	gigantic: "gigantic"
+	gigantic: "gigantic",
+	/* Was referenced by tile configs but missing from this enum, so those configs
+	   held literal undefined and tileCanBeCapturedByFriendlyTiles only matched by
+	   the accident of undefined === undefined */
+	canBeCapturedByFriendlyTiles: "canBeCapturedByFriendlyTiles"
 }
 
 export const TrifleAbilityName = {

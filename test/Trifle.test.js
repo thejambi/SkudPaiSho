@@ -2103,30 +2103,28 @@ describe('Fixed TODO Tiles - Definition and Abilities', () => {
 			expect(tileInfo.movements[0].captureTypes).toContain(TrifleCaptureType.all);
 		});
 
+		function findRetaliationAbility() {
+			const tileInfo = TrifleTiles[TrifleTileCodes.SnowWolf];
+			return tileInfo.abilities.find(
+				a => a.type === TrifleAbilityName.captureTargetTiles
+					&& a.triggers && a.triggers.some(
+						t => t.triggerType === TrifleAbilityTriggerType.whenAdjacentFriendlyTileIsCaptured
+					)
+			);
+		}
+
 		it('should have retaliation ability when adjacent friendly tile is captured', () => {
 			const tileInfo = TrifleTiles[TrifleTileCodes.SnowWolf];
 			expect(tileInfo.abilities).toBeDefined();
-			const retaliationAbility = tileInfo.abilities.find(
-				a => a.type === TrifleAbilityName.captureTargetTiles &&
-					a.triggerType === TrifleAbilityTriggerType.whenAdjacentFriendlyTileIsCaptured
-			);
-			expect(retaliationAbility).toBeDefined();
+			expect(findRetaliationAbility()).toBeDefined();
 		});
 
 		it('should move to captured enemy position after retaliation', () => {
-			const tileInfo = TrifleTiles[TrifleTileCodes.SnowWolf];
-			const retaliationAbility = tileInfo.abilities.find(
-				a => a.triggerType === TrifleAbilityTriggerType.whenAdjacentFriendlyTileIsCaptured
-			);
-			expect(retaliationAbility.moveSourceToTargetPosition).toBe(true);
+			expect(findRetaliationAbility().moveSourceToTargetPosition).toBe(true);
 		});
 
 		it('should capture regardless of protection', () => {
-			const tileInfo = TrifleTiles[TrifleTileCodes.SnowWolf];
-			const retaliationAbility = tileInfo.abilities.find(
-				a => a.triggerType === TrifleAbilityTriggerType.whenAdjacentFriendlyTileIsCaptured
-			);
-			expect(retaliationAbility.regardlessOfCaptureProtection).toBe(true);
+			expect(findRetaliationAbility().regardlessOfCaptureProtection).toBe(true);
 		});
 	});
 
@@ -3202,5 +3200,75 @@ describe('Stale abilityTargetTiles - immobilize refresh after cancel removed', (
 				TrifleAbilityName.immobilizeTiles, hermitCrabTile
 			)
 		).toBe(true);
+	});
+});
+
+describe('Snow Wolf - Avenge Fallen Ally', () => {
+	it('should capture the enemy that captures an adjacent friendly tile and take its place', () => {
+		const mockActuator = { actuate: vi.fn() };
+		const gameManager = new TrifleGameManager(mockActuator, true, true);
+
+		addTilesToTeam(gameManager, HOST, [
+			TrifleTileCodes.WaterBanner,
+			TrifleTileCodes.SnowWolf,
+			TrifleTileCodes.Firefly
+		]);
+		addTilesToTeam(gameManager, GUEST, [
+			TrifleTileCodes.AirBanner,
+			TrifleTileCodes.PolarBearDog
+		]);
+
+		// Both banners must be on the board before non-Flower captures are legal
+		// (Capture Restriction Game Rule)
+		gameManager.runNotationMove({
+			moveType: DEPLOY, player: HOST,
+			tileType: TrifleTileCodes.WaterBanner,
+			endPoint: new NotationPoint('-6,0')
+		}, false);
+		gameManager.runNotationMove({
+			moveType: DEPLOY, player: GUEST,
+			tileType: TrifleTileCodes.AirBanner,
+			endPoint: new NotationPoint('6,0')
+		}, false);
+
+		// Host Snow Wolf at (1,4), Host Firefly (the victim) adjacent at (0,4)
+		gameManager.runNotationMove({
+			moveType: DEPLOY, player: HOST,
+			tileType: TrifleTileCodes.SnowWolf,
+			endPoint: new NotationPoint('1,4')
+		}, false);
+		gameManager.runNotationMove({
+			moveType: DEPLOY, player: GUEST,
+			tileType: TrifleTileCodes.PolarBearDog,
+			endPoint: new NotationPoint('0,0')
+		}, false);
+		gameManager.runNotationMove({
+			moveType: DEPLOY, player: HOST,
+			tileType: TrifleTileCodes.Firefly,
+			endPoint: new NotationPoint('0,4')
+		}, false);
+
+		const snowWolfTile = gameManager.board.getTilePoints(TrifleTileCodes.SnowWolf, HOST)[0].tile;
+
+		// Guest Polar Bear Dog captures the Firefly next to the Snow Wolf
+		gameManager.runNotationMove({
+			moveType: MOVE, player: GUEST,
+			startPoint: new NotationPoint('0,0'),
+			endPoint: new NotationPoint('0,4')
+		}, false);
+
+		// Regression: this ability was completely dead before its config was fixed
+		// (triggers/targetTypes were nested at the wrong level).
+		// The Snow Wolf avenges the Firefly: the Polar Bear Dog is captured...
+		expect(gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, GUEST).length).toBe(0);
+
+		// ...and the Snow Wolf moves into its space
+		const capturePointRc = new NotationPoint('0,4').rowAndColumn;
+		const capturePoint = gameManager.board.cells[capturePointRc.row][capturePointRc.col];
+		expect(capturePoint.tile).toBe(snowWolfTile);
+		expect(snowWolfTile.seatedPoint).toBe(capturePoint);
+
+		const originalPointRc = new NotationPoint('1,4').rowAndColumn;
+		expect(gameManager.board.cells[originalPointRc.row][originalPointRc.col].hasTile()).toBe(false);
 	});
 });

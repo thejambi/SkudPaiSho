@@ -664,13 +664,17 @@ export function defineTrifleTiles() {
 		],
 		abilities: [
 			{
+				title: "Avenge Fallen Ally",
 				type: TrifleAbilityName.captureTargetTiles,
 				moveSourceToTargetPosition: true,
-				triggerType: TrifleAbilityTriggerType.whenAdjacentFriendlyTileIsCaptured,
 				regardlessOfCaptureProtection: true,
-				targetTriggerInfo: {
-					targetType: TrifleTargetType.triggerTargetTiles
-				}
+				triggers: [
+					{
+						triggerType: TrifleAbilityTriggerType.whenAdjacentFriendlyTileIsCaptured,
+						targetTeams: [TrifleTileTeam.enemy]
+					}
+				],
+				targetTypes: [TrifleTargetType.triggerTargetTiles]
 			}
 		],
 		textLines: [
