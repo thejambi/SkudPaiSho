@@ -102,10 +102,8 @@ TrifleSwapTwoSurroundingTilesAbilityBrain.prototype.activateAbility = function()
 			}));
 
 			// Swap tiles
-			firstBoardPoint.removeTile();
-			secondBoardPoint.removeTile();
-			firstBoardPoint.putTile(tileB);
-			secondBoardPoint.putTile(tileA);
+			board.relocateTile(tileB, firstBoardPoint);
+			board.relocateTile(tileA, secondBoardPoint);
 
 			this.abilityObject.boardChanged = true;
 		} else {

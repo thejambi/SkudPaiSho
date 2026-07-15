@@ -83,7 +83,7 @@ TrifleDisplaceOccupiedTileAbilityBrain.prototype.activateAbility = function() {
 			}));
 
 			// Place the displaced tile at the destination
-			destBoardPoint.putTile(displacedTile);
+			board.relocateTile(displacedTile, destBoardPoint);
 			this.abilityObject.boardChanged = true;
 		} else {
 			debug("Displace: destination point is occupied");

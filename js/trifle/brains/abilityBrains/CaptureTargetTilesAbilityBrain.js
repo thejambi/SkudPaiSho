@@ -58,17 +58,7 @@ TrifleCaptureTargetTilesAbilityBrain.prototype.activateAbility = function() {
 
 	// If moveSourceToTargetPosition is set, move the source tile to the last captured tile's position
 	if (this.abilityObject.abilityInfo.moveSourceToTargetPosition && lastCapturedPoint && this.capturedTiles.length > 0) {
-		var sourceTile = this.abilityObject.sourceTile;
-		var sourcePoint = sourceTile.seatedPoint;
-
-		// Remove tile from current position
-		if (sourcePoint) {
-			sourcePoint.removeTile();
-		}
-
-		// Place tile at captured position
-		lastCapturedPoint.putTile(sourceTile);
-		sourceTile.seatedPoint = lastCapturedPoint;
+		this.abilityObject.board.relocateTile(this.abilityObject.sourceTile, lastCapturedPoint);
 	}
 
 	if (this.capturedTiles.length > 0) {

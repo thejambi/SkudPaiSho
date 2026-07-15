@@ -26,8 +26,7 @@ TrifleMoveTileToRecordedPointAbilityBrain.prototype.activateAbility = function()
             for (var i = 0; i < surrounding.length && !placed; i++) {
                 var sp = surrounding[i];
                 if (!sp.hasTile()) {
-                    sp.putTile(occupyingTile);
-                    occupyingTile.seatedPoint = sp;
+                    board.relocateTile(occupyingTile, sp);
                     placed = true;
                 }
             }
@@ -38,8 +37,7 @@ TrifleMoveTileToRecordedPointAbilityBrain.prototype.activateAbility = function()
                     for (var c = 0; c < board.cells[r].length && !placed; c++) {
                         var bp = board.cells[r][c];
                         if (!bp.hasTile() && !bp.isType(NON_PLAYABLE)) {
-                            bp.putTile(occupyingTile);
-                            occupyingTile.seatedPoint = bp;
+                            board.relocateTile(occupyingTile, bp);
                             placed = true;
                         }
                     }
@@ -48,8 +46,7 @@ TrifleMoveTileToRecordedPointAbilityBrain.prototype.activateAbility = function()
 
             // Last resort: restore to original destination (so we don't drop the tile)
             if (!placed) {
-                destinationBoardPoint.putTile(occupyingTile);
-                occupyingTile.seatedPoint = destinationBoardPoint;
+                board.relocateTile(occupyingTile, destinationBoardPoint);
             }
         }
 

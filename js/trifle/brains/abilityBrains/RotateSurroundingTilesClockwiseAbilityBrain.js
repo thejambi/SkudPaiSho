@@ -84,7 +84,7 @@ TrifleRotateSurroundingTilesClockwiseAbilityBrain.prototype.activateAbility = fu
 	for (var i = 0; i < positions.length; i++) {
 		if (tiles[i]) {
 			var nextIndex = (i + 1) % positions.length;
-			positions[nextIndex].putTile(tiles[i]);
+			board.relocateTile(tiles[i], positions[nextIndex]);
 		}
 	}
 

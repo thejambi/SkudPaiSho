@@ -438,13 +438,31 @@ export class PaiShoGameBoard {
 		return Math.abs(bp1.row - bp2.row) + Math.abs(bp1.col - bp2.col)
 	}
 
+	/**
+	 * Seat a tile on a point, keeping both sides of the position relationship
+	 * (point.tile and tile.seatedPoint) in sync. If the tile is currently seated
+	 * on a point that still holds it, it is removed from there first.
+	 *
+	 * This is the single primitive for placing or relocating a standard tile.
+	 * Ability brains must use this instead of hand-rolling removeTile()/putTile()/
+	 * seatedPoint updates. Does not manage gigantic-tile extra occupied points
+	 * (otherPointsOccupied); moveTile() clears those before calling this.
+	 */
+	relocateTile(tile, targetPoint) {
+		const currentPoint = tile.seatedPoint;
+		if (currentPoint && currentPoint.tile === tile) {
+			currentPoint.removeTile();
+		}
+		targetPoint.putTile(tile);
+		tile.seatedPoint = targetPoint;
+	}
+
 	putTileOnPoint(tile, notationPoint) {
 		if (!tile) return;
 
 		var point = this.getPointFromNotationPoint(notationPoint);
 
-		point.putTile(tile);
-		tile.seatedPoint = point;
+		this.relocateTile(tile, point);
 
 		// Store deploy position for tiles with resurrection ability
 		if (!tile.deployPoint) {
@@ -1187,8 +1205,7 @@ export class PaiShoGameBoard {
 			capturedTile.beingCaptured = true;
 		});
 
-		boardPointEnd.putTile(tile);
-		tile.seatedPoint = boardPointEnd;
+		this.relocateTile(tile, boardPointEnd);
 
 		this.setPointFlags();
 
@@ -2613,8 +2630,7 @@ export class PaiShoGameBoard {
 		this.capturedTilesForResurrection.forEach((capturedTile) => {
 			if (capturedTile.deployPoint && !capturedTile.deployPoint.hasTile()) {
 				// Deploy position is empty - resurrect the tile!
-				capturedTile.deployPoint.putTile(capturedTile);
-				capturedTile.seatedPoint = capturedTile.deployPoint;
+				this.relocateTile(capturedTile, capturedTile.deployPoint);
 				resurrectedTiles.push(capturedTile);
 				debug("Resurrected " + capturedTile.code + " at its deploy position");
 			} else {

@@ -52,8 +52,7 @@ TrifleSubstituteForCaptureAbilityBrain.prototype.activateAbility = function() {
 	// position. The source tile takes the hit, the saved tile takes its spot.
 	sourceTilePoint.removeTile();
 
-	sourceTilePoint.putTile(restoredTile);
-	restoredTile.seatedPoint = sourceTilePoint;
+	this.abilityObject.board.relocateTile(restoredTile, sourceTilePoint);
 
 	// Capture source tile (the substitute)
 	this.capturedTiles.push(sourceTile);

@@ -367,6 +367,36 @@ describe('Gini Earth Accent Tile - Rotate Surrounding Tiles', () => {
 		expect(getTileAt(game, '1,-1').code).toBe(GiniTileCodes.Dragon);
 	});
 
+	it('should keep seatedPoint in sync with board position for rotated tiles', () => {
+		const game = createGame();
+
+		// Seat tiles through the board primitive so seatedPoint starts consistent
+		const koiStart = new NotationPoint('-4,2').rowAndColumn;
+		const koiTile = game.board.cells[koiStart.row][koiStart.col].removeTile();
+		const koiSetupRc = new NotationPoint('0,1').rowAndColumn;
+		game.board.relocateTile(koiTile, game.board.cells[koiSetupRc.row][koiSetupRc.col]);
+
+		const dragonStart = new NotationPoint('-5,-1').rowAndColumn;
+		const dragonTile = game.board.cells[dragonStart.row][dragonStart.col].removeTile();
+		const dragonSetupRc = new NotationPoint('1,0').rowAndColumn;
+		game.board.relocateTile(dragonTile, game.board.cells[dragonSetupRc.row][dragonSetupRc.col]);
+
+		// Earth placement rotates Koi (0,1 → 1,1) and Dragon (1,0 → 1,-1)
+		makeMove(game, GUEST, '-6,-4', '0,0', 0);
+
+		// Regression: rotation used to move tiles between points without
+		// updating tile.seatedPoint, leaving stale positions behind
+		const koiEndRc = new NotationPoint('1,1').rowAndColumn;
+		const koiEndPoint = game.board.cells[koiEndRc.row][koiEndRc.col];
+		expect(koiEndPoint.tile).toBe(koiTile);
+		expect(koiTile.seatedPoint).toBe(koiEndPoint);
+
+		const dragonEndRc = new NotationPoint('1,-1').rowAndColumn;
+		const dragonEndPoint = game.board.cells[dragonEndRc.row][dragonEndRc.col];
+		expect(dragonEndPoint.tile).toBe(dragonTile);
+		expect(dragonTile.seatedPoint).toBe(dragonEndPoint);
+	});
+
 	it('should not move the Earth tile itself during rotation', () => {
 		const game = createGame();
 		manualMoveTile(game, '-4,2', '0,1');

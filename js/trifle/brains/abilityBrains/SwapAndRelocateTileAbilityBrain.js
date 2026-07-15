@@ -71,14 +71,14 @@ TrifleSwapAndRelocateTileAbilityBrain.prototype.activateAbility = function() {
 		var airBoardPoint = this.abilityObject.sourceTilePoint;
 
 		if (swappedBoardPoint.hasTile() && !relocDestBoardPoint.hasTile()) {
-			var swappedTile = swappedBoardPoint.removeTile();
-			var airTile = airBoardPoint.removeTile();
+			var swappedTile = swappedBoardPoint.tile;
+			var airTile = airBoardPoint.tile;
 
 			// Air moves to where the swapped tile was
-			swappedBoardPoint.putTile(airTile);
+			board.relocateTile(airTile, swappedBoardPoint);
 
 			// Swapped tile goes to the chosen relocation destination
-			relocDestBoardPoint.putTile(swappedTile);
+			board.relocateTile(swappedTile, relocDestBoardPoint);
 
 			// Animate: Air slides to swapped tile's old position
 			animations.add(new TrifleAnimationInstruction(TrifleAnimationType.SLIDE, {
