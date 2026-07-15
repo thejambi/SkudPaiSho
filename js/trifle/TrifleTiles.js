@@ -472,7 +472,7 @@ export function defineTrifleTiles() {
 
 	/* Claude-created Tile */
 	TrifleTiles[TrifleTileCodes.Wisteria] = {	/* Done */
-		available: false,
+		available: false,	/* unavailable - this is a testing tile */
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.air],
 		deployTypes: [TrifleDeployType.anywhere],
@@ -800,7 +800,7 @@ export function defineTrifleTiles() {
 
 	/* Claude-created Tile */
 	TrifleTiles[TrifleTileCodes.Duckweed] = {	/* Done */
-		available: false,
+		available: false,	/* unavailable - this is a testing tile */
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.water],
 		deployTypes: [TrifleDeployType.anywhere],
@@ -1125,7 +1125,7 @@ export function defineTrifleTiles() {
 
 	/* Claude-created Tile */
 	TrifleTiles[TrifleTileCodes.Elderberry] = {	/* Done */
-		available: false,
+		available: false,	/* unavailable - this is a testing tile */
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.earth],
 		deployTypes: [TrifleDeployType.anywhere],
@@ -1494,7 +1494,7 @@ export function defineTrifleTiles() {
 
 	/* Claude-created Tile */
 	TrifleTiles[TrifleTileCodes.Marigold] = {	/* Done */
-		available: false,
+		available: false,	/* unavailable - this is a testing tile */
 		types: [TrifleTileType.flower],
 		identifiers: [TrifleTileIdentifier.fire],
 		deployTypes: [TrifleDeployType.anywhere],
