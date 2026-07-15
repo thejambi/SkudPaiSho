@@ -306,7 +306,7 @@ export class TrifleAbilityManager {
 						if (readyAbilityTriggeringActions && readyAbilityTriggeringActions.length > 0) {
 							readyAbilityTriggeringActions.forEach(triggeringAction => {
 								triggeringActions.forEach(tAction1 => {
-									if (JSON.stringify(tAction1) == JSON.stringify(triggeringAction)) {
+									if (TrifleAbilityManager.triggeringActionsMatch(tAction1, triggeringAction)) {
 										matchingReadyAbilities.push(readyAbility);
 									}
 								});
@@ -318,6 +318,21 @@ export class TrifleAbilityManager {
 		}
 
 		return matchingReadyAbilities;
+	}
+
+	/**
+	 * Two triggering actions describe the same event when their action type and
+	 * captured tile ids (sorted at creation by the trigger brains) match.
+	 * New triggering-action fields must be added here to take part in matching.
+	 */
+	static triggeringActionsMatch(actionA, actionB) {
+		if (!actionA || !actionB || actionA.actionType !== actionB.actionType) {
+			return false;
+		}
+		const idsA = actionA.capturedTileIds || [];
+		const idsB = actionB.capturedTileIds || [];
+		return idsA.length === idsB.length
+			&& idsA.every((id, index) => id === idsB[index]);
 	}
 
 	buildAbilityKey(ability) {

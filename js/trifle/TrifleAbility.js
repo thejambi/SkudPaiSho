@@ -257,9 +257,12 @@ export class TrifleAbility {
 	}
 
 	abilityInfoMatches(otherAbilityInfo) {
-		// Deep compare the ability definitions using JSON serialization
-		// This catches differences in triggers, targets, restricted types, etc.
-		return JSON.stringify(this.abilityInfo) === JSON.stringify(otherAbilityInfo);
+		/* Ability records hold their config entry from the shared tile metadata by
+		   reference (tileInfo.abilities[i]), so two records describe the same ability
+		   exactly when they hold the same config object. Reference identity also
+		   distinguishes distinct config entries with identical content, which
+		   serialization-based comparison wrongly deduped. */
+		return this.abilityInfo === otherAbilityInfo;
 	}
 
 	abilityTargetsTile(tile) {

@@ -2726,3 +2726,150 @@ describe('Ginseng Board Copy Fidelity (getCopy)', () => {
 			.toEqual(game.board.abilityManager.abilityActivationOrder);
 	});
 });
+
+// ============================================================================
+// Prompt Ability Flow Tests - end-to-end coverage of the prompt system
+// (Dragon push and temple exchange were previously untested through the
+// real prompt flow; runGame() bypasses it)
+// ============================================================================
+
+describe('Ginseng Prompt Ability Flows', () => {
+	function createGame() {
+		const mockActuator = { actuate: vi.fn() };
+		return new GinsengGameManager(mockActuator, true, true);
+	}
+
+	function getPoint(game, notationStr) {
+		const rc = new NotationPoint(notationStr).rowAndColumn;
+		return game.board.cells[rc.row][rc.col];
+	}
+
+	function getMarkedPoints(game) {
+		const markedPoints = [];
+		game.board.forEachBoardPoint((point) => {
+			if (point.isType(POSSIBLE_MOVE)) {
+				markedPoints.push(point.getNotationPointString());
+			}
+		});
+		return markedPoints;
+	}
+
+	function buildSourceTileKey(tile, destNotationStr) {
+		return JSON.stringify({
+			tileOwner: tile.ownerCode,
+			tileCode: tile.code,
+			boardPoint: destNotationStr,
+			tileId: tile.id
+		});
+	}
+
+	describe('Dragon push (moveTargetTile prompts)', () => {
+		/* Dragon lands on a RED point at (1,0) diagonally adjacent to a Guest Koi
+		   on a WHITE point at (0,1), arming the push ability */
+		function setupPush() {
+			const game = createGame();
+			const board = game.board;
+			const dragonTile = board.getTilePoints(GinsengTileCodes.Dragon, HOST)[0].tile;
+			const koiTile = board.getTilePoints(GinsengTileCodes.Koi, GUEST)[0].tile;
+			board.relocateTile(koiTile, getPoint(game, '0,1'));
+			board.relocateTile(dragonTile, getPoint(game, '3,0'));
+			return { game, dragonTile, koiTile };
+		}
+
+		function pushMove(game, promptTargetData) {
+			return game.runNotationMove({
+				moveNum: 0, player: HOST, moveType: MOVE,
+				startPoint: '3,0', endPoint: '1,0',
+				promptTargetData: promptTargetData
+			}, false);
+		}
+
+		it('prompts for the tile to push and marks the pushable tile', () => {
+			const { game } = setupPush();
+			const neededPromptInfo = pushMove(game, {});
+
+			expect(neededPromptInfo).toBeTruthy();
+			expect(neededPromptInfo.currentPromptTargetId).toBe('movedTilePoint');
+			expect(getMarkedPoints(game)).toEqual(['0,1']);
+		});
+
+		it('prompts for the push destination and marks only legal push points', () => {
+			const { game, dragonTile } = setupPush();
+			const promptTargetData = {};
+			promptTargetData[buildSourceTileKey(dragonTile, '1,0')] = {
+				movedTilePoint: new NotationPoint('0,1')
+			};
+			const neededPromptInfo = pushMove(game, promptTargetData);
+
+			expect(neededPromptInfo).toBeTruthy();
+			expect(neededPromptInfo.currentPromptTargetId).toBe('movedTileDestinationPoint');
+			expect(getMarkedPoints(game)).toEqual(['-1,2']);
+		});
+
+		it('executes the push with complete prompt data', () => {
+			const { game, dragonTile, koiTile } = setupPush();
+			const promptTargetData = {};
+			promptTargetData[buildSourceTileKey(dragonTile, '1,0')] = {
+				movedTilePoint: new NotationPoint('0,1'),
+				movedTileDestinationPoint: new NotationPoint('-1,2')
+			};
+			const neededPromptInfo = pushMove(game, promptTargetData);
+
+			// No further prompt; Koi pushed to the chosen point with consistent seating
+			expect(neededPromptInfo).toBeUndefined();
+			const destinationPoint = getPoint(game, '-1,2');
+			expect(destinationPoint.tile).toBe(koiTile);
+			expect(koiTile.seatedPoint).toBe(destinationPoint);
+			expect(getPoint(game, '0,1').hasTile()).toBe(false);
+			expect(getPoint(game, '1,0').tile).toBe(dragonTile);
+		});
+	});
+
+	describe('Temple exchange (exchangeWithCapturedTile prompt)', () => {
+		/* Guest Ginseng lands in the top temple at (0,8) with a friendly
+		   captured Bison available to retrieve */
+		function setupExchange() {
+			const game = createGame();
+			const board = game.board;
+			const ginsengTile = board.getTilePoints(GinsengTileCodes.Ginseng, GUEST)[0].tile;
+			const bisonTile = board.getTilePoints(GinsengTileCodes.Bison, GUEST)[0].removeTile();
+			game.tileManager.capturedTiles.push(bisonTile);
+			board.relocateTile(ginsengTile, getPoint(game, '0,6'));
+			return { game, ginsengTile, bisonTile };
+		}
+
+		function exchangeMove(game, promptTargetData) {
+			return game.runNotationMove({
+				moveNum: 0, player: GUEST, moveType: MOVE,
+				startPoint: '0,6', endPoint: '0,8',
+				promptTargetData: promptTargetData
+			}, false);
+		}
+
+		it('prompts to choose a captured tile when landing in a temple', () => {
+			const { game } = setupExchange();
+			const neededPromptInfo = exchangeMove(game, {});
+
+			expect(neededPromptInfo).toBeTruthy();
+			expect(neededPromptInfo.currentPromptTargetId).toBe('chosenCapturedTile');
+		});
+
+		it('exchanges with the chosen captured tile', () => {
+			const { game, ginsengTile, bisonTile } = setupExchange();
+			const promptTargetData = {};
+			promptTargetData[buildSourceTileKey(ginsengTile, '0,8')] = {
+				chosenCapturedTile: { ownerName: GUEST, code: GinsengTileCodes.Bison, id: bisonTile.id }
+			};
+			const neededPromptInfo = exchangeMove(game, promptTargetData);
+
+			expect(neededPromptInfo).toBeUndefined();
+			// The Bison takes the Ginseng's place at the temple...
+			const templePoint = getPoint(game, '0,8');
+			expect(templePoint.tile).toBe(bisonTile);
+			expect(bisonTile.seatedPoint).toBe(templePoint);
+			// ...and the Ginseng goes to the captured pile
+			expect(game.tileManager.capturedTiles).toContain(ginsengTile);
+			expect(game.tileManager.capturedTiles).not.toContain(bisonTile);
+		});
+	});
+});

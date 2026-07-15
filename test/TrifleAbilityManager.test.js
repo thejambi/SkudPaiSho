@@ -31,6 +31,7 @@ vi.mock('../js/PaiShoMain', () => {
 });
 
 import { TrifleAbilityManager } from '../js/trifle/TrifleAbilityManager';
+import { TrifleAbility } from '../js/trifle/TrifleAbility';
 import { TrifleWhenCapturedByTargetTileTriggerBrain } from '../js/trifle/brains/triggerBrains/WhenCapturedByTargetTileTriggerBrain';
 import { TrifleWhenCapturingTargetTileTriggerBrain } from '../js/trifle/brains/triggerBrains/WhenCapturingTargetTileTriggerBrain';
 import { TrifleWhenAdjacentFriendlyTileIsCapturedTriggerBrain } from '../js/trifle/brains/triggerBrains/WhenAdjacentFriendlyTileIsCapturedTriggerBrain';
@@ -232,5 +233,101 @@ describe('Capture trigger brains triggeringAction', () => {
 		// Same event, different ability owners: actions must match so the
 		// abilities co-activate
 		expect(JSON.stringify(brainA.triggeringAction)).toBe(JSON.stringify(brainB.triggeringAction));
+	});
+});
+
+/* ─── Ability identity (issue #5: JSON.stringify equality) ─── */
+
+describe('TrifleAbility appearsToBeTheSameAs identity', () => {
+	function makeAbilityRecord(abilityInfo, sourceTileId, sourceTilePoint) {
+		const record = Object.create(TrifleAbility.prototype);
+		record.abilityType = abilityInfo.type;
+		record.abilityInfo = abilityInfo;
+		record.sourceTile = { id: sourceTileId };
+		record.sourceTilePoint = sourceTilePoint;
+		record.triggerTargetTiles = [];
+		record.triggerTargetTilePoints = [];
+		return record;
+	}
+
+	const point = { row: 4, col: 4 };
+
+	it('matches two records built from the same config entry', () => {
+		const sharedInfo = { type: 'immobilizeTiles', triggers: [{ triggerType: 'whileOnBoard' }] };
+		const a = makeAbilityRecord(sharedInfo, 7, point);
+		const b = makeAbilityRecord(sharedInfo, 7, point);
+		expect(a.appearsToBeTheSameAs(b)).toBe(true);
+	});
+
+	it('does not match records from distinct config entries even with identical content', () => {
+		// Two separate config objects with equal content are different abilities
+		// (e.g. duplicated game-rule abilities); serialization-based comparison
+		// used to wrongly dedupe them
+		const infoA = { type: 'immobilizeTiles', triggers: [{ triggerType: 'whileOnBoard' }] };
+		const infoB = { type: 'immobilizeTiles', triggers: [{ triggerType: 'whileOnBoard' }] };
+		const a = makeAbilityRecord(infoA, 7, point);
+		const b = makeAbilityRecord(infoB, 7, point);
+		expect(a.appearsToBeTheSameAs(b)).toBe(false);
+	});
+
+	it('does not match records from different source tiles', () => {
+		const sharedInfo = { type: 'immobilizeTiles', triggers: [{ triggerType: 'whileOnBoard' }] };
+		const a = makeAbilityRecord(sharedInfo, 7, point);
+		const b = makeAbilityRecord(sharedInfo, 8, point);
+		expect(a.appearsToBeTheSameAs(b)).toBe(false);
+	});
+
+	it('does not throw when a config object holds a circular reference', () => {
+		// Board/point references can leak into ability config at runtime;
+		// serialization-based comparison would throw on them
+		const infoA = { type: 'immobilizeTiles', triggers: [{ triggerType: 'whileOnBoard' }] };
+		infoA.self = infoA;
+		const infoB = { type: 'immobilizeTiles', triggers: [{ triggerType: 'whileOnBoard' }] };
+		const a = makeAbilityRecord(infoA, 7, point);
+		const b = makeAbilityRecord(infoB, 7, point);
+		expect(() => a.appearsToBeTheSameAs(b)).not.toThrow();
+		expect(a.appearsToBeTheSameAs(b)).toBe(false);
+	});
+});
+
+/* ─── Triggering-action matching guards ─── */
+
+describe('TrifleAbilityManager triggering-action matching', () => {
+	it('does not co-activate abilities triggered by different capture events', () => {
+		const manager = createManager();
+		const activationOrder = [];
+
+		const first = makeStubAbility('first', activationOrder, {
+			boardChanges: true,
+			triggeringActions: [{ actionType: 'Capture', capturedTileIds: [42] }]
+		});
+		const other = makeStubAbility('other', activationOrder, {
+			triggeringActions: [{ actionType: 'Capture', capturedTileIds: [43] }]
+		});
+
+		manager.setReadyAbilities({ stubAbilityType: [first, other] });
+		manager.activateReadyAbilities();
+
+		// first changes the board and stops the run; 'other' was triggered by a
+		// different event, so it must NOT ride along
+		expect(activationOrder).toEqual(['first']);
+	});
+
+	it('does not co-activate abilities with different action types', () => {
+		const manager = createManager();
+		const activationOrder = [];
+
+		const first = makeStubAbility('first', activationOrder, {
+			boardChanges: true,
+			triggeringActions: [{ actionType: 'Capture', capturedTileIds: [42] }]
+		});
+		const other = makeStubAbility('other', activationOrder, {
+			triggeringActions: [{ actionType: 'CaptureRetaliation', capturedTileIds: [42] }]
+		});
+
+		manager.setReadyAbilities({ stubAbilityType: [first, other] });
+		manager.activateReadyAbilities();
+
+		expect(activationOrder).toEqual(['first']);
 	});
 });
