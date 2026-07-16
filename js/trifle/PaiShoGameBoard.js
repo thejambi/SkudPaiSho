@@ -1575,60 +1575,6 @@ export class PaiShoGameBoard {
 		return true;
 	}
 
-	movementPassesLineOfSightTest(targetPoint, tileBeingMoved, originPoint) {
-		const pointsToMoveTowards = [];
-		let movementPassesLineOfSightTest = true;
-		const lineOfSightPoints = this.getPointsForTilesInLineOfSight(originPoint);
-
-		const drawAlongLineOfSightAbilities = this.abilityManager.getAbilitiesTargetingTile(TrifleAbilityName.drawTilesAlongLineOfSight, tileBeingMoved);
-		if (drawAlongLineOfSightAbilities && drawAlongLineOfSightAbilities.length === 1) {
-			lineOfSightPoints.forEach((lineOfSightPoint) => {
-				const drawAbility = drawAlongLineOfSightAbilities[0];
-				if (lineOfSightPoint.hasTile() && lineOfSightPoint.tile === drawAbility.sourceTile) {
-					pointsToMoveTowards.push(lineOfSightPoint);
-					/* Movement OK if:
-						- Target Point is in line of sight of affecting tile
-						- Tile will be closer to affecting tile than it was where it started
-						- Tile be closer to where it started than the affecting tile was (did not move past the affecting tile) */
-					movementPassesLineOfSightTest = this.targetPointIsInLineOfSightOfThesePoints(targetPoint, [lineOfSightPoint])
-						&& this.targetPointIsCloserToThesePointsThanOriginPointIs(targetPoint, [lineOfSightPoint], originPoint)
-						&& this.getDistanceBetweenPoints(originPoint, targetPoint) < this.getDistanceBetweenPoints(originPoint, lineOfSightPoint)
-						|| targetPoint === drawAbility.sourceTilePoint;
-					if (!movementPassesLineOfSightTest) {
-						return false;
-					}
-				}
-			});
-		} else if (drawAlongLineOfSightAbilities && drawAlongLineOfSightAbilities.length > 1) {
-			movementPassesLineOfSightTest = false;	// Being pulled in multiple directions, cannot satisfy both
-		}
-
-		return movementPassesLineOfSightTest;
-	}
-
-	targetPointIsInLineOfSightOfThesePoints(targetPoint, checkPoints) {
-		var checkPointsInLineOfSight = 0;
-		var lineOfSightPoints = this.getPointsForTilesInLineOfSight(targetPoint);
-		lineOfSightPoints.forEach(function(targetLineOfSightPoint) {
-			if (checkPoints.includes(targetLineOfSightPoint)) {
-				checkPointsInLineOfSight++;
-			}
-		});
-		return checkPointsInLineOfSight === checkPoints.length;
-	}
-
-	targetPointIsCloserToThesePointsThanOriginPointIs(targetPoint, checkPoints, originPoint) {
-		let isCloserToAllCheckPoints = true;
-		checkPoints.forEach((checkPoint) => {
-			const targetPointDistance = this.getDistanceBetweenPoints(targetPoint, checkPoint);
-			const originPointDistance = this.getDistanceBetweenPoints(originPoint, checkPoint);
-			if (targetPointDistance >= originPointDistance) {
-				isCloserToAllCheckPoints = false;
-			}
-		});
-		return isCloserToAllCheckPoints;
-	}
-
 	oneOfTheseZonesContainsPoints(pointsWithZones, targetPoints) {
 		let zoneContainingPointsFound = false;
 		pointsWithZones.forEach((pointWithZone) => {

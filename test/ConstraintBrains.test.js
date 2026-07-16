@@ -49,7 +49,7 @@ import { TrifleAbilityName, TrifleAbilityTriggerType, TrifleTileTeam, TrifleTarg
 import { setCurrentTileMetadata, setCurrentTileCodes } from '../js/trifle/PaiShoGamesTileMetadata';
 import { TrifleTiles } from '../js/trifle/TrifleTileInfo';
 import { TrifleTile } from '../js/trifle/TrifleTile';
-import { POSSIBLE_MOVE } from '../js/trifle/TrifleBoardPoint';
+import { POSSIBLE_MOVE } from '../js/skud-pai-sho/SkudPaiShoBoardPoint';
 import { PaiShoGameBoard } from '../js/trifle/PaiShoGameBoard';
 import { TrifleBrainFactory, ConstraintCategory, getAbilityNamesForConstraintCategory } from '../js/trifle/brains/BrainFactory';
 import { TrifleDrawTilesAlongLineOfSightConstraintBrain } from '../js/trifle/brains/constraintBrains/DrawTilesAlongLineOfSightConstraintBrain';
@@ -265,196 +265,7 @@ describe('DrawTilesAlongLineOfSight Constraint', () => {
 			expect(hasDrawAbility).toBe(true);
 		});
 
-		/**
-		 * BUG DOCUMENTATION: The current implementation blocks ALL movement
-		 *
-		 * Investigation findings:
-		 * 1. movementPassesLineOfSightTest returns TRUE when called directly for valid moves
-		 * 2. setPointAsPossibleMovement also returns TRUE
-		 * 3. BUT the point is NOT actually marked as POSSIBLE_MOVE
-		 * 4. This causes ALL movement to be blocked when a draw ability is active
-		 *
-		 * The constraint brain implementation will fix this by properly integrating
-		 * the draw ability check into the movement generation flow.
-		 *
-		 * This test documents the bug and verifies our understanding of the issue.
-		 */
-		it.skip('BUG: movementPassesLineOfSightTest returns true but point not marked', () => {
-			addTilesToTeam(gameManager, HOST, [
-				TrifleTileCodes.AirBanner,
-				TrifleTileCodes.Firefly
-			]);
-			addTilesToTeam(gameManager, GUEST, [
-				TrifleTileCodes.WaterBanner
-			]);
-
-			gameManager.runNotationMove({
-				moveType: DEPLOY,
-				player: HOST,
-				tileType: TrifleTileCodes.Firefly,
-				endPoint: new NotationPoint('0,0')
-			}, false);
-
-			gameManager.runNotationMove({
-				moveType: DEPLOY,
-				player: GUEST,
-				tileType: TrifleTileCodes.WaterBanner,
-				endPoint: new NotationPoint('3,0')
-			}, false);
-
-			// Same setup as passing tests - no HOST move after deploys
-			// Get points for testing - Firefly at (0,0), WaterBanner at (3,0)
-			const startPoint = new NotationPoint('3,0');
-			const startRowCol = startPoint.rowAndColumn;
-			const originPoint = gameManager.board.cells[startRowCol.row][startRowCol.col];
-
-			const endPoint = new NotationPoint('2,0');
-			const endRowCol = endPoint.rowAndColumn;
-			const targetPoint = gameManager.board.cells[endRowCol.row][endRowCol.col];
-
-			// Firefly at (0,0)
-			const fireflyPoint = new NotationPoint('0,0');
-			const fireflyRowCol = fireflyPoint.rowAndColumn;
-			const lineOfSightPoint = gameManager.board.cells[fireflyRowCol.row][fireflyRowCol.col];
-
-			const bannerTile = originPoint.tile;
-
-			// Verify setup
-			expect(originPoint.hasTile()).toBe(true);
-			expect(originPoint.tile.code).toBe(TrifleTileCodes.WaterBanner);
-			expect(lineOfSightPoint.hasTile()).toBe(true);
-			expect(lineOfSightPoint.tile.code).toBe(TrifleTileCodes.Firefly);
-
-			// Debug: Check line of sight from origin - should find Firefly
-			const losFromOrigin = gameManager.board.getPointsForTilesInLineOfSight(originPoint);
-			expect(losFromOrigin.length).toBeGreaterThan(0);
-			expect(losFromOrigin).toContain(lineOfSightPoint);
-
-			// Debug: Check draw abilities
-			const drawAbilities = gameManager.board.abilityManager.getAbilitiesTargetingTile(
-				TrifleAbilityName.drawTilesAlongLineOfSight,
-				bannerTile
-			);
-			expect(drawAbilities.length).toBe(1);
-			expect(drawAbilities[0].sourceTile.code).toBe(TrifleTileCodes.Firefly);
-
-			// Debug: Check individual conditions
-			const inLOS = gameManager.board.targetPointIsInLineOfSightOfThesePoints(targetPoint, [lineOfSightPoint]);
-			// This should be true - from (2,0) we should see Firefly at (0,0)
-			expect(inLOS).toBe(true);
-
-			const isCloser = gameManager.board.targetPointIsCloserToThesePointsThanOriginPointIs(targetPoint, [lineOfSightPoint], originPoint);
-			// This should be true - (2,0) is closer to (0,0) than (3,0) is
-			expect(isCloser).toBe(true);
-
-			const moveDistance = gameManager.board.getDistanceBetweenPoints(originPoint, targetPoint);
-			const distanceToSource = gameManager.board.getDistanceBetweenPoints(originPoint, lineOfSightPoint);
-			// Move distance should be 1, distance to source should be 3 (Firefly at (0,0), WaterBanner at (3,0))
-			expect(moveDistance).toBe(1);
-			expect(distanceToSource).toBe(3);
-			expect(moveDistance < distanceToSource).toBe(true);
-
-			// Check tile metadata for WaterBanner
-			const waterBannerInfo = TrifleTiles[TrifleTileCodes.WaterBanner];
-
-			// Check if tile is immobilized
-			const movementInfo = waterBannerInfo.movements[0];
-			const isImmobilized = gameManager.board.tileMovementIsImmobilized(bannerTile, movementInfo, originPoint);
-
-			// Check if there are any abilities targeting the tile
-			const immobilizeAbilities = gameManager.board.abilityManager.getAbilitiesTargetingTile(
-				TrifleAbilityName.immobilizeTiles,
-				bannerTile
-			);
-
-			// Directly test movementPassesLineOfSightTest
-			const directLOSTestResult = gameManager.board.movementPassesLineOfSightTest(targetPoint, bannerTile, originPoint);
-
-			// Directly test setPointAsPossibleMovement
-			// First clear any previous state
-			gameManager.board.removePossibleMovePoints();
-			const directSetPointResult = gameManager.board.setPointAsPossibleMovement(targetPoint, bannerTile, originPoint);
-			const targetIsMarkedPossible = targetPoint.isType(POSSIBLE_MOVE);
-
-			// Check if target point has the types we expect
-			const targetPointTypes = targetPoint.types ? [...targetPoint.types] : ['no types'];
-
-			// Check if targetPoint is the same as board cells reference
-			const boardTargetPoint = gameManager.board.cells[endRowCol.row][endRowCol.col];
-			const isSameReference = targetPoint === boardTargetPoint;
-
-			// Manual check - can we add a type directly?
-			targetPoint.addType(POSSIBLE_MOVE);
-			const afterManualAdd = targetPoint.isType(POSSIBLE_MOVE);
-
-			// Check if tileCanMoveOntoPoint is blocking movement
-			const canMoveOntoTarget = gameManager.board.tileCanMoveOntoPoint(bannerTile, movementInfo, targetPoint, originPoint);
-
-			// Check adjacent points from origin
-			// Signature: standardMovementFunction(board, originPoint, boardPointAlongTheWay, movementInfo, moveStepNumber)
-			const adjacentPoints = PaiShoGameBoard.standardMovementFunction(gameManager.board, originPoint, originPoint, movementInfo, 0);
-			const adjacentNotations = adjacentPoints ? adjacentPoints.map(p => getNotationFromPoint(p)) : ['none'];
-
-			// Check if board is set up correctly
-			const boardHasOriginPoint = !!gameManager.board.cells[startRowCol.row][startRowCol.col];
-			const boardHasTargetPoint = !!gameManager.board.cells[endRowCol.row][endRowCol.col];
-
-			// Check if WaterBanner can move at all (without the draw constraint)
-			// First, let's see what moves are generated
-			const possibleMoves = getPossibleMovePoints(gameManager, '3,0');
-			const moveNotations = possibleMoves.map(p => getNotationFromPoint(p));
-
-			// First check adjacent notations separately
-			expect(adjacentNotations.length).toBeGreaterThan(0);
-			expect(adjacentNotations).toContain('2,0');
-
-			// This will show us the state
-			expect({
-				bannerOwner: bannerTile.ownerName,
-				isImmobilized,
-				immobilizeAbilitiesCount: immobilizeAbilities.length,
-				movementType: movementInfo?.type,
-				movementDistance: movementInfo?.distance,
-				directLOSTestResult,
-				directSetPointResult,
-				targetIsMarkedPossible,
-				isSameReference,
-				afterManualAdd,
-				targetPointTypes,
-				canMoveOntoTarget,
-				adjacentCount: adjacentNotations.length,
-				boardHasOriginPoint,
-				boardHasTargetPoint,
-				possibleMoves: moveNotations,
-				hasAnyMoves: possibleMoves.length > 0
-			}).toEqual({
-				bannerOwner: 'GUEST',
-				isImmobilized: false,
-				immobilizeAbilitiesCount: 0,
-				movementType: expect.any(String),
-				movementDistance: 2,
-				directLOSTestResult: true,
-				directSetPointResult: true,
-				targetIsMarkedPossible: true,
-				afterManualAdd: true,
-				isSameReference: true,
-				targetPointTypes: expect.any(Array),
-				canMoveOntoTarget: true,
-				adjacentCount: expect.any(Number),
-				boardHasOriginPoint: true,
-				boardHasTargetPoint: true,
-				possibleMoves: expect.arrayContaining(['2,0']),
-				hasAnyMoves: true
-			});
-		});
-
-		/**
-		 * Movement toward the drawing tile should be allowed.
-		 * The constraint brain correctly validates this (see movementPassesConstraintChecks tests).
-		 * This test is skipped because the full movement generation flow has a separate issue
-		 * that prevents moves from being generated even when constraints pass.
-		 */
-		it.skip('should allow movement that brings tile closer to the drawing tile', () => {
+		it('should allow movement that brings tile closer to the drawing tile', () => {
 			addTilesToTeam(gameManager, HOST, [
 				TrifleTileCodes.AirBanner,
 				TrifleTileCodes.Firefly
@@ -483,12 +294,7 @@ describe('DrawTilesAlongLineOfSight Constraint', () => {
 			expect(canMoveCloser).toBe(true);
 		});
 
-		/**
-		 * Movement even closer should be allowed.
-		 * The constraint brain correctly validates this (see movementPassesConstraintChecks tests).
-		 * This test is skipped because the full movement generation flow has a separate issue.
-		 */
-		it.skip('should allow movement that brings tile even closer', () => {
+		it('should allow movement that brings tile even closer', () => {
 			addTilesToTeam(gameManager, HOST, [
 				TrifleTileCodes.AirBanner,
 				TrifleTileCodes.Firefly
@@ -575,18 +381,16 @@ describe('DrawTilesAlongLineOfSight Constraint', () => {
 			expect(canMovePerp).toBe(false);
 		});
 
-		/**
-		 * Should be able to capture the drawing tile.
-		 * The constraint brain correctly validates this (see movementPassesConstraintChecks tests).
-		 * This test is skipped because the full movement generation flow has a separate issue.
-		 */
-		it.skip('should allow movement directly onto the drawing tile (capture attempt)', () => {
+		it('should allow movement directly onto the drawing tile (capture attempt)', () => {
+			/* The drawn tile must be able to capture (WaterBanner cannot), and the
+			   capture-restriction game rule requires both banners on the board */
 			addTilesToTeam(gameManager, HOST, [
 				TrifleTileCodes.AirBanner,
 				TrifleTileCodes.Firefly
 			]);
 			addTilesToTeam(gameManager, GUEST, [
-				TrifleTileCodes.WaterBanner
+				TrifleTileCodes.WaterBanner,
+				TrifleTileCodes.PolarBearDog
 			]);
 
 			// Deploy Firefly at origin
@@ -597,20 +401,34 @@ describe('DrawTilesAlongLineOfSight Constraint', () => {
 				endPoint: new NotationPoint('0,0')
 			}, false);
 
-			// Deploy WaterBanner 2 spaces away (within capture range - WaterBanner moves 2)
+			// Both banners on the board, away from the draw line
 			gameManager.runNotationMove({
 				moveType: DEPLOY,
 				player: GUEST,
 				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('-4,-4')
+			}, false);
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.AirBanner,
+				endPoint: new NotationPoint('4,4')
+			}, false);
+
+			// Deploy Polar Bear Dog (moves 4, can capture) in the Firefly's line of sight
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.PolarBearDog,
 				endPoint: new NotationPoint('2,0')
 			}, false);
 
-			// Verify draw ability is active
-			const bannerPoints = gameManager.board.getTilePoints(TrifleTileCodes.WaterBanner, GUEST);
-			const bannerTile = bannerPoints[0].tile;
+			// Verify draw ability is active on the Polar Bear Dog
+			const pbdPoints = gameManager.board.getTilePoints(TrifleTileCodes.PolarBearDog, GUEST);
+			const pbdTile = pbdPoints[0].tile;
 			const hasDrawAbility = gameManager.board.abilityManager.abilityTargetingTileExists(
 				TrifleAbilityName.drawTilesAlongLineOfSight,
-				bannerTile
+				pbdTile
 			);
 			expect(hasDrawAbility).toBe(true);
 
@@ -660,12 +478,7 @@ describe('DrawTilesAlongLineOfSight Constraint', () => {
 			expect(drawAbilities.length).toBe(1);
 		});
 
-		/**
-		 * Movement toward the drawing tile should be allowed.
-		 * The constraint brain correctly validates this (see movementPassesConstraintChecks tests).
-		 * This test is skipped because the full movement generation flow has a separate issue.
-		 */
-		it.skip('should allow movement toward the Firefly', () => {
+		it('should allow movement toward the Firefly', () => {
 			addTilesToTeam(gameManager, HOST, [
 				TrifleTileCodes.AirBanner,
 				TrifleTileCodes.Firefly
@@ -696,14 +509,44 @@ describe('DrawTilesAlongLineOfSight Constraint', () => {
 
 	describe('Movement Constraints - Multiple Draw Abilities (Future)', () => {
 		/**
-		 * Testing multiple draw abilities would require either:
-		 * 1. Two Firefly tiles (but we only have one per team typically)
-		 * 2. Another tile with drawTilesAlongLineOfSight ability
-		 *
-		 * For now, this is documented as future work since the current tile set
-		 * doesn't easily allow this scenario.
+		 * Intended rule quirk: a tile drawn by multiple Fireflies must move closer
+		 * to ALL of them; when they pull in opposite directions no move satisfies
+		 * both constraints, so the tile is frozen. This emerges naturally from
+		 * AND-composing one draw constraint per Firefly.
 		 */
-		it.todo('should block ALL movement when affected by two draw abilities from different sources');
+		it('should block ALL movement when affected by two draw abilities pulling opposite directions', () => {
+			addTilesToTeam(gameManager, HOST, [
+				TrifleTileCodes.AirBanner,
+				TrifleTileCodes.Firefly,
+				TrifleTileCodes.Firefly
+			]);
+			addTilesToTeam(gameManager, GUEST, [
+				TrifleTileCodes.WaterBanner
+			]);
+
+			// Fireflies at (0,0) and (6,0), WaterBanner caught between at (3,0)
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Firefly,
+				endPoint: new NotationPoint('0,0')
+			}, false);
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: GUEST,
+				tileType: TrifleTileCodes.WaterBanner,
+				endPoint: new NotationPoint('3,0')
+			}, false);
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: HOST,
+				tileType: TrifleTileCodes.Firefly,
+				endPoint: new NotationPoint('6,0')
+			}, false);
+
+			const possiblePoints = getPossibleMovePoints(gameManager, '3,0');
+			expect(possiblePoints.length).toBe(0);
+		});
 	});
 
 	describe('Mutual Draw - Two Fireflies in Line of Sight', () => {
@@ -2385,12 +2228,9 @@ describe('RestrictMovementWithinZone Constraint Brain', () => {
 			expect(restrictAbility.targetTileTypes).toContain(TrifleTileType.flower);
 		});
 
-		it.skip('BUG: GrassWeed restrictMovementWithinZone ability not targeting flowers correctly', () => {
-			// NOTE: This test is skipped because GrassWeed's restrictMovementWithinZone
-			// ability doesn't appear to be targeting flowers correctly in the test setup.
-			// The TitanArum tests for restrictMovementWithinZoneUnlessCapturing pass,
-			// confirming the zone blocking mechanism works. This specific ability
-			// targeting issue needs further investigation.
+		it('should target flowers with restrictMovementWithinZone and block them from the zone', () => {
+			// This was skipped as a suspected targeting bug; it passes on the current
+			// engine (resolved by the July 2026 ability manager fixes)
 			addTilesToTeam(gameManager, HOST, [
 				TrifleTileCodes.AirBanner,
 				TrifleTileCodes.GrassWeed
@@ -2421,6 +2261,13 @@ describe('RestrictMovementWithinZone Constraint Brain', () => {
 				chrysTile
 			);
 			expect(hasRestrictAbility).toBe(true);
+
+			// And the restriction actually blocks the flower from entering the zone:
+			// (1,0) is inside GrassWeed's zone (size 1 around (0,0))
+			const zonePointRowCol = new NotationPoint('1,0').rowAndColumn;
+			const zonePoint = gameManager.board.cells[zonePointRowCol.row][zonePointRowCol.col];
+			const isZonedOut = gameManager.board.tileZonedOutOfSpaceByAbility(chrysTile, zonePoint, false);
+			expect(isZonedOut).toBe(true);
 		});
 
 		it('should allow movement to a point outside the zone', () => {
@@ -4208,7 +4055,7 @@ describe('RequireDeployInZone Constraint Brain', () => {
 				moveType: DEPLOY,
 				player: GUEST,
 				tileType: TrifleTileCodes.Chrysanthemum,
-				endPoint: new NotationPoint('7,7')
+				endPoint: new NotationPoint('4,4')
 			}, false);
 
 			// Chrysanthemum is a flower, not a banner - should be allowed anywhere
@@ -4240,7 +4087,7 @@ describe('RequireDeployInZone Constraint Brain', () => {
 				moveType: DEPLOY,
 				player: GUEST,
 				tileType: TrifleTileCodes.Chrysanthemum,
-				endPoint: new NotationPoint('7,7')
+				endPoint: new NotationPoint('4,4')
 			}, false);
 
 			// Banner at distance 8 from (0,0) should be blocked (zone is 6)
@@ -4272,7 +4119,7 @@ describe('RequireDeployInZone Constraint Brain', () => {
 				moveType: DEPLOY,
 				player: GUEST,
 				tileType: TrifleTileCodes.Chrysanthemum,
-				endPoint: new NotationPoint('7,7')
+				endPoint: new NotationPoint('4,4')
 			}, false);
 
 			// Banner at distance 3 from (0,0) should be allowed (zone is 6)
@@ -4340,7 +4187,7 @@ describe('RequireDeployInZone Constraint Brain', () => {
 				moveType: DEPLOY,
 				player: GUEST,
 				tileType: TrifleTileCodes.Chrysanthemum,
-				endPoint: new NotationPoint('7,7')
+				endPoint: new NotationPoint('4,4')
 			}, false);
 
 			// Deploy constraints are global - apply to all players
@@ -4392,7 +4239,7 @@ describe('RequireDeployInZone Constraint Brain', () => {
 				moveType: DEPLOY,
 				player: GUEST,
 				tileType: TrifleTileCodes.Chrysanthemum,
-				endPoint: new NotationPoint('7,7')
+				endPoint: new NotationPoint('4,4')
 			}, false);
 
 			const guestBanner = new TrifleTile(TrifleTileCodes.WaterBanner, 'G');
