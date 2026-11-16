@@ -63,7 +63,16 @@ NickOptions.buildToggleViewAsGuestDiv = function() {
 		message = "Viewing board as Guest";
 		linkText = "View as Host";
 	}
-	div.innerHTML = message + ": <span class='skipBonus' onclick='gameController.toggleViewAsGuest();'>" + linkText + "</span>";
+	const textSpan = document.createElement("span");
+	textSpan.textContent = message + ": ";
+	div.appendChild(textSpan);
+
+	const toggleSpan = document.createElement("span");
+	toggleSpan.className = "skipBonus";
+	toggleSpan.textContent = linkText;
+	toggleSpan.addEventListener("click", () => gameController.toggleViewAsGuest());
+	div.appendChild(toggleSpan);
+
 	return div;
 };
 

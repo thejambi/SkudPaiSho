@@ -3542,7 +3542,9 @@ export function emailNotificationsCheckboxClicked() {
 /* export function showAccountSettings() {
 	let message = "Note: Email notifications are not working right now. Maybe in the future they will be back.<br />";
 
-	message += "<div><input id='emailNotificationsCheckbox' type='checkbox' onclick='emailNotificationsCheckboxClicked();'>Email Notifications</div>";
+	// NOTE: if re-enabled, attach emailNotificationsCheckboxClicked via addEventListener;
+	// inline onclick can't reach module-scoped functions.
+	message += "<div><input id='emailNotificationsCheckbox' type='checkbox'>Email Notifications</div>";
 
 	showModal("Settings", message);
 

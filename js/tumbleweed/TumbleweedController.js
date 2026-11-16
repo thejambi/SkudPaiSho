@@ -22,6 +22,7 @@ export class TumbleweedController {
 		}
 
 		this.actuator = new TumbleweedActuator(gameContainer, isMobile, this.getHostTilesContainerDivs(), this.getGuestTilesContainerDivs());
+		this.addTilePileClickListeners();
 
 		this.resetGameManager();
 		this.resetNotationBuilder();
@@ -67,12 +68,26 @@ export class TumbleweedController {
 
 	/* Required by Main */
 	getHostTilesContainerDivs() {
-		return "<div class='bloomsTileContainer'><div id='tumbleweedHostContainer' class='hexagon bloomsTilePileTile bloomsG1 " + this.additionalTilePileClass + "' name='H1' onclick='gameController.unplayedTileClicked(this)'><span></span></div></div>";
+		return "<div class='bloomsTileContainer'><div id='tumbleweedHostContainer' class='hexagon bloomsTilePileTile bloomsG1 " + this.additionalTilePileClass + "' name='H1'><span></span></div></div>";
 	}
 
 	/* Required by Main */
 	getGuestTilesContainerDivs() {
-		return "<div class='bloomsTileContainer'><div id='tumbleweedGuestContainer' class='hexagon bloomsTilePileTile bloomsH2 " + this.additionalTilePileClass + "' name='G1' onclick='gameController.unplayedTileClicked(this)'><span></span></div></div>";
+		return "<div class='bloomsTileContainer'><div id='tumbleweedGuestContainer' class='hexagon bloomsTilePileTile bloomsH2 " + this.additionalTilePileClass + "' name='G1'><span></span></div></div>";
+	}
+
+	/* Tile pile divs are built from HTML strings, so wire click handlers here
+	 * (inline onclick can't reach module-scoped gameController). */
+	addTilePileClickListeners() {
+		var tilePileDivs = [
+			this.actuator.hostTilesContainer.querySelector('#tumbleweedHostContainer'),
+			this.actuator.guestTilesContainer.querySelector('#tumbleweedGuestContainer')
+		];
+		tilePileDivs.forEach((tilePileDiv) => {
+			if (tilePileDiv) {
+				tilePileDiv.addEventListener('click', () => this.unplayedTileClicked(tilePileDiv));
+			}
+		});
 	}
 
 	/* Required by Main */
