@@ -47,6 +47,7 @@ import { TrifleAbilityName, TrifleAbilityTriggerType, TrifleAttributeType, Trifl
 import { setCurrentTileMetadata, setCurrentTileCodes } from '../js/trifle/PaiShoGamesTileMetadata';
 import { TrifleTiles } from '../js/trifle/TrifleTileInfo';
 import { TrifleTile } from '../js/trifle/TrifleTile';
+import { POSSIBLE_MOVE } from '../js/skud-pai-sho/SkudPaiShoBoardPoint';
 
 // Initialize tile metadata
 defineTrifleTiles();
@@ -3270,5 +3271,180 @@ describe('Snow Wolf - Avenge Fallen Ally', () => {
 
 		const originalPointRc = new NotationPoint('1,4').rowAndColumn;
 		expect(gameManager.board.cells[originalPointRc.row][originalPointRc.col].hasTile()).toBe(false);
+	});
+});
+
+/**
+ * Cancel abilities can't be canceled. Edelweiss and Buffalo Yak can each cancel the
+ * other, which used to resolve by board scan order: whichever tile was scanned first won.
+ * Both positions below come from a bug report. In each, Guest's Cherry Blossom protects
+ * the Air Banner, and Host's Buffalo Yak cancels the Cherry Blossom, so the Yak can
+ * capture the banner no matter where the Edelweiss sits.
+ */
+describe('Cancel abilities cannot be canceled', () => {
+	const owners = {
+		[TrifleTileCodes.Edelweiss]: GUEST,
+		[TrifleTileCodes.AirBanner]: GUEST,
+		[TrifleTileCodes.CherryBlossom]: GUEST,
+		[TrifleTileCodes.BuffaloYak]: HOST,
+		[TrifleTileCodes.WaterBanner]: HOST
+	};
+	const deployOrders = {
+		'Edelweiss deployed first': [TrifleTileCodes.AirBanner, TrifleTileCodes.WaterBanner, TrifleTileCodes.CherryBlossom, TrifleTileCodes.Edelweiss, TrifleTileCodes.BuffaloYak],
+		'Buffalo Yak deployed first': [TrifleTileCodes.AirBanner, TrifleTileCodes.WaterBanner, TrifleTileCodes.CherryBlossom, TrifleTileCodes.BuffaloYak, TrifleTileCodes.Edelweiss]
+	};
+	/* Figure a: Edelweiss is out of range of the Cherry Blossom (distance 3) and is scanned before the Yak. */
+	const figureA = {
+		[TrifleTileCodes.Edelweiss]: '-3,0',
+		[TrifleTileCodes.AirBanner]: '-2,-1',
+		[TrifleTileCodes.CherryBlossom]: '-1,-1',
+		[TrifleTileCodes.BuffaloYak]: '-1,0',
+		[TrifleTileCodes.WaterBanner]: '0,1'
+	};
+	/* Figure b: Edelweiss sits next to the Yak and is scanned after it. */
+	const figureB = Object.assign({}, figureA, { [TrifleTileCodes.Edelweiss]: '0,0' });
+
+	function setUpPosition(positions, deployOrder) {
+		const gameManager = new TrifleGameManager({ actuate: vi.fn() }, true, true);
+		Object.keys(owners).forEach(code => addTilesToTeam(gameManager, owners[code], [code]));
+		deployOrder.forEach(code => {
+			gameManager.runNotationMove({
+				moveType: DEPLOY,
+				player: owners[code],
+				tileType: code,
+				endPoint: new NotationPoint(positions[code])
+			}, false);
+		});
+		const pointOf = code => gameManager.board.getPointFromNotationPoint(new NotationPoint(positions[code]));
+		return { gameManager, abilityManager: gameManager.board.abilityManager, pointOf };
+	}
+
+	function yakCanCaptureAirBanner({ gameManager, pointOf }) {
+		gameManager.board.setPossibleMovePoints(pointOf(TrifleTileCodes.BuffaloYak));
+		const canCapture = pointOf(TrifleTileCodes.AirBanner).isType(POSSIBLE_MOVE);
+		gameManager.board.removePossibleMovePoints();
+		return canCapture;
+	}
+
+	Object.entries({ 'figure a': figureA, 'figure b': figureB }).forEach(([figureName, positions]) => {
+		Object.entries(deployOrders).forEach(([orderName, deployOrder]) => {
+			describe(`${figureName}, ${orderName}`, () => {
+				it('keeps the Buffalo Yak cancel active and cancels the Cherry Blossom', () => {
+					const position = setUpPosition(positions, deployOrder);
+					const { abilityManager, pointOf } = position;
+					const yakCancels = abilityManager.getActiveAbilitiesFromTile(
+						TrifleAbilityName.cancelAbilities, pointOf(TrifleTileCodes.BuffaloYak).tile);
+					expect(yakCancels.length).toBe(1);
+					expect(abilityManager.abilityIsCanceled(yakCancels[0])).toBe(false);
+					expect(abilityManager.abilityTargetingTileExists(
+						TrifleAbilityName.cancelAbilities, pointOf(TrifleTileCodes.CherryBlossom).tile)).toBe(true);
+				});
+
+				it('keeps the Edelweiss cancel active even though the Buffalo Yak targets it', () => {
+					const { abilityManager, pointOf } = setUpPosition(positions, deployOrder);
+					const edelweissCancels = abilityManager.getActiveAbilitiesFromTile(
+						TrifleAbilityName.cancelAbilities, pointOf(TrifleTileCodes.Edelweiss).tile);
+					expect(edelweissCancels.length).toBe(1);
+					expect(abilityManager.abilityIsCanceled(edelweissCancels[0])).toBe(false);
+				});
+
+				it('leaves the Air Banner unprotected so the Buffalo Yak can capture it', () => {
+					const position = setUpPosition(positions, deployOrder);
+					expect(position.abilityManager.abilityTargetingTileExists(
+						TrifleAbilityName.protectFromCapture, position.pointOf(TrifleTileCodes.AirBanner).tile)).toBe(false);
+					expect(yakCanCaptureAirBanner(position)).toBe(true);
+				});
+			});
+		});
+	});
+
+	it('still cancels non-cancel abilities: Edelweiss cancels the Air Banner bonus movement', () => {
+		const bonusFromAirBanner = ({ abilityManager, pointOf }) => abilityManager.getActiveAbilitiesFromTile(
+			TrifleAbilityName.grantBonusMovement, pointOf(TrifleTileCodes.AirBanner).tile);
+
+		// Control: without the Edelweiss on the board, the bonus movement is active
+		const withoutEdelweiss = setUpPosition(figureA, [TrifleTileCodes.AirBanner, TrifleTileCodes.WaterBanner]);
+		expect(bonusFromAirBanner(withoutEdelweiss).length).toBe(1);
+
+		// Figure a: the Air Banner is in the Edelweiss zone, so its bonus movement is canceled
+		const withEdelweiss = setUpPosition(figureA, deployOrders['Edelweiss deployed first']);
+		expect(bonusFromAirBanner(withEdelweiss).length).toBe(0);
+	});
+});
+
+/**
+ * Abilities marked `inevitable` can't be canceled. Sunflower's growGigantic is an inherent
+ * property of the tile, and the banner capture restrictions are game rules, so an Edelweiss
+ * (which cancels the abilities of every other tile in its zone) must not switch them off.
+ */
+describe('Inevitable abilities cannot be canceled', () => {
+	function deploy(gameManager, player, tileCode, point) {
+		addTilesToTeam(gameManager, player, [tileCode]);
+		gameManager.runNotationMove({
+			moveType: DEPLOY,
+			player: player,
+			tileType: tileCode,
+			endPoint: new NotationPoint(point)
+		}, false);
+		return gameManager.board.getPointFromNotationPoint(new NotationPoint(point));
+	}
+
+	function newGame() {
+		return new TrifleGameManager({ actuate: vi.fn() }, true, true);
+	}
+
+	describe('Sunflower growGigantic', () => {
+		it('grows gigantic when no Edelweiss is nearby (control)', () => {
+			const gameManager = newGame();
+			const sunflowerPoint = deploy(gameManager, HOST, TrifleTileCodes.Sunflower, '1,1');
+			expect(sunflowerPoint.tile.isGigantic).toBe(true);
+			expect(sunflowerPoint.otherPointsOccupied.length).toBe(3);
+		});
+
+		it('still grows gigantic when deployed inside an enemy Edelweiss zone', () => {
+			const gameManager = newGame();
+			deploy(gameManager, GUEST, TrifleTileCodes.Edelweiss, '0,0');
+			const sunflowerPoint = deploy(gameManager, HOST, TrifleTileCodes.Sunflower, '1,1');
+			expect(sunflowerPoint.tile.isGigantic).toBe(true);
+			expect(sunflowerPoint.otherPointsOccupied.length).toBe(3);
+		});
+
+		it('stays gigantic when an enemy Edelweiss is deployed next to it afterward', () => {
+			const gameManager = newGame();
+			const sunflowerPoint = deploy(gameManager, HOST, TrifleTileCodes.Sunflower, '1,1');
+			deploy(gameManager, GUEST, TrifleTileCodes.Edelweiss, '-1,1');
+			const growAbilities = gameManager.board.abilityManager.getActiveAbilitiesFromTile(
+				TrifleAbilityName.growGigantic, sunflowerPoint.tile);
+			// The board scan sees the 2x2 tile on all 4 points; the seated point's ability is the one that grows it
+			const seatedGrowAbility = growAbilities.find(ability => ability.sourceTilePoint === sunflowerPoint);
+			expect(seatedGrowAbility).toBeDefined();
+			expect(gameManager.board.abilityManager.abilityIsCanceled(seatedGrowAbility)).toBe(false);
+			expect(sunflowerPoint.tile.isGigantic).toBe(true);
+			expect(sunflowerPoint.otherPointsOccupied.length).toBe(3);
+		});
+	});
+
+	describe('Banner capture restriction game rule', () => {
+		function buffaloYakCanCaptureAt(gameManager, yakPoint, targetPoint) {
+			gameManager.board.setPossibleMovePoints(yakPoint);
+			const canCapture = targetPoint.isType(POSSIBLE_MOVE);
+			gameManager.board.removePossibleMovePoints();
+			return canCapture;
+		}
+
+		it('blocks capturing a flower before the friendly Banner is deployed (control)', () => {
+			const gameManager = newGame();
+			const yakPoint = deploy(gameManager, HOST, TrifleTileCodes.BuffaloYak, '0,0');
+			const lavenderPoint = deploy(gameManager, GUEST, TrifleTileCodes.Lavender, '1,0');
+			expect(buffaloYakCanCaptureAt(gameManager, yakPoint, lavenderPoint)).toBe(false);
+		});
+
+		it('still blocks it when the capturing tile is inside an enemy Edelweiss zone', () => {
+			const gameManager = newGame();
+			deploy(gameManager, GUEST, TrifleTileCodes.Edelweiss, '-2,0');
+			const yakPoint = deploy(gameManager, HOST, TrifleTileCodes.BuffaloYak, '0,0');
+			const lavenderPoint = deploy(gameManager, GUEST, TrifleTileCodes.Lavender, '1,0');
+			expect(buffaloYakCanCaptureAt(gameManager, yakPoint, lavenderPoint)).toBe(false);
+		});
 	});
 });

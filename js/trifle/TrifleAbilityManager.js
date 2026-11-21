@@ -5,6 +5,7 @@ import {
   TrifleAbilitiesForType,
   TrifleAbilityName,
   TrifleAbilityType,
+  TrifleTileInfo,
   TrifleTileTeam
 } from './TrifleTileInfo';
 import { debug } from '../GameData';
@@ -389,7 +390,7 @@ export class TrifleAbilityManager {
 					&& ability.abilityTargetsTile(tile)) {
 				// Check if targeting is canceled (e.g., by Elderberry's Antidote Aura)
 				// Also check if the ability itself is canceled (e.g., source tile in Edelweiss zone)
-				if (!self.targetingIsCanceled(ability.sourceTile, abilityName, tile)
+				if (!self.abilityTargetingIsCanceled(ability, tile)
 						&& !self.abilityIsCanceled(ability)) {
 					targetsTile = true;
 				}
@@ -436,6 +437,10 @@ export class TrifleAbilityManager {
 	}
 
 	abilityIsCanceled(abilityObject) {
+		if (TrifleTileInfo.abilityIsUncancelable(abilityObject.abilityInfo)) {
+			return false;
+		}
+
 		let isCanceled = false;
 
 		const affectingCancelAbilities = this.getAbilitiesTargetingTile(TrifleAbilityName.cancelAbilities, abilityObject.sourceTile);
@@ -457,6 +462,17 @@ export class TrifleAbilityManager {
 		});
 
 		return isCanceled;
+	}
+
+	/**
+	 * Whether a target-side shield (cancelAbilitiesTargetingTiles) blocks this ability from
+	 * affecting the tile. Inevitable abilities can't be blocked.
+	 */
+	abilityTargetingIsCanceled(ability, possibleTargetTile) {
+		if (ability.abilityInfo.inevitable) {
+			return false;
+		}
+		return this.targetingIsCanceled(ability.sourceTile, ability.abilityType, possibleTargetTile);
 	}
 
 	targetingIsCanceled(abilitySourceTile, abilityType, possibleTargetTile) {
@@ -545,7 +561,7 @@ export class TrifleAbilityManager {
 			const abilities = this.getAbilitiesTargetingTile(abilityName, tile);
 			abilities.forEach((ability) => {
 				// Skip abilities whose targeting is canceled (e.g., by Ginseng protection)
-				if (this.targetingIsCanceled(ability.sourceTile, ability.abilityType, tile)
+				if (this.abilityTargetingIsCanceled(ability, tile)
 						|| this.abilityIsCanceled(ability)) {
 					return;
 				}

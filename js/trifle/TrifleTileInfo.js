@@ -379,6 +379,20 @@ TrifleTileInfo.tileAbilityIsTriggeredWhenCaptured = function(tileAbilityInfo) {
 	return isTriggeredWhenCaptured;
 };
 
+/**
+ * Whether an ability can never be canceled by `cancelAbilities`. Two cases:
+ * - Abilities marked `inevitable: true`: inherent tile properties (e.g. Sunflower's
+ *   growGigantic) and game rules (e.g. the banner capture restrictions).
+ * - Cancel abilities themselves. Without this rule, two cancel tiles in range of each
+ *   other (e.g. Edelweiss and Buffalo Yak) would have no consistent resolution, and the
+ *   outcome would depend on board scan order.
+ */
+TrifleTileInfo.abilityIsUncancelable = function(abilityInfo) {
+	return !!abilityInfo.inevitable
+		|| abilityInfo.type === TrifleAbilityName.cancelAbilities
+		|| abilityInfo.type === TrifleAbilityName.cancelAbilitiesTargetingTiles;
+};
+
 /* TODO Does not belong in 'TileInfo' space? */
 TrifleTileInfo.abilityIsCategory = function(abilityObject, abilityCategory) {
 	return TrifleAbilitiesByCategory[abilityCategory] 
